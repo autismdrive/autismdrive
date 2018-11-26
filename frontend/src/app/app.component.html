@@ -1,4 +1,6 @@
-<mat-toolbar>
+<mat-toolbar
+  *ngIf="!hideHeader"
+>
   <mat-toolbar-row>
     <img
       src="/assets/logo/STAR_DRIVE-logomark.svg"
@@ -14,7 +16,7 @@
     <button
       mat-button
       *ngIf="!session"
-      (click)="goLogin($event)"
+      (click)="goRegister($event)"
       id="register-button"
     >
       <mat-icon>account_circle</mat-icon>
