@@ -27,7 +27,39 @@
 
   <mat-toolbar-row>
     <app-logo></app-logo>
+    <div
+      class="nav"
+      fxLayout="column"
+    >
     <h1>STAR Drive</h1>
+      <div>
+        <button
+          mat-button
+          (click)="goEnroll($event)"
+          id="enroll-button"
+        >
+          Enroll in a study
+        </button>
+        <button
+          mat-button
+          (click)="goStudies($event)"
+          id="studies-button"
+        >
+          Current studies
+        </button>
+        <button
+          mat-button
+          (click)="goResources($event)"
+          id="resources-button"
+        >
+          Training & Resources
+        </button>
+      </div>
+    </div>
+  </mat-toolbar-row>
+
+  <mat-toolbar-row>
+
   </mat-toolbar-row>
 
 </mat-toolbar>

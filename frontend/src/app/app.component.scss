@@ -15,6 +15,13 @@ mat-toolbar {
     .mat-divider-vertical {
       color: white;
     }
+
+    .nav {
+      button {
+        background-color: transparent;
+        border: transparent;
+      }
+    }
   }
   .menubar {
     color: #777777;
