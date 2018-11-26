@@ -1,8 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormioModule } from 'angular-formio';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
-import { MatIconModule, MatToolbarModule} from '@angular/material';
+import { MatButtonModule, MatCardModule, MatIconModule, MatToolbarModule} from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -23,8 +23,10 @@ import { RegisterComponent } from './register/register.component';
   imports: [
     AppRoutingModule,
     BrowserModule,
-    FormioModule,
+    FlexLayoutModule,
     HttpClientModule,
+    MatButtonModule,
+    MatCardModule,
     MatIconModule,
     MatToolbarModule
   ],
