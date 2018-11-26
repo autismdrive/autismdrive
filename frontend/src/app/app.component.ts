@@ -24,4 +24,14 @@ export class AppComponent {
       }
     });
   }
+
+  goLogin($event) {
+    $event.preventDefault();
+    this.router.navigate(['login']);
+  }
+
+  goRegister($event) {
+    $event.preventDefault();
+    this.router.navigate(['register']);
+  }
 }

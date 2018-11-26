@@ -1,14 +1,6 @@
 <mat-toolbar
   *ngIf="!hideHeader"
 >
-  <mat-toolbar-row>
-    <img
-      src="/assets/logo/STAR_DRIVE-logomark.svg"
-      alt="STARDrive"
-      class="logo"
-    />
-    <h1>STAR Drive</h1>
-  </mat-toolbar-row>
   <mat-toolbar-row
     class="menubar"
   >
@@ -32,6 +24,12 @@
       Sign in
     </button>
   </mat-toolbar-row>
+
+  <mat-toolbar-row>
+    <app-logo></app-logo>
+    <h1>STAR Drive</h1>
+  </mat-toolbar-row>
+
 </mat-toolbar>
 <div class="content">
   <router-outlet></router-outlet>

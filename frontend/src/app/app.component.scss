@@ -1,6 +1,6 @@
 
 mat-toolbar {
-  padding: 2%;
+  padding: 0 0 5% 0;
 
   mat-toolbar-row {
     a {
@@ -20,6 +20,10 @@ mat-toolbar {
     color: #777777;
     font-size: 12px;
     background-color: transparent;
+  }
+
+  button {
+    margin: 1em;
   }
 
   img {
