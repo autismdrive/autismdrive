@@ -1,0 +1,49 @@
+<mat-toolbar>
+  <mat-toolbar-row
+    class="menubar"
+  >
+    <span class="fill-remaining-space"></span>
+    <!--<button-->
+      <!--mat-button-->
+      <!--*appIsAdmin-->
+      <!--(click)="goUserAdmin($event)"-->
+    <!--&gt;-->
+      <!--<mat-icon>person_add</mat-icon>-->
+      <!--User Administration-->
+    <!--</button>-->
+    <button
+      mat-button
+      *ngIf="!session"
+      (click)="goLogin($event)"
+      id="login-button"
+    >
+      <mat-icon>account_circle</mat-icon>
+      Log in
+    </button>
+    <!--<button-->
+      <!--mat-button-->
+      <!--*ngIf="session"-->
+      <!--(click)="goHome($event)"-->
+    <!--&gt;-->
+      <!--<mat-icon>account_circle</mat-icon>-->
+      <!--{{session.display_name}}-->
+    <!--</button>-->
+    <!--<button-->
+      <!--mat-button-->
+      <!--*ngIf="session"-->
+      <!--(click)="goLogout($event)"-->
+    <!--&gt;-->
+      <!--<mat-icon>exit_to_app</mat-icon>-->
+      <!--Log Out-->
+    <!--</button>-->
+  </mat-toolbar-row>
+</mat-toolbar>
+<div style="text-align:center">
+  <h1>
+    Welcome to STAR Drive!
+  </h1>
+</div>
+<div class="content">
+  <router-outlet></router-outlet>
+</div>
+

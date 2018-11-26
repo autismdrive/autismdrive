@@ -1,0 +1,17 @@
+
+mat-toolbar {
+  mat-toolbar-row {
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .fill-remaining-space {
+      flex: 1 1 auto;
+    }
+
+    .mat-divider-vertical {
+      color: white;
+    }
+  }
+}
