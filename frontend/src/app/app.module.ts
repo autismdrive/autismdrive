@@ -10,13 +10,15 @@ import { HomeComponent } from './home/home.component';
 import { ApiService } from './api.service';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     LoginComponent,
-    LogoComponent
+    LogoComponent,
+    RegisterComponent
   ],
   imports: [
     AppRoutingModule,
