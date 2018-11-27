@@ -6,19 +6,25 @@ import { MatButtonModule, MatCardModule, MatIconModule, MatToolbarModule} from '
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
 import { ApiService } from './api.service';
+import { EnrollComponent } from './enroll/enroll.component';
+import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
 import { RegisterComponent } from './register/register.component';
+import { ResourcesComponent } from './resources/resources.component';
+import { StudiesComponent } from './studies/studies.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    EnrollComponent,
     HomeComponent,
     LoginComponent,
     LogoComponent,
-    RegisterComponent
+    RegisterComponent,
+    ResourcesComponent,
+    StudiesComponent
   ],
   imports: [
     AppRoutingModule,

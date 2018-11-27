@@ -34,4 +34,19 @@ export class AppComponent {
     $event.preventDefault();
     this.router.navigate(['register']);
   }
+
+  goEnroll($event) {
+    $event.preventDefault();
+    this.router.navigate(['enroll']);
+  }
+
+  goStudies($event) {
+    $event.preventDefault();
+    this.router.navigate(['studies']);
+  }
+
+  goResources($event) {
+    $event.preventDefault();
+    this.router.navigate(['resources']);
+  }
 }

@@ -11,8 +11,18 @@
 >
   <p>Join thousands of patients and families in understanding and investigating autism.</p>
   <div>
-    <button mat-button>Enroll in a study</button>
-    <button mat-button>Find autism support</button>
+    <button
+      mat-button
+      (click)="goEnroll($event)"
+    >
+      Enroll in a study
+    </button>
+    <button
+      mat-button
+      (click)="goResources($event)"
+    >
+      Find autism support
+    </button>
   </div>
 </div>
 <div
