@@ -31,6 +31,7 @@ export class LoginComponent implements OnInit {
   }
 
   goForgotPassword($event) {
-    console.log('forgot password!')
+    $event.preventDefault();
+    this.router.navigate(['forgot-password']);
   }
 }

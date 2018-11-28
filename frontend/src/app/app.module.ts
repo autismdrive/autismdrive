@@ -14,6 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ApiService } from './api.service';
 import { EnrollComponent } from './enroll/enroll.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
@@ -27,6 +28,7 @@ import { TermsComponent } from './terms/terms.component';
   declarations: [
     AppComponent,
     EnrollComponent,
+    ForgotPasswordComponent,
     HomeComponent,
     LoginComponent,
     LogoComponent,
