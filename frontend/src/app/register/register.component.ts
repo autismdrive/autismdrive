@@ -19,4 +19,9 @@ export class RegisterComponent implements OnInit {
     $event.preventDefault();
     this.router.navigate(['home']);
   }
+
+  goProfile($event) {
+    $event.preventDefault();
+    this.router.navigate(['profile']);
+  }
 }

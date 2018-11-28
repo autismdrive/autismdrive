@@ -21,7 +21,8 @@ export class LoginComponent implements OnInit {
   }
 
   goProfile($event) {
-    console.log('user profile!')
+    $event.preventDefault();
+    this.router.navigate(['profile']);
   }
 
   goTerms($event) {
