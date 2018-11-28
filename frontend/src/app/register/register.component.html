@@ -1,13 +1,35 @@
 <div
-  class="container mat-typography"
+  class="container"
   fxLayout="row"
   fxLayout.xs="column"
   fxLayoutWrap
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
 >
-  <div fxFlex="50%">
+  <div class="form" fxFlex="60%">
     <app-logo></app-logo>
-    <h1>Register Here</h1>
+    <h1>Create a STAR DRIVE Account</h1>
+    <!--<app-register-form></app-register-form>-->
+    <h3>First Name</h3>
+    <h3>Last Name</h3>
+    <h3>Email Address</h3>
+    <h3>Password</h3>
+    <div fxLayout="row" fxLayoutGap="2%" fxLayoutAlign="center center">
+      <button mat-button (click)="goHome($event)">Cancel</button>
+      <button mat-button>Next</button>
+    </div>
+  </div>
+  <div fxFlex="30%">
+    <h3>Why do I need an account?</h3>
+    <p>Explain what STAR will do with the information the user will provide.
+      Lorem ipsum nec eu netus varius luctus curabitur, eros sem varius leo
+      himenaeos justo consequat purus, lorem luctus interdum amet sed
+      ultricies lacinia habitant lorem hendrerit pellentesque magna cursus
+      aliquet fames duis.</p>
+    <h3>What you'll get</h3>
+    <p>List the benefits of creating a STAR DRIVE account, both to the specific
+      user and to the community at large. Amet aliquam sit tempus neque
+      adipiscing luctus eros metus, dui sapien eros per nibh porta tortor,
+      aliquam curae sociosqu magna porta molestie feugiat.</p>
   </div>
 </div>
