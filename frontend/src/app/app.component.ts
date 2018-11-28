@@ -30,9 +30,9 @@ export class AppComponent {
     this.router.navigate(['login']);
   }
 
-  goRegister($event) {
+  goTerms($event) {
     $event.preventDefault();
-    this.router.navigate(['register']);
+    this.router.navigate(['terms']);
   }
 
   goEnroll($event) {

@@ -14,6 +14,7 @@ import { LogoComponent } from './logo/logo.component';
 import { RegisterComponent } from './register/register.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { StudiesComponent } from './studies/studies.component';
+import { TermsComponent } from './terms/terms.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { StudiesComponent } from './studies/studies.component';
     LogoComponent,
     RegisterComponent,
     ResourcesComponent,
-    StudiesComponent
+    StudiesComponent,
+    TermsComponent
   ],
   imports: [
     AppRoutingModule,
