@@ -1,13 +1,34 @@
 <div
   class="container mat-typography"
   fxLayout="row"
-  fxLayout.xs="column"
   fxLayoutWrap
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
 >
-  <div fxFlex="50%">
+  <div
+    class="form"
+    fxFlex="50%"
+    fxFlex.xs="90%"
+  >
     <app-logo></app-logo>
-    <h1>Login Here</h1>
+    <!--<app-login-form></app-login-form>-->
+    <h3>Email Address:</h3>
+    <h3>Password:</h3>
+    <div
+      fxLayout="column"
+      fxLayoutGap="2%"
+      fxLayoutAlign="center"
+    >
+      <button mat-button (click)="goProfile($event)">Submit</button>
+      <button mat-button (click)="goHome($event)">Cancel</button>
+      <div
+        class="footer"
+        fxLayout="row"
+        fxLayoutAlign="space-between"
+      >
+        <button mat-button (click)="goTerms($event)">Create account</button>
+        <button mat-button (click)="goForgotPassword($event)">Forgot password?</button>
+      </div>
+    </div>
   </div>
 </div>
