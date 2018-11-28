@@ -1,26 +1,12 @@
 
 mat-toolbar {
   padding: 0 0 5% 0;
+  background-color: white;
 
   mat-toolbar-row {
     a {
       text-decoration: none;
       color: inherit;
-    }
-
-    .fill-remaining-space {
-      flex: 1 1 auto;
-    }
-
-    .mat-divider-vertical {
-      color: white;
-    }
-
-    .nav {
-      button {
-        background-color: transparent;
-        border: transparent;
-      }
     }
   }
   .menubar {
@@ -31,16 +17,5 @@ mat-toolbar {
 
   button {
     margin: 1em;
-  }
-
-  img {
-    &.logo {
-      //margin: 20px;
-      padding-top: 60px;
-      padding-bottom: 50px;
-      height: 100px;
-      max-height: 100px;
-      background-color: white;
-    }
   }
 }
