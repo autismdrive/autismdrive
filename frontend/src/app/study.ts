@@ -2,7 +2,6 @@
 export interface Study {
   id: number;
   title: string;
-  type: string;
   description: string;
   researcherDescription: string;
   participantDescription: string;
@@ -10,7 +9,8 @@ export interface Study {
   enrollmentDate: string;
   currentEnrolled: number;
   totalParticipants: number;
-  studyDates: string;
+  studyStart: string;
+  studyEnd: string;
   categories: string[];
   status?: string;
 }

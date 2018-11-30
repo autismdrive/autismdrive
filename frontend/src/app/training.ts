@@ -2,8 +2,9 @@
 export interface Training {
   id: number;
   title: string;
-  type: string;
   description: string;
   outcomes: string;
+  image: string;
+  imageCaption: string;
   status?: string;
 }

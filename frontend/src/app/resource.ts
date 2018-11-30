@@ -2,12 +2,16 @@
 export interface Resource {
   id: number;
   title: string;
-  type: string;
   description: string;
   image: string;
   imageCaption: string;
   organization: string;
-  address: string;
+  streetAddress1: string;
+  streetAddress2: string;
+  city: string;
+  state: string;
+  zip: string;
+  county: string;
   phone: string;
   website: string;
   categories: string[];
