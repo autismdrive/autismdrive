@@ -3,7 +3,7 @@ import datetime
 from app import db
 
 
-class StarResource(db.model):
+class StarResource(db.Model):
     __tablename__ = 'resource'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)

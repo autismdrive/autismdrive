@@ -1,4 +1,4 @@
-id,email_address,display_name,password,role
-1,daniel.h.funk@gmail.com,Dan Funk,dfunk7,Admin
-2,eleanorcjkgraham@gmail.com,Eleanor Graham,egraham4,Admin
-3,ajlouie@gmail.com,Aaron Louie,alouie2,Admin
+id,email,first_name,last_name,password,role
+1,daniel.h.funk@gmail.com,Dan,Funk,dfunk7,Admin
+2,eleanorcjkgraham@gmail.com,Eleanor,Graham,egraham4,Admin
+3,ajlouie@gmail.com,Aaron,Louie,alouie2,Admin

@@ -3,7 +3,7 @@ import datetime
 from app import db
 
 
-class Study(db.model):
+class Study(db.Model):
     __tablename__ = 'study'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
@@ -13,9 +13,10 @@ class Study(db.model):
     participant_description = db.Column(db.String)
     outcomes = db.Column(db.String)
     enrollment_date = db.Column(db.DateTime)
-    # current_enrolled = db.Column(db.Number) // change this to a count of related users?
-    total_participants = db.Column(db.Number)
+    current_enrolled = db.Column(db.Integer)
+    total_participants = db.Column(db.Integer)
     study_start = db.Column(db.DateTime)
     study_end = db.Column(db.DateTime)
 
     # need to add in related categories as well (perhaps a related model?)
+    # we'll change current_enrolled to a count of related participants if that's how we connect things.
