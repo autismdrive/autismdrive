@@ -9,7 +9,7 @@ from app.resources.TrainingEndpoint import TrainingListEndpoint, TrainingEndpoin
 from app.resources.UserEndpoint import UserListEndpoint, UserEndpoint
 
 
-class IThrivApi(flask_restful.Api):
+class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
     # properly handles the RestException status.
     def handle_error(self, e):
@@ -19,7 +19,7 @@ class IThrivApi(flask_restful.Api):
 
 
 api_blueprint = Blueprint("api", __name__, url_prefix='/api')
-api = IThrivApi(api_blueprint)
+api = StarDriveApi(api_blueprint)
 app.register_blueprint(api_blueprint)
 
 parser = flask_restful.reqparse.RequestParser()
