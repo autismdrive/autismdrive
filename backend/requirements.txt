@@ -1,4 +1,4 @@
-Flask==0.12.3
+Flask==0.12.4
 Flask-RESTful==0.3.6
 marshmallow==2.15.1
 Flask-Marshmallow==0.7.0
