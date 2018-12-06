@@ -179,6 +179,52 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["title"], 'Fantastic Study')
         self.assertEqual(response["description"], 'A study that will go down in history')
 
+    def test_modify_study_basics(self):
+        self.construct_study()
+        s = db.session.query(Study).first()
+        self.assertIsNotNone(s)
+        s_id = s.id
+        rv = self.app.get('/api/study/%i' % s_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['outcomes'] = 'Better fluids for you and your car, Duh.'
+        response['total_participants'] = '2'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/study/%i' % s_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['outcomes'], 'Better fluids for you and your car, Duh.')
+        self.assertEqual(response['total_participants'], 2)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_study(self):
+        s = self.construct_study()
+        s_id = s.id
+        rv = self.app.get('api/study/%i' % s_id, content_type="applicaiton/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/study/%i' % s_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/study/%i' % s_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_study(self):
+        study = {'title':"Study of Studies", 'outcomes':"This study will change your life."}
+        rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Study of Studies')
+        self.assertEqual(response['outcomes'], 'This study will change your life.')
+        self.assertIsNotNone(response['id'])
+
     def test_training_basics(self):
         self.construct_training()
         t = db.session.query(Training).first()
