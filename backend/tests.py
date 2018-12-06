@@ -298,3 +298,50 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["id"], u_id)
         self.assertEqual(response["first_name"], 'Stan')
         self.assertEqual(response["email"], 'stan@staunton.com')
+
+    def test_modify_user_basics(self):
+        self.construct_user()
+        u = db.session.query(User).first()
+        self.assertIsNotNone(u)
+        u_id = u.id
+        rv = self.app.get('/api/user/%i' % u_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['last_name'] = 'Lemonado'
+        response['role'] = 'Owner'
+        response['email'] = 'ed@edwardos.com'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/user/%i' % u_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/user/%i' % u_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['last_name'], 'Lemonado')
+        self.assertEqual(response['role'], 'Owner')
+        self.assertEqual(response['email'], 'ed@edwardos.com')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_user(self):
+        u = self.construct_user()
+        u_id = u.id
+        rv = self.app.get('api/user/%i' % u_id, content_type="applicaiton/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/user/%i' % u_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/user/%i' % u_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_user(self):
+        user = {'first_name':"Tarantella", 'last_name':"Arachnia", 'role':"Widow", 'email':"tara@spiders.org"}
+        rv = self.app.post('api/user', data=json.dumps(user), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Tarantella')
+        self.assertEqual(response['last_name'], 'Arachnia')
+        self.assertEqual(response['role'], 'Widow')
+        self.assertIsNotNone(response['id'])

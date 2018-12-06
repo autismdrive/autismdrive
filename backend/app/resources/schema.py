@@ -29,5 +29,5 @@ class TrainingSchema(ModelSchema):
 class UserSchema(ModelSchema):
     class Meta:
         model = User
-        fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password')
+        fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password', 'role')
     password = fields.String(load_only=True)
