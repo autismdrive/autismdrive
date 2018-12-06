@@ -239,6 +239,52 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["title"], 'Best Training')
         self.assertEqual(response["description"], 'A training to end all trainings')
 
+    def test_modify_training_basics(self):
+        self.construct_training()
+        t = db.session.query(Training).first()
+        self.assertIsNotNone(t)
+        t_id = t.id
+        rv = self.app.get('/api/training/%i' % t_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['outcomes'] = 'Better fluids for you and your car, Duh.'
+        response['image_caption'] = 'A nice cool glass of lemonade'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/training/%i' % t_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/training/%i' % t_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['outcomes'], 'Better fluids for you and your car, Duh.')
+        self.assertEqual(response['image_caption'], 'A nice cool glass of lemonade')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_training(self):
+        t = self.construct_training()
+        t_id = t.id
+        rv = self.app.get('api/training/%i' % t_id, content_type="applicaiton/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/training/%i' % t_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/training/%i' % t_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_training(self):
+        training = {'title':"Training of Trainings", 'outcomes':"This training will change your life."}
+        rv = self.app.post('api/training', data=json.dumps(training), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Training of Trainings')
+        self.assertEqual(response['outcomes'], 'This training will change your life.')
+        self.assertIsNotNone(response['id'])
+
     def test_user_basics(self):
         self.construct_user()
         u = db.session.query(User).first()
