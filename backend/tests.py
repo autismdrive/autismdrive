@@ -117,6 +117,54 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["title"], 'A+ Resource')
         self.assertEqual(response["description"], 'A delightful Resource destined to create rejoicing')
 
+    def test_modify_resource_basics(self):
+        self.construct_resource()
+        r = db.session.query(StarResource).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/resource/%i' % r_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['website'] = 'http://sartography.com'
+        response['county'] = 'Rockingbridge'
+        response['image_caption'] = 'Daniel GG Dog Da Funk-a-funka'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/resource/%i' % r_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/resource/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['website'], 'http://sartography.com')
+        self.assertEqual(response['county'], 'Rockingbridge')
+        self.assertEqual(response['image_caption'], 'Daniel GG Dog Da Funk-a-funka')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_resource(self):
+        r = self.construct_resource()
+        r_id = r.id
+        rv = self.app.get('api/resource/%i' % r_id, content_type="applicaiton/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_resource(self):
+        resource = {'title':"Resource of Resources", 'description':"You need this resource in your life."}
+        rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Resource of Resources')
+        self.assertEqual(response['description'], 'You need this resource in your life.')
+        self.assertIsNotNone(response['id'])
+
     def test_study_basics(self):
         self.construct_study()
         s = db.session.query(Study).first()
