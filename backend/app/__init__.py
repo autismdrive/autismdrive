@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import click
+from flask_marshmallow import Marshmallow
 
 from app.rest_exception import RestException
 
@@ -17,11 +18,38 @@ app.config.from_pyfile('config.py')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Password Encryption
-bcrypt = Bcrypt(app)
+# Flask-Marshmallow provides HATEOAS links
+ma = Marshmallow(app)
 
 # Database Migrations
 migrate = Migrate(app, db)
+
+# Password Encryption
+bcrypt = Bcrypt(app)
+
+# Constructing for a problem when building urls when the id is null.
+# there is a fix in the works for this, see
+# https://github.com/kids-first/kf-api-dathanaservice/pull/219
+# handler = lambda error, endpoint, values: ''
+
+
+def handler(error, endpoint, values=''):
+    print("URL Build error:" + str(error))
+    return ''
+app.url_build_error_handlers.append(handler)
+
+
+# Handle errors consistently
+@app.errorhandler(RestException)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+
+@app.errorhandler(404)
+def handle_404(error):
+    return handle_invalid_usage(RestException(RestException.NOT_FOUND, 404))
 
 
 def _load_data(data_loader):
