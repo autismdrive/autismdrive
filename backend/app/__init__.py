@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 import click
 from flask_marshmallow import Marshmallow
 
@@ -17,6 +18,10 @@ app.config.from_pyfile('config.py')
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Enable CORS
+if(app.config["CORS_ENABLED"]) :
+    cors = CORS(app, resources={r"*": {"origins": "*"}})
 
 # Flask-Marshmallow provides HATEOAS links
 ma = Marshmallow(app)
