@@ -1,20 +1,26 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { HttpClientModule } from '@angular/common/http';
 import {
   MatButtonModule,
   MatCardModule,
   MatIconModule,
   MatProgressBarModule,
-  MatToolbarModule
+  MatTableModule,
+  MatToolbarModule,
+  MatFormFieldModule
 } from '@angular/material';
-
+import { BrowserModule } from '@angular/platform-browser';
+import { FileDropModule } from 'ngx-file-drop';
+import { NgProgressModule } from 'ngx-progressbar';
+import { ApiService } from './api.service';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ApiService } from './api.service';
 import { EnrollComponent } from './enroll/enroll.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { SDFileUploadComponent } from './forms/file-upload/file-upload.component';
+import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
+import { SDFormFieldComponent } from './forms/form-field/form-field.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
@@ -35,6 +41,9 @@ import { TermsComponent } from './terms/terms.component';
     ProfileComponent,
     RegisterComponent,
     ResourcesComponent,
+    SDFileUploadComponent,
+    SDFormFieldComponent,
+    SDFormFieldLabelComponent,
     StudiesComponent,
     TermsComponent
   ],
@@ -45,9 +54,13 @@ import { TermsComponent } from './terms/terms.component';
     HttpClientModule,
     MatButtonModule,
     MatCardModule,
+    MatFormFieldModule,
     MatProgressBarModule,
     MatIconModule,
-    MatToolbarModule
+    MatTableModule,
+    MatToolbarModule,
+    NgProgressModule,
+    FileDropModule
   ],
   providers: [
     ApiService

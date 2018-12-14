@@ -1,0 +1,21 @@
+// Import theming functions
+@import '~@angular/material/theming';
+@import '../../ithriv_material';
+@include ithriv-theme($ithriv-theme);
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#fileQueueContainer {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  transition: $animationDuration ease opacity;
+
+  table {
+    width: 100%;
+  }
+}
