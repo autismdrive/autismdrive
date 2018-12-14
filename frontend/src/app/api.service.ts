@@ -1,11 +1,13 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { Study } from './study';
 import { Resource } from './resource';
 import { Training } from './training';
+import { User } from './user';
 
 @Injectable()
 export class ApiService {
@@ -20,9 +22,68 @@ export class ApiService {
     resource: '/api/resource/<id>',
     trainingList: '/api/training',
     training: '/api/training/<id>',
+    login_password: '/api/login_password',
+    forgot_password: '/api/forgot_password',
+    reset_password: '/api/reset_password',
+    session: '/api/session'
   };
 
+  private hasSession: boolean;
+  private sessionSubject = new BehaviorSubject<User>(null);
+
   constructor(private httpClient: HttpClient) {
+  }
+
+
+  /** getSession */
+  public getSession(): Observable<User> {
+    if (!this.hasSession && localStorage.getItem('token')) {
+      this._fetchSession();
+    }
+    return this.sessionSubject.asObservable();
+  }
+
+  /** _fetchSession */
+  public _fetchSession(): void {
+    this.httpClient.get<User>(this.apiRoot + this.endpoints.session).subscribe(user => {
+      this.hasSession = true;
+      this.sessionSubject.next(user);
+    }, (error) => {
+      localStorage.removeItem('token');
+      this.hasSession = false;
+      this.sessionSubject.error(error);
+    });
+  }
+
+  /** openSession */
+  openSession(token: string): Observable<User> {
+    localStorage.setItem('token', token);
+    return this.getSession();
+  }
+
+  /** closeSession */
+  closeSession(): Observable<User> {
+    this.httpClient.delete<User>(this.apiRoot + this.endpoints.session).subscribe(x => {
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+      this.hasSession = false;
+      this.sessionSubject.next(null);
+    }, (error) => {
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+      this.hasSession = false;
+      this.sessionSubject.error(error);
+    });
+    return this.sessionSubject.asObservable();
+  }
+
+  /** loginUser - allow users to log into the system with a user name and password.
+   * email_token is not required, only send this if user is logging in for the first time
+   * after an email verification link. */
+  login(email: string, password: string, email_token = ''): Observable<any> {
+    const options = { email: email, password: password, email_token: email_token };
+    return this.httpClient.post(this.apiRoot + this.endpoints.login_password, options)
+      .pipe(catchError(this.handleError));
   }
 
   // Add Study
