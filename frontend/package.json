@@ -25,10 +25,12 @@
     "@angular/router": "~7.0.0",
     "angular-formio": "^3.9.3",
     "core-js": "^2.5.4",
+    "ngx-color-picker": "^7.2.0",
     "ngx-file-drop": "^5.0.0",
     "ngx-markdown": "^7.0.2",
     "ngx-progressbar": "^2.1.1",
     "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.3.3",
     "ts-md5": "^1.2.4",
     "zone.js": "~0.8.26"
   },

@@ -11,25 +11,25 @@ import {
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { MarkdownModule } from 'ngx-markdown';
-import { FormField } from '../form-field';
-import { MockResourceApiService } from '../shared/mocks/resource-api.service.mock';
-import { ResourceApiService } from '../shared/resource-api/resource-api.service';
-import { FormFieldComponent } from './form-field.component';
+import { SDFormField } from '../form-field';
+import { MockApiService } from '../../testing/mocks/api.service.mock';
+import { ApiService } from '../../api.service';
+import { SDFormFieldComponent } from './form-field.component';
 
 describe('FormFieldComponent', () => {
-  let api: MockResourceApiService;
-  let component: FormFieldComponent;
+  let api: MockApiService;
+  let component: SDFormFieldComponent;
   let errorMatcher: ErrorStateMatcher;
-  let fixture: ComponentFixture<FormFieldComponent>;
+  let fixture: ComponentFixture<SDFormFieldComponent>;
 
   beforeEach(async(() => {
-    api = new MockResourceApiService();
+    api = new MockApiService();
     errorMatcher = new ErrorStateMatcher();
 
     TestBed
       .configureTestingModule({
         declarations: [
-          FormFieldComponent
+          SDFormFieldComponent
         ],
         imports: [
           BrowserAnimationsModule,
@@ -43,17 +43,17 @@ describe('FormFieldComponent', () => {
           ReactiveFormsModule
         ],
         providers: [
-          { provide: ResourceApiService, useValue: api },
+          { provide: ApiService, useValue: api },
           { provide: ErrorStateMatcher, useValue: { isErrorState: () => true } }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       })
       .compileComponents()
       .then(() => {
-        fixture = TestBed.createComponent(FormFieldComponent);
+        fixture = TestBed.createComponent(SDFormFieldComponent);
         component = fixture.componentInstance;
         component.errorMatcher = errorMatcher;
-        component.field = new FormField({
+        component.field = new SDFormField({
           formControl: new FormControl(),
           required: false,
           placeholder: 'Beep boop boop beeee?',

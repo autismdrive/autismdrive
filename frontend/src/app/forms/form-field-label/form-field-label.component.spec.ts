@@ -1,17 +1,17 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormField } from '../form-field';
-import { FormFieldLabelComponent } from './form-field-label.component';
+import { SDFormField } from '../form-field';
+import { SDFormFieldLabelComponent } from './form-field-label.component';
 
 describe('FormFieldLabelComponent', () => {
-  let component: FormFieldLabelComponent;
-  let fixture: ComponentFixture<FormFieldLabelComponent>;
+  let component: SDFormFieldLabelComponent;
+  let fixture: ComponentFixture<SDFormFieldLabelComponent>;
 
   beforeEach(async(() => {
     TestBed
       .configureTestingModule({
-        declarations: [FormFieldLabelComponent],
+        declarations: [SDFormFieldLabelComponent],
         imports: [
           FormsModule,
           ReactiveFormsModule
@@ -20,9 +20,9 @@ describe('FormFieldLabelComponent', () => {
       })
       .compileComponents()
       .then(() => {
-        fixture = TestBed.createComponent(FormFieldLabelComponent);
+        fixture = TestBed.createComponent(SDFormFieldLabelComponent);
         component = fixture.componentInstance;
-        component.field = new FormField({
+        component.field = new SDFormField({
           formControl: new FormControl(),
           required: false,
           placeholder: 'Beep boop boop beeee?',
