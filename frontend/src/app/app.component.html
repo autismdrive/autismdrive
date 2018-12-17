@@ -1,9 +1,5 @@
-<mat-toolbar
-  *ngIf="!hideHeader"
->
-  <mat-toolbar-row
-    class="menubar"
-  >
+<mat-toolbar *ngIf="!hideHeader">
+  <mat-toolbar-row class="menubar">
     <span class="spacer"></span>
     <button
       mat-button
@@ -49,7 +45,9 @@
       class="nav"
       fxLayout="column"
     >
-    <a href="home"><h1>STAR Drive</h1></a>
+      <a href="home">
+        <h1>STAR Drive</h1>
+      </a>
       <div>
         <button
           mat-button
@@ -76,12 +74,7 @@
     </div>
   </mat-toolbar-row>
 
-  <mat-toolbar-row>
-
-  </mat-toolbar-row>
-
 </mat-toolbar>
 <div class="content">
   <router-outlet></router-outlet>
 </div>
-
