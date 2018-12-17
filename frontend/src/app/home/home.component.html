@@ -1,47 +1,68 @@
-<div
-  class="highlight"
-  fxLayoutAlign="start end"
->
-  <h1>Big Headline about the mission of STAR DRIVE</h1>
-</div>
-<div
-  class="action"
-  fxLayout="column"
-  fxLayoutAlign="center center"
->
-  <p>Join thousands of patients and families in understanding and investigating autism.</p>
-  <div>
-    <button
-      mat-button
-      (click)="goEnroll($event)"
-    >
-      Enroll in a study
-    </button>
-    <button
-      mat-button
-      (click)="goResources($event)"
-    >
-      Find autism support
-    </button>
-  </div>
-</div>
-<div
-  class="news"
-  fxLayout="row"
->
-  <mat-card
-    fxLayout="column"
-    fxLayoutAlign="end start"
-  >
-    <h4>RESEARCH STUDY</h4>
-    <h2>New ABC study to explore XYZ in 2019</h2>
-  </mat-card>
-  <mat-card
+<div class="mat-typography">
+  <div
+    id="hero"
     class="highlight"
-    fxLayout="column"
-    fxLayoutAlign="end start"
+    fxLayoutAlign="start end"
   >
-    <h4>COMMUNITY RESOURCE</h4>
-    <h2>Charlottesville support group for XYZ</h2>
-  </mat-card>
+    <h1 class="mat-display-2">Big Headline about the mission of STAR DRIVE</h1>
+  </div>
+  <div
+    class="action"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+  >
+    <p>Join thousands of patients and families in understanding and investigating autism.</p>
+    <div id="cta">
+      <button
+        mat-flat-button
+        (click)="goEnroll($event)"
+        color="primary"
+      >
+        Enroll in a study
+      </button>
+      <button
+        mat-flat-button
+        (click)="goResources($event)"
+        color="accent"
+      >
+        Find autism support
+      </button>
+    </div>
+  </div>
+  <div
+    class="news"
+    fxLayout.gt-md="row"
+    fxLayout.lt-md="column"
+  >
+    <mat-card
+      id="news1"
+      fxLayout="column"
+      fxLayoutAlign="end start"
+      fxFlex="33%"
+    >
+      <h4>RESEARCH STUDY</h4>
+      <h2>New ABC study to explore XYZ in 2019</h2>
+    </mat-card>
+    <mat-card
+      id="news2"
+      class="highlight"
+      fxLayout="column"
+      fxLayoutAlign="end start"
+      fxFlex="33%"
+    >
+      <h4>COMMUNITY RESOURCE</h4>
+      <h2>Charlottesville support group for XYZ</h2>
+    </mat-card>
+    <mat-card
+      id="news3"
+      class="highlight"
+      fxLayout="column"
+      fxLayoutAlign="end start"
+      fxFlex="33%"
+    >
+      <h4>COMMUNITY RESOURCE</h4>
+      <h2>Charlottesville support group for XYZ</h2>
+    </mat-card>
+  </div>
+
 </div>
