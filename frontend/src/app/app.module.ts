@@ -1,3 +1,5 @@
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
@@ -17,6 +19,7 @@ import {
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ApiService } from './api.service';
+import { AuthInterceptor } from './AuthInterceptor';
 import { EnrollComponent } from './enroll/enroll.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { HomeComponent } from './home/home.component';
@@ -58,6 +61,11 @@ import { TermsComponent } from './terms/terms.component';
     ReactiveFormsModule
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
     ApiService
   ],
   bootstrap: [AppComponent]
