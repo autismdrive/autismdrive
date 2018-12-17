@@ -11,7 +11,7 @@
       (click)="goTerms($event)"
       id="register-button"
     >
-      <mat-icon>account_circle</mat-icon>
+      <mat-icon>person_add</mat-icon>
       Create Account
     </button>
     <button
@@ -22,6 +22,24 @@
     >
       <mat-icon>account_circle</mat-icon>
       Sign in
+    </button>
+    <button
+      mat-button
+      *ngIf="session"
+      (click)="goProfile($event)"
+      id="profile-button"
+    >
+      <mat-icon>account_circle</mat-icon>
+      Visit Profile
+    </button>
+    <button
+      mat-button
+      *ngIf="session"
+      (click)="goLogout($event)"
+      id="logout-button"
+    >
+      <mat-icon>exit_to_app</mat-icon>
+      Logout
     </button>
   </mat-toolbar-row>
 
