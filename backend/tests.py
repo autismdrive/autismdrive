@@ -460,6 +460,20 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertIsNotNone(response["token"])
 
+        return user
+
+    def test_get_current_user(self):
+        """ Test for the current user status """
+        user = self.test_login_user()
+
+        # Now get the user back.
+        response = self.app.get(
+            '/api/session',
+            headers=dict(
+                Authorization='Bearer ' + user.encode_auth_token().decode()))
+        self.assertSuccess(response)
+        return json.loads(response.data.decode())
+
     def decode(self, encoded_words):
         """
         Useful for checking the content of email messages
