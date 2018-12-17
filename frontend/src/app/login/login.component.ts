@@ -77,11 +77,6 @@ export class LoginComponent implements OnInit {
     this.router.navigate(['home']);
   }
 
-  goProfile($event) {
-    $event.preventDefault();
-    this.router.navigate(['profile']);
-  }
-
   goTerms($event) {
     $event.preventDefault();
     this.router.navigate(['terms']);
