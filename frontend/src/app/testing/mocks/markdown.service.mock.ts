@@ -1,12 +1,11 @@
 import { MarkdownService } from 'ngx-markdown';
-import { SpyObject } from './helper.mock';
-import Spy = jasmine.Spy;
+import { SpyObject, SDSpy } from './helper.mock';
 
 export class MockMarkdownService extends SpyObject {
 
-  compileSpy: Spy;
-  getSourceSpy: Spy;
-  highlightSpy: Spy;
+  compileSpy: SDSpy;
+  getSourceSpy: SDSpy;
+  highlightSpy: SDSpy;
   fakeResponse: any;
 
   constructor() {

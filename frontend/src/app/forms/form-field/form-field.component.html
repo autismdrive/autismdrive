@@ -96,17 +96,6 @@
 </mat-form-field>
 
 <div
-  *ngIf="field.type === 'tree'"
-  class="mat-typography"
->
-  <app-form-field-label
-    [field]="field"
-    [errors]="errors"
-  ></app-form-field-label>
-  <app-tree-select [field]="field"></app-tree-select>
-</div>
-
-<div
   *ngIf="field.type === 'richtexteditor'"
   class="mat-typography"
 >

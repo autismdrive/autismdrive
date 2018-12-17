@@ -6,6 +6,9 @@ $stardrive-accent: mat-palette($mat-orange);
 $stardrive-warn: mat-palette($mat-deep-orange);
 $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
 
+$easeDuration: 300ms;
+$animationDuration: 500ms;
+
 @include angular-material-theme($stardrive-theme);
 
 // Define a mixin that accepts a theme and outputs the color styles for the component.

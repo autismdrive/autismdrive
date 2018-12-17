@@ -1,16 +1,24 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCardModule,
+  MatCheckboxModule,
+  MatFormFieldModule,
   MatIconModule,
+  MatInputModule,
   MatProgressBarModule,
+  MatSelectModule,
+  MatSlideToggleModule,
   MatTableModule,
   MatToolbarModule,
-  MatFormFieldModule
+  MatTreeModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
+import { CovalentTextEditorModule } from '@covalent/text-editor';
+import { ColorPickerModule } from 'ngx-color-picker';
 import { FileDropModule } from 'ngx-file-drop';
 import { NgProgressModule } from 'ngx-progressbar';
 import { ApiService } from './api.service';
@@ -50,17 +58,25 @@ import { TermsComponent } from './terms/terms.component';
   imports: [
     AppRoutingModule,
     BrowserModule,
+    ColorPickerModule,
+    CovalentTextEditorModule,
+    FileDropModule,
     FlexLayoutModule,
     HttpClientModule,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatFormFieldModule,
-    MatProgressBarModule,
     MatIconModule,
+    MatInputModule,
+    MatProgressBarModule,
+    MatSelectModule,
+    MatSlideToggleModule,
     MatTableModule,
     MatToolbarModule,
+    MatTreeModule,
     NgProgressModule,
-    FileDropModule
+    ReactiveFormsModule
   ],
   providers: [
     ApiService

@@ -1,29 +1,28 @@
 import { Renderer2 } from '@angular/core';
-import { SpyObject } from './helper.mock';
-import Spy = jasmine.Spy;
+import { SpyObject, SDSpy } from './helper.mock';
 
 export class MockRenderer2 extends SpyObject {
 
-  addClassSpy: Spy;
-  appendChildSpy: Spy;
-  createCommentSpy: Spy;
-  createElementSpy: Spy;
-  createTextSpy: Spy;
-  dataSpy: Spy;
-  destroySpy: Spy;
-  insertBeforeSpy: Spy;
-  listenSpy: Spy;
-  nextSiblingSpy: Spy;
-  parentNodeSpy: Spy;
-  removeAttributeSpy: Spy;
-  removeChildSpy: Spy;
-  removeClassSpy: Spy;
-  removeStyleSpy: Spy;
-  selectRootElementSpy: Spy;
-  setAttributeSpy: Spy;
-  setPropertySpy: Spy;
-  setStyleSpy: Spy;
-  setValueSpy: Spy;
+  addClassSpy: SDSpy;
+  appendChildSpy: SDSpy;
+  createCommentSpy: SDSpy;
+  createElementSpy: SDSpy;
+  createTextSpy: SDSpy;
+  dataSpy: SDSpy;
+  destroySpy: SDSpy;
+  insertBeforeSpy: SDSpy;
+  listenSpy: SDSpy;
+  nextSiblingSpy: SDSpy;
+  parentNodeSpy: SDSpy;
+  removeAttributeSpy: SDSpy;
+  removeChildSpy: SDSpy;
+  removeClassSpy: SDSpy;
+  removeStyleSpy: SDSpy;
+  selectRootElementSpy: SDSpy;
+  setAttributeSpy: SDSpy;
+  setPropertySpy: SDSpy;
+  setStyleSpy: SDSpy;
+  setValueSpy: SDSpy;
   data: any;
 
   constructor() {

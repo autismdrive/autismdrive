@@ -1,13 +1,12 @@
 import { ActivatedRoute } from '@angular/router';
-import { SpyObject } from './helper.mock';
-import Spy = jasmine.Spy;
+import { SpyObject, SDSpy } from './helper.mock';
 
 export class MockActivatedRoute extends SpyObject {
-  urlSpy: Spy;
-  paramsSpy: Spy;
-  queryParamsSpy: Spy;
-  fragmentSpy: Spy;
-  dataSpy: Spy;
+  urlSpy: SDSpy;
+  paramsSpy: SDSpy;
+  queryParamsSpy: SDSpy;
+  fragmentSpy: SDSpy;
+  dataSpy: SDSpy;
   fakeResponse: any;
 
   constructor() {

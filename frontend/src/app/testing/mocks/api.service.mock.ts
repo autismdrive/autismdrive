@@ -1,30 +1,30 @@
 import { ApiService } from '../../api.service';
-import { SpyObject } from './helper.mock';
-import Spy = jasmine.Spy;
+import { SpyObject, SDSpy } from './helper.mock';
+
 
 export class MockApiService extends SpyObject {
 
-  addStudySpy: Spy;
-  updateStudySpy: Spy;
-  deleteStudySpy: Spy;
-  getStudySpy: Spy;
-  getStudiesSpy: Spy;
-  addResourceSpy: Spy;
-  updateResourceSpy: Spy;
-  deleteResourceSpy: Spy;
-  getResourceSpy: Spy;
-  getResourcesSpy: Spy;
-  addTrainingSpy: Spy;
-  updateTrainingSpy: Spy;
-  deleteTrainingSpy: Spy;
-  getTrainingSpy: Spy;
-  getTrainingsSpy: Spy;
-  getFileAttachmentSpy: Spy;
-  addFileAttachmentSpy: Spy;
-  addFileAttachmentBlobSpy: Spy;
-  updateFileAttachmentSpy: Spy;
-  getFileAttachmentBlobSpy: Spy;
-  deleteFileAttachmentSpy: Spy;
+  addStudySpy: SDSpy;
+  updateStudySpy: SDSpy;
+  deleteStudySpy: SDSpy;
+  getStudySpy: SDSpy;
+  getStudiesSpy: SDSpy;
+  addResourceSpy: SDSpy;
+  updateResourceSpy: SDSpy;
+  deleteResourceSpy: SDSpy;
+  getResourceSpy: SDSpy;
+  getResourcesSpy: SDSpy;
+  addTrainingSpy: SDSpy;
+  updateTrainingSpy: SDSpy;
+  deleteTrainingSpy: SDSpy;
+  getTrainingSpy: SDSpy;
+  getTrainingsSpy: SDSpy;
+  getFileAttachmentSpy: SDSpy;
+  addFileAttachmentSpy: SDSpy;
+  addFileAttachmentBlobSpy: SDSpy;
+  updateFileAttachmentSpy: SDSpy;
+  getFileAttachmentBlobSpy: SDSpy;
+  deleteFileAttachmentSpy: SDSpy;
   fakeResponse: any;
 
   constructor() {

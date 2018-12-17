@@ -1,10 +1,13 @@
-export interface GuinessCompatibleSpy extends jasmine.Spy {
+/// <reference path="../../../../node_modules/@types/jasmine/index.d.ts"‌​/>
+import Spy = jasmine.Spy;
+
+export interface SDSpy extends Spy {
   /** By chaining the spy with and.returnValue, all calls to the function will return a specific
    * value. */
   andReturn(val: any): void;
   /** By chaining the spy with and.callFake, all calls to the spy will delegate to the supplied
    * function. */
-  andCallFake(fn: Function): GuinessCompatibleSpy;
+  andCallFake(fn: Function): SDSpy;
   /** removes all recorded calls */
   reset();
 }
@@ -51,7 +54,7 @@ export class SpyObject {
 
   spy(name) {
     if (!this[name]) {
-      this[name] = this._createGuinnessCompatibleSpy(name);
+      this[name] = this._createSDSpy(name);
     }
     return this[name];
   }
@@ -59,8 +62,8 @@ export class SpyObject {
   prop(name, value) { this[name] = value; }
 
   /** @internal */
-  _createGuinnessCompatibleSpy(name): GuinessCompatibleSpy {
-    const newSpy: GuinessCompatibleSpy = <any>jasmine.createSpy(name);
+  _createSDSpy(name): SDSpy {
+    const newSpy: SDSpy = <any>jasmine.createSpy(name);
     newSpy.andCallFake = <any>newSpy.and.callFake;
     newSpy.andReturn = <any>newSpy.and.returnValue;
     newSpy.reset = <any>newSpy.calls.reset;
