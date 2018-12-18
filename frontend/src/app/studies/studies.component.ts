@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Study } from '../study';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-studies',
@@ -6,10 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./studies.component.scss']
 })
 export class StudiesComponent implements OnInit {
+  studies: Study[];
 
-  constructor() { }
+  constructor(private api: ApiService) {
+    this.loadStudies();
+  }
 
   ngOnInit() {
+  }
+
+  loadStudies() {
+    this.api.getStudies().subscribe(studies => this.studies = studies);
   }
 
 }
