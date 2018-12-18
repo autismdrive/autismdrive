@@ -17,7 +17,6 @@ import {
   MatToolbarModule
 } from '@angular/material';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ApiService } from './api.service';
 import { AuthInterceptor } from './AuthInterceptor';
@@ -32,6 +31,7 @@ import { RegisterComponent } from './register/register.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { StudiesComponent } from './studies/studies.component';
 import { TermsComponent } from './terms/terms.component';
+import { RoutingModule } from './routing/routing.module';
 
 @NgModule({
   declarations: [
@@ -49,7 +49,7 @@ import { TermsComponent } from './terms/terms.component';
     TermsComponent
   ],
   imports: [
-    AppRoutingModule,
+    RoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
