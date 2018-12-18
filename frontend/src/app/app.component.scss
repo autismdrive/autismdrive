@@ -23,7 +23,8 @@
       color: mat-color($stardrive-primary, default, 1);
 
       &.selected {
-        border-radius: 0;
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
         border-bottom-width: 4px;
         border-bottom-style: solid;
         border-bottom-color: mat-color($stardrive-primary, default, 1);
