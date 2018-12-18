@@ -10,7 +10,6 @@ import { ApiService } from '../api.service';
   styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent implements OnInit {
-  errorEmitter = new EventEmitter<string>();
   errorMessage: string;
   formStatus = 'form';
   form = new FormGroup({});
@@ -41,7 +40,6 @@ export class ForgotPasswordComponent implements OnInit {
       this.formStatus = 'submitting';
       this.api.sendResetPasswordEmail(this.model['email']).subscribe(e => {
         this.formStatus = 'complete';
-        this.router.navigate(['home']);
       }, error1 => {
         if (error1) {
           this.errorMessage = error1;
@@ -57,5 +55,10 @@ export class ForgotPasswordComponent implements OnInit {
   goHome($event) {
     $event.preventDefault();
     this.router.navigate(['home']);
+  }
+
+  goRegister($event) {
+    $event.preventDefault();
+    this.router.navigate(['register']);
   }
 }
