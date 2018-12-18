@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
   hideHeader = false;
   session: User;
 
-  public constructor (
+  public constructor(
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router
@@ -70,5 +70,9 @@ export class AppComponent implements OnInit {
   goResources($event) {
     $event.preventDefault();
     this.router.navigate(['resources']);
+  }
+
+  isSelected(route) {
+    return location.pathname.split('/')[1] === route;
   }
 }

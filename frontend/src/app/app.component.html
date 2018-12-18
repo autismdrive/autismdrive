@@ -1,77 +1,78 @@
 <mat-toolbar *ngIf="!hideHeader">
-  <mat-toolbar-row class="menubar">
-    <span class="spacer"></span>
-    <button
-      mat-button
-      *ngIf="!session"
-      (click)="goTerms($event)"
-      id="register-button"
-    >
-      <mat-icon>person_add</mat-icon>
-      Create Account
-    </button>
-    <button
-      mat-button
-      *ngIf="!session"
-      (click)="goLogin($event)"
-      id="login-button"
-    >
-      <mat-icon>account_circle</mat-icon>
-      Sign in
-    </button>
-    <button
-      mat-button
-      *ngIf="session"
-      (click)="goProfile($event)"
-      id="profile-button"
-    >
-      <mat-icon>account_circle</mat-icon>
-      Visit Profile
-    </button>
-    <button
-      mat-button
-      *ngIf="session"
-      (click)="goLogout($event)"
-      id="logout-button"
-    >
-      <mat-icon>exit_to_app</mat-icon>
-      Logout
-    </button>
-  </mat-toolbar-row>
-
-  <mat-toolbar-row>
+  <mat-toolbar-row
+    id="menu-bar"
+    fxLayout="row"
+  >
     <app-logo></app-logo>
-    <div
-      class="nav"
-      fxLayout="column"
-    >
-      <a href="home">
-        <h1>STAR Drive</h1>
-      </a>
-      <div>
-        <button
-          mat-button
-          (click)="goEnroll($event)"
-          id="enroll-button"
-        >
-          Enroll in a study
-        </button>
-        <button
-          mat-button
-          (click)="goStudies($event)"
-          id="studies-button"
-        >
-          Current studies
-        </button>
-        <button
-          mat-button
-          (click)="goResources($event)"
-          id="resources-button"
-        >
-          Training & Resources
-        </button>
-      </div>
+    <div id="primary-nav">
+      <button
+        mat-button
+        (click)="goEnroll($event)"
+        id="enroll-button"
+        [ngClass]="{'selected': isSelected('enroll')}"
+      >
+        Enroll in a study
+      </button>
+      <button
+        mat-button
+        (click)="goStudies($event)"
+        id="studies-button"
+        [ngClass]="{'selected': isSelected('studies')}"
+      >
+        Current studies
+      </button>
+      <button
+        mat-button
+        (click)="goResources($event)"
+        id="resources-button"
+        [ngClass]="{'selected': isSelected('resources')}"
+      >
+        Training & Resources
+      </button>
     </div>
+
+    <span fxFlex></span>
+
+    <div id="utility-nav">
+      <button
+        mat-button
+        *ngIf="!session"
+        (click)="goTerms($event)"
+        id="register-button"
+      >
+        <mat-icon>person_add</mat-icon>
+        Create Account
+      </button>
+      <button
+        mat-button
+        *ngIf="!session"
+        (click)="goLogin($event)"
+        id="login-button"
+      >
+        <mat-icon>account_circle</mat-icon>
+        Sign in
+      </button>
+      <button
+        mat-button
+        *ngIf="session"
+        (click)="goProfile($event)"
+        id="profile-button"
+      >
+        <mat-icon>account_circle</mat-icon>
+        Visit Profile
+      </button>
+      <button
+        mat-button
+        *ngIf="session"
+        (click)="goLogout($event)"
+        id="logout-button"
+      >
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </button>
+    </div>
+
+
   </mat-toolbar-row>
 
 </mat-toolbar>

@@ -73,36 +73,7 @@ $stardrive-warn: mat-palette($mat-deep-orange);
 $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
 
 @include angular-material-theme($stardrive-theme);
-
-// Define a mixin that accepts a theme and outputs the color styles for the component.
 @mixin stardrive-theme($theme) {
-  // Extract whichever individual palettes you need from the theme.
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
-
-  // Use mat-color to extract individual colors from a palette as necessary.
-
-  button {
-    background-color: transparent;
-    border: none;
-  }
-
-  button:not([disabled]):hover {
-    background-color: rgba(158, 158, 158, 0.2);
-  }
-
-  button[disabled] {
-    color : rgba(0, 0, 0, 0.26);
-    background-color: transparent;
-  }
-
-  .spacer {
-    flex: 1 1 auto;
-  }
-
-  a {
-    text-decoration: none;
-    color: mat-color($stardrive-primary, 800, 1.0);
-  }
-
 }
