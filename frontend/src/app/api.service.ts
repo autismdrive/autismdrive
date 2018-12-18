@@ -95,6 +95,14 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  /** sendResetPasswordEmail
+   * Reset password */
+  sendResetPasswordEmail(email: String): Observable<any> {
+    const email_data = { email: email };
+    return this.httpClient.post<any>(this.apiRoot + this.endpoints.forgot_password, email_data)
+      .pipe(catchError(this.handleError));
+  }
+
   // Add Study
   addStudy(study: Study): Observable<Study> {
     console.log('adding a study:', study);
