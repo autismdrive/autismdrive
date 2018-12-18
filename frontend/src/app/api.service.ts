@@ -87,6 +87,14 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  /** resetPassword
+   * Reset password */
+  resetPassword(newPassword: string, email_token: string): Observable<string> {
+    const reset = { password: newPassword, email_token: email_token };
+    return this.httpClient.post<string>(this.apiRoot + this.endpoints.reset_password, reset)
+      .pipe(catchError(this.handleError));
+  }
+
   // Add Study
   addStudy(study: Study): Observable<Study> {
     console.log('adding a study:', study);

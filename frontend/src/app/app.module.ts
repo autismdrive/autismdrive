@@ -26,6 +26,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './register/register.component';
 import { ResourcesComponent } from './resources/resources.component';
@@ -40,6 +41,7 @@ import { TermsComponent } from './terms/terms.component';
     HomeComponent,
     LoginComponent,
     LogoComponent,
+    PasswordResetComponent,
     ProfileComponent,
     RegisterComponent,
     ResourcesComponent,
