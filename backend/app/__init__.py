@@ -2,9 +2,13 @@ from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+from flask_httpauth import HTTPTokenAuth
 import click
+import os
 from flask_marshmallow import Marshmallow
 
+from app.email_service import EmailService
 from app.rest_exception import RestException
 
 app = Flask(__name__, instance_relative_config=True)
@@ -13,16 +17,30 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 # Load the configuration from the instance folder
 app.config.from_pyfile('config.py')
+# Load the file specified by the APP_CONFIG_FILE environment variable
+# Variables defined here will override those in the default configuration
+if "APP_CONFIG_FILE" in os.environ:
+    app.config.from_envvar('APP_CONFIG_FILE')
 
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Enable CORS
+if(app.config["CORS_ENABLED"]) :
+    cors = CORS(app, resources={r"*": {"origins": "*"}})
 
 # Flask-Marshmallow provides HATEOAS links
 ma = Marshmallow(app)
 
 # Database Migrations
 migrate = Migrate(app, db)
+
+# email service
+email_service = EmailService(app)
+
+# Token Authentication
+auth = HTTPTokenAuth('Bearer')
 
 # Password Encryption
 bcrypt = Bcrypt(app)

@@ -6,7 +6,8 @@ from marshmallow import ValidationError
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 
-from app import RestException, db
+from app import RestException, db, email_service
+from app.model.email_log import EmailLog
 from app.model.user import User
 from app.resources.schema import UserSchema
 
@@ -55,9 +56,16 @@ class UserListEndpoint(flask_restful.Resource):
                 raise RestException(RestException.EMAIL_EXISTS)
             db.session.add(new_user)
             db.session.commit()
+            self.send_confirm_email(new_user)
             return self.userSchema.dump(new_user)
         except IntegrityError as ie:
             raise RestException(RestException.INVALID_OBJECT)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=new_user.errors)
+
+    def send_confirm_email(self, user):
+        tracking_code = email_service.confirm_email(user)
+        log = EmailLog(user_id=user.id, type="confirm_email", tracking_code=tracking_code)
+        db.session.add(log)
+        db.session.commit()

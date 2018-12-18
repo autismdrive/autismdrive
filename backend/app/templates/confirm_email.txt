@@ -1,0 +1,6 @@
+{{ user.first_name }},
+
+Someone recently created an account for you on the STAR Drive.
+
+To Complete your registration, please place the following url in your browser to confirm your Email Address:
+{{confirm_url}}.

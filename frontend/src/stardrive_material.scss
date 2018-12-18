@@ -1,42 +1,107 @@
 @import '../node_modules/@angular/material/theming';
-@include mat-core();
+
+// Define a custom typography config that overrides the font-family
+$custom-typography: mat-typography-config(
+  $font-family: 'Roboto, sans-serif',
+);
+
+@include mat-core($custom-typography);
+
+$mat-blue: (
+  50 : #F1F5F7, // Modified, was #e0e6ed
+  100 : #b3c1d3,
+  200 : #8097b6,
+  300 : #4d6d98,
+  400 : #264e82,
+  500 : #002f6c,
+  600 : #002a64,
+  700 : #002359,
+  800 : #001d4f,
+  900 : #00123d,
+  A100 : #738cff,
+  A200 : #4062ff,
+  A400 : #0d38ff,
+  A700 : #002bf2,
+  contrast: (
+    50 : #000000,
+    100 : #000000,
+    200 : #000000,
+    300 : #ffffff,
+    400 : #ffffff,
+    500 : #ffffff,
+    600 : #ffffff,
+    700 : #ffffff,
+    800 : #ffffff,
+    900 : #ffffff,
+    A100 : #000000,
+    A200 : #ffffff,
+    A400 : #ffffff,
+    A700 : #ffffff,
+  )
+);
+
+$mat-orange: (
+  50 : #fceee0,
+  100 : #f7d5b3,
+  200 : #f2b980,
+  300 : #ed9c4d,
+  400 : #e98726,
+  500 : #e57200,
+  600 : #e26a00,
+  700 : #de5f00,
+  800 : #da5500,
+  900 : #d34200,
+  A100 : #fffcfb,
+  A200 : #ffd5c8,
+  A400 : #ffaf95,
+  A700 : #ff9b7b,
+  contrast: (
+    50 : #000000,
+    100 : #000000,
+    200 : #000000,
+    300 : #000000,
+    400 : #000000,
+    500 : #ffffff,
+    600 : #ffffff,
+    700 : #ffffff,
+    800 : #ffffff,
+    900 : #ffffff,
+    A100 : #000000,
+    A200 : #000000,
+    A400 : #000000,
+    A700 : #000000,
+  )
+);
 
 $stardrive-primary: mat-palette($mat-blue);
 $stardrive-accent: mat-palette($mat-orange);
-$stardrive-warn: mat-palette($mat-deep-orange);
+$stardrive-warn: mat-palette($mat-red);
 $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
 
 @include angular-material-theme($stardrive-theme);
-
-// Define a mixin that accepts a theme and outputs the color styles for the component.
 @mixin stardrive-theme($theme) {
-  // Extract whichever individual palettes you need from the theme.
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
 
-  // Use mat-color to extract individual colors from a palette as necessary.
-
+  // Global style overrides
   button {
-    background-color: transparent;
-    border: none;
+    &.btn-lg {
+      font-size: 32px;
+      padding-left: 32px;
+      padding-right: 32px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
   }
 
-  button:not([disabled]):hover {
-    background-color: rgba(158, 158, 158, 0.2);
-  }
+  .alert {
+    padding: 2em;
+    text-align: center;
+    border-radius: 4px;
 
-  button[disabled] {
-    color : rgba(0, 0, 0, 0.26);
-    background-color: transparent;
+    &.alert-warn {
+      background-color: mat-color($stardrive-warn, 900, 1);
+      color: white;
+    }
   }
-
-  .spacer {
-    flex: 1 1 auto;
-  }
-
-  a {
-    text-decoration: none;
-    color: mat-color($stardrive-primary, 800, 1.0);
-  }
-
 }

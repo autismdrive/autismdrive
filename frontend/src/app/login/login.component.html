@@ -11,24 +11,51 @@
     fxFlex.xs="90%"
   >
     <app-logo></app-logo>
-    <!--<app-login-form></app-login-form>-->
-    <h3>Email Address:</h3>
-    <h3>Password:</h3>
-    <div
-      fxLayout="column"
-      fxLayoutGap="2%"
-      fxLayoutAlign="center"
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit(model)"
     >
-      <button mat-button (click)="goProfile($event)">Submit</button>
-      <button mat-button (click)="goHome($event)">Cancel</button>
-      <div
-        class="footer"
-        fxLayout="row"
-        fxLayoutAlign="space-between"
+      <formly-form
+        [form]="form"
+        [fields]="fields"
+        [model]="model"
       >
-        <button mat-button (click)="goTerms($event)">Create account</button>
-        <button mat-button (click)="goForgotPassword($event)">Forgot password?</button>
-      </div>
+        <div
+          fxLayout="column"
+          fxLayoutGap="2%"
+          fxLayoutAlign="center"
+        >
+          <div
+            id="error_message"
+            class="display mat-error"
+          >{{errorEmitter | async}}</div>
+          <button
+            mat-flat-button
+            type="submit"
+            color="primary"
+          >Submit</button>
+          <button
+            mat-flat-button
+            (click)="goHome($event)"
+            color="accent"
+          >Cancel</button>
+        </div>
+      </formly-form>
+    </form>
+    <div
+      class="footer"
+      fxLayout="row"
+      fxLayoutAlign="space-between"
+    >
+      <button
+        mat-button
+        (click)="goTerms($event)"
+      >Create account</button>
+      <button
+        mat-button
+        (click)="goForgotPassword($event)"
+      >Forgot password?</button>
     </div>
   </div>
 </div>

@@ -31,3 +31,4 @@ class UserSchema(ModelSchema):
         model = User
         fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password', 'role')
     password = fields.String(load_only=True)
+    id = fields.Integer(required=False, allow_none=True)

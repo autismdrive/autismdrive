@@ -1,8 +1,11 @@
-<div class="profile">
-  <h1>Firstname Lastname’s profile</h1>
+<div class="profile mat-typography">
+  <h1>{{session.first_name}} {{session.last_name}}’s profile</h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
-    <mat-progress-bar mode="determinate" [value]="10"></mat-progress-bar>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="10"
+    ></mat-progress-bar>
   </div>
 </div>
