@@ -12,19 +12,34 @@
   >
     <app-logo></app-logo>
 
-    <form [formGroup]="form" (ngSubmit)="submit(model)">
-      <formly-form [form]="form" [fields]="fields" [model]="model">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit(model)"
+    >
+      <formly-form
+        [form]="form"
+        [fields]="fields"
+        [model]="model"
+      >
         <div
           fxLayout="column"
           fxLayoutGap="2%"
           fxLayoutAlign="center"
         >
-      <div
-        id="error_message"
-        class="display mat-error"
-      >{{errorEmitter | async}}</div>
-          <button mat-button type="submit">Submit</button>
-          <button mat-button (click)="goHome($event)">Cancel</button>
+          <div
+            id="error_message"
+            class="display mat-error"
+          >{{errorEmitter | async}}</div>
+          <button
+            mat-flat-button
+            type="submit"
+            color="primary"
+          >Submit</button>
+          <button
+            mat-flat-button
+            (click)="goHome($event)"
+            color="accent"
+          >Cancel</button>
         </div>
       </formly-form>
     </form>
@@ -33,8 +48,14 @@
       fxLayout="row"
       fxLayoutAlign="space-between"
     >
-      <button mat-button (click)="goTerms($event)">Create account</button>
-      <button mat-button (click)="goForgotPassword($event)">Forgot password?</button>
+      <button
+        mat-button
+        (click)="goTerms($event)"
+      >Create account</button>
+      <button
+        mat-button
+        (click)="goForgotPassword($event)"
+      >Forgot password?</button>
     </div>
   </div>
 </div>
