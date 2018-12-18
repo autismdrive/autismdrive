@@ -9,15 +9,32 @@
   <div class="form" fxFlex="60%">
     <app-logo></app-logo>
     <h1>Create a STAR DRIVE Account</h1>
-    <!--<app-register-form></app-register-form>-->
-    <h3>First Name</h3>
-    <h3>Last Name</h3>
-    <h3>Email Address</h3>
-    <h3>Password</h3>
-    <div fxLayout="row" fxLayoutGap="2%" fxLayoutAlign="center center">
-      <button mat-button (click)="goHome($event)">Cancel</button>
-      <button mat-button (click)="goProfile($event)">Next</button>
-    </div>
+    <form [formGroup]="form" (ngSubmit)="submit(model)">
+      <formly-form [form]="form" [fields]="fields" [model]="model">
+        <div
+          id="error_message"
+          class="display mat-error"
+        >{{errorEmitter | async}}</div>
+        <footer
+        fxLayout="column"
+        fxLayoutGap="2%"
+        fxLayoutAlign="center"
+        *ngIf="registerState === 'form'">
+          <button mat-button type="submit">Next</button>
+          <button mat-button (click)="goHome($event)">Cancel</button>
+        </footer>
+        <footer *ngIf="registerState === 'submitting'">
+          <mat-spinner></mat-spinner>
+        </footer>
+        <footer *ngIf="registerState === 'wait_for_email'">
+          <b>Account Created! </b>
+          <p>Please check your email to complete the signin process.</p>
+          <button color="primary" (click)="goHome($event)" mat-button>
+            Continue
+          </button>
+        </footer>
+      </formly-form>
+    </form>
   </div>
   <div fxFlex="30%">
     <h3>Why do I need an account?</h3>

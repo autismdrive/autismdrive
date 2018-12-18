@@ -13,6 +13,7 @@ import {
   MatCardModule,
   MatIconModule,
   MatProgressBarModule,
+  MatProgressSpinnerModule,
   MatToolbarModule
 } from '@angular/material';
 
@@ -55,8 +56,9 @@ import { TermsComponent } from './terms/terms.component';
     HttpClientModule,
     MatButtonModule,
     MatCardModule,
-    MatProgressBarModule,
     MatIconModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatToolbarModule,
     ReactiveFormsModule
   ],

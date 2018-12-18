@@ -25,7 +25,8 @@ export class ApiService {
     login_password: '/api/login_password',
     forgot_password: '/api/forgot_password',
     reset_password: '/api/reset_password',
-    session: '/api/session'
+    session: '/api/session',
+    userList: '/api/user',
   };
 
   private hasSession: boolean;
@@ -190,6 +191,13 @@ export class ApiService {
     return this.httpClient.get<Training[]>(this.apiRoot + this.endpoints.trainingList)
       .pipe(catchError(this.handleError));
   }
+
+  // addUser
+  addUser(user: User): Observable<User> {
+    return this.httpClient.post<User>(this.apiRoot + this.endpoints.userList, user)
+      .pipe(catchError(this.handleError));
+  }
+
 
   private handleError(error: HttpErrorResponse) {
     let message = 'Something bad happened; please try again later.';
