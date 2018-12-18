@@ -1,5 +1,11 @@
 @import '../node_modules/@angular/material/theming';
-@include mat-core();
+
+// Define a custom typography config that overrides the font-family
+$custom-typography: mat-typography-config(
+  $font-family: 'Roboto, sans-serif',
+);
+
+@include mat-core($custom-typography);
 
 $mat-blue: (
   50 : #F1F5F7, // Modified, was #e0e6ed
@@ -69,11 +75,33 @@ $mat-orange: (
 
 $stardrive-primary: mat-palette($mat-blue);
 $stardrive-accent: mat-palette($mat-orange);
-$stardrive-warn: mat-palette($mat-deep-orange);
+$stardrive-warn: mat-palette($mat-red);
 $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
 
 @include angular-material-theme($stardrive-theme);
 @mixin stardrive-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
+
+  // Global style overrides
+  button {
+    &.btn-lg {
+      font-size: 32px;
+      padding-left: 32px;
+      padding-right: 32px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
+
+  .alert {
+    padding: 2em;
+    text-align: center;
+    border-radius: 4px;
+
+    &.alert-warn {
+      background-color: mat-color($stardrive-warn, 900, 1);
+      color: white;
+    }
+  }
 }
