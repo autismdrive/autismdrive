@@ -12,18 +12,15 @@ export class ResourcesComponent implements OnInit {
 
   constructor(
     private api: ApiService
-  ) { }
-
-  ngOnInit() {
+  ) {
     this.loadResources();
   }
 
-  loadResources(){
-    this.api.getResources().subscribe(
-      (resources) => {
-        this.resources = resources;
-      }
-    )
+  ngOnInit() {
+  }
+
+  loadResources() {
+    this.api.getResources().subscribe(resources => this.resources = resources);
   }
 
 }
