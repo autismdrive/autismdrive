@@ -7,17 +7,25 @@ import {
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatFormFieldModule,
   MatGridListModule,
   MatIconModule,
+  MatInputModule,
   MatListModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
-  MatToolbarModule
+  MatSelectModule,
+  MatToolbarModule,
+  MatSlideToggleModule,
+  MatTableModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CovalentTextEditorModule } from '@covalent/text-editor';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
+import { ColorPickerModule } from 'ngx-color-picker';
+import { MarkdownModule } from 'ngx-markdown';
 import { ApiService } from './api.service';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './AuthInterceptor';
@@ -38,6 +46,8 @@ import { RoutingModule } from './routing/routing.module';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { StudiesComponent } from './studies/studies.component';
 import { TermsComponent } from './terms/terms.component';
+import { NgProgressModule } from 'ngx-progressbar';
+import { FileDropModule } from 'ngx-file-drop';
 
 
 @NgModule({
@@ -61,23 +71,33 @@ import { TermsComponent } from './terms/terms.component';
     SearchResultComponent
   ],
   imports: [
-    RoutingModule,
-    BrowserModule,
     BrowserAnimationsModule,
+    BrowserModule,
+    ColorPickerModule,
+    CovalentTextEditorModule,
+    FileDropModule,
     FlexLayoutModule,
-    FormlyModule.forRoot(),
     FormlyMaterialModule,
+    FormlyModule.forRoot(),
     HttpClientModule,
+    MarkdownModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
-    MatIconModule,
-    MatListModule,
+    MatFormFieldModule,
     MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatTableModule,
     MatToolbarModule,
-    ReactiveFormsModule
+    NgProgressModule,
+    ReactiveFormsModule,
+    RoutingModule
   ],
   providers: [
     {

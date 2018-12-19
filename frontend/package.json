@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^7.0.4",
     "@angular/platform-browser-dynamic": "^7.0.4",
     "@angular/router": "^7.0.4",
+    "@covalent/text-editor": "^2.0.0-rc.1",
     "@ngx-formly/core": "^4.8.2",
     "@ngx-formly/material": "^4.8.2",
     "angular-formio": "^3.8.0",
