@@ -1,13 +1,13 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpEventType, HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, last, map, tap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { Study } from './study';
 import { Resource } from './resource';
 import { Training } from './training';
-import { SDFileAttachment } from './forms/file-attachment';
-import { NgProgress } from 'ngx-progressbar';
+import { User } from './user';
 
 @Injectable()
 export class ApiService {
@@ -22,14 +22,88 @@ export class ApiService {
     resource: '/api/resource/<id>',
     trainingList: '/api/training',
     training: '/api/training/<id>',
-    fileAttachment: '/api/file/<file_id>', // One file
-    fileAttachmentList: '/api/file', // All files
+    login_password: '/api/login_password',
+    forgot_password: '/api/forgot_password',
+    reset_password: '/api/reset_password',
+    session: '/api/session',
+    userList: '/api/user',
   };
+
+  private hasSession: boolean;
+  private sessionSubject = new BehaviorSubject<User>(null);
 
   constructor(private httpClient: HttpClient) {
   }
 
-  /** Add Study */
+
+  /** getSession */
+  public getSession(): Observable<User> {
+    if (!this.hasSession && localStorage.getItem('token')) {
+      this._fetchSession();
+    }
+    return this.sessionSubject.asObservable();
+  }
+
+  /** _fetchSession */
+  public _fetchSession(): void {
+    this.httpClient.get<User>(this.apiRoot + this.endpoints.session).subscribe(user => {
+      this.hasSession = true;
+      this.sessionSubject.next(user);
+    }, (error) => {
+      localStorage.removeItem('token');
+      this.hasSession = false;
+      this.sessionSubject.error(error);
+    });
+  }
+
+  /** openSession */
+  openSession(token: string): Observable<User> {
+    localStorage.setItem('token', token);
+    return this.getSession();
+  }
+
+  /** closeSession */
+  closeSession(): Observable<User> {
+    this.httpClient.delete<User>(this.apiRoot + this.endpoints.session).subscribe(x => {
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+      this.hasSession = false;
+      this.sessionSubject.next(null);
+    }, (error) => {
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+      this.hasSession = false;
+      this.sessionSubject.error(error);
+    });
+    return this.sessionSubject.asObservable();
+  }
+
+  /** loginUser - allow users to log into the system with a user name and password.
+   * email_token is not required, only send this if user is logging in for the first time
+   * after an email verification link. */
+  login(email: string, password: string, email_token = ''): Observable<any> {
+    const options = { email: email, password: password, email_token: email_token };
+    return this.httpClient.post(this.apiRoot + this.endpoints.login_password, options)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** resetPassword
+   * Reset password */
+  resetPassword(newPassword: string, email_token: string): Observable<string> {
+    const reset = { password: newPassword, email_token: email_token };
+    return this.httpClient.post<string>(this.apiRoot + this.endpoints.reset_password, reset)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** sendResetPasswordEmail
+   * Reset password */
+  sendResetPasswordEmail(email: String): Observable<any> {
+    const email_data = { email: email };
+    return this.httpClient.post<any>(this.apiRoot + this.endpoints.forgot_password, email_data)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Add Study
   addStudy(study: Study): Observable<Study> {
     console.log('adding a study:', study);
     return this.httpClient.post<Study>(this.apiRoot + this.endpoints.studyList, study)
@@ -134,95 +208,12 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
-
-  /** getFileAttachment */
-  getFileAttachment(id?: number, md5?: string): Observable<SDFileAttachment> {
-    const params = { id: String(id), md5: md5 };
-    const url = this.apiRoot + this.endpoints.fileAttachmentList;
-
-    return this.httpClient.get<SDFileAttachment>(url, { params: params })
+  // addUser
+  addUser(user: User): Observable<User> {
+    return this.httpClient.post<User>(this.apiRoot + this.endpoints.userList, user)
       .pipe(catchError(this.handleError));
   }
 
-  /** addFileAttachment */
-  addFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this.apiRoot + this.endpoints.fileAttachmentList;
-    const attachmentMetadata = {
-      file_name: attachment.name,
-      display_name: attachment.name,
-      date_modified: new Date(attachment.lastModified),
-      md5: attachment.md5,
-      mime_type: attachment.type,
-      size: attachment.size
-    };
-
-    return this.httpClient.post<SDFileAttachment>(url, attachmentMetadata)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** addFileAttachmentBlob */
-  addFileAttachmentBlob(attachmentId: number, attachment: SDFileAttachment, progress: NgProgress): Observable<SDFileAttachment> {
-    const url = this.endpoints.fileAttachment.replace('<file_id>', attachmentId.toString());
-    const options: {
-      headers?: HttpHeaders,
-      observe: 'events',
-      params?: HttpParams,
-      reportProgress?: boolean,
-      responseType: 'json',
-      withCredentials?: boolean
-    } = {
-      observe: 'events',
-      reportProgress: true,
-      responseType: 'blob' as 'json'
-    };
-
-    return this.httpClient.put<File>(this.apiRoot + url, attachment, options)
-      .pipe(
-        map(event => this.showProgress(event, attachment, progress)),
-        last(), // return last (completed) message to caller
-        catchError(this.handleError)
-      );
-  }
-
-  /** updateFileAttachment */
-  updateFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this.endpoints.fileAttachment.replace('<file_id>', attachment.id.toString());
-    const attachmentMetadata = {
-      display_name: attachment.display_name,
-      date_modified: new Date(attachment.lastModified || attachment.date_modified),
-      md5: attachment.md5,
-      mime_type: attachment.type || attachment.mime_type,
-      size: attachment.size,
-      resource_id: attachment.resource_id
-    };
-
-    return this.httpClient.put<SDFileAttachment>(this.apiRoot + url, attachmentMetadata)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** getFileAttachmentBlob*/
-  getFileAttachmentBlob(attachment: SDFileAttachment): Observable<Blob> {
-    const options: {
-      headers?: HttpHeaders,
-      observe?: 'body',
-      params?: HttpParams,
-      reportProgress?: boolean,
-      responseType: 'json',
-      withCredentials?: boolean,
-    } = {
-      responseType: 'blob' as 'json'
-    };
-
-    return this.httpClient.get<Blob>(attachment.url, options)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** deleteFileAttachment */
-  deleteFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this.endpoints.fileAttachment.replace('<file_id>', attachment.id.toString());
-    return this.httpClient.delete<SDFileAttachment>(this.apiRoot + url)
-      .pipe(catchError(this.handleError));
-  }
 
   private handleError(error: HttpErrorResponse) {
     let message = 'Something bad happened; please try again later.';

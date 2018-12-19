@@ -65,7 +65,7 @@ class DataLoader():
             next(reader, None)  # skip the headers
             for row in reader:
                 user = User(id=row[0], email=row[1], first_name=row[2], last_name=row[3], password=row[4],
-                            role=row[5])
+                            role=row[5], email_verified=True)
                 db.session.add(user)
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())

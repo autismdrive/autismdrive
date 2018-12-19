@@ -1,7 +1,13 @@
+// Import theming functions
+@import '../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
 
-mat-toolbar {
-  padding: 0 0 5% 0;
+#menu-bar {
   background-color: white;
+  height: 120px;
 
   mat-toolbar-row {
     a {
@@ -9,13 +15,29 @@ mat-toolbar {
       color: inherit;
     }
   }
-  .menubar {
-    color: #777777;
-    font-size: 12px;
-    background-color: transparent;
+
+  #primary-nav, #utility-nav {
+    .mat-button {
+      color: mat-color($stardrive-primary, default, 1);
+
+      &.selected {
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
+        border-bottom-color: mat-color($stardrive-primary, default, 1);
+      }
+    }
   }
 
-  button {
-    margin: 1em;
+  #primary-nav .mat-button {
+    margin-top: 56px;
+    margin-bottom: 0px;
   }
+
+  #utility-nav .mat-button {
+    margin-top: 0px;
+    margin-bottom: 56px;
+  }
+
 }

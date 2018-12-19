@@ -7,7 +7,13 @@ import unittest
 import json
 import random
 import string
+import re
+import base64
+import quopri
+import datetime
 
+from app.email_service import TEST_MESSAGES
+from app.model.email_log import EmailLog
 from app.model.resource import StarResource
 from app.model.study import Study
 from app.model.training import Training
@@ -69,14 +75,17 @@ class TestCase(unittest.TestCase):
                                 phone=phone, website=website)
         db.session.add(resource)
         db.session.commit()
-        return resource
+
+        db_resource = db.session.query(StarResource).filter_by(title=resource.title).first()
+        self.assertEqual(db_resource.website, resource.website)
+        return db_resource
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
                         researcher_description="Fantastic people work on this fantastic study. You should be impressed",
                         participant_description="Even your pet hamster could benefit from participating in this study",
                         outcomes="You can expect to have your own rainbow following you around after participating",
-                        enrollment_date="2019-01-20 00:00:00", current_enrolled="54", total_participants="5000",
-                        study_start="2019-02-01 00:00:00", study_end="2019-03-31 00:00:00"):
+                        enrollment_date=datetime.date(2019, 1, 20), current_enrolled="54", total_participants="5000",
+                        study_start=datetime.date(2019, 2, 1), study_end=datetime.date(2019, 3, 31)):
 
         study = Study(title=title, description=description, researcher_description=researcher_description,
                       participant_description=participant_description, outcomes=outcomes,
@@ -84,24 +93,43 @@ class TestCase(unittest.TestCase):
                       total_participants=total_participants, study_start=study_start, study_end=study_end)
         db.session.add(study)
         db.session.commit()
-        return study
+
+        db_study = db.session.query(Study).filter_by(title=study.title).first()
+        self.assertEqual(db_study.description, study.description)
+        return db_study
 
     def construct_training(self, title="Best Training", description="A training to end all trainings",
                            outcomes="Increased intelligence and the ability to do magic tricks.",
                            image="assets/image.png", image_caption="One of the magic tricks you will learn"):
 
-        training= Training(title=title, description=description, outcomes=outcomes, image=image,
+        training = Training(title=title, description=description, outcomes=outcomes, image=image,
                            image_caption=image_caption)
         db.session.add(training)
         db.session.commit()
-        return training
+
+        db_training = db.session.query(Training).filter_by(title=training.title).first()
+        self.assertEqual(db_training.outcomes, training.outcomes)
+        return db_training
 
     def construct_user(self, first_name="Stan", last_name="Ton", email="stan@staunton.com", role="Self"):
 
         user = User(first_name=first_name, last_name=last_name, email=email, role=role)
         db.session.add(user)
         db.session.commit()
-        return user
+
+        db_user = db.session.query(User).filter_by(email=user.email).first()
+        self.assertEqual(db_user.first_name, user.first_name)
+        return db_user
+
+    def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
+
+        user = User(first_name=first_name, last_name=last_name, email=email, role=role)
+        db.session.add(user)
+        db.session.commit()
+
+        db_user = db.session.query(User).filter_by(email=user.email).first()
+        self.assertEqual(db_user.first_name, user.first_name)
+        return db_user
 
     def test_resource_basics(self):
         self.construct_resource()
@@ -206,7 +234,7 @@ class TestCase(unittest.TestCase):
     def test_delete_study(self):
         s = self.construct_study()
         s_id = s.id
-        rv = self.app.get('api/study/%i' % s_id, content_type="applicaiton/json")
+        rv = self.app.get('api/study/%i' % s_id, content_type="application/json")
         self.assertSuccess(rv)
 
         rv = self.app.delete('api/study/%i' % s_id, content_type="application/json")
@@ -345,3 +373,159 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['last_name'], 'Arachnia')
         self.assertEqual(response['role'], 'Widow')
         self.assertIsNotNone(response['id'])
+
+    def logged_in_headers(self, user=None):
+        # If no user is provided, generate a dummy Admin user
+        if not user:
+            user = User(
+                id=7,
+                first_name="Admin",
+                email="admin@admin.org",
+                password="myPass457",
+                email_verified=True,
+                role="Admin")
+
+        # Add user if it's not already in database
+        if user.id:
+            existing_user = User.query.filter_by(id=user.id).first()
+        if not existing_user and user.email:
+            existing_user = User.query.filter_by(email=user.email).first()
+
+        if not existing_user:
+            db.session.add(user)
+            db.session.commit()
+
+        data = {
+            'email': user.email,
+            'password': 'myPass457'
+        }
+
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+
+        db_user = User.query.filter_by(email=user.email).first()
+        return dict(
+            Authorization='Bearer ' + db_user.encode_auth_token().decode())
+
+    def test_create_user_with_password(self, first_name="Peter", id=8,
+                                       email="tyrion@got.com", role="User", password="peterpass"):
+        data = {
+            "first_name": first_name,
+            "id": id,
+            "email": email,
+            "role": role
+        }
+        rv = self.app.post(
+            '/api/user',
+            data=json.dumps(data),
+            follow_redirects=True,
+            headers=self.logged_in_headers(),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        user = User.query.filter_by(id=id).first()
+        user.password = password
+        db.session.add(user)
+        db.session.commit()
+
+        rv = self.app.get(
+            '/api/user/%i' % user.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(first_name, response["first_name"])
+        self.assertEqual(email, response["email"])
+        self.assertEqual(role, response["role"])
+        self.assertEqual(True, user.is_correct_password(password))
+
+        return user
+
+    def test_login_user(self):
+        user = self.test_create_user_with_password()
+        data = {"email": "tyrion@got.com", "password": "peterpass"}
+        # Login shouldn't work with email not yet verified
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assertEqual(400, rv.status_code)
+
+        user.email_verified = True
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response["token"])
+
+        return user
+
+    def test_get_current_user(self):
+        """ Test for the current user status """
+        user = self.test_login_user()
+
+        # Now get the user back.
+        response = self.app.get(
+            '/api/session',
+            headers=dict(
+                Authorization='Bearer ' + user.encode_auth_token().decode()))
+        self.assertSuccess(response)
+        return json.loads(response.data.decode())
+
+    def decode(self, encoded_words):
+        """
+        Useful for checking the content of email messages
+        (which we store in an array for testing)
+        """
+        encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
+        charset, encoding, encoded_text = re.match(encoded_word_regex,
+                                                   encoded_words).groups()
+        if encoding is 'b':
+            byte_string = base64.b64decode(encoded_text)
+        elif encoding is 'q':
+            byte_string = quopri.decodestring(encoded_text)
+        text = byte_string.decode(charset)
+        text = text.replace("_", " ")
+        return text
+
+    def test_register_sends_email(self):
+        message_count = len(TEST_MESSAGES)
+        self.test_create_user_with_password()
+        self.assertGreater(len(TEST_MESSAGES), message_count)
+        self.assertEqual("STAR Drive: Confirm Email",
+                         self.decode(TEST_MESSAGES[-1]['subject']))
+
+        logs = EmailLog.query.all()
+        self.assertIsNotNone(logs[-1].tracking_code)
+
+    def test_forgot_password_sends_email(self):
+        user = self.test_create_user_with_password()
+        message_count = len(TEST_MESSAGES)
+        data = {"email": user.email}
+        rv = self.app.post(
+            '/api/forgot_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        self.assertGreater(len(TEST_MESSAGES), message_count)
+        self.assertEqual("STAR Drive: Password Reset Email",
+                         self.decode(TEST_MESSAGES[-1]['subject']))
+
+        logs = EmailLog.query.all()
+        self.assertIsNotNone(logs[-1].tracking_code)
+
+    def test_get_current_user(self):
+        """ Test for the current user status """
+        self.test_create_user_with_password(id=9)
+
+        user = User.query.filter_by(id=9).first()
+
+        # Now get the user back.
+        response = self.app.get(
+            '/api/session',
+            headers=dict(
+                Authorization='Bearer ' + user.encode_auth_token().decode()))
+        self.assertSuccess(response)
+        return json.loads(response.data.decode())

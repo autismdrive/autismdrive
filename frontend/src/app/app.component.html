@@ -1,69 +1,75 @@
-<mat-toolbar
-  *ngIf="!hideHeader"
->
+<mat-toolbar *ngIf="!hideHeader">
   <mat-toolbar-row
-    class="menubar"
+    id="menu-bar"
+    fxLayout="row"
   >
-    <span class="spacer"></span>
-    <button
-      mat-button
-      *ngIf="!session"
-      (click)="goTerms($event)"
-      id="register-button"
-    >
-      <mat-icon>account_circle</mat-icon>
-      Create Account
-    </button>
-    <button
-      mat-button
-      *ngIf="!session"
-      (click)="goLogin($event)"
-      id="login-button"
-    >
-      <mat-icon>account_circle</mat-icon>
-      Sign in
-    </button>
-  </mat-toolbar-row>
-
-  <mat-toolbar-row>
     <app-logo></app-logo>
-    <div
-      class="nav"
-      fxLayout="column"
-    >
-    <a href="home"><h1>STAR Drive</h1></a>
-      <div>
-        <button
-          mat-button
-          (click)="goEnroll($event)"
-          id="enroll-button"
-        >
-          Enroll in a study
-        </button>
-        <button
-          mat-button
-          (click)="goStudies($event)"
-          id="studies-button"
-        >
-          Current studies
-        </button>
-        <button
-          mat-button
-          (click)="goResources($event)"
-          id="resources-button"
-        >
-          Training & Resources
-        </button>
-      </div>
+    <div id="primary-nav">
+      <a
+        mat-button
+        [routerLink]="[ '/enroll' ]"
+        routerLinkActive="selected"
+        id="enroll-button"
+      >Enroll in a study</a>
+      <a
+        mat-button
+        [routerLink]="[ '/studies' ]"
+        routerLinkActive="selected"
+        id="studies-button"
+      >Current studies</a>
+      <a
+        mat-button
+        [routerLink]="[ '/resources' ]"
+        routerLinkActive="selected"
+        id="resources-button"
+      >Training & Resources</a>
+    </div>
+
+    <span fxFlex></span>
+
+    <div id="utility-nav">
+      <a
+        mat-button
+        *ngIf="!session"
+        [routerLink]="[ '/terms' ]"
+        routerLinkActive="selected"
+        id="register-button"
+      >
+        <mat-icon>person_add</mat-icon>
+        Create Account
+      </a>
+      <a
+        mat-button
+        *ngIf="!session"
+        [routerLink]="[ '/login' ]"
+        routerLinkActive="selected"
+        id="login-button"
+      >
+        <mat-icon>account_circle</mat-icon>
+        Sign in
+      </a>
+      <a
+        mat-button
+        *ngIf="session"
+        [routerLink]="[ '/profile' ]"
+        routerLinkActive="selected"
+        id="profile-button"
+      >
+        <mat-icon>account_circle</mat-icon>
+        Visit Profile
+      </a>
+      <a
+        mat-button
+        *ngIf="session"
+        (click)="goLogout($event)"
+        id="logout-button"
+      >
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </a>
     </div>
   </mat-toolbar-row>
-
-  <mat-toolbar-row>
-
-  </mat-toolbar-row>
-
 </mat-toolbar>
 <div class="content">
   <router-outlet></router-outlet>
 </div>
-

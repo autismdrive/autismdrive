@@ -1,3 +1,10 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
 .enroll {
   margin: 1em;
 
@@ -18,5 +25,22 @@
   padding: 2em;
   color: white;
   background-color: #777777;
-  height: 300px;
+  height: 480px;
+}
+
+#hero {
+  background-image: url('/assets/enroll/hero.jpg');
+  background-position: 50% 20%;
+  background-size: cover;
+
+  h1.mat-display-2 {
+    margin: 0px;
+    text-shadow: 0 0 5px rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.5);
+  }
+}
+
+#feature {
+  background-image: url('/assets/enroll/feature.jpg');
+  background-position: 100% 20%;
+  background-size: cover;
 }
