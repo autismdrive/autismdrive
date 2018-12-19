@@ -1,11 +1,20 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpEventType, HttpEvent } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpEvent,
+  HttpEventType,
+  HttpHeaders,
+  HttpParams
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { NgProgress } from 'ngx-progressbar';
 import { Observable, throwError } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { catchError } from 'rxjs/operators';
+import { catchError, last, map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
-import { Study } from './study';
+import { SDFileAttachment } from './forms/file-attachment';
 import { Resource } from './resource';
+import { Study } from './study';
 import { Training } from './training';
 import { User } from './user';
 
@@ -16,16 +25,18 @@ export class ApiService {
 
   // REST endpoints
   endpoints = {
-    studyList: '/api/study',
-    study: '/api/study/<id>',
-    resourceList: '/api/resource',
-    resource: '/api/resource/<id>',
-    trainingList: '/api/training',
-    training: '/api/training/<id>',
-    login_password: '/api/login_password',
+    fileAttachment: '/api/file/<file_id>', // One file
+    fileAttachmentList: '/api/file', // All files
     forgot_password: '/api/forgot_password',
+    login_password: '/api/login_password',
     reset_password: '/api/reset_password',
+    resource: '/api/resource/<id>',
+    resourceList: '/api/resource',
     session: '/api/session',
+    study: '/api/study/<id>',
+    studyList: '/api/study',
+    training: '/api/training/<id>',
+    trainingList: '/api/training',
     userList: '/api/user',
   };
 
@@ -254,4 +265,94 @@ export class ApiService {
         break;
     }
   }
+
+
+  /** getFileAttachment */
+  getFileAttachment(id?: number, md5?: string): Observable<SDFileAttachment> {
+    const params = { id: String(id), md5: md5 };
+    const url = this.apiRoot + this.endpoints.fileAttachmentList;
+
+    return this.httpClient.get<SDFileAttachment>(url, { params: params });
+  }
+
+  /** updateFileAttachment */
+  updateFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
+    const url = this.endpoints.fileAttachment.replace('<file_id>', attachment.id.toString());
+    const attachmentMetadata = {
+      display_name: attachment.display_name,
+      date_modified: new Date(attachment.lastModified || attachment.date_modified),
+      md5: attachment.md5,
+      mime_type: attachment.type || attachment.mime_type,
+      size: attachment.size,
+      resource_id: attachment.resource_id
+    };
+
+    return this.httpClient.put<SDFileAttachment>(this.apiRoot + url, attachmentMetadata)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** getFileAttachmentBlob*/
+  getFileAttachmentBlob(attachment: SDFileAttachment): Observable<Blob> {
+    const options: {
+      headers?: HttpHeaders,
+      observe?: 'body',
+      params?: HttpParams,
+      reportProgress?: boolean,
+      responseType: 'json',
+      withCredentials?: boolean,
+    } = {
+      responseType: 'blob' as 'json'
+    };
+
+    return this.httpClient.get<Blob>(attachment.url, options)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** deleteFileAttachment */
+  deleteFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
+    const url = this.endpoints.fileAttachment.replace('<file_id>', attachment.id.toString());
+    return this.httpClient.delete<SDFileAttachment>(this.apiRoot + url)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** addFileAttachment */
+  addFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
+    const url = this.apiRoot + this.endpoints.fileAttachmentList;
+    const attachmentMetadata = {
+      file_name: attachment.name,
+      display_name: attachment.name,
+      date_modified: new Date(attachment.lastModified),
+      md5: attachment.md5,
+      mime_type: attachment.type,
+      size: attachment.size
+    };
+
+    return this.httpClient.post<SDFileAttachment>(url, attachmentMetadata)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** addFileAttachmentBlob */
+  addFileAttachmentBlob(attachmentId: number, attachment: SDFileAttachment, progress: NgProgress): Observable<SDFileAttachment> {
+    const url = this.endpoints.fileAttachment.replace('<file_id>', attachmentId.toString());
+    const options: {
+      headers?: HttpHeaders,
+      observe: 'events',
+      params?: HttpParams,
+      reportProgress?: boolean,
+      responseType: 'json',
+      withCredentials?: boolean
+    } = {
+      observe: 'events',
+      reportProgress: true,
+      responseType: 'blob' as 'json'
+    };
+
+    return this.httpClient.put<File>(this.apiRoot + url, attachment, options)
+      .pipe(
+        map(event => this.showProgress(event, attachment, progress)),
+        last(), // return last (completed) message to caller
+        catchError(this.handleError)
+      );
+  }
+
 }
