@@ -16,10 +16,8 @@
     }
   }
 
-  #primary-nav {
-    button {
-      margin-top: 56px;
-      margin-bottom: 0px;
+  #primary-nav, #utility-nav {
+    .mat-button {
       color: mat-color($stardrive-primary, default, 1);
 
       &.selected {
@@ -30,14 +28,16 @@
         border-bottom-color: mat-color($stardrive-primary, default, 1);
       }
     }
-
   }
 
-  #utility-nav {
-    button {
-      margin-top: 0px;
-      margin-bottom: 56px;
-      color: mat-color($stardrive-primary, default, 1);
-    }
+  #primary-nav .mat-button {
+    margin-top: 56px;
+    margin-bottom: 0px;
   }
+
+  #utility-nav .mat-button {
+    margin-top: 0px;
+    margin-bottom: 56px;
+  }
+
 }

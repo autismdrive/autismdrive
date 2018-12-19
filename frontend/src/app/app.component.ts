@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ActivationEnd, ActivationStart, Router } from '@angular/router';
+import { ActivationEnd, ActivationStart, Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { User } from './user';
 
@@ -15,7 +15,6 @@ export class AppComponent implements OnInit {
 
   public constructor(
     private api: ApiService,
-    private route: ActivatedRoute,
     private router: Router
   ) {
 
@@ -37,43 +36,9 @@ export class AppComponent implements OnInit {
     });
   }
 
-  goLogin($event) {
-    $event.preventDefault();
-    this.router.navigate(['login']);
-  }
-
-  goProfile($event) {
-    $event.preventDefault();
-    this.router.navigate(['profile']);
-  }
-
   goLogout($event) {
     $event.preventDefault();
     this.api.closeSession().subscribe();
     this.router.navigate(['home']);
-  }
-
-  goTerms($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms']);
-  }
-
-  goEnroll($event) {
-    $event.preventDefault();
-    this.router.navigate(['enroll']);
-  }
-
-  goStudies($event) {
-    $event.preventDefault();
-    this.router.navigate(['studies']);
-  }
-
-  goResources($event) {
-    $event.preventDefault();
-    this.router.navigate(['resources']);
-  }
-
-  isSelected(route) {
-    return location.pathname.split('/')[1] === route;
   }
 }
