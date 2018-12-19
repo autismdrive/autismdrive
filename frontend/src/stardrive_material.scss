@@ -2,7 +2,7 @@
 
 // Define a custom typography config that overrides the font-family
 $custom-typography: mat-typography-config(
-  $font-family: 'Roboto, sans-serif',
+  $font-family: 'Roboto, sans-serif'
 );
 
 @include mat-core($custom-typography);
@@ -85,12 +85,20 @@ $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardr
 
   // Global style overrides
   button {
-    &.btn-lg {
-      font-size: 32px;
-      padding-left: 32px;
-      padding-right: 32px;
+    &.btn-xl {
+      font-size: 24px;
+      padding-left: 24px;
+      padding-right: 24px;
       padding-top: 8px;
       padding-bottom: 8px;
+    }
+
+    &.btn-lg {
+      font-size: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 6px;
+      padding-bottom: 6px;
     }
   }
 
