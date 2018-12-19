@@ -59,13 +59,16 @@ def login_password():
 def forgot_password():
     request_data = request.get_json()
     email = request_data['email']
-    user = User.query.filter(func.lower(User.email) == email.lower()).first_or_404()
+    user = User.query.filter(func.lower(User.email) == email.lower()).first()
 
-    tracking_code = email_service.reset_email(user)
-    log = EmailLog(user_id=user.id, type="reset_email", tracking_code=tracking_code)
-    db.session.add(log)
-    db.session.commit()
-    return ''
+    if user:
+        tracking_code = email_service.reset_email(user)
+        log = EmailLog(user_id=user.id, type="reset_email", tracking_code=tracking_code)
+        db.session.add(log)
+        db.session.commit()
+        return ''
+    else:
+        raise RestException(RestException.EMAIL_NOT_REGISTERED)
 
 
 @auth_blueprint.route('/reset_password', methods=["GET", "POST"])

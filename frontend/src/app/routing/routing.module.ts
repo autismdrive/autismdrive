@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { EnrollComponent } from './enroll/enroll.component';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
-import { PasswordResetComponent } from './password-reset/password-reset.component';
-import { ProfileComponent } from './profile/profile.component';
-import { RegisterComponent } from './register/register.component';
-import { ResourcesComponent } from './resources/resources.component';
-import { StudiesComponent } from './studies/studies.component';
-import { TermsComponent } from './terms/terms.component';
+import { RouterModule, Routes } from '@angular/router';
+import { EnrollComponent } from '../enroll/enroll.component';
+import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
+import { HomeComponent } from '../home/home.component';
+import { LoginComponent } from '../login/login.component';
+import { PasswordResetComponent } from '../password-reset/password-reset.component';
+import { ProfileComponent } from '../profile/profile.component';
+import { RegisterComponent } from '../register/register.component';
+import { ResourcesComponent } from '../resources/resources.component';
+import { StudiesComponent } from '../studies/studies.component';
+import { TermsComponent } from '../terms/terms.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -32,4 +32,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class RoutingModule { }
