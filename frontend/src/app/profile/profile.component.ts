@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { User } from '../user';
+import { FormArray, FormGroup } from '@angular/forms';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+
+export interface StepType {
+  label: string;
+  description: string;
+  fields: FormlyFieldConfig[];
+}
 
 @Component({
   selector: 'app-profile',
@@ -9,6 +17,103 @@ import { User } from '../user';
 })
 export class ProfileComponent implements OnInit {
   session: User;
+  activeStep = 0;
+
+  model = {};
+  steps: StepType[] = [
+    {
+      label: 'Research Registrant Contact Information',
+      description: 'Please answer the following questions about YOURSELF (* indicates required response):',
+      fields: [
+        {
+          key: 'firstname',
+          type: 'input',
+          templateOptions: {
+            label: 'First name',
+            required: true,
+          },
+        },
+        {
+          key: 'lastname',
+          type: 'input',
+          templateOptions: {
+            label: 'Last name',
+            required: true,
+          },
+        },
+        {
+          key: 'nickname',
+          type: 'input',
+          templateOptions: {
+            label: 'Nickname',
+            required: false,
+          },
+        },
+        {
+          key: 'phone',
+          wrappers: ['card'],
+          templateOptions: { label: 'Phone' },
+          fieldGroup: [
+            {
+              key: 'phone',
+              type: 'input',
+              templateOptions: {
+                required: true,
+                type: 'phone',
+                label: 'Preferred phone number',
+              },
+            },
+            {
+              key: 'phoneType',
+              type: 'radio',
+              templateOptions: {
+                label: '',
+                placeholder: '',
+                description: '',
+                required: true,
+                options: [
+                  { value: 'home', label: 'Home' },
+                  { value: 'cell', label: 'Cell' },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: 'Address',
+      description: '',
+      fields: [
+        {
+          key: 'country',
+          type: 'input',
+          templateOptions: {
+            label: 'Country',
+            required: true,
+          },
+        },
+      ],
+    },
+    {
+      label: 'Day of the trip',
+      description: '',
+      fields: [
+        {
+          key: 'day',
+          type: 'input',
+          templateOptions: {
+            type: 'date',
+            label: 'Day of the trip',
+            required: true,
+          },
+        },
+      ],
+    },
+  ];
+
+  form = new FormArray(this.steps.map(() => new FormGroup({})));
+  options = this.steps.map(() => <FormlyFormOptions>{});
 
   constructor(
     private api: ApiService
@@ -23,4 +128,15 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  prevStep(step: number) {
+    this.activeStep = step - 1;
+  }
+
+  nextStep(step: number) {
+    this.activeStep = step + 1;
+  }
+
+  submit() {
+    alert(JSON.stringify(this.model));
+  }
 }

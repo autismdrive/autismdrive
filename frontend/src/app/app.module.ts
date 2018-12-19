@@ -17,7 +17,9 @@ import {
   MatSelectModule,
   MatToolbarModule,
   MatSlideToggleModule,
-  MatTableModule
+  MatTableModule,
+  MatExpansionModule,
+  MatStepperModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -48,6 +50,8 @@ import { StudiesComponent } from './studies/studies.component';
 import { TermsComponent } from './terms/terms.component';
 import { NgProgressModule } from 'ngx-progressbar';
 import { FileDropModule } from 'ngx-file-drop';
+import { CommonModule } from '@angular/common';
+import { CardWrapperComponent } from './card-wrapper/card-wrapper.component';
 
 
 @NgModule({
@@ -68,22 +72,32 @@ import { FileDropModule } from 'ngx-file-drop';
     StudiesComponent,
     TermsComponent,
     FiltersComponent,
-    SearchResultComponent
+    SearchResultComponent,
+    CardWrapperComponent
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
     ColorPickerModule,
+    CommonModule,
     CovalentTextEditorModule,
     FileDropModule,
     FlexLayoutModule,
     FormlyMaterialModule,
-    FormlyModule.forRoot(),
+    FormlyModule.forRoot({
+      validationMessages: [
+        { name: 'required', message: 'This field is required.' },
+      ],
+      wrappers: [
+        { name: 'card', component: CardWrapperComponent },
+      ],
+    }),
     HttpClientModule,
     MarkdownModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatGridListModule,
     MatIconModule,
@@ -93,6 +107,7 @@ import { FileDropModule } from 'ngx-file-drop';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatStepperModule,
     MatTableModule,
     MatToolbarModule,
     NgProgressModule,
