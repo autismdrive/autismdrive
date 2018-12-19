@@ -72,6 +72,10 @@ export class PasswordResetComponent implements OnInit {
   ngOnInit() {
   }
 
+  goHome($event) {
+    // should likely go somewhere.
+  }
+
   submit() {
     if (this.form.valid) {
       this.formState = 'submitting';

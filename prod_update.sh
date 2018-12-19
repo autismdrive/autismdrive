@@ -33,10 +33,10 @@ export FLASK_APP=${HOME_DIR}/backend/app/__init__.py
 eval 'cd ${HOME_DIR}/backend && pip3 install -r requirements.txt'
 
 # Upgrade the database
-eval 'cd ${HOME_DIR}/backend && flask db upgrade'
+eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask db upgrade'
 
 # rebuild the index (uncomment when this is working)
-# eval 'cd ${HOME_DIR}/backend && flask initindex'
+# eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
 
 # Rebuild the front end.
 eval 'cd ${HOME_DIR}/frontend && npm install'
