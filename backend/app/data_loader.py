@@ -1,5 +1,6 @@
 import sys
 from flask import json
+from app.model.email_log import EmailLog
 from app.model.resource import StarResource
 from app.model.study import Study
 from app.model.training import Training
@@ -72,6 +73,7 @@ class DataLoader():
         db.session.commit()
 
     def clear(self):
+        db.session.query(EmailLog).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()
