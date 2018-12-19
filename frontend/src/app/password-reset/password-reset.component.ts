@@ -14,7 +14,6 @@ export class PasswordResetComponent implements OnInit {
   token: string;
   formState = 'form';
   errorMessage = '';
-  errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
   model: any = {};
   fields: FormlyFieldConfig[] = [
@@ -73,7 +72,8 @@ export class PasswordResetComponent implements OnInit {
   }
 
   goHome($event) {
-    // should likely go somewhere.
+    $event.preventDefault();
+    this.router.navigate(['home']);
   }
 
   submit() {

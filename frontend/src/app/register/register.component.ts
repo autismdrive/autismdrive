@@ -13,7 +13,6 @@ import { User } from '../user';
 export class RegisterComponent implements OnInit {
 
   user: User;
-  errorEmitter = new EventEmitter<string>();
   registerState = 'form';
   errorMessage = '';
   form = new FormGroup({});

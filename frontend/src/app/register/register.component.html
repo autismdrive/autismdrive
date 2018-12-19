@@ -24,7 +24,8 @@
         <div
           id="error_message"
           class="display mat-error"
-        >{{errorEmitter | async}}</div>
+          *ngIf="errorMessage"
+        >{{errorMessage}}</div>
         <footer
           fxLayout="column"
           fxLayoutGap="2%"
@@ -51,7 +52,7 @@
           <button
             color="primary"
             (click)="goHome($event)"
-            mat-button
+            mat-flat-button
           >
             Continue
           </button>
