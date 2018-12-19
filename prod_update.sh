@@ -7,7 +7,7 @@
 
 # Move the configuration file into place.
 mkdir -p ./backend/instance
-cp /home/ubuntu/ithriv_config.py ./backend/instance/config.py
+cp /home/ubuntu/star_config.py ./backend/instance/config.py
 
 if [ "$1" == "prod" ]; then
     echo "Building for production."
