@@ -9,7 +9,11 @@ class Training(db.Model):
     title = db.Column(db.String)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     description = db.Column(db.String)
-    outcomes = db.Column(db.String)
-    image = db.Column(db.String)  # Should be the url for a feature image
+    outcomes_description = db.Column(db.String)
+    organization_id = db.Column('organization_id', db.Integer,
+                               db.ForeignKey('organization.id'))
+    image_url = db.Column(db.String)  # Should be the url for a feature image
     image_caption = db.Column(db.String)
+    website = db.Column(db.String)
+
     # Probably need related categories as well for recommendations, even though that isn't explicitly in the design

@@ -25,10 +25,9 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                resource = StarResource(id=row[0], title=row[1], description=row[2], image=row[3], image_caption=row[4],
-                                        organization=row[5], street_address1=row[6], street_address2=row[7],
-                                        city=row[8], state=row[9], zip=row[10], county=row[11], website=row[12],
-                                        phone=row[13])
+                resource = StarResource(id=row[0], title=row[1], description=row[2], image_url=row[3], image_caption=row[4],
+                                        street_address1=row[6], street_address2=row[7], city=row[8], state=row[9],
+                                        zip=row[10], county=row[11], website=row[12], phone=row[13])
                 db.session.add(resource)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
                 StarResource).count())
@@ -41,8 +40,8 @@ class DataLoader():
             for row in reader:
 
                 study = Study(id=row[0], title=row[1], description=row[2], researcher_description=row[3],
-                              participant_description=row[4], outcomes=row[5], enrollment_date=row[6],
-                              current_enrolled=row[7], total_participants=row[8], study_start=row[9], study_end=row[10])
+                              participant_description=row[4], outcomes_description=row[5], enrollment_start_date=row[6],
+                              current_num_participants=row[7], max_num_participants=row[8], start_date=row[9], end_date=row[10])
                 db.session.add(study)
             print("Studies loaded.  There are now %i studies in the database." % db.session.query(
                 Study).count())
@@ -53,7 +52,7 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                training = Training(id=row[0], title=row[1], description=row[2], outcomes=row[3], image=row[4],
+                training = Training(id=row[0], title=row[1], description=row[2], outcomes_description=row[3], image_url=row[4],
                                     image_caption=row[5])
                 db.session.add(training)
             print("Trainings loaded.  There are now %i trainings in the database." % db.session.query(
