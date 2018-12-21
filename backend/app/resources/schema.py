@@ -1,5 +1,8 @@
 from flask_marshmallow.sqla import ModelSchema
 from marshmallow import fields
+
+from app import ma
+from app.model.category import Category
 from app.model.organization import Organization
 from app.model.resource import StarResource
 from app.model.study import Study
@@ -11,6 +14,35 @@ class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
         fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies', 'trainings')
+
+
+class ParentCategorySchema(ModelSchema):
+    """Provides a view of the parent category, all the way to the top, but ignores children"""
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'parent', 'level', '_links')
+    parent = fields.Nested('self', dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level())
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.categoryendpoint', id='<id>'),
+        'collection': ma.URLFor('api.categorylistendpoint')
+    })
+
+
+class CategorySchema(ModelSchema):
+    """Provides detailed information about a category, including all the children"""
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', '_links')
+    id = fields.Integer(required=False, allow_none=True)
+    parent_id = fields.Integer(required=False, allow_none=True)
+    children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
+    parent = fields.Nested(ParentCategorySchema, dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.categoryendpoint', id='<id>'),
+        'collection': ma.URLFor('api.categorylistendpoint')
+    })
 
 
 class StarResourceSchema(ModelSchema):

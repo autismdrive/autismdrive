@@ -13,6 +13,7 @@ import quopri
 import datetime
 
 from app.email_service import TEST_MESSAGES
+from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.resource import StarResource
@@ -124,6 +125,18 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_org.description, organization.description)
         return db_org
 
+    def construct_category(self, name="Ultimakers", parent=None):
+
+        category = Category(name=name)
+        if parent is not None:
+            category.parent = parent
+        db.session.add(category)
+        db.session.commit()
+
+        db_category = db.session.query(Category).filter_by(name=category.name).first()
+        self.assertIsNotNone(db_category.id)
+        return db_category
+
     def construct_user(self, first_name="Stan", last_name="Ton", email="stan@staunton.com", role="Self"):
 
         user = User(first_name=first_name, last_name=last_name, email=email, role=role)
@@ -187,7 +200,7 @@ class TestCase(unittest.TestCase):
     def test_delete_resource(self):
         r = self.construct_resource()
         r_id = r.id
-        rv = self.app.get('api/resource/%i' % r_id, content_type="applicaiton/json")
+        rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
         self.assertSuccess(rv)
 
         rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json")
@@ -307,7 +320,7 @@ class TestCase(unittest.TestCase):
     def test_delete_training(self):
         t = self.construct_training()
         t_id = t.id
-        rv = self.app.get('api/training/%i' % t_id, content_type="applicaiton/json")
+        rv = self.app.get('api/training/%i' % t_id, content_type="application/json")
         self.assertSuccess(rv)
 
         rv = self.app.delete('api/training/%i' % t_id, content_type="application/json")
@@ -325,7 +338,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['title'], 'Training of Trainings')
         self.assertEqual(response['outcomes_description'], 'This training will change your life.')
         self.assertIsNotNone(response['id'])
-
 
     def test_organization_basics(self):
         self.construct_organization()
@@ -364,7 +376,7 @@ class TestCase(unittest.TestCase):
     def test_delete_organization(self):
         o = self.construct_organization()
         o_id = o.id
-        rv = self.app.get('api/organization/%i' % o_id, content_type="applicaiton/json")
+        rv = self.app.get('api/organization/%i' % o_id, content_type="application/json")
         self.assertSuccess(rv)
 
         rv = self.app.delete('api/organization/%i' % o_id, content_type="application/json")
@@ -382,6 +394,120 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['name'], 'Organization of Champions')
         self.assertEqual(response['description'], 'All the best people, all the time.')
         self.assertIsNotNone(response['id'])
+
+    def test_category_basics(self):
+        self.construct_category()
+        c = db.session.query(Category).first()
+        self.assertIsNotNone(c)
+        c_id = c.id
+        c.parent = self.construct_category(name="3d Printers")
+        rv = self.app.get('/api/category/%i' % c_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], c_id)
+        self.assertEqual(response["name"], 'Ultimakers')
+        self.assertEqual(response["parent"]["name"], '3d Printers')
+
+    def test_modify_category_basics(self):
+        self.construct_category()
+        c = db.session.query(Category).first()
+        self.assertIsNotNone(c)
+        c_id = c.id
+        c.parent = self.construct_category(name="3d Printers")
+        rv = self.app.get('/api/category/%i' % c_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['name'] = 'JellyBoxes'
+        new_parent = self.construct_category(name="Strange Kitchen Gadgets")
+        response['parent_id'] = new_parent.id
+        rv = self.app.put('/api/category/%i' % c_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/category/%i' % c_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['name'], 'JellyBoxes')
+        self.assertEqual(response['parent']['name'], 'Strange Kitchen Gadgets')
+
+    def test_delete_category(self):
+        c = self.construct_category()
+        c_id = c.id
+        rv = self.app.get('api/category/%i' % c_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/category/%i' % c_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/category/%i' % c_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_category(self):
+        category = {'name': "My Favorite Things"}
+        rv = self.app.post('api/category', data=json.dumps(category), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['name'], 'My Favorite Things')
+        self.assertIsNotNone(response['id'])
+
+    def test_category_has_links(self):
+        self.construct_category()
+        rv = self.app.get(
+            '/api/category/1',
+            follow_redirects=True,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["_links"]["self"], '/api/category/1')
+        self.assertEqual(response["_links"]["collection"], '/api/category')
+
+    def test_category_has_children(self):
+        c1 = self.construct_category()
+        c2 = self.construct_category(name="I'm the kid", parent=c1)
+        rv = self.app.get(
+            '/api/category/1',
+            follow_redirects=True,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["children"][0]['id'], 2)
+        self.assertEqual(response["children"][0]['name'], "I'm the kid")
+
+    def test_category_has_parents_and_that_parent_has_no_children(self):
+        c1 = self.construct_category()
+        c2 = self.construct_category(name="I'm the kid", parent=c1)
+        c3 = self.construct_category(name="I'm the grand kid", parent=c2)
+        rv = self.app.get(
+            '/api/category/3',
+            follow_redirects=True,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["parent"]['id'], 2)
+        self.assertNotIn("children", response["parent"])
+
+    def test_category_depth_is_limited(self):
+        c1 = self.construct_category()
+        c2 = self.construct_category(
+            name="I'm the kid", parent=c1)
+        c3 = self.construct_category(
+            name="I'm the grand kid",
+            parent=c2)
+        c4 = self.construct_category(
+            name="I'm the great grand kid",
+            parent=c3)
+
+        rv = self.app.get(
+            '/api/category',
+            follow_redirects=True,
+            content_type="application/json")
+
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+
+        self.assertEqual(1, len(response))
+        self.assertEqual(1, len(response[0]["children"]))
 
     def test_user_basics(self):
         self.construct_user()
@@ -424,7 +550,7 @@ class TestCase(unittest.TestCase):
     def test_delete_user(self):
         u = self.construct_user()
         u_id = u.id
-        rv = self.app.get('api/user/%i' % u_id, content_type="applicaiton/json")
+        rv = self.app.get('api/user/%i' % u_id, content_type="application/json")
         self.assertSuccess(rv)
 
         rv = self.app.delete('api/user/%i' % u_id, content_type="application/json")
