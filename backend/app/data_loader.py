@@ -1,6 +1,7 @@
 import sys
 from flask import json
 from app.model.email_log import EmailLog
+from app.model.organization import Organization
 from app.model.resource import StarResource
 from app.model.study import Study
 from app.model.training import Training
@@ -25,9 +26,10 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
+                org = self.get_org_by_name(row[5]) if row[5] else None
                 resource = StarResource(id=row[0], title=row[1], description=row[2], image_url=row[3], image_caption=row[4],
-                                        street_address1=row[6], street_address2=row[7], city=row[8], state=row[9],
-                                        zip=row[10], county=row[11], website=row[12], phone=row[13])
+                                        organization=org, street_address1=row[6], street_address2=row[7], city=row[8],
+                                        state=row[9], zip=row[10], county=row[11], website=row[12], phone=row[13])
                 db.session.add(resource)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
                 StarResource).count())
@@ -38,10 +40,11 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-
+                org = self.get_org_by_name(row[12]) if row[12] else None
                 study = Study(id=row[0], title=row[1], description=row[2], researcher_description=row[3],
                               participant_description=row[4], outcomes_description=row[5], enrollment_start_date=row[6],
-                              current_num_participants=row[7], max_num_participants=row[8], start_date=row[9], end_date=row[10])
+                              enrollment_end_date=row[7], current_num_participants=row[8], max_num_participants=row[9],
+                              start_date=row[10], end_date=row[11], organization=org)
                 db.session.add(study)
             print("Studies loaded.  There are now %i studies in the database." % db.session.query(
                 Study).count())
@@ -52,8 +55,9 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
+                org = self.get_org_by_name(row[6]) if row[6] else None
                 training = Training(id=row[0], title=row[1], description=row[2], outcomes_description=row[3], image_url=row[4],
-                                    image_caption=row[5])
+                                    image_caption=row[5], organization=org, website=row[7])
                 db.session.add(training)
             print("Trainings loaded.  There are now %i trainings in the database." % db.session.query(
                 Training).count())
@@ -70,6 +74,14 @@ class DataLoader():
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())
         db.session.commit()
+
+    def get_org_by_name(self, org_name):
+        organization = db.session.query(Organization).filter(Organization.name == org_name).first()
+        if organization is None:
+            organization = Organization(name=org_name)
+            db.session.add(organization)
+            db.session.commit()
+        return organization
 
     def clear(self):
         db.session.query(EmailLog).delete()
