@@ -1,12 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatExpansionModule,
   MatFormFieldModule,
   MatGridListModule,
   MatIconModule,
@@ -15,11 +17,10 @@ import {
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatSelectModule,
-  MatToolbarModule,
   MatSlideToggleModule,
+  MatStepperModule,
   MatTableModule,
-  MatExpansionModule,
-  MatStepperModule
+  MatToolbarModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -27,16 +28,20 @@ import { CovalentTextEditorModule } from '@covalent/text-editor';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
+import { NgProgressModule } from 'ngx-progressbar';
 import { ApiService } from './api.service';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './AuthInterceptor';
+import { CardWrapperComponent } from './forms/card-wrapper/card-wrapper.component';
 import { EnrollComponent } from './enroll/enroll.component';
 import { FiltersComponent } from './filters/filters.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { SDFileUploadComponent } from './forms/file-upload/file-upload.component';
 import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
 import { SDFormFieldComponent } from './forms/form-field/form-field.component';
+import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './forms/validators/formly.validator';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
@@ -48,16 +53,32 @@ import { RoutingModule } from './routing/routing.module';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { StudiesComponent } from './studies/studies.component';
 import { TermsComponent } from './terms/terms.component';
-import { NgProgressModule } from 'ngx-progressbar';
-import { FileDropModule } from 'ngx-file-drop';
-import { CommonModule } from '@angular/common';
-import { CardWrapperComponent } from './card-wrapper/card-wrapper.component';
+
+@Injectable()
+export class FormlyConfig {
+  public static config = {
+    validators: [
+      { name: 'phone', validation: PhoneValidator },
+      { name: 'email', validation: EmailValidator },
+    ],
+    validationMessages: [
+      { name: 'phone', message: PhoneValidatorMessage },
+      { name: 'email', message: EmailValidatorMessage },
+      { name: 'required', message: 'This field is required.' },
+    ],
+    wrappers: [
+      { name: 'card', component: CardWrapperComponent },
+    ],
+  };
+}
 
 
 @NgModule({
   declarations: [
     AppComponent,
+    CardWrapperComponent,
     EnrollComponent,
+    FiltersComponent,
     ForgotPasswordComponent,
     HomeComponent,
     LoginComponent,
@@ -69,11 +90,9 @@ import { CardWrapperComponent } from './card-wrapper/card-wrapper.component';
     SDFileUploadComponent,
     SDFormFieldComponent,
     SDFormFieldLabelComponent,
-    StudiesComponent,
-    TermsComponent,
-    FiltersComponent,
     SearchResultComponent,
-    CardWrapperComponent
+    StudiesComponent,
+    TermsComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -84,14 +103,7 @@ import { CardWrapperComponent } from './card-wrapper/card-wrapper.component';
     FileDropModule,
     FlexLayoutModule,
     FormlyMaterialModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required.' },
-      ],
-      wrappers: [
-        { name: 'card', component: CardWrapperComponent },
-      ],
-    }),
+    FormlyModule.forRoot(FormlyConfig.config),
     HttpClientModule,
     MarkdownModule,
     MatButtonModule,

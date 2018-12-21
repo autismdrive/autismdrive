@@ -109,6 +109,19 @@ $animationDuration: 500ms;
     transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
   }
 
+  .mat-radio-group {
+    outline: none;
+  }
+
+  .vertical-radio-group {
+    display: inline-flex;
+    flex-direction: column;
+
+    .mat-radio-button {
+      margin: 5px;
+    }
+  }
+
   .mat-radio-button {
     padding-right: 16px;
   }

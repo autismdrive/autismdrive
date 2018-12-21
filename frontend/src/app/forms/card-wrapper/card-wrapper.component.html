@@ -1,6 +1,8 @@
 <mat-card>
   <mat-card-content>
-    {{ to.label }}
+    <mat-card-header>
+      <mat-card-title>{{ to.label }}</mat-card-title>
+    </mat-card-header>
     <ng-container #fieldComponent></ng-container>
   </mat-card-content>
 </mat-card>

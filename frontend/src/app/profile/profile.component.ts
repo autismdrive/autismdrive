@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { User } from '../user';
-import { FormArray, FormGroup } from '@angular/forms';
+import { FormArray, FormGroup, EmailValidator } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 
 export interface StepType {
@@ -59,8 +59,11 @@ export class ProfileComponent implements OnInit {
               type: 'input',
               templateOptions: {
                 required: true,
-                type: 'phone',
-                label: 'Preferred phone number',
+                type: 'tel',
+                label: 'Preferred phone number (including area code)',
+              },
+              validators: {
+                validation: ['phone'],
               },
             },
             {
@@ -101,25 +104,102 @@ export class ProfileComponent implements OnInit {
             },
           ],
         },
-      ],
-    },
-    {
-      label: 'Address',
-      description: '',
-      fields: [
         {
-          key: 'country',
+          key: 'email',
           type: 'input',
           templateOptions: {
-            label: 'Country',
+            label: 'Email',
+            type: 'email',
             required: true,
           },
+          validators: {
+            validation: ['email'],
+          },
+        },
+        {
+          key: 'address',
+          wrappers: ['card'],
+          templateOptions: { label: 'Address' },
+          fieldGroup: [
+            {
+              key: 'streetAddress',
+              type: 'input',
+              templateOptions: {
+                label: 'Street Address',
+                required: true,
+              },
+            },
+            {
+              key: 'city',
+              type: 'input',
+              templateOptions: {
+                label: 'Town/City',
+                required: false,
+              },
+            },
+            {
+              key: 'state',
+              type: 'input',
+              templateOptions: {
+                label: 'State',
+                required: false,
+              },
+            },
+            {
+              key: 'zip',
+              type: 'input',
+              templateOptions: {
+                type: 'number',
+                label: 'Zip',
+                max: 99999,
+                min: 0,
+                pattern: '\\d{5}',
+                required: true,
+              },
+            },
+          ],
+        },
+        {
+          key: 'marketing',
+          wrappers: ['card'],
+          templateOptions: { label: 'How did you hear about us?' },
+          fieldGroup: [
+            {
+              key: 'marketingChannel',
+              type: 'radio',
+              className: 'vertical-radio-group',
+              templateOptions: {
+                label: '',
+                placeholder: '',
+                description: '',
+                required: true,
+                options: [
+                  { value: '1', label: 'Internet' },
+                  { value: '2', label: 'Health care provider (doctor, speech therapist, etc)' },
+                  { value: '3', label: 'Teacher or school' },
+                  { value: '4', label: 'Word of mouth (friend, family member, etc)' },
+                  { value: '5', label: 'Community event (autism walk, resource fair, etc.)' },
+                  { value: '6', label: 'Television or radio (CNN, NPR, local news, etc.)' },
+                  { value: '7', label: 'While participating in a research study' },
+                  { value: '8', label: 'Other' },
+                ],
+              },
+            },
+            {
+              key: 'marketingChannelOther',
+              type: 'input',
+              templateOptions: {
+                placeholder: 'Where did you hear about us?'
+              },
+              hideExpression: '!(model.marketingChannel && (model.marketingChannel === "8"))',
+            },
+          ]
         },
       ],
     },
     {
-      label: 'Day of the trip',
-      description: '',
+      label: 'Respondent’s Demographics',
+      description: 'Please answer the following questions about YOURSELF (* indicates required response):',
       fields: [
         {
           key: 'day',
