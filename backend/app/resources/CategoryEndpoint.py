@@ -63,6 +63,6 @@ class RootCategoryListEndpoint(flask_restful.Resource):
     def get(self):
         categories = db.session.query(Category)\
             .filter(Category.parent_id == None)\
-            .order_by(Category.display_order, Category.name)\
+            .order_by(Category.name)\
             .all()
         return self.categories_schema.dump(categories)

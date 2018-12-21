@@ -1,5 +1,6 @@
 import sys
 from flask import json
+from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.resource import StarResource
@@ -15,11 +16,24 @@ class DataLoader():
     file = "example_data/resources.csv"
 
     def __init__(self, directory="./example_data"):
+        self.category_file = directory + "/categories.csv"
         self.resource_file = directory + "/resources.csv"
         self.study_file = directory + "/studies.csv"
         self.training_file = directory + "/trainings.csv"
         self.user_file = directory + "/users.csv"
         print("Data loader initialized")
+
+    def load_categories(self):
+        with open(self.category_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                parent = self.get_category_by_name(row[1]) if row[1] else None
+                category = Category(name=row[0], parent=parent)
+                db.session.add(category)
+            print("Categories loaded.  There are now %i categories in the database." % db.session.query(
+                Category).count())
+        db.session.commit()
 
     def load_resources(self):
         with open(self.resource_file, newline='') as csvfile:
@@ -83,7 +97,16 @@ class DataLoader():
             db.session.commit()
         return organization
 
+    def get_category_by_name(self, category_name):
+        category = db.session.query(Category).filter(Category.name == category_name).first()
+        if category is None:
+            category = Category(name=category_name)
+            db.session.add(category)
+            db.session.commit()
+        return category
+
     def clear(self):
+        db.session.query(Category).delete()
         db.session.query(EmailLog).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
