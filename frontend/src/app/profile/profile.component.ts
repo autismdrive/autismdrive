@@ -77,6 +77,28 @@ export class ProfileComponent implements OnInit {
                 ],
               },
             },
+            {
+              key: 'phoneType',
+              type: 'radio',
+              defaultValue: true,
+              templateOptions: {
+                label: 'Is it okay to leave a voicemail message at this number?',
+                required: false,
+                options: [
+                  { value: true, label: 'Yes' },
+                  { value: false, label: 'No' },
+                ],
+              },
+            },
+            {
+              key: 'contactTimes',
+              type: 'textarea',
+              templateOptions: {
+                label: `Some research studies might involve a phone call.
+                        If that’s the case, when would be the best times of day to call you?`,
+                required: false,
+              },
+            },
           ],
         },
       ],
