@@ -105,6 +105,14 @@ $animationDuration: 500ms;
     }
   }
 
+  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
+  }
+
+  .mat-radio-button {
+    padding-right: 16px;
+  }
+
   .alert {
     padding: 2em;
     text-align: center;
