@@ -113,16 +113,16 @@ $animationDuration: 500ms;
     outline: none;
   }
 
-  .vertical-radio-group {
+  .vertical-radio-group, .vertical-checkbox-group {
     display: inline-flex;
     flex-direction: column;
 
-    .mat-radio-button {
+    .mat-radio-button, .mat-checkbox {
       margin: 5px;
     }
   }
 
-  .mat-radio-button {
+  .mat-radio-button, .mat-checkbox {
     padding-right: 16px;
   }
 

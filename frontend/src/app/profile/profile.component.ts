@@ -202,16 +202,79 @@ export class ProfileComponent implements OnInit {
       description: 'Please answer the following questions about YOURSELF (* indicates required response):',
       fields: [
         {
-          key: 'day',
-          type: 'input',
+          key: 'birthdate',
+          type: 'datepicker',
           templateOptions: {
-            type: 'date',
-            label: 'Day of the trip',
+            label: 'Your date of birth',
             required: true,
           },
         },
-      ],
+        {
+          key: 'gender',
+          type: 'radio',
+          templateOptions: {
+            label: 'Gender',
+            placeholder: '',
+            description: '',
+            required: false,
+            options: [
+              { value: 'male', label: 'Male' },
+              { value: 'female', label: 'Female' },
+              { value: 'other', label: 'Other' },
+              { value: 'no_answer', label: 'Prefer not to answer' },
+            ],
+          },
+        },
+        {
+          key: 'race',
+          type: 'multicheckbox',
+          className: 'vertical-radio-group',
+          templateOptions: {
+            options: [
+              {
+                key: 'raceBlack',
+                value: 'Black / African / African American'
+              },
+              {
+                key: 'raceAsian',
+                value: 'Asian / Asian American'
+              },
+              {
+                key: 'raceWhite',
+                value: 'White / Caucasian'
+              },
+              {
+                key: 'raceHispanic',
+                value: 'Hispanic / Latin(o / a)'
+              },
+              {
+                key: 'raceNative',
+                value: 'Native American / Alaska Native'
+              },
+              {
+                key: 'racePacific',
+                value: 'Pacific Islander'
+              },
+              {
+                key: 'raceOther',
+                value: 'Other'
+              },
+            ],
+            label: 'Your race/ethnicity (select all that apply):'
+          }
+        },
+        {
+          key: 'raceOtherValue',
+          type: 'input',
+          templateOptions: {
+            placeholder: 'Enter race/ethnicity'
+          },
+          hideExpression: '!model.raceOther',
+        },
+      ]
     },
+
+
   ];
 
   form = new FormArray(this.steps.map(() => new FormGroup({})));

@@ -8,12 +8,14 @@ import {
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatDatepickerModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatGridListModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
+  MatNativeDateModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatSelectModule,
@@ -27,6 +29,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CovalentTextEditorModule } from '@covalent/text-editor';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
+import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
@@ -34,10 +37,10 @@ import { NgProgressModule } from 'ngx-progressbar';
 import { ApiService } from './api.service';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './AuthInterceptor';
-import { CardWrapperComponent } from './forms/card-wrapper/card-wrapper.component';
 import { EnrollComponent } from './enroll/enroll.component';
 import { FiltersComponent } from './filters/filters.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { CardWrapperComponent } from './forms/card-wrapper/card-wrapper.component';
 import { SDFileUploadComponent } from './forms/file-upload/file-upload.component';
 import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
 import { SDFormFieldComponent } from './forms/form-field/form-field.component';
@@ -109,6 +112,9 @@ export class FormlyConfig {
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatNativeDateModule,
+    FormlyMatDatepickerModule,
+    MatDatepickerModule,
     MatExpansionModule,
     MatFormFieldModule,
     MatGridListModule,
