@@ -21,6 +21,6 @@ class Study(db.Model):
     start_date = db.Column(db.DateTime)
     end_date = db.Column(db.DateTime)
     website = db.Column(db.String)
+    categories = db.relationship("StudyCategory", back_populates="study")
 
-    # need to add in related categories as well (perhaps a related model?)
     # we'll change current_num_participants to a count of related participants if that's how we connect things.

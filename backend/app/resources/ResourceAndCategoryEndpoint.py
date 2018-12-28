@@ -5,7 +5,6 @@ from app import db, RestException
 from app.model.category import Category
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
-from app.resources.Auth import login_optional
 from app.resources.schema import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
 
 

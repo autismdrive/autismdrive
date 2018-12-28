@@ -15,5 +15,4 @@ class Training(db.Model):
     image_url = db.Column(db.String)  # Should be the url for a feature image
     image_caption = db.Column(db.String)
     website = db.Column(db.String)
-
-    # Probably need related categories as well for recommendations, even though that isn't explicitly in the design
+    categories = db.relationship("TrainingCategory", back_populates="training")
