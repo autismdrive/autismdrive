@@ -21,4 +21,4 @@ class StarResource(db.Model):
     county = db.Column(db.String)
     phone = db.Column(db.String)
     website = db.Column(db.String)
-    # need to add in related categories as well (perhaps a related model?)
+    categories = db.relationship("ResourceCategory", back_populates="resource")
