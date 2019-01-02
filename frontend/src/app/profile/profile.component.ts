@@ -271,6 +271,33 @@ export class ProfileComponent implements OnInit {
           },
           hideExpression: '!model.raceOther',
         },
+        {
+          key: 'primaryLanguageIsEnglish',
+          type: 'radio',
+          defaultValue: true,
+          templateOptions: {
+            label: 'Is your primary language English?',
+            required: false,
+            options: [
+              { value: true, label: 'Yes' },
+              { value: false, label: 'No' },
+            ],
+          },
+        },
+        {
+          key: 'primaryLanguageIsEnglish',
+          type: 'select',
+          defaultValue: true,
+          templateOptions: {
+            label: 'Is your primary language English?',
+            required: false,
+            options: [
+              { value: true, label: 'Yes' },
+              { value: false, label: 'No' },
+            ],
+          },
+        },
+
       ]
     },
 
