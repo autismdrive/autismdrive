@@ -10,6 +10,42 @@ export interface StepType {
   fields: FormlyFieldConfig[];
 }
 
+export interface StarProfileModel {
+  enrollingFor?: string;
+  dependentFirstName?: string;
+  dependentLastName?: string;
+  dependentNickname?: string;
+  firstname?: string;
+  lastname?: string;
+  nickname?: string;
+  phone?: string;
+  phoneType?: string;
+  contactTimes?: string;
+  email?: string;
+  address?: string;
+  streetAddress?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  marketing?: string;
+  marketingChannel?: string;
+  marketingChannelOther?: string;
+  birthdate?: string;
+  sex?: string;
+  race?: string;
+  raceBlack?: string;
+  raceAsian?: string;
+  raceWhite?: string;
+  raceHispanic?: string;
+  raceNative?: string;
+  racePacific?: string;
+  raceOther?: string;
+  raceOtherValue?: string;
+  primaryLanguageIsEnglish?: string;
+  relationshipToDependent?: string;
+  relationshipToDependentOtherValue?: string;
+}
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -19,8 +55,63 @@ export class ProfileComponent implements OnInit {
   session: User;
   activeStep = 0;
 
-  model = {};
+  model: StarProfileModel = {};
   steps: StepType[] = [
+    {
+      label: 'UVA Research Registry Enrollment',
+      description: '',
+      fields: [
+        {
+          key: 'enrollingFor',
+          type: 'radio',
+          defaultValue: 'self',
+          modelOptions: {
+            updateOn: 'change',
+          },
+          templateOptions: {
+            label: 'Are you enrolling yourself or someone else?',
+            required: true,
+            options: [
+              { value: 'self', label: 'Myself' },
+              { value: 'dependent', label: 'My child or a person I have legal guardianship over*' },
+            ],
+            description: '*You must be this person’s legal guardian in order to enroll them.'
+          },
+        },
+      ]
+    },
+    {
+      label: 'Dependent Information',
+      description: `Please answer the following questions about your child
+        or the person with autism on whom you are providing information:`,
+      fields: [
+        {
+          key: 'dependentFirstName',
+          type: 'input',
+          templateOptions: {
+            label: 'First name',
+            required: true,
+          },
+        },
+        {
+          key: 'dependentLastName',
+          type: 'input',
+          templateOptions: {
+            label: 'Last name',
+            required: true,
+          },
+        },
+        {
+          key: 'dependentNickname',
+          type: 'input',
+          templateOptions: {
+            label: 'Nickname',
+            required: false,
+          },
+        },
+      ]
+
+    },
     {
       label: 'Research Registrant Contact Information',
       description: 'Please answer the following questions about YOURSELF (* indicates required response):',
@@ -210,10 +301,10 @@ export class ProfileComponent implements OnInit {
           },
         },
         {
-          key: 'gender',
+          key: 'sex',
           type: 'radio',
           templateOptions: {
-            label: 'Gender',
+            label: 'Your biological sex',
             placeholder: '',
             description: '',
             required: false,
@@ -285,19 +376,37 @@ export class ProfileComponent implements OnInit {
           },
         },
         {
-          key: 'primaryLanguageIsEnglish',
+          key: 'relationshipToDependent',
           type: 'select',
           defaultValue: true,
           templateOptions: {
-            label: 'Is your primary language English?',
+            label: 'Your relationship to dependent',
             required: false,
             options: [
-              { value: true, label: 'Yes' },
-              { value: false, label: 'No' },
+              { value: '1', label: 'Biological mother' },
+              { value: '2', label: 'Biological father' },
+              { value: '3', label: 'Adoptive mother' },
+              { value: '4', label: 'Adoptive father' },
+              { value: '5', label: 'Other' },
             ],
           },
+          hideExpression: '!((model.enrollingFor === "dependent") && model.dependentFirstName && model.dependentLastName)',
+          expressionProperties: {
+            'templateOptions.label': '"Your relationship to " + model.dependentFirstName + " " + model.dependentLastName'
+          }
         },
-
+        {
+          key: 'relationshipToDependentOtherValue',
+          type: 'input',
+          templateOptions: {
+            placeholder: 'Enter relationship'
+          },
+          hideExpression: '!(' +
+            'model.enrollingFor === "dependent" && ' +
+            'model.relationshipToDependent && ' +
+            '(model.relationshipToDependent === "5")' +
+            ')',
+        },
       ]
     },
 
