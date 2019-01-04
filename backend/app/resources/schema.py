@@ -38,8 +38,8 @@ class CategorySchema(ModelSchema):
     """Provides detailed information about a category, including all the children"""
     class Meta:
         model = Category
-        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'resource_count', 'study_count', 'training_count',
-                  '_links')
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'resource_count', 'study_count', 'training_count',
+                  '_links', '_meta')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -48,10 +48,22 @@ class CategorySchema(ModelSchema):
     resource_count = fields.Method('get_resource_count')
     study_count = fields.Method('get_study_count')
     training_count = fields.Method('get_training_count')
+    _meta = fields.Method('get_meta')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
     })
+
+    def get_meta(self, obj):
+        metadata = {}
+        for key, value in self.fields.items():
+            try:
+                meta = obj._sa_class_manager[key].info
+                if meta:
+                    metadata[key] = meta
+            except:
+                pass
+        return metadata
 
     def get_resource_count(self, obj):
         query = db.session.query(ResourceCategory).join(ResourceCategory.resource)\
