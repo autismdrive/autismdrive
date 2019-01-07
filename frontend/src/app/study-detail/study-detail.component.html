@@ -1,0 +1,101 @@
+<div
+  *ngIf="study"
+  class="mat-typography"
+  fxLayout="row"
+  fxLayoutGap="20px"
+  id="study"
+>
+  <div
+    id="study-details"
+    fxFlex="60%"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <h1>{{study.title}}</h1>
+    <p>{{study.description}}</p>
+    <div *ngIf="study.researcherDescription">
+      <h2>About the researchers</h2>
+      <p>{{study.researcherDescription}}</p>
+    </div>
+    <div *ngIf="study.participantDescription">
+      <h2>Who we're looking for</h2>
+      <p>{{study.participantDescription}}</p>
+    </div>
+    <div *ngIf="study.outcomes">
+      <h2>Benefits of participating</h2>
+      <p>{{study.outcomes}}</p>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayoutGap="20px"
+    >
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="goEnroll($event)"
+      >Enroll in this study</button>
+    </div>
+  </div>
+  <div
+    id="study-meta"
+    fxFlex="40%"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <div id="study-contact">
+      <mat-card>
+        <mat-card-title>Status</mat-card-title>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngIf="study.enrollmentDate">
+              <a
+                matLine
+                [routerLink]="['/enroll']"
+              >study.enrollmentDate</a>
+            </mat-list-item>
+            <mat-list-item *ngIf="study.totalParticipants">
+              {{study.currentEnrolled}} / {{study.totalParticipants}} participants enrolled
+            </mat-list-item>
+            <mat-list-item *ngIf="study.studyStart && study.studyEnd">
+              Study runs from {{study.studyStart}} to {{study.studyEnd}}
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div id="study-related">
+      <mat-card>
+        <mat-card-title>Related</mat-card-title>
+        <mat-card-content>
+          <h2>Resources</h2>
+          <mat-list>
+            <mat-list-item>
+              <a
+                matLine
+                href="/#/resource/1"
+              >Resource 1</a>
+              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                accusantium
+                doloremque laudantium, totam rem aperiam...</p>
+            </mat-list-item>
+          </mat-list>
+
+          <h2>Research Studies</h2>
+          <mat-list>
+            <mat-list-item>
+              <a
+                matLine
+                href="/#/study/1"
+              >Study 1</a>
+              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                accusantium
+                doloremque laudantium, totam rem aperiam...</p>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <div *ngIf="!study">
+    <mat-spinner></mat-spinner>
+  </div>

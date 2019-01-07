@@ -10,6 +10,9 @@ import { RegisterComponent } from '../register/register.component';
 import { ResourcesComponent } from '../resources/resources.component';
 import { StudiesComponent } from '../studies/studies.component';
 import { TermsComponent } from '../terms/terms.component';
+import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
+import { StudyDetailComponent } from '../study-detail/study-detail.component';
+import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -24,8 +27,11 @@ const routes: Routes = [
   { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' } },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
+  { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
   { path: 'studies', component: StudiesComponent, data: { title: 'Create a STAR Drive Account' } },
+  { path: 'study/:studyId', component: StudyDetailComponent, data: { title: 'Study Details' } },
   { path: 'terms', component: TermsComponent, data: { title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true } },
+  { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
 ];
 
 @NgModule({
