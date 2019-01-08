@@ -1,0 +1,106 @@
+<div
+  *ngIf="resource"
+  class="mat-typography"
+  fxLayout="row"
+  fxLayoutGap="20px"
+  id="resource"
+>
+  <div
+    id="resource-details"
+    fxFlex="60%"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <h1>{{resource.title}}</h1>
+    <img
+      *ngIf="resource.image"
+      [src]="resource.image"
+    >
+    <caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>
+    <h2>About this resource</h2>
+    <p>{{resource.description}}</p>
+    <div
+      fxLayout="column"
+      fxLayoutGap="20px"
+    >
+      <button
+        *ngIf="resource.phone"
+        mat-flat-button
+        color="primary"
+        (click)="goPhone($event)"
+      >Call {{resource.phone}}</button>
+      <button
+        *ngIf="resource.website"
+        mat-stroked-button
+        color="primary"
+        (click)="goWebsite($event)"
+      >Visit website</button>
+    </div>
+  </div>
+  <div
+    id="resource-meta"
+    fxFlex="40%"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <div id="resource-contact">
+      <mat-card>
+        <mat-card-title>Contact: {{resource.organization}}</mat-card-title>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngIf="resource.streetAddress1">
+              <mat-icon>address</mat-icon>
+              <address>
+                {{resource.streetAddress1}}
+                {{resource.streetAddress2}}
+                {{resource.city}}, {{resource.state}} {{resource.zip}}
+              </address>
+            </mat-list-item>
+            <mat-list-item *ngIf="resource.phone">
+              <mat-icon>phone</mat-icon>
+              <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
+            </mat-list-item>
+            <mat-list-item *ngIf="resource.website">
+              <mat-icon>link</mat-icon>
+              <a href="{{resource.website}}">{{resource.website}}</a>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div id="resource-related">
+      <mat-card>
+        <mat-card-title>Related</mat-card-title>
+        <mat-card-content>
+          <h2>Resources</h2>
+          <mat-list>
+            <mat-list-item>
+              <a
+                matLine
+                href="/#/resource/1"
+              >Resource 1</a>
+              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                accusantium
+                doloremque laudantium, totam rem aperiam...</p>
+            </mat-list-item>
+          </mat-list>
+
+          <h2>Research Studies</h2>
+          <mat-list>
+            <mat-list-item>
+              <a
+                matLine
+                href="/#/study/1"
+              >Study 1</a>
+              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                accusantium
+                doloremque laudantium, totam rem aperiam...</p>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <div *ngIf="!resource">
+    <mat-spinner></mat-spinner>
+  </div>
