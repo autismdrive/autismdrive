@@ -68,6 +68,11 @@
         </mat-card-content>
       </mat-card>
     </div>
+    <div id="resource-categories">
+      <mat-chip-list>
+        <mat-chip *ngFor="let rc of resource.resource_categories">{{rc.category.name}}</mat-chip>
+      </mat-chip-list>
+    </div>
     <div id="resource-related">
       <mat-card>
         <mat-card-title>Related</mat-card-title>

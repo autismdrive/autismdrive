@@ -63,6 +63,11 @@
         </mat-card-content>
       </mat-card>
     </div>
+    <div id="study-categories">
+      <mat-chip-list>
+        <mat-chip *ngFor="let sc of study.study_categories">{{sc.category.name}}</mat-chip>
+      </mat-chip-list>
+    </div>
     <div id="study-related">
       <mat-card>
         <mat-card-title>Related</mat-card-title>
