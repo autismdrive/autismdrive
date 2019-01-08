@@ -1,3 +1,4 @@
+import { ResourceCategory } from './resource_category';
 
 export interface Resource {
   id: number;
@@ -16,4 +17,5 @@ export interface Resource {
   website: string;
   categories: string[];
   status?: string;
+  resource_categories?: ResourceCategory[];
 }
