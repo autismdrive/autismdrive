@@ -11,12 +11,16 @@ class Study(db.Model):
     description = db.Column(db.String)
     researcher_description = db.Column(db.String)
     participant_description = db.Column(db.String)
-    outcomes = db.Column(db.String)
-    enrollment_date = db.Column(db.DateTime)
-    current_enrolled = db.Column(db.Integer)
-    total_participants = db.Column(db.Integer)
-    study_start = db.Column(db.DateTime)
-    study_end = db.Column(db.DateTime)
+    outcomes_description = db.Column(db.String)
+    organization_id = db.Column('organization_id', db.Integer,
+                               db.ForeignKey('organization.id'))
+    enrollment_start_date = db.Column(db.DateTime)
+    enrollment_end_date = db.Column(db.DateTime)
+    current_num_participants = db.Column(db.Integer)
+    max_num_participants = db.Column(db.Integer)
+    start_date = db.Column(db.DateTime)
+    end_date = db.Column(db.DateTime)
+    website = db.Column(db.String)
+    categories = db.relationship("StudyCategory", back_populates="study")
 
-    # need to add in related categories as well (perhaps a related model?)
-    # we'll change current_enrolled to a count of related participants if that's how we connect things.
+    # we'll change current_num_participants to a count of related participants if that's how we connect things.
