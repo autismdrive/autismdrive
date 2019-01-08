@@ -1,3 +1,4 @@
+import { StudyCategory } from './study_category';
 
 export interface Study {
   id: number;
@@ -13,4 +14,5 @@ export interface Study {
   studyEnd: string;
   categories: string[];
   status?: string;
+  study_categories?: StudyCategory[];
 }

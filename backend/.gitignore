@@ -3,3 +3,7 @@
 **/__pycache__
 instance
 python-env
+*.pyc
+.vscode/
+_trial_temp.lock
+pylintrc

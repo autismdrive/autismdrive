@@ -22,7 +22,8 @@ import {
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatChipsModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -120,6 +121,7 @@ export class FormlyConfig {
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatChipsModule,
     MatNativeDateModule,
     FormlyMatDatepickerModule,
     MatDatepickerModule,
