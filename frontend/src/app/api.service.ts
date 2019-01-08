@@ -138,7 +138,7 @@ export class ApiService {
   /** Get Study */
   getStudy(id: number): Observable<Study> {
     console.log('getting Study number ', id);
-    return this.httpClient.get<Study>(`${this.apiRoot + this.endpoints.study}/${id}`)
+    return this.httpClient.get<Study>(this.apiRoot + this.endpoints.study.replace('<id>', id.toString()))
       .pipe(catchError(this.handleError));
   }
 
@@ -173,7 +173,7 @@ export class ApiService {
   /** Get Resource */
   getResource(id: number): Observable<Resource> {
     console.log('getting resource number ', id);
-    return this.httpClient.get<Resource>(`${this.apiRoot + this.endpoints.resource}/${id}`)
+    return this.httpClient.get<Resource>(this.apiRoot + this.endpoints.resource.replace('<id>', id.toString()))
       .pipe(catchError(this.handleError));
   }
 
@@ -208,7 +208,7 @@ export class ApiService {
   /** Get Training */
   getTraining(id: number): Observable<Training> {
     console.log('getting training number ', id);
-    return this.httpClient.get<Training>(`${this.apiRoot + this.endpoints.training}/${id}`)
+    return this.httpClient.get<Training>(this.apiRoot + this.endpoints.training.replace('<id>', id.toString()))
       .pipe(catchError(this.handleError));
   }
 

@@ -56,6 +56,9 @@ import { RoutingModule } from './routing/routing.module';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { StudiesComponent } from './studies/studies.component';
 import { TermsComponent } from './terms/terms.component';
+import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
+import { StudyDetailComponent } from './study-detail/study-detail.component';
+import { TrainingDetailComponent } from './training-detail/training-detail.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -95,7 +98,12 @@ export class FormlyConfig {
     SDFormFieldLabelComponent,
     SearchResultComponent,
     StudiesComponent,
-    TermsComponent
+    TermsComponent,
+    FiltersComponent,
+    SearchResultComponent,
+    ResourceDetailComponent,
+    StudyDetailComponent,
+    TrainingDetailComponent
   ],
   imports: [
     BrowserAnimationsModule,
