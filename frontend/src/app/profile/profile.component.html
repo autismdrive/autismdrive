@@ -1,4 +1,7 @@
-<div class="profile mat-typography">
+<div
+  *ngIf="session"
+  class="profile mat-typography"
+>
   <h1>{{session.first_name}} {{session.last_name}}’s profile</h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
@@ -7,5 +10,50 @@
       mode="determinate"
       [value]="10"
     ></mat-progress-bar>
+
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+    >
+      <mat-vertical-stepper>
+        <mat-step *ngFor="let step of steps; let index = index; let last = last;">
+          <ng-template matStepLabel>{{ step.label }}</ng-template>
+          {{ step.description }}
+          <formly-form
+            [form]="form.at(index)"
+            [model]="model"
+            [fields]="step.fields"
+            [options]="options[index]"
+          >
+          </formly-form>
+
+          <div>
+            <button
+              *ngIf="index !== 0"
+              mat-flat-button
+              matStepperPrevious
+              type="button"
+              (click)="prevStep(index)"
+            >Back</button>
+            <button
+              *ngIf="!last"
+              mat-flat-button
+              matStepperNext
+              type="button"
+              [disabled]="!form.at(index).valid"
+              (click)="nextStep(index)"
+            >Save &amp; Next</button>
+            <button
+              *ngIf="last"
+              mat-flat-button
+              [disabled]="!form.valid"
+              type="submit"
+            >Submit</button>
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+    </form>
+
   </div>
 </div>

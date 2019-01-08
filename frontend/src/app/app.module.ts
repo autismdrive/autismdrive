@@ -1,29 +1,50 @@
+import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatDatepickerModule,
+  MatExpansionModule,
+  MatFormFieldModule,
   MatGridListModule,
   MatIconModule,
+  MatInputModule,
   MatListModule,
+  MatNativeDateModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
+  MatSelectModule,
+  MatSlideToggleModule,
+  MatStepperModule,
+  MatTableModule,
   MatToolbarModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CovalentTextEditorModule } from '@covalent/text-editor';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
+import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
+import { ColorPickerModule } from 'ngx-color-picker';
+import { FileDropModule } from 'ngx-file-drop';
+import { MarkdownModule } from 'ngx-markdown';
+import { NgProgressModule } from 'ngx-progressbar';
 import { ApiService } from './api.service';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './AuthInterceptor';
 import { EnrollComponent } from './enroll/enroll.component';
 import { FiltersComponent } from './filters/filters.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { CardWrapperComponent } from './forms/card-wrapper/card-wrapper.component';
+import { SDFileUploadComponent } from './forms/file-upload/file-upload.component';
+import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
+import { SDFormFieldComponent } from './forms/form-field/form-field.component';
+import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './forms/validators/formly.validator';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
@@ -39,11 +60,31 @@ import { ResourceDetailComponent } from './resource-detail/resource-detail.compo
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
 
+@Injectable()
+export class FormlyConfig {
+  public static config = {
+    validators: [
+      { name: 'phone', validation: PhoneValidator },
+      { name: 'email', validation: EmailValidator },
+    ],
+    validationMessages: [
+      { name: 'phone', message: PhoneValidatorMessage },
+      { name: 'email', message: EmailValidatorMessage },
+      { name: 'required', message: 'This field is required.' },
+    ],
+    wrappers: [
+      { name: 'card', component: CardWrapperComponent },
+    ],
+  };
+}
+
 
 @NgModule({
   declarations: [
     AppComponent,
+    CardWrapperComponent,
     EnrollComponent,
+    FiltersComponent,
     ForgotPasswordComponent,
     HomeComponent,
     LoginComponent,
@@ -52,6 +93,10 @@ import { TrainingDetailComponent } from './training-detail/training-detail.compo
     ProfileComponent,
     RegisterComponent,
     ResourcesComponent,
+    SDFileUploadComponent,
+    SDFormFieldComponent,
+    SDFormFieldLabelComponent,
+    SearchResultComponent,
     StudiesComponent,
     TermsComponent,
     FiltersComponent,
@@ -61,23 +106,39 @@ import { TrainingDetailComponent } from './training-detail/training-detail.compo
     TrainingDetailComponent
   ],
   imports: [
-    RoutingModule,
-    BrowserModule,
     BrowserAnimationsModule,
+    BrowserModule,
+    ColorPickerModule,
+    CommonModule,
+    CovalentTextEditorModule,
+    FileDropModule,
     FlexLayoutModule,
-    FormlyModule.forRoot(),
     FormlyMaterialModule,
+    FormlyModule.forRoot(FormlyConfig.config),
     HttpClientModule,
+    MarkdownModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
-    MatIconModule,
-    MatListModule,
+    MatNativeDateModule,
+    FormlyMatDatepickerModule,
+    MatDatepickerModule,
+    MatExpansionModule,
+    MatFormFieldModule,
     MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatStepperModule,
+    MatTableModule,
     MatToolbarModule,
-    ReactiveFormsModule
+    NgProgressModule,
+    ReactiveFormsModule,
+    RoutingModule
   ],
   providers: [
     {

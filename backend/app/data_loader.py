@@ -11,6 +11,7 @@ from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
 from app import db
+from sqlalchemy import Sequence
 import csv
 
 
@@ -38,6 +39,7 @@ class DataLoader():
                 Category).count())
         db.session.commit()
 
+
     def load_resources(self):
         with open(self.resource_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -48,6 +50,7 @@ class DataLoader():
                                         organization=org, street_address1=row[6], street_address2=row[7], city=row[8],
                                         state=row[9], zip=row[10], county=row[11], website=row[12], phone=row[13])
                 db.session.add(resource)
+                self.__increment_id_sequence(StarResource)
 
                 for i in range(14, 19):
                     if not row[i]: continue
@@ -74,6 +77,7 @@ class DataLoader():
                               enrollment_end_date=row[7], current_num_participants=row[8], max_num_participants=row[9],
                               start_date=row[10], end_date=row[11], organization=org)
                 db.session.add(study)
+                self.__increment_id_sequence(Study)
 
                 for i in range(13, 17):
                     if not row[i]: continue
@@ -98,6 +102,7 @@ class DataLoader():
                 training = Training(id=row[0], title=row[1], description=row[2], outcomes_description=row[3], image_url=row[4],
                                     image_caption=row[5], organization=org, website=row[7])
                 db.session.add(training)
+                self.__increment_id_sequence(Training)
 
                 for i in range(8, 12):
                     if not row[i]: continue
@@ -121,6 +126,7 @@ class DataLoader():
                 user = User(id=row[0], email=row[1], first_name=row[2], last_name=row[3], password=row[4],
                             role=row[5], email_verified=True)
                 db.session.add(user)
+                self.__increment_id_sequence(User)
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())
         db.session.commit()
@@ -152,3 +158,6 @@ class DataLoader():
         db.session.query(Training).delete()
         db.session.query(User).delete()
         db.session.commit()
+
+    def __increment_id_sequence(self, model):
+        db.session.execute(Sequence(model.__tablename__ + '_id_seq'))

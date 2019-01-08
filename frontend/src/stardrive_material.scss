@@ -78,6 +78,9 @@ $stardrive-accent: mat-palette($mat-orange);
 $stardrive-warn: mat-palette($mat-red);
 $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
 
+$easeDuration: 300ms;
+$animationDuration: 500ms;
+
 @include angular-material-theme($stardrive-theme);
 @mixin stardrive-theme($theme) {
   $primary: map-get($theme, primary);
@@ -100,6 +103,27 @@ $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardr
       padding-top: 6px;
       padding-bottom: 6px;
     }
+  }
+
+  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
+  }
+
+  .mat-radio-group {
+    outline: none;
+  }
+
+  .vertical-radio-group, .vertical-checkbox-group {
+    display: inline-flex;
+    flex-direction: column;
+
+    .mat-radio-button, .mat-checkbox {
+      margin: 5px;
+    }
+  }
+
+  .mat-radio-button, .mat-checkbox {
+    padding-right: 16px;
   }
 
   .alert {
