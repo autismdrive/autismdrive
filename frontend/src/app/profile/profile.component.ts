@@ -172,7 +172,7 @@ export class ProfileComponent implements OnInit {
               },
             },
             {
-              key: 'phoneType',
+              key: 'canLeaveVoicemail',
               type: 'radio',
               defaultValue: true,
               templateOptions: {

@@ -5,6 +5,7 @@ from sqlalchemy import func
 
 from app import ma, db
 from app.model.category import Category
+from app.model.contact_questionnaire import ContactQuestionnaire
 from app.model.organization import Organization
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
@@ -39,7 +40,7 @@ class CategorySchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'resource_count', 'study_count', 'training_count',
-                  '_links', '_meta')
+                  '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -48,22 +49,10 @@ class CategorySchema(ModelSchema):
     resource_count = fields.Method('get_resource_count')
     study_count = fields.Method('get_study_count')
     training_count = fields.Method('get_training_count')
-    _meta = fields.Method('get_meta')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
     })
-
-    def get_meta(self, obj):
-        metadata = {}
-        for key, value in self.fields.items():
-            try:
-                meta = obj._sa_class_manager[key].info
-                if meta:
-                    metadata[key] = meta
-            except:
-                pass
-        return metadata
 
     def get_resource_count(self, obj):
         query = db.session.query(ResourceCategory).join(ResourceCategory.resource)\
@@ -282,3 +271,19 @@ class UserSchema(ModelSchema):
         fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password', 'role')
     password = fields.String(load_only=True)
     id = fields.Integer(required=False, allow_none=True)
+
+
+class ContactQuestionnaireSchema(ModelSchema):
+    class Meta:
+        model = ContactQuestionnaire
+        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'last_name', 'nickname', 'phone', 'phone_type', 'can_leave_voicemails', 'contact_times',
+                  'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
+
+
+class ContactQuestionnaireMetaSchema(ModelSchema):
+    class Meta:
+        model = ContactQuestionnaire
+    _meta = fields.Method('get_meta')
+
+    def get_meta(self, obj):
+        return self.Meta.model.info
