@@ -1,5 +1,3 @@
-import sys
-from flask import json
 from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
@@ -32,12 +30,12 @@ from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnai
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
-from app import db
+from app import db, elastic_index
 from sqlalchemy import Sequence
 import csv
 
 
-class DataLoader():
+class DataLoader:
     "Loads CSV files into the database"
     file = "example_data/resources.csv"
 
@@ -285,6 +283,16 @@ class DataLoader():
             db.session.add(category)
             db.session.commit()
         return category
+
+    def build_index(self):
+        elastic_index.load_resources(db.session.query(StarResource).all(),
+                                     db.session.query(Study).all(),
+                                     db.session.query(Training).all()
+                                     )
+
+    def clear_index(self):
+        print("Clearing the index")
+        elastic_index.clear()
 
     def clear(self):
         db.session.query(ClinicalDiagnosesQuestionnaire).delete()

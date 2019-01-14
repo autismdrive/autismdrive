@@ -15,7 +15,7 @@ import random
 import string
 import datetime
 import unittest
-from app import db, app
+from app import db, app, elastic_index
 from app.model.user import User, Role
 from app.model.study import Study
 from app.email_service import TEST_MESSAGES
@@ -1443,6 +1443,62 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def search(self, query, user=None):
+        """Executes a query as the given user, returning the resulting search results object."""
+        rv = self.app.post(
+            '/api/search',
+            data=json.dumps(query),
+            follow_redirects=True,
+            content_type="application/json",
+            headers=self.logged_in_headers(user))
+        self.assertSuccess(rv)
+        return json.loads(rv.get_data(as_text=True))
+
+    def search_anonymous(self, query):
+        """Executes a query as an anonymous user, returning the resulting search results object."""
+        rv = self.app.post(
+            '/api/search',
+            data=json.dumps(query),
+            follow_redirects=True,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        return json.loads(rv.get_data(as_text=True))
+
+    def test_search_crud(self):
+        elastic_index.clear()
+        rainbow_query = {'query': 'rainbows', 'filters': []}
+        world_query = {'query': 'world', 'filters': []}
+        space_query = {'query': 'space', 'filters': []}
+        search_results = self.search(rainbow_query)
+        self.assertEqual(0, len(search_results["resources"]))
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+        resource = self.construct_resource(
+            title='space unicorn', description="delivering rainbows")
+        elastic_index.add_resource(resource, 'Resource')
+        search_results = self.search(rainbow_query)
+        self.assertEqual(1, len(search_results["resources"]))
+        self.assertEqual(search_results['resources'][0]['id'], resource.id)
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+        resource.description = 'all around the world'
+        elastic_index.update_resource(resource, 'Resource')
+
+        search_results = self.search(space_query)
+        search_results = self.search(rainbow_query)
+        self.assertEqual(0, len(search_results["resources"]))
+        search_results = self.search(world_query)
+        self.assertEqual(1, len(search_results["resources"]))
+        self.assertEqual(resource.id, search_results['resources'][0]['id'])
+
+        elastic_index.remove_resource(resource.id, 'Resource')
+        search_results = self.search(rainbow_query)
+        self.assertEqual(0, len(search_results["resources"]))
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
 
     def test_user_basics(self):
         self.construct_user()

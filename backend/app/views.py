@@ -6,6 +6,7 @@ from flask_restful import reqparse
 
 from app import app
 from app.resources.Auth import auth_blueprint
+from app.resources.SearchEndpoint import SearchEndpoint
 from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
     FlowEndpoint,
