@@ -1,3 +1,5 @@
+import { ResourceCategory } from './resource_category';
+import { Organization } from './organization';
 
 export interface Resource {
   id: number;
@@ -5,7 +7,7 @@ export interface Resource {
   description: string;
   image: string;
   imageCaption: string;
-  organization: string;
+  organization: Organization;
   streetAddress1: string;
   streetAddress2: string;
   city: string;
@@ -16,4 +18,5 @@ export interface Resource {
   website: string;
   categories: string[];
   status?: string;
+  resource_categories?: ResourceCategory[];
 }

@@ -38,6 +38,11 @@
     fxLayout="column"
     fxLayoutGap="20px"
   >
+    <div id="training-categories">
+      <mat-chip-list>
+        <mat-chip *ngFor="let tc of training.training_categories">{{tc.category.name}}</mat-chip>
+      </mat-chip-list>
+    </div>
     <div id="training-related">
       <mat-card>
         <mat-card-title>Related</mat-card-title>

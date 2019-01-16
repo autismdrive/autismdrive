@@ -54,7 +54,7 @@ class DataLoader():
 
                 for i in range(14, 19):
                     if not row[i]: continue
-                    category = self.get_category_by_name(row[i])
+                    category = self.get_category_by_name(row[i].strip())
                     resource_id = eval(row[0])
                     category_id = category.id
 

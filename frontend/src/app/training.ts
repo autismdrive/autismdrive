@@ -1,3 +1,4 @@
+import { TrainingCategory } from './training_category';
 
 export interface Training {
   id: number;
@@ -7,4 +8,5 @@ export interface Training {
   image: string;
   imageCaption: string;
   status?: string;
+  training_categories?: TrainingCategory[];
 }

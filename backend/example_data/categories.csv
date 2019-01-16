@@ -1,9 +1,27 @@
 Category,Parent
 Locations,
 Virginia,Locations
-Accomack County,Virginia
-Albemarle County,Virginia
-Alleghany County,Virginia
+Winchester/Front Royal,Virginia
+Northern Virginia,Virginia
+Fredericksburg and Northern Neck,Virginia
+Culpeper/Madison,Virginia
+Harrisonburg,Virginia
+Waynesboro/Staunton/Lexington,Virginia
+Charlottesville,Virginia
+Richmond,Virginia
+Hampton Roads,Virginia
+Lynchburg,Virginia
+Roanoke/New River Valley,Virginia
+Southside Virginia,Virginia
+Southwest Virginia,Virginia
+West Virginia,Locations
+Eastern Panhandle (Martinsburg/Charles Town),West Virginia
+Fairmont/Morgantown,West Virginia
+Northern Panhandle (Wheeling),West Virginia
+Huntington,West Virginia
+Charleston,West Virginia
+Lewisburg/White Sulphur Springs,West Virginia
+National, Locations
 SES,
 Low-income,SES
 Supplemental Security Income (SSI),Low-income
@@ -65,6 +83,7 @@ Single words,Verbal
 Phrase speech,Verbal
 Fluent speech,Verbal
 Education level,Patient Abilities
+Pre-School,Education level
 Elementary school,Education level
 Middle (junior high) school,Education level
 High School Graduate/GED,Education level
@@ -158,3 +177,29 @@ Social Work,Services
 Speech Services,Services
 Respite,Services
 Medical home,Services
+New to Diagnosis,Services
+Summer camps,Services
+"Handouts, Books, Printed Resources",
+Parents,"Handouts, Books, Printed Resources"
+Professionals,"Handouts, Books, Printed Resources"
+Individuals with Autism,"Handouts, Books, Printed Resources"
+Gender/Sexuality,
+Boys/Men,Gender/Sexuality
+Girls/Women,Gender/Sexuality
+Puberty/Adolescence,Gender/Sexuality
+Lesbian,Gender/Sexuality
+Gay,Gender/Sexuality
+Transgender,Gender/Sexuality
+Bisexual,Gender/Sexuality
+Questioning Sexuality,Gender/Sexuality
+Sexual health/Sex Ed,Gender/Sexuality
+Foreign Language Resources,
+Spanish,Foreign Language Resources
+Health and healthcare access,
+Oral/Dental health,Health and healthcare access
+Reproductive health,Health and healthcare access
+Cancer screens,Health and healthcare access
+Check-ups,Health and healthcare access
+Working with physicians,Health and healthcare access
+Diet/Healthy eating,Health and healthcare access
+Exercise promotion,Health and healthcare access
