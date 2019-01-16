@@ -10,6 +10,7 @@ class ContactQuestionnaire(db.Model):
     participant_id = db.Column('participant_id', db.Integer, db.ForeignKey('stardrive_user.id'))
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
+    is_first_name_preferred = db.Column(db.Boolean)
     nickname = db.Column(db.String)
     phone = db.Column(db.String)
     phone_type = db.Column(db.String)
@@ -26,7 +27,9 @@ class ContactQuestionnaire(db.Model):
             'description': 'Please answer the following questions about YOURSELF (* indicates required response):'},
             'first_name': {'key': 'firstname', 'type': 'input', 'template_label': 'First name', 'required': 'true'},
             'last_name': {'key': 'lastname', 'type': 'input', 'template_label': 'Last name', 'required': 'true'},
-            'nickname': {'key': 'nickname', 'type': 'input', 'template_label': 'Nickname', 'required': 'false'},
+            'is_first_name_preferred': {'key': 'firstNamePreferred', 'type': 'radio',
+                                        'template_label': 'Is this your preferred name/nick name?', 'required': 'false'},
+            'nickname': {'key': 'nickname', 'type': 'input', 'template_label': 'Preferred name or nickname', 'required': 'false'},
             'phone': {'wrapper_key': 'phone', 'wrapper_label': 'Phone', 'key': 'phone', 'type': 'input',
                       'template_type': 'tel', 'required': 'true',
                       'template_label': 'Preferred phone number (including area code)', 'validation': 'phone'},
@@ -34,7 +37,9 @@ class ContactQuestionnaire(db.Model):
                            'template_type': 'tel', 'required': 'true', 'template_label': '',
                            'options': [{'value': 'home', 'label': 'Home'}, {'value': 'cell', 'label': 'Cell'}]},
             'can_leave_voicemail': {'wrapper_key': 'phone', 'wrapper_label': 'Phone', 'key': 'canLeaveVoicemail',
-                                    'type': 'radio', 'default_value': 'true', 'template_label': 'Nickname', 'required': 'false'},
+                                    'type': 'radio', 'default_value': 'true',
+                                    'template_label': 'Is it okay to leave a voicemail message at this number?',
+                                    'required': 'false'},
             'contact_times': {'wrapper_key': 'phone', 'wrapper_label': 'Phone', 'key': 'contactTimes', 'type': 'textarea',
                               'template_label': 'Some research studies might involve a phone call. If that’s the case, '
                                                 'when would be the best times of day to call you?', 'required': 'false'},
