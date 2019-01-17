@@ -176,19 +176,19 @@ class TestCase(unittest.TestCase):
         dq = DemographicsQuestionnaire(first_name=first_name, last_name=last_name, birth_state=birth_state,
                                        is_english_primary=is_english_primary)
         if participant is None:
-            dq.participant_id = self.construct_user().id
+            dq.participant_id = self.construct_user(email="participant@study.com").id
         else:
             dq.participant_id = participant.id
 
         if guardian is None:
-            dq.guardian_id = self.construct_user().id
+            dq.guardian_id = self.construct_user(email="guardian@study.com").id
         else:
             dq.guardian_id = guardian.id
 
         db.session.add(dq)
         db.session.commit()
 
-        db_dq = db.session.query(DemographicsQuestionnaire).filter_by(zip=dq.zip).first()
+        db_dq = db.session.query(DemographicsQuestionnaire).filter_by(birth_state=dq.birth_state).first()
         self.assertEqual(db_dq.first_name, dq.first_name)
         return db_dq
 
@@ -1199,4 +1199,63 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['first_name'], 'Darah')
         self.assertEqual(response['marketing_channel'], 'Subway sign')
+        self.assertIsNotNone(response['id'])
+
+    def test_demographics_questionnaire_basics(self):
+        self.construct_demographics_questionnaire()
+        dq = db.session.query(DemographicsQuestionnaire).first()
+        self.assertIsNotNone(dq)
+        dq_id = dq.id
+        rv = self.app.get('/api/demographics_questionnaire/%i' % dq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], dq_id)
+        self.assertEqual(response["first_name"], dq.first_name)
+        self.assertEqual(response["birth_state"], dq.birth_state)
+
+    def test_modify_demographics_questionnaire_basics(self):
+        self.construct_demographics_questionnaire()
+        dq = db.session.query(DemographicsQuestionnaire).first()
+        self.assertIsNotNone(dq)
+        dq_id = dq.id
+        rv = self.app.get('/api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['is_english_primary'] = False
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['guardian_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/demographics_questionnaire/%i' % dq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertEqual(response['guardian_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_demographics_questionnaire(self):
+        dq = self.construct_demographics_questionnaire()
+        dq_id = dq.id
+        rv = self.app.get('api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_demographics_questionnaire(self):
+        demographics_questionnaire = {'first_name': "Darah", 'is_english_primary': False}
+        rv = self.app.post('api/demographics_questionnaire', data=json.dumps(demographics_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Darah')
+        self.assertEqual(response['is_english_primary'], False)
         self.assertIsNotNone(response['id'])
