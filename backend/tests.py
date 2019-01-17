@@ -192,11 +192,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_dq.first_name, dq.first_name)
         return db_dq
 
-    def construct_guardian_demographics_questionnaire(self, first_name="Hubbard", last_name="Bubbard", user=None,
-                                                      relationship_to_child="Father", is_english_primary=True):
+    def construct_guardian_demographics_questionnaire(self, user=None, relationship_to_child="Father", is_english_primary=True):
 
-        gdq = GuardianDemographicsQuestionnaire(first_name=first_name, last_name=last_name,
-                                                relationship_to_child=relationship_to_child,
+        gdq = GuardianDemographicsQuestionnaire(relationship_to_child=relationship_to_child,
                                                 is_english_primary=is_english_primary)
         if user is None:
             gdq.guardian_id = self.construct_user().id
@@ -205,8 +203,8 @@ class TestCase(unittest.TestCase):
         db.session.add(gdq)
         db.session.commit()
 
-        db_gdq = db.session.query(ContactQuestionnaire).filter_by(zip=gdq.zip).first()
-        self.assertEqual(db_gdq.first_name, gdq.first_name)
+        db_gdq = db.session.query(GuardianDemographicsQuestionnaire).filter_by(guardian_id=gdq.guardian_id).first()
+        self.assertEqual(db_gdq.relationship_to_child, gdq.relationship_to_child)
         return db_gdq
 
     def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
@@ -1257,5 +1255,64 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['first_name'], 'Darah')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertIsNotNone(response['id'])
+
+    def test_guardian_demographics_questionnaire_basics(self):
+        self.construct_guardian_demographics_questionnaire()
+        gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
+        self.assertIsNotNone(gdq)
+        gdq_id = gdq.id
+        rv = self.app.get('/api/guardian_demographics_questionnaire/%i' % gdq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], gdq_id)
+        self.assertEqual(response["relationship_to_child"], gdq.relationship_to_child)
+        self.assertEqual(response["is_english_primary"], gdq.is_english_primary)
+
+    def test_modify_guardian_demographics_questionnaire_basics(self):
+        self.construct_guardian_demographics_questionnaire()
+        gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
+        self.assertIsNotNone(gdq)
+        gdq_id = gdq.id
+        rv = self.app.get('/api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['relationship_to_child'] = 'Parent'
+        response['is_english_primary'] = False
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['guardian_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/guardian_demographics_questionnaire/%i' % gdq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['relationship_to_child'], 'Parent')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertEqual(response['guardian_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_guardian_demographics_questionnaire(self):
+        gdq = self.construct_guardian_demographics_questionnaire()
+        gdq_id = gdq.id
+        rv = self.app.get('api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_guardian_demographics_questionnaire(self):
+        guardian_demographics_questionnaire = {'relationship_to_child': "Mother", 'is_english_primary': False}
+        rv = self.app.post('api/guardian_demographics_questionnaire', data=json.dumps(guardian_demographics_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['relationship_to_child'], 'Mother')
         self.assertEqual(response['is_english_primary'], False)
         self.assertIsNotNone(response['id'])
