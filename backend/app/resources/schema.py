@@ -295,9 +295,9 @@ class ContactQuestionnaireMetaSchema(ModelSchema):
 class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'middle_name', 'last_name', 'nickname',
-                  'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex', 'current_gender',
-                  'race_ethnicity', 'is_english_primary')
+        fields = ('id', 'last_updated', 'participant_id', 'guardian_id','first_name', 'middle_name', 'last_name',
+                  'nickname', 'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex',
+                  'current_gender', 'race_ethnicity', 'is_english_primary')
 
 
 class GuardianDemographicsQuestionnaireSchema(ModelSchema):
