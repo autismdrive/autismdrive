@@ -303,5 +303,5 @@ class DemographicsQuestionnaireSchema(ModelSchema):
 class GuardianDemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = GuardianDemographicsQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'birthdate', 'sex', 'race_ethnicity', 'is_english_primary',
+        fields = ('id', 'last_updated', 'guardian_id', 'birthdate', 'sex', 'race_ethnicity', 'is_english_primary',
                   'relationship_to_child')
