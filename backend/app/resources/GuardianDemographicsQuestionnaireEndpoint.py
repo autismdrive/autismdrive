@@ -1,4 +1,5 @@
 import flask_restful
+import datetime
 from flask import request
 from sqlalchemy.exc import IntegrityError
 
@@ -29,6 +30,7 @@ class GuardianDemographicsQuestionnaireEndpoint(flask_restful.Resource):
         updated, errors = self.schema.load(request_data, instance=instance)
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
+        updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()
         return self.schema.dump(updated)
