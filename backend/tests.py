@@ -23,6 +23,9 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
+from app.model.contact_questionnaire import ContactQuestionnaire
+from app.model.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app import app, db
 
 
@@ -149,6 +152,62 @@ class TestCase(unittest.TestCase):
         db_user = db.session.query(User).filter_by(email=user.email).first()
         self.assertEqual(db_user.first_name, user.first_name)
         return db_user
+
+    def construct_contact_questionnaire(self, first_name="Flibby", last_name="Tribby", zip=55678,
+                                        marketing_channel="Zine Ad", user=None):
+
+        cq = ContactQuestionnaire(first_name=first_name, last_name=last_name, zip=zip,
+                                  marketing_channel=marketing_channel)
+        if user is None:
+            cq.participant_id = self.construct_user().id
+        else:
+            cq.participant_id = user.id
+
+        db.session.add(cq)
+        db.session.commit()
+
+        db_cq = db.session.query(ContactQuestionnaire).filter_by(zip=cq.zip).first()
+        self.assertEqual(db_cq.first_name, cq.first_name)
+        return db_cq
+
+    def construct_demographics_questionnaire(self, first_name="Trina", last_name="Frina", birth_state="VA",
+                                             is_english_primary=True, participant=None, guardian=None):
+
+        dq = DemographicsQuestionnaire(first_name=first_name, last_name=last_name, birth_state=birth_state,
+                                       is_english_primary=is_english_primary)
+        if participant is None:
+            dq.participant_id = self.construct_user().id
+        else:
+            dq.participant_id = participant.id
+
+        if guardian is None:
+            dq.guardian_id = self.construct_user().id
+        else:
+            dq.guardian_id = guardian.id
+
+        db.session.add(dq)
+        db.session.commit()
+
+        db_dq = db.session.query(DemographicsQuestionnaire).filter_by(zip=dq.zip).first()
+        self.assertEqual(db_dq.first_name, dq.first_name)
+        return db_dq
+
+    def construct_guardian_demographics_questionnaire(self, first_name="Hubbard", last_name="Bubbard", user=None,
+                                                      relationship_to_child="Father", is_english_primary=True):
+
+        gdq = GuardianDemographicsQuestionnaire(first_name=first_name, last_name=last_name,
+                                                relationship_to_child=relationship_to_child,
+                                                is_english_primary=is_english_primary)
+        if user is None:
+            gdq.guardian_id = self.construct_user().id
+        else:
+            gdq.guardian_id = user.id
+        db.session.add(gdq)
+        db.session.commit()
+
+        db_gdq = db.session.query(ContactQuestionnaire).filter_by(zip=gdq.zip).first()
+        self.assertEqual(db_gdq.first_name, gdq.first_name)
+        return db_gdq
 
     def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
 
@@ -1084,16 +1143,60 @@ class TestCase(unittest.TestCase):
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-    def test_get_current_user(self):
-        """ Test for the current user status """
-        self.test_create_user_with_password(id=9)
+    def test_contact_questionnaire_basics(self):
+        self.construct_contact_questionnaire()
+        cq = db.session.query(ContactQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/contact_questionnaire/%i' % cq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], cq_id)
+        self.assertEqual(response["first_name"], cq.first_name)
+        self.assertEqual(response["marketing_channel"], cq.marketing_channel)
 
-        user = User.query.filter_by(id=9).first()
+    def test_modify_contact_questionnaire_basics(self):
+        self.construct_contact_questionnaire()
+        cq = db.session.query(ContactQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['zip'] = 22345
+        response['marketing_channel'] = 'flyer'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/contact_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['zip'], 22345)
+        self.assertEqual(response['marketing_channel'], 'flyer')
+        self.assertNotEqual(orig_date, response['last_updated'])
 
-        # Now get the user back.
-        response = self.app.get(
-            '/api/session',
-            headers=dict(
-                Authorization='Bearer ' + user.encode_auth_token().decode()))
-        self.assertSuccess(response)
-        return json.loads(response.data.decode())
+    def test_delete_contact_questionnaire(self):
+        cq = self.construct_contact_questionnaire()
+        cq_id = cq.id
+        rv = self.app.get('api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_contact_questionnaire(self):
+        contact_questionnaire = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
+        rv = self.app.post('api/contact_questionnaire', data=json.dumps(contact_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Darah')
+        self.assertEqual(response['marketing_channel'], 'Subway sign')
+        self.assertIsNotNone(response['id'])
