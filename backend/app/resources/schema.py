@@ -6,6 +6,8 @@ from sqlalchemy import func
 from app import ma, db
 from app.model.category import Category
 from app.model.contact_questionnaire import ContactQuestionnaire
+from app.model.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app.model.organization import Organization
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
@@ -276,7 +278,8 @@ class UserSchema(ModelSchema):
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'last_name', 'nickname', 'phone', 'phone_type', 'can_leave_voicemails', 'contact_times',
+        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'last_name','is_first_name_preferred',
+                  'nickname', 'phone', 'phone_type', 'can_leave_voicemails', 'contact_times',
                   'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
 
 
@@ -287,3 +290,18 @@ class ContactQuestionnaireMetaSchema(ModelSchema):
 
     def get_meta(self, obj):
         return self.Meta.model.info
+
+
+class DemographicsQuestionnaireSchema(ModelSchema):
+    class Meta:
+        model = DemographicsQuestionnaire
+        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'middle_name', 'last_name', 'nickname',
+                  'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex', 'current_gender',
+                  'race_ethnicity', 'is_english_primary')
+
+
+class GuardianDemographicsQuestionnaireSchema(ModelSchema):
+    class Meta:
+        model = GuardianDemographicsQuestionnaire
+        fields = ('id', 'last_updated', 'participant_id', 'birthdate', 'sex', 'race_ethnicity', 'is_english_primary',
+                  'relationship_to_child')

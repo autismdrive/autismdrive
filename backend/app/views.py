@@ -6,6 +6,8 @@ from flask_restful import reqparse
 from app.resources.Auth import auth_blueprint
 from app.resources.CategoryEndpoint import CategoryEndpoint, CategoryListEndpoint, RootCategoryListEndpoint
 from app.resources.ContactQuestionnaireEndpoint import ContactQuestionnaireEndpoint, ContactQuestionnaireListEndpoint, ContactQuestionnaireMetaEndpoint
+from app.resources.DemographicsQuestionnaireEndpoint import DemographicsQuestionnaireEndpoint, DemographicsQuestionnaireListEndpoint
+from app.resources.GuardianDemographicsQuestionnaireEndpoint import GuardianDemographicsQuestionnaireEndpoint, GuardianDemographicsQuestionnaireListEndpoint
 from app.resources.OrganizationEndpoint import OrganizationListEndpoint, OrganizationEndpoint
 from app.resources.ResourceAndCategoryEndpoint import ResourceCategoryEndpoint, ResourceCategoryListEndpoint, \
     ResourceByCategoryEndpoint, CategoryByResourceEndpoint
@@ -58,9 +60,6 @@ def root():
 api.add_resource(CategoryListEndpoint, '/category')
 api.add_resource(CategoryEndpoint, '/category/<id>')
 api.add_resource(RootCategoryListEndpoint, '/category/root')
-api.add_resource(ContactQuestionnaireListEndpoint, '/contact_questionnaire')
-api.add_resource(ContactQuestionnaireEndpoint, '/contact_questionnaire/<id>')
-api.add_resource(ContactQuestionnaireMetaEndpoint, '/contact_questionnaire/meta')
 api.add_resource(ResourceByCategoryEndpoint, '/category/<category_id>/resource')
 api.add_resource(StudyByCategoryEndpoint, '/category/<category_id>/study')
 api.add_resource(TrainingByCategoryEndpoint, '/category/<category_id>/training')
@@ -84,3 +83,12 @@ api.add_resource(TrainingCategoryEndpoint, '/training_category/<id>')
 api.add_resource(UserListEndpoint, '/user')
 api.add_resource(UserEndpoint, '/user/<id>')
 api.add_resource(SessionEndpoint, '/session')
+
+
+api.add_resource(ContactQuestionnaireListEndpoint, '/contact_questionnaire')
+api.add_resource(ContactQuestionnaireEndpoint, '/contact_questionnaire/<id>')
+api.add_resource(ContactQuestionnaireMetaEndpoint, '/contact_questionnaire/meta')
+api.add_resource(DemographicsQuestionnaireListEndpoint, '/demographics_questionnaire')
+api.add_resource(DemographicsQuestionnaireEndpoint, '/demographics_questionnaire/<id>')
+api.add_resource(GuardianDemographicsQuestionnaireListEndpoint, '/guardian_demographics_questionnaire')
+api.add_resource(GuardianDemographicsQuestionnaireEndpoint, '/guardian_demographics_questionnaire/<id>')
