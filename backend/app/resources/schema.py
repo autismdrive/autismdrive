@@ -5,9 +5,9 @@ from sqlalchemy import func
 
 from app import ma, db
 from app.model.category import Category
-from app.model.contact_questionnaire import ContactQuestionnaire
-from app.model.demographics_questionnaire import DemographicsQuestionnaire
-from app.model.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app.model.organization import Organization
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory

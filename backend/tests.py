@@ -23,9 +23,9 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
-from app.model.contact_questionnaire import ContactQuestionnaire
-from app.model.demographics_questionnaire import DemographicsQuestionnaire
-from app.model.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app import app, db
 
 

@@ -4,7 +4,7 @@ from flask import request
 from sqlalchemy.exc import IntegrityError
 
 from app import db, RestException
-from app.model.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
+from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app.resources.schema import GuardianDemographicsQuestionnaireSchema
 
 
