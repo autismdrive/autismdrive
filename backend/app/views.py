@@ -95,53 +95,51 @@ def root():
 endpoints = [
 
     # Categories
-    (CategoryListEndpoint, '/category')
-    (RootCategoryListEndpoint, '/category/root')
-    (CategoryEndpoint, '/category/<id>')
-    (ResourceByCategoryEndpoint, '/category/<category_id>/resource')
-    (StudyByCategoryEndpoint, '/category/<category_id>/study')
-    (TrainingByCategoryEndpoint, '/category/<category_id>/training')
+    (CategoryListEndpoint, '/category'),
+    (RootCategoryListEndpoint, '/category/root'),
+    (CategoryEndpoint, '/category/<id>'),
+    (ResourceByCategoryEndpoint, '/category/<category_id>/resource'),
+    (StudyByCategoryEndpoint, '/category/<category_id>/study'),
+    (TrainingByCategoryEndpoint, '/category/<category_id>/training'),
 
     # Organizations
-    (OrganizationListEndpoint, '/organization')
-    (OrganizationEndpoint, '/organization/<id>')
+    (OrganizationListEndpoint, '/organization'),
+    (OrganizationEndpoint, '/organization/<id>'),
 
     # Resources
-    (ResourceListEndpoint, '/resource')
-    (ResourceEndpoint, '/resource/<id>')
-    (CategoryByResourceEndpoint, '/resource/<resource_id>/category')
-    (ResourceCategoryListEndpoint, '/resource_category')
-    (ResourceCategoryEndpoint, '/resource_category/<id>')
+    (ResourceListEndpoint, '/resource'),
+    (ResourceEndpoint, '/resource/<id>'),
+    (CategoryByResourceEndpoint, '/resource/<resource_id>/category'),
+    (ResourceCategoryListEndpoint, '/resource_category'),
+    (ResourceCategoryEndpoint, '/resource_category/<id>'),
 
     # Studies
-    (StudyListEndpoint, '/study')
-    (StudyEndpoint, '/study/<id>')
-    (CategoryByStudyEndpoint, '/study/<study_id>/category')
-    (StudyCategoryListEndpoint, '/study_category')
-    (StudyCategoryEndpoint, '/study_category/<id>')
+    (StudyListEndpoint, '/study'),
+    (StudyEndpoint, '/study/<id>'),
+    (CategoryByStudyEndpoint, '/study/<study_id>/category'),
+    (StudyCategoryListEndpoint, '/study_category'),
+    (StudyCategoryEndpoint, '/study_category/<id>'),
 
     # Trainings
-    (TrainingListEndpoint, '/training')
-    (TrainingEndpoint, '/training/<id>')
-    (CategoryByTrainingEndpoint, '/training/<training_id>/category')
-    (TrainingCategoryListEndpoint, '/training_category')
-    (TrainingCategoryEndpoint, '/training_category/<id>')
+    (TrainingListEndpoint, '/training'),
+    (TrainingEndpoint, '/training/<id>'),
+    (CategoryByTrainingEndpoint, '/training/<training_id>/category'),
+    (TrainingCategoryListEndpoint, '/training_category'),
+    (TrainingCategoryEndpoint, '/training_category/<id>'),
 
     # User Sessions
-    (SessionEndpoint, '/session')
-    (UserListEndpoint, '/user')
-    (UserEndpoint, '/user/<id>')
+    (SessionEndpoint, '/session'),
+    (UserListEndpoint, '/user'),
+    (UserEndpoint, '/user/<id>'),
 
     # Questionnaires
-    (ContactQuestionnaireListEndpoint, '/contact_questionnaire')
-    (ContactQuestionnaireEndpoint, '/contact_questionnaire/<id>')
-    (ContactQuestionnaireMetaEndpoint, '/contact_questionnaire/meta')
-    (DemographicsQuestionnaireListEndpoint, '/demographics_questionnaire')
-    (DemographicsQuestionnaireEndpoint, '/demographics_questionnaire/<id>')
-    (GuardianDemographicsQuestionnaireListEndpoint,
-     '/guardian_demographics_questionnaire')
-    (GuardianDemographicsQuestionnaireEndpoint,
-     '/guardian_demographics_questionnaire/<id>')
+    (ContactQuestionnaireListEndpoint, '/contact_questionnaire'),
+    (ContactQuestionnaireEndpoint, '/contact_questionnaire/<id>'),
+    (ContactQuestionnaireMetaEndpoint, '/contact_questionnaire/meta'),
+    (DemographicsQuestionnaireListEndpoint, '/demographics_questionnaire'),
+    (DemographicsQuestionnaireEndpoint, '/demographics_questionnaire/<id>'),
+    (GuardianDemographicsQuestionnaireListEndpoint, '/guardian_demographics_questionnaire'),
+    (GuardianDemographicsQuestionnaireEndpoint, '/guardian_demographics_questionnaire/<id>'),
 ]
 
 # Add all endpoints to the API
