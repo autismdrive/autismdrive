@@ -3,3 +3,4 @@ backend/app/TEST_DB
 .idea/
 frontend/package-lock.json
 .vscode
+.isort.cfg
