@@ -455,30 +455,27 @@ export class ProfileComponent implements OnInit {
     });
 
     console.log('q', q);
+    const all = q._meta;
 
-    // Clone the object
-    const form = Object.assign(q._meta);
+    Object.keys(all).forEach(key => {
+      const item = all[key];
 
-    Object.keys(form).forEach(fieldName => {
-      const field = form[fieldName];
+      // Skip if the key is 'table'
+      if (key === 'table') {
+        step.description = item.description;
+        step.label = item.label;
+      } else if (!item.wrapper_key) {
 
-      if (fieldName === 'table') {
-        step.description = field.description;
-        step.label = field.label;
-      } else if (field.hasOwnProperty('wrapper_key')) {
-        // Move the field to its parent.
-        const childField = Object.assign(field);
-
-        // Is parent field at top level?
-        if (form.hasOwnProperty(field.wrapper_key)) {
-          if (!form[field.wrapper_key].fieldGroup) {
-            form[field.wrapper_key].fieldGroup = [];
-          }
-          form[field.wrapper_key].fieldGroup.push(childField);
-          delete form[fieldName];
-        } else {
-          // How to elegantly traverse the object?
+        // !! TO DO - CONVERT ITEM TO FORMLY CONFIG SYNTAX
+        step.fields.push(item);
+      } else if (item.wrapper_key in all) {
+        const p = all[item.wrapper_key];
+        if (!('fieldGroup' in p)) {
+          p.fieldGroup = [];
         }
+
+        // !! TO DO - CONVERT ITEM TO FORMLY CONFIG SYNTAX
+        p.fieldGroup.push(item);
       }
     });
 
