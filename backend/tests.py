@@ -3,30 +3,33 @@
 import os
 os.environ["APP_CONFIG_FILE"] = '../config/testing.py'
 
-import unittest
-import json
-import random
-import string
 import re
+import json
 import base64
 import quopri
+import random
+import string
 import datetime
+import unittest
 
+
+from app import db, app
+from app.model.user import User
+from app.model.study import Study
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
+from app.model.resource import StarResource
+from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
-from app.model.resource import StarResource
-from app.model.resource_category import ResourceCategory
-from app.model.study import Study
 from app.model.study_category import StudyCategory
-from app.model.training import Training
+from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
-from app.model.user import User
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
-from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
-from app import app, db
+from app.model.questionnaires.guardian_demographics_questionnaire import (
+    GuardianDemographicsQuestionnaire
+)
 
 
 class TestCase(unittest.TestCase):
@@ -65,11 +68,48 @@ class TestCase(unittest.TestCase):
                           content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertTrue("_links" in response)
-        self.assertTrue("resources" in response['_links'])
-        self.assertTrue("studies" in response['_links'])
-        self.assertTrue("trainings" in response['_links'])
-        self.assertTrue("users" in response['_links'])
+
+        endpoints = [
+            ('api.categorybyresourceendpoint', '/api/resource/<resource_id>/category'),
+            ('api.categorybystudyendpoint', '/api/study/<study_id>/category'),
+            ('api.categorybytrainingendpoint', '/api/training/<training_id>/category'),
+            ('api.categoryendpoint', '/api/category/<id>'),
+            ('api.categorylistendpoint', '/api/category'),
+            ('api.contactquestionnaireendpoint', '/api/contact_questionnaire/<id>'),
+            ('api.contactquestionnairelistendpoint', '/api/contact_questionnaire'),
+            ('api.contactquestionnairemetaendpoint', '/api/contact_questionnaire/meta'),
+            ('api.demographicsquestionnaireendpoint', '/api/demographics_questionnaire/<id>'),
+            ('api.demographicsquestionnairelistendpoint', '/api/demographics_questionnaire'),
+            ('api.guardiandemographicsquestionnaireendpoint', '/api/guardian_demographics_questionnaire/<id>'),
+            ('api.guardiandemographicsquestionnairelistendpoint', '/api/guardian_demographics_questionnaire'),
+            ('api.organizationendpoint', '/api/organization/<id>'),
+            ('api.organizationlistendpoint', '/api/organization'),
+            ('api.resourcebycategoryendpoint', '/api/category/<category_id>/resource'),
+            ('api.resourcecategoryendpoint', '/api/resource_category/<id>'),
+            ('api.resourcecategorylistendpoint', '/api/resource_category'),
+            ('api.resourceendpoint', '/api/resource/<id>'),
+            ('api.resourcelistendpoint', '/api/resource'),
+            ('api.rootcategorylistendpoint', '/api/category/root'),
+            ('api.sessionendpoint', '/api/session'),
+            ('api.studybycategoryendpoint', '/api/category/<category_id>/study'),
+            ('api.studycategoryendpoint', '/api/study_category/<id>'),
+            ('api.studycategorylistendpoint', '/api/study_category'),
+            ('api.studyendpoint', '/api/study/<id>'),
+            ('api.studylistendpoint', '/api/study'),
+            ('api.trainingbycategoryendpoint', '/api/category/<category_id>/training'),
+            ('api.trainingcategoryendpoint', '/api/training_category/<id>'),
+            ('api.trainingcategorylistendpoint', '/api/training_category'),
+            ('api.trainingendpoint', '/api/training/<id>'),
+            ('api.traininglistendpoint', '/api/training'),
+            ('api.userendpoint', '/api/user/<id>'),
+            ('api.userlistendpoint', '/api/user'),
+            ('auth.forgot_password', '/api/forgot_password'),
+            ('auth.login_password', '/api/login_password'),
+            ('auth.reset_password', '/api/reset_password'),
+        ]
+
+        for endpoint in endpoints:
+            self.assertEqual(response[endpoint[0]], endpoint[1])
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            image_url="assets/image.svg", image_caption="An inspiring photograph of great renown",

@@ -38,6 +38,13 @@ export class ApiService {
     training: '/api/training/<id>',
     trainingList: '/api/training',
     userList: '/api/user',
+    contactQuestionnaireList: '/api/contact_questionnaire',
+    contactQuestionnaire: '/api/contact_questionnaire/<id>',
+    contactQuestionnaireMeta: '/api/contact_questionnaire/meta',
+    demographicsQuestionnaireList: '/api/demographics_questionnaire',
+    demographicsQuestionnaire: '/api/demographics_questionnaire/<id>',
+    guardianDemographicsQuestionnaireList: '/api/guardian_demographics_questionnaire',
+    guardianDemographicsQuestionnaire: '/api/guardian_demographics_questionnaire/<id>',
   };
 
   private hasSession: boolean;
@@ -353,6 +360,27 @@ export class ApiService {
         last(), // return last (completed) message to caller
         catchError(this.handleError)
       );
+  }
+
+  /** getQuestionnaire */
+  getQuestionnaire(key: string, id: number) {
+    const path = this.endpoints[key + 'Questionnaire'].replace('<id>', id.toString());
+    return this.httpClient.get<any>(this.apiRoot + path)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** getQuestionnaireMeta */
+  getQuestionnaireMeta(key: string) {
+    const path = this.endpoints[key + 'QuestionnaireMeta'];
+    return this.httpClient.get<any>(this.apiRoot + path)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** getQuestionnaireList */
+  getQuestionnaireList(key: string) {
+    const path = this.endpoints[key + 'QuestionnaireList'];
+    return this.httpClient.get<any>(this.apiRoot + path)
+      .pipe(catchError(this.handleError));
   }
 
 }

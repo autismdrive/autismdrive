@@ -3,12 +3,8 @@ import { ApiService } from '../api.service';
 import { User } from '../user';
 import { FormArray, FormGroup, EmailValidator } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { QuestionnaireStep } from '../step';
 
-export interface StepType {
-  label: string;
-  description: string;
-  fields: FormlyFieldConfig[];
-}
 
 export interface StarProfileModel {
   enrollingFor?: string;
@@ -56,7 +52,9 @@ export class ProfileComponent implements OnInit {
   activeStep = 0;
 
   model: StarProfileModel = {};
-  steps: StepType[] = [
+  steps: QuestionnaireStep[] = [];
+
+  formlySteps = [
     {
       label: 'UVA Research Registry Enrollment',
       description: '',
@@ -413,12 +411,31 @@ export class ProfileComponent implements OnInit {
 
   ];
 
-  form = new FormArray(this.steps.map(() => new FormGroup({})));
-  options = this.steps.map(() => <FormlyFormOptions>{});
+  form: FormArray;
+  options;
 
   constructor(
     private api: ApiService
-  ) { }
+  ) {
+
+    const stepKeys = ['contact'];
+    let numStepsMapped = 0;
+
+    // loop thru steps
+    stepKeys.forEach(k => {
+      this.api.getQuestionnaireMeta(k).subscribe(q => {
+        this.steps.push(this.qMetaToFormlyForm(q));
+
+        numStepsMapped++;
+
+        if (numStepsMapped === stepKeys.length) {
+          this.form = new FormArray(this.steps.map(() => new FormGroup({})));
+          this.options = this.steps.map(() => <FormlyFormOptions>{});
+        }
+      });
+    });
+
+  }
 
   ngOnInit() {
     this.api.getSession().subscribe(user => {
@@ -427,6 +444,47 @@ export class ProfileComponent implements OnInit {
     }, error1 => {
       this.session = null;
     });
+  }
+
+  qMetaToFormlyForm(q): QuestionnaireStep {
+
+    const step = new QuestionnaireStep({
+      label: '',
+      description: '',
+      fields: []
+    });
+
+    console.log('q', q);
+
+    // Clone the object
+    const form = Object.assign(q._meta);
+
+    Object.keys(form).forEach(fieldName => {
+      const field = form[fieldName];
+
+      if (fieldName === 'table') {
+        step.description = field.description;
+        step.label = field.label;
+      } else if (field.hasOwnProperty('wrapper_key')) {
+        // Move the field to its parent.
+        const childField = Object.assign(field);
+
+        // Is parent field at top level?
+        if (form.hasOwnProperty(field.wrapper_key)) {
+          if (!form[field.wrapper_key].fieldGroup) {
+            form[field.wrapper_key].fieldGroup = [];
+          }
+          form[field.wrapper_key].fieldGroup.push(childField);
+          delete form[fieldName];
+        } else {
+          // How to elegantly traverse the object?
+        }
+      }
+    });
+
+    console.log('step', step);
+    return step;
+
   }
 
   prevStep(step: number) {
