@@ -76,6 +76,7 @@ def _load_data(data_loader):
     data_loader.load_studies()
     data_loader.load_trainings()
     data_loader.load_users()
+    data_loader.load_contact_questionnaire()
 
 
 @app.cli.command()

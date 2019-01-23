@@ -286,11 +286,7 @@ class ContactQuestionnaireSchema(ModelSchema):
 class ContactQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-    _meta = fields.Method('get_meta')
-
-    def get_meta(self, obj):
-        return self.Meta.model.info
-
+        fields = ('get_meta',)
 
 class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:

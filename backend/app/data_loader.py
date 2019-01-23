@@ -10,6 +10,7 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app import db
 from sqlalchemy import Sequence
 import csv
@@ -131,6 +132,11 @@ class DataLoader():
                 User).count())
         db.session.commit()
 
+    def load_contact_questionnaire(self):
+        ques = ContactQuestionnaire(first_name="Charlie", last_name="Brown")
+        db.session.add(ques)
+        db.session.commit()
+
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
         if organization is None:
@@ -148,6 +154,7 @@ class DataLoader():
         return category
 
     def clear(self):
+        db.session.query(ContactQuestionnaire).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()
