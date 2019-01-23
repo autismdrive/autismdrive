@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import db, RestException
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
-from app.resources.schema import DemographicsQuestionnaireSchema
+from app.resources.schema import DemographicsQuestionnaireSchema, DemographicsQuestionnaireMetaSchema
 
 
 class DemographicsQuestionnaireEndpoint(flask_restful.Resource):
@@ -51,3 +51,11 @@ class DemographicsQuestionnaireListEndpoint(flask_restful.Resource):
         db.session.add(new_quest)
         db.session.commit()
         return self.demographics_questionnaire_schema.dump(new_quest)
+
+
+class DemographicsQuestionnaireMetaEndpoint(flask_restful.Resource):
+    demographics_questionnaire_meta_schema = DemographicsQuestionnaireMetaSchema()
+
+    def get(self):
+        demographics_questionnaire = db.session.query(DemographicsQuestionnaire).first()
+        return self.demographics_questionnaire_meta_schema.dump(demographics_questionnaire)

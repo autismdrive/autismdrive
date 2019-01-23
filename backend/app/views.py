@@ -53,7 +53,8 @@ from app.resources.questionnaire_endpoints.ContactQuestionnaireEndpoint import (
 )
 from app.resources.questionnaire_endpoints.DemographicsQuestionnaireEndpoint import (
     DemographicsQuestionnaireEndpoint,
-    DemographicsQuestionnaireListEndpoint
+    DemographicsQuestionnaireListEndpoint,
+    DemographicsQuestionnaireMetaEndpoint
 )
 from app.resources.questionnaire_endpoints.GuardianDemographicsQuestionnaireEndpoint import (
     GuardianDemographicsQuestionnaireEndpoint,
@@ -141,6 +142,7 @@ endpoints = [
     (ContactQuestionnaireMetaEndpoint, '/contact_questionnaire/meta'),
     (DemographicsQuestionnaireListEndpoint, '/demographics_questionnaire'),
     (DemographicsQuestionnaireEndpoint, '/demographics_questionnaire/<id>'),
+    (DemographicsQuestionnaireMetaEndpoint, '/demographics_questionnaire/meta'),
     (GuardianDemographicsQuestionnaireListEndpoint, '/guardian_demographics_questionnaire'),
     (GuardianDemographicsQuestionnaireEndpoint, '/guardian_demographics_questionnaire/<id>'),
 ]

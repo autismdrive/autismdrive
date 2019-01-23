@@ -288,12 +288,19 @@ class ContactQuestionnaireMetaSchema(ModelSchema):
         model = ContactQuestionnaire
         fields = ('get_meta',)
 
+
 class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
         fields = ('id', 'last_updated', 'participant_id', 'guardian_id','first_name', 'middle_name', 'last_name',
                   'nickname', 'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex',
                   'current_gender', 'race_ethnicity', 'is_english_primary')
+
+
+class DemographicsQuestionnaireMetaSchema(ModelSchema):
+    class Meta:
+        model = ContactQuestionnaire
+        fields = ('get_meta',)
 
 
 class GuardianDemographicsQuestionnaireSchema(ModelSchema):
