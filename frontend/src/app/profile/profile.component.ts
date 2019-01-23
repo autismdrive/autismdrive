@@ -4,7 +4,7 @@ import { User } from '../user';
 import { FormArray, FormGroup, EmailValidator } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { QuestionnaireStep } from '../step';
-
+import * as camelcaseKeys from 'camelcase-keys';
 
 export interface StarProfileModel {
   enrollingFor?: string;
@@ -455,7 +455,8 @@ export class ProfileComponent implements OnInit {
     });
 
     console.log('q', q);
-    const all = q._meta;
+    const all = JSON.parse(JSON.stringify(q.get_meta));
+    console.log('all', all);
 
     Object.keys(all).forEach(key => {
       const item = all[key];
@@ -464,18 +465,31 @@ export class ProfileComponent implements OnInit {
       if (key === 'table') {
         step.description = item.description;
         step.label = item.label;
-      } else if (!item.wrapper_key) {
+      } else if (key === 'field_groups') {
+        console.log('item is a field_group', item);
+
+        Object.keys(item).forEach(fgKey => {
+          console.log('fgKey', fgKey);
+          const fgFields = item[fgKey].fields || [];
+          const fg = {
+            key: fgKey,
+            fieldGroup: fgFields.map((childKey: string) => {
+              const childField = JSON.parse(JSON.stringify(all[childKey]));
+              childField.key = childKey;
+              childField.name = childKey;
+              delete all[childKey];
+              return camelcaseKeys(childField);
+            })
+          };
+
+          step.fields.push(fg);
+        });
+      } else if (item && (key !== 'id')) {
+        item.key = key;
+        item.name = key;
 
         // !! TO DO - CONVERT ITEM TO FORMLY CONFIG SYNTAX
-        step.fields.push(item);
-      } else if (item.wrapper_key in all) {
-        const p = all[item.wrapper_key];
-        if (!('fieldGroup' in p)) {
-          p.fieldGroup = [];
-        }
-
-        // !! TO DO - CONVERT ITEM TO FORMLY CONFIG SYNTAX
-        p.fieldGroup.push(item);
+        step.fields.push(camelcaseKeys(item));
       }
     });
 
@@ -495,4 +509,5 @@ export class ProfileComponent implements OnInit {
   submit() {
     alert(JSON.stringify(this.model));
   }
+
 }
