@@ -16,6 +16,7 @@ class ContactQuestionnaire(db.Model):
     first_name = db.Column(
         db.String,
         info={
+            'display_order': 1,
             'type': 'input',
             'template_options': {
                 'label': 'First name',
@@ -27,6 +28,7 @@ class ContactQuestionnaire(db.Model):
     last_name = db.Column(
         db.String,
         info={
+            'display_order': 2,
             'type': 'input',
             'template_options': {
                 'label': 'Last name',
@@ -35,20 +37,10 @@ class ContactQuestionnaire(db.Model):
         }
     )
 
-    nickname = db.Column(
-        db.String,
-        info={
-            'type': 'input',
-            'template_options': {
-                'label': 'Nickname',
-                'required': False
-            }
-        }
-    )
-
     is_first_name_preferred = db.Column(
         db.Boolean,
         info={
+            'display_order': 3,
             'type': 'radio',
             'template_options': {
                 'label': 'Is this your preferred name/nick name?',
@@ -61,9 +53,21 @@ class ContactQuestionnaire(db.Model):
         }
     )
 
+    nickname = db.Column(
+        db.String,
+        info={
+            'display_order': 4,
+            'type': 'input',
+            'template_options': {
+                'label': 'Nickname',
+                'required': False
+            }
+        }
+    )
     phone = db.Column(
         db.String,
         info={
+            'display_order': 5.1,
             'type': 'input',
             'template_options': {
                 'required': True,
@@ -79,6 +83,7 @@ class ContactQuestionnaire(db.Model):
     phone_type = db.Column(
         db.String,
         info={
+            'display_order': 5.2,
             'type': 'radio',
             'template_options': {
                 'label': '',
@@ -96,6 +101,7 @@ class ContactQuestionnaire(db.Model):
     can_leave_voicemail = db.Column(
         db.Boolean,
         info={
+            'display_order': 5.3,
             'type': 'radio',
             'default_value': True,
             'template_options': {
@@ -112,6 +118,7 @@ class ContactQuestionnaire(db.Model):
     contact_times = db.Column(
         db.String,
         info={
+            'display_order': 5.4,
             'type': 'textarea',
             'template_options': {
                 'label': 'Some research studies might involve a phone call. '
@@ -125,6 +132,7 @@ class ContactQuestionnaire(db.Model):
     email = db.Column(
         db.String,
         info={
+            'display_order': 6,
             'type': 'input',
             'template_options': {
                 'label': 'Email',
@@ -140,6 +148,7 @@ class ContactQuestionnaire(db.Model):
     street_address = db.Column(
         db.String,
         info={
+            'display_order': 7.1,
             'type': 'input',
             'template_options': {
                 'label': 'Street Address',
@@ -151,6 +160,7 @@ class ContactQuestionnaire(db.Model):
     city = db.Column(
         db.String,
         info={
+            'display_order': 7.2,
             'type': 'input',
             'template_options': {
                 'label': 'Town/City',
@@ -162,6 +172,7 @@ class ContactQuestionnaire(db.Model):
     state = db.Column(
         db.String,
         info={
+            'display_order': 7.3,
             'type': 'input',
             'template_options': {
                 'label': 'State',
@@ -173,6 +184,7 @@ class ContactQuestionnaire(db.Model):
     zip = db.Column(
         db.Integer,
         info={
+            'display_order': 7.4,
             'type': 'input',
             'template_options': {
                 'type': 'number',
@@ -188,6 +200,7 @@ class ContactQuestionnaire(db.Model):
     marketing_channel = db.Column(
         db.String,
         info={
+            'display_order': 8.1,
             'type': 'radio',
             'class_name': 'vertical-radio-group',
             'template_options': {
@@ -209,6 +222,18 @@ class ContactQuestionnaire(db.Model):
         }
     )
 
+    marketing_other = db.Column(
+        db.String,
+        info={
+            'display_order': 8.2,
+            'type': 'input',
+            'template_ptions': {
+                'placeholder': 'Where did you hear about us?'
+            },
+            'hideExpression': '!(model.marketing_channel && (model.marketing_channel === "8"))',
+        }
+    )
+
     def get_meta(self):
         info = {
             'table': {
@@ -224,6 +249,7 @@ class ContactQuestionnaire(db.Model):
                         'can_leave_voicemail',
                         'contact_times'
                     ],
+                    'display_order': 5,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Phone'},
                 },
@@ -234,11 +260,16 @@ class ContactQuestionnaire(db.Model):
                         'state',
                         'zip'
                     ],
+                    'display_order': 7,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Address'},
                 },
                 'marketing': {
-                    'fields': ['marketing_channel'],
+                    'fields': [
+                        'marketing_channel',
+                        'marketing_other'
+                    ],
+                    'display_order': 8,
                     'wrappers': ['card'],
                     'template_options': {'label': 'How did you hear about us?'},
                 }
