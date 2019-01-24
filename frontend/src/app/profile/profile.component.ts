@@ -50,6 +50,7 @@ export interface StarProfileModel {
 export class ProfileComponent implements OnInit {
   session: User;
   activeStep = 0;
+  loading = true;
 
   model: StarProfileModel = {};
   steps: QuestionnaireStep[] = [];
@@ -417,85 +418,81 @@ export class ProfileComponent implements OnInit {
   constructor(
     private api: ApiService
   ) {
-
     const stepKeys = ['contact'];
     let numStepsMapped = 0;
 
     // loop thru steps
     stepKeys.forEach(k => {
       this.api.getQuestionnaireMeta(k).subscribe(q => {
-        this.steps.push(this.qMetaToFormlyForm(q));
+        this.steps.push(this.infoToFormlyForm(q.get_meta));
 
         numStepsMapped++;
 
         if (numStepsMapped === stepKeys.length) {
           this.form = new FormArray(this.steps.map(() => new FormGroup({})));
           this.options = this.steps.map(() => <FormlyFormOptions>{});
+          this.loading = false;
         }
       });
     });
-
   }
 
   ngOnInit() {
     this.api.getSession().subscribe(user => {
-      console.log(user);
       this.session = user;
     }, error1 => {
       this.session = null;
     });
   }
 
-  qMetaToFormlyForm(q): QuestionnaireStep {
-
+  infoToFormlyForm(info): QuestionnaireStep {
     const step = new QuestionnaireStep({
       label: '',
       description: '',
       fields: []
     });
+    const stepFields = [];
 
-    console.log('q', q);
-    const all = JSON.parse(JSON.stringify(q.get_meta));
-    console.log('all', all);
+    Object.keys(info).forEach(key => {
+      const item = info[key];
 
-    Object.keys(all).forEach(key => {
-      const item = all[key];
-
-      // Skip if the key is 'table'
       if (key === 'table') {
         step.description = item.description;
         step.label = item.label;
       } else if (key === 'field_groups') {
-        console.log('item is a field_group', item);
+        Object.keys(item).forEach(wrapperKey => {
 
-        Object.keys(item).forEach(fgKey => {
-          console.log('fgKey', fgKey);
-          const fgFields = item[fgKey].fields || [];
-          const fg = {
-            key: fgKey,
-            fieldGroup: fgFields.map((childKey: string) => {
-              const childField = JSON.parse(JSON.stringify(all[childKey]));
-              childField.key = childKey;
-              childField.name = childKey;
-              delete all[childKey];
-              return camelcaseKeys(childField);
-            })
-          };
+          // Clone the wrapper object so we can delete the original later
+          const wrapper = JSON.parse(JSON.stringify(item[wrapperKey]));
+          const fgFields = item[wrapperKey].fields || [];
+          wrapper.key = wrapperKey;
+          wrapper.fieldGroup = fgFields.map((childKey: string) => {
+            const childField = JSON.parse(JSON.stringify(info[childKey]));
+            childField.key = childKey;
+            childField.name = childKey;
 
-          step.fields.push(fg);
+            // Remove the field from the 'all' object, since we've
+            // now copied it to its parent fieldGroup
+            delete info[childKey];
+            return camelcaseKeys(childField);
+          });
+
+          // Remove the fields array from the wrapper object,
+          // since all its child fields are now inside the
+          // fieldGroup attribute
+          delete wrapper.fields;
+          stepFields.push(camelcaseKeys(wrapper));
         });
-      } else if (item && (key !== 'id')) {
+      } else if (item) {
         item.key = key;
         item.name = key;
-
-        // !! TO DO - CONVERT ITEM TO FORMLY CONFIG SYNTAX
-        step.fields.push(camelcaseKeys(item));
+        stepFields.push(camelcaseKeys(item));
       }
     });
 
-    console.log('step', step);
+    stepFields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
+    stepFields.forEach(f => step.fields.push(f));
     return step;
-
   }
 
   prevStep(step: number) {
