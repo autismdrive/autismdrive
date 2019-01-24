@@ -105,12 +105,13 @@ class DemographicsQuestionnaire(db.Model):
             'type': 'radio',
             'template_options': {
                 'required': True,
-                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " sex at birth*"'
-            },
-            'options': [{'value': 'male', 'label': 'Male'},
-                        {'value': 'female', 'label': 'Female'},
-                        {'value': 'intersex', 'label': 'Intersex'}
-                        ]
+                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " sex at birth*"',
+                'options': [
+                    {'value': 'male', 'label': 'Male'},
+                    {'value': 'female', 'label': 'Female'},
+                    {'value': 'intersex', 'label': 'Intersex'}
+                ]
+            }
         }
     )
     gender_identity = db.Column(
@@ -121,15 +122,16 @@ class DemographicsQuestionnaire(db.Model):
                 'required': True,
                 'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " current gender identity '
                          '(how " + (model.is_self ? "you describe yourself)*:" : model.first_name + '
-                         '" describes themselves)*:"'
-            },
-            'options': [{'value': 'male', 'label': 'Male'},
-                        {'value': 'female', 'label': 'Female'},
-                        {'value': 'intersex', 'label': 'Intersex'},
-                        {'value': 'transgender', 'label': 'Transgender'},
-                        {'value': 'other', 'label': 'Other'},
-                        {'value': 'no_answer', 'label': 'Choose not to answer'}
-                        ]
+                         '" describes themselves)*:"',
+                'options': [
+                    {'value': 'male', 'label': 'Male'},
+                    {'value': 'female', 'label': 'Female'},
+                    {'value': 'intersex', 'label': 'Intersex'},
+                    {'value': 'transgender', 'label': 'Transgender'},
+                    {'value': 'other', 'label': 'Other'},
+                    {'value': 'no_answer', 'label': 'Choose not to answer'}
+                ]
+            }
             }
     )
 
@@ -152,18 +154,18 @@ class DemographicsQuestionnaire(db.Model):
             'template_options': {
                 'required': True,
                 'label': '"What is " + (model.is_self ? "your" : model.first_name + "\'s" ) + " race/ethnicity? '
-                         '(select all that apply)*"'
-            },
-            'options': [
-                {'value': 'raceBlack', 'label': 'Black / African / African American'},
-                {'value': 'raceAsian', 'label': 'Asian / Asian American'},
-                {'value': 'raceWhite', 'label': 'White / Caucasian'},
-                {'value': 'raceHispanic', 'label': 'Hispanic / Latin(o / a)'},
-                {'value': 'raceNative', 'label': 'Native American / Alaskan Native'},
-                {'value': 'racePacific', 'label': 'Pacific Islander'},
-                {'value': 'raceNoAnswer', 'label': 'Prefer not to answer'},
-                {'value': 'raceOther', 'label': 'Other'}
+                         '(select all that apply)*"',
+                'options': [
+                    {'value': 'raceBlack', 'label': 'Black / African / African American'},
+                    {'value': 'raceAsian', 'label': 'Asian / Asian American'},
+                    {'value': 'raceWhite', 'label': 'White / Caucasian'},
+                    {'value': 'raceHispanic', 'label': 'Hispanic / Latin(o / a)'},
+                    {'value': 'raceNative', 'label': 'Native American / Alaskan Native'},
+                    {'value': 'racePacific', 'label': 'Pacific Islander'},
+                    {'value': 'raceNoAnswer', 'label': 'Prefer not to answer'},
+                    {'value': 'raceOther', 'label': 'Other'}
                 ]
+            }
         }
     )
 
@@ -186,12 +188,12 @@ class DemographicsQuestionnaire(db.Model):
             'default': True,
             'template_options': {
                 'required': False,
-                'label': '"Is " + (model.is_self ? "your" : model.first_name + "\'s") + " primary language English?"'
-            },
-            'options': [
-                {'value': 'true', 'label': 'True'},
-                {'value': 'false', 'label': 'False'}
-            ]
+                'label': '"Is " + (model.is_self ? "your" : model.first_name + "\'s") + " primary language English?"',
+                'options': [
+                    {'value': 'true', 'label': 'True'},
+                    {'value': 'false', 'label': 'False'}
+                ]
+            }
         }
     )
 
