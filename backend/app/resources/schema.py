@@ -300,7 +300,15 @@ class DemographicsQuestionnaireSchema(ModelSchema):
 class DemographicsQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = ('get_meta',)
+        fields = ('self_meta', 'guardian_meta')
+    self_meta = fields.Method('get_self_meta')
+    guardian_meta = fields.Method('get_guardian_meta')
+
+    def get_guardian_meta(self, obj):
+        return obj.get_meta(is_self=False)
+
+    def get_self_meta(self, obj):
+        return obj.get_meta(is_self=True)
 
 
 class GuardianDemographicsQuestionnaireSchema(ModelSchema):

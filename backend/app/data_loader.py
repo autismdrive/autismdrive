@@ -144,7 +144,7 @@ class DataLoader():
         d_ques = DemographicsQuestionnaire(guardian_id=1, participant_id=2, first_name="Charles", middle_name="Monroe",
                                          last_name="Brown", is_first_name_preferred=False, nickname="Charlie",
                                          birthdate="1979-1-5", birth_city="Staunton", birth_state="VA", birth_sex='male',
-                                         current_gender='male', race_ethnicity="raceWhite", is_english_primary=True)
+                                         gender_identity='male', race_ethnicity="raceWhite", is_english_primary=True)
         db.session.add(d_ques)
         print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
             DemographicsQuestionnaire).count())
