@@ -60,6 +60,7 @@ import { TermsComponent } from './terms/terms.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
+import { LoadingComponent } from './loading/loading.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -104,7 +105,8 @@ export class FormlyConfig {
     SearchResultComponent,
     ResourceDetailComponent,
     StudyDetailComponent,
-    TrainingDetailComponent
+    TrainingDetailComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserAnimationsModule,
