@@ -232,7 +232,7 @@ class ContactQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Where did you hear about us?'
             },
-            'hide_expression': '!(model.marketing_channel && (model.marketing_channel === "8"))',
+            'hide_expression': '!(model.marketing_channel && (model.marketing_channel === "other"))',
         }
     )
 
