@@ -42,8 +42,9 @@ class ContactQuestionnaire(db.Model):
         info={
             'display_order': 3,
             'type': 'radio',
+            'default_value': True,
             'template_options': {
-                'label': 'Is this your preferred name/nick name?',
+                'label': 'Is this your preferred name?',
                 'required': False,
                 'options': [
                     {'value': True, 'label': 'Yes'},
@@ -61,7 +62,8 @@ class ContactQuestionnaire(db.Model):
             'template_options': {
                 'label': 'Nickname',
                 'required': False
-            }
+            },
+            'hide_expression': 'model.is_first_name_preferred'
         }
     )
     phone = db.Column(
@@ -209,14 +211,14 @@ class ContactQuestionnaire(db.Model):
                 'description': '',
                 'required': True,
                 'options': [
-                    {'value': '1', 'label': 'Internet'},
-                    {'value': '2', 'label': 'Health care provider (doctor, speech therapist, etc)'},
-                    {'value': '3', 'label': 'Teacher or school'},
-                    {'value': '4', 'label': 'Word of mouth (friend, family member, etc)'},
-                    {'value': '5', 'label': 'Community event (autism walk, resource fair, etc.)'},
-                    {'value': '6', 'label': 'Television or radio (CNN, NPR, local news, etc.)'},
-                    {'value': '7', 'label': 'While participating in a research study'},
-                    {'value': '8', 'label': 'Other'}
+                    {'value': 'internet', 'label': 'Internet'},
+                    {'value': 'health_care_provider', 'label': 'Health care provider (doctor, speech therapist, etc)'},
+                    {'value': 'school', 'label': 'Teacher or school'},
+                    {'value': 'word_of_mouth', 'label': 'Word of mouth (friend, family member, etc)'},
+                    {'value': 'community_event', 'label': 'Community event (autism walk, resource fair, etc.)'},
+                    {'value': 'media', 'label': 'Television or radio (CNN, NPR, local news, etc.)'},
+                    {'value': 'research_study', 'label': 'While participating in a research study'},
+                    {'value': 'other', 'label': 'Other'},
                 ]
             }
         }
@@ -227,10 +229,10 @@ class ContactQuestionnaire(db.Model):
         info={
             'display_order': 8.2,
             'type': 'input',
-            'template_ptions': {
+            'template_options': {
                 'placeholder': 'Where did you hear about us?'
             },
-            'hideExpression': '!(model.marketing_channel && (model.marketing_channel === "8"))',
+            'hide_expression': '!(model.marketing_channel && (model.marketing_channel === "other"))',
         }
     )
 
