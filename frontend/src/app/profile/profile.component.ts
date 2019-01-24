@@ -5,6 +5,7 @@ import { FormArray, FormGroup, EmailValidator } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { QuestionnaireStep } from '../step';
 import * as camelcaseKeys from 'camelcase-keys';
+import * as flatten from 'flat';
 
 export interface StarProfileModel {
   enrollingFor?: string;
@@ -424,7 +425,7 @@ export class ProfileComponent implements OnInit {
     // loop thru steps
     stepKeys.forEach(k => {
       this.api.getQuestionnaireMeta(k).subscribe(q => {
-        this.steps.push(this.infoToFormlyForm(q.get_meta));
+        this.steps.push(this.infoToFormlyForm(q.get_meta, k));
 
         numStepsMapped++;
 
@@ -445,8 +446,10 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  infoToFormlyForm(info): QuestionnaireStep {
+  infoToFormlyForm(info, questionnaireKey): QuestionnaireStep {
     const step = new QuestionnaireStep({
+      id: info.id,
+      key: questionnaireKey,
       label: '',
       description: '',
       fields: []
@@ -504,7 +507,28 @@ export class ProfileComponent implements OnInit {
   }
 
   submit() {
-    alert(JSON.stringify(this.model));
-  }
+    // Flatten the model
+    const flattened = flatten(this.model, { safe: true });
 
+    // Rename the keys
+    const options = {};
+    const pattern = /^(.*)\./gi;
+    Object.keys(flattened).map(oldKey => {
+      const newKey = oldKey.replace(pattern, '');
+      options[newKey] = flattened[oldKey];
+    });
+
+    // Get the current step
+    const step = this.steps[this.activeStep];
+
+    if (isFinite(step.id)) {
+      this.api.updateQuestionnaire(step.key, step.id, options).subscribe(response => {
+        // Update form with saved values
+      });
+    } else {
+      this.api.submitQuestionnaire(step.key, options).subscribe(response => {
+        // Update form with saved values
+      });
+    }
+  }
 }

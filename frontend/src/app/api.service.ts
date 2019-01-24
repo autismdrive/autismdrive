@@ -369,6 +369,13 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  /** updateQuestionnaire */
+  updateQuestionnaire(key: string, id: number, options: object) {
+    const path = this.endpoints[key + 'Questionnaire'].replace('<id>', id.toString());
+    return this.httpClient.post<object>(this.apiRoot + path, options)
+      .pipe(catchError(this.handleError));
+  }
+
   /** getQuestionnaireMeta */
   getQuestionnaireMeta(key: string) {
     const path = this.endpoints[key + 'QuestionnaireMeta'];
@@ -380,6 +387,13 @@ export class ApiService {
   getQuestionnaireList(key: string) {
     const path = this.endpoints[key + 'QuestionnaireList'];
     return this.httpClient.get<any>(this.apiRoot + path)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** submitQuestionnaire */
+  submitQuestionnaire(key: string, options: object) {
+    const path = this.endpoints[key + 'QuestionnaireList'];
+    return this.httpClient.post<object>(this.apiRoot + path, options)
       .pipe(catchError(this.handleError));
   }
 
