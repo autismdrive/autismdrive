@@ -211,14 +211,14 @@ class ContactQuestionnaire(db.Model):
                 'description': '',
                 'required': True,
                 'options': [
-                    {'value': '1', 'label': 'Internet'},
-                    {'value': '2', 'label': 'Health care provider (doctor, speech therapist, etc)'},
-                    {'value': '3', 'label': 'Teacher or school'},
-                    {'value': '4', 'label': 'Word of mouth (friend, family member, etc)'},
-                    {'value': '5', 'label': 'Community event (autism walk, resource fair, etc.)'},
-                    {'value': '6', 'label': 'Television or radio (CNN, NPR, local news, etc.)'},
-                    {'value': '7', 'label': 'While participating in a research study'},
-                    {'value': '8', 'label': 'Other'}
+                    {'value': 'internet', 'label': 'Internet'},
+                    {'value': 'health_care_provider', 'label': 'Health care provider (doctor, speech therapist, etc)'},
+                    {'value': 'school', 'label': 'Teacher or school'},
+                    {'value': 'word_of_mouth', 'label': 'Word of mouth (friend, family member, etc)'},
+                    {'value': 'community_event', 'label': 'Community event (autism walk, resource fair, etc.)'},
+                    {'value': 'media', 'label': 'Television or radio (CNN, NPR, local news, etc.)'},
+                    {'value': 'research_study', 'label': 'While participating in a research study'},
+                    {'value': 'other', 'label': 'Other'},
                 ]
             }
         }
