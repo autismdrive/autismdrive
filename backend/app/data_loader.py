@@ -12,6 +12,7 @@ from app.model.training_category import TrainingCategory
 from app.model.user import User
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app import db
 from sqlalchemy import Sequence
 import csv
@@ -150,6 +151,13 @@ class DataLoader():
             DemographicsQuestionnaire).count())
         db.session.commit()
 
+    def load_guardian_demographics_questionnaire(self):
+        gd_ques = GuardianDemographicsQuestionnaire(birthdate="1979-1-5", sex='male', race_ethnicity="raceWhite", is_english_primary=True)
+        db.session.add(gd_ques)
+        print("Guardian Demographics loaded.  There is now %i guardian demographics record in the database." % db.session.query(
+            GuardianDemographicsQuestionnaire).count())
+        db.session.commit()
+
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
         if organization is None:
@@ -169,6 +177,7 @@ class DataLoader():
     def clear(self):
         db.session.query(ContactQuestionnaire).delete()
         db.session.query(DemographicsQuestionnaire).delete()
+        db.session.query(GuardianDemographicsQuestionnaire).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()

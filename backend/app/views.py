@@ -58,7 +58,8 @@ from app.resources.questionnaire_endpoints.DemographicsQuestionnaireEndpoint imp
 )
 from app.resources.questionnaire_endpoints.GuardianDemographicsQuestionnaireEndpoint import (
     GuardianDemographicsQuestionnaireEndpoint,
-    GuardianDemographicsQuestionnaireListEndpoint
+    GuardianDemographicsQuestionnaireListEndpoint,
+    GuardianDemographicsQuestionnaireMetaEndpoint
 )
 
 
@@ -145,6 +146,7 @@ endpoints = [
     (DemographicsQuestionnaireMetaEndpoint, '/demographics_questionnaire/meta'),
     (GuardianDemographicsQuestionnaireListEndpoint, '/guardian_demographics_questionnaire'),
     (GuardianDemographicsQuestionnaireEndpoint, '/guardian_demographics_questionnaire/<id>'),
+    (GuardianDemographicsQuestionnaireMetaEndpoint, '/guardian_demographics_questionnaire/meta'),
 ]
 
 # Add all endpoints to the API
