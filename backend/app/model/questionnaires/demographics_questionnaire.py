@@ -52,10 +52,9 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'radio',
             'template_options': {
-                'required': False
-            },
-            'self_template_label': 'Is this your preferred name/nick name?',
-            'guardian_template_label': 'Is this your child’s preferred name/nick name?'
+                'required': False,
+                'label': '"Is this your " + (!model.is_self ? "child\'s ") + "preferred name?"'
+            }
         }
     )
     nickname = db.Column(
@@ -75,10 +74,9 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'datepicker',
             'template_options': {
-                'required': True
-            },
-            'self_template_label': 'Your Date of Birth*',
-            'guardian_template_label': 'model.first_name + "\'s Date of Birth*"'
+                'required': True,
+                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " Date of Birth*"'
+            }
         }
     )
     birth_city = db.Column(
@@ -86,10 +84,9 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'input',
             'template_options': {
-                'required': True
-            },
-            'self_template_label': 'Your City/municipality of birth*',
-            'guardian_template_label': 'model.first_name + "\'s City/municipality of birth*"'
+                'required': True,
+                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " City/municipality of birth*"'
+            }
         }
     )
     birth_state = db.Column(
@@ -97,10 +94,9 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'input',
             'template_options': {
-                'required': True
+                'required': True,
+                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " state of birth*"'
             },
-            'self_template_label': 'Your state of birth*',
-            'guardian_template_label': 'model.first_name + "\'s state of birth*"'
         }
     )
     birth_sex = db.Column(
@@ -108,10 +104,9 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'radio',
             'template_options': {
-                'required': True
+                'required': True,
+                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " sex at birth*"'
             },
-            'self_template_label': 'Your sex at birth*',
-            'guardian_template_label': 'model.first_name + "\'s sex at birth*"',
             'options': [{'value': 'male', 'label': 'Male'},
                         {'value': 'female', 'label': 'Female'},
                         {'value': 'intersex', 'label': 'Intersex'}
@@ -123,11 +118,11 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'radio',
             'template_options': {
-                'required': True
+                'required': True,
+                'label': '(model.is_self ? "Your" : model.first_name + "\'s") + " current gender identity '
+                         '(how " + (model.is_self ? "you describe yourself)*:" : model.first_name + '
+                         '" describes themselves)*:"'
             },
-            'self_template_label': 'Your current gender identity (how you describe yourself)*:',
-            'guardian_template_label': 'model.first_name + "\'s current gender identity (how " + model.first_name + '
-                                       '" describes themselves)*:"',
             'options': [{'value': 'male', 'label': 'Male'},
                         {'value': 'female', 'label': 'Female'},
                         {'value': 'intersex', 'label': 'Intersex'},
@@ -155,10 +150,10 @@ class DemographicsQuestionnaire(db.Model):
         info={
             'type': 'radio',
             'template_options': {
-                'required': True
+                'required': True,
+                'label': '"What is " + (model.is_self ? "your" : model.first_name + "\'s" ) + " race/ethnicity? '
+                         '(select all that apply)*"'
             },
-            'self_template_label': 'What is your race/ethnicity? (select all that apply)*',
-            'guardian_template_label': '"What is " + model.first_name + "\'s race/ethnicity?* (select all that apply)"',
             'options': [
                 {'value': 'raceBlack', 'label': 'Black / African / African American'},
                 {'value': 'raceAsian', 'label': 'Asian / Asian American'},
@@ -190,10 +185,9 @@ class DemographicsQuestionnaire(db.Model):
             'type': 'radio',
             'default': True,
             'template_options': {
-                'required': False
+                'required': False,
+                'label': '"Is " + (model.is_self ? "your" : model.first_name + "\'s") + " primary language English?"'
             },
-            'self_template_label': 'Is your primary language English?',
-            'guardian_template_label': '"Is " + model.first_name + "\'s primary language English?"',
             'options': [
                 {'value': 'true', 'label': 'True'},
                 {'value': 'false', 'label': 'False'}
@@ -201,22 +195,14 @@ class DemographicsQuestionnaire(db.Model):
         }
     )
 
-    def get_meta(self, is_self=True):
+    def get_meta(self):
         info = {'table': {'sensitive': False,
-                          'label': 'Demographics'
+                          'label': 'Demographics',
+                          'description': '"Please answer the following questions about " + '
+                                         '(model.is_self ? "yourself" : "your child or the person with autism on whom '
+                                         'you are providing information") + " (* indicates required response):"'
                           }
                 }
-        if is_self:
-            info['table']['description'] = 'Please answer the following questions about yourself (* indicates ' \
-                                           'required response):',
-        else:
-            info['table']['description'] = 'Please answer the following questions about your child or the person ' \
-                                           'with autism on whom you are providing information (* indicates required ' \
-                                           'response):'
         for c in self.metadata.tables['demographics_questionnaire'].columns:
             info[c.name] = c.info
-            if 'self_template_label' in info[c.name] and is_self:
-                info[c.name]['template_options']['label'] = info[c.name]['self_template_label']
-            elif 'guardian_template_label' in info[c.name] and not is_self:
-                info[c.name]['template_options']['label'] = info[c.name]['guardian_template_label']
         return info
