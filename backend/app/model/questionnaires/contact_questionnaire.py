@@ -42,8 +42,9 @@ class ContactQuestionnaire(db.Model):
         info={
             'display_order': 3,
             'type': 'radio',
+            'default_value': True,
             'template_options': {
-                'label': 'Is this your preferred name/nick name?',
+                'label': 'Is this your preferred name?',
                 'required': False,
                 'options': [
                     {'value': True, 'label': 'Yes'},
@@ -61,7 +62,8 @@ class ContactQuestionnaire(db.Model):
             'template_options': {
                 'label': 'Nickname',
                 'required': False
-            }
+            },
+            'hide_expression': 'model.is_first_name_preferred'
         }
     )
     phone = db.Column(
@@ -227,10 +229,10 @@ class ContactQuestionnaire(db.Model):
         info={
             'display_order': 8.2,
             'type': 'input',
-            'template_ptions': {
+            'template_options': {
                 'placeholder': 'Where did you hear about us?'
             },
-            'hideExpression': '!(model.marketing_channel && (model.marketing_channel === "8"))',
+            'hide_expression': '!(model.marketing_channel && (model.marketing_channel === "8"))',
         }
     )
 
