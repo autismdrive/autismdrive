@@ -16,6 +16,7 @@ class GuardianDemographicsQuestionnaire(db.Model):
     birthdate = db.Column(
         db.Date,
         info={
+            'display_order': 1,
             'type': 'datepicker',
             'template_options': {
                 'required': True,
@@ -27,15 +28,16 @@ class GuardianDemographicsQuestionnaire(db.Model):
     sex = db.Column(
         db.String,
         info={
+            'display_order': 2,
             'type': 'radio',
             'template_options': {
                 'required': True,
-                'label': 'Your sex*:',
+                'label': 'Your biological sex*:',
                 'options': [
                     {'value': 'male', 'label': 'Male'},
                     {'value': 'female', 'label': 'Female'},
                     {'value': 'intersex', 'label': 'Intersex'},
-                    {'value': 'no_answer', 'label': 'Choose not to answer'}
+                    {'value': 'no_answer', 'label': 'Prefer not to answer'}
                 ]
             }
         }
@@ -44,6 +46,7 @@ class GuardianDemographicsQuestionnaire(db.Model):
     race_ethnicity = db.Column(
         db.String,
         info={
+            'display_order': 3,
             'type': 'radio',
             'template_options': {
                 'required': True,
@@ -65,7 +68,7 @@ class GuardianDemographicsQuestionnaire(db.Model):
     race_ethnicity_other = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 4,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter race/ethnicity'
@@ -77,6 +80,7 @@ class GuardianDemographicsQuestionnaire(db.Model):
     is_english_primary = db.Column(
         db.Boolean,
         info={
+            'display_order': 5,
             'type': 'radio',
             'default': True,
             'template_options': {
@@ -93,6 +97,7 @@ class GuardianDemographicsQuestionnaire(db.Model):
     relationship_to_child = db.Column(
         db.String,
         info={
+            'display_order': 6,
             'type': 'radio',
             'default': True,
             'template_options': {
@@ -112,7 +117,7 @@ class GuardianDemographicsQuestionnaire(db.Model):
     relationship_to_child_other = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 7,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter your relationship to your child'

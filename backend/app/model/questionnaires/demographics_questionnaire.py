@@ -20,6 +20,7 @@ class DemographicsQuestionnaire(db.Model):
     first_name = db.Column(
         db.String,
         info={
+            'display_order': 1,
             'type': 'input',
             'template_options': {
                 'label': 'First name',
@@ -30,6 +31,7 @@ class DemographicsQuestionnaire(db.Model):
     middle_name = db.Column(
         db.String,
         info={
+            'display_order': 2,
             'type': 'input',
             'template_options': {
                 'label': 'Middle name',
@@ -40,6 +42,7 @@ class DemographicsQuestionnaire(db.Model):
     last_name = db.Column(
         db.String,
         info={
+            'display_order': 3,
             'type': 'input',
             'template_options': {
                 'label': 'Last name*',
@@ -50,6 +53,7 @@ class DemographicsQuestionnaire(db.Model):
     is_first_name_preferred = db.Column(
         db.Boolean,
         info={
+            'display_order': 4,
             'type': 'radio',
             'template_options': {
                 'required': False,
@@ -60,6 +64,7 @@ class DemographicsQuestionnaire(db.Model):
     nickname = db.Column(
         db.String,
         info={
+            'display_order': 5,
             'type': 'input',
             'template_options': {
                 'label': 'Preferred name or nickname',
@@ -72,6 +77,7 @@ class DemographicsQuestionnaire(db.Model):
     birthdate = db.Column(
         db.Date,
         info={
+            'display_order': 6,
             'type': 'datepicker',
             'template_options': {
                 'required': True,
@@ -82,6 +88,7 @@ class DemographicsQuestionnaire(db.Model):
     birth_city = db.Column(
         db.String,
         info={
+            'display_order': 7,
             'type': 'input',
             'template_options': {
                 'required': True,
@@ -92,6 +99,7 @@ class DemographicsQuestionnaire(db.Model):
     birth_state = db.Column(
         db.String,
         info={
+            'display_order': 8,
             'type': 'input',
             'template_options': {
                 'required': True,
@@ -102,6 +110,7 @@ class DemographicsQuestionnaire(db.Model):
     birth_sex = db.Column(
         db.String,
         info={
+            'display_order': 9,
             'type': 'radio',
             'template_options': {
                 'required': True,
@@ -117,6 +126,7 @@ class DemographicsQuestionnaire(db.Model):
     gender_identity = db.Column(
         db.String,
         info={
+            'display_order': 10,
             'type': 'radio',
             'template_options': {
                 'required': True,
@@ -138,7 +148,7 @@ class DemographicsQuestionnaire(db.Model):
     gender_identity_other = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 11,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter gender identity'
@@ -150,6 +160,7 @@ class DemographicsQuestionnaire(db.Model):
     race_ethnicity = db.Column(
         db.String,
         info={
+            'display_order': 12,
             'type': 'radio',
             'template_options': {
                 'required': True,
@@ -172,7 +183,7 @@ class DemographicsQuestionnaire(db.Model):
     race_ethnicity_other = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 13,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter race/ethnicity'
@@ -184,6 +195,7 @@ class DemographicsQuestionnaire(db.Model):
     is_english_primary = db.Column(
         db.Boolean,
         info={
+            'display_order': 14,
             'type': 'radio',
             'default': True,
             'template_options': {
