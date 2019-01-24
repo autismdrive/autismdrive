@@ -44,7 +44,7 @@
           >Cancel</button>
         </footer>
         <footer *ngIf="registerState === 'submitting'">
-          <mat-spinner></mat-spinner>
+          <app-loading></app-loading>
         </footer>
         <footer *ngIf="registerState === 'wait_for_email'">
           <b>Account Created! </b>

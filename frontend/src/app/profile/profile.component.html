@@ -12,7 +12,9 @@
     ></mat-progress-bar>
 
 
+    <app-loading *ngIf="loading" message="Loading..."></app-loading>
     <form
+      *ngIf="!loading"
       [formGroup]="form"
       (ngSubmit)="submit()"
     >

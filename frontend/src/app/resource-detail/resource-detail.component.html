@@ -106,6 +106,4 @@
       </mat-card>
     </div>
   </div>
-  <div *ngIf="!resource">
-    <mat-spinner></mat-spinner>
-  </div>
+  <app-loading *ngIf="!resource" message="Loading..."></app-loading>
