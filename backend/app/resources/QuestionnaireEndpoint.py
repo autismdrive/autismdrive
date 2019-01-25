@@ -12,7 +12,7 @@ from app import db, RestException
 #   * It is saved in a snaked cased file of the same name as the class.
 #   * It extends db.Model
 #   * it has an id field called "id"
-#   * It has a date_field called
+#   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
 
 class QuestionnaireEndpoint(flask_restful.Resource):
