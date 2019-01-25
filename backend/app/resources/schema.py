@@ -284,8 +284,8 @@ class ParticipantSchema(ModelSchema):
 class UserParticipantsSchema(ModelSchema):
     class Meta:
         model = UserParticipant
-        fields = ('id', '_links', 'participant_id', 'user_id', 'user')
-    user = fields.Nested(UserSchema, dump_only=True)
+        fields = ('id', '_links', 'participant_id', 'user_id', 'participant')
+    participant = fields.Nested(ParticipantSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
         'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
@@ -296,8 +296,8 @@ class UserParticipantsSchema(ModelSchema):
 class ParticipantUsersSchema(ModelSchema):
     class Meta:
         model = UserParticipant
-        fields = ('id', '_links', 'participant_id', 'user_id', 'participant')
-    participant = fields.Nested(ParticipantSchema, dump_only=True)
+        fields = ('id', '_links', 'participant_id', 'user_id', 'user')
+    user = fields.Nested(UserSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
         'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),

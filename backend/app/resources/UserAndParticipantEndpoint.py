@@ -16,7 +16,7 @@ class UserByParticipantEndpoint(flask_restful.Resource):
         user_participants = db.session.query(UserParticipant)\
             .join(UserParticipant.user)\
             .filter(UserParticipant.participant_id == participant_id)\
-            .order_by(User.title)\
+            .order_by(User.last_name)\
             .all()
         return self.schema.dump(user_participants, many=True)
 
@@ -29,7 +29,7 @@ class ParticipantByUserEndpoint(flask_restful.Resource):
         user_participants = db.session.query(UserParticipant).\
             join(UserParticipant.participant).\
             filter(UserParticipant.user_id == user_id).\
-            order_by(Participant.name).\
+            order_by(Participant.last_name).\
             all()
         return self.schema.dump(user_participants,many=True)
 

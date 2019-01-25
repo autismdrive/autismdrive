@@ -134,12 +134,12 @@ endpoints = [
     (SessionEndpoint, '/session'),
     (UserListEndpoint, '/user'),
     (UserEndpoint, '/user/<id>'),
-    (ParticipantByUserEndpoint, '/user/<id>/participant'),
+    (ParticipantByUserEndpoint, '/user/<user_id>/participant'),
 
     # Participants
     (ParticipantListEndpoint, '/participant'),
     (ParticipantEndpoint, '/participant/<id>'),
-    (UserByParticipantEndpoint, '/participant/<id>/user'),
+    (UserByParticipantEndpoint, '/participant/<participant_id>/user'),
     (UserParticipantListEndpoint, '/user_participant'),
     (UserParticipantEndpoint, '/user_participant/<id>'),
 
