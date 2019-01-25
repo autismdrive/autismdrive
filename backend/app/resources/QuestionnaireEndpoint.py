@@ -78,7 +78,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         try:
             module_ = importlib.import_module(module_name)
             try:
-                class_ = getattr(module_, class_name)
+                return getattr(module_, class_name)
             except AttributeError:
                 # FIXME: Get some damn logging.
                 print("Error class does not exist:" + class_name)
@@ -87,7 +87,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
             # FIXME: Get some damn logging.
             print("Module does not exist:" + module_name)
             #   logging.('Module does not exist')
-        return class_ or None
+        return None
 
 
 class QuestionnaireListEndpoint(flask_restful.Resource):
