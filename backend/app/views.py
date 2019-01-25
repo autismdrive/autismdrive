@@ -28,6 +28,10 @@ from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
     OrganizationListEndpoint
 )
+from app.resources.ParticipantEndpoint import (
+    ParticipantEndpoint,
+    ParticipantListEndpoint
+)
 from app.resources.StudyAndCategoryEndpoint import (
     StudyCategoryEndpoint,
     CategoryByStudyEndpoint,
@@ -46,7 +50,12 @@ from app.resources.TrainingAndCategoryEndpoint import (
     TrainingByCategoryEndpoint,
     TrainingCategoryListEndpoint
 )
-
+from app.resources.UserAndParticipantEndpoint import (
+    UserParticipantEndpoint,
+    UserByParticipantEndpoint,
+    ParticipantByUserEndpoint,
+    UserParticipantListEndpoint
+)
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
     QuestionnaireListEndpoint,
@@ -125,7 +134,16 @@ endpoints = [
     (SessionEndpoint, '/session'),
     (UserListEndpoint, '/user'),
     (UserEndpoint, '/user/<id>'),
+    (ParticipantByUserEndpoint, '/user/<id>/participant'),
 
+    # Participants
+    (ParticipantListEndpoint, '/participant'),
+    (ParticipantEndpoint, '/participant/<id>'),
+    (UserByParticipantEndpoint, '/participant/<id>/user'),
+    (UserParticipantListEndpoint, '/user_participant'),
+    (UserParticipantEndpoint, '/user_participant/<id>'),
+
+    # Questionnaires
     (QuestionnaireEndpoint, '/q/<string:name>/<string:id>'),
     (QuestionnaireListEndpoint, '/q/<string:name>'),
     (QuestionnaireMetaEndpoint, '/q/<string:name>/meta')
