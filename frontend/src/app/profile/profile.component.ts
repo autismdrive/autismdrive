@@ -419,7 +419,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private api: ApiService
   ) {
-    const stepKeys = ['contact'];
+    const stepKeys = ['contact', 'demographics'];
     let numStepsMapped = 0;
 
     // loop thru steps
