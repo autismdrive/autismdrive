@@ -8,6 +8,7 @@ import {
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatChipsModule,
   MatDatepickerModule,
   MatExpansionModule,
   MatFormFieldModule,
@@ -22,8 +23,7 @@ import {
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule,
-  MatChipsModule
+  MatToolbarModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -45,22 +45,23 @@ import { CardWrapperComponent } from './forms/card-wrapper/card-wrapper.componen
 import { SDFileUploadComponent } from './forms/file-upload/file-upload.component';
 import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
 import { SDFormFieldComponent } from './forms/form-field/form-field.component';
+import { HelpWrapperComponent } from './forms/help-wrapper/help-wrapper.component';
 import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './forms/validators/formly.validator';
 import { HomeComponent } from './home/home.component';
+import { LoadingComponent } from './loading/loading.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './register/register.component';
+import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { RoutingModule } from './routing/routing.module';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { StudiesComponent } from './studies/studies.component';
-import { TermsComponent } from './terms/terms.component';
-import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
+import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
-import { LoadingComponent } from './loading/loading.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -75,6 +76,7 @@ export class FormlyConfig {
       { name: 'required', message: 'This field is required.' },
     ],
     wrappers: [
+      { name: 'help', component: HelpWrapperComponent },
       { name: 'card', component: CardWrapperComponent },
     ],
   };
@@ -106,7 +108,8 @@ export class FormlyConfig {
     ResourceDetailComponent,
     StudyDetailComponent,
     TrainingDetailComponent,
-    LoadingComponent
+    LoadingComponent,
+    HelpWrapperComponent
   ],
   imports: [
     BrowserAnimationsModule,
