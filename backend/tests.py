@@ -22,6 +22,8 @@ from app.model.resource import StarResource
 from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
+from app.model.participant import Participant
+from app.model.user_participant import UserParticipant
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
@@ -187,6 +189,25 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_user.first_name, user.first_name)
         return db_user
 
+    def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
+
+        user = User(first_name=first_name, last_name=last_name, email=email, role=role)
+        db.session.add(user)
+        db.session.commit()
+
+        db_user = db.session.query(User).filter_by(email=user.email).first()
+        self.assertEqual(db_user.first_name, user.first_name)
+        return db_user
+
+    def construct_participant(self, first_name="Wayne", last_name="Boro"):
+        participant = Participant(first_name=first_name, last_name=last_name)
+        db.session.add(participant)
+        db.session.commit()
+
+        db_participant = db.session.query(Participant).filter_by(last_name=participant.last_name).first()
+        self.assertEqual(db_participant.first_name, participant.first_name)
+        return db_participant
+
     def construct_contact_questionnaire(self, first_name="Flibby", last_name="Tribby", zip=55678,
                                         marketing_channel="Zine Ad", user=None):
 
@@ -240,16 +261,6 @@ class TestCase(unittest.TestCase):
         db_gdq = db.session.query(GuardianDemographicsQuestionnaire).filter_by(guardian_id=gdq.guardian_id).first()
         self.assertEqual(db_gdq.relationship_to_child, gdq.relationship_to_child)
         return db_gdq
-
-    def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
-
-        user = User(first_name=first_name, last_name=last_name, email=email, role=role)
-        db.session.add(user)
-        db.session.commit()
-
-        db_user = db.session.query(User).filter_by(email=user.email).first()
-        self.assertEqual(db_user.first_name, user.first_name)
-        return db_user
 
     def test_resource_basics(self):
         self.construct_resource()
@@ -1174,6 +1185,152 @@ class TestCase(unittest.TestCase):
 
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
+
+    def test_participant_basics(self):
+        self.construct_participant()
+        p = db.session.query(Participant).first()
+        self.assertIsNotNone(p)
+        p_id = p.id
+        rv = self.app.get('/api/participant/%i' % p_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], p_id)
+        self.assertEqual(response["first_name"], p.first_name)
+        self.assertEqual(response["last_name"], p.last_name)
+
+    def test_modify_participant_basics(self):
+        self.construct_participant()
+        p = db.session.query(Participant).first()
+        self.assertIsNotNone(p)
+        p_id = p.id
+        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['last_name'] = 'Better'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/participant/%i' % p_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['last_name'], 'Better')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_participant(self):
+        p = self.construct_participant()
+        p_id = p.id
+        rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/participant/%i' % p_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_participant(self):
+        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
+        rv = self.app.post('api/participant', data=json.dumps(participant), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Dorothy')
+        self.assertEqual(response['last_name'], 'Edwards')
+        self.assertIsNotNone(response['id'])
+
+    def test_get_user_by_participant(self):
+        u = self.construct_user()
+        p = self.construct_participant()
+        up = UserParticipant(user=u, participant=p, relationship="Self")
+        db.session.add(up)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/participant/%i/user' % p.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(u.id, response[0]["id"])
+        self.assertEqual(u.last_name, response[0]["user"]["last_name"])
+
+    def test_get_participant_by_user(self):
+        u = self.construct_user()
+        p = self.construct_participant()
+        up = UserParticipant(user=u, participant=p, relationship="Self")
+        db.session.add(up)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/user/%i/participant' % u.id,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(p.id, response[0]["id"])
+        self.assertEqual(p.first_name, response[0]["participant"]["first_name"])
+
+    def test_add_participant_to_user(self):
+        u = self.construct_user()
+        p = self.construct_participant()
+
+        up_data = {"user_id": u.id, "participant_id": p.id}
+
+        rv = self.app.post(
+            '/api/user_participant',
+            data=json.dumps(up_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(p.id, response["participant_id"])
+        self.assertEqual(u.id, response["user_id"])
+
+    def test_set_all_participants_on_user(self):
+        p1 = self.construct_participant(first_name="Evelyn", last_name="Sarabande")
+        p2 = self.construct_participant(first_name="Adela", last_name="Allemande")
+        p3 = self.construct_participant(first_name="Valentia", last_name="Gigue")
+        u = self.construct_user()
+
+        up_data = [
+            {
+                "participant_id": p1.id
+            },
+            {
+                "participant_id": p2.id
+            },
+            {
+                "participant_id": p3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/user/%i/participant' % u.id,
+            data=json.dumps(up_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        up_data = [{"participant_id": p1.id}]
+        rv = self.app.post(
+            '/api/user/%i/participant' % u.id,
+            data=json.dumps(up_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_participant_from_user(self):
+        self.test_add_participant_to_user()
+        rv = self.app.delete('/api/user_participant/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/user/%i/participant' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
 
     def test_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
