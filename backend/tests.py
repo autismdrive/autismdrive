@@ -75,13 +75,7 @@ class TestCase(unittest.TestCase):
             ('api.categorybytrainingendpoint', '/api/training/<training_id>/category'),
             ('api.categoryendpoint', '/api/category/<id>'),
             ('api.categorylistendpoint', '/api/category'),
-            ('api.contactquestionnaireendpoint', '/api/contact_questionnaire/<id>'),
-            ('api.contactquestionnairelistendpoint', '/api/contact_questionnaire'),
-            ('api.contactquestionnairemetaendpoint', '/api/contact_questionnaire/meta'),
-            ('api.demographicsquestionnaireendpoint', '/api/demographics_questionnaire/<id>'),
-            ('api.demographicsquestionnairelistendpoint', '/api/demographics_questionnaire'),
-            ('api.guardiandemographicsquestionnaireendpoint', '/api/guardian_demographics_questionnaire/<id>'),
-            ('api.guardiandemographicsquestionnairelistendpoint', '/api/guardian_demographics_questionnaire'),
+            ('api.questionnaireendpoint', '/api/q/<name>/<id>'),
             ('api.organizationendpoint', '/api/organization/<id>'),
             ('api.organizationlistendpoint', '/api/organization'),
             ('api.resourcebycategoryendpoint', '/api/category/<category_id>/resource'),
@@ -1186,7 +1180,7 @@ class TestCase(unittest.TestCase):
         cq = db.session.query(ContactQuestionnaire).first()
         self.assertIsNotNone(cq)
         cq_id = cq.id
-        rv = self.app.get('/api/contact_questionnaire/%i' % cq_id,
+        rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id,
                           follow_redirects=True,
                           content_type="application/json")
         self.assertSuccess(rv)
@@ -1200,16 +1194,16 @@ class TestCase(unittest.TestCase):
         cq = db.session.query(ContactQuestionnaire).first()
         self.assertIsNotNone(cq)
         cq_id = cq.id
-        rv = self.app.get('/api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
         response['first_name'] = 'Edwarardo'
         response['zip'] = 22345
         response['marketing_channel'] = 'flyer'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/contact_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/q/contact_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['first_name'], 'Edwarardo')
@@ -1220,18 +1214,18 @@ class TestCase(unittest.TestCase):
     def test_delete_contact_questionnaire(self):
         cq = self.construct_contact_questionnaire()
         cq_id = cq.id
-        rv = self.app.get('api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.delete('api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.delete('api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.get('api/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
 
     def test_create_contact_questionnaire(self):
         contact_questionnaire = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
-        rv = self.app.post('api/contact_questionnaire', data=json.dumps(contact_questionnaire), content_type="application/json",
+        rv = self.app.post('api/q/contact_questionnaire', data=json.dumps(contact_questionnaire), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -1244,7 +1238,7 @@ class TestCase(unittest.TestCase):
         dq = db.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
         dq_id = dq.id
-        rv = self.app.get('/api/demographics_questionnaire/%i' % dq_id,
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id,
                           follow_redirects=True,
                           content_type="application/json")
         self.assertSuccess(rv)
@@ -1258,17 +1252,17 @@ class TestCase(unittest.TestCase):
         dq = db.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
         dq_id = dq.id
-        rv = self.app.get('/api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
         response['first_name'] = 'Edwarardo'
         response['is_english_primary'] = False
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['guardian_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/demographics_questionnaire/%i' % dq_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/q/demographics_questionnaire/%i' % dq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['first_name'], 'Edwarardo')
@@ -1279,18 +1273,18 @@ class TestCase(unittest.TestCase):
     def test_delete_demographics_questionnaire(self):
         dq = self.construct_demographics_questionnaire()
         dq_id = dq.id
-        rv = self.app.get('api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        rv = self.app.get('api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.delete('api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        rv = self.app.delete('api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.get('api/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        rv = self.app.get('api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
 
     def test_create_demographics_questionnaire(self):
         demographics_questionnaire = {'first_name': "Darah", 'is_english_primary': False}
-        rv = self.app.post('api/demographics_questionnaire', data=json.dumps(demographics_questionnaire), content_type="application/json",
+        rv = self.app.post('api/q/demographics_questionnaire', data=json.dumps(demographics_questionnaire), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -1303,7 +1297,7 @@ class TestCase(unittest.TestCase):
         gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
         self.assertIsNotNone(gdq)
         gdq_id = gdq.id
-        rv = self.app.get('/api/guardian_demographics_questionnaire/%i' % gdq_id,
+        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id,
                           follow_redirects=True,
                           content_type="application/json")
         self.assertSuccess(rv)
@@ -1317,17 +1311,17 @@ class TestCase(unittest.TestCase):
         gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
         self.assertIsNotNone(gdq)
         gdq_id = gdq.id
-        rv = self.app.get('/api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
         response['relationship_to_child'] = 'Parent'
         response['is_english_primary'] = False
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['guardian_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/guardian_demographics_questionnaire/%i' % gdq_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['relationship_to_child'], 'Parent')
@@ -1338,21 +1332,22 @@ class TestCase(unittest.TestCase):
     def test_delete_guardian_demographics_questionnaire(self):
         gdq = self.construct_guardian_demographics_questionnaire()
         gdq_id = gdq.id
-        rv = self.app.get('api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        rv = self.app.get('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.delete('api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        rv = self.app.delete('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.get('api/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        rv = self.app.get('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
 
     def test_create_guardian_demographics_questionnaire(self):
         guardian_demographics_questionnaire = {'relationship_to_child': "Mother", 'is_english_primary': False}
-        rv = self.app.post('api/guardian_demographics_questionnaire', data=json.dumps(guardian_demographics_questionnaire), content_type="application/json",
+        rv = self.app.post('api/q/guardian_demographics_questionnaire', data=json.dumps(guardian_demographics_questionnaire), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['relationship_to_child'], 'Mother')
         self.assertEqual(response['is_english_primary'], False)
         self.assertIsNotNone(response['id'])
+

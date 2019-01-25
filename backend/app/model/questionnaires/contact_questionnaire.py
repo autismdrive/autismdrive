@@ -1,5 +1,7 @@
 import datetime
 
+from marshmallow_sqlalchemy import ModelSchema
+
 from app import db
 
 
@@ -283,3 +285,17 @@ class ContactQuestionnaire(db.Model):
                 info[c.name] = c.info
 
         return info
+
+
+class ContactQuestionnaireSchema(ModelSchema):
+    class Meta:
+        model = ContactQuestionnaire
+        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'last_name','is_first_name_preferred',
+                  'nickname', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
+                  'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
+
+
+class ContactQuestionnaireMetaSchema(ModelSchema):
+    class Meta:
+        model = ContactQuestionnaire
+        fields = ('get_meta',)

@@ -1,5 +1,7 @@
 import datetime
 
+from marshmallow_sqlalchemy import ModelSchema
+
 from app import db
 
 
@@ -220,3 +222,20 @@ class DemographicsQuestionnaire(db.Model):
         for c in self.metadata.tables['demographics_questionnaire'].columns:
             info[c.name] = c.info
         return info
+
+
+class DemographicsQuestionnaireSchema(ModelSchema):
+    class Meta:
+        model = DemographicsQuestionnaire
+        fields = ('id', 'last_updated', 'participant_id', 'guardian_id','first_name', 'middle_name', 'last_name',
+                  'nickname', 'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex',
+                  'gender_identity', 'race_ethnicity', 'is_english_primary')
+
+
+class DemographicsQuestionnaireMetaSchema(ModelSchema):
+    class Meta:
+        model = DemographicsQuestionnaire
+        fields = ('get_meta',)
+
+
+

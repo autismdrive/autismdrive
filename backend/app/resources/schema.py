@@ -275,42 +275,5 @@ class UserSchema(ModelSchema):
     id = fields.Integer(required=False, allow_none=True)
 
 
-class ContactQuestionnaireSchema(ModelSchema):
-    class Meta:
-        model = ContactQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'last_name','is_first_name_preferred',
-                  'nickname', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
-                  'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
 
 
-class ContactQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = ContactQuestionnaire
-        fields = ('get_meta',)
-
-
-class DemographicsQuestionnaireSchema(ModelSchema):
-    class Meta:
-        model = DemographicsQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'guardian_id','first_name', 'middle_name', 'last_name',
-                  'nickname', 'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex',
-                  'current_gender', 'race_ethnicity', 'is_english_primary')
-
-
-class DemographicsQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = DemographicsQuestionnaire
-        fields = ('get_meta',)
-
-
-class GuardianDemographicsQuestionnaireSchema(ModelSchema):
-    class Meta:
-        model = GuardianDemographicsQuestionnaire
-        fields = ('id', 'last_updated', 'guardian_id', 'birthdate', 'sex', 'race_ethnicity', 'is_english_primary',
-                  'relationship_to_child')
-
-
-class GuardianDemographicsQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = GuardianDemographicsQuestionnaire
-        fields = ('get_meta',)

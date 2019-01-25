@@ -46,22 +46,11 @@ from app.resources.TrainingAndCategoryEndpoint import (
     TrainingByCategoryEndpoint,
     TrainingCategoryListEndpoint
 )
-from app.resources.questionnaire_endpoints.ContactQuestionnaireEndpoint import (
-    ContactQuestionnaireEndpoint,
-    ContactQuestionnaireListEndpoint,
-    ContactQuestionnaireMetaEndpoint
-)
-from app.resources.questionnaire_endpoints.DemographicsQuestionnaireEndpoint import (
-    DemographicsQuestionnaireEndpoint,
-    DemographicsQuestionnaireListEndpoint,
-    DemographicsQuestionnaireMetaEndpoint
-)
-from app.resources.questionnaire_endpoints.GuardianDemographicsQuestionnaireEndpoint import (
-    GuardianDemographicsQuestionnaireEndpoint,
-    GuardianDemographicsQuestionnaireListEndpoint,
-    GuardianDemographicsQuestionnaireMetaEndpoint
-)
 
+from app.resources.QuestionnaireEndpoint import (
+    QuestionnaireEndpoint,
+    QuestionnaireListEndpoint,
+    QuestionnaireMetaEndpoint)
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -137,18 +126,12 @@ endpoints = [
     (UserListEndpoint, '/user'),
     (UserEndpoint, '/user/<id>'),
 
-    # Questionnaires
-    (ContactQuestionnaireListEndpoint, '/contact_questionnaire'),
-    (ContactQuestionnaireEndpoint, '/contact_questionnaire/<id>'),
-    (ContactQuestionnaireMetaEndpoint, '/contact_questionnaire/meta'),
-    (DemographicsQuestionnaireListEndpoint, '/demographics_questionnaire'),
-    (DemographicsQuestionnaireEndpoint, '/demographics_questionnaire/<id>'),
-    (DemographicsQuestionnaireMetaEndpoint, '/demographics_questionnaire/meta'),
-    (GuardianDemographicsQuestionnaireListEndpoint, '/guardian_demographics_questionnaire'),
-    (GuardianDemographicsQuestionnaireEndpoint, '/guardian_demographics_questionnaire/<id>'),
-    (GuardianDemographicsQuestionnaireMetaEndpoint, '/guardian_demographics_questionnaire/meta'),
+    (QuestionnaireEndpoint, '/q/<string:name>/<string:id>'),
+    (QuestionnaireListEndpoint, '/q/<string:name>'),
+    (QuestionnaireMetaEndpoint, '/q/<string:name>/meta')
 ]
 
 # Add all endpoints to the API
 for endpoint in endpoints:
     api.add_resource(endpoint[0], endpoint[1])
+
