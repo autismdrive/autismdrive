@@ -4,8 +4,9 @@ import { User } from '../user';
 import { FormArray, FormGroup, EmailValidator } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { QuestionnaireStep } from '../step';
-import * as camelcaseKeys from 'camelcase-keys';
 import * as flatten from 'flat';
+import { keysToCamel, toCamel } from 'src/util/snakeToCamel';
+
 
 export interface StarProfileModel {
   enrollingFor?: string;
@@ -460,8 +461,9 @@ export class ProfileComponent implements OnInit {
       const item = info[key];
 
       if (key === 'table') {
-        step.description = item.description;
-        step.label = item.label;
+        Object.keys(item).forEach(tableKey => {
+          step[toCamel(tableKey)] = item[tableKey];
+        });
       } else if (key === 'field_groups') {
         Object.keys(item).forEach(wrapperKey => {
 
@@ -477,19 +479,19 @@ export class ProfileComponent implements OnInit {
             // Remove the field from the 'all' object, since we've
             // now copied it to its parent fieldGroup
             delete info[childKey];
-            return camelcaseKeys(childField);
+            return keysToCamel(childField);
           });
 
           // Remove the fields array from the wrapper object,
           // since all its child fields are now inside the
           // fieldGroup attribute
           delete wrapper.fields;
-          stepFields.push(camelcaseKeys(wrapper));
+          stepFields.push(keysToCamel(wrapper));
         });
       } else if (item) {
         item.key = key;
         item.name = key;
-        stepFields.push(camelcaseKeys(item));
+        stepFields.push(keysToCamel(item));
       }
     });
 
@@ -531,4 +533,5 @@ export class ProfileComponent implements OnInit {
       });
     }
   }
+
 }
