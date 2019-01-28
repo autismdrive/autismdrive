@@ -24,6 +24,8 @@ from app.model.questionnaires.demographics_questionnaire import DemographicsQues
     DemographicsQuestionnaireMetaSchema
 from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaireSchema, \
     GuardianDemographicsQuestionnaireMetaSchema
+from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaireSchema, \
+    EvaluationHistoryQuestionnaireMetaSchema
 
 
 class OrganizationSchema(ModelSchema):

@@ -29,6 +29,7 @@ from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
 from app.model.questionnaires.guardian_demographics_questionnaire import (
     GuardianDemographicsQuestionnaire
 )
@@ -246,6 +247,32 @@ class TestCase(unittest.TestCase):
         db_dq = db.session.query(DemographicsQuestionnaire).filter_by(birth_state=dq.birth_state).first()
         self.assertEqual(db_dq.first_name, dq.first_name)
         return db_dq
+
+    def construct_evaluation_history_questionnaire(self, self_identifies_autistic=True, has_autism_diagnosis=True,
+                                                   years_old_at_first_diagnosis=7, who_diagnosed="pediatrician",
+                                                   participant=None, user=None):
+
+        ehq = EvaluationHistoryQuestionnaire(self_identifies_autistic=self_identifies_autistic,
+                                             has_autism_diagnosis=has_autism_diagnosis,
+                                             years_old_at_first_diagnosis=years_old_at_first_diagnosis,
+                                             who_diagnosed=who_diagnosed)
+        if participant is None:
+            ehq.participant_id = self.construct_participant(last_name="Silamona").id
+        else:
+            ehq.participant_id = participant.id
+
+        if user is None:
+            ehq.user_id = self.construct_user(email="guardian@study.com").id
+        else:
+            ehq.user_id = user.id
+
+        db.session.add(ehq)
+        db.session.commit()
+
+        db_ehq = db.session.query(EvaluationHistoryQuestionnaire).filter_by(
+            years_old_at_first_diagnosis=ehq.years_old_at_first_diagnosis).first()
+        self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
+        return db_ehq
 
     def construct_guardian_demographics_questionnaire(self, user=None, relationship_to_child="Father", is_english_primary=True):
 
@@ -1508,3 +1535,60 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['is_english_primary'], False)
         self.assertIsNotNone(response['id'])
 
+    def test_evaluation_history_questionnaire_basics(self):
+        self.construct_evaluation_history_questionnaire()
+        ehq = db.session.query(EvaluationHistoryQuestionnaire).first()
+        self.assertIsNotNone(ehq)
+        ehq_id = ehq.id
+        rv = self.app.get('/api/q/evaluation_history_questionnaire/%i' % ehq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], ehq_id)
+        self.assertEqual(response["self_identifies_autistic"], ehq.self_identifies_autistic)
+        self.assertEqual(response["years_old_at_first_diagnosis"], ehq.years_old_at_first_diagnosis)
+
+    def test_modify_evaluation_history_questionnaire_basics(self):
+        self.construct_evaluation_history_questionnaire()
+        ehq = db.session.query(EvaluationHistoryQuestionnaire).first()
+        self.assertIsNotNone(ehq)
+        ehq_id = ehq.id
+        rv = self.app.get('/api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['self_identifies_autistic'] = False
+        response['years_old_at_first_diagnosis'] = 12
+        response['who_diagnosed'] = 'healthTeam'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/evaluation_history_questionnaire/%i' % ehq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_identifies_autistic'], False)
+        self.assertEqual(response['years_old_at_first_diagnosis'], 12)
+        self.assertEqual(response['who_diagnosed'], 'healthTeam')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_evaluation_history_questionnaire(self):
+        ehq = self.construct_evaluation_history_questionnaire()
+        ehq_id = ehq.id
+        rv = self.app.get('api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_evaluation_history_questionnaire(self):
+        evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
+        rv = self.app.post('api/q/evaluation_history_questionnaire', data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_identifies_autistic'], True)
+        self.assertEqual(response['years_old_at_first_diagnosis'], 5)
+        self.assertIsNotNone(response['id'])
