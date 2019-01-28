@@ -155,8 +155,8 @@ class DemographicsQuestionnaire(db.Model):
                     {'value': 'female', 'label': 'Female'},
                     {'value': 'intersex', 'label': 'Intersex'},
                     {'value': 'transgender', 'label': 'Transgender'},
-                    {'value': 'other', 'label': 'Other'},
-                    {'value': 'no_answer', 'label': 'Choose not to answer'}
+                    {'value': 'genderOther', 'label': 'Other'},
+                    {'value': 'no_answer', 'label': 'Prefer not to answer'}
                 ]
             }
         }
@@ -170,7 +170,7 @@ class DemographicsQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Enter gender identity'
             },
-            'hide_expression': '!(model.gender_identity && (model.gender_identity === "other"))',
+            'hide_expression': '!(model.gender_identity && (model.gender_identity === "genderOther"))',
         }
     )
 
@@ -204,7 +204,7 @@ class DemographicsQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Enter race/ethnicity'
             },
-            'hide_expression': '!(model.race_ethnicity && (model.race_ethnicity === "other"))',
+            'hide_expression': '!(model.race_ethnicity && (model.race_ethnicity === "raceOther"))',
         }
     )
 
