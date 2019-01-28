@@ -78,6 +78,7 @@ def _load_data(data_loader):
     data_loader.load_users()
     data_loader.load_contact_questionnaire()
     data_loader.load_demographics_questionnaire()
+    data_loader.load_evaluation_history_questionnaire()
     data_loader.load_guardian_demographics_questionnaire()
 
 
