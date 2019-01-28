@@ -1,8 +1,8 @@
 <div
-  *ngIf="session"
+  *ngIf="user"
   class="profile mat-typography"
 >
-  <h1>{{session.first_name}} {{session.last_name}}’s profile</h1>
+  <h1>{{user.first_name}} {{user.last_name}}’s profile</h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
@@ -12,50 +12,62 @@
     ></mat-progress-bar>
 
 
-    <app-loading *ngIf="loading" message="Loading..."></app-loading>
-    <form
+    <app-loading
+      *ngIf="loading"
+      message="Loading..."
+    ></app-loading>
+
+    <mat-drawer-container
       *ngIf="!loading"
-      [formGroup]="form"
-      (ngSubmit)="submit()"
     >
-      <mat-vertical-stepper>
-        <mat-step *ngFor="let step of steps; let index = index; let last = last;">
-          <ng-template matStepLabel>{{ step.label }}</ng-template>
-          {{ step.description }}
+      <mat-drawer
+        *ngIf="user && stepNames"
+        [mode]="'side'"
+        [opened]="true"
+      >
+        <app-questionnaire-steps-list
+          [user]="user"
+          [stepNames]="stepNames"
+        ></app-questionnaire-steps-list>
+      </mat-drawer>
+      <mat-drawer-content>
+        <form
+          *ngIf="form && step && options"
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+          class="pad-2"
+        >
+          <h1>{{ step.label }}</h1>
+          <p>{{ step.description }}</p>
+
           <formly-form
-            [form]="form.at(index)"
+            [form]="form.at(activeStep)"
             [model]="model"
             [fields]="step.fields"
-            [options]="options[index]"
+            [options]="options[activeStep]"
           >
           </formly-form>
 
-          <div>
+          <div class="button-row">
             <button
-              *ngIf="index !== 0"
               mat-flat-button
-              matStepperPrevious
               type="button"
-              (click)="prevStep(index)"
+              (click)="prevStep(activeStep)"
             >Back</button>
             <button
-              *ngIf="!last"
               mat-flat-button
-              matStepperNext
               type="button"
-              [disabled]="!form.at(index).valid"
-              (click)="nextStep(index)"
+              [disabled]="!form.at(activeStep).valid"
+              (click)="nextStep(activeStep)"
             >Save &amp; Next</button>
             <button
-              *ngIf="last"
               mat-flat-button
               [disabled]="!form.valid"
               type="submit"
             >Submit</button>
           </div>
-        </mat-step>
-      </mat-vertical-stepper>
-    </form>
-
+        </form>
+      </mat-drawer-content>
+    </mat-drawer-container>
   </div>
 </div>

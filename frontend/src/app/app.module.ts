@@ -23,7 +23,8 @@ import {
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatSidenavModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -62,6 +63,8 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
+import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
+import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -109,7 +112,9 @@ export class FormlyConfig {
     StudyDetailComponent,
     TrainingDetailComponent,
     LoadingComponent,
-    HelpWrapperComponent
+    HelpWrapperComponent,
+    QuestionnaireStepsListComponent,
+    QuestionnaireStepComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -128,6 +133,7 @@ export class FormlyConfig {
     MatCheckboxModule,
     MatChipsModule,
     MatNativeDateModule,
+    MatSidenavModule,
     FormlyMatDatepickerModule,
     MatDatepickerModule,
     MatExpansionModule,

@@ -2,7 +2,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 
 export class QuestionnaireStep {
   id: number;
-  key: string;
+  name: string;
   label: string;
   description: string;
   fields: FormlyFieldConfig[];

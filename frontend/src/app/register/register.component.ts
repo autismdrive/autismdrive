@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService}  from '../api.service';
+import { ApiService } from '../api.service';
 import { User } from '../user';
 
 @Component({
@@ -52,7 +52,7 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
-    this.user = {id:null, first_name:this.model['first_name'], last_name:this.model['last_name'], email:this.model['email'], role:'User'}
+    this.user = { id: null, first_name: this.model['first_name'], last_name: this.model['last_name'], email: this.model['email'], role: 'User' }
   }
 
   ngOnInit() {
