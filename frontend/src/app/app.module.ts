@@ -20,11 +20,11 @@ import {
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatSelectModule,
+  MatSidenavModule,
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule,
-  MatSidenavModule
+  MatToolbarModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -47,6 +47,7 @@ import { SDFileUploadComponent } from './forms/file-upload/file-upload.component
 import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
 import { SDFormFieldComponent } from './forms/form-field/form-field.component';
 import { HelpWrapperComponent } from './forms/help-wrapper/help-wrapper.component';
+import { RepeatSectionComponent } from './forms/repeat-section/repeat-section.component';
 import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './forms/validators/formly.validator';
 import { HomeComponent } from './home/home.component';
 import { LoadingComponent } from './loading/loading.component';
@@ -54,6 +55,8 @@ import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
+import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
+import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
 import { RegisterComponent } from './register/register.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { ResourcesComponent } from './resources/resources.component';
@@ -63,12 +66,13 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
-import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
-import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
 
 @Injectable()
 export class FormlyConfig {
   public static config = {
+    types: [
+      { name: 'repeat', component: RepeatSectionComponent },
+    ],
     validators: [
       { name: 'phone', validation: PhoneValidator },
       { name: 'email', validation: EmailValidator },
@@ -114,7 +118,8 @@ export class FormlyConfig {
     LoadingComponent,
     HelpWrapperComponent,
     QuestionnaireStepsListComponent,
-    QuestionnaireStepComponent
+    QuestionnaireStepComponent,
+    RepeatSectionComponent
   ],
   imports: [
     BrowserAnimationsModule,
