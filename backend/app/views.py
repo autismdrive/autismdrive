@@ -1,24 +1,65 @@
-from flask import jsonify, url_for, Blueprint
-from app import app
+import urllib
+
 import flask_restful
+from flask import Blueprint, jsonify, url_for
 from flask_restful import reqparse
 
+from app import app
 from app.resources.Auth import auth_blueprint
-from app.resources.CategoryEndpoint import CategoryEndpoint, CategoryListEndpoint, RootCategoryListEndpoint
-from app.resources.OrganizationEndpoint import OrganizationListEndpoint, OrganizationEndpoint
-from app.resources.ResourceAndCategoryEndpoint import ResourceCategoryEndpoint, ResourceCategoryListEndpoint, \
-    ResourceByCategoryEndpoint, CategoryByResourceEndpoint
-from app.resources.StudyAndCategoryEndpoint import StudyCategoryEndpoint, StudyCategoryListEndpoint, \
-    StudyByCategoryEndpoint, CategoryByStudyEndpoint
-from app.resources.TrainingAndCategoryEndpoint import TrainingCategoryEndpoint, TrainingCategoryListEndpoint, \
-    TrainingByCategoryEndpoint, CategoryByTrainingEndpoint
-from app.resources.ResourceEndpoint import ResourceListEndpoint, ResourceEndpoint
-from app.resources.SessionEndpoint import SessionEndpoint
-from app.resources.StudyEndpoint import StudyListEndpoint, StudyEndpoint
-from app.resources.Tracking import tracking_blueprint
-from app.resources.TrainingEndpoint import TrainingListEndpoint, TrainingEndpoint
-from app.resources.UserEndpoint import UserListEndpoint, UserEndpoint
 
+from app.resources.Tracking import tracking_blueprint
+from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
+from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
+from app.resources.SessionEndpoint import SessionEndpoint
+from app.resources.CategoryEndpoint import (
+    CategoryEndpoint,
+    CategoryListEndpoint,
+    RootCategoryListEndpoint
+)
+from app.resources.ResourceEndpoint import (
+    ResourceEndpoint,
+    ResourceListEndpoint
+)
+from app.resources.TrainingEndpoint import (
+    TrainingEndpoint,
+    TrainingListEndpoint
+)
+from app.resources.OrganizationEndpoint import (
+    OrganizationEndpoint,
+    OrganizationListEndpoint
+)
+from app.resources.ParticipantEndpoint import (
+    ParticipantEndpoint,
+    ParticipantListEndpoint
+)
+from app.resources.StudyAndCategoryEndpoint import (
+    StudyCategoryEndpoint,
+    CategoryByStudyEndpoint,
+    StudyByCategoryEndpoint,
+    StudyCategoryListEndpoint
+)
+from app.resources.ResourceAndCategoryEndpoint import (
+    ResourceCategoryEndpoint,
+    CategoryByResourceEndpoint,
+    ResourceByCategoryEndpoint,
+    ResourceCategoryListEndpoint
+)
+from app.resources.TrainingAndCategoryEndpoint import (
+    TrainingCategoryEndpoint,
+    CategoryByTrainingEndpoint,
+    TrainingByCategoryEndpoint,
+    TrainingCategoryListEndpoint
+)
+from app.resources.UserAndParticipantEndpoint import (
+    UserParticipantEndpoint,
+    UserByParticipantEndpoint,
+    ParticipantByUserEndpoint,
+    UserParticipantListEndpoint
+)
+from app.resources.QuestionnaireEndpoint import (
+    QuestionnaireEndpoint,
+    QuestionnaireListEndpoint,
+    QuestionnaireMetaEndpoint)
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -35,48 +76,80 @@ app.register_blueprint(api_blueprint)
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(tracking_blueprint)
 
-
 parser = flask_restful.reqparse.RequestParser()
 parser.add_argument('resource')
 
 
 @app.route('/', methods=['GET'])
 def root():
-    _links = {"_links": {
-        "resources": url_for("api.resourcelistendpoint"),
-        "studies": url_for("api.studylistendpoint"),
-        "trainings": url_for("api.traininglistendpoint"),
-        "categories": url_for("api.categorylistendpoint"),
-        "organizations": url_for("api.organizationlistendpoint"),
-        "users": url_for("api.userlistendpoint"),
-        "auth": url_for("auth.login_password"),
-    }}
-    return jsonify(_links)
+    output = {}
+    for rule in app.url_map.iter_rules():
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = "<{0}>".format(arg)
+
+        methods = ','.join(rule.methods)
+        url = url_for(rule.endpoint, **options)
+        output[rule.endpoint] = urllib.parse.unquote(url)
+
+    return jsonify(output)
 
 
-api.add_resource(CategoryListEndpoint, '/category')
-api.add_resource(CategoryEndpoint, '/category/<id>')
-api.add_resource(RootCategoryListEndpoint, '/category/root')
-api.add_resource(ResourceByCategoryEndpoint, '/category/<category_id>/resource')
-api.add_resource(StudyByCategoryEndpoint, '/category/<category_id>/study')
-api.add_resource(TrainingByCategoryEndpoint, '/category/<category_id>/training')
-api.add_resource(OrganizationListEndpoint, '/organization')
-api.add_resource(OrganizationEndpoint, '/organization/<id>')
-api.add_resource(ResourceListEndpoint, '/resource')
-api.add_resource(ResourceEndpoint, '/resource/<id>')
-api.add_resource(CategoryByResourceEndpoint, '/resource/<resource_id>/category')
-api.add_resource(StudyListEndpoint, '/study')
-api.add_resource(StudyEndpoint, '/study/<id>')
-api.add_resource(CategoryByStudyEndpoint, '/study/<study_id>/category')
-api.add_resource(TrainingListEndpoint, '/training')
-api.add_resource(TrainingEndpoint, '/training/<id>')
-api.add_resource(CategoryByTrainingEndpoint, '/training/<training_id>/category')
-api.add_resource(ResourceCategoryListEndpoint, '/resource_category')
-api.add_resource(ResourceCategoryEndpoint, '/resource_category/<id>')
-api.add_resource(StudyCategoryListEndpoint, '/study_category')
-api.add_resource(StudyCategoryEndpoint, '/study_category/<id>')
-api.add_resource(TrainingCategoryListEndpoint, '/training_category')
-api.add_resource(TrainingCategoryEndpoint, '/training_category/<id>')
-api.add_resource(UserListEndpoint, '/user')
-api.add_resource(UserEndpoint, '/user/<id>')
-api.add_resource(SessionEndpoint, '/session')
+endpoints = [
+
+    # Categories
+    (CategoryListEndpoint, '/category'),
+    (RootCategoryListEndpoint, '/category/root'),
+    (CategoryEndpoint, '/category/<id>'),
+    (ResourceByCategoryEndpoint, '/category/<category_id>/resource'),
+    (StudyByCategoryEndpoint, '/category/<category_id>/study'),
+    (TrainingByCategoryEndpoint, '/category/<category_id>/training'),
+
+    # Organizations
+    (OrganizationListEndpoint, '/organization'),
+    (OrganizationEndpoint, '/organization/<id>'),
+
+    # Resources
+    (ResourceListEndpoint, '/resource'),
+    (ResourceEndpoint, '/resource/<id>'),
+    (CategoryByResourceEndpoint, '/resource/<resource_id>/category'),
+    (ResourceCategoryListEndpoint, '/resource_category'),
+    (ResourceCategoryEndpoint, '/resource_category/<id>'),
+
+    # Studies
+    (StudyListEndpoint, '/study'),
+    (StudyEndpoint, '/study/<id>'),
+    (CategoryByStudyEndpoint, '/study/<study_id>/category'),
+    (StudyCategoryListEndpoint, '/study_category'),
+    (StudyCategoryEndpoint, '/study_category/<id>'),
+
+    # Trainings
+    (TrainingListEndpoint, '/training'),
+    (TrainingEndpoint, '/training/<id>'),
+    (CategoryByTrainingEndpoint, '/training/<training_id>/category'),
+    (TrainingCategoryListEndpoint, '/training_category'),
+    (TrainingCategoryEndpoint, '/training_category/<id>'),
+
+    # User Sessions
+    (SessionEndpoint, '/session'),
+    (UserListEndpoint, '/user'),
+    (UserEndpoint, '/user/<id>'),
+    (ParticipantByUserEndpoint, '/user/<user_id>/participant'),
+
+    # Participants
+    (ParticipantListEndpoint, '/participant'),
+    (ParticipantEndpoint, '/participant/<id>'),
+    (UserByParticipantEndpoint, '/participant/<participant_id>/user'),
+    (UserParticipantListEndpoint, '/user_participant'),
+    (UserParticipantEndpoint, '/user_participant/<id>'),
+
+    # Questionnaires
+    (QuestionnaireEndpoint, '/q/<string:name>/<string:id>'),
+    (QuestionnaireListEndpoint, '/q/<string:name>'),
+    (QuestionnaireMetaEndpoint, '/q/<string:name>/meta')
+]
+
+# Add all endpoints to the API
+for endpoint in endpoints:
+    api.add_resource(endpoint[0], endpoint[1])
+

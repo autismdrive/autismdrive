@@ -6,6 +6,11 @@ from app import app, db, RestException, bcrypt
 
 
 class User(db.Model):
+    # The user model is used to manage interaction with the StarDrive system, including sign-in and access levels. Users
+    # can be Admins, people with autism and/or their guardians wishing to manage their care and participate in studies,
+    # as well professionals in the field of autism research and care. Anyone who wishes to use the system will have a
+    # user account. Please note that there is a separate participant model for tracking enrollment and participation in
+    # studies.
     __tablename__ = 'stardrive_user'
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
@@ -13,6 +18,7 @@ class User(db.Model):
     last_name = db.Column(db.String)
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.String, default='Self')
+    participants = db.relationship("UserParticipant", back_populates="user")
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
 

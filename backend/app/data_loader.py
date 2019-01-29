@@ -10,6 +10,10 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
+from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app import db
 from sqlalchemy import Sequence
 import csv
@@ -38,7 +42,6 @@ class DataLoader():
             print("Categories loaded.  There are now %i categories in the database." % db.session.query(
                 Category).count())
         db.session.commit()
-
 
     def load_resources(self):
         with open(self.resource_file, newline='') as csvfile:
@@ -131,6 +134,37 @@ class DataLoader():
                 User).count())
         db.session.commit()
 
+    def load_contact_questionnaire(self):
+        c_ques = ContactQuestionnaire(first_name="Charlie", last_name="Brown")
+        db.session.add(c_ques)
+        print("Contact loaded.  There is now %i contact record in the database." % db.session.query(
+            ContactQuestionnaire).count())
+        db.session.commit()
+
+    def load_demographics_questionnaire(self):
+        d_ques = DemographicsQuestionnaire(guardian_id=1, participant_id=2, first_name="Charles", middle_name="Monroe",
+                                         last_name="Brown", is_first_name_preferred=False, nickname="Charlie",
+                                         birthdate="1979-1-5", birth_city="Staunton", birth_state="VA", birth_sex='male',
+                                         gender_identity='male', race_ethnicity="raceWhite", is_english_primary=True)
+        db.session.add(d_ques)
+        print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
+            DemographicsQuestionnaire).count())
+        db.session.commit()
+
+    def load_evaluation_history_questionnaire(self):
+        eh_ques = EvaluationHistoryQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
+        db.session.add(eh_ques)
+        print("Evaluation History loaded.  There is now %i evaluation history record in the database." % db.session.query(
+            EvaluationHistoryQuestionnaire).count())
+        db.session.commit()
+
+    def load_guardian_demographics_questionnaire(self):
+        gd_ques = GuardianDemographicsQuestionnaire(birthdate="1979-1-5", sex='male', race_ethnicity="raceWhite", is_english_primary=True)
+        db.session.add(gd_ques)
+        print("Guardian Demographics loaded.  There is now %i guardian demographics record in the database." % db.session.query(
+            GuardianDemographicsQuestionnaire).count())
+        db.session.commit()
+
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
         if organization is None:
@@ -148,6 +182,10 @@ class DataLoader():
         return category
 
     def clear(self):
+        db.session.query(ContactQuestionnaire).delete()
+        db.session.query(DemographicsQuestionnaire).delete()
+        db.session.query(EvaluationHistoryQuestionnaire).delete()
+        db.session.query(GuardianDemographicsQuestionnaire).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()

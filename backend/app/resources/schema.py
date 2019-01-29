@@ -6,6 +6,7 @@ from sqlalchemy import func
 from app import ma, db
 from app.model.category import Category
 from app.model.organization import Organization
+from app.model.participant import Participant
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.study import Study
@@ -13,6 +14,18 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
+from app.model.user_participant import UserParticipant
+
+# Import the questionnaire schemas in order to include them when auto-generating migrations (and to ensure that the
+# tables don't get accidentally dropped!)
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaireSchema, \
+    ContactQuestionnaireMetaSchema
+from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaireSchema, \
+    DemographicsQuestionnaireMetaSchema
+from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaireSchema, \
+    GuardianDemographicsQuestionnaireMetaSchema
+from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaireSchema, \
+    EvaluationHistoryQuestionnaireMetaSchema
 
 
 class OrganizationSchema(ModelSchema):
@@ -39,7 +52,7 @@ class CategorySchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'resource_count', 'study_count', 'training_count',
-                  '_links', '_meta')
+                  '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -48,22 +61,10 @@ class CategorySchema(ModelSchema):
     resource_count = fields.Method('get_resource_count')
     study_count = fields.Method('get_study_count')
     training_count = fields.Method('get_training_count')
-    _meta = fields.Method('get_meta')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
     })
-
-    def get_meta(self, obj):
-        metadata = {}
-        for key, value in self.fields.items():
-            try:
-                meta = obj._sa_class_manager[key].info
-                if meta:
-                    metadata[key] = meta
-            except:
-                pass
-        return metadata
 
     def get_resource_count(self, obj):
         query = db.session.query(ResourceCategory).join(ResourceCategory.resource)\
@@ -282,3 +283,45 @@ class UserSchema(ModelSchema):
         fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password', 'role')
     password = fields.String(load_only=True)
     id = fields.Integer(required=False, allow_none=True)
+
+
+class ParticipantSchema(ModelSchema):
+    class Meta:
+        model = Participant
+        fields = ('id', 'last_updated', 'first_name', 'last_name')
+    id = fields.Integer(required=False, allow_none=True)
+
+
+class UserParticipantsSchema(ModelSchema):
+    class Meta:
+        model = UserParticipant
+        fields = ('id', '_links', 'participant_id', 'user_id', 'participant')
+    participant = fields.Nested(ParticipantSchema, dump_only=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
+        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>')
+    })
+
+
+class ParticipantUsersSchema(ModelSchema):
+    class Meta:
+        model = UserParticipant
+        fields = ('id', '_links', 'participant_id', 'user_id', 'user')
+    user = fields.Nested(UserSchema, dump_only=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
+        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>')
+    })
+
+
+class UserParticipantSchema(ModelSchema):
+    class Meta:
+        model = UserParticipant
+        fields = ('id', '_links', 'user_id', 'participant_id')
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
+        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>')
+    })

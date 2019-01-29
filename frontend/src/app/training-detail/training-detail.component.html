@@ -76,6 +76,4 @@
       </mat-card>
     </div>
   </div>
-  <div *ngIf="!training">
-    <mat-spinner></mat-spinner>
-  </div>
+  <app-loading *ngIf="!training" message="Loading..."></app-loading>

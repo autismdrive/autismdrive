@@ -38,6 +38,14 @@ export class ApiService {
     training: '/api/training/<id>',
     trainingList: '/api/training',
     userList: '/api/user',
+
+    // Valid questionnaire <name> values:
+    // 'contact'
+    // 'demographics'
+    // 'guardian_demographics'
+    questionnaireList: '/api/q/<name>',
+    questionnaire: '/api/q/<name>/<id>',
+    questionnaireMeta: '/api/q/<name>/meta'
   };
 
   private hasSession: boolean;
@@ -353,6 +361,50 @@ export class ApiService {
         last(), // return last (completed) message to caller
         catchError(this.handleError)
       );
+  }
+
+  /** getQuestionnaire */
+  getQuestionnaire(key: string, id: number) {
+    return this.httpClient.get<object>(this._qEndpoint('', key, id))
+      .pipe(catchError(this.handleError));
+  }
+
+  /** updateQuestionnaire */
+  updateQuestionnaire(key: string, id: number, options: object) {
+    return this.httpClient.put<object>(this._qEndpoint('', key, id), options)
+      .pipe(catchError(this.handleError));
+  }
+
+  /** getQuestionnaireMeta */
+  getQuestionnaireMeta(key: string) {
+    return this.httpClient.get<any>(this._qEndpoint('meta', key))
+      .pipe(catchError(this.handleError));
+  }
+
+  /** getQuestionnaireList */
+  getQuestionnaireList(key: string) {
+    return this.httpClient.get<object>(this._qEndpoint('list', key))
+      .pipe(catchError(this.handleError));
+  }
+
+  /** submitQuestionnaire */
+  submitQuestionnaire(key: string, options: object) {
+    return this.httpClient.post<object>(this._qEndpoint('list', key), options)
+      .pipe(catchError(this.handleError));
+  }
+
+  private _qEndpoint(eType = '', qName: string, qId?: number) {
+    // Capitalize first letter of endpoint
+    if (eType !== '') {
+      eType = eType.charAt(0).toUpperCase() + eType.slice(1);
+    }
+
+    const path = this
+      .endpoints['questionnaire' + eType]
+      .replace('<name>', qName + '_questionnaire')
+      .replace('<id>', isFinite(qId) ? qId.toString() : '');
+
+    return this.apiRoot + path;
   }
 
 }

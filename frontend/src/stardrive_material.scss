@@ -131,6 +131,11 @@ $animationDuration: 500ms;
     text-align: center;
     border-radius: 4px;
 
+    &.alert-info {
+      background-color: mat-color($stardrive-primary, 50, 1);
+      color: black;
+    }
+
     &.alert-warn {
       background-color: mat-color($stardrive-warn, 900, 1);
       color: white;

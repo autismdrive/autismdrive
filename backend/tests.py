@@ -3,27 +3,36 @@
 import os
 os.environ["APP_CONFIG_FILE"] = '../config/testing.py'
 
-import unittest
-import json
-import random
-import string
 import re
+import json
 import base64
 import quopri
+import random
+import string
 import datetime
+import unittest
 
+
+from app import db, app
+from app.model.user import User
+from app.model.study import Study
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
+from app.model.resource import StarResource
+from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
-from app.model.resource import StarResource
-from app.model.resource_category import ResourceCategory
-from app.model.study import Study
+from app.model.participant import Participant
+from app.model.user_participant import UserParticipant
 from app.model.study_category import StudyCategory
-from app.model.training import Training
+from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
-from app.model.user import User
-from app import app, db
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
+from app.model.questionnaires.guardian_demographics_questionnaire import (
+    GuardianDemographicsQuestionnaire
+)
 
 
 class TestCase(unittest.TestCase):
@@ -62,11 +71,42 @@ class TestCase(unittest.TestCase):
                           content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertTrue("_links" in response)
-        self.assertTrue("resources" in response['_links'])
-        self.assertTrue("studies" in response['_links'])
-        self.assertTrue("trainings" in response['_links'])
-        self.assertTrue("users" in response['_links'])
+
+        endpoints = [
+            ('api.categorybyresourceendpoint', '/api/resource/<resource_id>/category'),
+            ('api.categorybystudyendpoint', '/api/study/<study_id>/category'),
+            ('api.categorybytrainingendpoint', '/api/training/<training_id>/category'),
+            ('api.categoryendpoint', '/api/category/<id>'),
+            ('api.categorylistendpoint', '/api/category'),
+            ('api.questionnaireendpoint', '/api/q/<name>/<id>'),
+            ('api.organizationendpoint', '/api/organization/<id>'),
+            ('api.organizationlistendpoint', '/api/organization'),
+            ('api.resourcebycategoryendpoint', '/api/category/<category_id>/resource'),
+            ('api.resourcecategoryendpoint', '/api/resource_category/<id>'),
+            ('api.resourcecategorylistendpoint', '/api/resource_category'),
+            ('api.resourceendpoint', '/api/resource/<id>'),
+            ('api.resourcelistendpoint', '/api/resource'),
+            ('api.rootcategorylistendpoint', '/api/category/root'),
+            ('api.sessionendpoint', '/api/session'),
+            ('api.studybycategoryendpoint', '/api/category/<category_id>/study'),
+            ('api.studycategoryendpoint', '/api/study_category/<id>'),
+            ('api.studycategorylistendpoint', '/api/study_category'),
+            ('api.studyendpoint', '/api/study/<id>'),
+            ('api.studylistendpoint', '/api/study'),
+            ('api.trainingbycategoryendpoint', '/api/category/<category_id>/training'),
+            ('api.trainingcategoryendpoint', '/api/training_category/<id>'),
+            ('api.trainingcategorylistendpoint', '/api/training_category'),
+            ('api.trainingendpoint', '/api/training/<id>'),
+            ('api.traininglistendpoint', '/api/training'),
+            ('api.userendpoint', '/api/user/<id>'),
+            ('api.userlistendpoint', '/api/user'),
+            ('auth.forgot_password', '/api/forgot_password'),
+            ('auth.login_password', '/api/login_password'),
+            ('auth.reset_password', '/api/reset_password'),
+        ]
+
+        for endpoint in endpoints:
+            self.assertEqual(response[endpoint[0]], endpoint[1])
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            image_url="assets/image.svg", image_caption="An inspiring photograph of great renown",
@@ -159,6 +199,95 @@ class TestCase(unittest.TestCase):
         db_user = db.session.query(User).filter_by(email=user.email).first()
         self.assertEqual(db_user.first_name, user.first_name)
         return db_user
+
+    def construct_participant(self, first_name="Wayne", last_name="Boro"):
+        participant = Participant(first_name=first_name, last_name=last_name)
+        db.session.add(participant)
+        db.session.commit()
+
+        db_participant = db.session.query(Participant).filter_by(last_name=participant.last_name).first()
+        self.assertEqual(db_participant.first_name, participant.first_name)
+        return db_participant
+
+    def construct_contact_questionnaire(self, first_name="Flibby", last_name="Tribby", zip=55678,
+                                        marketing_channel="Zine Ad", user=None):
+
+        cq = ContactQuestionnaire(first_name=first_name, last_name=last_name, zip=zip,
+                                  marketing_channel=marketing_channel)
+        if user is None:
+            cq.participant_id = self.construct_user().id
+        else:
+            cq.participant_id = user.id
+
+        db.session.add(cq)
+        db.session.commit()
+
+        db_cq = db.session.query(ContactQuestionnaire).filter_by(zip=cq.zip).first()
+        self.assertEqual(db_cq.first_name, cq.first_name)
+        return db_cq
+
+    def construct_demographics_questionnaire(self, first_name="Trina", last_name="Frina", birth_state="VA",
+                                             is_english_primary=True, participant=None, guardian=None):
+
+        dq = DemographicsQuestionnaire(first_name=first_name, last_name=last_name, birth_state=birth_state,
+                                       is_english_primary=is_english_primary)
+        if participant is None:
+            dq.participant_id = self.construct_user(email="participant@study.com").id
+        else:
+            dq.participant_id = participant.id
+
+        if guardian is None:
+            dq.guardian_id = self.construct_user(email="guardian@study.com").id
+        else:
+            dq.guardian_id = guardian.id
+
+        db.session.add(dq)
+        db.session.commit()
+
+        db_dq = db.session.query(DemographicsQuestionnaire).filter_by(birth_state=dq.birth_state).first()
+        self.assertEqual(db_dq.first_name, dq.first_name)
+        return db_dq
+
+    def construct_evaluation_history_questionnaire(self, self_identifies_autistic=True, has_autism_diagnosis=True,
+                                                   years_old_at_first_diagnosis=7, who_diagnosed="pediatrician",
+                                                   participant=None, user=None):
+
+        ehq = EvaluationHistoryQuestionnaire(self_identifies_autistic=self_identifies_autistic,
+                                             has_autism_diagnosis=has_autism_diagnosis,
+                                             years_old_at_first_diagnosis=years_old_at_first_diagnosis,
+                                             who_diagnosed=who_diagnosed)
+        if participant is None:
+            ehq.participant_id = self.construct_participant(last_name="Silamona").id
+        else:
+            ehq.participant_id = participant.id
+
+        if user is None:
+            ehq.user_id = self.construct_user(email="guardian@study.com").id
+        else:
+            ehq.user_id = user.id
+
+        db.session.add(ehq)
+        db.session.commit()
+
+        db_ehq = db.session.query(EvaluationHistoryQuestionnaire).filter_by(
+            years_old_at_first_diagnosis=ehq.years_old_at_first_diagnosis).first()
+        self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
+        return db_ehq
+
+    def construct_guardian_demographics_questionnaire(self, user=None, relationship_to_child="Father", is_english_primary=True):
+
+        gdq = GuardianDemographicsQuestionnaire(relationship_to_child=relationship_to_child,
+                                                is_english_primary=is_english_primary)
+        if user is None:
+            gdq.guardian_id = self.construct_user().id
+        else:
+            gdq.guardian_id = user.id
+        db.session.add(gdq)
+        db.session.commit()
+
+        db_gdq = db.session.query(GuardianDemographicsQuestionnaire).filter_by(guardian_id=gdq.guardian_id).first()
+        self.assertEqual(db_gdq.relationship_to_child, gdq.relationship_to_child)
+        return db_gdq
 
     def test_resource_basics(self):
         self.construct_resource()
@@ -1084,16 +1213,382 @@ class TestCase(unittest.TestCase):
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-    def test_get_current_user(self):
-        """ Test for the current user status """
-        self.test_create_user_with_password(id=9)
+    def test_participant_basics(self):
+        self.construct_participant()
+        p = db.session.query(Participant).first()
+        self.assertIsNotNone(p)
+        p_id = p.id
+        rv = self.app.get('/api/participant/%i' % p_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], p_id)
+        self.assertEqual(response["first_name"], p.first_name)
+        self.assertEqual(response["last_name"], p.last_name)
 
-        user = User.query.filter_by(id=9).first()
+    def test_modify_participant_basics(self):
+        self.construct_participant()
+        p = db.session.query(Participant).first()
+        self.assertIsNotNone(p)
+        p_id = p.id
+        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['last_name'] = 'Better'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/participant/%i' % p_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['last_name'], 'Better')
+        self.assertNotEqual(orig_date, response['last_updated'])
 
-        # Now get the user back.
-        response = self.app.get(
-            '/api/session',
-            headers=dict(
-                Authorization='Bearer ' + user.encode_auth_token().decode()))
-        self.assertSuccess(response)
-        return json.loads(response.data.decode())
+    def test_delete_participant(self):
+        p = self.construct_participant()
+        p_id = p.id
+        rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/participant/%i' % p_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_participant(self):
+        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
+        rv = self.app.post('api/participant', data=json.dumps(participant), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Dorothy')
+        self.assertEqual(response['last_name'], 'Edwards')
+        self.assertIsNotNone(response['id'])
+
+    def test_get_user_by_participant(self):
+        u = self.construct_user()
+        p = self.construct_participant()
+        up = UserParticipant(user=u, participant=p, relationship="Self")
+        db.session.add(up)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/participant/%i/user' % p.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(u.id, response[0]["id"])
+        self.assertEqual(u.last_name, response[0]["user"]["last_name"])
+
+    def test_get_participant_by_user(self):
+        u = self.construct_user()
+        p = self.construct_participant()
+        up = UserParticipant(user=u, participant=p, relationship="Self")
+        db.session.add(up)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/user/%i/participant' % u.id,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(p.id, response[0]["id"])
+        self.assertEqual(p.first_name, response[0]["participant"]["first_name"])
+
+    def test_add_participant_to_user(self):
+        u = self.construct_user()
+        p = self.construct_participant()
+
+        up_data = {"user_id": u.id, "participant_id": p.id}
+
+        rv = self.app.post(
+            '/api/user_participant',
+            data=json.dumps(up_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(p.id, response["participant_id"])
+        self.assertEqual(u.id, response["user_id"])
+
+    def test_set_all_participants_on_user(self):
+        p1 = self.construct_participant(first_name="Evelyn", last_name="Sarabande")
+        p2 = self.construct_participant(first_name="Adela", last_name="Allemande")
+        p3 = self.construct_participant(first_name="Valentia", last_name="Gigue")
+        u = self.construct_user()
+
+        up_data = [
+            {
+                "participant_id": p1.id
+            },
+            {
+                "participant_id": p2.id
+            },
+            {
+                "participant_id": p3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/user/%i/participant' % u.id,
+            data=json.dumps(up_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        up_data = [{"participant_id": p1.id}]
+        rv = self.app.post(
+            '/api/user/%i/participant' % u.id,
+            data=json.dumps(up_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_participant_from_user(self):
+        self.test_add_participant_to_user()
+        rv = self.app.delete('/api/user_participant/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/user/%i/participant' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
+    def test_contact_questionnaire_basics(self):
+        self.construct_contact_questionnaire()
+        cq = db.session.query(ContactQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], cq_id)
+        self.assertEqual(response["first_name"], cq.first_name)
+        self.assertEqual(response["marketing_channel"], cq.marketing_channel)
+
+    def test_modify_contact_questionnaire_basics(self):
+        self.construct_contact_questionnaire()
+        cq = db.session.query(ContactQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['zip'] = 22345
+        response['marketing_channel'] = 'flyer'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/contact_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['zip'], 22345)
+        self.assertEqual(response['marketing_channel'], 'flyer')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_contact_questionnaire(self):
+        cq = self.construct_contact_questionnaire()
+        cq_id = cq.id
+        rv = self.app.get('api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_contact_questionnaire(self):
+        contact_questionnaire = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
+        rv = self.app.post('api/q/contact_questionnaire', data=json.dumps(contact_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Darah')
+        self.assertEqual(response['marketing_channel'], 'Subway sign')
+        self.assertIsNotNone(response['id'])
+
+    def test_demographics_questionnaire_basics(self):
+        self.construct_demographics_questionnaire()
+        dq = db.session.query(DemographicsQuestionnaire).first()
+        self.assertIsNotNone(dq)
+        dq_id = dq.id
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], dq_id)
+        self.assertEqual(response["first_name"], dq.first_name)
+        self.assertEqual(response["birth_state"], dq.birth_state)
+
+    def test_modify_demographics_questionnaire_basics(self):
+        self.construct_demographics_questionnaire()
+        dq = db.session.query(DemographicsQuestionnaire).first()
+        self.assertIsNotNone(dq)
+        dq_id = dq.id
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Edwarardo'
+        response['is_english_primary'] = False
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['guardian_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/demographics_questionnaire/%i' % dq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertEqual(response['guardian_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_demographics_questionnaire(self):
+        dq = self.construct_demographics_questionnaire()
+        dq_id = dq.id
+        rv = self.app.get('api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_demographics_questionnaire(self):
+        demographics_questionnaire = {'first_name': "Darah", 'is_english_primary': False}
+        rv = self.app.post('api/q/demographics_questionnaire', data=json.dumps(demographics_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Darah')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertIsNotNone(response['id'])
+
+    def test_guardian_demographics_questionnaire_basics(self):
+        self.construct_guardian_demographics_questionnaire()
+        gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
+        self.assertIsNotNone(gdq)
+        gdq_id = gdq.id
+        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], gdq_id)
+        self.assertEqual(response["relationship_to_child"], gdq.relationship_to_child)
+        self.assertEqual(response["is_english_primary"], gdq.is_english_primary)
+
+    def test_modify_guardian_demographics_questionnaire_basics(self):
+        self.construct_guardian_demographics_questionnaire()
+        gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
+        self.assertIsNotNone(gdq)
+        gdq_id = gdq.id
+        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['relationship_to_child'] = 'Parent'
+        response['is_english_primary'] = False
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['guardian_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['relationship_to_child'], 'Parent')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertEqual(response['guardian_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_guardian_demographics_questionnaire(self):
+        gdq = self.construct_guardian_demographics_questionnaire()
+        gdq_id = gdq.id
+        rv = self.app.get('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_guardian_demographics_questionnaire(self):
+        guardian_demographics_questionnaire = {'relationship_to_child': "Mother", 'is_english_primary': False}
+        rv = self.app.post('api/q/guardian_demographics_questionnaire', data=json.dumps(guardian_demographics_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['relationship_to_child'], 'Mother')
+        self.assertEqual(response['is_english_primary'], False)
+        self.assertIsNotNone(response['id'])
+
+    def test_evaluation_history_questionnaire_basics(self):
+        self.construct_evaluation_history_questionnaire()
+        ehq = db.session.query(EvaluationHistoryQuestionnaire).first()
+        self.assertIsNotNone(ehq)
+        ehq_id = ehq.id
+        rv = self.app.get('/api/q/evaluation_history_questionnaire/%i' % ehq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], ehq_id)
+        self.assertEqual(response["self_identifies_autistic"], ehq.self_identifies_autistic)
+        self.assertEqual(response["years_old_at_first_diagnosis"], ehq.years_old_at_first_diagnosis)
+
+    def test_modify_evaluation_history_questionnaire_basics(self):
+        self.construct_evaluation_history_questionnaire()
+        ehq = db.session.query(EvaluationHistoryQuestionnaire).first()
+        self.assertIsNotNone(ehq)
+        ehq_id = ehq.id
+        rv = self.app.get('/api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['self_identifies_autistic'] = False
+        response['years_old_at_first_diagnosis'] = 12
+        response['who_diagnosed'] = 'healthTeam'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/evaluation_history_questionnaire/%i' % ehq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_identifies_autistic'], False)
+        self.assertEqual(response['years_old_at_first_diagnosis'], 12)
+        self.assertEqual(response['who_diagnosed'], 'healthTeam')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_evaluation_history_questionnaire(self):
+        ehq = self.construct_evaluation_history_questionnaire()
+        ehq_id = ehq.id
+        rv = self.app.get('api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/evaluation_history_questionnaire/%i' % ehq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_evaluation_history_questionnaire(self):
+        evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
+        rv = self.app.post('api/q/evaluation_history_questionnaire', data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_identifies_autistic'], True)
+        self.assertEqual(response['years_old_at_first_diagnosis'], 5)
+        self.assertIsNotNone(response['id'])
