@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import * as flatten from 'flat';
 import { keysToCamel, toCamel } from 'src/util/snakeToCamel';
@@ -28,6 +28,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private api: ApiService,
+    private router: Router,
     private route: ActivatedRoute
   ) {
     console.log('this.stepNames', this.stepNames);
@@ -60,10 +61,10 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
   }
 
-  infoToFormlyForm(info, questionnaireKey): QuestionnaireStep {
+  infoToFormlyForm(info, stepName): QuestionnaireStep {
     const step = new QuestionnaireStep({
       id: info.id,
-      key: questionnaireKey,
+      name: stepName,
       label: '',
       description: '',
       fields: []
@@ -118,14 +119,17 @@ export class ProfileComponent implements OnInit {
 
   prevStep(step: number) {
     this.activeStep = step - 1;
+    this.submit();
   }
 
   nextStep(step: number) {
     this.activeStep = step + 1;
+    this.submit();
   }
 
   setActiveStep(step: number) {
     this.activeStep = step;
+    this.submit();
   }
 
   submit() {
@@ -148,10 +152,17 @@ export class ProfileComponent implements OnInit {
     if (isFinite(this.step.id)) {
       this.api.updateQuestionnaire(this.step.name, this.step.id, options).subscribe(response => {
         // Update form with saved values
+        this.router.navigate(['profile', this.stepNames[this.activeStep]]);
       });
     } else {
+      console.log('this.step.name', this.step.name);
+
+
       this.api.submitQuestionnaire(this.step.name, options).subscribe(response => {
         // Update form with saved values
+        console.log('this.stepNames[this.activeStep]', this.stepNames[this.activeStep]);
+
+        this.router.navigate(['profile', this.stepNames[this.activeStep]]);
       });
     }
   }
