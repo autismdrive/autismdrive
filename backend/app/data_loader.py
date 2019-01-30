@@ -13,6 +13,7 @@ from app.model.user import User
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
+from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
 from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
 from app import db
 from sqlalchemy import Sequence
@@ -158,6 +159,13 @@ class DataLoader():
             EvaluationHistoryQuestionnaire).count())
         db.session.commit()
 
+    def load_home_questionnaire(self):
+        h_ques = HomeQuestionnaire(self_living_situation="spouse", struggle_to_afford=True)
+        db.session.add(h_ques)
+        print("Home loaded.  There is now %i home record in the database." % db.session.query(
+            HomeQuestionnaire).count())
+        db.session.commit()
+
     def load_guardian_demographics_questionnaire(self):
         gd_ques = GuardianDemographicsQuestionnaire(birthdate="1979-1-5", sex='male', race_ethnicity="raceWhite", is_english_primary=True)
         db.session.add(gd_ques)
@@ -186,6 +194,7 @@ class DataLoader():
         db.session.query(DemographicsQuestionnaire).delete()
         db.session.query(EvaluationHistoryQuestionnaire).delete()
         db.session.query(GuardianDemographicsQuestionnaire).delete()
+        db.session.query(HomeQuestionnaire).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()

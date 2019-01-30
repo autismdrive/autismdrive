@@ -80,6 +80,7 @@ def _load_data(data_loader):
     data_loader.load_demographics_questionnaire()
     data_loader.load_evaluation_history_questionnaire()
     data_loader.load_guardian_demographics_questionnaire()
+    data_loader.load_home_questionnaire()
 
 
 @app.cli.command()

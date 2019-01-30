@@ -16,16 +16,16 @@ from app.model.training_category import TrainingCategory
 from app.model.user import User
 from app.model.user_participant import UserParticipant
 
-# Import the questionnaire schemas in order to include them when auto-generating migrations (and to ensure that the
-# tables don't get accidentally dropped!)
-from app.model.questionnaires.contact_questionnaire import ContactQuestionnaireSchema, \
-    ContactQuestionnaireMetaSchema
-from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaireSchema, \
-    DemographicsQuestionnaireMetaSchema
-from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaireSchema, \
-    GuardianDemographicsQuestionnaireMetaSchema
-from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaireSchema, \
-    EvaluationHistoryQuestionnaireMetaSchema
+# Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
+# ensure that the tables don't get accidentally dropped!)
+# Models:
+import app.model.questionnaires.housemate
+# Questionnaires:
+import app.model.questionnaires.contact_questionnaire
+import app.model.questionnaires.demographics_questionnaire
+import app.model.questionnaires.evaluation_history_questionnaire
+import app.model.questionnaires.guardian_demographics_questionnaire
+import app.model.questionnaires.home_questionnaire
 
 
 class OrganizationSchema(ModelSchema):
