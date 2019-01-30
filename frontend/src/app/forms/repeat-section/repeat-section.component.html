@@ -1,0 +1,18 @@
+<div *ngFor="let field of field.fieldGroup; let i = index;">
+  <formly-group
+    [model]="model[i]"
+    [field]="field"
+    [options]="options"
+    [form]="formControl"
+  >
+    <button
+      mat-flat-button
+      color="warn"
+      (click)="remove(i)"
+    >Remove</button>
+  </formly-group>
+</div>
+<button
+  mat-flat-button
+  (click)="add()"
+>Add a {{ field.fieldArray.templateOptions.label }}</button>
