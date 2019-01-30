@@ -17,10 +17,8 @@ export class QuestionnaireStepsListComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('ngOnInit this.user', this.user);
-    console.log('ngOnInit this.stepNames', this.stepNames);
     if (this.stepNames && (this.stepNames.length > 0)) {
-      this.stepNames.forEach(stepName => {
+      this.stepNames.forEach((stepName, i) => {
         console.log('stepName', stepName);
 
         this.api.getQuestionnaireMeta(stepName).subscribe(q => {
@@ -28,14 +26,13 @@ export class QuestionnaireStepsListComponent implements OnInit {
           const stepInfo = q.get_meta.table;
           console.log('stepInfo', stepInfo);
 
-          this.steps.push(new QuestionnaireStep({
+          this.steps[i] = new QuestionnaireStep({
             name: stepName,
             label: stepInfo.label,
             description: stepInfo.description
-          }));
+          });
         });
       });
-
     }
   }
 

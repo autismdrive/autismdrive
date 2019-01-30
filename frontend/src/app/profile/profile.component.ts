@@ -19,7 +19,7 @@ export class ProfileComponent implements OnInit {
   stepName: string;
   activeStep = 0;
   loading = true;
-  stepNames = ['contact', 'demographics'];
+  stepNames = ['identification', 'contact', 'demographics', 'home', 'evaluation_history'];
 
   model = {};
   step: QuestionnaireStep;
