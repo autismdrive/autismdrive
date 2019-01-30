@@ -34,7 +34,7 @@ if(app.config["CORS_ENABLED"]) :
 ma = Marshmallow(app)
 
 # Database Migrations
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 
 # email service
 email_service = EmailService(app)

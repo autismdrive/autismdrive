@@ -20,7 +20,7 @@ class HomeQuestionnaire(db.Model):
         db.ForeignKey('stardrive_user.id')
     )
     self_living_situation = db.Column(
-        db.ARRAY(db.String),
+        db.String,
         info={
             'display_order': 1.1,
             'type': 'radio',
@@ -51,7 +51,7 @@ class HomeQuestionnaire(db.Model):
         }
     )
     dependant_living_situation = db.Column(
-        db.ARRAY(db.String),
+        db.String,
         info={
             'display_order': 2.1,
             'type': 'radio',
