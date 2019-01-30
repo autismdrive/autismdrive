@@ -66,6 +66,8 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
+import { EnrollmentFlowComponent } from './enrollment-flow/enrollment-flow.component';
+import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -119,7 +121,9 @@ export class FormlyConfig {
     HelpWrapperComponent,
     QuestionnaireStepsListComponent,
     QuestionnaireStepComponent,
-    RepeatSectionComponent
+    RepeatSectionComponent,
+    EnrollmentFlowComponent,
+    ParticipantProfileComponent
   ],
   imports: [
     BrowserAnimationsModule,

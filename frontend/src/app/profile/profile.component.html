@@ -6,10 +6,7 @@
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
-    <mat-progress-bar
-      mode="determinate"
-      [value]="10"
-    ></mat-progress-bar>
+
 
 
     <app-loading
@@ -17,57 +14,30 @@
       message="Loading..."
     ></app-loading>
 
-    <mat-drawer-container
-      *ngIf="!loading"
+    <div
+      fxLayout="row"
+      fxLayoutGap="40px"
     >
-      <mat-drawer
-        *ngIf="user && stepNames"
-        [mode]="'side'"
-        [opened]="true"
+      <div
+        fxFlex="60%"
+        fxLayout="column"
+        fxLayoutGap="40px"
       >
-        <app-questionnaire-steps-list
-          [user]="user"
-          [stepNames]="stepNames"
-        ></app-questionnaire-steps-list>
-      </mat-drawer>
-      <mat-drawer-content>
-        <form
-          *ngIf="form && step && options"
-          [formGroup]="form"
-          (ngSubmit)="submit()"
-          class="pad-2"
-        >
-          <h1>{{ step.label }}</h1>
-          <p>{{ step.description }}</p>
+        <app-participant-profile
+          *ngFor="let participant of participants"
+          [participant]="participant"
+        ></app-participant-profile>
 
-          <formly-form
-            [form]="form.at(activeStep)"
-            [model]="model"
-            [fields]="step.fields"
-            [options]="options[activeStep]"
-          >
-          </formly-form>
+        <a
+          mat-flat-button
+          color="primary"
+          [routerLink]="['/profile/enrollment/identification']"
+        >Enroll another dependent</a>
+      </div>
+      <div fxFlex="40%">
+        [List of studies here]
+      </div>
+    </div>
 
-          <div class="button-row">
-            <button
-              mat-flat-button
-              type="button"
-              (click)="prevStep(activeStep)"
-            >Back</button>
-            <button
-              mat-flat-button
-              type="button"
-              [disabled]="!form.at(activeStep).valid"
-              (click)="nextStep(activeStep)"
-            >Save &amp; Next</button>
-            <button
-              mat-flat-button
-              [disabled]="!form.valid"
-              type="submit"
-            >Submit</button>
-          </div>
-        </form>
-      </mat-drawer-content>
-    </mat-drawer-container>
   </div>
 </div>
