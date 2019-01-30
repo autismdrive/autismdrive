@@ -1,4 +1,6 @@
+<app-loading *ngIf="loading" message="Loading..."></app-loading>
 <div
+  hidden="loading"
   class="container mat-typography"
   fxLayout="row"
   fxLayoutWrap
@@ -14,7 +16,7 @@
 
     <form
       [formGroup]="form"
-      (ngSubmit)="submit()"
+      (ngSubmit)="submit(model)"
     >
       <formly-form
         [form]="form"
@@ -35,11 +37,11 @@
             type="submit"
             color="primary"
           >Submit</button>
-          <button
+          <a
             mat-flat-button
-            (click)="goHome($event)"
+            [routerLink]="[ '/home' ]"
             color="accent"
-          >Cancel</button>
+          >Cancel</a>
         </div>
       </formly-form>
     </form>
@@ -48,14 +50,14 @@
       fxLayout="row"
       fxLayoutAlign="space-between"
     >
-      <button
+      <a
         mat-button
-        (click)="goTerms($event)"
-      >Create account</button>
-      <button
+        [routerLink]="[ '/terms' ]"
+      >Create account</a>
+      <a
         mat-button
-        (click)="goForgotPassword($event)"
-      >Forgot password?</button>
+        [routerLink]="[ '/forgot-password' ]"
+      >Forgot password?</a>
     </div>
   </div>
 </div>

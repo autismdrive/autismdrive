@@ -38,7 +38,8 @@ export class AppComponent implements OnInit {
 
   goLogout($event) {
     $event.preventDefault();
-    this.api.closeSession().subscribe();
-    this.router.navigate(['home']);
+    this.api.closeSession().subscribe(response => {
+      this.router.navigate(['home']);
+    });
   }
 }

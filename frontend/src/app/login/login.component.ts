@@ -10,7 +10,7 @@ import { ApiService } from '../api.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-
+  loading = false;
   emailToken: string;
   errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
@@ -52,38 +52,31 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  submit() {
+  submit(model) {
+    this.loading = true;
+
     if (this.form.valid) {
-      this.api.login(this.model['email'], this.model['password'], this.emailToken).subscribe(
+      this.api.login(model['email'], model['password'], this.emailToken).subscribe(
         token => {
           this.api.openSession(token['token']).subscribe(
             user => {
               this.router.navigate(['profile']);
+              this.loading = false;
             }
-          )
+          );
         }, error1 => {
+          this.loading = false;
           if (error1) {
             this.errorEmitter.emit(error1);
           } else {
-            this.errorEmitter.emit('An unexpected error occurred. Please contact support')
+            this.errorEmitter.emit('An unexpected error occurred. Please contact support');
           }
         }
       );
+    } else {
+      this.loading = false;
+      this.errorEmitter.emit('Please enter a valid email address and password.');
     }
   }
 
-  goHome($event) {
-    $event.preventDefault();
-    this.router.navigate(['home']);
-  }
-
-  goTerms($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms']);
-  }
-
-  goForgotPassword($event) {
-    $event.preventDefault();
-    this.router.navigate(['forgot-password']);
-  }
 }
