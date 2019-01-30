@@ -182,7 +182,7 @@ class IdentificationQuestionnaire(db.Model):
         info = {
             'table': {
                 'sensitive': False,
-                'label': 'Demographics',
+                'label': 'Identification',
                 'description': '',
             },
             'field_groups': {
