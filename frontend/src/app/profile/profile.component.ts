@@ -38,7 +38,6 @@ export class ProfileComponent implements OnInit {
   constructor(
     private api: ApiService
   ) {
-
     this.api.getSession().subscribe(user => {
       this.user = user;
       this.loading = false;

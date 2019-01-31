@@ -65,7 +65,7 @@ export class ApiService {
 
   /** _fetchSession */
   public _fetchSession(): void {
-    this.httpClient.get<User>(this.apiRoot + this.endpoints.session).subscribe(user => {
+    this.httpClient.get<User>(this._endpointUrl('session')).subscribe(user => {
       this.hasSession = true;
       this.sessionSubject.next(user);
     }, (error) => {
@@ -83,7 +83,7 @@ export class ApiService {
 
   /** closeSession */
   closeSession(): Observable<User> {
-    this.httpClient.delete<User>(this.apiRoot + this.endpoints.session).subscribe(x => {
+    this.httpClient.delete<User>(this._endpointUrl('session')).subscribe(x => {
       localStorage.removeItem('token');
       sessionStorage.clear();
       this.hasSession = false;
@@ -102,7 +102,7 @@ export class ApiService {
    * after an email verification link. */
   login(email: string, password: string, email_token = ''): Observable<any> {
     const options = { email: email, password: password, email_token: email_token };
-    return this.httpClient.post(this.apiRoot + this.endpoints.login_password, options)
+    return this.httpClient.post(this._endpointUrl('login_password'), options)
       .pipe(catchError(this.handleError));
   }
 
@@ -110,7 +110,7 @@ export class ApiService {
    * Reset password */
   resetPassword(newPassword: string, email_token: string): Observable<string> {
     const reset = { password: newPassword, email_token: email_token };
-    return this.httpClient.post<string>(this.apiRoot + this.endpoints.reset_password, reset)
+    return this.httpClient.post<string>(this._endpointUrl('reset_password'), reset)
       .pipe(catchError(this.handleError));
   }
 
@@ -118,118 +118,103 @@ export class ApiService {
    * Reset password */
   sendResetPasswordEmail(email: String): Observable<any> {
     const email_data = { email: email };
-    return this.httpClient.post<any>(this.apiRoot + this.endpoints.forgot_password, email_data)
+    return this.httpClient.post<any>(this._endpointUrl('forgot_password'), email_data)
       .pipe(catchError(this.handleError));
   }
 
   // Add Study
   addStudy(study: Study): Observable<Study> {
-    console.log('adding a study:', study);
-    return this.httpClient.post<Study>(this.apiRoot + this.endpoints.studyList, study)
+    return this.httpClient.post<Study>(this._endpointUrl('studyList'), study)
       .pipe(catchError(this.handleError));
   }
 
   /** Update Study */
   updateStudy(study: Study): Observable<Study> {
-    console.log('updating a study:', study);
-    return this.httpClient.put<Study>(`${this.apiRoot + this.endpoints.study}/${study.id}`, study)
+    return this.httpClient.put<Study>(`${this._endpointUrl('study')}/${study.id}`, study)
       .pipe(catchError(this.handleError));
   }
 
   /** Delete Study */
   deleteStudy(study: Study): Observable<Study> {
-    console.log('deleting a study:', study);
-    return this.httpClient.delete<Study>(`${this.apiRoot + this.endpoints.study}/${study.id}`)
+    return this.httpClient.delete<Study>(`${this._endpointUrl('study')}/${study.id}`)
       .pipe(catchError(this.handleError));
   }
 
   /** Get Study */
   getStudy(id: number): Observable<Study> {
-    console.log('getting Study number ', id);
-    return this.httpClient.get<Study>(this.apiRoot + this.endpoints.study.replace('<id>', id.toString()))
+    return this.httpClient.get<Study>(this._endpointUrl('study').replace('<id>', id.toString()))
       .pipe(catchError(this.handleError));
   }
 
   /** Get Studies */
   getStudies(): Observable<Study[]> {
-    console.log('getting a list of Studies');
-    return this.httpClient.get<Study[]>(this.apiRoot + this.endpoints.studyList)
+    return this.httpClient.get<Study[]>(this._endpointUrl('studyList'))
       .pipe(catchError(this.handleError));
   }
 
   /** Add Resource */
   addResource(resource: Resource): Observable<Resource> {
-    console.log('adding a resource:', resource);
-    return this.httpClient.post<Resource>(this.apiRoot + this.endpoints.resourceList, resource)
+    return this.httpClient.post<Resource>(this._endpointUrl('resourceList'), resource)
       .pipe(catchError(this.handleError));
   }
 
   /** Update resource */
   updateResource(resource: Resource): Observable<Resource> {
-    console.log('updating a resource:', resource);
-    return this.httpClient.put<Resource>(`${this.apiRoot + this.endpoints.resource}/${resource.id}`, resource)
+    return this.httpClient.put<Resource>(`${this._endpointUrl('resource')}/${resource.id}`, resource)
       .pipe(catchError(this.handleError));
   }
 
   /** Delete Resource */
   deleteResource(resource: Resource): Observable<Resource> {
-    console.log('deleting a resource:', resource);
-    return this.httpClient.delete<Resource>(`${this.apiRoot + this.endpoints.resource}/${resource.id}`)
+    return this.httpClient.delete<Resource>(`${this._endpointUrl('resource')}/${resource.id}`)
       .pipe(catchError(this.handleError));
   }
 
   /** Get Resource */
   getResource(id: number): Observable<Resource> {
-    console.log('getting resource number ', id);
-    return this.httpClient.get<Resource>(this.apiRoot + this.endpoints.resource.replace('<id>', id.toString()))
+    return this.httpClient.get<Resource>(this._endpointUrl('resource').replace('<id>', id.toString()))
       .pipe(catchError(this.handleError));
   }
 
   /** Get Resources */
   getResources(): Observable<Resource[]> {
-    console.log('getting a list of resources');
-    return this.httpClient.get<Resource[]>(this.apiRoot + this.endpoints.resourceList)
+    return this.httpClient.get<Resource[]>(this._endpointUrl('resourceList'))
       .pipe(catchError(this.handleError));
   }
 
   /** Add Training */
   addTraining(training: Training): Observable<Training> {
-    console.log('adding a training:', training);
-    return this.httpClient.post<Training>(this.apiRoot + this.endpoints.trainingList, training)
+    return this.httpClient.post<Training>(this._endpointUrl('trainingList'), training)
       .pipe(catchError(this.handleError));
   }
 
   /** Update Training */
   updateTraining(training: Training): Observable<Training> {
-    console.log('updating a training:', training);
-    return this.httpClient.put<Training>(`${this.apiRoot + this.endpoints.training}/${training.id}`, training)
+    return this.httpClient.put<Training>(`${this._endpointUrl('training')}/${training.id}`, training)
       .pipe(catchError(this.handleError));
   }
 
   /** Delete Training */
   deleteTraining(training: Training): Observable<Training> {
-    console.log('deleting a training:', training);
-    return this.httpClient.delete<Training>(`${this.apiRoot + this.endpoints.training}/${training.id}`)
+    return this.httpClient.delete<Training>(`${this._endpointUrl('training')}/${training.id}`)
       .pipe(catchError(this.handleError));
   }
 
   /** Get Training */
   getTraining(id: number): Observable<Training> {
-    console.log('getting training number ', id);
-    return this.httpClient.get<Training>(this.apiRoot + this.endpoints.training.replace('<id>', id.toString()))
+    return this.httpClient.get<Training>(this._endpointUrl('training').replace('<id>', id.toString()))
       .pipe(catchError(this.handleError));
   }
 
   /** Get Trainings */
   getTrainings(): Observable<Training[]> {
-    console.log('getting a list of trainings');
-    return this.httpClient.get<Training[]>(this.apiRoot + this.endpoints.trainingList)
+    return this.httpClient.get<Training[]>(this._endpointUrl('trainingList'))
       .pipe(catchError(this.handleError));
   }
 
   // addUser
   addUser(user: User): Observable<User> {
-    return this.httpClient.post<User>(this.apiRoot + this.endpoints.userList, user)
+    return this.httpClient.post<User>(this._endpointUrl('userList'), user)
       .pipe(catchError(this.handleError));
   }
 
@@ -278,7 +263,7 @@ export class ApiService {
   /** getFileAttachment */
   getFileAttachment(id?: number, md5?: string): Observable<SDFileAttachment> {
     const params = { id: String(id), md5: md5 };
-    const url = this.apiRoot + this.endpoints.fileAttachmentList;
+    const url = this._endpointUrl('fileAttachmentList');
 
     return this.httpClient.get<SDFileAttachment>(url, { params: params });
   }
@@ -325,7 +310,7 @@ export class ApiService {
 
   /** addFileAttachment */
   addFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this.apiRoot + this.endpoints.fileAttachmentList;
+    const url = this._endpointUrl('fileAttachmentList');
     const attachmentMetadata = {
       file_name: attachment.name,
       display_name: attachment.name,
@@ -391,6 +376,10 @@ export class ApiService {
   submitQuestionnaire(key: string, options: object) {
     return this.httpClient.post<object>(this._qEndpoint('list', key), options)
       .pipe(catchError(this.handleError));
+  }
+
+  private _endpointUrl(endpointName: string): string {
+    return this.apiRoot + this.endpoints[endpointName];
   }
 
   private _qEndpoint(eType = '', qName: string, qId?: number) {

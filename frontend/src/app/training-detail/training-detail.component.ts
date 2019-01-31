@@ -18,8 +18,6 @@ export class TrainingDetailComponent implements OnInit {
       if (isFinite(trainingId)) {
         this.api.getTraining(trainingId).subscribe(training => {
           this.training = training;
-          console.log('training', training);
-
         });
       }
     });

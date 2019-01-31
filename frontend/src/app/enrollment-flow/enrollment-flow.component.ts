@@ -31,13 +31,8 @@ export class EnrollmentFlowComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    console.log('this.stepNames', this.stepNames);
-
     this.api.getSession().subscribe(user => {
       this.user = user;
-
-      console.log('user', user);
-
       this.route.params.subscribe(params => {
         const stepName = params.stepName || '';
 
@@ -111,9 +106,6 @@ export class EnrollmentFlowComponent implements OnInit {
 
     stepFields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     stepFields.forEach(f => step.fields.push(f));
-
-    console.log('step', step);
-
     return step;
   }
 
@@ -133,13 +125,8 @@ export class EnrollmentFlowComponent implements OnInit {
   }
 
   submit() {
-    console.log('this.model', this.model);
-
     // Flatten the model
     const flattened = flatten(this.model, { safe: true });
-
-    console.log('flattened', flattened);
-
 
     // Rename the keys
     const options = {};
@@ -155,13 +142,8 @@ export class EnrollmentFlowComponent implements OnInit {
         this.router.navigate(['profile', this.stepNames[this.activeStep]]);
       });
     } else {
-      console.log('this.step.name', this.step.name);
-
-
       this.api.submitQuestionnaire(this.step.name, options).subscribe(response => {
         // Update form with saved values
-        console.log('this.stepNames[this.activeStep]', this.stepNames[this.activeStep]);
-
         this.router.navigate(['profile', this.stepNames[this.activeStep]]);
       });
     }

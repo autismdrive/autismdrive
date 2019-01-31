@@ -26,14 +26,15 @@ export class AppComponent implements OnInit {
         }
       }
     });
-  }
 
-  ngOnInit() {
     this.api.getSession().subscribe(user => {
       this.session = user;
     }, error1 => {
       this.session = null;
     });
+  }
+
+  ngOnInit() {
   }
 
   goLogout($event) {

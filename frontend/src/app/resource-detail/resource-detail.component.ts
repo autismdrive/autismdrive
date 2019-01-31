@@ -18,8 +18,6 @@ export class ResourceDetailComponent implements OnInit {
       if (isFinite(resourceId)) {
         this.api.getResource(resourceId).subscribe(resource => {
           this.resource = resource;
-          console.log('resource', resource);
-
         });
       }
     });

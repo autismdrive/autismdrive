@@ -52,7 +52,13 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
-    this.user = { id: null, first_name: this.model['first_name'], last_name: this.model['last_name'], email: this.model['email'], role: 'User' }
+    this.user = {
+      id: null,
+      first_name: this.model['first_name'],
+      last_name: this.model['last_name'],
+      email: this.model['email'],
+      role: 'User'
+    };
   }
 
   ngOnInit() {
@@ -62,8 +68,6 @@ export class RegisterComponent implements OnInit {
     if (this.form.valid) {
       this.registerState = 'submitting';
       this.errorMessage = '';
-      console.log('Register state is submitting');
-
       this.user['first_name'] = this.model['first_name'];
       this.user['last_name'] = this.model['last_name'];
       this.user['email'] = this.model['email'];
@@ -72,12 +76,10 @@ export class RegisterComponent implements OnInit {
         this.user = u;
         this.registerState = 'wait_for_email';
         this.changeDetectorRef.detectChanges();
-        console.log('Register state is wait_for_email');
       }, error1 => {
         this.registerState = 'form';
         this.errorMessage = error1;
         this.changeDetectorRef.detectChanges();
-        console.log('Register state is form?' + this.registerState);
       });
     }
   }
