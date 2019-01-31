@@ -1,0 +1,11 @@
+mat-card.repeat {
+  background: #fbfbfb;
+
+  &:active, &:hover, &:focus, &:focus-within {
+    background: #eeeeee;
+  }
+}
+
+.container, .repeat-action {
+  padding-top: 1em;
+}

@@ -30,7 +30,6 @@
         <form
           *ngIf="form && step && options"
           [formGroup]="form"
-          (ngSubmit)="submit()"
           class="pad-2"
         >
           <h1>{{ step.label }}</h1>
@@ -60,6 +59,7 @@
               mat-flat-button
               [disabled]="!form.valid"
               type="submit"
+              (click)="submit()"
             >Submit</button>
           </div>
         </form>
