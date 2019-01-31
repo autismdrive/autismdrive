@@ -183,7 +183,7 @@ class ContactQuestionnaire(db.Model):
         info = {
             'table': {
                 'sensitive': 'false',
-                'label': 'Research Registrant Contact Information',
+                'label': 'Contact Information',
                 'description': 'Please answer the following questions about YOURSELF (* indicates required response):'
             },
             'field_groups': {
