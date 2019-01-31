@@ -29,7 +29,7 @@ class Housemate(db.Model):
         db.String,
         info={
             'display_order': 3.2,
-            'type': 'radio',
+            'type': 'select',
             'template_options': {
                 'required': False,
                 'label': 'Relationship',
@@ -94,12 +94,15 @@ class Housemate(db.Model):
     )
 
     def get_meta(self):
-        info = {'table': {'sensitive': False,
-                          'label': 'Housemate'
-                          }
-                }
+        info = {
+            'table': {
+                'sensitive': False,
+                'label': 'Housemate'
+            }
+        }
         for c in self.metadata.tables['housemate'].columns:
-            info[c.name] = c.info
+            if c.info:
+                info[c.name] = c.info
         return info
 
 

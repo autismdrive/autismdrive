@@ -25,6 +25,7 @@ class IdentificationQuestionnaire(db.Model):
             'display_order': 1.1,
             'type': 'radio',
             'default': 'self',
+            'class_name': 'vertical-radio-group',
             'template_options': {
                 'required': False,
                 'label': '',
@@ -36,7 +37,7 @@ class IdentificationQuestionnaire(db.Model):
                     {'value': 'other', 'label': 'Other'}
                 ]
             },
-            'hideExpression': '(model.is_self))',
+            'hide_expression': '(model.is_self)',
         }
     )
     relationship_to_participant_other = db.Column(
@@ -47,7 +48,7 @@ class IdentificationQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Enter your relationship'
             },
-            'hideExpression': '(model.is_self) || !(model.relationship_to_participant && '
+            'hide_expression': '(model.is_self) || !(model.relationship_to_participant && '
                               '(model.relationship_to_participant === "other"))',
         }
     )
@@ -166,8 +167,8 @@ class IdentificationQuestionnaire(db.Model):
                 'required': False,
                 'label': 'Is the primary language English?',
                 'options': [
-                    {'value': 'true', 'label': 'True'},
-                    {'value': 'false', 'label': 'False'}
+                    {'value': True, 'label': 'Yes'},
+                    {'value': False, 'label': 'No'}
                 ]
             },
             'expression_properties': {
