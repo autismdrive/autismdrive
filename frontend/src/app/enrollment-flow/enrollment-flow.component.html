@@ -1,3 +1,4 @@
+
 <div
   *ngIf="user"
   class="profile mat-typography"
@@ -27,6 +28,11 @@
         ></app-questionnaire-steps-list>
       </mat-drawer>
       <mat-drawer-content>
+        <mat-slide-toggle
+          (change)="toggleSelf()"
+          [checked]="isSelf"
+        >Self</mat-slide-toggle>
+
         <form
           *ngIf="form && step && options"
           [formGroup]="form"

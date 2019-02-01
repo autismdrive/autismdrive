@@ -128,6 +128,26 @@ class HomeQuestionnaire(db.Model):
             'table': {'sensitive': False,
                       'label': 'Home'
                       },
+            'first_name': {
+                'type': 'input',
+                'default_value': 'FIRST_NAME',
+                'hide_expression': True
+            },
+            'nickname': {
+                'type': 'input',
+                'default_value': 'NICKNAME',
+                'hide_expression': True
+            },
+            'last_name': {
+                'type': 'input',
+                'default_value': 'LAST_NAME',
+                'hide_expression': True
+            },
+            'is_self': {
+                'type': 'input',
+                'default_value': True,
+                'hide_expression': True
+            },
             'field_groups': {
                 'self_living': {
                     'fields': [

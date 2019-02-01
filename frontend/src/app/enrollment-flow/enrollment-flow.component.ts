@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormlyFormOptions } from '@ngx-formly/core';
+import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import * as flatten from 'flat';
 import { keysToCamel, toCamel } from 'src/util/snakeToCamel';
 import { ApiService } from '../api.service';
@@ -16,6 +16,7 @@ import { User } from '../user';
 })
 export class EnrollmentFlowComponent implements OnInit {
   user: User;
+  isSelf = true;
   stepName: string;
   activeStep = 0;
   loading = true;
@@ -27,10 +28,10 @@ export class EnrollmentFlowComponent implements OnInit {
     'evaluation_history'
   ];
 
-  model = {};
+  model: any = {};
   step: QuestionnaireStep;
   form: FormArray;
-  options;
+  options: FormlyFormOptions;
 
   constructor(
     private api: ApiService,
@@ -112,6 +113,8 @@ export class EnrollmentFlowComponent implements OnInit {
 
     stepFields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     stepFields.forEach(f => step[fieldsType].push(f));
+
+    console.log('step', this.clone(step));
     return step;
   }
 
@@ -128,6 +131,11 @@ export class EnrollmentFlowComponent implements OnInit {
   setActiveStep(step: number) {
     this.activeStep = step;
     this.submit();
+  }
+
+  toggleSelf() {
+    this.isSelf = !this.isSelf;
+    this._updateModelIsSelf();
   }
 
   submit() {
@@ -170,6 +178,15 @@ export class EnrollmentFlowComponent implements OnInit {
       delete parentObject[childKey];
       return keysToCamel(childField);
     });
+  }
+
+  private _updateModelIsSelf() {
+    this.model.is_self = this.isSelf;
+    this.model.first_name = this.isSelf ? 'ParentFirst' : 'ChildFirst';
+    this.model.last_name = this.isSelf ? 'ParentLast' : 'ChildLast';
+    this.model.nickname = this.isSelf ? '' : 'ChildNickname';
+    this.step.fields = [...this.step.fields];
+    this.step.fieldGroup = [...this.step.fieldGroup];
   }
 
 }
