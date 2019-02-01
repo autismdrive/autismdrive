@@ -6,6 +6,7 @@ from flask_restful import reqparse
 
 from app import app
 from app.resources.Auth import auth_blueprint
+from app.resources.FlowEndpoint import FlowEndpoint, FlowListEndpoint, FlowQuestionnaireEndpoint
 
 from app.resources.Tracking import tracking_blueprint
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
@@ -29,9 +30,9 @@ from app.resources.OrganizationEndpoint import (
     OrganizationListEndpoint
 )
 from app.resources.ParticipantEndpoint import (
-    ParticipantEndpoint,
-    ParticipantListEndpoint
+    ParticipantEndpoint
 )
+
 from app.resources.StudyAndCategoryEndpoint import (
     StudyCategoryEndpoint,
     CategoryByStudyEndpoint,
@@ -52,13 +53,10 @@ from app.resources.TrainingAndCategoryEndpoint import (
 )
 from app.resources.UserAndParticipantEndpoint import (
     UserParticipantEndpoint,
-    UserByParticipantEndpoint,
-    ParticipantByUserEndpoint,
-    UserParticipantListEndpoint
-)
+    UserParticipantListEndpoint,
+    ParticipantBySessionEndpoint)
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
-    QuestionnaireListEndpoint,
     QuestionnaireMetaEndpoint)
 
 class StarDriveApi(flask_restful.Api):
@@ -132,21 +130,26 @@ endpoints = [
 
     # User Sessions
     (SessionEndpoint, '/session'),
+    (ParticipantBySessionEndpoint, '/session/participant/<relationship>'),
+    # User Schema, Admin endpoints
     (UserListEndpoint, '/user'),
     (UserEndpoint, '/user/<id>'),
-    (ParticipantByUserEndpoint, '/user/<user_id>/participant'),
 
     # Participants
-    (ParticipantListEndpoint, '/participant'),
     (ParticipantEndpoint, '/participant/<id>'),
-    (UserByParticipantEndpoint, '/participant/<participant_id>/user'),
-    (UserParticipantListEndpoint, '/user_participant'),
-    (UserParticipantEndpoint, '/user_participant/<id>'),
+#    (UserByParticipantEndpoint, '/participant/<participant_id>/user'),
+#    (UserParticipantListEndpoint, '/user_participant'),
+#    (UserParticipantEndpoint, '/user_participant/<id>'),
 
     # Questionnaires
     (QuestionnaireEndpoint, '/q/<string:name>/<string:id>'),
-    (QuestionnaireListEndpoint, '/q/<string:name>'),
-    (QuestionnaireMetaEndpoint, '/q/<string:name>/meta')
+    (QuestionnaireMetaEndpoint, '/q/<string:name>/meta'),
+
+    # Flow Endpoint
+    (FlowEndpoint, '/flow/<string:name>'),
+    (FlowListEndpoint, '/flow'),
+    (FlowQuestionnaireEndpoint, '/flow/<string:flow>/<string:questionnaire_name>'),
+
 ]
 
 # Add all endpoints to the API
