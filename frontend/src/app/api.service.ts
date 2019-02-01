@@ -37,15 +37,22 @@ export class ApiService {
     studyList: '/api/study',
     training: '/api/training/<id>',
     trainingList: '/api/training',
+    participantBySession: '/api/session/participant/<relationship>',
+    participant: '/api/participant/<id>',
     userList: '/api/user',
+    flow: '/api/flow/<name>',
+    flowList: '/api/flow',
+    flowQuestionnaire: '/api/flow/<flow>/<questionnaire_name>',
 
     // Valid questionnaire <name> values:
     // 'contact'
     // 'demographics'
-    // 'guardian_demographics'
+    // 'evaluation_history'
+    // 'home'
+    // 'identification'
     questionnaireList: '/api/q/<name>',
     questionnaire: '/api/q/<name>/<id>',
-    questionnaireMeta: '/api/q/<name>/meta'
+    questionnaireMeta: '/api/q/<name>/meta',
   };
 
   private hasSession: boolean;
