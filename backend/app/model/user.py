@@ -22,6 +22,11 @@ class User(db.Model):
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
 
+    def related_to_participant(self, participant_id):
+        for p in self.participants:
+            if p.id == participant_id:
+                return True
+        return False
 
     @hybrid_property
     def password(self):
