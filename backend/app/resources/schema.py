@@ -22,6 +22,7 @@ from app.model.user_participant import UserParticipant
 import app.model.questionnaires.housemate
 # Questionnaires:
 import app.model.questionnaires.contact_questionnaire
+import app.model.questionnaires.current_behaviors_questionnaire
 import app.model.questionnaires.demographics_questionnaire
 import app.model.questionnaires.evaluation_history_questionnaire
 import app.model.questionnaires.home_questionnaire
