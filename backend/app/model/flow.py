@@ -1,26 +1,3 @@
-
-
-# { "name": "Intake Process",
-#   "estimate_minutes": "20",
-#   "steps": [
-#       {
-#         "name": "contact",
-#         "type": "identifying",
-#         "status": "complete"
-#         "date_completed": 2009-12-11h11:12:15
-#       },
-#      {
-#         "name": "demographics",
-#         "type": "sensitive",
-#         "status": "incomplete"
-#       },
-#       {
-#         "name": "eating_preferences",
-#         "type": "unrestricted",
-#         "status": "complete"
-#       }
-#     ]
-# }
 from marshmallow import Schema, fields
 
 #         "name": "contact",
@@ -42,10 +19,6 @@ class Step:
 class Flow:
 
     steps = []
-    # is this me, or a dependent (relationship)
-    # id of the questiionnaire
-    # Participant's preferred name.
-    #
 
     def __init__(self, name):
         self.name = name
