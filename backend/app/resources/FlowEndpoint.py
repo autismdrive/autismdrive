@@ -5,7 +5,7 @@ from flask import request, g
 
 from app import RestException, db, auth
 from app.model.flow import Flow, FlowSchema
-from app.model.progress_log import ProgressLog
+from app.model.step_log import StepLog
 from app.question_service import QuestionService
 
 
@@ -69,12 +69,12 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         return schema.dump(new_quest)
 
     def log_progress(self, flow, questionnaire_name, questionnaire):
-        log = ProgressLog(questionnaire_name=questionnaire_name,
-                          questionnaire_id=questionnaire.id,
-                          flow=flow.name,
-                          participant_id=questionnaire.participant_id,
-                          user_id=g.user.id,
-                          date_completed=datetime.datetime.now(),
-                          time_on_task_ms=questionnaire.time_on_task_ms)
+        log = StepLog(questionnaire_name=questionnaire_name,
+                      questionnaire_id=questionnaire.id,
+                      flow=flow.name,
+                      participant_id=questionnaire.participant_id,
+                      user_id=g.user.id,
+                      date_completed=datetime.datetime.now(),
+                      time_on_task_ms=questionnaire.time_on_task_ms)
         db.session.add(log)
         db.session.commit()

@@ -5,7 +5,7 @@ import os
 os.environ["APP_CONFIG_FILE"] = '../config/testing.py'
 
 
-from app.model.progress_log import ProgressLog
+from app.model.step_log import StepLog
 from app.question_service import QuestionService
 import re
 import json
@@ -1591,7 +1591,7 @@ class TestCase(unittest.TestCase):
         rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True, headers=headers)
         self.assertSuccess(rv)
-        log = db.session.query(ProgressLog).all()
+        log = db.session.query(StepLog).all()
         self.assertIsNotNone(log)
         self.assertTrue(len(log) > 0)
 

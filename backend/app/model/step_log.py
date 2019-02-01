@@ -2,8 +2,9 @@ import datetime
 
 from app import db
 
-class ProgressLog(db.Model):
-    __tablename__ = 'questionnaire_log'
+
+class StepLog(db.Model):
+    __tablename__ = 'step_log'
     id = db.Column(db.Integer, primary_key=True)
     questionnaire_name = db.Column(db.String)
     questionnaire_id = db.Column(db.Integer)
