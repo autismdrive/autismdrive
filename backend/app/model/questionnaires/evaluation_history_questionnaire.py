@@ -85,7 +85,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 4,
-            'type': 'radio',
+            'type': 'select',
             'template_options': {
                 'label': 'Who diagnosed?',
                 'required': True,
@@ -119,7 +119,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 6,
-            'type': 'radio',
+            'type': 'select',
             'template_options': {
                 'label': 'Where diagnosed?',
                 'required': True,
@@ -172,10 +172,10 @@ class EvaluationHistoryQuestionnaire(db.Model):
     partner_centers_evaluation = db.Column(
         db.String,
         info={
-            'display_order': 8,
-            'type': 'radio',
+            'display_order': 8.1,
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': 'Evaluation at partner institution?',
                 'required': True,
                 'options': [
                     {'value': 'uva', 'label': 'UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children\'s Rehabilitation Center, KCRC)'},
@@ -184,10 +184,6 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     {'value': 'fc', 'label': 'Faison Center'},
                     {'value': 'inova', 'label': 'INOVA Health System'}
                 ]
-            },
-            'expression_properties': {
-                'template_options.label': '(!model.is_self ? "Have you" : "Has " + model.first_name) + '
-                                          '" ever been evaluated at any of the following centers?"'
             }
         }
     )
@@ -254,6 +250,22 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 'sensitive': True,
                 'label': 'Evaluation History',
                 'description': '',
+            },
+            'field_groups': {
+                'partner_centers': {
+                    'fields': [
+                        'partner_centers_evaluation'
+                    ],
+                    'display_order': 8,
+                    'wrappers': ['card'],
+                    'template_options': {
+                        'label': 'Evaluation at partner institution?'
+                    },
+                    'expression_properties': {
+                        'template_options.label': '(!model.is_self ? "Have you" : "Has " + model.first_name) + '
+                        '" ever been evaluated at any of the following centers?"'
+                    }
+                }
             }
         }
         for c in self.metadata.tables['evaluation_history_questionnaire'].columns:
