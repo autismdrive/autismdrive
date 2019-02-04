@@ -37,11 +37,11 @@ class Flow:
                 step.status = step.STATUS_COMPLETE
                 step.date_completed = step_log.date_completed
 
-
     def add_step(self, questionnaireName):
-        q = QuestionService.get_class(questionnaireName)()
-        step = Step(questionnaireName, q.__question_type__)
-        self.steps.append(step)
+        if not self.has_step(questionnaireName):
+            q = QuestionService.get_class(questionnaireName)()
+            step = Step(questionnaireName, q.__question_type__)
+            self.steps.append(step)
 
 
 class StepSchema(Schema):
