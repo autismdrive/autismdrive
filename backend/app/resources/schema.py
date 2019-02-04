@@ -1,5 +1,5 @@
 from flask_marshmallow.sqla import ModelSchema
-from marshmallow import fields
+from marshmallow import fields, Schema
 from sqlalchemy import func
 
 
@@ -281,14 +281,6 @@ class TrainingCategorySchema(ModelSchema):
     })
 
 
-class UserSchema(ModelSchema):
-    class Meta:
-        model = User
-        fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password', 'role')
-    password = fields.String(load_only=True)
-    id = fields.Integer(required=False, allow_none=True)
-
-
 class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
@@ -299,13 +291,23 @@ class ParticipantSchema(ModelSchema):
 class UserParticipantsSchema(ModelSchema):
     class Meta:
         model = UserParticipant
-        fields = ('id', '_links', 'participant_id', 'user_id', 'participant')
+        fields = ('id', '_links', 'participant_id', 'user_id', 'participant', 'relationship')
     participant = fields.Nested(ParticipantSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
         'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
     })
+
+
+class UserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'last_updated', 'email', 'password', 'role',
+                  'participants')
+    password = fields.String(load_only=True)
+    participants = fields.Nested(UserParticipantsSchema, dump_only=True, many=True)
+    id = fields.Integer(required=False, allow_none=True)
 
 
 class ParticipantUsersSchema(ModelSchema):
@@ -320,12 +322,13 @@ class ParticipantUsersSchema(ModelSchema):
     })
 
 
-class UserParticipantSchema(ModelSchema):
-    class Meta:
-        model = UserParticipant
-        fields = ('id', '_links', 'user_id', 'participant_id')
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
-        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>')
-    })
+
+
+class FlowQuestionnaireSchema(Schema):
+    title = fields.Str()
+    release_date = fields.Date()
+
+
+class FlowSchema(Schema):
+    name = fields.Str()
+    steps = fields.Nested(FlowQuestionnaireSchema())

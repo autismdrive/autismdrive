@@ -14,14 +14,17 @@ class User(db.Model):
     __tablename__ = 'stardrive_user'
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
-    first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.String, default='Self')
     participants = db.relationship("UserParticipant", back_populates="user")
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
 
+    def related_to_participant(self, participant_id):
+        for p in self.participants:
+            if p.id == participant_id:
+                return True
+        return False
 
     @hybrid_property
     def password(self):
