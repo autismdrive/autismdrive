@@ -2,7 +2,7 @@
   <a
     *ngIf="step && step.name"
     mat-list-item
-    [routerLink]="['/profile/enrollment/' + step.name]"
+    [routerLink]="['/participant/' + participant.id + '/' + flow.name + '/' + step.name]"
     routerLinkActive="router-link-active"
   >{{step.label}}</a>
 </mat-nav-list>

@@ -4,9 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import * as flatten from 'flat';
 import { keysToCamel, toCamel } from 'src/util/snakeToCamel';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 import { QuestionnaireStep } from '../step';
 import { User } from '../user';
+import { Participant } from '../participant';
+import { Flow } from '../flow';
 
 
 @Component({
@@ -16,17 +18,16 @@ import { User } from '../user';
 })
 export class EnrollmentFlowComponent implements OnInit {
   user: User;
+  participant: Participant;
+  flow: Flow;
+
   isSelf = true;
   stepName: string;
   activeStep = 0;
   loading = true;
-  stepNames = [
-    'identification',
-    'contact',
-    'demographics',
-    'home',
-    'evaluation_history'
-  ];
+  stepNames = [];
+  flowName: string;
+  participantId: number;
 
   model: any = {};
   step: QuestionnaireStep;
@@ -41,22 +42,44 @@ export class EnrollmentFlowComponent implements OnInit {
     this.api.getSession().subscribe(user => {
       this.user = user;
       this.route.params.subscribe(params => {
-        const stepName = params.stepName || '';
+        this.stepName = params.stepName || '';
+        this.flowName = params.flowName || '';
 
-        if (stepName !== '') {
-          this.api.getQuestionnaireMeta(stepName).subscribe(q => {
-            this.step = this._infoToFormlyForm(q.get_meta, stepName);
-            this.form = new FormArray([new FormGroup({})]);
-            this.options = <FormlyFormOptions>{};
-            this.loading = false;
-          });
+        if (params.hasOwnProperty('participantId')) {
+          this.participantId = parseInt(params.participantId, 10);
 
+          for (const up of user.participants) {
+            if (up.participant_id === this.participantId) {
+              this.participant = up.participant;
+            }
+          }
         } else {
-          this.loading = false;
+          this.participantId = undefined;
+        }
+
+        if (isFinite(this.participantId) && (this.flowName !== '')) {
+          this.api
+            .getFlow(this.flowName, this.participantId)
+            .subscribe(f => {
+              this.flow = f;
+
+              console.log('f', f);
+
+              this.stepNames = f.steps.map(s => s.name);
+
+              if (this.stepName === '') {
+                this.stepName = this.stepNames[0];
+              }
+
+              this.api.getQuestionnaireMeta(this.stepName).subscribe(q => {
+                this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
+                this.form = new FormArray([new FormGroup({})]);
+                this.options = <FormlyFormOptions>{};
+                this.loading = false;
+              });
+            });
         }
       });
-    }, error1 => {
-      this.user = null;
     });
   }
 

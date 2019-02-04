@@ -3,7 +3,7 @@
   *ngIf="user"
   class="profile mat-typography"
 >
-  <h1>{{user.first_name}} {{user.last_name}}’s enrollment info</h1>
+  <h1>{{participant.first_name}} {{participant.last_name}}’s enrollment info</h1>
   <div>
     <mat-progress-bar
       mode="determinate"
@@ -24,6 +24,8 @@
       >
         <app-questionnaire-steps-list
           [user]="user"
+          [participant]="participant"
+          [flow]="flow"
           [stepNames]="stepNames"
         ></app-questionnaire-steps-list>
       </mat-drawer>

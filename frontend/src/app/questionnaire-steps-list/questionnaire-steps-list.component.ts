@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 import { QuestionnaireStep } from '../step';
 import { User } from '../user';
+import { Participant } from '../participant';
+import { Flow, Step } from '../flow';
 
 @Component({
   selector: 'app-questionnaire-steps-list',
@@ -10,6 +12,8 @@ import { User } from '../user';
 })
 export class QuestionnaireStepsListComponent implements OnInit {
   @Input() user: User;
+  @Input() participant: Participant;
+  @Input() flow: Flow;
   @Input() stepNames: string[];
   steps: QuestionnaireStep[] = [];
 
