@@ -55,7 +55,7 @@ class EducationQuestionnaire(db.Model):
     school_type = db.Column(
         db.String,
         info={
-            'display_order': 2,
+            'display_order': 3,
             'type': 'input',
             'template_options': {
                 'label': 'What type of school?',
@@ -72,7 +72,7 @@ class EducationQuestionnaire(db.Model):
     self_placement = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 4,
             'type': 'radio',
             'template_options': {
                 'label': 'What type of program is it?',
@@ -84,13 +84,14 @@ class EducationQuestionnaire(db.Model):
                     {'value': 'graduate', 'label': 'Graduate school'},
                     {'value': 'schoolOther', 'label': 'Other'}
                 ]
-            }
+            },
+            'hide_expression': '!(model.is_self)'
         }
     )
     dependent_placement = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 4,
             'type': 'radio',
             'template_options': {
                 'label': '"What is " + (model.nickname || model.first_name || "your child") + "\'s '
@@ -106,13 +107,14 @@ class EducationQuestionnaire(db.Model):
                     {'value': 'graduate', 'label': 'Graduate school'},
                     {'value': 'schoolOther', 'label': 'Other'}
                 ]
-            }
+            },
+            'hide_expression': '(model.is_self)'
         }
     )
     placement_other = db.Column(
         db.String,
         info={
-            'display_order': 3.2,
+            'display_order': 4.2,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter school placement'
@@ -124,19 +126,19 @@ class EducationQuestionnaire(db.Model):
     current_grade = db.Column(
         db.String,
         info={
-            'display_order': 3.2,
+            'display_order': 5,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter grade'
             },
             'hide_expression': '!((model.dependent_placement && (model.dependent_placement.1through12)) || '
-                               '(model.self_placement && (model.self_placement.highSchool)))',
+                               '(model.self_placement && (model.self_placement.highSchool)))'
         }
     )
     school_services = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 6,
             'type': 'radio',
             'template_options': {
                 'label': 'School services',
@@ -164,7 +166,7 @@ class EducationQuestionnaire(db.Model):
     school_services_other = db.Column(
         db.String,
         info={
-            'display_order': 3.2,
+            'display_order': 6.2,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter service'
