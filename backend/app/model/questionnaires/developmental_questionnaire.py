@@ -20,16 +20,85 @@ class DevelopmentalQuestionnaire(db.Model):
         db.ForeignKey('stardrive_user.id')
     )
     had_birth_complications = db.Column(
-        db.Boolean
+        db.Boolean,
+        info={
+            'display_order': 1,
+            'type': 'radio',
+            'template_options': {
+                'label': 'Were there any complications during the pregnancy or delivery?',
+                'required': False,
+                'options': [
+                    {'value': True, 'label': 'Yes'},
+                    {'value': False, 'label': 'No'}
+                ]
+            }
+        }
+    )
+    birth_complications_description = db.Column(
+        db.String,
+        info={
+            'display_order': 1.2,
+            'type': 'textarea',
+            'template_options': {
+                'label': 'Please describe:',
+                'required': False,
+            },
+            'hide_expression': '!(model.had_birth_complications && (model.had_birth_complications == True))',
+        }
     )
     when_motor_milestones = db.Column(
-        db.String
+        db.String,
+        info={
+            'display_order': 2,
+            'type': 'radio',
+            'template_options': {
+                'label': '"When did " + (model.nickname || model.first_name || "Your child") "reach their motor '
+                         'developmental milestones (e.g., walking, crawling, etc.)?"',
+                'required': False,
+                'options': [
+                    {'value': 'early', 'label': 'Early'},
+                    {'value': 'onTime', 'label': 'On-time'},
+                    {'value': 'delayed', 'label': 'Delayed'},
+                    {'value': 'notYet', 'label': 'Not yet acquired'}
+                ]
+            }
+        }
     )
     when_language_milestones = db.Column(
-        db.String
+        db.String,
+        info={
+            'display_order': 3,
+            'type': 'radio',
+            'template_options': {
+                'label': '"When did " + (model.nickname || model.first_name || "Your child") + "reach their '
+                         'speech/language developmental milestones (e.g., babbling, using first words and phrases)?"',
+                'required': False,
+                'options': [
+                    {'value': 'early', 'label': 'Early'},
+                    {'value': 'onTime', 'label': 'On-time'},
+                    {'value': 'delayed', 'label': 'Delayed'},
+                    {'value': 'notYet', 'label': 'Not yet acquired'}
+                ]
+            }
+        }
     )
     when_toileting_milestones = db.Column(
-        db.String
+        db.String,
+        info={
+            'display_order': 4,
+            'type': 'radio',
+            'template_options': {
+                'label': '"When did " + (model.nickname || model.first_name || "Your child") "reach their toileting '
+                         'milestones (e.g., potty training)?"',
+                'required': False,
+                'options': [
+                    {'value': 'early', 'label': 'Early'},
+                    {'value': 'onTime', 'label': 'On-time'},
+                    {'value': 'delayed', 'label': 'Delayed'},
+                    {'value': 'notYet', 'label': 'Not yet acquired'}
+                ]
+            }
+        }
     )
 
     def get_meta(self):
@@ -49,8 +118,9 @@ class DevelopmentalQuestionnaire(db.Model):
 class DevelopmentalQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DevelopmentalQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'user_id', 'had_birth_complications', 'when_motor_milestones',
-                  'when_language_milestones', 'when_toileting_milestones')
+        fields = ('id', 'last_updated', 'participant_id', 'user_id', 'had_birth_complications',
+                  'birth_complications_description', 'when_motor_milestones', 'when_language_milestones',
+                  'when_toileting_milestones')
 
 
 class DevelopmentalQuestionnaireMetaSchema(ModelSchema):
