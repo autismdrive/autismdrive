@@ -3,12 +3,18 @@ import datetime
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
+from app.question_service import QuestionService
 
 
 class ContactQuestionnaire(db.Model):
     __tablename__ = 'contact_questionnaire'
+    __question_type__ = QuestionService.TYPE_IDENTIFYING
+    __estimated_duration_minutes__ = 5
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         'participant_id',
         db.Integer,
@@ -230,7 +236,7 @@ class ContactQuestionnaire(db.Model):
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = ('id', 'last_updated', 'user_id', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
+        fields = ('id', 'last_updated', 'user_id', 'participant_id', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
                   'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
 
 

@@ -4,12 +4,18 @@ from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
 from app.model.questionnaires.housemate import Housemate
+from app.question_service import QuestionService
 
 
 class HomeQuestionnaire(db.Model):
     __tablename__ = 'home_questionnaire'
+    __question_type__ = QuestionService.TYPE_IDENTIFYING
+    __estimated_duration_minutes__ = 5
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         'participant_id',
         db.Integer,

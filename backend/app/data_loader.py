@@ -3,6 +3,7 @@ from flask import json
 from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
+from app.model.participant import Participant
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.study import Study
@@ -24,6 +25,8 @@ from app import db
 from sqlalchemy import Sequence
 import csv
 
+from app.model.user_participant import UserParticipant
+
 
 class DataLoader():
     "Loads CSV files into the database"
@@ -35,6 +38,8 @@ class DataLoader():
         self.study_file = directory + "/studies.csv"
         self.training_file = directory + "/trainings.csv"
         self.user_file = directory + "/users.csv"
+        self.participant_file = directory + "/participants.csv"
+        self.user_participant_file = directory + "/user_participants.csv"
         print("Data loader initialized")
 
     def load_categories(self):
@@ -132,12 +137,37 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                user = User(id=row[0], email=row[1], first_name=row[2], last_name=row[3], password=row[4],
-                            role=row[5], email_verified=True)
+                user = User(id=row[0], email=row[1], password=row[2],
+                            role=row[3], email_verified=True)
                 db.session.add(user)
                 self.__increment_id_sequence(User)
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())
+        db.session.commit()
+
+    def load_participants(self):
+        with open(self.participant_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                participant = Participant(id=row[0], first_name=row[1], last_name=row[2])
+                db.session.add(participant)
+                self.__increment_id_sequence(Participant)
+            print("Participants loaded.  There are now %i participants in the database." % db.session.query(
+                Participant).count())
+        db.session.commit()
+
+    def link_users_participants(self):
+        with open(self.user_participant_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                user_particpant = UserParticipant(id=row[0], participant_id=row[1],
+                                                  user_id=row[2], relationship=row[3])
+                db.session.add(user_particpant)
+                self.__increment_id_sequence(UserParticipant)
+            print("Participants/Users linked.  There are now %i relationships in the database." % db.session.query(
+                UserParticipant).count())
         db.session.commit()
 
     def load_clinical_diagnoses_questionnaire(self):
@@ -248,6 +278,8 @@ class DataLoader():
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()
+        db.session.query(UserParticipant).delete()
+        db.session.query(Participant).delete()
         db.session.query(User).delete()
         db.session.commit()
 
