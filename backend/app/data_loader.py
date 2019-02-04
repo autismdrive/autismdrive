@@ -10,11 +10,16 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
+from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.current_behaviors_questionnaire import CurrentBehaviorsQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
+from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
 from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app import db
 from sqlalchemy import Sequence
 import csv
@@ -135,11 +140,25 @@ class DataLoader():
                 User).count())
         db.session.commit()
 
+    def load_clinical_diagnoses_questionnaire(self):
+        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
+        db.session.add(cd_ques)
+        print("Clinical Diagnoses loaded.  There is now %i clinical diagnoses record in the database." % db.session.query(
+            ClinicalDiagnosesQuestionnaire).count())
+        db.session.commit()
+
     def load_contact_questionnaire(self):
         c_ques = ContactQuestionnaire(phone=555-555-1234, contact_times='Weekdays at 5AM', email='charlie@brown.com')
         db.session.add(c_ques)
         print("Contact loaded.  There is now %i contact record in the database." % db.session.query(
             ContactQuestionnaire).count())
+        db.session.commit()
+
+    def load_current_behaviors_questionnaire(self):
+        cb_ques = CurrentBehaviorsQuestionnaire(verbal_ability='nonVerbal', has_academic_difficulties=True)
+        db.session.add(cb_ques)
+        print("Current Behaviors loaded.  There is now %i current behavior record in the database." % db.session.query(
+            CurrentBehaviorsQuestionnaire).count())
         db.session.commit()
 
     def load_demographics_questionnaire(self):
@@ -148,6 +167,20 @@ class DataLoader():
         db.session.add(d_ques)
         print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
             DemographicsQuestionnaire).count())
+        db.session.commit()
+
+    def load_developmental_questionnaire(self):
+        d_ques = DevelopmentalQuestionnaire(had_birth_complications=True, when_language_milestones="early")
+        db.session.add(d_ques)
+        print("Developmental History loaded.  There is now %i developmental record in the database." % db.session.query(
+            DevelopmentalQuestionnaire).count())
+        db.session.commit()
+
+    def load_education_questionnaire(self):
+        e_ques = EducationQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
+        db.session.add(e_ques)
+        print("Education loaded.  There is now %i education record in the database." % db.session.query(
+            EducationQuestionnaire).count())
         db.session.commit()
 
     def load_evaluation_history_questionnaire(self):
@@ -173,6 +206,13 @@ class DataLoader():
             IdentificationQuestionnaire).count())
         db.session.commit()
 
+    def load_supports_questionnaire(self):
+        s_ques = SupportsQuestionnaire()
+        db.session.add(s_ques)
+        print("Supports loaded.  There is now %i supports record in the database." % db.session.query(
+            SupportsQuestionnaire).count())
+        db.session.commit()
+
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
         if organization is None:
@@ -190,11 +230,16 @@ class DataLoader():
         return category
 
     def clear(self):
+        db.session.query(ClinicalDiagnosesQuestionnaire).delete()
         db.session.query(ContactQuestionnaire).delete()
+        db.session.query(CurrentBehaviorsQuestionnaire).delete()
         db.session.query(DemographicsQuestionnaire).delete()
+        db.session.query(DevelopmentalQuestionnaire).delete()
+        db.session.query(EducationQuestionnaire).delete()
         db.session.query(EvaluationHistoryQuestionnaire).delete()
         db.session.query(HomeQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
+        db.session.query(SupportsQuestionnaire).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()
