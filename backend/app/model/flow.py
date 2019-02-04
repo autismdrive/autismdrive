@@ -1,26 +1,3 @@
-
-
-# { "name": "Intake Process",
-#   "estimate_minutes": "20",
-#   "steps": [
-#       {
-#         "name": "contact",
-#         "type": "identifying",
-#         "status": "complete"
-#         "date_completed": 2009-12-11h11:12:15
-#       },
-#      {
-#         "name": "demographics",
-#         "type": "sensitive",
-#         "status": "incomplete"
-#       },
-#       {
-#         "name": "eating_preferences",
-#         "type": "unrestricted",
-#         "status": "complete"
-#       }
-#     ]
-# }
 from marshmallow import Schema, fields
 
 #         "name": "contact",
@@ -31,21 +8,19 @@ from app.question_service import QuestionService
 
 
 class Step:
+    STATUS_COMPLETE = "COMPLETE"
+    STATUS_INCOMPLETE = "INCOMPLETE"
 
-    def __init__(self, name, question_type, status, date_completed):
+    def __init__(self, name, question_type):
         self.name = name
         self.type = question_type
-        self.status = status
-        self.date_completed = date_completed
+        self.status = self.STATUS_INCOMPLETE
+        self.date_completed = None
 
 
 class Flow:
 
     steps = []
-    # is this me, or a dependent (relationship)
-    # id of the questiionnaire
-    # Participant's preferred name.
-    #
 
     def __init__(self, name):
         self.name = name
@@ -56,9 +31,16 @@ class Flow:
                 return True
         return False
 
+    def update_step_progress(self, step_log):
+        for step in self.steps:
+            if step.name == step_log.questionnaire_name:
+                step.status = step.STATUS_COMPLETE
+                step.date_completed = step_log.date_completed
+
+
     def add_step(self, questionnaireName):
         q = QuestionService.get_class(questionnaireName)()
-        step = Step(questionnaireName, q.__question_type__, "unknown", '')
+        step = Step(questionnaireName, q.__question_type__)
         self.steps.append(step)
 
 

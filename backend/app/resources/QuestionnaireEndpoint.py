@@ -14,12 +14,10 @@ from app import db, RestException
 #   * it has an id field called "id"
 #   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
-from app.model.progress_log import ProgressLog
 from app.question_service import QuestionService
 
 
 class QuestionnaireEndpoint(flask_restful.Resource):
-
 
     def get(self, name, id):
         class_ref = QuestionService.get_class(name)

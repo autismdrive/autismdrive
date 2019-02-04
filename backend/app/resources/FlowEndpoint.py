@@ -5,7 +5,8 @@ from flask import request, g
 
 from app import RestException, db, auth
 from app.model.flow import Flow, FlowSchema
-from app.model.progress_log import ProgressLog
+from app.model.participant import Participant
+from app.model.step_log import StepLog
 from app.question_service import QuestionService
 
 
@@ -34,8 +35,16 @@ class FlowEndpoint(flask_restful.Resource):
     schema = FlowSchema()
 
     @auth.login_required
-    def get(self, name):
-        return self.schema.dump(Flows.get_flow_by_name(name))
+    def get(self, name, participant_id):
+        flow = Flows.get_flow_by_name(name)
+        participant = db.session.query(Participant).filter_by(id=participant_id).first()
+        if participant is None: raise RestException(RestException.NOT_FOUND)
+        if g.user.related_to_participant(participant_id) and not g.user.role == 'Admin':
+            raise RestException(RestException.UNRELATED_PARTICIPANT)
+        step_logs = db.session.query(StepLog).filter_by(participant_id=participant_id, flow=name)
+        for log in step_logs:
+            flow.update_step_progress(log)
+        return self.schema.dump(flow)
 
 
 class FlowListEndpoint(flask_restful.Resource):
@@ -69,12 +78,12 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         return schema.dump(new_quest)
 
     def log_progress(self, flow, questionnaire_name, questionnaire):
-        log = ProgressLog(questionnaire_name=questionnaire_name,
-                          questionnaire_id=questionnaire.id,
-                          flow=flow.name,
-                          participant_id=questionnaire.participant_id,
-                          user_id=g.user.id,
-                          date_completed=datetime.datetime.now(),
-                          time_on_task_ms=questionnaire.time_on_task_ms)
+        log = StepLog(questionnaire_name=questionnaire_name,
+                      questionnaire_id=questionnaire.id,
+                      flow=flow.name,
+                      participant_id=questionnaire.participant_id,
+                      user_id=g.user.id,
+                      date_completed=datetime.datetime.now(),
+                      time_on_task_ms=questionnaire.time_on_task_ms)
         db.session.add(log)
         db.session.commit()

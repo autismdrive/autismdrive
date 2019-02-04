@@ -53,7 +53,6 @@ from app.resources.TrainingAndCategoryEndpoint import (
 )
 from app.resources.UserAndParticipantEndpoint import (
     UserParticipantEndpoint,
-    UserParticipantListEndpoint,
     ParticipantBySessionEndpoint)
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
@@ -137,16 +136,14 @@ endpoints = [
 
     # Participants
     (ParticipantEndpoint, '/participant/<id>'),
-#    (UserByParticipantEndpoint, '/participant/<participant_id>/user'),
-#    (UserParticipantListEndpoint, '/user_participant'),
-#    (UserParticipantEndpoint, '/user_participant/<id>'),
+    (UserParticipantEndpoint, '/user_participant/<id>'),
 
     # Questionnaires
     (QuestionnaireEndpoint, '/q/<string:name>/<string:id>'),
     (QuestionnaireMetaEndpoint, '/q/<string:name>/meta'),
 
     # Flow Endpoint
-    (FlowEndpoint, '/flow/<string:name>'),
+    (FlowEndpoint, '/flow/<string:name>/<string:participant_id>'),
     (FlowListEndpoint, '/flow'),
     (FlowQuestionnaireEndpoint, '/flow/<string:flow>/<string:questionnaire_name>'),
 
