@@ -36,7 +36,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
-import { ApiService } from './api.service';
+import { ApiService } from './services/api/api.service';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './AuthInterceptor';
 import { EnrollComponent } from './enroll/enroll.component';
@@ -65,6 +65,9 @@ import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
 import { EnrollmentFlowComponent } from './enrollment-flow/enrollment-flow.component';
 import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
+import { IntervalService } from './services/interval/interval.service';
+import { TimedoutComponent } from './timed-out/timed-out.component';
+import { LogoutComponent } from './logout/logout.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -117,7 +120,9 @@ export class FormlyConfig {
     QuestionnaireStepComponent,
     RepeatSectionComponent,
     EnrollmentFlowComponent,
-    ParticipantProfileComponent
+    ParticipantProfileComponent,
+    TimedoutComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -162,7 +167,8 @@ export class FormlyConfig {
       useClass: AuthInterceptor,
       multi: true
     },
-    ApiService
+    ApiService,
+    IntervalService
   ],
   bootstrap: [AppComponent]
 })

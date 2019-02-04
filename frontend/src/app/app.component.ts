@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivationEnd, ActivationStart, Router } from '@angular/router';
-import { ApiService } from './api.service';
+import { ApiService } from './services/api/api.service';
 import { User } from './user';
+import { IntervalService } from './services/interval/interval.service';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,13 @@ import { User } from './user';
 export class AppComponent implements OnInit {
   title = 'star-drive';
   hideHeader = false;
-  user: User;
+  user: User = null;
+  timeLeftInSession = 0;
 
   public constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private intervalService: IntervalService
   ) {
 
     this.router.events.subscribe((e) => {
@@ -32,15 +35,56 @@ export class AppComponent implements OnInit {
       console.log('ApiService constructor > getSession callback user', u);
       this.user = u;
     });
+
+    const numMinutes = 1;
+    this.intervalService.setInterval(() => {
+      // Update seconds
+      this.timeLeftInSession -= 1000;
+
+      // Check status every numMinutes
+      if ((this.timeLeftInSession % (numMinutes * 60 * 1000)) < 1000) {
+        this.checkStatus();
+      }
+    }, 1000);
+
   }
 
   ngOnInit() {
   }
 
-  goLogout($event) {
+  goLogout($event: MouseEvent) {
     $event.preventDefault();
-    this.api.closeSession().subscribe(_ => {
-      this.router.navigate(['home']);
-    });
+    localStorage.setItem('prev_url', this.router.url);
+    this.api.closeSession().subscribe();
+    this.user = null;
+    this.router.navigate(['logout']);
+  }
+
+  checkStatus() {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      this.api.getSessionStatus().subscribe((timestamp: number) => {
+        console.log('timestamp', timestamp);
+
+        const now = new Date();
+        const exp = new Date(timestamp * 1000);
+        const msLeft: number = exp.getTime() - now.getTime();
+        const loggedOut = (timestamp <= 0) || (msLeft <= 0);
+        this.timeLeftInSession = msLeft;
+
+        if (loggedOut) {
+          this.api.closeSession().subscribe((_: any) => {
+            this.intervalService.clearInterval();
+            this.user = null;
+            this.router.navigate(['timedout']);
+          });
+        } else {
+          this.api.getSession().subscribe(user => {
+            this.user = user;
+          });
+        }
+      });
+    }
   }
 }

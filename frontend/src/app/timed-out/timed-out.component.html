@@ -1,0 +1,21 @@
+<div
+  class="container mat-typography"
+  fxLayout="row"
+  fxLayout.xs="column"
+  fxLayoutWrap
+  fxLayoutGap="10px"
+  fxLayoutAlign="center center"
+>
+  <div
+    fxFlex="50%"
+    class="message"
+  >
+    <app-logo (click)="goHome()"></app-logo>
+    <h1>Your STAR DRIVE session has timed out.</h1>
+    <p>You will need to log in again to access your profile.</p>
+    <button
+      mat-flat-button
+      (click)="goHome()"
+    >Ok</button>
+  </div>
+</div>
