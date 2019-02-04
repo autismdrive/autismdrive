@@ -180,12 +180,16 @@ class TestCase(unittest.TestCase):
 
     def construct_user(self, first_name="Stan", last_name="Ton", email="stan@staunton.com", role="Self"):
 
-        user = User(first_name=first_name, last_name=last_name, email=email, role=role)
+        user = User(email=email, role=role)
+        participant = Participant(first_name=first_name, last_name=last_name)
+        relation = UserParticipant(user=user, participant=participant, relationship="self")
         db.session.add(user)
+        db.session.add(participant)
+        db.session.add(relation)
         db.session.commit()
 
         db_user = db.session.query(User).filter_by(email=user.email).first()
-        self.assertEqual(db_user.first_name, user.first_name)
+        self.assertEqual(db_user.email, user.email)
         return db_user
 
     def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
@@ -1015,7 +1019,6 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], u_id)
-        self.assertEqual(response["first_name"], 'Stan')
         self.assertEqual(response["email"], 'stan@staunton.com')
 
     def test_modify_user_basics(self):
@@ -1026,8 +1029,6 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        response['first_name'] = 'Edwarardo'
-        response['last_name'] = 'Lemonado'
         response['role'] = 'Owner'
         response['email'] = 'ed@edwardos.com'
         orig_date = response['last_updated']
@@ -1037,8 +1038,6 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Edwarardo')
-        self.assertEqual(response['last_name'], 'Lemonado')
         self.assertEqual(response['role'], 'Owner')
         self.assertEqual(response['email'], 'ed@edwardos.com')
         self.assertNotEqual(orig_date, response['last_updated'])
@@ -1063,13 +1062,12 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_user(self):
-        user = {'first_name':"Tarantella", 'last_name':"Arachnia", 'role':"Widow", 'email':"tara@spiders.org"}
+        user = {'role':"Widow", 'email':"tara@spiders.org"}
         rv = self.app.post('api/user', data=json.dumps(user), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Tarantella')
-        self.assertEqual(response['last_name'], 'Arachnia')
+        self.assertEqual(response['email'], 'tara@spiders.org')
         self.assertEqual(response['role'], 'Widow')
         self.assertIsNotNone(response['id'])
 
@@ -1078,7 +1076,6 @@ class TestCase(unittest.TestCase):
         if not user:
             user = User(
                 id=7,
-                first_name="Admin",
                 email="admin@admin.org",
                 password="myPass457",
                 email_verified=True,
@@ -1112,7 +1109,6 @@ class TestCase(unittest.TestCase):
     def test_create_user_with_password(self, first_name="Peter", id=8,
                                        email="tyrion@got.com", role="User", password="peterpass"):
         data = {
-            "first_name": first_name,
             "id": id,
             "email": email,
             "role": role
@@ -1134,7 +1130,6 @@ class TestCase(unittest.TestCase):
             content_type="application/json",
             headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(first_name, response["first_name"])
         self.assertEqual(email, response["email"])
         self.assertEqual(role, response["role"])
         self.assertEqual(True, user.is_correct_password(password))
@@ -1237,7 +1232,6 @@ class TestCase(unittest.TestCase):
 
         p = db.session.query(Participant).first()
         odd_user = User(
-                first_name="Frankie No good",
                 email="frankie@badfella.fr",
                 password="h@corleet",
                 email_verified=True,
@@ -1339,8 +1333,8 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(u.id, response['id'])
-        self.assertEqual(1, len(response['participants']))
-        self.assertEqual(p.first_name, response['participants'][0]["participant"]["first_name"])
+        self.assertEqual(2, len(response['participants']))
+        self.assertEqual(p.first_name, response['participants'][1]["participant"]["first_name"])
 
 
     def test_contact_questionnaire_basics(self):
