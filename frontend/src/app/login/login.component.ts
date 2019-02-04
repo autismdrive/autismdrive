@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 
 @Component({
   selector: 'app-login',

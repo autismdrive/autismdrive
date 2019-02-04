@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/cor
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
 
 @Component({

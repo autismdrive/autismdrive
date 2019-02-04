@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/cor
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router} from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 
 @Component({
   selector: 'app-password-reset',
