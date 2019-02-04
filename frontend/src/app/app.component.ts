@@ -11,7 +11,7 @@ import { User } from './user';
 export class AppComponent implements OnInit {
   title = 'star-drive';
   hideHeader = false;
-  session: User;
+  user: User;
 
   public constructor(
     private api: ApiService,
@@ -27,10 +27,10 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.api.getSession().subscribe(user => {
-      this.session = user;
-    }, error1 => {
-      this.session = null;
+    console.log('Calling getSession from AppComponent constructor');
+    this.api.getSession().subscribe(u => {
+      console.log('ApiService constructor > getSession callback user', u);
+      this.user = u;
     });
   }
 
@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
 
   goLogout($event) {
     $event.preventDefault();
-    this.api.closeSession().subscribe(response => {
+    this.api.closeSession().subscribe(_ => {
       this.router.navigate(['home']);
     });
   }

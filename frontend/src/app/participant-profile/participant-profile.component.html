@@ -3,28 +3,28 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="{{participant.avatar_img_url}}"
+        src="{{userParticipant.participant.avatar_img_url || dummyImgUrl}}"
       >
       <mat-card-title>
-        {{participant.nickname !== '' ? participant.nickname : participant.first_name}}
-        {{participant.last_name}}
+        {{userParticipant.participant.nickname || userParticipant.participant.first_name}}
+        {{userParticipant.participant.last_name}}
       </mat-card-title>
       <mat-card-subtitle>
-        {{participant.relationship === 'self' ? 'You' : participant.relationship | titlecase}}
+        {{userParticipant.relationship === 'self' ? 'You' : userParticipant.relationship | titlecase}}
         <div
-          *ngIf="participant.percent_complete < 100"
+          *ngIf="percentComplete < 100"
           class="mat-subheading-2"
         >
           <mat-progress-bar
             [mode]="'determinate'"
-            [value]="participant.percent_complete"
+            [value]="percentComplete"
           ></mat-progress-bar>
         </div>
         <div
-          *ngIf="participant.percent_complete >= 100"
+          *ngIf="percentComplete >= 100"
           class="mat-subheading-2"
         >
-          Enrolled in {{participant.num_studies_enrolled}} studies
+          Enrolled in {{numStudies}} studies
         </div>
         <a
           mat-flat-button

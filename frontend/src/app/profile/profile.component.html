@@ -24,15 +24,22 @@
         fxLayoutGap="40px"
       >
         <app-participant-profile
-          *ngFor="let participant of participants"
-          [participant]="participant"
+          *ngFor="let userParticipant of userParticipants"
+          [userParticipant]="userParticipant"
         ></app-participant-profile>
 
-        <a
+        <button
+          *ngIf="!isAlreadyEnrolled()"
           mat-flat-button
           color="primary"
-          [routerLink]="['/profile/enrollment/identification']"
-        >Enroll another dependent</a>
+          (click)="addParticipant('self')"
+        >Enroll yourself</button>
+
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="addParticipant('dependent')"
+        >Enroll a dependent</button>
       </div>
       <div fxFlex="40%">
         [List of studies here]

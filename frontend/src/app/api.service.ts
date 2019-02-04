@@ -8,7 +8,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NgProgress } from 'ngx-progressbar';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of as observableOf } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError, last, map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
@@ -17,6 +17,7 @@ import { Resource } from './resource';
 import { Study } from './study';
 import { Training } from './training';
 import { User } from './user';
+import { Participant } from './participant';
 
 @Injectable()
 export class ApiService {
@@ -55,31 +56,17 @@ export class ApiService {
     questionnaireMeta: '/api/q/<name>/meta',
   };
 
-  private hasSession: boolean;
-  private sessionSubject = new BehaviorSubject<User>(null);
-
   constructor(private httpClient: HttpClient) {
   }
 
-
   /** getSession */
   public getSession(): Observable<User> {
-    if (!this.hasSession && localStorage.getItem('token')) {
-      this._fetchSession();
+    if (localStorage.getItem('token')) {
+      return this.httpClient.get<User>(this._endpointUrl('session'))
+        .pipe(catchError(this.handleError));
+    } else {
+      return observableOf(null);
     }
-    return this.sessionSubject.asObservable();
-  }
-
-  /** _fetchSession */
-  public _fetchSession(): void {
-    this.httpClient.get<User>(this._endpointUrl('session')).subscribe(user => {
-      this.hasSession = true;
-      this.sessionSubject.next(user);
-    }, (error) => {
-      localStorage.removeItem('token');
-      this.hasSession = false;
-      this.sessionSubject.error(error);
-    });
   }
 
   /** openSession */
@@ -90,18 +77,15 @@ export class ApiService {
 
   /** closeSession */
   closeSession(): Observable<User> {
-    this.httpClient.delete<User>(this._endpointUrl('session')).subscribe(x => {
-      localStorage.removeItem('token');
+    if (localStorage.getItem('token')) {
+      localStorage.clear();
       sessionStorage.clear();
-      this.hasSession = false;
-      this.sessionSubject.next(null);
-    }, (error) => {
-      localStorage.removeItem('token');
+      return this.httpClient.delete<User>(this._endpointUrl('session'));
+    } else {
+      localStorage.clear();
       sessionStorage.clear();
-      this.hasSession = false;
-      this.sessionSubject.error(error);
-    });
-    return this.sessionSubject.asObservable();
+      return observableOf(null);
+    }
   }
 
   /** loginUser - allow users to log into the system with a user name and password.
@@ -123,10 +107,18 @@ export class ApiService {
 
   /** sendResetPasswordEmail
    * Reset password */
-  sendResetPasswordEmail(email: String): Observable<any> {
+  sendResetPasswordEmail(email: string): Observable<any> {
     const email_data = { email: email };
     return this.httpClient.post<any>(this._endpointUrl('forgot_password'), email_data)
       .pipe(catchError(this.handleError));
+  }
+
+  /** addParticipant */
+  addParticipant(relationship: string, participant: Participant): Observable<Participant> {
+    const url = this
+      ._endpointUrl('participantBySession')
+      .replace('<relationship>', relationship);
+    return this.httpClient.post<Participant>(url, participant);
   }
 
   // Add Study
