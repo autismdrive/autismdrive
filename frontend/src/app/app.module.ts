@@ -43,9 +43,6 @@ import { EnrollComponent } from './enroll/enroll.component';
 import { FiltersComponent } from './filters/filters.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { CardWrapperComponent } from './forms/card-wrapper/card-wrapper.component';
-import { SDFileUploadComponent } from './forms/file-upload/file-upload.component';
-import { SDFormFieldLabelComponent } from './forms/form-field-label/form-field-label.component';
-import { SDFormFieldComponent } from './forms/form-field/form-field.component';
 import { HelpWrapperComponent } from './forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './forms/repeat-section/repeat-section.component';
 import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './forms/validators/formly.validator';
@@ -106,9 +103,6 @@ export class FormlyConfig {
     ProfileComponent,
     RegisterComponent,
     ResourcesComponent,
-    SDFileUploadComponent,
-    SDFormFieldComponent,
-    SDFormFieldLabelComponent,
     SearchResultComponent,
     StudiesComponent,
     TermsComponent,
