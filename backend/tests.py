@@ -2,7 +2,6 @@
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
 
-
 os.environ["APP_CONFIG_FILE"] = '../config/testing.py'
 
 from app.model.flow import Step
