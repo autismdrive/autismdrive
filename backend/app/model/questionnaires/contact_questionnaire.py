@@ -153,8 +153,7 @@ class ContactQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 4.1,
-            'type': 'radio',
-            'class_name': 'vertical-radio-group',
+            'type': 'select',
             'template_options': {
                 'label': '',
                 'placeholder': '',

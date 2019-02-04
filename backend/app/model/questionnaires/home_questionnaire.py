@@ -65,7 +65,7 @@ class HomeQuestionnaire(db.Model):
             'class_name': 'vertical-checkbox-group',
             'template_options': {
                 'required': True,
-                'label': '"Where does " + (model.nickname || model.first_name || "your child") + " currently live (select all that apply)?"',
+                'label': '',
                 'options': [
                     {'value': 'fullTimeGuardian', 'label': 'With me full-time'},
                     {'value': 'partTimeGuardian', 'label': 'With me part time'},
@@ -74,6 +74,9 @@ class HomeQuestionnaire(db.Model):
                     {'value': 'groupHome', 'label': 'Group home'},
                     {'value': 'livingOther', 'label': 'Other (please explain)'}
                 ]
+            },
+            'expression_properties': {
+                'template_options.label': '"Where does " + (model.nickname || model.first_name || "your child") + " currently live (select all that apply)?"'
             }
         }
     )
@@ -83,9 +86,12 @@ class HomeQuestionnaire(db.Model):
             'display_order': 2.2,
             'type': 'input',
             'template_options': {
-                'placeholder': '"Please describe "+ (model.nickname || model.first_name || "your child") + "\'s current living situation"'
+                'placeholder': ''
             },
             'hide_expression': '!(model.dependent_living_situation && model.dependent_living_situation.livingOther)',
+            'expression_properties': {
+                'template_options.placeholder': '"Please describe "+ (model.nickname || model.first_name || "your child") + "\'s current living situation"'
+            }
         }
     )
     housemates = db.relationship(
@@ -118,7 +124,7 @@ class HomeQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Do you " + (!model.is_self ? "or " + (model.nickname || model.first_name || "your child") + "/’s other caregivers" : "") + " ever struggle with being able to afford to pay for household needs, food, or security" + (!model.is_self ? " for the family" : "") + "?"'
+                'template_options.label': '"Do you " + (!model.is_self ? "or " + (model.nickname || model.first_name || "your child") + "\'s other caregivers" : "") + " ever struggle with being able to afford to pay for household needs, food, or security" + (!model.is_self ? " for the family" : "") + "?"'
             }
         }
     )
@@ -137,7 +143,7 @@ class HomeQuestionnaire(db.Model):
                     'display_order': 1,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Current Living Situation'},
-                    'hide_expression': '(!model.is_self)'
+                    'hide_expression': '!model.is_self'
                 },
                 'dependent_living': {
                     'fields': [
@@ -147,7 +153,7 @@ class HomeQuestionnaire(db.Model):
                     'display_order': 2,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Current Living Situation'},
-                    'hide_expression': '(model.is_self)'
+                    'hide_expression': 'model.is_self'
                 },
                 'housemates': {
                     'type': 'repeat',

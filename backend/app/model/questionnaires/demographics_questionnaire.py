@@ -48,8 +48,7 @@ class DemographicsQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 2.1,
-            'type': 'radio',
-            'class_name': 'vertical-radio-group',
+            'type': 'select',
             'template_options': {
                 'required': True,
                 'options': [
@@ -78,8 +77,8 @@ class DemographicsQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 3.1,
-            'type': 'radio',
-            'class_name': 'vertical-radio-group',
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
                 'required': True,
                 'options': [
@@ -103,7 +102,7 @@ class DemographicsQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Enter race/ethnicity'
             },
-            'hide_expression': '!(model.race_ethnicity && (model.race_ethnicity === "raceOther"))',
+            'hide_expression': '!(model.race_ethnicity && (model.race_ethnicity.raceOther))',
         }
     )
 
