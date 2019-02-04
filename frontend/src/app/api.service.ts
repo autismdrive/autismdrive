@@ -7,12 +7,9 @@ import {
   HttpParams
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { NgProgress } from 'ngx-progressbar';
 import { Observable, throwError, of as observableOf } from 'rxjs';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError, last, map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
-import { SDFileAttachment } from './forms/file-attachment';
 import { Resource } from './resource';
 import { Study } from './study';
 import { Training } from './training';
@@ -26,34 +23,43 @@ export class ApiService {
 
   // REST endpoints
   endpoints = {
-    fileAttachment: '/api/file/<file_id>', // One file
-    fileAttachmentList: '/api/file', // All files
+    categorybyresource: '/api/resource/<resource_id>/category',
+    categorybystudy: '/api/study/<study_id>/category',
+    categorybytraining: '/api/training/<training_id>/category',
+    category: '/api/category/<id>',
+    categorylist: '/api/category',
+    flow: '/api/flow/<name>/<participant_id>',
+    flowlist: '/api/flow',
+    flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
+    organization: '/api/organization/<id>',
+    organizationlist: '/api/organization',
+    participantbysession: '/api/session/participant/<relationship>',
+    participant: '/api/participant/<id>',
+    questionnaire: '/api/q/<name>/<id>',
+    questionnairemeta: '/api/q/<name>/meta',
+    resourcebycategory: '/api/category/<category_id>/resource',
+    resourcecategory: '/api/resource_category/<id>',
+    resourcecategorylist: '/api/resource_category',
+    resource: '/api/resource/<id>',
+    resourcelist: '/api/resource',
+    rootcategorylist: '/api/category/root',
+    session: '/api/session',
+    studybycategory: '/api/category/<category_id>/study',
+    studycategory: '/api/study_category/<id>',
+    studycategorylist: '/api/study_category',
+    study: '/api/study/<id>',
+    studylist: '/api/study',
+    trainingbycategory: '/api/category/<category_id>/training',
+    trainingcategory: '/api/training_category/<id>',
+    trainingcategorylist: '/api/training_category',
+    training: '/api/training/<id>',
+    traininglist: '/api/training',
+    user: '/api/user/<id>',
+    userlist: '/api/user',
+    userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
     login_password: '/api/login_password',
     reset_password: '/api/reset_password',
-    resource: '/api/resource/<id>',
-    resourceList: '/api/resource',
-    session: '/api/session',
-    study: '/api/study/<id>',
-    studyList: '/api/study',
-    training: '/api/training/<id>',
-    trainingList: '/api/training',
-    participantBySession: '/api/session/participant/<relationship>',
-    participant: '/api/participant/<id>',
-    userList: '/api/user',
-    flow: '/api/flow/<name>',
-    flowList: '/api/flow',
-    flowQuestionnaire: '/api/flow/<flow>/<questionnaire_name>',
-
-    // Valid questionnaire <name> values:
-    // 'contact'
-    // 'demographics'
-    // 'evaluation_history'
-    // 'home'
-    // 'identification'
-    questionnaireList: '/api/q/<name>',
-    questionnaire: '/api/q/<name>/<id>',
-    questionnaireMeta: '/api/q/<name>/meta',
   };
 
   constructor(private httpClient: HttpClient) {
@@ -116,14 +122,14 @@ export class ApiService {
   /** addParticipant */
   addParticipant(relationship: string, participant: Participant): Observable<Participant> {
     const url = this
-      ._endpointUrl('participantBySession')
+      ._endpointUrl('participantbysession')
       .replace('<relationship>', relationship);
     return this.httpClient.post<Participant>(url, participant);
   }
 
   // Add Study
   addStudy(study: Study): Observable<Study> {
-    return this.httpClient.post<Study>(this._endpointUrl('studyList'), study)
+    return this.httpClient.post<Study>(this._endpointUrl('studylist'), study)
       .pipe(catchError(this.handleError));
   }
 
@@ -147,13 +153,13 @@ export class ApiService {
 
   /** Get Studies */
   getStudies(): Observable<Study[]> {
-    return this.httpClient.get<Study[]>(this._endpointUrl('studyList'))
+    return this.httpClient.get<Study[]>(this._endpointUrl('studylist'))
       .pipe(catchError(this.handleError));
   }
 
   /** Add Resource */
   addResource(resource: Resource): Observable<Resource> {
-    return this.httpClient.post<Resource>(this._endpointUrl('resourceList'), resource)
+    return this.httpClient.post<Resource>(this._endpointUrl('resourcelist'), resource)
       .pipe(catchError(this.handleError));
   }
 
@@ -177,13 +183,13 @@ export class ApiService {
 
   /** Get Resources */
   getResources(): Observable<Resource[]> {
-    return this.httpClient.get<Resource[]>(this._endpointUrl('resourceList'))
+    return this.httpClient.get<Resource[]>(this._endpointUrl('resourcelist'))
       .pipe(catchError(this.handleError));
   }
 
   /** Add Training */
   addTraining(training: Training): Observable<Training> {
-    return this.httpClient.post<Training>(this._endpointUrl('trainingList'), training)
+    return this.httpClient.post<Training>(this._endpointUrl('traininglist'), training)
       .pipe(catchError(this.handleError));
   }
 
@@ -207,13 +213,13 @@ export class ApiService {
 
   /** Get Trainings */
   getTrainings(): Observable<Training[]> {
-    return this.httpClient.get<Training[]>(this._endpointUrl('trainingList'))
+    return this.httpClient.get<Training[]>(this._endpointUrl('traininglist'))
       .pipe(catchError(this.handleError));
   }
 
   // addUser
   addUser(user: User): Observable<User> {
-    return this.httpClient.post<User>(this._endpointUrl('userList'), user)
+    return this.httpClient.post<User>(this._endpointUrl('userlist'), user)
       .pipe(catchError(this.handleError));
   }
 
@@ -235,116 +241,6 @@ export class ApiService {
     // return an observable with a user-facing error message
     // FIXME: Log all error messages to Google Analytics
     return throwError(message);
-  }
-
-  /** showProgress
-   * Return distinct message for sent, upload progress, & response events */
-  private showProgress(event: HttpEvent<any>, attachment: SDFileAttachment, progress: NgProgress): SDFileAttachment {
-    switch (event.type) {
-      case HttpEventType.Sent:
-        progress.start();
-        break;
-      case HttpEventType.UploadProgress:
-        progress.set(Math.round(100 * event.loaded / event.total));
-        break;
-      case HttpEventType.DownloadProgress:
-        progress.set(Math.round(100 * event.loaded / event.total));
-        break;
-      case HttpEventType.Response:
-        progress.done();
-        return attachment;
-      default:
-        break;
-    }
-  }
-
-
-  /** getFileAttachment */
-  getFileAttachment(id?: number, md5?: string): Observable<SDFileAttachment> {
-    const params = { id: String(id), md5: md5 };
-    const url = this._endpointUrl('fileAttachmentList');
-
-    return this.httpClient.get<SDFileAttachment>(url, { params: params });
-  }
-
-  /** updateFileAttachment */
-  updateFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this.endpoints.fileAttachment.replace('<file_id>', attachment.id.toString());
-    const attachmentMetadata = {
-      display_name: attachment.display_name,
-      date_modified: new Date(attachment.lastModified || attachment.date_modified),
-      md5: attachment.md5,
-      mime_type: attachment.type || attachment.mime_type,
-      size: attachment.size,
-      resource_id: attachment.resource_id
-    };
-
-    return this.httpClient.put<SDFileAttachment>(this.apiRoot + url, attachmentMetadata)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** getFileAttachmentBlob*/
-  getFileAttachmentBlob(attachment: SDFileAttachment): Observable<Blob> {
-    const options: {
-      headers?: HttpHeaders,
-      observe?: 'body',
-      params?: HttpParams,
-      reportProgress?: boolean,
-      responseType: 'json',
-      withCredentials?: boolean,
-    } = {
-      responseType: 'blob' as 'json'
-    };
-
-    return this.httpClient.get<Blob>(attachment.url, options)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** deleteFileAttachment */
-  deleteFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this.endpoints.fileAttachment.replace('<file_id>', attachment.id.toString());
-    return this.httpClient.delete<SDFileAttachment>(this.apiRoot + url)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** addFileAttachment */
-  addFileAttachment(attachment: SDFileAttachment): Observable<SDFileAttachment> {
-    const url = this._endpointUrl('fileAttachmentList');
-    const attachmentMetadata = {
-      file_name: attachment.name,
-      display_name: attachment.name,
-      date_modified: new Date(attachment.lastModified),
-      md5: attachment.md5,
-      mime_type: attachment.type,
-      size: attachment.size
-    };
-
-    return this.httpClient.post<SDFileAttachment>(url, attachmentMetadata)
-      .pipe(catchError(this.handleError));
-  }
-
-  /** addFileAttachmentBlob */
-  addFileAttachmentBlob(attachmentId: number, attachment: SDFileAttachment, progress: NgProgress): Observable<SDFileAttachment> {
-    const url = this.endpoints.fileAttachment.replace('<file_id>', attachmentId.toString());
-    const options: {
-      headers?: HttpHeaders,
-      observe: 'events',
-      params?: HttpParams,
-      reportProgress?: boolean,
-      responseType: 'json',
-      withCredentials?: boolean
-    } = {
-      observe: 'events',
-      reportProgress: true,
-      responseType: 'blob' as 'json'
-    };
-
-    return this.httpClient.put<File>(this.apiRoot + url, attachment, options)
-      .pipe(
-        map(event => this.showProgress(event, attachment, progress)),
-        last(), // return last (completed) message to caller
-        catchError(this.handleError)
-      );
   }
 
   /** getQuestionnaire */
@@ -378,7 +274,13 @@ export class ApiService {
   }
 
   private _endpointUrl(endpointName: string): string {
-    return this.apiRoot + this.endpoints[endpointName];
+    const path = this.endpoints[endpointName];
+
+    if (path) {
+      return this.apiRoot + path;
+    } else {
+      console.log(`endpoint '${endpointName}' does not exist`);
+    }
   }
 
   private _qEndpoint(eType = '', qName: string, qId?: number) {
