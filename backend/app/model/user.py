@@ -14,8 +14,6 @@ class User(db.Model):
     __tablename__ = 'stardrive_user'
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
-    first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.String, default='Self')
     participants = db.relationship("UserParticipant", back_populates="user")
