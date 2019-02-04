@@ -2,7 +2,6 @@ import datetime
 
 import flask_restful
 from flask import request, g
-from marshmallow import ValidationError
 
 from app import RestException, db, auth
 from app.model.participant import Participant

@@ -2,6 +2,8 @@
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
 
+from app.model.flow import Step
+
 os.environ["APP_CONFIG_FILE"] = '../config/testing.py'
 
 
@@ -1604,8 +1606,10 @@ class TestCase(unittest.TestCase):
         self.assertTrue(len(response) > 0)
 
     def test_intake_flow_with_user(self):
-        self.construct_contact_questionnaire()
-        rv = self.app.get('api/flow/intake', content_type="application/json", headers=self.logged_in_headers())
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+        rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
         self.assertEqual(200, rv.status_code)
         response = json.loads(rv.get_data(as_text=True))
         self.assertIsNotNone(response)
@@ -1614,13 +1618,16 @@ class TestCase(unittest.TestCase):
         self.assertTrue(len(response['steps']) > 0)
         self.assertEqual('contact_questionnaire', response['steps'][0]['name'])
         self.assertEqual(QuestionService.TYPE_IDENTIFYING, response['steps'][0]['type'])
-        self.assertEqual('unknown', response['steps'][0]['status'])
-    # { "name": "Intake Process",
-    #   "estimate_minutes": "20",
-    #   "steps": [
-    #       {
-    #         "name": "contact",
-    #         "type": "identifying",
-    #         "status": "complete"
-    #         "date_completed": 2009-12-11h11:12:15
-    #       },
+        self.assertEqual(Step.STATUS_INCOMPLETE, response['steps'][0]['status'])
+
+        cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
+        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+                           follow_redirects=True, headers=headers)
+
+        rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual('contact_questionnaire', response['steps'][0]['name'])
+        self.assertEqual(Step.STATUS_COMPLETE, response['steps'][0]['status'])
+        self.assertIsNotNone(response['steps'][0]['date_completed'])
+
+

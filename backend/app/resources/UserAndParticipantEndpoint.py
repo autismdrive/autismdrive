@@ -4,10 +4,8 @@ from marshmallow import ValidationError
 
 from app import db, RestException, auth
 from app.model.participant import Participant
-from app.model.user import User
 from app.model.user_participant import UserParticipant
-from app.resources.schema import UserParticipantsSchema, ParticipantUsersSchema, \
-    ParticipantSchema
+from app.resources.schema import UserParticipantsSchema, ParticipantSchema
 from app.wrappers import requires_roles
 
 
@@ -40,8 +38,6 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
                                 details=load_result.errors)
 
 
-
-
 class UserParticipantEndpoint(flask_restful.Resource):
     schema = UserParticipantsSchema()
 
@@ -58,14 +54,4 @@ class UserParticipantEndpoint(flask_restful.Resource):
         return None
 
 
-class UserParticipantListEndpoint(flask_restful.Resource):
-    schema = UserParticipantsSchema()
 
-    def post(self):
-        request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
-        db.session.query(UserParticipant).filter_by(user_id=load_result.user_id,
-                                                     participant_id=load_result.participant_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
-        return self.schema.dump(load_result)
