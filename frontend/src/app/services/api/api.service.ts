@@ -268,15 +268,22 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** getQuestionnaire */
-  getQuestionnaire(key: string, id: number) {
-    return this.httpClient.get<object>(this._qEndpoint('', key, id))
+  /** submitQuestionnaire */
+  getQuestionnaire(name: string, id: number) {
+    const url = this
+      ._endpointUrl('questionnaire')
+      .replace('<name>', name)
+      .replace('<id>', id.toString());
+    return this.httpClient.get<object>(url)
       .pipe(catchError(this._handleError));
   }
 
   /** updateQuestionnaire */
-  updateQuestionnaire(key: string, id: number, options: object) {
-    return this.httpClient.put<object>(this._qEndpoint('', key, id), options)
+  updateQuestionnaire(name: string, id: number, options: object) {
+    const url = this._endpointUrl('questionnaire')
+      .replace('<name>', name)
+      .replace('<id>', id.toString());
+    return this.httpClient.put<object>(url, options)
       .pipe(catchError(this._handleError));
   }
 
@@ -287,15 +294,13 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** getQuestionnaireList */
-  getQuestionnaireList(key: string) {
-    return this.httpClient.get<object>(this._qEndpoint('list', key))
-      .pipe(catchError(this._handleError));
-  }
-
   /** submitQuestionnaire */
-  submitQuestionnaire(key: string, options: object) {
-    return this.httpClient.post<object>(this._qEndpoint('list', key), options)
+  submitQuestionnaire(flow: string, questionnaire_name: string, options: object) {
+    const url = this
+      ._endpointUrl('flowquestionnaire')
+      .replace('<flow>', flow)
+      .replace('<questionnaire_name>', questionnaire_name);
+    return this.httpClient.post<object>(url, options)
       .pipe(catchError(this._handleError));
   }
 

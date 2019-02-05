@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFormOptions } from '@ngx-formly/core';
 import * as flatten from 'flat';
 import { keysToCamel, toCamel } from 'src/util/snakeToCamel';
 import { ApiService } from '../services/api/api.service';
@@ -20,6 +20,7 @@ export class EnrollmentFlowComponent implements OnInit {
   user: User;
   participant: Participant;
   flow: Flow;
+  stepData;
 
   isSelf = true;
   stepName: string;
@@ -50,6 +51,7 @@ export class EnrollmentFlowComponent implements OnInit {
 
           for (const up of user.participants) {
             if (up.participant_id === this.participantId) {
+              this.isSelf = up.relationship === 'self';
               this.participant = new Participant(up.participant);
             }
           }
@@ -71,7 +73,14 @@ export class EnrollmentFlowComponent implements OnInit {
               this.api.getQuestionnaireMeta(this.stepName).subscribe(q => {
                 this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
                 this.form = new FormArray([new FormGroup({})]);
-                this.options = <FormlyFormOptions>{};
+                this.options = {
+                  formState: {
+                    mainModel: this.model
+                  }
+                };
+
+                this.model.is_self = this.isSelf;
+                this.model.preferred_name = this.participant.preferredName();
                 this.loading = false;
               });
             });
@@ -151,17 +160,15 @@ export class EnrollmentFlowComponent implements OnInit {
     this.submit();
   }
 
-  toggleSelf() {
-    this.isSelf = !this.isSelf;
-    this._updateModelIsSelf();
-  }
-
   submit() {
     // Flatten the model
     const flattened = flatten(this.model, { safe: true });
 
     // Rename the keys
-    const options = {};
+    const options = {
+      relationship_to_participant: this.isSelf ? 'self' : 'dependent',
+      participant_id: this.participantId
+    };
     const pattern = /^(.*)\./gi;
     Object.keys(flattened).map(oldKey => {
       const newKey = oldKey.replace(pattern, '');
@@ -170,13 +177,13 @@ export class EnrollmentFlowComponent implements OnInit {
 
     if (isFinite(this.step.id)) {
       this.api.updateQuestionnaire(this.step.name, this.step.id, options).subscribe(response => {
-        // Update form with saved values
-        this.router.navigate(['profile', 'enrollment', this.stepNames[this.activeStep]]);
+        // !!! TO DO - Update form with saved values
+        this.router.navigate(['participant', this.participantId, this.flowName, this.stepNames[this.activeStep]]);
       });
     } else {
-      this.api.submitQuestionnaire(this.step.name, options).subscribe(response => {
-        // Update form with saved values
-        this.router.navigate(['profile', 'enrollment', this.stepNames[this.activeStep]]);
+      this.api.submitQuestionnaire(this.flowName, this.step.name, options).subscribe(response => {
+        // !!! TO DO - Update form with saved values
+        this.router.navigate(['participant', this.participantId, this.flowName, this.stepNames[this.activeStep]]);
       });
     }
   }
@@ -196,15 +203,6 @@ export class EnrollmentFlowComponent implements OnInit {
       delete parentObject[childKey];
       return keysToCamel(childField);
     });
-  }
-
-  private _updateModelIsSelf() {
-    this.model.is_self = this.isSelf;
-    this.model.first_name = this.isSelf ? 'ParentFirst' : 'ChildFirst';
-    this.model.last_name = this.isSelf ? 'ParentLast' : 'ChildLast';
-    this.model.nickname = this.isSelf ? '' : 'ChildNickname';
-    this.step.fields = [...this.step.fields];
-    this.step.fieldGroup = [...this.step.fieldGroup];
   }
 
 }

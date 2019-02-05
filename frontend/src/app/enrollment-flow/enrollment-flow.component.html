@@ -30,13 +30,8 @@
         ></app-questionnaire-steps-list>
       </mat-drawer>
       <mat-drawer-content>
-        <mat-slide-toggle
-          (change)="toggleSelf()"
-          [checked]="isSelf"
-        >Self</mat-slide-toggle>
-
         <form
-          *ngIf="form && step && options"
+          *ngIf="form && model && step && options"
           [formGroup]="form"
           class="pad-2"
         >
@@ -47,7 +42,7 @@
             [form]="form.at(activeStep)"
             [model]="model"
             [fields]="step.fields"
-            [options]="options[activeStep]"
+            [options]="options"
           >
           </formly-form>
 
