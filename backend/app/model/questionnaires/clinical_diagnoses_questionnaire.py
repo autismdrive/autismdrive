@@ -7,6 +7,9 @@ from app import db
 
 class ClinicalDiagnosesQuestionnaire(db.Model):
     __tablename__ = 'clinical_diagnoses_questionnaire'
+    __question_type__ = QuestionService.TYPE_SENSITIVE
+    __estimated_duration_minutes__ = 5
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     participant_id = db.Column(

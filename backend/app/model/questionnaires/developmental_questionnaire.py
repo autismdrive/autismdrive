@@ -7,6 +7,9 @@ from app import db
 
 class DevelopmentalQuestionnaire(db.Model):
     __tablename__ = 'developmental_questionnaire'
+    __question_type__ = QuestionService.TYPE_UNRESTRICTED
+    __estimated_duration_minutes__ = 5
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     participant_id = db.Column(

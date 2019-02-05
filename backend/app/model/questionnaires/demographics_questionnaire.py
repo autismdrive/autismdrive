@@ -11,7 +11,6 @@ class DemographicsQuestionnaire(db.Model):
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 8
 
-
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     time_on_task_ms = db.Column(db.BigInteger, default=0)
