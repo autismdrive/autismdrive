@@ -19,7 +19,10 @@ from app.model.user_participant import UserParticipant
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
 # Models:
+import app.model.questionnaires.assistive_device
 import app.model.questionnaires.housemate
+import app.model.questionnaires.medication
+import app.model.questionnaires.therapy
 # Questionnaires:
 import app.model.questionnaires.contact_questionnaire
 import app.model.questionnaires.clinical_diagnoses_questionnaire
@@ -30,6 +33,7 @@ import app.model.questionnaires.education_questionnaire
 import app.model.questionnaires.evaluation_history_questionnaire
 import app.model.questionnaires.home_questionnaire
 import app.model.questionnaires.identification_questionnaire
+import app.model.questionnaires.supports_questionnaire
 
 
 class OrganizationSchema(ModelSchema):
