@@ -3,10 +3,10 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="{{userParticipant.participant.avatar_img_url || dummyImgUrl}}"
+        src="{{participant.avatar_img_url || dummyImgUrl}}"
       >
       <mat-card-title>
-        {{userParticipant.participant.preferredName()}}
+        {{participant.preferredName()}}
       </mat-card-title>
       <mat-card-subtitle>
         {{userParticipant.relationship === 'self' ? 'You' : userParticipant.relationship | titlecase}}
@@ -28,7 +28,7 @@
         <a
           mat-flat-button
           color="primary"
-          [routerLink]="['/participant/'+ userParticipant.participant.id + '/intake']"
+          [routerLink]="['/participant/'+ participant.id + '/intake']"
         >Edit enrollment info</a>
 
       </mat-card-subtitle>

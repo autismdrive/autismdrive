@@ -9,6 +9,7 @@ import { UserParticipant } from '../user-participant';
 })
 export class ParticipantProfileComponent implements OnInit {
   @Input() userParticipant: UserParticipant;
+  participant: Participant;
   dummyImgUrl: string;
   percentComplete: number;
   numStudies: number;
@@ -18,6 +19,8 @@ export class ParticipantProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.participant = new Participant(this.userParticipant.participant);
+
     if (isFinite(this.userParticipant.participant.percent_complete)) {
       this.percentComplete = this.userParticipant.participant.percent_complete;
     } else {
