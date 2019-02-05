@@ -1608,17 +1608,27 @@ class TestCase(unittest.TestCase):
         self.assertEqual('intake', response['name'])
         self.assertIsNotNone(response['steps'])
         self.assertTrue(len(response['steps']) > 0)
-        self.assertEqual('contact_questionnaire', response['steps'][0]['name'])
+        self.assertEqual('identification_questionnaire', response['steps'][0]['name'])
         self.assertEqual(QuestionService.TYPE_IDENTIFYING, response['steps'][0]['type'])
         self.assertEqual(Step.STATUS_INCOMPLETE, response['steps'][0]['status'])
 
-        cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
+        cq = {
+            'first_name': "Darah",
+            'middle_name': "Darah",
+            'last_name': "Darah",
+            'is_first_name_preferred': True,
+            'birthdate': '02/02/2002',
+            'birth_city': 'Staunton',
+            'birth_state': 'VA',
+            'is_english_primary': True,
+            'participant_id': p.id
+        }
         rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True, headers=headers)
 
         rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual('contact_questionnaire', response['steps'][0]['name'])
+        self.assertEqual('identification_questionnaire', response['steps'][0]['name'])
         self.assertEqual(Step.STATUS_COMPLETE, response['steps'][0]['status'])
         self.assertIsNotNone(response['steps'][0]['date_completed'])
 
