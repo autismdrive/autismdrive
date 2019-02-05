@@ -2,10 +2,10 @@ import { User } from './user';
 
 export class Participant {
   id: number;
-  last_updated: Date;
+  last_updated?: Date;
   first_name: string;
   last_name: string;
-  users: User[];
+  users?: User[];
 
   nickname?: string;
   percent_complete?: number;

@@ -5,5 +5,5 @@ export interface User {
   email: string;
   role: string;
   participants?: UserParticipant[];
-  last_updated: Date;
+  last_updated?: Date;
 }

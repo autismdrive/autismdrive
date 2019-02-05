@@ -5,7 +5,7 @@ export interface UserParticipant {
   id: number;
   participant_id: number;
   user_id: number;
-  participant: Participant;
-  user: User;
   relationship: string;
+  participant: Participant;
+  user?: User;
 }

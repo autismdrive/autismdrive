@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
+import { Participant } from '../participant';
 
 @Component({
   selector: 'app-register',
@@ -54,10 +55,21 @@ export class RegisterComponent implements OnInit {
   ) {
     this.user = {
       id: null,
-      first_name: this.model['first_name'],
-      last_name: this.model['last_name'],
       email: this.model['email'],
-      role: 'User'
+      role: 'User',
+      participants: [
+        {
+          id: null,
+          user_id: null,
+          participant_id: null,
+          relationship: 'self',
+          participant: new Participant({
+            id: null,
+            first_name: this.model['first_name'],
+            last_name: this.model['last_name'],
+          })
+        }
+      ]
     };
   }
 
