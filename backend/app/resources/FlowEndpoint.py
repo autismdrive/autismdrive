@@ -14,16 +14,21 @@ class Flows:
     @staticmethod
     def get_intake_flow():
         flow = Flow(name="intake")
+        flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
-        flow.add_step('evaluation_history_questionnaire')
         flow.add_step('home_questionnaire')
-        flow.add_step('identification_questionnaire')
+        flow.add_step('evaluation_history_questionnaire')
+        flow.add_step('clinical_diagnoses_questionnaire')
+        flow.add_step('developmental_questionnaire')
+        flow.add_step('current_behaviors_questionnaire')
+        flow.add_step('education_questionnaire')
+        flow.add_step('supports_questionnaire')
         return flow
 
     @staticmethod
     def get_all_flows():
-        return [Flows.get_intake_flow()];
+        return [Flows.get_intake_flow()]
 
     @staticmethod
     def get_flow_by_name(name):
@@ -74,7 +79,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.UNRELATED_PARTICIPANT)
         db.session.add(new_quest)
         db.session.commit()
-        self.log_progress(flow, questionnaire_name, new_quest);
+        self.log_progress(flow, questionnaire_name, new_quest)
         return schema.dump(new_quest)
 
     def log_progress(self, flow, questionnaire_name, questionnaire):
