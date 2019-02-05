@@ -3,8 +3,8 @@ import datetime
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
-from app.model.questionnaires.housemate import Housemate
 from app.question_service import QuestionService
+from app.model.questionnaires.housemate import Housemate
 
 
 class HomeQuestionnaire(db.Model):

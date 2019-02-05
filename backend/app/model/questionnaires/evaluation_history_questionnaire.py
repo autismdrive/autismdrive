@@ -287,4 +287,3 @@ class EvaluationHistoryQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = EvaluationHistoryQuestionnaire
         fields = ('get_meta',)
-

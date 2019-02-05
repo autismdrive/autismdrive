@@ -175,4 +175,3 @@ class DemographicsQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
         fields = ('get_meta',)
-

@@ -236,4 +236,3 @@ class IdentificationQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = IdentificationQuestionnaire
         fields = ('get_meta',)
-

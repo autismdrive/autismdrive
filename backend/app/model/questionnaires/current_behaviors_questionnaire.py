@@ -3,6 +3,7 @@ import datetime
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
+from app.question_service import QuestionService
 
 
 class CurrentBehaviorsQuestionnaire(db.Model):
@@ -186,4 +187,3 @@ class CurrentBehaviorsQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = CurrentBehaviorsQuestionnaire
         fields = ('get_meta',)
-
