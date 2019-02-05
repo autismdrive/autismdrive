@@ -50,7 +50,7 @@ export class EnrollmentFlowComponent implements OnInit {
 
           for (const up of user.participants) {
             if (up.participant_id === this.participantId) {
-              this.participant = up.participant;
+              this.participant = new Participant(up.participant);
             }
           }
         } else {

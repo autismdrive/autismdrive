@@ -12,37 +12,33 @@ import { UserParticipant } from '../user-participant';
 })
 export class ProfileComponent implements OnInit {
   user: User;
+  participantSelf: Participant;
   stepName: string;
   activeStep = 0;
   loading = true;
   userParticipants: UserParticipant[];
   currentId: number;
   firstNames = [
-    'Atreyu',
-    'Moon Child',
     'Bastian',
-    'Falkor',
     'Engywook',
-    'Urgl'
-  ];
-  lastNames = [
-    'Artax',
     'Gmorg',
-    'Rockbiter'
+    'Moon Child',
+    'Rockbiter',
+    'Urgl',
   ];
 
   constructor(
     private api: ApiService
   ) {
     this.currentId = Math.floor(Math.random() * 99999999) + 999;
-
-
-    console.log('Calling getSession from ProfileComponent constructor');
     this.api.getSession().subscribe(user => {
-      console.log('ProfileComponent constructor > getSession callback user', user);
-
       this.user = user;
       this.userParticipants = user.participants;
+      this.userParticipants.forEach(up => {
+        if (up.relationship === 'self') {
+          this.participantSelf = new Participant(up.participant);
+        }
+      });
       this.loading = false;
     }, error1 => {
       console.error(error1);
@@ -57,17 +53,15 @@ export class ProfileComponent implements OnInit {
   addParticipant(relationship: string) {
     this.loading = true;
     const name = this.randomName();
-    const options: Participant = {
+    const options = new Participant({
       id: ++this.currentId,
       last_updated: new Date(),
       first_name: name.first,
       last_name: name.last,
       users: []
-    };
+    });
 
     this.api.addParticipant(relationship, options).subscribe(participant => {
-      console.log('new participant', participant);
-
       this.api.getSession().subscribe(updatedUser => {
         this.user = updatedUser;
         this.userParticipants = updatedUser.participants;
@@ -77,12 +71,9 @@ export class ProfileComponent implements OnInit {
   }
 
   randomName() {
-    const firstIndex = Math.floor(Math.random() * this.firstNames.length);
-    const lastIndex = Math.floor(Math.random() * this.lastNames.length);
-
     return {
-      first: this.firstNames[firstIndex],
-      last: this.lastNames[lastIndex]
+      first: this.firstNames[Math.floor(Math.random() * this.firstNames.length)],
+      last: this.participantSelf.last_name
     };
   }
 

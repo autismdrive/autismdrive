@@ -2,7 +2,7 @@
   *ngIf="user"
   class="profile mat-typography"
 >
-  <h1>{{user.first_name}} {{user.last_name}}’s profile</h1>
+  <h1 *ngIf="participantSelf">{{participantSelf.preferredName()}}’s profile</h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
@@ -29,7 +29,7 @@
         ></app-participant-profile>
 
         <button
-          *ngIf="!isAlreadyEnrolled()"
+          *ngIf="!isAlreadyEnrolled('self')"
           mat-flat-button
           color="primary"
           (click)="addParticipant('self')"
@@ -39,7 +39,7 @@
           mat-flat-button
           color="primary"
           (click)="addParticipant('dependent')"
-        >Enroll a dependent</button>
+        >Enroll {{isAlreadyEnrolled('dependent') ? 'another' : 'a'}} dependent</button>
       </div>
       <div fxFlex="40%">
         [List of studies here]
