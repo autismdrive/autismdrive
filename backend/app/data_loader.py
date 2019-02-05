@@ -185,7 +185,7 @@ class DataLoader():
         db.session.commit()
 
     def load_current_behaviors_questionnaire(self):
-        cb_ques = CurrentBehaviorsQuestionnaire(verbal_ability='nonVerbal', has_academic_difficulties=True)
+        cb_ques = CurrentBehaviorsQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
         db.session.add(cb_ques)
         print("Current Behaviors loaded.  There is now %i current behavior record in the database." % db.session.query(
             CurrentBehaviorsQuestionnaire).count())
