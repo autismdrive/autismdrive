@@ -30,9 +30,7 @@ export class AppComponent implements OnInit {
       }
     });
 
-    console.log('Calling getSession from AppComponent constructor');
     this.api.getSession().subscribe(u => {
-      console.log('ApiService constructor > getSession callback user', u);
       this.user = u;
     });
 
@@ -65,8 +63,6 @@ export class AppComponent implements OnInit {
 
     if (token) {
       this.api.getSessionStatus().subscribe((timestamp: number) => {
-        console.log('timestamp', timestamp);
-
         const now = new Date();
         const exp = new Date(timestamp * 1000);
         const msLeft: number = exp.getTime() - now.getTime();

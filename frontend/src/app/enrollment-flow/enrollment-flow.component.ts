@@ -62,9 +62,6 @@ export class EnrollmentFlowComponent implements OnInit {
             .getFlow(this.flowName, this.participantId)
             .subscribe(f => {
               this.flow = f;
-
-              console.log('f', f);
-
               this.stepNames = f.steps.map(s => s.name);
 
               if (this.stepName === '') {
@@ -136,8 +133,6 @@ export class EnrollmentFlowComponent implements OnInit {
 
     stepFields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     stepFields.forEach(f => step[fieldsType].push(f));
-
-    console.log('step', this.clone(step));
     return step;
   }
 
