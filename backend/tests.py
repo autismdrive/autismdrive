@@ -1614,8 +1614,8 @@ class TestCase(unittest.TestCase):
 
         cq = {
             'first_name': "Darah",
-            'middle_name': "Darah",
-            'last_name': "Darah",
+            'middle_name': "Soo",
+            'last_name': "Ubway",
             'is_first_name_preferred': True,
             'birthdate': '02/02/2002',
             'birth_city': 'Staunton',
@@ -1623,7 +1623,7 @@ class TestCase(unittest.TestCase):
             'is_english_primary': True,
             'participant_id': p.id
         }
-        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+        rv = self.app.post('api/flow/intake/identification_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True, headers=headers)
 
         rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
