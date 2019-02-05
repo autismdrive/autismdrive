@@ -54,9 +54,10 @@ class SupportsQuestionnaire(db.Model):
                         'description': 'Add a medication',
                     },
                     'expression_properties': {
-                        'template_options.label': '(model.is_self ? "Do you" : "Does" + '
-                                                  '(model.nickname || model.first_name || "your child")) + '
-                                                  '" take any medications and/or vitamins?"'
+                        'template_options.label': ''
+                        '(formState.mainModel.is_self ? "Do you" : '
+                        '"Does your child") + '
+                        '" take any medications and/or vitamins?"'
                     }
                 },
                 'therapies': {
@@ -68,9 +69,10 @@ class SupportsQuestionnaire(db.Model):
                         'description': 'Add a therapy or service',
                     },
                     'expression_properties': {
-                        'template_options.label': '"What kinds of therapies and services " + (model.is_self ? "do you" '
-                                                  ': "does " + (model.nickname || model.first_name || "your child")) + '
-                                                  '" currently receive?"'
+                        'template_options.label': ''
+                        '"What kinds of therapies and services " + '
+                        '(formState.mainModel.is_self ? "do you" : '
+                        '"does your child") + " currently receive?"'
                     }
                 },
                 'assistive_devices': {
@@ -82,10 +84,11 @@ class SupportsQuestionnaire(db.Model):
                         'description': 'Add an assistive device',
                     },
                     'expression_properties': {
-                        'template_options.label': '(model.is_self ? "Do you" : "Does " + '
-                                                  '(model.nickname || model.first_name || "your child")) + '
-                                                  '" use an AAC (alternative & augmentative communication) system or '
-                                                  'other assistive device?"'
+                        'template_options.label': ''
+                        '(formState.mainModel.is_self ? "Do you" : '
+                        '"Does your child") + '
+                        '" use an AAC (alternative & augmentative '
+                        'communication) system or other assistive device?"'
                     }
                 }
             },

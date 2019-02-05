@@ -75,9 +75,6 @@ class HomeQuestionnaire(db.Model):
                     {'value': 'livingOther', 'label': 'Other (please explain)'}
                 ]
             },
-            'expression_properties': {
-                'template_options.label': '"Where does " + (model.nickname || model.first_name || "your child") + " currently live (select all that apply)?"'
-            }
         }
     )
     dependent_living_other = db.Column(
@@ -105,7 +102,7 @@ class HomeQuestionnaire(db.Model):
                 'label': 'Who else lives there?'
             },
             'expression_properties': {
-                'template_options.label': '"Who else lives with " + (model.is_self ? "you" : (model.nickname || model.first_name || "your child")) + "?"'
+                'template_options.label': '"Who else lives with " + (formState.mainModel.is_self ? "you" : (model.nickname || model.first_name || "your child")) + "?"'
             }
         }
     )
@@ -114,7 +111,7 @@ class HomeQuestionnaire(db.Model):
         info={
             'display_order': 4,
             'type': 'radio',
-            'default_value': True,
+            'default_value': False,
             'template_options': {
                 'required': False,
                 'label': 'Do you ever struggle with being able to afford to pay for household needs, food, or security?',
@@ -124,7 +121,7 @@ class HomeQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Do you " + (!model.is_self ? "or " + (model.nickname || model.first_name || "your child") + "\'s other caregivers" : "") + " ever struggle with being able to afford to pay for household needs, food, or security" + (!model.is_self ? " for the family" : "") + "?"'
+                'template_options.label': '"Do you " + (!formState.mainModel.is_self ? "or " + formState.mainModel.preferred_name + "\'s other caregivers" : "") + " ever struggle with being able to afford to pay for household needs, food, or security" + (!formState.mainModel.is_self ? " for the family" : "") + "?"'
             }
         }
     )
@@ -163,7 +160,7 @@ class HomeQuestionnaire(db.Model):
                     'display_order': 1,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Current Living Situation'},
-                    'hide_expression': '!model.is_self'
+                    'hide_expression': '!formState.mainModel.is_self'
                 },
                 'dependent_living': {
                     'fields': [
@@ -173,7 +170,10 @@ class HomeQuestionnaire(db.Model):
                     'display_order': 2,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Current Living Situation'},
-                    'hide_expression': 'model.is_self'
+                    'hide_expression': 'formState.mainModel.is_self',
+                    'expression_properties': {
+                        'template_options.label': '"Where does " + formState.mainModel.preferred_name + " currently live (select all that apply)?"'
+                    }
                 },
                 'housemates': {
                     'type': 'repeat',
@@ -184,9 +184,9 @@ class HomeQuestionnaire(db.Model):
                         'description': 'Add a housemate',
                     },
                     'expression_properties': {
-                        'template_options.label': '"Who else lives with " + (model.is_self ? "you" : (model.nickname || model.first_name || "your child")) + "?"'
+                        'template_options.label': '"Who else lives with " + (formState.mainModel.is_self ? "you" : (model.nickname || model.first_name || "your child")) + "?"'
                     }
-                }
+                },
             }
         }
         for c in self.metadata.tables['home_questionnaire'].columns:

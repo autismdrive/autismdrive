@@ -43,7 +43,7 @@ class IdentificationQuestionnaire(db.Model):
                     {'value': 'other', 'label': 'Other'}
                 ]
             },
-            'hide_expression': '(model.is_self)',
+            'hide_expression': '(formState.mainModel.is_self)',
         }
     )
     relationship_to_participant_other = db.Column(
@@ -54,8 +54,9 @@ class IdentificationQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Enter your relationship'
             },
-            'hide_expression': '(model.is_self) || !(model.relationship_to_participant && '
-                              '(model.relationship_to_participant === "other"))',
+            'hide_expression': 'formState.mainModel.is_self || '
+            '!(model.relationship_to_participant && '
+            '(model.relationship_to_participant === "other"))',
         }
     )
     first_name = db.Column(
@@ -106,7 +107,9 @@ class IdentificationQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Is this your " + (!model.is_self ? "child\'s " : "") + "preferred name?"'
+                'template_options.label': '"Is this your " + '
+                '(!formState.mainModel.is_self ? "child\'s" : "") + '
+                '" preferred name?"'
             }
         }
     )
@@ -132,7 +135,9 @@ class IdentificationQuestionnaire(db.Model):
                 'label': 'Date of birth'
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " date of birth"'
+                'template_options.label': '"Your " + '
+                '(formState.mainModel.is_self ? "" : "child\'s") + '
+                '" date of birth"'
             }
         }
     )
@@ -146,7 +151,9 @@ class IdentificationQuestionnaire(db.Model):
                 'label': 'City/municipality of birth'
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " city/municipality of birth"'
+                'template_options.label': '"Your " + '
+                '(formState.mainModel.is_self ? "" : "child\'s") + '
+                '" city/municipality of birth"'
             }
         }
     )
@@ -159,7 +166,9 @@ class IdentificationQuestionnaire(db.Model):
                 'required': True
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " state of birth"'
+                'template_options.label': '"Your " + '
+                '(formState.mainModel.is_self ? "" : "child\'s") + '
+                '" state of birth"'
             }
         }
     )
@@ -178,7 +187,9 @@ class IdentificationQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Is " + (model.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " primary language English?"'
+                'template_options.label': '"Is your " + '
+                '(formState.mainModel.is_self ? "" : "child\'s") + '
+                '" primary language English?"'
             }
 
         }
@@ -200,9 +211,12 @@ class IdentificationQuestionnaire(db.Model):
                         'description': ''
                     },
                     'expression_properties': {
-                        'template_options.description': '"Please answer the following questions about " + '
-                        '(model.is_self ? "yourself" : "your child or the person with autism on whom '
-                        'you are providing information") + " (* indicates required response):"'
+                        'template_options.description': '"Please answer the '
+                        'following questions about " + '
+                        '(formState.mainModel.is_self ? "yourself" : "your '
+                        'child or the person with autism on whom you are '
+                        'providing information") + '
+                        '". (* indicates required response):"'
                     }
                 },
                 'relationship': {
@@ -213,9 +227,11 @@ class IdentificationQuestionnaire(db.Model):
                     'display_order': 1,
                     'wrappers': ['card'],
                     'template_options': {
-                        'label': 'Your relationship to your child or the person with autism on whom '
-                        'you are providing information:'
-                    }
+                        'label': 'Your relationship to your child or the '
+                        'person with autism on whom you are providing '
+                        'information:'
+                    },
+                    'hide_expression': 'formState.mainModel.is_self'
                 }
             }
         }
@@ -228,8 +244,12 @@ class IdentificationQuestionnaire(db.Model):
 class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:
         model = IdentificationQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'user_id', 'first_name', 'middle_name', 'last_name',
-                  'nickname', 'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'is_english_primary')
+        fields = (
+            'id', 'last_updated', 'participant_id', 'user_id',
+            'first_name', 'middle_name', 'last_name', 'nickname',
+            'is_first_name_preferred', 'birthdate', 'birth_city',
+            'birth_state', 'is_english_primary'
+        )
 
 
 class IdentificationQuestionnaireMetaSchema(ModelSchema):

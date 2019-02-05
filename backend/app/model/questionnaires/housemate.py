@@ -49,7 +49,7 @@ class Housemate(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Relationship to " + (model.is_self ? "you" : (model.nickname || model.first_name || "your child"))'
+                'template_options.label': '"Relationship to " + (formState.mainModel.is_self ? "you" : (model.nickname || model.first_name || "your child"))'
             }
         }
     )

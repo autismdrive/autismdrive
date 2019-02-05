@@ -21,6 +21,7 @@ class AssistiveDevice(db.Model):
             'type': 'select',
             'template_options': {
                 'required': False,
+                'label': 'Select device',
                 'options': [
                     {'value': 'cane', 'label': 'Canes', 'group': 'Mobility aids'},
                     {'value': 'crutches', 'label': 'Crutches', 'group': 'Mobility aids'},

@@ -39,7 +39,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                                                     '(e.g., Picture exchange, sign language, ipad, etc)'}
                 ]
             },
-            'hide_expression': '!(model.is_self)'
+            'hide_expression': '!(formState.mainModel.is_self)'
         }
     )
     dependent_verbal_ability = db.Column(
@@ -48,7 +48,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             'display_order': 1,
             'type': 'radio',
             'template_options': {
-                'label': '(model.nickname || model.first_name || "Your child") + "\'s current verbal ability:"',
+                'label': '(formState.mainModel.preferred_name || "Your child") + "\'s current verbal ability:"',
                 'required': False,
                 'options': [
                     {'value': 'nonVerbal', 'label': 'Non-verbal'},
@@ -58,7 +58,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                     {'value': 'fluent', 'label': 'Fluent Speech'}
                 ]
             },
-            'hide_expression': '(model.is_self)'
+            'hide_expression': '(formState.mainModel.is_self)'
         }
     )
     concerning_behaviors = db.Column(
@@ -68,7 +68,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             'type': 'multicheckbox',
             'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': '"Does " + (model.nickname || model.first_name || "Your child") + "currently engage in the '
+                'label': '"Does " + (formState.mainModel.preferred_name || "your child") + "currently engage in the '
                          'following behaviors of concern?"',
                 'required': False,
                 'options': [
@@ -93,7 +93,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                     {'value': 'concerningOther', 'label': 'Other'},
                 ]
             },
-            'hide_expression': '(model.is_self)'
+            'hide_expression': '(formState.mainModel.is_self)'
         }
     )
     concerning_behaviors_other = db.Column(
@@ -122,7 +122,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Do you " : "Does " + (model.nickname || model.first_name '
+                'template_options.label': '(formState.mainModel.is_self ? "Do you " : "Does " + (formState.mainModel.preferred_name '
                                           '|| "your child")) + "have any difficulties with academics?"'
             }
         }
@@ -144,8 +144,8 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"What areas of academics are difficult for " + (model.is_self ? "you?" : '
-                                          '(model.nickname || model.first_name || "your child"))'
+                'template_options.label': '"What areas of academics are difficult for " + (formState.mainModel.is_self ? "you?" : '
+                                          '(formState.mainModel.preferred_name || "your child"))'
             }
         }
     )

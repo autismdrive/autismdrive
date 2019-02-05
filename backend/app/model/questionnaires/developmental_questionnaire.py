@@ -56,8 +56,7 @@ class DevelopmentalQuestionnaire(db.Model):
             'display_order': 2,
             'type': 'radio',
             'template_options': {
-                'label': '"When did " + (model.nickname || model.first_name || "Your child") "reach their motor '
-                         'developmental milestones (e.g., walking, crawling, etc.)?"',
+                'label': '',
                 'required': False,
                 'options': [
                     {'value': 'early', 'label': 'Early'},
@@ -65,6 +64,12 @@ class DevelopmentalQuestionnaire(db.Model):
                     {'value': 'delayed', 'label': 'Delayed'},
                     {'value': 'notYet', 'label': 'Not yet acquired'}
                 ]
+            },
+            'expression_properties': {
+                'template_options.label': '"When did " + '
+                '(formState.mainModel.preferred_name || "Your child") + '
+                '" reach their motor developmental milestones '
+                '(e.g., walking, crawling, etc.)?"',
             }
         }
     )
@@ -74,8 +79,7 @@ class DevelopmentalQuestionnaire(db.Model):
             'display_order': 3,
             'type': 'radio',
             'template_options': {
-                'label': '"When did " + (model.nickname || model.first_name || "Your child") + "reach their '
-                         'speech/language developmental milestones (e.g., babbling, using first words and phrases)?"',
+                'label': '',
                 'required': False,
                 'options': [
                     {'value': 'early', 'label': 'Early'},
@@ -83,6 +87,12 @@ class DevelopmentalQuestionnaire(db.Model):
                     {'value': 'delayed', 'label': 'Delayed'},
                     {'value': 'notYet', 'label': 'Not yet acquired'}
                 ]
+            },
+            'expression_properties': {
+                'template_options.label': '"When did " + '
+                '(formState.mainModel.preferred_name || "Your child") + '
+                '" reach their speech/language developmental milestones '
+                '(e.g., babbling, using first words and phrases)?"',
             }
         }
     )
@@ -92,8 +102,7 @@ class DevelopmentalQuestionnaire(db.Model):
             'display_order': 4,
             'type': 'radio',
             'template_options': {
-                'label': '"When did " + (model.nickname || model.first_name || "Your child") "reach their toileting '
-                         'milestones (e.g., potty training)?"',
+                'label': '',
                 'required': False,
                 'options': [
                     {'value': 'early', 'label': 'Early'},
@@ -101,6 +110,11 @@ class DevelopmentalQuestionnaire(db.Model):
                     {'value': 'delayed', 'label': 'Delayed'},
                     {'value': 'notYet', 'label': 'Not yet acquired'}
                 ]
+            },
+            'expression_properties': {
+                'template_options.label': '"When did " + '
+                '(formState.mainModel.preferred_name || "Your child") + '
+                '" reach their toileting milestones (e.g., potty training)?"',
             }
         }
     )

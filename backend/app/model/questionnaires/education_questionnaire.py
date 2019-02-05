@@ -38,7 +38,7 @@ class EducationQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Do you attend an academic program, such as a school, '
+                'template_options.label': '(formState.mainModel.is_self ? "Do you attend an academic program, such as a school, '
                                           'college, or university?" : '
                                           '"Does " + (model.nickname || model.first_name || "your child") + '
                                           '" attend school?")'
@@ -66,7 +66,7 @@ class EducationQuestionnaire(db.Model):
                 'required': False
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Is this a public school, private school, or are you '
+                'template_options.label': '(formState.mainModel.is_self ? "Is this a public school, private school, or are you '
                                           'home schooled?" : '
                                           '"Is " + (model.nickname || model.first_name || "your child") + '
                                           '"\'s school:")'
@@ -89,7 +89,7 @@ class EducationQuestionnaire(db.Model):
                     {'value': 'schoolOther', 'label': 'Other'}
                 ]
             },
-            'hide_expression': '!(model.is_self)'
+            'hide_expression': '!(formState.mainModel.is_self)'
         }
     )
     dependent_placement = db.Column(
@@ -112,7 +112,7 @@ class EducationQuestionnaire(db.Model):
                     {'value': 'schoolOther', 'label': 'Other'}
                 ]
             },
-            'hide_expression': '(model.is_self)'
+            'hide_expression': '(formState.mainModel.is_self)'
         }
     )
     placement_other = db.Column(
@@ -160,7 +160,7 @@ class EducationQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Please check the following services " + (model.is_self ? "you currently '
+                'template_options.label': '"Please check the following services " + (formState.mainModel.is_self ? "you currently '
                                           'receive through your academic program (check all that apply):" : '
                                           '(model.nickname || model.first_name || "your child") + '
                                           '" currently receives in school (check all that apply):")'

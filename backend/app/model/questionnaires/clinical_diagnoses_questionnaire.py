@@ -26,10 +26,10 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
     developmental = db.Column(
         db.String,
         info={
-            'display_order': 1,
-            'type': 'radio',
+            'display_order': 1.1,
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': 'Developmental',
                 'required': False,
                 'options': [
                     {'value': 'intellectual', 'label': 'Intellectual disability'},
@@ -60,9 +60,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 2,
-            'type': 'radio',
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': 'Mental health',
                 'required': False,
                 'options': [
                     {'value': 'anxiety', 'label': 'Anxiety Disorder'},
@@ -93,10 +93,10 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
     medical = db.Column(
         db.String,
         info={
-            'display_order': 3,
-            'type': 'radio',
+            'display_order': 3.1,
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': 'Medical',
                 'required': False,
                 'options': [
                     {'value': 'gastrointestinal', 'label': 'Chronic Gastrointestinal (GI) problems'},
@@ -124,10 +124,10 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
     genetic = db.Column(
         db.String,
         info={
-            'display_order': 4,
-            'type': 'radio',
+            'display_order': 4.1,
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': 'Genetic Conditions',
                 'required': False,
                 'options': [
                     {'value': 'fragileX', 'label': 'Fragile X syndrome'},
@@ -170,12 +170,57 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                         'description': ''
                     },
                     'expression_properties': {
-                        'template_options.description': '(model.is_self ? "Do you" : "Does" + '
-                                                        '(model.nickname || model.first_name || "your child")) + '
-                                                        '" CURRENTLY have any of the following diagnoses? '
-                                                        '(please check all that apply)"'
+                        'template_options.description': ''
+                        '(formState.mainModel.is_self ? "Do you" : "Does your '
+                        'child") + " CURRENTLY have any of the following '
+                        'diagnoses? (please check all that apply)"'
                     }
-                }
+                },
+                'developmental_group': {
+                    'fields': [
+                        'developmental',
+                        'developmental_other'
+                    ],
+                    'display_order': 1,
+                    'wrappers': ['card'],
+                    'template_options': {
+                        'label': 'Developmental',
+                    },
+                },
+                'mental_health_group': {
+                    'fields': [
+                        'mental_health',
+                        'mental_health_other'
+                    ],
+                    'display_order': 2,
+                    'wrappers': ['card'],
+                    'template_options': {
+                        'label': 'Mental health',
+                    },
+                },
+                'medical_group': {
+                    'fields': [
+                        'medical',
+                        'medical_other'
+                    ],
+                    'display_order': 3,
+                    'wrappers': ['card'],
+                    'template_options': {
+                        'label': 'Medical',
+                    },
+                },
+                'genetic_group': {
+                    'fields': [
+                        'genetic',
+                        'genetic_other'
+                    ],
+                    'display_order': 4,
+                    'wrappers': ['card'],
+                    'template_options': {
+                        'label': 'Genetic Conditions',
+                    },
+                },
+
             }
         }
         for c in self.metadata.tables['clinical_diagnoses_questionnaire'].columns:

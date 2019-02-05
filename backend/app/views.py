@@ -141,7 +141,7 @@ endpoints = [
     # Flow Endpoint
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),
-    (FlowQuestionnaireEndpoint,"/flow/<string:flow>/<string:questionnaire_name>"),
+    (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
 ]
 
 # Add all endpoints to the API

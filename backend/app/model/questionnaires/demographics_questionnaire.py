@@ -39,7 +39,7 @@ class DemographicsQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " sex at birth"'
+                'template_options.label': '(formState.mainModel.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " sex at birth"'
             }
         }
     )
@@ -122,7 +122,7 @@ class DemographicsQuestionnaire(db.Model):
                     },
                     'expression_properties': {
                         'template_options.description': '"Please answer the following questions about " + '
-                        '(model.is_self ? "yourself" : "your child or the person with autism on whom '
+                        '(formState.mainModel.is_self ? "yourself" : "your child or the person with autism on whom '
                         'you are providing information") + " (* indicates required response):"'
                     }
                 },
@@ -137,8 +137,8 @@ class DemographicsQuestionnaire(db.Model):
                         'label': 'Gender identity'
                     },
                     'expression_properties': {
-                        'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " current gender identity '
-                        '(how " + (model.is_self ? "you describe yourself)*:" : (model.nickname || model.first_name || "your child")) + '
+                        'template_options.label': '(formState.mainModel.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " current gender identity '
+                        '(how " + (formState.mainModel.is_self ? "you describe yourself)*:" : (model.nickname || model.first_name || "your child")) + '
                         '" describes themselves)*:"'
                     }
                 },
@@ -153,7 +153,7 @@ class DemographicsQuestionnaire(db.Model):
                         'label': 'Race/ethnicity'
                     },
                     'expression_properties': {
-                        'template_options.label': '"What is " + (model.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " race/ethnicity? (select all that apply)"',
+                        'template_options.label': '"What is " + (formState.mainModel.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " race/ethnicity? (select all that apply)"',
                     }
                 }
             }
