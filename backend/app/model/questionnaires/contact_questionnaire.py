@@ -18,7 +18,9 @@ class ContactQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     phone = db.Column(
         db.String,
         info={
@@ -83,7 +85,11 @@ class ContactQuestionnaire(db.Model):
         info={
             "display_order": 2,
             "type": "input",
-            "template_options": {"label": "Email", "type": "email", "required": True},
+            "template_options": {
+                "label": "Email",
+                "type": "email",
+                "required": True,
+            },
             "validators": {"validation": ["email"]},
         },
     )
@@ -169,7 +175,9 @@ class ContactQuestionnaire(db.Model):
         info={
             "display_order": 4.2,
             "type": "input",
-            "template_options": {"placeholder": "Where did you hear about us?"},
+            "template_options": {
+                "placeholder": "Where did you hear about us?"
+            },
             "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
         },
     )
@@ -203,7 +211,9 @@ class ContactQuestionnaire(db.Model):
                     "fields": ["marketing_channel", "marketing_other"],
                     "display_order": 4,
                     "wrappers": ["card"],
-                    "template_options": {"label": "How did you hear about us?"},
+                    "template_options": {
+                        "label": "How did you hear about us?"
+                    },
                 },
             },
         }

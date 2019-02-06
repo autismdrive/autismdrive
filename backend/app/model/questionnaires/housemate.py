@@ -10,7 +10,9 @@ class Housemate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     home_questionnaire_id = db.Column(
-        "home_questionnaire_id", db.Integer, db.ForeignKey("home_questionnaire.id")
+        "home_questionnaire_id",
+        db.Integer,
+        db.ForeignKey("home_questionnaire.id"),
     )
     name = db.Column(
         db.String,
@@ -36,7 +38,10 @@ class Housemate(db.Model):
                     {"value": "adoptParent", "label": "Adoptive Parent"},
                     {"value": "adoptSibling", "label": "Adoptive Sibling"},
                     {"value": "spouse", "label": "Spouse"},
-                    {"value": "significantOther", "label": "Significant Other"},
+                    {
+                        "value": "significantOther",
+                        "label": "Significant Other",
+                    },
                     {"value": "child", "label": "Child"},
                     {"value": "roommate", "label": "Roommate"},
                     {"value": "paidCaregiver", "label": "Paid Caregiver"},
@@ -53,7 +58,9 @@ class Housemate(db.Model):
         info={
             "display_order": 3.3,
             "type": "input",
-            "template_options": {"placeholder": "Please enter their relationship"},
+            "template_options": {
+                "placeholder": "Please enter their relationship"
+            },
             "hide_expression": '!(model.relationship && (model.relationship === "relationOther"))',
         },
     )
@@ -62,7 +69,11 @@ class Housemate(db.Model):
         info={
             "display_order": 3.4,
             "type": "input",
-            "template_options": {"type": "number", "label": "Age", "required": True},
+            "template_options": {
+                "type": "number",
+                "label": "Age",
+                "required": True,
+            },
         },
     )
     has_autism = db.Column(

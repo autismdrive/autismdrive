@@ -18,7 +18,9 @@ class EvaluationHistoryQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     self_identifies_autistic = db.Column(
         db.Boolean,
         info={
@@ -130,7 +132,10 @@ class EvaluationHistoryQuestionnaire(db.Model):
                         "value": "2sjcCse",
                         "label": "Sheila Johnson Center or Curry School of Education",
                     },
-                    {"value": "3via", "label": "Virginia Institute of Autism (VIA)"},
+                    {
+                        "value": "3via",
+                        "label": "Virginia Institute of Autism (VIA)",
+                    },
                     {"value": "4school", "label": "School system"},
                     {
                         "value": "5evms",
@@ -150,7 +155,10 @@ class EvaluationHistoryQuestionnaire(db.Model):
                         "value": "10brAac",
                         "label": "Blue Ridge Autism and Achievement Center",
                     },
-                    {"value": "11cnh", "label": "Children’s National Hospital"},
+                    {
+                        "value": "11cnh",
+                        "label": "Children’s National Hospital",
+                    },
                     {
                         "value": "12kki",
                         "label": "Center for Autism and Related Disorders (Kennedy Krieger Institute)",
@@ -161,11 +169,20 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     },
                     {"value": "14vtc", "label": "Virginia Tech Carilion"},
                     {"value": "15centra", "label": "CENTRA Lynchburg"},
-                    {"value": "16apg", "label": "Alexandria Pediatrician Group"},
+                    {
+                        "value": "16apg",
+                        "label": "Alexandria Pediatrician Group",
+                    },
                     {"value": "17cc", "label": "Carilion Clinic"},
                     {"value": "18mwh", "label": "Mary Washington Hospital"},
-                    {"value": "19rna", "label": "Roanoke Neurological Associates"},
-                    {"value": "20ruac", "label": "Radford University Autism Center"},
+                    {
+                        "value": "19rna",
+                        "label": "Roanoke Neurological Associates",
+                    },
+                    {
+                        "value": "20ruac",
+                        "label": "Radford University Autism Center",
+                    },
                     {
                         "value": "21rcim",
                         "label": "Rimland Center for Integrative Medicine",
@@ -176,7 +193,10 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     },
                     {"value": "23inova", "label": "INOVA Health System"},
                     {"value": "24sentara", "label": "Sentara Health System"},
-                    {"value": "25psv", "label": "Pediatric Specialists of Virginia"},
+                    {
+                        "value": "25psv",
+                        "label": "Pediatric Specialists of Virginia",
+                    },
                     {"value": "diagnosisOther", "label": "Other"},
                 ],
             },
@@ -212,7 +232,10 @@ class EvaluationHistoryQuestionnaire(db.Model):
                         "value": "sjc",
                         "label": "Sheila Johnson Center or Curry School of Education",
                     },
-                    {"value": "via", "label": "Virginia Institute of Autism (VIA)"},
+                    {
+                        "value": "via",
+                        "label": "Virginia Institute of Autism (VIA)",
+                    },
                     {"value": "fc", "label": "Faison Center"},
                     {"value": "inova", "label": "INOVA Health System"},
                 ],
@@ -286,7 +309,9 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     "fields": ["partner_centers_evaluation"],
                     "display_order": 8,
                     "wrappers": ["card"],
-                    "template_options": {"label": "Evaluation at partner institution?"},
+                    "template_options": {
+                        "label": "Evaluation at partner institution?"
+                    },
                     "expression_properties": {
                         "template_options.label": '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
                         '" ever been evaluated at any of the following centers?"'
@@ -294,7 +319,9 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 }
             },
         }
-        for c in self.metadata.tables["evaluation_history_questionnaire"].columns:
+        for c in self.metadata.tables[
+            "evaluation_history_questionnaire"
+        ].columns:
             if c.info:
                 info[c.name] = c.info
         return info

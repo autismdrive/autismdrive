@@ -22,7 +22,10 @@ class Therapy(db.Model):
             "template_options": {
                 "required": False,
                 "options": [
-                    {"value": "speechLanguage", "label": "Speech/Language Therapy"},
+                    {
+                        "value": "speechLanguage",
+                        "label": "Speech/Language Therapy",
+                    },
                     {"value": "occupational", "label": "Occupational Therapy"},
                     {"value": "physical", "label": "Physical Therapy"},
                     {
@@ -33,7 +36,10 @@ class Therapy(db.Model):
                         "value": "developmental",
                         "label": "Developmental or relationship-based Therapy (DIR/Floortime)",
                     },
-                    {"value": "family", "label": "Family Therapy and/or counseling"},
+                    {
+                        "value": "family",
+                        "label": "Family Therapy and/or counseling",
+                    },
                     {
                         "value": "behavioralParent",
                         "label": "Behavioral parent training (non ASD specific)",
@@ -46,8 +52,14 @@ class Therapy(db.Model):
                         "value": "medication",
                         "label": "Medication management/Psychiatry",
                     },
-                    {"value": "socialSkills", "label": "Social skills training"},
-                    {"value": "parentEducation", "label": "Parent education workshops"},
+                    {
+                        "value": "socialSkills",
+                        "label": "Social skills training",
+                    },
+                    {
+                        "value": "parentEducation",
+                        "label": "Parent education workshops",
+                    },
                     {
                         "value": "alternativeTreatments",
                         "label": "Complementary or alternative treatments (e.g., vitamin/nutrient supplements, special diet, food restrictions)",
@@ -89,7 +101,10 @@ class Therapy(db.Model):
                 "options": [
                     {"value": "current", "label": "Currently receiving"},
                     {"value": "past", "label": "Received in the past"},
-                    {"value": "futureInterest", "label": "Interested in receiving"},
+                    {
+                        "value": "futureInterest",
+                        "label": "Interested in receiving",
+                    },
                 ],
             },
         },
@@ -114,7 +129,9 @@ class Therapy(db.Model):
                     "fields": ["type", "type_other"],
                     "display_order": 1,
                     "wrappers": ["card"],
-                    "template_options": {"label": "Type of therapy or service"},
+                    "template_options": {
+                        "label": "Type of therapy or service"
+                    },
                 }
             },
         }

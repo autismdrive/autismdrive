@@ -23,7 +23,11 @@ class AssistiveDevice(db.Model):
                 "required": False,
                 "label": "Select device",
                 "options": [
-                    {"value": "cane", "label": "Canes", "group": "Mobility aids"},
+                    {
+                        "value": "cane",
+                        "label": "Canes",
+                        "group": "Mobility aids",
+                    },
                     {
                         "value": "crutches",
                         "label": "Crutches",
@@ -39,8 +43,16 @@ class AssistiveDevice(db.Model):
                         "label": "Prosthetic devices",
                         "group": "Mobility aids",
                     },
-                    {"value": "scooter", "label": "Scooters", "group": "Mobility aids"},
-                    {"value": "walker", "label": "Walkers", "group": "Mobility aids"},
+                    {
+                        "value": "scooter",
+                        "label": "Scooters",
+                        "group": "Mobility aids",
+                    },
+                    {
+                        "value": "walker",
+                        "label": "Walkers",
+                        "group": "Mobility aids",
+                    },
                     {
                         "value": "wheelchair",
                         "label": "Wheelchairs",
@@ -69,7 +81,7 @@ class AssistiveDevice(db.Model):
                     {
                         "value": "screenEnlarge",
                         "label": "Screen enlargement applications",
-                        "group": "Computer software " "and hardware",
+                        "group": "Computer software and hardware",
                     },
                     {
                         "value": "screenReader",
@@ -79,7 +91,7 @@ class AssistiveDevice(db.Model):
                     {
                         "value": "voiceRecognition",
                         "label": "Voice recognition programs",
-                        "group": "Computer software " "and hardware",
+                        "group": "Computer software and hardware",
                     },
                     {
                         "value": "autoPageTurn",
@@ -117,7 +129,7 @@ class AssistiveDevice(db.Model):
                         "group": "ADA Building Modifications",
                     },
                     {
-                        "value": "grapBar",
+                        "value": "grabBar",
                         "label": "Grab bars",
                         "group": "ADA Building Modifications",
                     },
@@ -172,7 +184,10 @@ class AssistiveDevice(db.Model):
                 "options": [
                     {"value": "current", "label": "Currently receiving"},
                     {"value": "past", "label": "Received in the past"},
-                    {"value": "futureInterest", "label": "Interested in receiving"},
+                    {
+                        "value": "futureInterest",
+                        "label": "Interested in receiving",
+                    },
                 ],
             },
         },

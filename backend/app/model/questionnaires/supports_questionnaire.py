@@ -19,7 +19,9 @@ class SupportsQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     medications = db.relationship(
         "Medication", backref=db.backref("supports_questionnaire", lazy=True)
     )
@@ -27,7 +29,8 @@ class SupportsQuestionnaire(db.Model):
         "Therapy", backref=db.backref("supports_questionnaire", lazy=True)
     )
     assistive_devices = db.relationship(
-        "AssistiveDevice", backref=db.backref("supports_questionnaire", lazy=True)
+        "AssistiveDevice",
+        backref=db.backref("supports_questionnaire", lazy=True),
     )
 
     def get_meta(self):

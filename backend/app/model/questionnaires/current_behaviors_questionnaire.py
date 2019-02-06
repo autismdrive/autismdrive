@@ -16,7 +16,9 @@ class CurrentBehaviorsQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     self_verbal_ability = db.Column(
         db.String,
         info={
@@ -74,21 +76,36 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                 "options": [
                     {"value": "aggression", "label": "Aggression"},
                     {"value": "anxiety", "label": "Anxiety"},
-                    {"value": "destruction", "label": "Destruction of property"},
-                    {"value": "hoarding", "label": "Collecting or hoarding objects"},
+                    {
+                        "value": "destruction",
+                        "label": "Destruction of property",
+                    },
+                    {
+                        "value": "hoarding",
+                        "label": "Collecting or hoarding objects",
+                    },
                     {
                         "value": "elopement",
                         "label": "Elopement (running away or leaving supervision without an adult)",
                     },
-                    {"value": "insistRoutine", "label": "Insistence on routines"},
+                    {
+                        "value": "insistRoutine",
+                        "label": "Insistence on routines",
+                    },
                     {"value": "irritability", "label": "Irritability"},
-                    {"value": "pica", "label": "Pica (eating inedible objects)"},
+                    {
+                        "value": "pica",
+                        "label": "Pica (eating inedible objects)",
+                    },
                     {"value": "rectalDig", "label": "Rectal digging"},
                     {
                         "value": "repetitiveWords",
                         "label": "Repetitive words, sounds, or sentences",
                     },
-                    {"value": "restrictEating", "label": "Restricted/picky eating"},
+                    {
+                        "value": "restrictEating",
+                        "label": "Restricted/picky eating",
+                    },
                     {"value": "selfInjury", "label": "Self-injury"},
                     {
                         "value": "soiling",
@@ -164,7 +181,9 @@ class CurrentBehaviorsQuestionnaire(db.Model):
         info={
             "display_order": 4.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter area of academic difficulty"},
+            "template_options": {
+                "placeholder": "Enter area of academic difficulty"
+            },
             "hide_expression": "!(model.academic_difficulty_areas && (model.academic_difficulty_areas.other))",
         },
     )
@@ -177,7 +196,9 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                 "description": "",
             }
         }
-        for c in self.metadata.tables["current_behaviors_questionnaire"].columns:
+        for c in self.metadata.tables[
+            "current_behaviors_questionnaire"
+        ].columns:
             if c.info:
                 info[c.name] = c.info
         return info

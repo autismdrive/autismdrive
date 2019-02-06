@@ -16,7 +16,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     developmental = db.Column(
         db.String,
         info={
@@ -26,13 +28,19 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "template_options": {
                 "required": False,
                 "options": [
-                    {"value": "intellectual", "label": "Intellectual disability"},
+                    {
+                        "value": "intellectual",
+                        "label": "Intellectual disability",
+                    },
                     {
                         "value": "globalDevelopmental",
                         "label": "Global developmental delay",
                     },
                     {"value": "learning", "label": "Learning disability"},
-                    {"value": "speechLanguage", "label": "Speech or language disorder"},
+                    {
+                        "value": "speechLanguage",
+                        "label": "Speech or language disorder",
+                    },
                     {
                         "value": "coordination",
                         "label": "Developmental coordination disorder",
@@ -56,7 +64,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         info={
             "display_order": 1.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter developmental condition"},
+            "template_options": {
+                "placeholder": "Enter developmental condition"
+            },
             "hide_expression": "!(model.developmental && (model.developmental.developmentalOther))",
         },
     )
@@ -76,14 +86,26 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     },
                     {"value": "bipolar", "label": "Bipolar Disorder"},
                     {"value": "depression", "label": "Depression"},
-                    {"value": "ocd", "label": "Obsessive compulsive disorder (OCD)"},
-                    {"value": "odd", "label": "Oppositional Defiant Disorder (ODD)"},
-                    {"value": "ptsd", "label": "Post-traumatic stress disorder (PTSD)"},
+                    {
+                        "value": "ocd",
+                        "label": "Obsessive compulsive disorder (OCD)",
+                    },
+                    {
+                        "value": "odd",
+                        "label": "Oppositional Defiant Disorder (ODD)",
+                    },
+                    {
+                        "value": "ptsd",
+                        "label": "Post-traumatic stress disorder (PTSD)",
+                    },
                     {
                         "value": "schizophrenia",
                         "label": "Schizophrenia or Psychotic Disorder",
                     },
-                    {"value": "tourette", "label": "Tourette Syndrome or Tic Disorder"},
+                    {
+                        "value": "tourette",
+                        "label": "Tourette Syndrome or Tic Disorder",
+                    },
                     {
                         "value": "mentalHealthOther",
                         "label": "Other mental health condition",
@@ -97,7 +119,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter mental health condition"},
+            "template_options": {
+                "placeholder": "Enter mental health condition"
+            },
             "hide_expression": "!(model.mental_health && (model.mental_health.mentalHealthOther))",
         },
     )
@@ -114,14 +138,20 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                         "value": "gastrointestinal",
                         "label": "Chronic Gastrointestinal (GI) problems",
                     },
-                    {"value": "seizure", "label": "Epilepsy (seizure disorder)"},
+                    {
+                        "value": "seizure",
+                        "label": "Epilepsy (seizure disorder)",
+                    },
                     {
                         "value": "insomnia",
                         "label": "Insomnia (problems falling or staying asleep)",
                     },
                     {"value": "cerebralPalsy", "label": "Cerebral palsy"},
                     {"value": "asthma", "label": "Asthma"},
-                    {"value": "earInfections", "label": "Chronic ear infections"},
+                    {
+                        "value": "earInfections",
+                        "label": "Chronic ear infections",
+                    },
                     {"value": "medicalOther", "label": "Other health problem"},
                 ],
             },
@@ -146,13 +176,25 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "required": False,
                 "options": [
                     {"value": "fragileX", "label": "Fragile X syndrome"},
-                    {"value": "tuberousSclerosis", "label": "Tuberous Sclerosis"},
-                    {"value": "corneliaDeLange", "label": "Cornelia de Lange syndrome"},
+                    {
+                        "value": "tuberousSclerosis",
+                        "label": "Tuberous Sclerosis",
+                    },
+                    {
+                        "value": "corneliaDeLange",
+                        "label": "Cornelia de Lange syndrome",
+                    },
                     {"value": "down", "label": "Down syndrome"},
                     {"value": "angelman", "label": "Angelman syndrome"},
                     {"value": "rett", "label": "Rett syndrome"},
-                    {"value": "22q11.2deletion", "label": "22q11.2 Deletion syndrome"},
-                    {"value": "geneticOther", "label": "Other genetic condition"},
+                    {
+                        "value": "22q11.2deletion",
+                        "label": "22q11.2 Deletion syndrome",
+                    },
+                    {
+                        "value": "geneticOther",
+                        "label": "Other genetic condition",
+                    },
                 ],
             },
         },
@@ -213,7 +255,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 },
             },
         }
-        for c in self.metadata.tables["clinical_diagnoses_questionnaire"].columns:
+        for c in self.metadata.tables[
+            "clinical_diagnoses_questionnaire"
+        ].columns:
             if c.info:
                 info[c.name] = c.info
         return info

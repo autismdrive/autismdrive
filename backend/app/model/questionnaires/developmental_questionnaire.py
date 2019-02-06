@@ -16,7 +16,9 @@ class DevelopmentalQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     had_birth_complications = db.Column(
         db.Boolean,
         info={
@@ -37,7 +39,10 @@ class DevelopmentalQuestionnaire(db.Model):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {"label": "Please describe:", "required": False},
+            "template_options": {
+                "label": "Please describe:",
+                "required": False,
+            },
             "hide_expression": "!(model.had_birth_complications && (model.had_birth_complications == True))",
         },
     )

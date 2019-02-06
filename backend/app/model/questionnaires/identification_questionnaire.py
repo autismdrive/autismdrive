@@ -18,7 +18,9 @@ class IdentificationQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     relationship_to_participant = db.Column(
         db.String,
         info={
@@ -159,7 +161,11 @@ class IdentificationQuestionnaire(db.Model):
 
     def get_meta(self):
         info = {
-            "table": {"sensitive": False, "label": "Identification", "description": ""},
+            "table": {
+                "sensitive": False,
+                "label": "Identification",
+                "description": "",
+            },
             "field_groups": {
                 "intro": {
                     "fields": [],

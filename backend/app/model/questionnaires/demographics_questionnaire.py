@@ -18,7 +18,9 @@ class DemographicsQuestionnaire(db.Model):
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
     birth_sex = db.Column(
         db.String,
         info={
@@ -79,7 +81,10 @@ class DemographicsQuestionnaire(db.Model):
                     },
                     {"value": "raceAsian", "label": "Asian / Asian American"},
                     {"value": "raceWhite", "label": "White / Caucasian"},
-                    {"value": "raceHispanic", "label": "Hispanic / Latin(o / a)"},
+                    {
+                        "value": "raceHispanic",
+                        "label": "Hispanic / Latin(o / a)",
+                    },
                     {
                         "value": "raceNative",
                         "label": "Native American / Alaskan Native",
@@ -103,7 +108,11 @@ class DemographicsQuestionnaire(db.Model):
 
     def get_meta(self):
         info = {
-            "table": {"sensitive": False, "label": "Demographics", "description": ""},
+            "table": {
+                "sensitive": False,
+                "label": "Demographics",
+                "description": "",
+            },
             "field_groups": {
                 "intro": {
                     "fields": [],
