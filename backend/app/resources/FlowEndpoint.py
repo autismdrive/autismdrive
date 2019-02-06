@@ -13,15 +13,14 @@ from app.question_service import QuestionService
 
 class Flows:
     @staticmethod
-    def get_intake_flow():
-        flow = Flow(name="intake")
+    def get_self_intake_flow():
+        flow = Flow(name="self_intake")
         flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
         flow.add_step('home_questionnaire')
         flow.add_step('evaluation_history_questionnaire')
         flow.add_step('clinical_diagnoses_questionnaire')
-        flow.add_step('developmental_questionnaire')
         flow.add_step('current_behaviors_questionnaire')
         flow.add_step('education_questionnaire')
         flow.add_step('employment_questionnaire')
@@ -29,13 +28,44 @@ class Flows:
         return flow
 
     @staticmethod
+    def get_dependent_intake_flow():
+        flow = Flow(name="dependent_intake")
+        flow.add_step('identification_questionnaire')
+        flow.add_step('demographics_questionnaire')
+        flow.add_step('home_questionnaire')
+        flow.add_step('evaluation_history_questionnaire')
+        flow.add_step('clinical_diagnoses_questionnaire')
+        flow.add_step('developmental_questionnaire')
+        flow.add_step('current_behaviors_questionnaire')
+        flow.add_step('education_questionnaire')
+        flow.add_step('supports_questionnaire')
+        return flow
+
+    @staticmethod
+    def get_guardian_intake_flow():
+        flow = Flow(name="guardian_intake")
+        flow.add_step('identification_questionnaire')
+        flow.add_step('contact_questionnaire')
+        flow.add_step('demographics_questionnaire')
+        return flow
+
+    @staticmethod
     def get_all_flows():
-        return [Flows.get_intake_flow()]
+        flows = [
+            Flows.get_self_intake_flow(),
+            Flows.get_dependent_intake_flow(),
+            Flows.get_guardian_intake_flow()
+        ]
+        return flows
 
     @staticmethod
     def get_flow_by_name(name):
-        if name == 'intake':
-            return Flows.get_intake_flow()
+        if name == 'self_intake':
+            return Flows.get_self_intake_flow()
+        if name == 'dependent_intake':
+            return Flows.get_dependent_intake_flow()
+        if name == 'guardian_intake':
+            return Flows.get_guardian_intake_flow()
 
 
 class FlowEndpoint(flask_restful.Resource):

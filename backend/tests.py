@@ -1391,7 +1391,7 @@ class TestCase(unittest.TestCase):
         headers = self.logged_in_headers(u)
 
         contact_questionnaire = {'phone': "123-456-7890", 'marketing_channel': "Subway sign", 'participant_id': p.id}
-        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(contact_questionnaire),
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(contact_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -1456,7 +1456,7 @@ class TestCase(unittest.TestCase):
         headers = self.logged_in_headers(u)
 
         demographics_questionnaire = {'birth_sex': "female", 'gender_identity': "genderOther", 'participant_id': p.id}
-        rv = self.app.post('api/flow/intake/demographics_questionnaire', data=json.dumps(demographics_questionnaire),
+        rv = self.app.post('api/flow/self_intake/demographics_questionnaire', data=json.dumps(demographics_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -1521,7 +1521,7 @@ class TestCase(unittest.TestCase):
 
         evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5,
                                             'participant_id': p.id}
-        rv = self.app.post('api/flow/intake/evaluation_history_questionnaire',
+        rv = self.app.post('api/flow/self_intake/evaluation_history_questionnaire',
                            data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -1546,7 +1546,7 @@ class TestCase(unittest.TestCase):
 
     def test_questionnare_post_fails_if_question_not_in_flow(self):
         evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
-        rv = self.app.post('api/flow/intake/guardian_demographics_questionnaire',
+        rv = self.app.post('api/flow/self_intake/guardian_demographics_questionnaire',
                            data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=self.logged_in_headers())
@@ -1559,14 +1559,14 @@ class TestCase(unittest.TestCase):
 
     def test_questionnare_post_fails_if_not_logged_in(self):
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
-        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True)
         self.assertEqual(401, rv.status_code)
         pass
 
     def test_questionnaire_post_fails_if_user_not_connected_to_participant(self):
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
-        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assertEqual(400, rv.status_code,
                           "This endpoint should require a participant id that is associated with current user.")
@@ -1582,7 +1582,7 @@ class TestCase(unittest.TestCase):
         headers = self.logged_in_headers(u)
 
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
-        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True, headers=headers)
         self.assertSuccess(rv)
         log = db.session.query(StepLog).all()
@@ -1597,15 +1597,15 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertTrue(len(response) > 0)
 
-    def test_intake_flow_with_user(self):
+    def test_self_intake_flow_with_user(self):
         u = self.construct_user()
         p = self.construct_participant(user=u, relationship="self")
         headers = self.logged_in_headers(u)
-        rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
+        rv = self.app.get('api/flow/self_intake/%i' % p.id, content_type="application/json", headers=headers)
         self.assertEqual(200, rv.status_code)
         response = json.loads(rv.get_data(as_text=True))
         self.assertIsNotNone(response)
-        self.assertEqual('intake', response['name'])
+        self.assertEqual('self_intake', response['name'])
         self.assertIsNotNone(response['steps'])
         self.assertTrue(len(response['steps']) > 0)
         self.assertEqual('identification_questionnaire', response['steps'][0]['name'])
@@ -1623,10 +1623,10 @@ class TestCase(unittest.TestCase):
             'is_english_primary': True,
             'participant_id': p.id
         }
-        rv = self.app.post('api/flow/intake/identification_questionnaire', data=json.dumps(cq), content_type="application/json",
+        rv = self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(cq), content_type="application/json",
                            follow_redirects=True, headers=headers)
 
-        rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
+        rv = self.app.get('api/flow/self_intake/%i' % p.id, content_type="application/json", headers=headers)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual('identification_questionnaire', response['steps'][0]['name'])
         self.assertEqual(Step.STATUS_COMPLETE, response['steps'][0]['status'])
