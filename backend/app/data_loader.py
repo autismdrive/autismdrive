@@ -6,6 +6,7 @@ from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
+from app.model.step_log import StepLog
 from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.training import Training
@@ -17,6 +18,7 @@ from app.model.questionnaires.current_behaviors_questionnaire import CurrentBeha
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
 from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
+from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
 from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
@@ -213,6 +215,13 @@ class DataLoader():
             EducationQuestionnaire).count())
         db.session.commit()
 
+    def load_employment_questionnaire(self):
+        em_ques = EmploymentQuestionnaire(is_currently_employed=True, employment_capacity='fullTime', has_employment_support=False)
+        db.session.add(em_ques)
+        print("Employment loaded.  There is now %i employment record in the database." % db.session.query(
+            EmploymentQuestionnaire).count())
+        db.session.commit()
+
     def load_evaluation_history_questionnaire(self):
         eh_ques = EvaluationHistoryQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
         db.session.add(eh_ques)
@@ -266,10 +275,12 @@ class DataLoader():
         db.session.query(DemographicsQuestionnaire).delete()
         db.session.query(DevelopmentalQuestionnaire).delete()
         db.session.query(EducationQuestionnaire).delete()
+        db.session.query(EmploymentQuestionnaire).delete()
         db.session.query(EvaluationHistoryQuestionnaire).delete()
         db.session.query(HomeQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
         db.session.query(SupportsQuestionnaire).delete()
+        db.session.query(StepLog).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()
