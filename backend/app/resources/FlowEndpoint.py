@@ -24,6 +24,7 @@ class Flows:
         flow.add_step('developmental_questionnaire')
         flow.add_step('current_behaviors_questionnaire')
         flow.add_step('education_questionnaire')
+        flow.add_step('employment_questionnaire')
         flow.add_step('supports_questionnaire')
         return flow
 

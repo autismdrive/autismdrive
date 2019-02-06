@@ -28,7 +28,6 @@ class EmploymentQuestionnaire(db.Model):
         info={
             'display_order': 1,
             'type': 'radio',
-            'default_value': True,
             'template_options': {
                 'label': 'Are you currently employed?',
                 'required': False,
@@ -53,7 +52,7 @@ class EmploymentQuestionnaire(db.Model):
                     {'value': 'partTime', 'label': 'Part time (0-34 hours per week)'}
                 ]
             },
-            'hide_expression': '!(model.is_currently_employed && (model.is_currently_employed === False))',
+            'hide_expression': '!(model.is_currently_employed)',
         }
     )
     has_employment_support = db.Column(
@@ -61,7 +60,6 @@ class EmploymentQuestionnaire(db.Model):
         info={
             'display_order': 1,
             'type': 'radio',
-            'default_value': True,
             'template_options': {
                 'label': 'Do you currently receive supports to help you work successfully, such as job coaching or '
                          'vocational training?',
