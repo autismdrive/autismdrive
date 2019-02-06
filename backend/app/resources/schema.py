@@ -326,13 +326,18 @@ class ParticipantUsersSchema(ModelSchema):
     })
 
 
-
-
-class FlowQuestionnaireSchema(Schema):
-    title = fields.Str()
-    release_date = fields.Date()
+class StepSchema(Schema):
+    name = fields.Str()
+    type = fields.Str()
+    status = fields.Str()
+    date_completed = fields.Date()
+    questionnaire_id = fields.Integer()
+    _links = ma.Hyperlinks({
+        'questionnaire': ma.URLFor('api.questionnaireendpoint', name='<name>', id='<questionnaire_id>'),
+        'questionnaire_meta': ma.URLFor('api.questionnairemetaendpoint', name='<name>')
+    })
 
 
 class FlowSchema(Schema):
     name = fields.Str()
-    steps = fields.Nested(FlowQuestionnaireSchema())
+    steps = fields.Nested(StepSchema(), many=True)
