@@ -1,9 +1,3 @@
-from marshmallow import Schema, fields
-
-#         "name": "contact",
-#         "type": "identifying",
-#         "status": "complete"
-#         "date_completed": 2009-12-11h11:12:15
 from app.question_service import QuestionService
 
 
@@ -16,6 +10,7 @@ class Step:
         self.type = question_type
         self.status = self.STATUS_INCOMPLETE
         self.date_completed = None
+        self.questionnaire_id = None
 
 
 class Flow:
@@ -36,21 +31,10 @@ class Flow:
             if step.name == step_log.questionnaire_name:
                 step.status = step.STATUS_COMPLETE
                 step.date_completed = step_log.date_completed
+                step.questionnaire_id = step_log.questionnaire_id
 
     def add_step(self, questionnaireName):
         if not self.has_step(questionnaireName):
             q = QuestionService.get_class(questionnaireName)()
             step = Step(questionnaireName, q.__question_type__)
             self.steps.append(step)
-
-
-class StepSchema(Schema):
-    name = fields.Str()
-    type = fields.Str()
-    status = fields.Str()
-    date_completed = fields.Date()
-
-
-class FlowSchema(Schema):
-    name = fields.Str()
-    steps = fields.Nested(StepSchema(), many=True)

@@ -4,9 +4,10 @@ import flask_restful
 from flask import request, g
 
 from app import RestException, db, auth
-from app.model.flow import Flow, FlowSchema
+from app.model.flow import Flow
 from app.model.participant import Participant
 from app.model.step_log import StepLog
+from app.resources.schema import FlowSchema
 from app.question_service import QuestionService
 
 
