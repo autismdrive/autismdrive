@@ -7,7 +7,7 @@ from app.question_service import QuestionService
 
 
 class ContactQuestionnaire(db.Model):
-    __tablename__ = 'contact_questionnaire'
+    __tablename__ = "contact_questionnaire"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
@@ -16,217 +16,199 @@ class ContactQuestionnaire(db.Model):
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
     participant_id = db.Column(
-        'participant_id',
-        db.Integer,
-        db.ForeignKey('stardrive_participant.id')
+        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
-    user_id = db.Column(
-        'user_id',
-        db.Integer,
-        db.ForeignKey('stardrive_user.id')
-    )
+    user_id = db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
     phone = db.Column(
         db.String,
         info={
-            'display_order': 1.1,
-            'type': 'input',
-            'template_options': {
-                'required': True,
-                'type': 'tel',
-                'label': 'Preferred phone number (including area code)',
+            "display_order": 1.1,
+            "type": "input",
+            "template_options": {
+                "required": True,
+                "type": "tel",
+                "label": "Preferred phone number (including area code)",
             },
-            'validators': {
-                'validation': ['phone']
-            }
-        }
+            "validators": {"validation": ["phone"]},
+        },
     )
     phone_type = db.Column(
         db.String,
         info={
-            'display_order': 1.2,
-            'type': 'radio',
-            'template_options': {
-                'label': '',
-                'placeholder': '',
-                'description': '',
-                'required': True,
-                'options': [
-                    {'value': 'home', 'label': 'Home'},
-                    {'value': 'cell', 'label': 'Cell'}
-                ]
-            }
-        }
+            "display_order": 1.2,
+            "type": "radio",
+            "template_options": {
+                "label": "",
+                "placeholder": "",
+                "description": "",
+                "required": True,
+                "options": [
+                    {"value": "home", "label": "Home"},
+                    {"value": "cell", "label": "Cell"},
+                ],
+            },
+        },
     )
     can_leave_voicemail = db.Column(
         db.Boolean,
         info={
-            'display_order': 1.3,
-            'type': 'radio',
-            'default_value': True,
-            'template_options': {
-                'label': 'Is it okay to leave a voicemail message at this number?',
-                'required': False,
-                'options': [
-                    {'value': True, 'label': 'Yes'},
-                    {'value': False, 'label': 'No'}
-                ]
-            }
-        }
+            "display_order": 1.3,
+            "type": "radio",
+            "default_value": True,
+            "template_options": {
+                "label": "Is it okay to leave a voicemail message at this number?",
+                "required": False,
+                "options": [
+                    {"value": True, "label": "Yes"},
+                    {"value": False, "label": "No"},
+                ],
+            },
+        },
     )
     contact_times = db.Column(
         db.String,
         info={
-            'display_order': 1.4,
-            'type': 'textarea',
-            'template_options': {
-                'label': 'Some research studies might involve a phone call. '
-                         'If that’s the case, when would be the best times '
-                         'of day to call you?',
-                'required': False,
+            "display_order": 1.4,
+            "type": "textarea",
+            "template_options": {
+                "label": "Some research studies might involve a phone call. "
+                "If that’s the case, when would be the best times "
+                "of day to call you?",
+                "required": False,
             },
-        }
+        },
     )
     email = db.Column(
         db.String,
         info={
-            'display_order': 2,
-            'type': 'input',
-            'template_options': {
-                'label': 'Email',
-                'type': 'email',
-                'required': True,
-            },
-            'validators': {
-                'validation': ['email'],
-            },
-        }
+            "display_order": 2,
+            "type": "input",
+            "template_options": {"label": "Email", "type": "email", "required": True},
+            "validators": {"validation": ["email"]},
+        },
     )
     street_address = db.Column(
         db.String,
         info={
-            'display_order': 3.1,
-            'type': 'input',
-            'template_options': {
-                'label': 'Street Address',
-                'required': True
-            }
-        }
+            "display_order": 3.1,
+            "type": "input",
+            "template_options": {"label": "Street Address", "required": True},
+        },
     )
     city = db.Column(
         db.String,
         info={
-            'display_order': 3.2,
-            'type': 'input',
-            'template_options': {
-                'label': 'Town/City',
-                'required': False
-            }
-        }
+            "display_order": 3.2,
+            "type": "input",
+            "template_options": {"label": "Town/City", "required": False},
+        },
     )
     state = db.Column(
         db.String,
         info={
-            'display_order': 3.3,
-            'type': 'input',
-            'template_options': {
-                'label': 'State',
-                'required': False
-            }
-        }
+            "display_order": 3.3,
+            "type": "input",
+            "template_options": {"label": "State", "required": False},
+        },
     )
     zip = db.Column(
         db.Integer,
         info={
-            'display_order': 3.4,
-            'type': 'input',
-            'template_options': {
-                'type': 'number',
-                'label': 'Zip',
-                'max': 99999,
-                'min': 0,
-                'pattern': '\\d{5}',
-                'required': True
-            }
-        }
+            "display_order": 3.4,
+            "type": "input",
+            "template_options": {
+                "type": "number",
+                "label": "Zip",
+                "max": 99999,
+                "min": 0,
+                "pattern": "\\d{5}",
+                "required": True,
+            },
+        },
     )
     marketing_channel = db.Column(
         db.String,
         info={
-            'display_order': 4.1,
-            'type': 'select',
-            'template_options': {
-                'label': '',
-                'placeholder': '',
-                'description': '',
-                'required': True,
-                'options': [
-                    {'value': 'internet', 'label': 'Internet'},
-                    {'value': 'health_care_provider', 'label': 'Health care provider (doctor, speech therapist, etc)'},
-                    {'value': 'school', 'label': 'Teacher or school'},
-                    {'value': 'word_of_mouth', 'label': 'Word of mouth (friend, family member, etc)'},
-                    {'value': 'community_event', 'label': 'Community event (autism walk, resource fair, etc.)'},
-                    {'value': 'media', 'label': 'Television or radio (CNN, NPR, local news, etc.)'},
-                    {'value': 'research_study', 'label': 'While participating in a research study'},
-                    {'value': 'other', 'label': 'Other'},
-                ]
-            }
-        }
+            "display_order": 4.1,
+            "type": "select",
+            "template_options": {
+                "label": "",
+                "placeholder": "",
+                "description": "",
+                "required": True,
+                "options": [
+                    {"value": "internet", "label": "Internet"},
+                    {
+                        "value": "health_care_provider",
+                        "label": "Health care provider (doctor, speech therapist, etc)",
+                    },
+                    {"value": "school", "label": "Teacher or school"},
+                    {
+                        "value": "word_of_mouth",
+                        "label": "Word of mouth (friend, family member, etc)",
+                    },
+                    {
+                        "value": "community_event",
+                        "label": "Community event (autism walk, resource fair, etc.)",
+                    },
+                    {
+                        "value": "media",
+                        "label": "Television or radio (CNN, NPR, local news, etc.)",
+                    },
+                    {
+                        "value": "research_study",
+                        "label": "While participating in a research study",
+                    },
+                    {"value": "other", "label": "Other"},
+                ],
+            },
+        },
     )
     marketing_other = db.Column(
         db.String,
         info={
-            'display_order': 4.2,
-            'type': 'input',
-            'template_options': {
-                'placeholder': 'Where did you hear about us?'
-            },
-            'hide_expression': '!(model.marketing_channel && (model.marketing_channel === "other"))',
-        }
+            "display_order": 4.2,
+            "type": "input",
+            "template_options": {"placeholder": "Where did you hear about us?"},
+            "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
+        },
     )
 
     def get_meta(self):
         info = {
-            'table': {
-                'sensitive': 'false',
-                'label': 'Contact Information',
-                'description': 'Please answer the following questions about YOURSELF (* indicates required response):'
+            "table": {
+                "sensitive": "false",
+                "label": "Contact Information",
+                "description": "Please answer the following questions about YOURSELF (* indicates required response):",
             },
-            'field_groups': {
-                'phone': {
-                    'fields': [
-                        'phone',
-                        'phone_type',
-                        'can_leave_voicemail',
-                        'contact_times'
+            "field_groups": {
+                "phone": {
+                    "fields": [
+                        "phone",
+                        "phone_type",
+                        "can_leave_voicemail",
+                        "contact_times",
                     ],
-                    'display_order': 1,
-                    'wrappers': ['card'],
-                    'template_options': {'label': 'Phone'},
+                    "display_order": 1,
+                    "wrappers": ["card"],
+                    "template_options": {"label": "Phone"},
                 },
-                'address': {
-                    'fields': [
-                        'street_address',
-                        'city',
-                        'state',
-                        'zip'
-                    ],
-                    'display_order': 3,
-                    'wrappers': ['card'],
-                    'template_options': {'label': 'Address'},
+                "address": {
+                    "fields": ["street_address", "city", "state", "zip"],
+                    "display_order": 3,
+                    "wrappers": ["card"],
+                    "template_options": {"label": "Address"},
                 },
-                'marketing': {
-                    'fields': [
-                        'marketing_channel',
-                        'marketing_other'
-                    ],
-                    'display_order': 4,
-                    'wrappers': ['card'],
-                    'template_options': {'label': 'How did you hear about us?'},
-                }
-            }
+                "marketing": {
+                    "fields": ["marketing_channel", "marketing_other"],
+                    "display_order": 4,
+                    "wrappers": ["card"],
+                    "template_options": {"label": "How did you hear about us?"},
+                },
+            },
         }
 
-        for c in self.metadata.tables['contact_questionnaire'].columns:
+        for c in self.metadata.tables["contact_questionnaire"].columns:
             if c.info:
                 info[c.name] = c.info
 
@@ -236,11 +218,25 @@ class ContactQuestionnaire(db.Model):
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = ('id', 'last_updated', 'user_id', 'participant_id', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
-                  'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
+        fields = (
+            "id",
+            "last_updated",
+            "user_id",
+            "participant_id",
+            "phone",
+            "phone_type",
+            "can_leave_voicemail",
+            "contact_times",
+            "email",
+            "street_address",
+            "city",
+            "state",
+            "zip",
+            "marketing_channel",
+        )
 
 
 class ContactQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = ('get_meta',)
+        fields = ("get_meta",)
