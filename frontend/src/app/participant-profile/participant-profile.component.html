@@ -28,7 +28,7 @@
         <a
           mat-flat-button
           color="primary"
-          [routerLink]="['/participant/'+ participant.id + '/intake']"
+          (click)="goEditEnroll($event)"
         >Edit enrollment info</a>
 
       </mat-card-subtitle>

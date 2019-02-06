@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { Participant } from '../participant';
 import { UserParticipant } from '../user-participant';
 
@@ -14,7 +15,9 @@ export class ParticipantProfileComponent implements OnInit {
   percentComplete: number;
   numStudies: number;
 
-  constructor() {
+  constructor(
+    private router: Router
+  ) {
     this.dummyImgUrl = this.randomImgUrl();
   }
 
@@ -38,5 +41,18 @@ export class ParticipantProfileComponent implements OnInit {
     const gender = Math.random() > 0.5 ? 'men' : 'women';
     const id = Math.floor(Math.random() * 100);
     return `https://randomuser.me/api/portraits/med/${gender}/${id}.jpg`;
+  }
+
+  goEditEnroll($event) {
+    if (this.userParticipant.relationship == 'self') {
+      $event.preventDefault();
+      this.router.navigate(['participant', this.participant.id, 'self_intake']);
+    } else if (this.userParticipant.relationship == 'dependent') {
+      $event.preventDefault();
+      this.router.navigate(['participant', this.participant.id, 'dependent_intake']);
+    } else {
+      $event.preventDefault();
+      this.router.navigate(['participant', this.participant.id, 'guardian_intake']);
+    }
   }
 }
