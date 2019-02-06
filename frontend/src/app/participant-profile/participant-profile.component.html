@@ -1,0 +1,39 @@
+<div class="mat-typography">
+  <mat-card [class.mat-elevation-z0]="true">
+    <mat-card-header>
+      <img
+        mat-card-avatar
+        src="{{participant.avatar_img_url || dummyImgUrl}}"
+      >
+      <mat-card-title>
+        {{participant.preferredName()}}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{userParticipant.relationship === 'self' ? 'You' : userParticipant.relationship | titlecase}}
+        <div
+          *ngIf="percentComplete < 100"
+          class="mat-subheading-2"
+        >
+          <mat-progress-bar
+            [mode]="'determinate'"
+            [value]="percentComplete"
+          ></mat-progress-bar>
+        </div>
+        <div
+          *ngIf="percentComplete >= 100"
+          class="mat-subheading-2"
+        >
+          Enrolled in {{numStudies}} studies
+        </div>
+        <a
+          mat-flat-button
+          color="primary"
+          [routerLink]="['/participant/'+ participant.id + '/intake']"
+        >Edit enrollment info</a>
+
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+    </mat-card-content>
+  </mat-card>
+</div>

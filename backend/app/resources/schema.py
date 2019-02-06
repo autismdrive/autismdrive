@@ -1,5 +1,5 @@
 from flask_marshmallow.sqla import ModelSchema
-from marshmallow import fields
+from marshmallow import fields, Schema
 from sqlalchemy import func
 
 
@@ -16,16 +16,24 @@ from app.model.training_category import TrainingCategory
 from app.model.user import User
 from app.model.user_participant import UserParticipant
 
-# Import the questionnaire schemas in order to include them when auto-generating migrations (and to ensure that the
-# tables don't get accidentally dropped!)
-from app.model.questionnaires.contact_questionnaire import ContactQuestionnaireSchema, \
-    ContactQuestionnaireMetaSchema
-from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaireSchema, \
-    DemographicsQuestionnaireMetaSchema
-from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaireSchema, \
-    GuardianDemographicsQuestionnaireMetaSchema
-from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaireSchema, \
-    EvaluationHistoryQuestionnaireMetaSchema
+# Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
+# ensure that the tables don't get accidentally dropped!)
+# Models:
+import app.model.questionnaires.assistive_device
+import app.model.questionnaires.housemate
+import app.model.questionnaires.medication
+import app.model.questionnaires.therapy
+# Questionnaires:
+import app.model.questionnaires.contact_questionnaire
+import app.model.questionnaires.clinical_diagnoses_questionnaire
+import app.model.questionnaires.current_behaviors_questionnaire
+import app.model.questionnaires.demographics_questionnaire
+import app.model.questionnaires.developmental_questionnaire
+import app.model.questionnaires.education_questionnaire
+import app.model.questionnaires.evaluation_history_questionnaire
+import app.model.questionnaires.home_questionnaire
+import app.model.questionnaires.identification_questionnaire
+import app.model.questionnaires.supports_questionnaire
 
 
 class OrganizationSchema(ModelSchema):
@@ -277,14 +285,6 @@ class TrainingCategorySchema(ModelSchema):
     })
 
 
-class UserSchema(ModelSchema):
-    class Meta:
-        model = User
-        fields = ('id', 'last_updated', 'first_name', 'last_name', 'email', 'password', 'role')
-    password = fields.String(load_only=True)
-    id = fields.Integer(required=False, allow_none=True)
-
-
 class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
@@ -295,13 +295,23 @@ class ParticipantSchema(ModelSchema):
 class UserParticipantsSchema(ModelSchema):
     class Meta:
         model = UserParticipant
-        fields = ('id', '_links', 'participant_id', 'user_id', 'participant')
+        fields = ('id', '_links', 'participant_id', 'user_id', 'participant', 'relationship')
     participant = fields.Nested(ParticipantSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
         'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
     })
+
+
+class UserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'last_updated', 'email', 'password', 'role',
+                  'participants')
+    password = fields.String(load_only=True)
+    participants = fields.Nested(UserParticipantsSchema, dump_only=True, many=True)
+    id = fields.Integer(required=False, allow_none=True)
 
 
 class ParticipantUsersSchema(ModelSchema):
@@ -316,12 +326,18 @@ class ParticipantUsersSchema(ModelSchema):
     })
 
 
-class UserParticipantSchema(ModelSchema):
-    class Meta:
-        model = UserParticipant
-        fields = ('id', '_links', 'user_id', 'participant_id')
+class StepSchema(Schema):
+    name = fields.Str()
+    type = fields.Str()
+    status = fields.Str()
+    date_completed = fields.Date()
+    questionnaire_id = fields.Integer()
     _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
-        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>')
+        'questionnaire': ma.URLFor('api.questionnaireendpoint', name='<name>', id='<questionnaire_id>'),
+        'questionnaire_meta': ma.URLFor('api.questionnairemetaendpoint', name='<name>')
     })
+
+
+class FlowSchema(Schema):
+    name = fields.Str()
+    steps = fields.Nested(StepSchema(), many=True)

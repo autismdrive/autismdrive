@@ -34,7 +34,7 @@ if(app.config["CORS_ENABLED"]) :
 ma = Marshmallow(app)
 
 # Database Migrations
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 
 # email service
 email_service = EmailService(app)
@@ -76,10 +76,18 @@ def _load_data(data_loader):
     data_loader.load_studies()
     data_loader.load_trainings()
     data_loader.load_users()
+    data_loader.load_participants()
+    data_loader.link_users_participants()
+    data_loader.load_clinical_diagnoses_questionnaire()
     data_loader.load_contact_questionnaire()
+    data_loader.load_current_behaviors_questionnaire()
     data_loader.load_demographics_questionnaire()
+    data_loader.load_developmental_questionnaire()
+    data_loader.load_education_questionnaire()
     data_loader.load_evaluation_history_questionnaire()
-    data_loader.load_guardian_demographics_questionnaire()
+    data_loader.load_home_questionnaire()
+    data_loader.load_identification_questionnaire()
+    data_loader.load_supports_questionnaire()
 
 
 @app.cli.command()

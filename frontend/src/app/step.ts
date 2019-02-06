@@ -5,7 +5,8 @@ export class QuestionnaireStep {
   name: string;
   label: string;
   description: string;
-  fields: FormlyFieldConfig[];
+  fields?: FormlyFieldConfig[];
+  fieldGroup?: FormlyFieldConfig[];
 
   constructor(private _props) {
     for (const propName in this._props) {

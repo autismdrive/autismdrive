@@ -1,0 +1,23 @@
+<div
+  class="container mat-typography"
+  fxLayout="row"
+  fxLayout.xs="column"
+  fxLayoutWrap
+  fxLayoutGap="10px"
+  fxLayoutAlign="center center"
+  id="logout-message"
+>
+  <div
+    fxFlex="50%"
+    class="message"
+  >
+    <app-logo (click)="goHome()"></app-logo>
+    <h1>You have been logged out.</h1>
+    <button
+      id="ok-button"
+      mat-flat-button
+      (click)="goHome()"
+      color="primary"
+    >Ok</button>
+  </div>
+</div>

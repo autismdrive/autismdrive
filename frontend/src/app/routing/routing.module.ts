@@ -14,6 +14,9 @@ import { ResourceDetailComponent } from '../resource-detail/resource-detail.comp
 import { StudyDetailComponent } from '../study-detail/study-detail.component';
 import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { QuestionnaireStepComponent } from '../questionnaire-step/questionnaire-step.component';
+import { EnrollmentFlowComponent } from '../enrollment-flow/enrollment-flow.component';
+import { TimedoutComponent } from '../timed-out/timed-out.component';
+import { LogoutComponent } from '../logout/logout.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -26,13 +29,21 @@ const routes: Routes = [
     data: { title: 'Reset your STAR Drive password', hideHeader: true }
   },
   { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' } },
-  { path: 'profile/:stepName', component: ProfileComponent, data: { title: 'Your STAR Drive Account' } },
+  { path: 'participant/:participantId', component: EnrollmentFlowComponent, data: { title: 'Your STAR Drive Account' } },
+  { path: 'participant/:participantId/:flowName', component: EnrollmentFlowComponent, data: { title: 'Your STAR Drive Account' } },
+  {
+    path: 'participant/:participantId/:flowName/:stepName',
+    component: EnrollmentFlowComponent,
+    data: { title: 'Your STAR Drive Account' }
+  },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
   { path: 'studies', component: StudiesComponent, data: { title: 'Create a STAR Drive Account' } },
   { path: 'study/:studyId', component: StudyDetailComponent, data: { title: 'Study Details' } },
   { path: 'terms', component: TermsComponent, data: { title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true } },
+  { path: 'logout', component: LogoutComponent, data: { title: 'You have been logged out.', hideHeader: true } },
+  { path: 'timedout', component: TimedoutComponent, data: { title: 'Your session has timed out.', hideHeader: true } },
   { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
 ];
 

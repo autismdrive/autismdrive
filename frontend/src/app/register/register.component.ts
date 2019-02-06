@@ -2,8 +2,9 @@ import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/cor
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
+import { Participant } from '../participant';
 
 @Component({
   selector: 'app-register',
@@ -52,7 +53,24 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
-    this.user = { id: null, first_name: this.model['first_name'], last_name: this.model['last_name'], email: this.model['email'], role: 'User' }
+    this.user = {
+      id: null,
+      email: this.model['email'],
+      role: 'User',
+      participants: [
+        {
+          id: null,
+          user_id: null,
+          participant_id: null,
+          relationship: 'self',
+          participant: new Participant({
+            id: null,
+            first_name: this.model['first_name'],
+            last_name: this.model['last_name'],
+          })
+        }
+      ]
+    };
   }
 
   ngOnInit() {
@@ -62,8 +80,6 @@ export class RegisterComponent implements OnInit {
     if (this.form.valid) {
       this.registerState = 'submitting';
       this.errorMessage = '';
-      console.log('Register state is submitting');
-
       this.user['first_name'] = this.model['first_name'];
       this.user['last_name'] = this.model['last_name'];
       this.user['email'] = this.model['email'];
@@ -72,12 +88,10 @@ export class RegisterComponent implements OnInit {
         this.user = u;
         this.registerState = 'wait_for_email';
         this.changeDetectorRef.detectChanges();
-        console.log('Register state is wait_for_email');
       }, error1 => {
         this.registerState = 'form';
         this.errorMessage = error1;
         this.changeDetectorRef.detectChanges();
-        console.log('Register state is form?' + this.registerState);
       });
     }
   }

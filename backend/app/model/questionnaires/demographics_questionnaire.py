@@ -3,131 +3,32 @@ import datetime
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
+from app.question_service import QuestionService
 
 
 class DemographicsQuestionnaire(db.Model):
     __tablename__ = 'demographics_questionnaire'
+    __question_type__ = QuestionService.TYPE_IDENTIFYING
+    __estimated_duration_minutes__ = 8
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         'participant_id',
         db.Integer,
-        db.ForeignKey('stardrive_user.id')
+        db.ForeignKey('stardrive_participant.id')
     )
-    guardian_id = db.Column(
-        'guardian_id',
+    user_id = db.Column(
+        'user_id',
         db.Integer,
         db.ForeignKey('stardrive_user.id')
-    )
-    first_name = db.Column(
-        db.String,
-        info={
-            'display_order': 1,
-            'type': 'input',
-            'template_options': {
-                'label': 'First name',
-                'required': True
-            }
-        }
-    )
-    middle_name = db.Column(
-        db.String,
-        info={
-            'display_order': 2,
-            'type': 'input',
-            'template_options': {
-                'label': 'Middle name',
-                'required': False
-            }
-        }
-    )
-    last_name = db.Column(
-        db.String,
-        info={
-            'display_order': 3,
-            'type': 'input',
-            'template_options': {
-                'label': 'Last name',
-                'required': True
-            }
-        }
-    )
-    is_first_name_preferred = db.Column(
-        db.Boolean,
-        info={
-            'display_order': 4,
-            'type': 'radio',
-            'default_value': True,
-            'template_options': {
-                'required': False,
-                'label': 'Is this the preferred name?',
-                'options': [
-                    {'value': True, 'label': 'Yes'},
-                    {'value': False, 'label': 'No'}
-                ]
-            },
-            'expression_properties': {
-                'template_options.label': '"Is this your " + (!model.is_self ? "child\'s " : "") + "preferred name?"'
-            }
-        }
-    )
-    nickname = db.Column(
-        db.String,
-        info={
-            'display_order': 5,
-            'type': 'input',
-            'template_options': {
-                'label': 'Nickname',
-                'required': False
-            },
-            'hide_expression': 'model.is_first_name_preferred'
-        }
-    )
-    birthdate = db.Column(
-        db.Date,
-        info={
-            'display_order': 6,
-            'type': 'datepicker',
-            'template_options': {
-                'required': True,
-                'label': 'Date of birth'
-            },
-            'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " date of birth"'
-            }
-        }
-    )
-    birth_city = db.Column(
-        db.String,
-        info={
-            'display_order': 7,
-            'type': 'input',
-            'template_options': {
-                'required': True,
-                'label': 'City/municipality of birth'
-            },
-            'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " city/municipality of birth"'
-            }
-        }
-    )
-    birth_state = db.Column(
-        db.String,
-        info={
-            'display_order': 8,
-            'type': 'input',
-            'template_options': {
-                'required': True
-            },
-            'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " state of birth"'
-            }
-        }
     )
     birth_sex = db.Column(
         db.String,
         info={
-            'display_order': 9,
+            'display_order': 1,
             'type': 'radio',
             'template_options': {
                 'required': True,
@@ -138,16 +39,15 @@ class DemographicsQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " sex at birth"'
+                'template_options.label': '(formState.mainModel.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " sex at birth"'
             }
         }
     )
     gender_identity = db.Column(
         db.String,
         info={
-            'display_order': 10.1,
-            'type': 'radio',
-            'class_name': 'vertical-radio-group',
+            'display_order': 2.1,
+            'type': 'select',
             'template_options': {
                 'required': True,
                 'options': [
@@ -161,11 +61,10 @@ class DemographicsQuestionnaire(db.Model):
             }
         }
     )
-
     gender_identity_other = db.Column(
         db.String,
         info={
-            'display_order': 10.2,
+            'display_order': 2.2,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter gender identity'
@@ -173,13 +72,12 @@ class DemographicsQuestionnaire(db.Model):
             'hide_expression': '!(model.gender_identity && (model.gender_identity === "genderOther"))',
         }
     )
-
     race_ethnicity = db.Column(
         db.String,
         info={
-            'display_order': 11.1,
-            'type': 'radio',
-            'class_name': 'vertical-radio-group',
+            'display_order': 3.1,
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
                 'required': True,
                 'options': [
@@ -195,37 +93,15 @@ class DemographicsQuestionnaire(db.Model):
             }
         }
     )
-
     race_ethnicity_other = db.Column(
         db.String,
         info={
-            'display_order': 11.2,
+            'display_order': 3.2,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Enter race/ethnicity'
             },
-            'hide_expression': '!(model.race_ethnicity && (model.race_ethnicity === "raceOther"))',
-        }
-    )
-
-    is_english_primary = db.Column(
-        db.Boolean,
-        info={
-            'display_order': 12,
-            'type': 'radio',
-            'default': True,
-            'template_options': {
-                'required': False,
-                'label': 'Is the primary language English?',
-                'options': [
-                    {'value': 'true', 'label': 'True'},
-                    {'value': 'false', 'label': 'False'}
-                ]
-            },
-            'expression_properties': {
-                'template_options.label': '"Is " + (model.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " primary language English?"'
-            }
-
+            'hide_expression': '!(model.race_ethnicity && (model.race_ethnicity.raceOther))',
         }
     )
 
@@ -246,7 +122,7 @@ class DemographicsQuestionnaire(db.Model):
                     },
                     'expression_properties': {
                         'template_options.description': '"Please answer the following questions about " + '
-                        '(model.is_self ? "yourself" : "your child or the person with autism on whom '
+                        '(formState.mainModel.is_self ? "yourself" : "your child or the person with autism on whom '
                         'you are providing information") + " (* indicates required response):"'
                     }
                 },
@@ -255,14 +131,14 @@ class DemographicsQuestionnaire(db.Model):
                         'gender_identity',
                         'gender_identity_other'
                     ],
-                    'display_order': 10,
+                    'display_order': 2,
                     'wrappers': ['card'],
                     'template_options': {
                         'label': 'Gender identity'
                     },
                     'expression_properties': {
-                        'template_options.label': '(model.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " current gender identity '
-                        '(how " + (model.is_self ? "you describe yourself)*:" : (model.nickname || model.first_name || "your child")) + '
+                        'template_options.label': '(formState.mainModel.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " current gender identity '
+                        '(how " + (formState.mainModel.is_self ? "you describe yourself)*:" : (model.nickname || model.first_name || "your child")) + '
                         '" describes themselves)*:"'
                     }
                 },
@@ -271,13 +147,13 @@ class DemographicsQuestionnaire(db.Model):
                         'race_ethnicity',
                         'race_ethnicity_other'
                     ],
-                    'display_order': 11,
+                    'display_order': 3,
                     'wrappers': ['card'],
                     'template_options': {
                         'label': 'Race/ethnicity'
                     },
                     'expression_properties': {
-                        'template_options.label': '"What is " + (model.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " race/ethnicity? (select all that apply)"',
+                        'template_options.label': '"What is " + (formState.mainModel.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " race/ethnicity? (select all that apply)"',
                     }
                 }
             }
@@ -291,13 +167,11 @@ class DemographicsQuestionnaire(db.Model):
 class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'guardian_id','first_name', 'middle_name', 'last_name',
-                  'nickname', 'is_first_name_preferred', 'birthdate', 'birth_city', 'birth_state', 'birth_sex',
-                  'gender_identity', 'race_ethnicity', 'is_english_primary')
+        fields = ('id', 'last_updated', 'participant_id', 'user_id', 'birth_sex', 'gender_identity',
+                  'race_ethnicity')
 
 
 class DemographicsQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
         fields = ('get_meta',)
-

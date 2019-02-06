@@ -3,75 +3,32 @@ import datetime
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
+from app.question_service import QuestionService
 
 
 class ContactQuestionnaire(db.Model):
     __tablename__ = 'contact_questionnaire'
+    __question_type__ = QuestionService.TYPE_IDENTIFYING
+    __estimated_duration_minutes__ = 5
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         'participant_id',
         db.Integer,
+        db.ForeignKey('stardrive_participant.id')
+    )
+    user_id = db.Column(
+        'user_id',
+        db.Integer,
         db.ForeignKey('stardrive_user.id')
-    )
-
-    first_name = db.Column(
-        db.String,
-        info={
-            'display_order': 1,
-            'type': 'input',
-            'template_options': {
-                'label': 'First name',
-                'required': True
-            }
-        }
-    )
-
-    last_name = db.Column(
-        db.String,
-        info={
-            'display_order': 2,
-            'type': 'input',
-            'template_options': {
-                'label': 'Last name',
-                'required': True
-            }
-        }
-    )
-
-    is_first_name_preferred = db.Column(
-        db.Boolean,
-        info={
-            'display_order': 3,
-            'type': 'radio',
-            'default_value': True,
-            'template_options': {
-                'label': 'Is this your preferred name?',
-                'required': False,
-                'options': [
-                    {'value': True, 'label': 'Yes'},
-                    {'value': False, 'label': 'No'}
-                ]
-            }
-        }
-    )
-
-    nickname = db.Column(
-        db.String,
-        info={
-            'display_order': 4,
-            'type': 'input',
-            'template_options': {
-                'label': 'Nickname',
-                'required': False
-            },
-            'hide_expression': 'model.is_first_name_preferred'
-        }
     )
     phone = db.Column(
         db.String,
         info={
-            'display_order': 5.1,
+            'display_order': 1.1,
             'type': 'input',
             'template_options': {
                 'required': True,
@@ -83,11 +40,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     phone_type = db.Column(
         db.String,
         info={
-            'display_order': 5.2,
+            'display_order': 1.2,
             'type': 'radio',
             'template_options': {
                 'label': '',
@@ -101,11 +57,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     can_leave_voicemail = db.Column(
         db.Boolean,
         info={
-            'display_order': 5.3,
+            'display_order': 1.3,
             'type': 'radio',
             'default_value': True,
             'template_options': {
@@ -118,11 +73,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     contact_times = db.Column(
         db.String,
         info={
-            'display_order': 5.4,
+            'display_order': 1.4,
             'type': 'textarea',
             'template_options': {
                 'label': 'Some research studies might involve a phone call. '
@@ -132,11 +86,10 @@ class ContactQuestionnaire(db.Model):
             },
         }
     )
-
     email = db.Column(
         db.String,
         info={
-            'display_order': 6,
+            'display_order': 2,
             'type': 'input',
             'template_options': {
                 'label': 'Email',
@@ -148,11 +101,10 @@ class ContactQuestionnaire(db.Model):
             },
         }
     )
-
     street_address = db.Column(
         db.String,
         info={
-            'display_order': 7.1,
+            'display_order': 3.1,
             'type': 'input',
             'template_options': {
                 'label': 'Street Address',
@@ -160,11 +112,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     city = db.Column(
         db.String,
         info={
-            'display_order': 7.2,
+            'display_order': 3.2,
             'type': 'input',
             'template_options': {
                 'label': 'Town/City',
@@ -172,11 +123,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     state = db.Column(
         db.String,
         info={
-            'display_order': 7.3,
+            'display_order': 3.3,
             'type': 'input',
             'template_options': {
                 'label': 'State',
@@ -184,11 +134,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     zip = db.Column(
         db.Integer,
         info={
-            'display_order': 7.4,
+            'display_order': 3.4,
             'type': 'input',
             'template_options': {
                 'type': 'number',
@@ -200,13 +149,11 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     marketing_channel = db.Column(
         db.String,
         info={
-            'display_order': 8.1,
-            'type': 'radio',
-            'class_name': 'vertical-radio-group',
+            'display_order': 4.1,
+            'type': 'select',
             'template_options': {
                 'label': '',
                 'placeholder': '',
@@ -225,11 +172,10 @@ class ContactQuestionnaire(db.Model):
             }
         }
     )
-
     marketing_other = db.Column(
         db.String,
         info={
-            'display_order': 8.2,
+            'display_order': 4.2,
             'type': 'input',
             'template_options': {
                 'placeholder': 'Where did you hear about us?'
@@ -242,7 +188,7 @@ class ContactQuestionnaire(db.Model):
         info = {
             'table': {
                 'sensitive': 'false',
-                'label': 'Research Registrant Contact Information',
+                'label': 'Contact Information',
                 'description': 'Please answer the following questions about YOURSELF (* indicates required response):'
             },
             'field_groups': {
@@ -253,7 +199,7 @@ class ContactQuestionnaire(db.Model):
                         'can_leave_voicemail',
                         'contact_times'
                     ],
-                    'display_order': 5,
+                    'display_order': 1,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Phone'},
                 },
@@ -264,7 +210,7 @@ class ContactQuestionnaire(db.Model):
                         'state',
                         'zip'
                     ],
-                    'display_order': 7,
+                    'display_order': 3,
                     'wrappers': ['card'],
                     'template_options': {'label': 'Address'},
                 },
@@ -273,7 +219,7 @@ class ContactQuestionnaire(db.Model):
                         'marketing_channel',
                         'marketing_other'
                     ],
-                    'display_order': 8,
+                    'display_order': 4,
                     'wrappers': ['card'],
                     'template_options': {'label': 'How did you hear about us?'},
                 }
@@ -290,8 +236,7 @@ class ContactQuestionnaire(db.Model):
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'first_name', 'last_name','is_first_name_preferred',
-                  'nickname', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
+        fields = ('id', 'last_updated', 'user_id', 'participant_id', 'phone', 'phone_type', 'can_leave_voicemail', 'contact_times',
                   'email', 'street_address', 'city', 'state', 'zip', 'marketing_channel')
 
 

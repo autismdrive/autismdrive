@@ -30,7 +30,7 @@
     <div id="utility-nav">
       <a
         mat-button
-        *ngIf="!session"
+        *ngIf="!user"
         [routerLink]="[ '/terms' ]"
         routerLinkActive="selected"
         id="register-button"
@@ -40,7 +40,7 @@
       </a>
       <a
         mat-button
-        *ngIf="!session"
+        *ngIf="!user"
         [routerLink]="[ '/login' ]"
         routerLinkActive="selected"
         id="login-button"
@@ -50,7 +50,7 @@
       </a>
       <a
         mat-button
-        *ngIf="session"
+        *ngIf="user"
         [routerLink]="[ '/profile' ]"
         routerLinkActive="selected"
         id="profile-button"
@@ -60,7 +60,7 @@
       </a>
       <a
         mat-button
-        *ngIf="session"
+        *ngIf="user"
         (click)="goLogout($event)"
         id="logout-button"
       >

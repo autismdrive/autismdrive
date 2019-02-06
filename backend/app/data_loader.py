@@ -3,6 +3,7 @@ from flask import json
 from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
+from app.model.participant import Participant
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.study import Study
@@ -10,13 +11,21 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
+from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.current_behaviors_questionnaire import CurrentBehaviorsQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
+from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
-from app.model.questionnaires.guardian_demographics_questionnaire import GuardianDemographicsQuestionnaire
+from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
+from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app import db
 from sqlalchemy import Sequence
 import csv
+
+from app.model.user_participant import UserParticipant
 
 
 class DataLoader():
@@ -29,6 +38,8 @@ class DataLoader():
         self.study_file = directory + "/studies.csv"
         self.training_file = directory + "/trainings.csv"
         self.user_file = directory + "/users.csv"
+        self.participant_file = directory + "/participants.csv"
+        self.user_participant_file = directory + "/user_participants.csv"
         print("Data loader initialized")
 
     def load_categories(self):
@@ -126,29 +137,80 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                user = User(id=row[0], email=row[1], first_name=row[2], last_name=row[3], password=row[4],
-                            role=row[5], email_verified=True)
+                user = User(id=row[0], email=row[1], password=row[2],
+                            role=row[3], email_verified=True)
                 db.session.add(user)
                 self.__increment_id_sequence(User)
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())
         db.session.commit()
 
+    def load_participants(self):
+        with open(self.participant_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                participant = Participant(id=row[0], first_name=row[1], last_name=row[2])
+                db.session.add(participant)
+                self.__increment_id_sequence(Participant)
+            print("Participants loaded.  There are now %i participants in the database." % db.session.query(
+                Participant).count())
+        db.session.commit()
+
+    def link_users_participants(self):
+        with open(self.user_participant_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                user_particpant = UserParticipant(id=row[0], participant_id=row[1],
+                                                  user_id=row[2], relationship=row[3])
+                db.session.add(user_particpant)
+                self.__increment_id_sequence(UserParticipant)
+            print("Participants/Users linked.  There are now %i relationships in the database." % db.session.query(
+                UserParticipant).count())
+        db.session.commit()
+
+    def load_clinical_diagnoses_questionnaire(self):
+        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
+        db.session.add(cd_ques)
+        print("Clinical Diagnoses loaded.  There is now %i clinical diagnoses record in the database." % db.session.query(
+            ClinicalDiagnosesQuestionnaire).count())
+        db.session.commit()
+
     def load_contact_questionnaire(self):
-        c_ques = ContactQuestionnaire(first_name="Charlie", last_name="Brown")
+        c_ques = ContactQuestionnaire(phone=555-555-1234, contact_times='Weekdays at 5AM', email='charlie@brown.com')
         db.session.add(c_ques)
         print("Contact loaded.  There is now %i contact record in the database." % db.session.query(
             ContactQuestionnaire).count())
         db.session.commit()
 
+    def load_current_behaviors_questionnaire(self):
+        cb_ques = CurrentBehaviorsQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        db.session.add(cb_ques)
+        print("Current Behaviors loaded.  There is now %i current behavior record in the database." % db.session.query(
+            CurrentBehaviorsQuestionnaire).count())
+        db.session.commit()
+
     def load_demographics_questionnaire(self):
-        d_ques = DemographicsQuestionnaire(guardian_id=1, participant_id=2, first_name="Charles", middle_name="Monroe",
-                                         last_name="Brown", is_first_name_preferred=False, nickname="Charlie",
-                                         birthdate="1979-1-5", birth_city="Staunton", birth_state="VA", birth_sex='male',
-                                         gender_identity='male', race_ethnicity="raceWhite", is_english_primary=True)
+        d_ques = DemographicsQuestionnaire(user_id=1, birth_sex='male', gender_identity='intersex',
+                                           race_ethnicity="raceAsian")
         db.session.add(d_ques)
         print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
             DemographicsQuestionnaire).count())
+        db.session.commit()
+
+    def load_developmental_questionnaire(self):
+        d_ques = DevelopmentalQuestionnaire(had_birth_complications=True, when_language_milestones="early")
+        db.session.add(d_ques)
+        print("Developmental History loaded.  There is now %i developmental record in the database." % db.session.query(
+            DevelopmentalQuestionnaire).count())
+        db.session.commit()
+
+    def load_education_questionnaire(self):
+        e_ques = EducationQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
+        db.session.add(e_ques)
+        print("Education loaded.  There is now %i education record in the database." % db.session.query(
+            EducationQuestionnaire).count())
         db.session.commit()
 
     def load_evaluation_history_questionnaire(self):
@@ -158,11 +220,27 @@ class DataLoader():
             EvaluationHistoryQuestionnaire).count())
         db.session.commit()
 
-    def load_guardian_demographics_questionnaire(self):
-        gd_ques = GuardianDemographicsQuestionnaire(birthdate="1979-1-5", sex='male', race_ethnicity="raceWhite", is_english_primary=True)
-        db.session.add(gd_ques)
-        print("Guardian Demographics loaded.  There is now %i guardian demographics record in the database." % db.session.query(
-            GuardianDemographicsQuestionnaire).count())
+    def load_home_questionnaire(self):
+        h_ques = HomeQuestionnaire(self_living_situation="spouse", struggle_to_afford=True)
+        db.session.add(h_ques)
+        print("Home loaded.  There is now %i home record in the database." % db.session.query(
+            HomeQuestionnaire).count())
+        db.session.commit()
+
+    def load_identification_questionnaire(self):
+        i_ques = IdentificationQuestionnaire(first_name="Charles", middle_name="Monroe", last_name="Brown",
+                                             is_first_name_preferred=False, nickname="Charlie", birthdate="1979-1-5",
+                                             birth_city="Staunton", birth_state="VA", is_english_primary=True)
+        db.session.add(i_ques)
+        print("Identification loaded.  There is now %i home record in the database." % db.session.query(
+            IdentificationQuestionnaire).count())
+        db.session.commit()
+
+    def load_supports_questionnaire(self):
+        s_ques = SupportsQuestionnaire()
+        db.session.add(s_ques)
+        print("Supports loaded.  There is now %i supports record in the database." % db.session.query(
+            SupportsQuestionnaire).count())
         db.session.commit()
 
     def get_org_by_name(self, org_name):
@@ -182,10 +260,16 @@ class DataLoader():
         return category
 
     def clear(self):
+        db.session.query(ClinicalDiagnosesQuestionnaire).delete()
         db.session.query(ContactQuestionnaire).delete()
+        db.session.query(CurrentBehaviorsQuestionnaire).delete()
         db.session.query(DemographicsQuestionnaire).delete()
+        db.session.query(DevelopmentalQuestionnaire).delete()
+        db.session.query(EducationQuestionnaire).delete()
         db.session.query(EvaluationHistoryQuestionnaire).delete()
-        db.session.query(GuardianDemographicsQuestionnaire).delete()
+        db.session.query(HomeQuestionnaire).delete()
+        db.session.query(IdentificationQuestionnaire).delete()
+        db.session.query(SupportsQuestionnaire).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(TrainingCategory).delete()
@@ -194,6 +278,8 @@ class DataLoader():
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()
+        db.session.query(UserParticipant).delete()
+        db.session.query(Participant).delete()
         db.session.query(User).delete()
         db.session.commit()
 

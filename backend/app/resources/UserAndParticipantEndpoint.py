@@ -1,71 +1,57 @@
 import flask_restful
-from flask import request
+from flask import request, g
+from marshmallow import ValidationError
 
-from app import db, RestException
+from app import db, RestException, auth
 from app.model.participant import Participant
-from app.model.user import User
 from app.model.user_participant import UserParticipant
-from app.resources.schema import UserParticipantSchema, UserParticipantsSchema, ParticipantUsersSchema
+from app.resources.schema import UserParticipantsSchema, ParticipantSchema
+from app.wrappers import requires_roles
 
 
-class UserByParticipantEndpoint(flask_restful.Resource):
-
-    schema = ParticipantUsersSchema()
-
-    def get(self, participant_id):
-        user_participants = db.session.query(UserParticipant)\
-            .join(UserParticipant.user)\
-            .filter(UserParticipant.participant_id == participant_id)\
-            .order_by(User.last_name)\
-            .all()
-        return self.schema.dump(user_participants, many=True)
-
-
-class ParticipantByUserEndpoint(flask_restful.Resource):
+class ParticipantBySessionEndpoint(flask_restful.Resource):
 
     schema = UserParticipantsSchema()
+    participant_schema = ParticipantSchema()
 
-    def get(self, user_id):
+    @auth.login_required
+    def get(self, relationship):
         user_participants = db.session.query(UserParticipant).\
             join(UserParticipant.participant).\
-            filter(UserParticipant.user_id == user_id).\
+            filter(UserParticipant.user_id == g.user.id and UserParticipant.relationship == relationship).\
             order_by(Participant.last_name).\
             all()
-        return self.schema.dump(user_participants,many=True)
+        return self.schema.dump(user_participants, many=True)
 
-    def post(self, user_id):
+    @auth.login_required
+    def post(self, relationship):
         request_data = request.get_json()
-        user_participants = self.schema.load(request_data, many=True).data
-        db.session.query(UserParticipant).filter_by(user_id=user_id).delete()
-        for up in user_participants:
-            db.session.add(UserParticipant(user_id=user_id,
-                           participant_id=up.participant_id))
-        db.session.commit()
-        return self.get(user_id)
+        try:
+            load_result = self.participant_schema.load(request_data).data
+            relation = UserParticipant(user_id = g.user.id, participant=load_result, relationship=relationship)
+            db.session.add(load_result)
+            db.session.add(relation)
+            db.session.commit()
+            return self.schema.dump(relation)
+        except ValidationError as err:
+            raise RestException(RestException.INVALID_OBJECT,
+                                details=load_result.errors)
 
 
 class UserParticipantEndpoint(flask_restful.Resource):
-    schema = UserParticipantSchema()
+    schema = UserParticipantsSchema()
 
+    @requires_roles('Admin')
     def get(self, id):
         model = db.session.query(UserParticipant).filter_by(id=id).first()
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
+    @requires_roles('Admin')
     def delete(self, id):
         db.session.query(UserParticipant).filter_by(id=id).delete()
         db.session.commit()
         return None
 
 
-class UserParticipantListEndpoint(flask_restful.Resource):
-    schema = UserParticipantSchema()
 
-    def post(self):
-        request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
-        db.session.query(UserParticipant).filter_by(user_id=load_result.user_id,
-                                                     participant_id=load_result.participant_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
-        return self.schema.dump(load_result)

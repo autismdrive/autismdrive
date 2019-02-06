@@ -1,0 +1,40 @@
+<div
+  fxLayout="column"
+  fxLayoutGap="1em"
+  class="container"
+>
+  <mat-card *ngFor="let field of field.fieldGroup; let i = index;" class="repeat">
+    <mat-card-content fxLayout="row wrap">
+      <mat-chip-list fxFlex="50">
+        <mat-chip color="primary" selected>{{i + 1}}</mat-chip>
+      </mat-chip-list>
+      <div
+        fxFlex="50"
+        fxLayout="column"
+      >
+        <button
+          mat-icon-button
+          type="button"
+          (click)="remove(i)"
+          fxFlexAlign="end"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div fxFlex="100">
+        <formly-group [field]="field"></formly-group>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="repeat-action">
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    (click)="add()"
+  >
+    {{ field.templateOptions.description }}
+  </button>
+</div>

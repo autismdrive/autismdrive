@@ -1,8 +1,12 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
+
 os.environ["APP_CONFIG_FILE"] = '../config/testing.py'
 
+from app.model.flow import Step
+from app.model.step_log import StepLog
+from app.question_service import QuestionService
 import re
 import json
 import base64
@@ -11,8 +15,6 @@ import random
 import string
 import datetime
 import unittest
-
-
 from app import db, app
 from app.model.user import User
 from app.model.study import Study
@@ -30,10 +32,6 @@ from app.model.training_category import TrainingCategory
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
-from app.model.questionnaires.guardian_demographics_questionnaire import (
-    GuardianDemographicsQuestionnaire
-)
-
 
 class TestCase(unittest.TestCase):
 
@@ -182,12 +180,16 @@ class TestCase(unittest.TestCase):
 
     def construct_user(self, first_name="Stan", last_name="Ton", email="stan@staunton.com", role="Self"):
 
-        user = User(first_name=first_name, last_name=last_name, email=email, role=role)
+        user = User(email=email, role=role)
+        participant = Participant(first_name=first_name, last_name=last_name)
+        relation = UserParticipant(user=user, participant=participant, relationship="self")
         db.session.add(user)
+        db.session.add(participant)
+        db.session.add(relation)
         db.session.commit()
 
         db_user = db.session.query(User).filter_by(email=user.email).first()
-        self.assertEqual(db_user.first_name, user.first_name)
+        self.assertEqual(db_user.email, user.email)
         return db_user
 
     def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
@@ -200,8 +202,13 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_user.first_name, user.first_name)
         return db_user
 
-    def construct_participant(self, first_name="Wayne", last_name="Boro"):
+    def construct_participant(self, first_name="Wayne", last_name="Boro", user=None, relationship=None):
         participant = Participant(first_name=first_name, last_name=last_name)
+
+        if user is not None and relationship is not None:
+            r = UserParticipant(participant=participant, user = user, relationship=relationship)
+            db.session.add(r)
+
         db.session.add(participant)
         db.session.commit()
 
@@ -209,43 +216,48 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_participant.first_name, participant.first_name)
         return db_participant
 
-    def construct_contact_questionnaire(self, first_name="Flibby", last_name="Tribby", zip=55678,
-                                        marketing_channel="Zine Ad", user=None):
+    def construct_contact_questionnaire(self, phone="123-456-7890", zip=55678, marketing_channel="Zine Ad",
+                                        participant=None, user=None):
 
-        cq = ContactQuestionnaire(first_name=first_name, last_name=last_name, zip=zip,
+        cq = ContactQuestionnaire(phone=phone, zip=zip,
                                   marketing_channel=marketing_channel)
-        if user is None:
-            cq.participant_id = self.construct_user().id
+        if participant is None:
+            cq.participant_id = self.construct_participant().id
         else:
-            cq.participant_id = user.id
+            cq.participant_id = participant.id
+
+        if user is None:
+            cq.user_id = self.construct_user().id
+        else:
+            cq.user_id = user.id
 
         db.session.add(cq)
         db.session.commit()
 
         db_cq = db.session.query(ContactQuestionnaire).filter_by(zip=cq.zip).first()
-        self.assertEqual(db_cq.first_name, cq.first_name)
+        self.assertEqual(db_cq.phone, cq.phone)
         return db_cq
 
-    def construct_demographics_questionnaire(self, first_name="Trina", last_name="Frina", birth_state="VA",
-                                             is_english_primary=True, participant=None, guardian=None):
+    def construct_demographics_questionnaire(self, birth_sex="intersex", gender_identity="intersex",
+                                             race_ethnicity="raceBlack", participant=None, user=None):
 
-        dq = DemographicsQuestionnaire(first_name=first_name, last_name=last_name, birth_state=birth_state,
-                                       is_english_primary=is_english_primary)
+        dq = DemographicsQuestionnaire(birth_sex=birth_sex, gender_identity=gender_identity,
+                                       race_ethnicity=race_ethnicity)
         if participant is None:
-            dq.participant_id = self.construct_user(email="participant@study.com").id
+            dq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
         else:
             dq.participant_id = participant.id
 
-        if guardian is None:
-            dq.guardian_id = self.construct_user(email="guardian@study.com").id
+        if user is None:
+            dq.user_id = self.construct_user(email="user@study.com").id
         else:
-            dq.guardian_id = guardian.id
+            dq.user_id = user.id
 
         db.session.add(dq)
         db.session.commit()
 
-        db_dq = db.session.query(DemographicsQuestionnaire).filter_by(birth_state=dq.birth_state).first()
-        self.assertEqual(db_dq.first_name, dq.first_name)
+        db_dq = db.session.query(DemographicsQuestionnaire).filter_by(birth_sex=dq.birth_sex).first()
+        self.assertEqual(db_dq.gender_identity, dq.gender_identity)
         return db_dq
 
     def construct_evaluation_history_questionnaire(self, self_identifies_autistic=True, has_autism_diagnosis=True,
@@ -262,7 +274,7 @@ class TestCase(unittest.TestCase):
             ehq.participant_id = participant.id
 
         if user is None:
-            ehq.user_id = self.construct_user(email="guardian@study.com").id
+            ehq.user_id = self.construct_user(email="user@study.com").id
         else:
             ehq.user_id = user.id
 
@@ -273,21 +285,6 @@ class TestCase(unittest.TestCase):
             years_old_at_first_diagnosis=ehq.years_old_at_first_diagnosis).first()
         self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
         return db_ehq
-
-    def construct_guardian_demographics_questionnaire(self, user=None, relationship_to_child="Father", is_english_primary=True):
-
-        gdq = GuardianDemographicsQuestionnaire(relationship_to_child=relationship_to_child,
-                                                is_english_primary=is_english_primary)
-        if user is None:
-            gdq.guardian_id = self.construct_user().id
-        else:
-            gdq.guardian_id = user.id
-        db.session.add(gdq)
-        db.session.commit()
-
-        db_gdq = db.session.query(GuardianDemographicsQuestionnaire).filter_by(guardian_id=gdq.guardian_id).first()
-        self.assertEqual(db_gdq.relationship_to_child, gdq.relationship_to_child)
-        return db_gdq
 
     def test_resource_basics(self):
         self.construct_resource()
@@ -1015,35 +1012,32 @@ class TestCase(unittest.TestCase):
         u = db.session.query(User).first()
         self.assertIsNotNone(u)
         u_id = u.id
+        headers = self.logged_in_headers(u)
         rv = self.app.get('/api/user/%i' % u_id,
                           follow_redirects=True,
-                          content_type="application/json")
+                          content_type="application/json", headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], u_id)
-        self.assertEqual(response["first_name"], 'Stan')
         self.assertEqual(response["email"], 'stan@staunton.com')
 
     def test_modify_user_basics(self):
         self.construct_user()
         u = db.session.query(User).first()
+        headers = self.logged_in_headers(u)
         self.assertIsNotNone(u)
-        u_id = u.id
-        rv = self.app.get('/api/user/%i' % u_id, content_type="application/json")
+        rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
+        self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        response['first_name'] = 'Edwarardo'
-        response['last_name'] = 'Lemonado'
         response['role'] = 'Owner'
         response['email'] = 'ed@edwardos.com'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/user/%i' % u_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+        rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=headers)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/user/%i' % u_id, content_type="application/json")
+        rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Edwarardo')
-        self.assertEqual(response['last_name'], 'Lemonado')
         self.assertEqual(response['role'], 'Owner')
         self.assertEqual(response['email'], 'ed@edwardos.com')
         self.assertNotEqual(orig_date, response['last_updated'])
@@ -1051,23 +1045,29 @@ class TestCase(unittest.TestCase):
     def test_delete_user(self):
         u = self.construct_user()
         u_id = u.id
-        rv = self.app.get('api/user/%i' % u_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.delete('api/user/%i' % u_id, content_type="application/json")
-        self.assertSuccess(rv)
 
         rv = self.app.get('api/user/%i' % u_id, content_type="application/json")
+        self.assertEquals(401, rv.status_code)
+        rv = self.app.get('api/user/%i' % u_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/user/%i' % u_id, content_type="application/json", headers=None)
+        self.assertEquals(401, rv.status_code)
+        rv = self.app.delete('api/user/%i' % u_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/user/%i' % u_id, content_type="application/json")
+        self.assertEquals(401, rv.status_code)
+        rv = self.app.get('api/user/%i' % u_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertEqual(404, rv.status_code)
 
     def test_create_user(self):
-        user = {'first_name':"Tarantella", 'last_name':"Arachnia", 'role':"Widow", 'email':"tara@spiders.org"}
+        user = {'role':"Widow", 'email':"tara@spiders.org"}
         rv = self.app.post('api/user', data=json.dumps(user), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Tarantella')
-        self.assertEqual(response['last_name'], 'Arachnia')
+        self.assertEqual(response['email'], 'tara@spiders.org')
         self.assertEqual(response['role'], 'Widow')
         self.assertIsNotNone(response['id'])
 
@@ -1076,13 +1076,13 @@ class TestCase(unittest.TestCase):
         if not user:
             user = User(
                 id=7,
-                first_name="Admin",
                 email="admin@admin.org",
                 password="myPass457",
                 email_verified=True,
                 role="Admin")
 
         # Add user if it's not already in database
+        existing_user = None
         if user.id:
             existing_user = User.query.filter_by(id=user.id).first()
         if not existing_user and user.email:
@@ -1109,7 +1109,6 @@ class TestCase(unittest.TestCase):
     def test_create_user_with_password(self, first_name="Peter", id=8,
                                        email="tyrion@got.com", role="User", password="peterpass"):
         data = {
-            "first_name": first_name,
             "id": id,
             "email": email,
             "role": role
@@ -1131,7 +1130,6 @@ class TestCase(unittest.TestCase):
             content_type="application/json",
             headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(first_name, response["first_name"])
         self.assertEqual(email, response["email"])
         self.assertEqual(role, response["role"])
         self.assertEqual(True, user.is_correct_password(password))
@@ -1220,27 +1218,64 @@ class TestCase(unittest.TestCase):
         p_id = p.id
         rv = self.app.get('/api/participant/%i' % p_id,
                           follow_redirects=True,
-                          content_type="application/json")
+                          content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], p_id)
         self.assertEqual(response["first_name"], p.first_name)
         self.assertEqual(response["last_name"], p.last_name)
 
-    def test_modify_participant_basics(self):
+    def test_modify_participant_you_do_not_own(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        good_headers = self.logged_in_headers(u)
+
+        p = db.session.query(Participant).first()
+        odd_user = User(
+                email="frankie@badfella.fr",
+                password="h@corleet",
+                email_verified=True,
+                role="User")
+        participant = {'first_name': "Lil' Johnny", 'last_name': "Tables"}
+        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+                          follow_redirects=True)
+        self.assertEqual(401, rv.status_code, "you have to be logged in to edit participant.")
+        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers(odd_user))
+        self.assertEqual(400, rv.status_code, "you have to have a relationship with the user to do stuff.")
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual("unrelated_participant", response['code'])
+        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+                          follow_redirects=True, headers=good_headers)
+        self.assertEqual(200, rv.status_code, "The owner can edit the user.")
+
+    def test_modify_participant_you_do_own(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+        participant = {'first_name': "My brand new", 'last_name': "name"}
+        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+                          follow_redirects=True, headers=headers)
+        self.assertSuccess(rv)
+        p = db.session.query(Participant).filter_by(id=p.id).first()
+        self.assertEqual("My brand new", p.first_name)
+
+
+    def test_modify_participant_basics_admin(self):
         self.construct_participant()
         p = db.session.query(Participant).first()
         self.assertIsNotNone(p)
         p_id = p.id
-        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json")
+        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         response['first_name'] = 'Edwarardo'
         response['last_name'] = 'Better'
         orig_date = response['last_updated']
         rv = self.app.put('/api/participant/%i' % p_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+                          follow_redirects=True, headers=self.logged_in_headers())
         self.assertSuccess(rv)
-        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json")
+        rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['first_name'], 'Edwarardo')
@@ -1251,39 +1286,40 @@ class TestCase(unittest.TestCase):
         p = self.construct_participant()
         p_id = p.id
         rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
+        self.assertEquals(401, rv.status_code)
+        rv = self.app.get('api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
 
         rv = self.app.delete('api/participant/%i' % p_id, content_type="application/json")
+        self.assertEquals(401, rv.status_code)
+        rv = self.app.delete('api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
 
         rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
+        self.assertEquals(401, rv.status_code)
+        rv = self.app.get('api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertEqual(404, rv.status_code)
 
     def test_create_participant(self):
-        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
-        rv = self.app.post('api/participant', data=json.dumps(participant), content_type="application/json",
-                           follow_redirects=True)
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Dorothy')
-        self.assertEqual(response['last_name'], 'Edwards')
-        self.assertIsNotNone(response['id'])
 
-    def test_get_user_by_participant(self):
-        u = self.construct_user()
-        p = self.construct_participant()
-        up = UserParticipant(user=u, participant=p, relationship="Self")
-        db.session.add(up)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/participant/%i/user' % p.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
+        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
+        rv = self.app.post('/api/session/participant/dependent', data=json.dumps(participant), content_type="application/json",
+                           follow_redirects=True)
+        self.assertEquals(401, rv.status_code, "you can't create a participant without an account.")
+
+        rv = self.app.post(
+            '/api/session/participant/dependent', data=json.dumps(participant),
+            content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
+
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(u.id, response[0]["id"])
-        self.assertEqual(u.last_name, response[0]["user"]["last_name"])
+        self.assertIsNotNone(response["participant_id"])
+        self.assertIsNotNone(response["user_id"])
+        self.assertEquals("dependent", response["relationship"])
+        self.assertTrue("participant" in response)
+        self.assertEquals("Dorothy", response["participant"]["first_name"])
+        self.assertEquals("Edwards", response["participant"]["last_name"])
+
 
     def test_get_participant_by_user(self):
         u = self.construct_user()
@@ -1292,72 +1328,14 @@ class TestCase(unittest.TestCase):
         db.session.add(up)
         db.session.commit()
         rv = self.app.get(
-            '/api/user/%i/participant' % u.id,
-            content_type="application/json")
+            '/api/user/%i' % u.id,
+            content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(p.id, response[0]["id"])
-        self.assertEqual(p.first_name, response[0]["participant"]["first_name"])
+        self.assertEqual(u.id, response['id'])
+        self.assertEqual(2, len(response['participants']))
+        self.assertEqual(p.first_name, response['participants'][1]["participant"]["first_name"])
 
-    def test_add_participant_to_user(self):
-        u = self.construct_user()
-        p = self.construct_participant()
-
-        up_data = {"user_id": u.id, "participant_id": p.id}
-
-        rv = self.app.post(
-            '/api/user_participant',
-            data=json.dumps(up_data),
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(p.id, response["participant_id"])
-        self.assertEqual(u.id, response["user_id"])
-
-    def test_set_all_participants_on_user(self):
-        p1 = self.construct_participant(first_name="Evelyn", last_name="Sarabande")
-        p2 = self.construct_participant(first_name="Adela", last_name="Allemande")
-        p3 = self.construct_participant(first_name="Valentia", last_name="Gigue")
-        u = self.construct_user()
-
-        up_data = [
-            {
-                "participant_id": p1.id
-            },
-            {
-                "participant_id": p2.id
-            },
-            {
-                "participant_id": p3.id
-            },
-        ]
-        rv = self.app.post(
-            '/api/user/%i/participant' % u.id,
-            data=json.dumps(up_data),
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(3, len(response))
-
-        up_data = [{"participant_id": p1.id}]
-        rv = self.app.post(
-            '/api/user/%i/participant' % u.id,
-            data=json.dumps(up_data),
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-
-    def test_remove_participant_from_user(self):
-        self.test_add_participant_to_user()
-        rv = self.app.delete('/api/user_participant/%i' % 1)
-        self.assertSuccess(rv)
-        rv = self.app.get(
-            '/api/user/%i/participant' % 1, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(0, len(response))
 
     def test_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
@@ -1370,7 +1348,7 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], cq_id)
-        self.assertEqual(response["first_name"], cq.first_name)
+        self.assertEqual(response["phone"], cq.phone)
         self.assertEqual(response["marketing_channel"], cq.marketing_channel)
 
     def test_modify_contact_questionnaire_basics(self):
@@ -1380,7 +1358,7 @@ class TestCase(unittest.TestCase):
         cq_id = cq.id
         rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
-        response['first_name'] = 'Edwarardo'
+        response['phone'] = '123-456-7890'
         response['zip'] = 22345
         response['marketing_channel'] = 'flyer'
         orig_date = response['last_updated']
@@ -1390,7 +1368,7 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/q/contact_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Edwarardo')
+        self.assertEqual(response['phone'], '123-456-7890')
         self.assertEqual(response['zip'], 22345)
         self.assertEqual(response['marketing_channel'], 'flyer')
         self.assertNotEqual(orig_date, response['last_updated'])
@@ -1408,12 +1386,18 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_contact_questionnaire(self):
-        contact_questionnaire = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
-        rv = self.app.post('api/q/contact_questionnaire', data=json.dumps(contact_questionnaire), content_type="application/json",
-                           follow_redirects=True)
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        contact_questionnaire = {'phone': "123-456-7890", 'marketing_channel': "Subway sign", 'participant_id': p.id}
+        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(contact_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Darah')
+        self.assertEqual(response['phone'], '123-456-7890')
         self.assertEqual(response['marketing_channel'], 'Subway sign')
         self.assertIsNotNone(response['id'])
 
@@ -1424,12 +1408,12 @@ class TestCase(unittest.TestCase):
         dq_id = dq.id
         rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id,
                           follow_redirects=True,
-                          content_type="application/json")
+                          content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], dq_id)
-        self.assertEqual(response["first_name"], dq.first_name)
-        self.assertEqual(response["birth_state"], dq.birth_state)
+        self.assertEqual(response["birth_sex"], dq.birth_sex)
+        self.assertEqual(response["gender_identity"], dq.gender_identity)
 
     def test_modify_demographics_questionnaire_basics(self):
         self.construct_demographics_questionnaire()
@@ -1438,10 +1422,10 @@ class TestCase(unittest.TestCase):
         dq_id = dq.id
         rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
-        response['first_name'] = 'Edwarardo'
-        response['is_english_primary'] = False
+        response['gender_identity'] = 'genderOther'
+        response['race_ethnicity'] = 'raceOther'
         u2 = self.construct_user(email="rainbows@rainy.com")
-        response['guardian_id'] = u2.id
+        response['user_id'] = u2.id
         orig_date = response['last_updated']
         rv = self.app.put('/api/q/demographics_questionnaire/%i' % dq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -1449,9 +1433,9 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Edwarardo')
-        self.assertEqual(response['is_english_primary'], False)
-        self.assertEqual(response['guardian_id'], u2.id)
+        self.assertEqual(response['gender_identity'], 'genderOther')
+        self.assertEqual(response['race_ethnicity'], 'raceOther')
+        self.assertEqual(response['user_id'], u2.id)
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_demographics_questionnaire(self):
@@ -1467,72 +1451,19 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_demographics_questionnaire(self):
-        demographics_questionnaire = {'first_name': "Darah", 'is_english_primary': False}
-        rv = self.app.post('api/q/demographics_questionnaire', data=json.dumps(demographics_questionnaire), content_type="application/json",
-                           follow_redirects=True)
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        demographics_questionnaire = {'birth_sex': "female", 'gender_identity': "genderOther", 'participant_id': p.id}
+        rv = self.app.post('api/flow/intake/demographics_questionnaire', data=json.dumps(demographics_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Darah')
-        self.assertEqual(response['is_english_primary'], False)
-        self.assertIsNotNone(response['id'])
-
-    def test_guardian_demographics_questionnaire_basics(self):
-        self.construct_guardian_demographics_questionnaire()
-        gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
-        self.assertIsNotNone(gdq)
-        gdq_id = gdq.id
-        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id,
-                          follow_redirects=True,
-                          content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["id"], gdq_id)
-        self.assertEqual(response["relationship_to_child"], gdq.relationship_to_child)
-        self.assertEqual(response["is_english_primary"], gdq.is_english_primary)
-
-    def test_modify_guardian_demographics_questionnaire_basics(self):
-        self.construct_guardian_demographics_questionnaire()
-        gdq = db.session.query(GuardianDemographicsQuestionnaire).first()
-        self.assertIsNotNone(gdq)
-        gdq_id = gdq.id
-        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
-        response = json.loads(rv.get_data(as_text=True))
-        response['relationship_to_child'] = 'Parent'
-        response['is_english_primary'] = False
-        u2 = self.construct_user(email="rainbows@rainy.com")
-        response['guardian_id'] = u2.id
-        orig_date = response['last_updated']
-        rv = self.app.put('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
-        self.assertSuccess(rv)
-        rv = self.app.get('/api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['relationship_to_child'], 'Parent')
-        self.assertEqual(response['is_english_primary'], False)
-        self.assertEqual(response['guardian_id'], u2.id)
-        self.assertNotEqual(orig_date, response['last_updated'])
-
-    def test_delete_guardian_demographics_questionnaire(self):
-        gdq = self.construct_guardian_demographics_questionnaire()
-        gdq_id = gdq.id
-        rv = self.app.get('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.delete('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.get('api/q/guardian_demographics_questionnaire/%i' % gdq_id, content_type="application/json")
-        self.assertEqual(404, rv.status_code)
-
-    def test_create_guardian_demographics_questionnaire(self):
-        guardian_demographics_questionnaire = {'relationship_to_child': "Mother", 'is_english_primary': False}
-        rv = self.app.post('api/q/guardian_demographics_questionnaire', data=json.dumps(guardian_demographics_questionnaire), content_type="application/json",
-                           follow_redirects=True)
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['relationship_to_child'], 'Mother')
-        self.assertEqual(response['is_english_primary'], False)
+        self.assertEqual(response['birth_sex'], 'female')
+        self.assertEqual(response['gender_identity'], 'genderOther')
         self.assertIsNotNone(response['id'])
 
     def test_evaluation_history_questionnaire_basics(self):
@@ -1584,11 +1515,121 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_evaluation_history_questionnaire(self):
-        evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
-        rv = self.app.post('api/q/evaluation_history_questionnaire', data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
-                           follow_redirects=True)
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5,
+                                            'participant_id': p.id}
+        rv = self.app.post('api/flow/intake/evaluation_history_questionnaire',
+                           data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['self_identifies_autistic'], True)
         self.assertEqual(response['years_old_at_first_diagnosis'], 5)
         self.assertIsNotNone(response['id'])
+
+    def test_questionnare_post_fails_if_flow_does_not_exist(self):
+        evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
+        rv = self.app.post('api/flow/noSuchFlow/evaluation_history_questionnaire',
+                           data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
+                           follow_redirects=True,
+                           headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code,
+                          "This endpoint should require that the flow exists and that the question is in the flow.")
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response)
+        self.assertEqual("Unknown path.", response["message"],
+                          "There should be a clear error message explaining what went wrong.")
+
+    def test_questionnare_post_fails_if_question_not_in_flow(self):
+        evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
+        rv = self.app.post('api/flow/intake/guardian_demographics_questionnaire',
+                           data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
+                           follow_redirects=True,
+                           headers=self.logged_in_headers())
+        self.assertEqual(400, rv.status_code,
+                          "This endpoint should require that the flow exists and that the question is in the flow.")
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response)
+        self.assertEqual("not_in_the_flow", response["code"],
+                          "There should be a clear error message explaining what went wrong.")
+
+    def test_questionnare_post_fails_if_not_logged_in(self):
+        cq = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
+        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+                           follow_redirects=True)
+        self.assertEqual(401, rv.status_code)
+        pass
+
+    def test_questionnaire_post_fails_if_user_not_connected_to_participant(self):
+        cq = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
+        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+                           follow_redirects=True, headers=self.logged_in_headers())
+        self.assertEqual(400, rv.status_code,
+                          "This endpoint should require a participant id that is associated with current user.")
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response)
+        self.assertEqual("Unable to save the provided object.", response["message"],
+                          "There should be a clear error message explaining what went wrong.")
+
+
+    def test_questionnionare_post_creates_log_record(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
+        rv = self.app.post('api/flow/intake/contact_questionnaire', data=json.dumps(cq), content_type="application/json",
+                           follow_redirects=True, headers=headers)
+        self.assertSuccess(rv)
+        log = db.session.query(StepLog).all()
+        self.assertIsNotNone(log)
+        self.assertTrue(len(log) > 0)
+
+    def test_flow_endpoint(self):
+        # It should be possible to get a list of available flows
+        rv = self.app.get('api/flow', content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(200, rv.status_code)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response)
+        self.assertTrue(len(response) > 0)
+
+    def test_intake_flow_with_user(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+        rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
+        self.assertEqual(200, rv.status_code)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response)
+        self.assertEqual('intake', response['name'])
+        self.assertIsNotNone(response['steps'])
+        self.assertTrue(len(response['steps']) > 0)
+        self.assertEqual('identification_questionnaire', response['steps'][0]['name'])
+        self.assertEqual(QuestionService.TYPE_IDENTIFYING, response['steps'][0]['type'])
+        self.assertEqual(Step.STATUS_INCOMPLETE, response['steps'][0]['status'])
+
+        cq = {
+            'first_name': "Darah",
+            'middle_name': "Soo",
+            'last_name': "Ubway",
+            'is_first_name_preferred': True,
+            'birthdate': '02/02/2002',
+            'birth_city': 'Staunton',
+            'birth_state': 'VA',
+            'is_english_primary': True,
+            'participant_id': p.id
+        }
+        rv = self.app.post('api/flow/intake/identification_questionnaire', data=json.dumps(cq), content_type="application/json",
+                           follow_redirects=True, headers=headers)
+
+        rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual('identification_questionnaire', response['steps'][0]['name'])
+        self.assertEqual(Step.STATUS_COMPLETE, response['steps'][0]['status'])
+        self.assertIsNotNone(response['steps'][0]['date_completed'])
+
+

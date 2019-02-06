@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 import { Resource } from '../resource';
 import { ActivatedRoute } from '@angular/router';
 
@@ -18,8 +18,6 @@ export class ResourceDetailComponent implements OnInit {
       if (isFinite(resourceId)) {
         this.api.getResource(resourceId).subscribe(resource => {
           this.resource = resource;
-          console.log('resource', resource);
-
         });
       }
     });

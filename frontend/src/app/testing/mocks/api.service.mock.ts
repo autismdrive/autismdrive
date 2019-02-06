@@ -1,5 +1,5 @@
-import { ApiService } from '../../api.service';
 import { SpyObject, SDSpy } from './helper.mock';
+import { ApiService } from '../../services/api/api.service';
 
 
 export class MockApiService extends SpyObject {

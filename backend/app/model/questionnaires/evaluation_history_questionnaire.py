@@ -3,12 +3,18 @@ import datetime
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
+from app.question_service import QuestionService
 
 
 class EvaluationHistoryQuestionnaire(db.Model):
     __tablename__ = 'evaluation_history_questionnaire'
+    __question_type__ = QuestionService.TYPE_SENSITIVE
+    __estimated_duration_minutes__ = 5
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         'participant_id',
         db.Integer,
@@ -34,7 +40,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(!model.is_self ? "Do you" : "Does " + model.first_name) + '
+                'template_options.label': '(formState.mainModel.is_self ? "Do you" : "Does " + formState.mainModel.preferred_name) + '
                                           '" self-identify as having Autism?"'
             }
         }
@@ -54,7 +60,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(!model.is_self ? "Have you" : "Has " + model.first_name) + '
+                'template_options.label': '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
                                           '" been formally diagnosed with Autism Spectrum Disorder?"'
             }
         }
@@ -69,8 +75,8 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 'required': True
             },
             'expression_properties': {
-                'template_options.label': '"How old " + (!model.is_self ? "were you " : "was " + model.first_name) + '
-                                          '" when " + (!model.is_self ? "you " : "they ") + " were first diagnosed'
+                'template_options.label': '"How old " + (formState.mainModel.is_self ? "were you " : "was " + formState.mainModel.preferred_name) + '
+                                          '" when " + (formState.mainModel.is_self ? "you " : "they ") + " were first diagnosed'
                                           ' with ASD?"'
             }
         }
@@ -79,7 +85,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
         db.String,
         info={
             'display_order': 4,
-            'type': 'radio',
+            'type': 'select',
             'template_options': {
                 'label': 'Who diagnosed?',
                 'required': True,
@@ -93,7 +99,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Who first diagnosed " + (!model.is_self ? "you" : model.first_name) + '
+                'template_options.label': '"Who first diagnosed " + (formState.mainModel.is_self ? "you" : formState.mainModel.preferred_name) + '
                                           '" with ASD?"'
             }
         }
@@ -106,14 +112,14 @@ class EvaluationHistoryQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'First diagnosed by'
             },
-            'hide_expression': '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
+            'hide_expression': '!(formState.mainModel.who_diagnosed && (formState.mainModel.who_diagnosed === "diagnosisOther"))',
         }
     )
     where_diagnosed = db.Column(
         db.String,
         info={
             'display_order': 6,
-            'type': 'radio',
+            'type': 'select',
             'template_options': {
                 'label': 'Where diagnosed?',
                 'required': True,
@@ -147,7 +153,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Where did " + (!model.is_self ? "you" : model.first_name) + '
+                'template_options.label': '"Where did " + (formState.mainModel.is_self ? "you" : formState.mainModel.preferred_name) + '
                                           '" receive this diagnosis?"'
             }
         }
@@ -160,16 +166,16 @@ class EvaluationHistoryQuestionnaire(db.Model):
             'template_options': {
                 'placeholder': 'Where diagnosed?'
             },
-            'hide_expression': '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
+            'hide_expression': '!(formState.mainModel.where_diagnosed && (formState.mainModel.where_diagnosed === "diagnosisOther"))',
         }
     )
     partner_centers_evaluation = db.Column(
         db.String,
         info={
-            'display_order': 8,
-            'type': 'radio',
+            'display_order': 8.1,
+            'type': 'multicheckbox',
+            'class_name': 'vertical-checkbox-group',
             'template_options': {
-                'label': 'Evaluation at partner institution?',
                 'required': True,
                 'options': [
                     {'value': 'uva', 'label': 'UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children\'s Rehabilitation Center, KCRC)'},
@@ -178,10 +184,6 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     {'value': 'fc', 'label': 'Faison Center'},
                     {'value': 'inova', 'label': 'INOVA Health System'}
                 ]
-            },
-            'expression_properties': {
-                'template_options.label': '(!model.is_self ? "Have you" : "Has " + model.first_name) + '
-                                          '" ever been evaluated at any of the following centers?"'
             }
         }
     )
@@ -200,10 +202,10 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '"Do we have your permission to link " + (!model.is_self ? "your" : model.first_name + "\'s") + '
+                'template_options.label': '"Do we have your permission to link " + (!formState.mainModel.is_self ? "your" : formState.mainModel.preferred_name + "\'s") + '
                                           '" evaluation data to the UVa Autism Database?"'
                                          },
-            'hide_expression': '!(model.partner_centers_evaluation)',
+            'hide_expression': '!(formState.mainModel.partner_centers_evaluation)',
         }
     )
     has_iq_test = db.Column(
@@ -221,7 +223,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 ]
             },
             'expression_properties': {
-                'template_options.label': '(!model.is_self ? "Have you" : "Has " + model.first_name) + '
+                'template_options.label': '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
                                           '" been given an IQ or intelligence test?"'
             }
         }
@@ -232,13 +234,13 @@ class EvaluationHistoryQuestionnaire(db.Model):
             'display_order': 11,
             'type': 'input',
             'template_options': {
-                'placeholder': 'Recent IQ score?'
+                'placeholder': 'IQ score'
             },
             'expression_properties': {
-                'template_options.label': '"What was" + (!model.is_self ? "your" : model.first_name + "\'s") + '
+                'template_options.label': '"What was " + (formState.mainModel.is_self ? "your" : formState.mainModel.preferred_name + "\'s") + '
                                           '" most recent IQ score?"'
             },
-            'hide_expression': '!(model.has_iq_test)'
+            'hide_expression': '!(formState.mainModel.has_iq_test)'
         }
     )
 
@@ -248,6 +250,22 @@ class EvaluationHistoryQuestionnaire(db.Model):
                 'sensitive': True,
                 'label': 'Evaluation History',
                 'description': '',
+            },
+            'field_groups': {
+                'partner_centers': {
+                    'fields': [
+                        'partner_centers_evaluation'
+                    ],
+                    'display_order': 8,
+                    'wrappers': ['card'],
+                    'template_options': {
+                        'label': 'Evaluation at partner institution?'
+                    },
+                    'expression_properties': {
+                        'template_options.label': '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
+                        '" ever been evaluated at any of the following centers?"'
+                    }
+                }
             }
         }
         for c in self.metadata.tables['evaluation_history_questionnaire'].columns:
@@ -269,4 +287,3 @@ class EvaluationHistoryQuestionnaireMetaSchema(ModelSchema):
     class Meta:
         model = EvaluationHistoryQuestionnaire
         fields = ('get_meta',)
-

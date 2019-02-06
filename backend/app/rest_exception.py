@@ -1,6 +1,6 @@
 class RestException(Exception):
     status_code = 400
-    NOT_FOUND = {'code': 'not_found', 'message': 'Unknown path.', 'status_code':404}
+    NOT_FOUND = {'code': 'not_found', 'message': 'Unknown path.', 'status_code': 404}
     TOKEN_INVALID = {'code': 'token_invalid', 'message': 'Please log in again.'}
     EMAIL_TOKEN_INVALID = {'code': 'email_token_invalid', 'message': 'Your email was not validated.  Please try resetting your password to continue.'}
     TOKEN_EXPIRED = {'code': 'token_expired', 'message': 'Your session timed out.  Please log in again.'}
@@ -14,6 +14,8 @@ class RestException(Exception):
     EMAIL_EXISTS = {'code': 'duplicate_email', 'message': 'The email you provided is already in use.'}
     EMAIL_NOT_REGISTERED = {'code': 'email_not_registered', 'message': 'The email you provided not associated with any of our accounts. Please enter a different email or register for an account.'}
     CONFIRM_EMAIL = {'code': 'confirm_email', 'message': 'You must confirm your email address before signing in.'}
+    NOT_IN_THE_FLOW = {'code': 'not_in_the_flow', 'message': 'The Questionnaire you submitted is not in the flow'}
+    UNRELATED_PARTICIPANT = {'code': 'unrelated_participant', 'message': 'You must be related to the participant.'}
 
     def __init__(self, payload, status_code=None, details=None):
         Exception.__init__(self)

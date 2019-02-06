@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../api.service';
+import { ApiService } from '../services/api/api.service';
 import { Study } from '../study';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -18,8 +18,6 @@ export class StudyDetailComponent implements OnInit {
       if (isFinite(studyId)) {
         this.api.getStudy(studyId).subscribe(study => {
           this.study = study;
-          console.log('study', study);
-
         });
       }
     });
