@@ -26,7 +26,7 @@ class EmploymentQuestionnaire(db.Model):
     is_currently_employed = db.Column(
         db.Boolean,
         info={
-            'display_order': 1,
+            'display_order': 1.1,
             'type': 'radio',
             'template_options': {
                 'label': 'Are you currently employed?',
@@ -41,7 +41,7 @@ class EmploymentQuestionnaire(db.Model):
     employment_capacity = db.Column(
         db.String,
         info={
-            'display_order': 1,
+            'display_order': 1.2,
             'type': 'radio',
             'default_value': True,
             'template_options': {
@@ -58,7 +58,7 @@ class EmploymentQuestionnaire(db.Model):
     has_employment_support = db.Column(
         db.Boolean,
         info={
-            'display_order': 1,
+            'display_order': 2,
             'type': 'radio',
             'template_options': {
                 'label': 'Do you currently receive supports to help you work successfully, such as job coaching or '
