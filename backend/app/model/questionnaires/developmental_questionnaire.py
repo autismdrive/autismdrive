@@ -43,8 +43,8 @@ class DevelopmentalQuestionnaire(db.Model):
                 "label": "Please describe:",
                 "required": False,
             },
-            "hide_expression": "!(model.had_birth_complications && (model.had_birth_complications == True))",
-        },
+            'hide_expression': '!model.had_birth_complications',
+        }
     )
     when_motor_milestones = db.Column(
         db.String,
