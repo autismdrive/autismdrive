@@ -1320,7 +1320,6 @@ class TestCase(unittest.TestCase):
         self.assertEquals("Dorothy", response["participant"]["first_name"])
         self.assertEquals("Edwards", response["participant"]["last_name"])
 
-
     def test_get_participant_by_user(self):
         u = self.construct_user()
         p = self.construct_participant()
@@ -1335,7 +1334,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(u.id, response['id'])
         self.assertEqual(2, len(response['participants']))
         self.assertEqual(p.first_name, response['participants'][1]["participant"]["first_name"])
-
 
     def test_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
@@ -1596,6 +1594,22 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertIsNotNone(response)
         self.assertTrue(len(response) > 0)
+
+    def test_intake_flows_endpoint(self):
+        # Are the basics correct about the existing intake flows?
+        rv = self.app.get('api/flow', content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(200, rv.status_code)
+        response = json.loads(rv.get_data(as_text=True))
+        for i in response:
+            if i['name'] == 'self_intake':
+                self.assertEqual(len(i['steps']), 10)
+                self.assertEqual(i['steps'][8]['name'], 'employment_questionnaire')
+            if i['name'] == 'dependent_intake':
+                self.assertEqual(len(i['steps']), 9)
+                self.assertEqual(i['steps'][5]['name'], 'developmental_questionnaire')
+            if i['name'] == 'guardian_intake':
+                self.assertEqual(len(i['steps']), 3)
+                self.assertEqual(i['steps'][1]['name'], 'contact_questionnaire')
 
     def test_self_intake_flow_with_user(self):
         u = self.construct_user()
