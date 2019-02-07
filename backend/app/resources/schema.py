@@ -1,5 +1,6 @@
 from flask_marshmallow.sqla import ModelSchema
 from marshmallow import fields, Schema
+from marshmallow_enum import EnumField
 from sqlalchemy import func
 
 
@@ -14,7 +15,7 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
-from app.model.user_participant import UserParticipant
+from app.model.user_participant import UserParticipant, Relationship
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
@@ -298,6 +299,7 @@ class UserParticipantsSchema(ModelSchema):
         model = UserParticipant
         fields = ('id', '_links', 'participant_id', 'user_id', 'participant', 'relationship')
     participant = fields.Nested(ParticipantSchema, dump_only=True)
+    relationship = EnumField(Relationship)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
         'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),

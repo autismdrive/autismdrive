@@ -1,10 +1,11 @@
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
+from sqlalchemy import exc
 
 from app import db, RestException, auth
 from app.model.participant import Participant
-from app.model.user_participant import UserParticipant
+from app.model.user_participant import UserParticipant, Relationship
 from app.resources.schema import UserParticipantsSchema, ParticipantSchema
 from app.wrappers import requires_roles
 
@@ -25,6 +26,9 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def post(self, relationship):
+        if not Relationship.has_name(relationship) :
+            raise RestException(RestException.UNKNOWN_RELATIONSHIP,
+                                details="Valid Options:" + ','.join(Relationship.options()))
         request_data = request.get_json()
         try:
             load_result = self.participant_schema.load(request_data).data
@@ -36,6 +40,10 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
+        except exc.IntegrityError as err:
+            raise RestException(RestException.INVALID_OBJECT,
+                                details=load_result.errors)
+
 
 
 class UserParticipantEndpoint(flask_restful.Resource):
