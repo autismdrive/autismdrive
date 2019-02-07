@@ -13,6 +13,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
