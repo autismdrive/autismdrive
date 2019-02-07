@@ -29,9 +29,20 @@ from app.model.user_participant import UserParticipant
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
+from app.model.questionnaires.assistive_device import AssistiveDevice
+from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.questionnaires.current_behaviors_questionnaire import CurrentBehaviorsQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
+from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
+from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
+from app.model.questionnaires.housemate import Housemate
+from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.medication import Medication
+from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
+from app.model.questionnaires.therapy import Therapy
 
 class TestCase(unittest.TestCase):
 
@@ -216,6 +227,20 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_participant.first_name, participant.first_name)
         return db_participant
 
+    def construct_assistive_device(self, type='prosthetic', description='leg', timeframe='current',
+                                   notes='I love my new leg!', supports_questionnaire=None):
+
+        ad = AssistiveDevice(type=type, description=description, timeframe=timeframe, notes=notes)
+        if supports_questionnaire is not None:
+            ad.supports_questionnaire_id = supports_questionnaire.id
+
+        db.session.add(ad)
+        db.session.commit()
+
+        db_ad = db.session.query(AssistiveDevice).filter_by(last_updated=ad.last_updated).first()
+        self.assertEqual(db_ad.description, ad.description)
+        return db_ad
+
     def construct_contact_questionnaire(self, phone="123-456-7890", zip=55678, marketing_channel="Zine Ad",
                                         participant=None, user=None):
 
@@ -285,6 +310,69 @@ class TestCase(unittest.TestCase):
             years_old_at_first_diagnosis=ehq.years_old_at_first_diagnosis).first()
         self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
         return db_ehq
+
+    def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
+                             notes='I feel better than ever!', supports_questionnaire=None):
+
+        m = Medication(name=name, dosage=dosage, time_frame=time_frame, notes=notes)
+        if supports_questionnaire is not None:
+            m.supports_questionnaire_id = supports_questionnaire.id
+
+        db.session.add(m)
+        db.session.commit()
+
+        db_m = db.session.query(Medication).filter_by(last_updated=m.last_updated).first()
+        self.assertEqual(db_m.dosage, m.dosage)
+        return db_m
+
+    def construct_therapy(self, type='behavioral', description='Discrete Trial Training', timeframe='current',
+                          notes='Small steps', supports_questionnaire=None):
+
+        t = Therapy(type=type, description=description, timeframe=timeframe, notes=notes)
+        if supports_questionnaire is not None:
+            t.supports_questionnaire_id = supports_questionnaire.id
+
+        db.session.add(t)
+        db.session.commit()
+
+        db_t = db.session.query(Therapy).filter_by(last_updated=t.last_updated).first()
+        self.assertEqual(db_t.description, t.description)
+        return db_t
+
+    def construct_supports_questionnaire(self, medications=None, therapies=None, assistive_devices=None, participant=None, user=None):
+
+        sq = SupportsQuestionnaire()
+        if participant is None:
+            sq.participant_id = self.construct_participant(last_name="Cantorella").id
+        else:
+            sq.participant_id = participant.id
+
+        if user is None:
+            sq.user_id = self.construct_user(email="user@supports.org").id
+        else:
+            sq.user_id = user.id
+
+        db.session.add(sq)
+        db.session.commit()
+
+        if assistive_devices is None:
+            self.construct_assistive_device(supports_questionnaire=sq)
+        else:
+            sq.assistive_devices = assistive_devices
+
+        if medications is None:
+            self.construct_medication(supports_questionnaire=sq)
+        else:
+            sq.medications = medications
+
+        if therapies is None:
+            self.construct_therapy(supports_questionnaire=sq)
+        else:
+            sq.therapies = therapies
+
+        db_sq = db.session.query(SupportsQuestionnaire).filter_by(participant_id=sq.participant_id).first()
+        self.assertEqual(db_sq.last_updated, sq.last_updated)
+        return db_sq
 
     def test_resource_basics(self):
         self.construct_resource()
@@ -1260,7 +1348,6 @@ class TestCase(unittest.TestCase):
         p = db.session.query(Participant).filter_by(id=p.id).first()
         self.assertEqual("My brand new", p.first_name)
 
-
     def test_modify_participant_basics_admin(self):
         self.construct_participant()
         p = db.session.query(Participant).first()
@@ -1529,6 +1616,73 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['years_old_at_first_diagnosis'], 5)
         self.assertIsNotNone(response['id'])
 
+    def test_supports_questionnaire_basics(self):
+        self.construct_supports_questionnaire()
+        sq = db.session.query(SupportsQuestionnaire).first()
+        self.assertIsNotNone(sq)
+        sq_id = sq.id
+        rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], sq_id)
+        self.assertEqual(response["participant_id"], sq.participant_id)
+        self.assertEqual(response["user_id"], sq.user_id)
+        self.assertEqual(len(response["assistive_devices"]), len(sq.assistive_devices))
+        self.assertEqual(len(response["medications"]), len(sq.medications))
+        self.assertEqual(len(response["therapies"]), len(sq.therapies))
+
+    def test_modify_supports_questionnaire_basics(self):
+        self.construct_supports_questionnaire()
+        sq = db.session.query(SupportsQuestionnaire).first()
+        self.assertIsNotNone(sq)
+        sq_id = sq.id
+        rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['participant_id'] = self.construct_participant(first_name="Solidaria").id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/supports_questionnaire/%i' % sq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        self.construct_medication(name='Iocane Powder', supports_questionnaire=sq)
+        self.construct_therapy(type='socialSkills', supports_questionnaire=sq)
+        self.construct_assistive_device(type='scooter', supports_questionnaire=sq)
+        rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(len(response['medications']), 2)
+        self.assertEqual(len(response['therapies']), 2)
+        self.assertEqual(len(response['assistive_devices']), 2)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_supports_questionnaire(self):
+        sq = self.construct_supports_questionnaire()
+        sq_id = sq.id
+        rv = self.app.get('api/q/supports_questionnaire/%i' % sq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/supports_questionnaire/%i' % sq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/supports_questionnaire/%i' % sq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_supports_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        supports_questionnaire = {'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/supports_questionnaire',
+                           data=json.dumps(supports_questionnaire), content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['participant_id'], p.id)
+        self.assertIsNotNone(response['id'])
+
     def test_questionnare_post_fails_if_flow_does_not_exist(self):
         evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
         rv = self.app.post('api/flow/noSuchFlow/evaluation_history_questionnaire',
@@ -1572,7 +1726,6 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertEqual("Unable to save the provided object.", response["message"],
                           "There should be a clear error message explaining what went wrong.")
-
 
     def test_questionnionare_post_creates_log_record(self):
         u = self.construct_user()
