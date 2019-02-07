@@ -241,6 +241,29 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_ad.description, ad.description)
         return db_ad
 
+    def construct_clinical_diagnoses_questionnaire(self, developmental='speechLanguage', mental_health='ocd',
+                                                   medical='insomnia', genetic='corneliaDeLange', participant=None,
+                                                   user=None):
+
+        cdq = ClinicalDiagnosesQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
+                                             genetic=genetic)
+        if participant is None:
+            cdq.participant_id = self.construct_participant().id
+        else:
+            cdq.participant_id = participant.id
+
+        if user is None:
+            cdq.user_id = self.construct_user().id
+        else:
+            cdq.user_id = user.id
+
+        db.session.add(cdq)
+        db.session.commit()
+
+        db_cdq = db.session.query(ClinicalDiagnosesQuestionnaire).filter_by(user_id=cdq.user_id).first()
+        self.assertEqual(db_cdq.participant_id, cdq.participant_id)
+        return db_cdq
+
     def construct_contact_questionnaire(self, phone="123-456-7890", zip=55678, marketing_channel="Zine Ad",
                                         participant=None, user=None):
 
@@ -1421,6 +1444,70 @@ class TestCase(unittest.TestCase):
         self.assertEqual(u.id, response['id'])
         self.assertEqual(2, len(response['participants']))
         self.assertEqual(p.first_name, response['participants'][1]["participant"]["first_name"])
+
+    def test_clinical_diagnoses_questionnaire_basics(self):
+        self.construct_clinical_diagnoses_questionnaire()
+        cq = db.session.query(ClinicalDiagnosesQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], cq_id)
+        self.assertEqual(response["medical"], cq.medical)
+        self.assertEqual(response["genetic"], cq.genetic)
+
+    def test_modify_clinical_diagnoses_questionnaire_basics(self):
+        self.construct_clinical_diagnoses_questionnaire()
+        cq = db.session.query(ClinicalDiagnosesQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['developmental'] = 'intellectual'
+        response['mental_health'] = 'depression'
+        response['medical'] = 'gastrointestinal'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['developmental'], 'intellectual')
+        self.assertEqual(response['mental_health'], 'depression')
+        self.assertEqual(response['medical'], 'gastrointestinal')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_clinical_diagnoses_questionnaire(self):
+        cq = self.construct_clinical_diagnoses_questionnaire()
+        cq_id = cq.id
+        rv = self.app.get('api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_clinical_diagnoses_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        clinical_diagnoses_questionnaire = {'medical': 'seizure', 'genetic': 'fragileX', 'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/clinical_diagnoses_questionnaire', data=json.dumps(clinical_diagnoses_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['medical'], 'seizure')
+        self.assertEqual(response['genetic'], 'fragileX')
+        self.assertIsNotNone(response['id'])
 
     def test_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
