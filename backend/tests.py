@@ -334,6 +334,30 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_dq.gender_identity, dq.gender_identity)
         return db_dq
 
+    def construct_developmental_questionnaire(self, had_birth_complications=False, when_motor_milestones='delayed',
+                                              when_language_milestones='early', when_toileting_milestones='notYet', participant=None, user=None):
+
+        dq = DevelopmentalQuestionnaire(had_birth_complications=had_birth_complications,
+                                        when_motor_milestones=when_motor_milestones,
+                                        when_language_milestones=when_language_milestones,
+                                        when_toileting_milestones=when_toileting_milestones)
+        if participant is None:
+            dq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+        else:
+            dq.participant_id = participant.id
+
+        if user is None:
+            dq.user_id = self.construct_user(email="user@study.com").id
+        else:
+            dq.user_id = user.id
+
+        db.session.add(dq)
+        db.session.commit()
+
+        db_dq = db.session.query(DevelopmentalQuestionnaire).filter_by(participant_id=dq.participant_id).first()
+        self.assertEqual(db_dq.when_language_milestones, dq.when_language_milestones)
+        return db_dq
+
     def construct_evaluation_history_questionnaire(self, self_identifies_autistic=True, has_autism_diagnosis=True,
                                                    years_old_at_first_diagnosis=7, who_diagnosed="pediatrician",
                                                    participant=None, user=None):
@@ -1730,6 +1754,74 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['birth_sex'], 'female')
         self.assertEqual(response['gender_identity'], 'genderOther')
+        self.assertIsNotNone(response['id'])
+
+    def test_developmental_questionnaire_basics(self):
+        self.construct_developmental_questionnaire()
+        dq = db.session.query(DevelopmentalQuestionnaire).first()
+        self.assertIsNotNone(dq)
+        dq_id = dq.id
+        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], dq_id)
+        self.assertEqual(response["had_birth_complications"], dq.had_birth_complications)
+        self.assertEqual(response["when_motor_milestones"], dq.when_motor_milestones)
+
+    def test_modify_developmental_questionnaire_basics(self):
+        self.construct_developmental_questionnaire()
+        dq = db.session.query(DevelopmentalQuestionnaire).first()
+        self.assertIsNotNone(dq)
+        dq_id = dq.id
+        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['when_motor_milestones'] = 'notYet'
+        response['when_language_milestones'] = 'notYet'
+        response['when_toileting_milestones'] = 'early'
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['user_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/developmental_questionnaire/%i' % dq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['when_motor_milestones'], 'notYet')
+        self.assertEqual(response['when_language_milestones'], 'notYet')
+        self.assertEqual(response['when_toileting_milestones'], 'early')
+        self.assertEqual(response['user_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_developmental_questionnaire(self):
+        dq = self.construct_developmental_questionnaire()
+        dq_id = dq.id
+        rv = self.app.get('api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_developmental_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="dependent")
+        headers = self.logged_in_headers(u)
+
+        developmental_questionnaire = {'had_birth_complications': True, 'birth_complications_description': 'C-Section',
+                                       'participant_id': p.id}
+        rv = self.app.post('api/flow/dependent_intake/developmental_questionnaire', data=json.dumps(developmental_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['had_birth_complications'], True)
+        self.assertEqual(response['birth_complications_description'], 'C-Section')
         self.assertIsNotNone(response['id'])
 
     def test_evaluation_history_questionnaire_basics(self):
