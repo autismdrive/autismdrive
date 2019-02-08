@@ -286,6 +286,32 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_cq.phone, cq.phone)
         return db_cq
 
+    def construct_current_behaviors_questionnaire(self, self_verbal_ability='verbal', dependent_verbal_ability='fluent',
+                                                  concerning_behaviors='hoarding', has_academic_difficulties=True,
+                                                  academic_difficulty_areas='math', participant=None, user=None):
+
+        cb = CurrentBehaviorsQuestionnaire(self_verbal_ability=self_verbal_ability,
+                                           dependent_verbal_ability=dependent_verbal_ability,
+                                           concerning_behaviors=concerning_behaviors,
+                                           has_academic_difficulties=has_academic_difficulties,
+                                           academic_difficulty_areas=academic_difficulty_areas)
+        if participant is None:
+            cb.participant_id = self.construct_participant().id
+        else:
+            cb.participant_id = participant.id
+
+        if user is None:
+            cb.user_id = self.construct_user().id
+        else:
+            cb.user_id = user.id
+
+        db.session.add(cb)
+        db.session.commit()
+
+        db_cb = db.session.query(CurrentBehaviorsQuestionnaire).filter_by(participant_id=cb.participant_id).first()
+        self.assertEqual(db_cb.concerning_behaviors, cb.concerning_behaviors)
+        return db_cb
+
     def construct_demographics_questionnaire(self, birth_sex="intersex", gender_identity="intersex",
                                              race_ethnicity="raceBlack", participant=None, user=None):
 
@@ -1571,6 +1597,74 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['phone'], '123-456-7890')
         self.assertEqual(response['marketing_channel'], 'Subway sign')
+        self.assertIsNotNone(response['id'])
+
+    def test_current_behaviors_questionnaire_basics(self):
+        self.construct_current_behaviors_questionnaire()
+        cbq = db.session.query(CurrentBehaviorsQuestionnaire).first()
+        self.assertIsNotNone(cbq)
+        cbq_id = cbq.id
+        rv = self.app.get('/api/q/current_behaviors_questionnaire/%i' % cbq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], cbq_id)
+        self.assertEqual(response["concerning_behaviors"], cbq.concerning_behaviors)
+        self.assertEqual(response["has_academic_difficulties"], cbq.has_academic_difficulties)
+
+    def test_modify_current_behaviors_questionnaire_basics(self):
+        self.construct_current_behaviors_questionnaire()
+        cbq = db.session.query(CurrentBehaviorsQuestionnaire).first()
+        self.assertIsNotNone(cbq)
+        cbq_id = cbq.id
+        rv = self.app.get('/api/q/current_behaviors_questionnaire/%i' % cbq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['self_verbal_ability'] = 'nonVerbal'
+        response['dependent_verbal_ability'] = 'nonVerbal'
+        response['concerning_behaviors'] = 'elopement'
+        response['has_academic_difficulties'] = False
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/current_behaviors_questionnaire/%i' % cbq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/current_behaviors_questionnaire/%i' % cbq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_verbal_ability'], 'nonVerbal')
+        self.assertEqual(response['dependent_verbal_ability'], 'nonVerbal')
+        self.assertEqual(response['concerning_behaviors'], 'elopement')
+        self.assertEqual(response['has_academic_difficulties'], False)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_current_behaviors_questionnaire(self):
+        cbq = self.construct_current_behaviors_questionnaire()
+        cbq_id = cbq.id
+        rv = self.app.get('api/q/current_behaviors_questionnaire/%i' % cbq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/current_behaviors_questionnaire/%i' % cbq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/current_behaviors_questionnaire/%i' % cbq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_current_behaviors_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        current_behaviors_questionnaire = {'self_verbal_ability': 'verbal, AACsystem',
+                                           'has_academic_difficulties': False, 'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/current_behaviors_questionnaire',
+                           data=json.dumps(current_behaviors_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_verbal_ability'], 'verbal, AACsystem')
+        self.assertEqual(response['has_academic_difficulties'], False)
         self.assertIsNotNone(response['id'])
 
     def test_demographics_questionnaire_basics(self):
