@@ -55,10 +55,15 @@ class EducationQuestionnaire(db.Model):
         db.String,
         info={
             "display_order": 3,
-            "type": "input",
+            "type": "radio",
             "template_options": {
                 "label": "What type of school?",
                 "required": False,
+                "options":[
+                    {"value": "public", "label": "Public"},
+                    {"value": "private", "label": "Private"},
+                    {"value": "homeschool", "label": "Home School"},
+                ]
             },
             "expression_properties": {
                 "template_options.label": '(formState.mainModel.is_self ? "Is this a public school, private school, or are you home schooled?" : "Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:")'
