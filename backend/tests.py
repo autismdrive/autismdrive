@@ -471,6 +471,30 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_h.relationship, h.relationship)
         return db_h
 
+    def construct_identification_questionnaire(self, relationship_to_participant='adoptFather', first_name='Karl',
+                                               is_first_name_preferred=False, nickname='Big K', birth_state='VA',
+                                               is_english_primary=False, participant=None, user=None):
+
+        iq = IdentificationQuestionnaire(relationship_to_participant=relationship_to_participant, first_name=first_name,
+                                         is_first_name_preferred=is_first_name_preferred, nickname=nickname,
+                                         birth_state=birth_state, is_english_primary=is_english_primary)
+        if participant is None:
+            iq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+        else:
+            iq.participant_id = participant.id
+
+        if user is None:
+            iq.user_id = self.construct_user(email="user@study.com").id
+        else:
+            iq.user_id = user.id
+
+        db.session.add(iq)
+        db.session.commit()
+
+        db_iq = db.session.query(IdentificationQuestionnaire).filter_by(participant_id=iq.participant_id).first()
+        self.assertEqual(db_iq.nickname, iq.nickname)
+        return db_iq
+
     def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
                              notes='I feel better than ever!', supports_questionnaire=None):
 
@@ -2178,6 +2202,74 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['participant_id'], p.id)
         self.assertEqual(response['self_living_situation'], 'family')
         self.assertEqual(response['struggle_to_afford'], False)
+        self.assertIsNotNone(response['id'])
+
+    def test_identification_questionnaire_basics(self):
+        self.construct_identification_questionnaire()
+        iq = db.session.query(IdentificationQuestionnaire).first()
+        self.assertIsNotNone(iq)
+        iq_id = iq.id
+        rv = self.app.get('/api/q/identification_questionnaire/%i' % iq_id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], iq_id)
+        self.assertEqual(response["first_name"], iq.first_name)
+        self.assertEqual(response["nickname"], iq.nickname)
+        self.assertEqual(response["birth_state"], iq.birth_state)
+
+    def test_modify_identification_questionnaire_basics(self):
+        self.construct_identification_questionnaire()
+        iq = db.session.query(IdentificationQuestionnaire).first()
+        self.assertIsNotNone(iq)
+        iq_id = iq.id
+        rv = self.app.get('/api/q/identification_questionnaire/%i' % iq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['first_name'] = 'Helga'
+        response['birth_city'] = 'Staunton'
+        response['is_first_name_preferred'] = True
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['user_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/identification_questionnaire/%i' % iq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/identification_questionnaire/%i' % iq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Helga')
+        self.assertEqual(response['birth_city'], 'Staunton')
+        self.assertEqual(response['is_first_name_preferred'], True)
+        self.assertEqual(response['user_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_identification_questionnaire(self):
+        iq = self.construct_identification_questionnaire()
+        iq_id = iq.id
+        rv = self.app.get('api/q/identification_questionnaire/%i' % iq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/identification_questionnaire/%i' % iq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/identification_questionnaire/%i' % iq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_identification_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        identification_questionnaire = {'first_name': 'Eloise', 'middle_name': 'Elora', 'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(identification_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['first_name'], 'Eloise')
+        self.assertEqual(response['middle_name'], 'Elora')
         self.assertIsNotNone(response['id'])
 
     def test_supports_questionnaire_basics(self):
