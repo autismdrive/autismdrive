@@ -431,6 +431,46 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
         return db_ehq
 
+    def construct_home_questionnaire(self,self_living_situation='alone', housemates=None, struggle_to_afford=False,
+                                     participant=None, user=None):
+
+        hq = HomeQuestionnaire(self_living_situation=self_living_situation, struggle_to_afford=struggle_to_afford)
+        if participant is None:
+            hq.participant_id = self.construct_participant(last_name="Silamona").id
+        else:
+            hq.participant_id = participant.id
+
+        if user is None:
+            hq.user_id = self.construct_user(email="user@study.com").id
+        else:
+            hq.user_id = user.id
+
+        db.session.add(hq)
+        db.session.commit()
+
+        if housemates is None:
+            self.construct_housemate(home_questionnaire=hq)
+        else:
+            hq.housemates = housemates
+
+        db_hq = db.session.query(HomeQuestionnaire).filter_by(participant_id=hq.participant_id).first()
+        self.assertEqual(db_hq.self_living_situation, hq.self_living_situation)
+        return db_hq
+
+    def construct_housemate(self, name="Fred Fredly", relationship='bioSibling', age=23, has_autism=True,
+                            home_questionnaire=None):
+
+        h = Housemate(name=name, relationship=relationship, age=age, has_autism=has_autism)
+        if home_questionnaire is not None:
+            h.home_questionnaire_id = home_questionnaire.id
+
+        db.session.add(h)
+        db.session.commit()
+
+        db_h = db.session.query(Housemate).filter_by(last_updated=h.last_updated).first()
+        self.assertEqual(db_h.relationship, h.relationship)
+        return db_h
+
     def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
                              notes='I feel better than ever!', supports_questionnaire=None):
 
@@ -2069,6 +2109,75 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['self_identifies_autistic'], True)
         self.assertEqual(response['years_old_at_first_diagnosis'], 5)
+        self.assertIsNotNone(response['id'])
+
+    def test_home_questionnaire_basics(self):
+        self.construct_home_questionnaire()
+        hq = db.session.query(HomeQuestionnaire).first()
+        self.assertIsNotNone(hq)
+        hq_id = hq.id
+        rv = self.app.get('/api/q/home_questionnaire/%i' % hq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], hq_id)
+        self.assertEqual(response["participant_id"], hq.participant_id)
+        self.assertEqual(response["user_id"], hq.user_id)
+        self.assertEqual(response["self_living_situation"], hq.self_living_situation)
+        self.assertEqual(response["struggle_to_afford"], hq.struggle_to_afford)
+        self.assertEqual(len(response["housemates"]), len(hq.housemates))
+
+    def test_modify_home_questionnaire_basics(self):
+        self.construct_home_questionnaire()
+        hq = db.session.query(HomeQuestionnaire).first()
+        self.assertIsNotNone(hq)
+        hq_id = hq.id
+        rv = self.app.get('/api/q/home_questionnaire/%i' % hq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['participant_id'] = self.construct_participant(first_name="Solidaria").id
+        response['self_living_situation'] = 'caregiver'
+        response['struggle_to_afford'] = True
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/home_questionnaire/%i' % hq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        self.construct_housemate(name='Debbie Danger', home_questionnaire=hq)
+        rv = self.app.get('/api/q/home_questionnaire/%i' % hq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['self_living_situation'], 'caregiver')
+        self.assertEqual(response['struggle_to_afford'], True)
+        self.assertEqual(len(response['housemates']), 2)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_home_questionnaire(self):
+        hq = self.construct_home_questionnaire()
+        hq_id = hq.id
+        rv = self.app.get('api/q/home_questionnaire/%i' % hq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/home_questionnaire/%i' % hq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/home_questionnaire/%i' % hq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_home_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship="self")
+        headers = self.logged_in_headers(u)
+
+        home_questionnaire = {'self_living_situation': 'family', 'struggle_to_afford': False, 'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/home_questionnaire',
+                           data=json.dumps(home_questionnaire), content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['participant_id'], p.id)
+        self.assertEqual(response['self_living_situation'], 'family')
+        self.assertEqual(response['struggle_to_afford'], False)
         self.assertIsNotNone(response['id'])
 
     def test_supports_questionnaire_basics(self):
