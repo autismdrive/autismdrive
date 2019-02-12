@@ -25,7 +25,7 @@ from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.participant import Participant
-from app.model.user_participant import UserParticipant
+from app.model.user_participant import UserParticipant, Relationship
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
@@ -182,7 +182,7 @@ class TestCase(unittest.TestCase):
 
         user = User(email=email, role=role)
         participant = Participant(first_name=first_name, last_name=last_name)
-        relation = UserParticipant(user=user, participant=participant, relationship="self")
+        relation = UserParticipant(user=user, participant=participant, relationship=Relationship.self_guardian)
         db.session.add(user)
         db.session.add(participant)
         db.session.add(relation)
@@ -1227,7 +1227,7 @@ class TestCase(unittest.TestCase):
 
     def test_modify_participant_you_do_not_own(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         good_headers = self.logged_in_headers(u)
 
         p = db.session.query(Participant).first()
@@ -1251,7 +1251,7 @@ class TestCase(unittest.TestCase):
 
     def test_modify_participant_you_do_own(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
         participant = {'first_name': "My brand new", 'last_name': "name"}
         rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
@@ -1305,7 +1305,7 @@ class TestCase(unittest.TestCase):
         participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
         rv = self.app.post('/api/session/participant/dependent', data=json.dumps(participant), content_type="application/json",
                            follow_redirects=True)
-        self.assertEquals(401, rv.status_code, "you can't create a participant without an account.")
+        self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
 
         rv = self.app.post(
             '/api/session/participant/dependent', data=json.dumps(participant),
@@ -1320,11 +1320,20 @@ class TestCase(unittest.TestCase):
         self.assertEquals("Dorothy", response["participant"]["first_name"])
         self.assertEquals("Edwards", response["participant"]["last_name"])
 
+    def test_create_participant_with_bad_relationship(self):
+
+        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
+        rv = self.app.post('/api/session/participant/free_loader', data=json.dumps(participant),
+                           content_type="application/json", follow_redirects=True,  headers=self.logged_in_headers())
+        self.assertEqual(400, rv.status_code, "you can't create a participant using an invalid relationship")
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["code"], "unkown_relationship")
+
 
     def test_get_participant_by_user(self):
         u = self.construct_user()
         p = self.construct_participant()
-        up = UserParticipant(user=u, participant=p, relationship="Self")
+        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
         db.session.add(up)
         db.session.commit()
         rv = self.app.get(
@@ -1387,7 +1396,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_contact_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
 
         contact_questionnaire = {'phone': "123-456-7890", 'marketing_channel': "Subway sign", 'participant_id': p.id}
@@ -1452,7 +1461,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_demographics_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
 
         demographics_questionnaire = {'birth_sex': "female", 'gender_identity': "genderOther", 'participant_id': p.id}
@@ -1516,7 +1525,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_evaluation_history_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
 
         evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5,
@@ -1578,7 +1587,7 @@ class TestCase(unittest.TestCase):
 
     def test_questionnionare_post_creates_log_record(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
 
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
@@ -1599,7 +1608,7 @@ class TestCase(unittest.TestCase):
 
     def test_intake_flow_with_user(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
         rv = self.app.get('api/flow/intake/%i' % p.id, content_type="application/json", headers=headers)
         self.assertEqual(200, rv.status_code)

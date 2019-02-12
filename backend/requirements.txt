@@ -9,3 +9,4 @@ flask-bcrypt==0.7.1
 flask-cors==3.0.3
 flask-httpauth==3.2.4
 PyJWT==1.6.3
+marshmallow-enum==1.4.1

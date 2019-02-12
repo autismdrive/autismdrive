@@ -1,3 +1,5 @@
+
+
 class RestException(Exception):
     status_code = 400
     NOT_FOUND = {'code': 'not_found', 'message': 'Unknown path.', 'status_code': 404}
@@ -16,6 +18,7 @@ class RestException(Exception):
     CONFIRM_EMAIL = {'code': 'confirm_email', 'message': 'You must confirm your email address before signing in.'}
     NOT_IN_THE_FLOW = {'code': 'not_in_the_flow', 'message': 'The Questionnaire you submitted is not in the flow'}
     UNRELATED_PARTICIPANT = {'code': 'unrelated_participant', 'message': 'You must be related to the participant.'}
+    UNKNOWN_RELATIONSHIP = {'code': 'unkown_relationship', 'message': 'please use a pre-defined relationship'}
 
     def __init__(self, payload, status_code=None, details=None):
         Exception.__init__(self)
