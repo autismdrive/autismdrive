@@ -195,7 +195,7 @@ class TestCase(unittest.TestCase):
 
         user = User(email=email, role=role)
         participant = Participant(first_name=first_name, last_name=last_name)
-        relation = UserParticipant(user=user, participant=participant, relationship=Relationship.self_guardian)
+        relation = UserParticipant(user=user, participant=participant, relationship=Relationship.self_participant)
         db.session.add(user)
         db.session.add(participant)
         db.session.add(relation)
@@ -1588,8 +1588,8 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(response["user_id"])
         self.assertEqual("dependent", response["relationship"])
         self.assertTrue("participant" in response)
-        self.assertEquals("Dorothy", response["participant"]["first_name"])
-        self.assertEquals("Edwards", response["participant"]["last_name"])
+        self.assertEqual("Dorothy", response["participant"]["first_name"])
+        self.assertEqual("Edwards", response["participant"]["last_name"])
 
     def test_create_participant_with_bad_relationship(self):
 
@@ -1598,7 +1598,7 @@ class TestCase(unittest.TestCase):
                            content_type="application/json", follow_redirects=True,  headers=self.logged_in_headers())
         self.assertEqual(400, rv.status_code, "you can't create a participant using an invalid relationship")
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["code"], "unkown_relationship")
+        self.assertEqual(response["code"], "unknown_relationship")
 
     def test_get_participant_by_user(self):
         u = self.construct_user()
@@ -1729,7 +1729,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_contact_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         contact_questionnaire = {'phone': "123-456-7890", 'marketing_channel': "Subway sign", 'participant_id': p.id}
@@ -1862,7 +1862,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_demographics_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         demographics_questionnaire = {'birth_sex': "female", 'gender_identity': "genderOther", 'participant_id': p.id}
@@ -2134,7 +2134,7 @@ class TestCase(unittest.TestCase):
 
         evaluation_history_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5,
                                             'participant_id': p.id}
-        rv = self.app.post('api/flow/self_intake/evaluation_history_questionnaire',
+        rv = self.app.post('api/flow/dependent_intake/evaluation_history_questionnaire',
                            data=json.dumps(evaluation_history_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -2394,7 +2394,7 @@ class TestCase(unittest.TestCase):
 
     def test_questionnionare_post_creates_log_record(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
@@ -2431,7 +2431,7 @@ class TestCase(unittest.TestCase):
 
     def test_self_intake_flow_with_user(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
         rv = self.app.get('api/flow/self_intake/%i' % p.id, content_type="application/json", headers=headers)
         self.assertEqual(200, rv.status_code)
