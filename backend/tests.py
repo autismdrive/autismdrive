@@ -1600,7 +1600,6 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["code"], "unkown_relationship")
 
-
     def test_get_participant_by_user(self):
         u = self.construct_user()
         p = self.construct_participant()
@@ -1666,7 +1665,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_clinical_diagnoses_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         clinical_diagnoses_questionnaire = {'medical': 'seizure', 'genetic': 'fragileX', 'participant_id': p.id}
@@ -1796,7 +1795,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_current_behaviors_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         current_behaviors_questionnaire = {'self_verbal_ability': 'verbal, AACsystem',
@@ -1930,7 +1929,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_developmental_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="dependent")
+        p = self.construct_participant(user=u, relationship=Relationship.dependent)
         headers = self.logged_in_headers(u)
 
         developmental_questionnaire = {'had_birth_complications': True, 'birth_complications_description': 'C-Section',
@@ -1998,7 +1997,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_education_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         education_questionnaire = {'attends_school': True, 'school_name': 'Attreyu Academy', 'participant_id': p.id}
@@ -2066,7 +2065,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_employment_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         employment_questionnaire = {'is_currently_employed': True, 'employment_capacity': 'partTime', 'participant_id': p.id}
@@ -2199,7 +2198,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_home_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         home_questionnaire = {'self_living_situation': 'family', 'struggle_to_afford': False, 'participant_id': p.id}
@@ -2268,7 +2267,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_identification_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         identification_questionnaire = {'first_name': 'Eloise', 'middle_name': 'Elora', 'participant_id': p.id}
@@ -2336,7 +2335,7 @@ class TestCase(unittest.TestCase):
 
     def test_create_supports_questionnaire(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship="self")
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         supports_questionnaire = {'participant_id': p.id}
