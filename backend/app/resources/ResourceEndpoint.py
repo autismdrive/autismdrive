@@ -4,7 +4,7 @@ import flask_restful
 from flask import request
 from marshmallow import ValidationError
 
-from app import RestException, db
+from app import RestException, db, elastic_index
 from app.model.resource import StarResource
 from app.resources.schema import StarResourceSchema
 
@@ -19,7 +19,11 @@ class ResourceEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     def delete(self, id):
-        db.session.query(StarResource).filter_by(id=id).delete()
+        resource = db.session.query(StarResource).filter_by(id=id).delete()
+        try:
+            elastic_index.remove_resource(resource, 'Resource')
+        except:
+            print("unable to remove record from elastic index, might not exist.")
         db.session.commit()
         return None
 
@@ -31,6 +35,7 @@ class ResourceEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()
+        elastic_index.update_resource(updated, 'Resource')
         return self.schema.dump(updated)
 
 
@@ -49,6 +54,7 @@ class ResourceListEndpoint(flask_restful.Resource):
             load_result = self.resourceSchema.load(request_data).data
             db.session.add(load_result)
             db.session.commit()
+            elastic_index.add_resource(load_result, 'Resource')
             return self.resourceSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,

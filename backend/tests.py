@@ -143,6 +143,7 @@ class TestCase(unittest.TestCase):
 
         db_resource = db.session.query(StarResource).filter_by(title=resource.title).first()
         self.assertEqual(db_resource.website, resource.website)
+        elastic_index.add_resource(db_resource, 'Resource')
         return db_resource
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
@@ -1465,36 +1466,106 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         return json.loads(rv.get_data(as_text=True))
 
-    def test_search_crud(self):
+    def test_resource_search_basics(self):
         elastic_index.clear()
         rainbow_query = {'query': 'rainbows', 'filters': []}
         world_query = {'query': 'world', 'filters': []}
-        space_query = {'query': 'space', 'filters': []}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["resources"]))
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["resources"]))
 
+        # test that elastic resource is created with post
+        resource = {'title': "space unicorn", 'description': "delivering rainbows"}
+        rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+
+        search_results = self.search(rainbow_query)
+        self.assertEqual(1, len(search_results["resources"]))
+        self.assertEqual(search_results['resources'][0]['id'], response['id'])
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+    def test_study_search_basics(self):
+        elastic_index.clear()
+        rainbow_query = {'query': 'rainbows', 'filters': []}
+        world_query = {'query': 'world', 'filters': []}
+        search_results = self.search(rainbow_query)
+        self.assertEqual(0, len(search_results["resources"]))
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+        # test that elastic resource is created with post
+        study = {'title': "space unicorn", 'description': "delivering rainbows"}
+        rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+
+        search_results = self.search(rainbow_query)
+        self.assertEqual(1, len(search_results["resources"]))
+        self.assertEqual(search_results['resources'][0]['id'], response['id'])
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+    def test_training_search_basics(self):
+        elastic_index.clear()
+        rainbow_query = {'query': 'rainbows', 'filters': []}
+        world_query = {'query': 'world', 'filters': []}
+        search_results = self.search(rainbow_query)
+        self.assertEqual(0, len(search_results["resources"]))
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+        # test that elastic resource is created with post
+        training = {'title': "space unicorn", 'description': "delivering rainbows"}
+        rv = self.app.post('api/training', data=json.dumps(training), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+
+        search_results = self.search(rainbow_query)
+        self.assertEqual(1, len(search_results["resources"]))
+        self.assertEqual(search_results['resources'][0]['id'], response['id'])
+        search_results = self.search(world_query)
+        self.assertEqual(0, len(search_results["resources"]))
+
+    def test_modify_resource_search_basics(self):
+        elastic_index.clear()
+        rainbow_query = {'query': 'rainbows', 'filters': []}
+        world_query = {'query': 'world', 'filters': []}
+        # create the resource
         resource = self.construct_resource(
             title='space unicorn', description="delivering rainbows")
-        elastic_index.add_resource(resource, 'Resource')
+        # test that it indeed exists
+        rv = self.app.get('/api/resource/%i' % resource.id, content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+
         search_results = self.search(rainbow_query)
         self.assertEqual(1, len(search_results["resources"]))
         self.assertEqual(search_results['resources'][0]['id'], resource.id)
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["resources"]))
 
-        resource.description = 'all around the world'
-        elastic_index.update_resource(resource, 'Resource')
+        response = json.loads(rv.get_data(as_text=True))
+        response['description'] = 'all around the world'
+        rv = self.app.put('/api/resource/%i' % resource.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
 
-        search_results = self.search(space_query)
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["resources"]))
         search_results = self.search(world_query)
         self.assertEqual(1, len(search_results["resources"]))
         self.assertEqual(resource.id, search_results['resources'][0]['id'])
 
-        elastic_index.remove_resource(resource.id, 'Resource')
+    def test_delete_search_item(self):
+        rainbow_query = {'query': 'rainbows', 'filters': []}
+        world_query = {'query': 'world', 'filters': []}
+        resource = self.construct_resource(
+            title='space unicorn', description="delivering rainbows")
+        elastic_index.remove_resource(resource, 'Resource')
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["resources"]))
         search_results = self.search(world_query)
