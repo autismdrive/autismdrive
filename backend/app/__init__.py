@@ -136,8 +136,10 @@ def reset():
     click.echo('Rebuilding the databases from the example data files')
     from app import data_loader
     data_loader = data_loader.DataLoader()
+    data_loader.clear_index()
     data_loader.clear()
     _load_data(data_loader)
+    data_loader.build_index()
 
 
 from app import views
