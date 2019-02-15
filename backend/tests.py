@@ -30,7 +30,8 @@ from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
 from app.model.questionnaires.assistive_device import AssistiveDevice
-from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
+from app.model.questionnaires.clinical_diagnoses_dependent_questionnaire import ClinicalDiagnosesDependentQuestionnaire
+from app.model.questionnaires.clinical_diagnoses_self_questionnaire import ClinicalDiagnosesSelfQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_questionnaire import CurrentBehaviorsQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
@@ -243,26 +244,61 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_ad.description, ad.description)
         return db_ad
 
-    def construct_clinical_diagnoses_questionnaire(self, developmental='speechLanguage', mental_health='ocd',
+    def construct_clinical_diagnoses_self_questionnaire(self, developmental='speechLanguage', mental_health='ocd',
                                                    medical='insomnia', genetic='corneliaDeLange', participant=None,
                                                    user=None):
 
-        cdq = ClinicalDiagnosesQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
+        cdq = ClinicalDiagnosesSelfQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
                                              genetic=genetic)
         if participant is None:
-            cdq.participant_id = self.construct_participant().id
+            p = self.construct_participant()
+            cdq.participant_id = p.id
         else:
-            cdq.participant_id = participant.id
+            p = participant
+            cdq.participant_id = p.id
 
         if user is None:
-            cdq.user_id = self.construct_user().id
+            u = self.construct_user()
+            cdq.user_id = u.id
         else:
-            cdq.user_id = user.id
+            u = user
+            cdq.user_id = u.id
 
-        db.session.add(cdq)
+        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
+
+        db.session.add_all([cdq, up])
         db.session.commit()
 
-        db_cdq = db.session.query(ClinicalDiagnosesQuestionnaire).filter_by(user_id=cdq.user_id).first()
+        db_cdq = db.session.query(ClinicalDiagnosesSelfQuestionnaire).filter_by(user_id=cdq.user_id).first()
+        self.assertEqual(db_cdq.participant_id, cdq.participant_id)
+        return db_cdq
+
+    def construct_clinical_diagnoses_dependent_questionnaire(self, developmental='speechLanguage', mental_health='ocd',
+                                                   medical='insomnia', genetic='corneliaDeLange', participant=None,
+                                                   user=None):
+
+        cdq = ClinicalDiagnosesDependentQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
+                                             genetic=genetic)
+        if participant is None:
+            p = self.construct_participant()
+            cdq.participant_id = p.id
+        else:
+            p = participant
+            cdq.participant_id = p.id
+
+        if user is None:
+            u = self.construct_user()
+            cdq.user_id = u.id
+        else:
+            u = user
+            cdq.user_id = u.id
+
+        up = UserParticipant(user=u, participant=p, relationship=Relationship.dependent)
+
+        db.session.add_all([cdq, up])
+        db.session.commit()
+
+        db_cdq = db.session.query(ClinicalDiagnosesDependentQuestionnaire).filter_by(user_id=cdq.user_id).first()
         self.assertEqual(db_cdq.participant_id, cdq.participant_id)
         return db_cdq
 
@@ -1615,12 +1651,12 @@ class TestCase(unittest.TestCase):
         self.assertEqual(2, len(response['participants']))
         self.assertEqual(p.first_name, response['participants'][1]["participant"]["first_name"])
 
-    def test_clinical_diagnoses_questionnaire_basics(self):
-        self.construct_clinical_diagnoses_questionnaire()
-        cq = db.session.query(ClinicalDiagnosesQuestionnaire).first()
+    def test_clinical_diagnoses_self_questionnaire_basics(self):
+        self.construct_clinical_diagnoses_self_questionnaire()
+        cq = db.session.query(ClinicalDiagnosesSelfQuestionnaire).first()
         self.assertIsNotNone(cq)
         cq_id = cq.id
-        rv = self.app.get('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id,
+        rv = self.app.get('/api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id,
                           follow_redirects=True,
                           content_type="application/json")
         self.assertSuccess(rv)
@@ -1629,21 +1665,21 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["medical"], cq.medical)
         self.assertEqual(response["genetic"], cq.genetic)
 
-    def test_modify_clinical_diagnoses_questionnaire_basics(self):
-        self.construct_clinical_diagnoses_questionnaire()
-        cq = db.session.query(ClinicalDiagnosesQuestionnaire).first()
+    def test_modify_clinical_diagnoses_self_questionnaire_basics(self):
+        self.construct_clinical_diagnoses_self_questionnaire()
+        cq = db.session.query(ClinicalDiagnosesSelfQuestionnaire).first()
         self.assertIsNotNone(cq)
         cq_id = cq.id
-        rv = self.app.get('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('/api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
         response['developmental'] = 'intellectual'
         response['mental_health'] = 'depression'
         response['medical'] = 'gastrointestinal'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('/api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['developmental'], 'intellectual')
@@ -1651,25 +1687,91 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['medical'], 'gastrointestinal')
         self.assertNotEqual(orig_date, response['last_updated'])
 
-    def test_delete_clinical_diagnoses_questionnaire(self):
-        cq = self.construct_clinical_diagnoses_questionnaire()
+    def test_delete_clinical_diagnoses_self_questionnaire(self):
+        cq = self.construct_clinical_diagnoses_self_questionnaire()
         cq_id = cq.id
-        rv = self.app.get('api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.delete('api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.delete('api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.get('api/q/clinical_diagnoses_questionnaire/%i' % cq_id, content_type="application/json")
+        rv = self.app.get('api/q/clinical_diagnoses_self_questionnaire/%i' % cq_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
 
-    def test_create_clinical_diagnoses_questionnaire(self):
+    def test_create_clinical_diagnoses_self_questionnaire(self):
         u = self.construct_user()
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
-        clinical_diagnoses_questionnaire = {'medical': 'seizure', 'genetic': 'fragileX', 'participant_id': p.id}
-        rv = self.app.post('api/flow/self_intake/clinical_diagnoses_questionnaire', data=json.dumps(clinical_diagnoses_questionnaire),
+        clinical_diagnoses_self_questionnaire = {'medical': 'seizure', 'genetic': 'fragileX', 'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/clinical_diagnoses_self_questionnaire',
+                           data=json.dumps(clinical_diagnoses_self_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['medical'], 'seizure')
+        self.assertEqual(response['genetic'], 'fragileX')
+        self.assertIsNotNone(response['id'])
+
+    def test_clinical_diagnoses_dependent_questionnaire_basics(self):
+        self.construct_clinical_diagnoses_dependent_questionnaire()
+        cq = db.session.query(ClinicalDiagnosesDependentQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], cq_id)
+        self.assertEqual(response["medical"], cq.medical)
+        self.assertEqual(response["genetic"], cq.genetic)
+
+    def test_modify_clinical_diagnoses_dependent_questionnaire_basics(self):
+        self.construct_clinical_diagnoses_dependent_questionnaire()
+        cq = db.session.query(ClinicalDiagnosesDependentQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['developmental'] = 'intellectual'
+        response['mental_health'] = 'depression'
+        response['medical'] = 'gastrointestinal'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['developmental'], 'intellectual')
+        self.assertEqual(response['mental_health'], 'depression')
+        self.assertEqual(response['medical'], 'gastrointestinal')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_clinical_diagnoses_dependent_questionnaire(self):
+        cq = self.construct_clinical_diagnoses_dependent_questionnaire()
+        cq_id = cq.id
+        rv = self.app.get('api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/clinical_diagnoses_dependent_questionnaire/%i' % cq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_clinical_diagnoses_dependent_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship=Relationship.dependent)
+        headers = self.logged_in_headers(u)
+
+        clinical_diagnoses_dependent_questionnaire = {'medical': 'seizure', 'genetic': 'fragileX', 'participant_id': p.id}
+        rv = self.app.post('api/flow/dependent_intake/clinical_diagnoses_dependent_questionnaire',
+                           data=json.dumps(clinical_diagnoses_dependent_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)

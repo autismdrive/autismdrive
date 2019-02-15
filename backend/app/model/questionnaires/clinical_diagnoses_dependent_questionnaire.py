@@ -6,8 +6,8 @@ from app import db
 from app.question_service import QuestionService
 
 
-class ClinicalDiagnosesQuestionnaire(db.Model):
-    __tablename__ = "clinical_diagnoses_questionnaire"
+class ClinicalDiagnosesDependentQuestionnaire(db.Model):
+    __tablename__ = "clinical_diagnoses_dependent_questionnaire"
     __question_type__ = QuestionService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
@@ -223,13 +223,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": ""},
-                    "expression_properties": {
-                        "template_options.description": ""
-                        '(formState.mainModel.is_self ? "Do you" : "Does your '
-                        'child") + " CURRENTLY have any of the following '
-                        'diagnoses? (please check all that apply)"'
-                    },
+                    "template_options": {"description": '"Does " + (model.nickname || model.first_name || "Your child")'
+                                                        ' + " CURRENTLY have any of the following diagnoses? '
+                                                        '(please check all that apply)"'},
                 },
                 "developmental_group": {
                     "fields": ["developmental", "developmental_other"],
@@ -258,16 +254,16 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             },
         }
         for c in self.metadata.tables[
-            "clinical_diagnoses_questionnaire"
+            "clinical_diagnoses_dependent_questionnaire"
         ].columns:
             if c.info:
                 info[c.name] = c.info
         return info
 
 
-class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
+class ClinicalDiagnosesDependentQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = ClinicalDiagnosesQuestionnaire
+        model = ClinicalDiagnosesDependentQuestionnaire
         fields = (
             "id",
             "last_updated",
@@ -284,7 +280,7 @@ class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
         )
 
 
-class ClinicalDiagnosesQuestionnaireMetaSchema(ModelSchema):
+class ClinicalDiagnosesDependentQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = ClinicalDiagnosesQuestionnaire
+        model = ClinicalDiagnosesDependentQuestionnaire
         fields = ("get_meta",)
