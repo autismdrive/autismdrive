@@ -22,7 +22,7 @@ class Flows:
         flow.add_step('evaluation_history_questionnaire')
         flow.add_step('clinical_diagnoses_self_questionnaire')
         flow.add_step('current_behaviors_self_questionnaire')
-        flow.add_step('education_questionnaire')
+        flow.add_step('education_self_questionnaire')
         flow.add_step('employment_questionnaire')
         flow.add_step('supports_questionnaire')
         return flow
@@ -37,7 +37,7 @@ class Flows:
         flow.add_step('clinical_diagnoses_dependent_questionnaire')
         flow.add_step('developmental_questionnaire')
         flow.add_step('current_behaviors_dependent_questionnaire')
-        flow.add_step('education_questionnaire')
+        flow.add_step('education_dependent_questionnaire')
         flow.add_step('supports_questionnaire')
         return flow
 

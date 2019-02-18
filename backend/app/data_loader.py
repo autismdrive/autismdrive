@@ -19,7 +19,8 @@ from app.model.questionnaires.current_behaviors_dependent_questionnaire import C
 from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
-from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
+from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
+from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
 from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
 from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
@@ -218,11 +219,15 @@ class DataLoader():
             DevelopmentalQuestionnaire).count())
         db.session.commit()
 
-    def load_education_questionnaire(self):
-        e_ques = EducationQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
-        db.session.add(e_ques)
-        print("Education loaded.  There is now %i education record in the database." % db.session.query(
-            EducationQuestionnaire).count())
+    def load_education_questionnaires(self):
+        e_dques = EducationDependentQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
+        db.session.add(e_dques)
+        print("Education for Dependents loaded.  There is now %i dependent education record in the database." % db.session.query(
+            EducationDependentQuestionnaire).count())
+        e_sques = EducationSelfQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
+        db.session.add(e_sques)
+        print("Education for Self participants loaded.  There is now %i self education record in the database." % db.session.query(
+            EducationSelfQuestionnaire).count())
         db.session.commit()
 
     def load_employment_questionnaire(self):
@@ -286,7 +291,8 @@ class DataLoader():
         db.session.query(CurrentBehaviorsSelfQuestionnaire).delete()
         db.session.query(DemographicsQuestionnaire).delete()
         db.session.query(DevelopmentalQuestionnaire).delete()
-        db.session.query(EducationQuestionnaire).delete()
+        db.session.query(EducationDependentQuestionnaire).delete()
+        db.session.query(EducationSelfQuestionnaire).delete()
         db.session.query(EmploymentQuestionnaire).delete()
         db.session.query(EvaluationHistoryQuestionnaire).delete()
         db.session.query(HomeQuestionnaire).delete()

@@ -37,7 +37,8 @@ from app.model.questionnaires.current_behaviors_dependent_questionnaire import C
 from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
-from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
+from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
+from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
 from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
 from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
 from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
@@ -438,25 +439,59 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_dq.when_language_milestones, dq.when_language_milestones)
         return db_dq
 
-    def construct_education_questionnaire(self, attends_school=True, school_name='Harvard', school_type='privateSchool',
-                                          self_placement='graduate', participant=None, user=None):
+    def construct_education_dependent_questionnaire(self, attends_school=True, school_name='Harvard', school_type='privateSchool',
+                                                    dependent_placement='graduate', participant=None, user=None):
 
-        eq = EducationQuestionnaire(attends_school=attends_school, school_name=school_name, school_type=school_type,
-                                    self_placement=self_placement)
+        eq = EducationDependentQuestionnaire(attends_school=attends_school, school_name=school_name, school_type=school_type,
+                                             dependent_placement=dependent_placement)
         if participant is None:
-            eq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+            p = self.construct_participant(first_name="Trina", last_name="Frina")
+            eq.participant_id = p.id
         else:
-            eq.participant_id = participant.id
+            p = participant
+            eq.participant_id = p.id
 
         if user is None:
-            eq.user_id = self.construct_user(email="user@study.com").id
+            u = self.construct_user(email="user@study.com")
+            eq.user_id = u.id
         else:
-            eq.user_id = user.id
+            u = user
+            eq.user_id = u.id
 
-        db.session.add(eq)
+        up = UserParticipant(user=u, participant=p, relationship=Relationship.dependent)
+
+        db.session.add_all([eq, up])
         db.session.commit()
 
-        db_eq = db.session.query(EducationQuestionnaire).filter_by(participant_id=eq.participant_id).first()
+        db_eq = db.session.query(EducationDependentQuestionnaire).filter_by(participant_id=eq.participant_id).first()
+        self.assertEqual(db_eq.school_name, eq.school_name)
+        return db_eq
+
+    def construct_education_self_questionnaire(self, attends_school=True, school_name='Harvard', school_type='privateSchool',
+                                               self_placement='graduate', participant=None, user=None):
+
+        eq = EducationSelfQuestionnaire(attends_school=attends_school, school_name=school_name, school_type=school_type,
+                                        self_placement=self_placement)
+        if participant is None:
+            p = self.construct_participant(first_name="Trina", last_name="Frina")
+            eq.participant_id = p.id
+        else:
+            p = participant
+            eq.participant_id = p.id
+
+        if user is None:
+            u = self.construct_user(email="user@study.com")
+            eq.user_id = u.id
+        else:
+            u = user
+            eq.user_id = u.id
+
+        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
+
+        db.session.add_all([eq, up])
+        db.session.commit()
+
+        db_eq = db.session.query(EducationSelfQuestionnaire).filter_by(participant_id=eq.participant_id).first()
         self.assertEqual(db_eq.school_name, eq.school_name)
         return db_eq
 
@@ -2151,12 +2186,12 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['birth_complications_description'], 'C-Section')
         self.assertIsNotNone(response['id'])
 
-    def test_education_questionnaire_basics(self):
-        self.construct_education_questionnaire()
-        eq = db.session.query(EducationQuestionnaire).first()
+    def test_education_dependent_questionnaire_basics(self):
+        self.construct_education_dependent_questionnaire()
+        eq = db.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
         eq_id = eq.id
-        rv = self.app.get('/api/q/education_questionnaire/%i' % eq_id,
+        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id,
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
@@ -2165,12 +2200,79 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["school_name"], eq.school_name)
         self.assertEqual(response["school_type"], eq.school_type)
 
-    def test_modify_education_questionnaire_basics(self):
-        self.construct_education_questionnaire()
-        eq = db.session.query(EducationQuestionnaire).first()
+    def test_modify_education_dependent_questionnaire_basics(self):
+        self.construct_education_dependent_questionnaire()
+        eq = db.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
         eq_id = eq.id
-        rv = self.app.get('/api/q/education_questionnaire/%i' % eq_id, content_type="application/json")
+        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['school_name'] = 'Sesame School'
+        response['school_type'] = 'public'
+        response['dependent_placement'] = 'vocational'
+        u2 = self.construct_user(email="rainbows@rainy.com")
+        response['user_id'] = u2.id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/education_dependent_questionnaire/%i' % eq_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['school_name'], 'Sesame School')
+        self.assertEqual(response['school_type'], 'public')
+        self.assertEqual(response['dependent_placement'], 'vocational')
+        self.assertEqual(response['user_id'], u2.id)
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_education_dependent_questionnaire(self):
+        eq = self.construct_education_dependent_questionnaire()
+        eq_id = eq.id
+        rv = self.app.get('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_education_dependent_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        headers = self.logged_in_headers(u)
+
+        education_dependent_questionnaire = {'attends_school': True, 'school_name': 'Attreyu Academy', 'participant_id': p.id}
+        rv = self.app.post('api/flow/dependent_intake/education_dependent_questionnaire', data=json.dumps(education_dependent_questionnaire),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['attends_school'], True)
+        self.assertEqual(response['school_name'], 'Attreyu Academy')
+        self.assertIsNotNone(response['id'])
+
+    def test_education_self_questionnaire_basics(self):
+        self.construct_education_self_questionnaire()
+        eq = db.session.query(EducationSelfQuestionnaire).first()
+        self.assertIsNotNone(eq)
+        eq_id = eq.id
+        rv = self.app.get('/api/q/education_self_questionnaire/%i' % eq_id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], eq_id)
+        self.assertEqual(response["school_name"], eq.school_name)
+        self.assertEqual(response["school_type"], eq.school_type)
+
+    def test_modify_education_self_questionnaire_basics(self):
+        self.construct_education_self_questionnaire()
+        eq = db.session.query(EducationSelfQuestionnaire).first()
+        self.assertIsNotNone(eq)
+        eq_id = eq.id
+        rv = self.app.get('/api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
         response['school_name'] = 'Sesame School'
         response['school_type'] = 'public'
@@ -2178,10 +2280,10 @@ class TestCase(unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/education_questionnaire/%i' % eq_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/q/education_self_questionnaire/%i' % eq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/q/education_questionnaire/%i' % eq_id, content_type="application/json")
+        rv = self.app.get('/api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['school_name'], 'Sesame School')
@@ -2190,25 +2292,25 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['user_id'], u2.id)
         self.assertNotEqual(orig_date, response['last_updated'])
 
-    def test_delete_education_questionnaire(self):
-        eq = self.construct_education_questionnaire()
+    def test_delete_education_self_questionnaire(self):
+        eq = self.construct_education_self_questionnaire()
         eq_id = eq.id
-        rv = self.app.get('api/q/education_questionnaire/%i' % eq_id, content_type="application/json")
+        rv = self.app.get('api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.delete('api/q/education_questionnaire/%i' % eq_id, content_type="application/json")
+        rv = self.app.delete('api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json")
         self.assertSuccess(rv)
 
-        rv = self.app.get('api/q/education_questionnaire/%i' % eq_id, content_type="application/json")
+        rv = self.app.get('api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
 
-    def test_create_education_questionnaire(self):
+    def test_create_education_self_questionnaire(self):
         u = self.construct_user()
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
-        education_questionnaire = {'attends_school': True, 'school_name': 'Attreyu Academy', 'participant_id': p.id}
-        rv = self.app.post('api/flow/self_intake/education_questionnaire', data=json.dumps(education_questionnaire),
+        education_self_questionnaire = {'attends_school': True, 'school_name': 'Attreyu Academy', 'participant_id': p.id}
+        rv = self.app.post('api/flow/self_intake/education_self_questionnaire', data=json.dumps(education_self_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
