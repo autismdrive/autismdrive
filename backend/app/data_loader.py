@@ -22,7 +22,8 @@ from app.model.questionnaires.developmental_questionnaire import DevelopmentalQu
 from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
 from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
 from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
-from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
+from app.model.questionnaires.evaluation_history_dependent_questionnaire import EvaluationHistoryDependentQuestionnaire
+from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
 from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
@@ -237,11 +238,15 @@ class DataLoader():
             EmploymentQuestionnaire).count())
         db.session.commit()
 
-    def load_evaluation_history_questionnaire(self):
-        eh_ques = EvaluationHistoryQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
-        db.session.add(eh_ques)
-        print("Evaluation History loaded.  There is now %i evaluation history record in the database." % db.session.query(
-            EvaluationHistoryQuestionnaire).count())
+    def load_evaluation_history_questionnaires(self):
+        eh_dques = EvaluationHistoryDependentQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
+        db.session.add(eh_dques)
+        print("Evaluation History for Dependents loaded.  There is now %i dependent evaluation history record in the database." % db.session.query(
+            EvaluationHistoryDependentQuestionnaire).count())
+        eh_sques = EvaluationHistorySelfQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
+        db.session.add(eh_sques)
+        print("Evaluation History for Self participants loaded.  There is now %i self evaluation history record in the database." % db.session.query(
+            EvaluationHistorySelfQuestionnaire).count())
         db.session.commit()
 
     def load_home_questionnaire(self):
@@ -294,7 +299,8 @@ class DataLoader():
         db.session.query(EducationDependentQuestionnaire).delete()
         db.session.query(EducationSelfQuestionnaire).delete()
         db.session.query(EmploymentQuestionnaire).delete()
-        db.session.query(EvaluationHistoryQuestionnaire).delete()
+        db.session.query(EvaluationHistoryDependentQuestionnaire).delete()
+        db.session.query(EvaluationHistorySelfQuestionnaire).delete()
         db.session.query(HomeQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
         db.session.query(SupportsQuestionnaire).delete()
