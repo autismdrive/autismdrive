@@ -179,7 +179,7 @@ class DataLoader():
         print("Clinical Diagnoses for Dependents loaded. There is now %i dependent clinical diagnoses record in the database." % db.session.query(
             ClinicalDiagnosesDependentQuestionnaire).count())
         cd_sques = ClinicalDiagnosesSelfQuestionnaire(mental_health='ptsd', genetic='angelman')
-        db.session.add(cd_dques)
+        db.session.add(cd_sques)
         print("Clinical Diagnoses for Self users loaded. There is now %i self clinical diagnoses record in the database." % db.session.query(
             ClinicalDiagnosesSelfQuestionnaire).count())
         db.session.commit()
