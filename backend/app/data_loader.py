@@ -15,7 +15,8 @@ from app.model.user import User
 from app.model.questionnaires.clinical_diagnoses_dependent_questionnaire import ClinicalDiagnosesDependentQuestionnaire
 from app.model.questionnaires.clinical_diagnoses_self_questionnaire import ClinicalDiagnosesSelfQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
-from app.model.questionnaires.current_behaviors_questionnaire import CurrentBehaviorsQuestionnaire
+from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
+from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
 from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
@@ -180,7 +181,7 @@ class DataLoader():
             ClinicalDiagnosesDependentQuestionnaire).count())
         cd_sques = ClinicalDiagnosesSelfQuestionnaire(mental_health='ptsd', genetic='angelman')
         db.session.add(cd_sques)
-        print("Clinical Diagnoses for Self users loaded. There is now %i self clinical diagnoses record in the database." % db.session.query(
+        print("Clinical Diagnoses for Self participants loaded. There is now %i self clinical diagnoses record in the database." % db.session.query(
             ClinicalDiagnosesSelfQuestionnaire).count())
         db.session.commit()
 
@@ -191,11 +192,15 @@ class DataLoader():
             ContactQuestionnaire).count())
         db.session.commit()
 
-    def load_current_behaviors_questionnaire(self):
-        cb_ques = CurrentBehaviorsQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
-        db.session.add(cb_ques)
-        print("Current Behaviors loaded.  There is now %i current behavior record in the database." % db.session.query(
-            CurrentBehaviorsQuestionnaire).count())
+    def load_current_behaviors_questionnaires(self):
+        cb_dques = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        db.session.add(cb_dques)
+        print("Current Behaviors for Dependents loaded.  There is now %i dependent current behavior record in the database." % db.session.query(
+            CurrentBehaviorsDependentQuestionnaire).count())
+        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        db.session.add(cb_sques)
+        print("Current Behaviors for Self participants loaded.  There is now %i self current behavior record in the database." % db.session.query(
+            CurrentBehaviorsSelfQuestionnaire).count())
         db.session.commit()
 
     def load_demographics_questionnaire(self):
@@ -277,7 +282,8 @@ class DataLoader():
         db.session.query(ClinicalDiagnosesDependentQuestionnaire).delete()
         db.session.query(ClinicalDiagnosesSelfQuestionnaire).delete()
         db.session.query(ContactQuestionnaire).delete()
-        db.session.query(CurrentBehaviorsQuestionnaire).delete()
+        db.session.query(CurrentBehaviorsDependentQuestionnaire).delete()
+        db.session.query(CurrentBehaviorsSelfQuestionnaire).delete()
         db.session.query(DemographicsQuestionnaire).delete()
         db.session.query(DevelopmentalQuestionnaire).delete()
         db.session.query(EducationQuestionnaire).delete()

@@ -6,8 +6,8 @@ from app import db
 from app.question_service import QuestionService
 
 
-class CurrentBehaviorsQuestionnaire(db.Model):
-    __tablename__ = "current_behaviors_questionnaire"
+class CurrentBehaviorsDependentQuestionnaire(db.Model):
+    __tablename__ = "current_behaviors_dependent_questionnaire"
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
@@ -21,28 +21,6 @@ class CurrentBehaviorsQuestionnaire(db.Model):
     user_id = db.Column(
         "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
     )
-    self_verbal_ability = db.Column(
-        db.String,
-        info={
-            "display_order": 1,
-            "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
-            "template_options": {
-                "label": "How do you best communicate?",
-                "required": False,
-                "options": [
-                    {"value": "verbal", "label": "Verbally"},
-                    {"value": "nonVerbal", "label": "Non-verbally"},
-                    {
-                        "value": "AACsystem",
-                        "label": "An alternative and augmentative communication (AAC) system "
-                        "(e.g., Picture exchange, sign language, ipad, etc)",
-                    },
-                ],
-            },
-            "hide_expression": "!(formState.mainModel.is_self)",
-        },
-    )
     dependent_verbal_ability = db.Column(
         db.String,
         info={
@@ -55,15 +33,11 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                     {"value": "nonVerbal", "label": "Non-verbal"},
                     {"value": "singleWords", "label": "Single Words"},
                     {"value": "phraseSpeech", "label": "Phrase Speech"},
-                    {
-                        "value": "fluentErrors",
-                        "label": "Fluent Speech with grammatical errors",
-                    },
+                    {"value": "fluentErrors", "label": "Fluent Speech with grammatical errors"},
                     {"value": "fluent", "label": "Fluent Speech"},
-                ],
-            },
-            "hide_expression": "(formState.mainModel.is_self)",
-        },
+                ]
+            }
+        }
     )
     concerning_behaviors = db.Column(
         db.String,
@@ -124,7 +98,6 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                     {"value": "concerningOther", "label": "Other"},
                 ],
             },
-            "hide_expression": "(formState.mainModel.is_self)",
         },
     )
     concerning_behaviors_other = db.Column(
@@ -143,16 +116,13 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Academic Difficulties",
+                "label": '"Does " + (formState.mainModel.preferred_name || "your child")) + '
+                         '"have any difficulties with academics?"',
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Do you " : "Does " + (formState.mainModel.preferred_name '
-                '|| "your child")) + "have any difficulties with academics?"'
             },
         },
     )
@@ -163,7 +133,8 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": "",
+                "label": '"What areas of academics are difficult for " + (formState.mainModel.preferred_name || '
+                         '"your child"))',
                 "required": True,
                 "options": [
                     {"value": "math", "label": "Math"},
@@ -171,10 +142,6 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                     {"value": "writing", "label": "Writing"},
                     {"value": "other", "label": "Other"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"What areas of academics are difficult for " + (formState.mainModel.is_self ? "you?" : '
-                '(formState.mainModel.preferred_name || "your child"))'
             },
         },
     )
@@ -199,22 +166,21 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             }
         }
         for c in self.metadata.tables[
-            "current_behaviors_questionnaire"
+            "current_behaviors_dependent_questionnaire"
         ].columns:
             if c.info:
                 info[c.name] = c.info
         return info
 
 
-class CurrentBehaviorsQuestionnaireSchema(ModelSchema):
+class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = CurrentBehaviorsQuestionnaire
+        model = CurrentBehaviorsDependentQuestionnaire
         fields = (
             "id",
             "last_updated",
             "participant_id",
             "user_id",
-            "self_verbal_ability",
             "dependent_verbal_ability",
             "concerning_behaviors",
             "concerning_behaviors_other",
@@ -224,7 +190,7 @@ class CurrentBehaviorsQuestionnaireSchema(ModelSchema):
         )
 
 
-class CurrentBehaviorsQuestionnaireMetaSchema(ModelSchema):
+class CurrentBehaviorsDependentQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = CurrentBehaviorsQuestionnaire
+        model = CurrentBehaviorsDependentQuestionnaire
         fields = ("get_meta",)
