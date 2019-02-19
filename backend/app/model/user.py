@@ -22,7 +22,7 @@ class User(db.Model):
 
     def related_to_participant(self, participant_id):
         for p in self.participants:
-            if p.id == participant_id:
+            if p.participant.id == participant_id:
                 return True
         return False
 

@@ -26,10 +26,16 @@ export class ProfileComponent implements OnInit {
     'Rockbiter',
     'Urgl',
   ];
+  lastNames = [
+    'Funk',
+    'Funkleweizen',
+    'Funklestein',
+    'Funkadullah',
+    'Funkaswabi',
+    'Funkelhansen'
+  ]
 
-  constructor(
-    private api: ApiService
-  ) {
+  constructor(private api: ApiService) {
     this.currentId = Math.floor(Math.random() * 99999999) + 999;
     this.api.getSession().subscribe(user => {
       this.user = user;
@@ -73,7 +79,7 @@ export class ProfileComponent implements OnInit {
   randomName() {
     return {
       first: this.firstNames[Math.floor(Math.random() * this.firstNames.length)],
-      last: this.participantSelf.last_name
+      last: this.lastNames[Math.floor(Math.random() * this.lastNames.length)],
     };
   }
 
