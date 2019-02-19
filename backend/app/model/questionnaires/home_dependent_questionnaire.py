@@ -63,7 +63,7 @@ class HomeDependentQuestionnaire(db.Model):
             "type": "repeat",
             "template_options": {
                 "required": False,
-                "label": '"Who else lives with " + (formState.mainModel.preferred_name) + "?"'
+                "label": ''
             },
         },
     )
@@ -75,12 +75,17 @@ class HomeDependentQuestionnaire(db.Model):
             "default_value": False,
             "template_options": {
                 "required": False,
-                "label": '"Do you or " + formState.mainModel.preferred_name + "\'s other caregivers ever struggle with'
-                         ' being able to afford to pay for household needs, food, or security for the family?"',
+                "label": '',
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Do you or " + (formState.mainModel.preferred_name) + "\'s other caregivers '
+                                          'ever struggle with being able to afford to pay for household needs, food, or'
+                                          ' security for the family?"',
+
             },
         },
     )

@@ -27,7 +27,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
             "display_order": 1,
             "type": "radio",
             "template_options": {
-                "label": '(formState.mainModel.preferred_name || "Your child") + "\'s current verbal ability:"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "nonVerbal", "label": "Non-verbal"},
@@ -36,7 +36,11 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
                     {"value": "fluentErrors", "label": "Fluent Speech with grammatical errors"},
                     {"value": "fluent", "label": "Fluent Speech"},
                 ]
-            }
+            },
+            "expression_properties": {
+                "template_options.label": '(formState.mainModel.preferred_name || "Your child") + "\'s current '
+                                          'verbal ability:"'
+            },
         }
     )
     concerning_behaviors = db.Column(
@@ -46,8 +50,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": '"Does " + (formState.mainModel.preferred_name || "your child") + "currently engage in the '
-                'following behaviors of concern?"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "aggression", "label": "Aggression"},
@@ -98,6 +101,9 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
                     {"value": "concerningOther", "label": "Other"},
                 ],
             },
+            "expression_properties": {
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + " currently engage in the following behaviors of concern?"'
+            },
         },
     )
     concerning_behaviors_other = db.Column(
@@ -116,13 +122,16 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": '"Does " + (formState.mainModel.preferred_name || "your child")) + '
-                         '"have any difficulties with academics?"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + '
+                                          '"have any difficulties with academics?"'
             },
         },
     )
@@ -133,8 +142,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": '"What areas of academics are difficult for " + (formState.mainModel.preferred_name || '
-                         '"your child"))',
+                "label": '',
                 "required": True,
                 "options": [
                     {"value": "math", "label": "Math"},
@@ -142,6 +150,10 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model):
                     {"value": "writing", "label": "Writing"},
                     {"value": "other", "label": "Other"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"What areas of academics are difficult for " + '
+                                          '(formState.mainModel.preferred_name || "your child")'
             },
         },
     )

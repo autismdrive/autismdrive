@@ -28,12 +28,16 @@ class EducationDependentQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": '"Does " + (formState.mainModel.preferred_name || "your child") + " attend school?")',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + '
+                                          '" attend school?"',
             },
         },
     )
@@ -54,13 +58,16 @@ class EducationDependentQuestionnaire(db.Model):
             "display_order": 3,
             "type": "radio",
             "template_options": {
-                "label": '"Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:")',
+                "label": '',
                 "required": False,
                 "options":[
                     {"value": "public", "label": "Public"},
                     {"value": "private", "label": "Private"},
                     {"value": "homeschool", "label": "Home School"},
                 ]
+            },
+            "expression_properties": {
+                "template_options.label": '"Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:"',
             },
         },
     )
@@ -70,7 +77,7 @@ class EducationDependentQuestionnaire(db.Model):
             "display_order": 4.2,
             "type": "select",
             "template_options": {
-                "label": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s current grade/school placement?"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "daycare", "label": "Daycare center"},
@@ -88,6 +95,10 @@ class EducationDependentQuestionnaire(db.Model):
                     {"value": "graduate", "label": "Graduate school"},
                     {"value": "schoolOther", "label": "Other"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s '
+                                          'current grade/school placement?"',
             },
         },
     )
@@ -116,7 +127,7 @@ class EducationDependentQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": '"Please check the following services " + (formState.mainModel.preferred_name || "your child") + " currently receives in school (check all that apply):"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "504mod", "label": "504 Modification Plan"},
@@ -150,6 +161,11 @@ class EducationDependentQuestionnaire(db.Model):
                     },
                     {"value": "servicesOther", "label": "Other"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Please check the following services " + '
+                                          '(formState.mainModel.preferred_name || "your child") + '
+                                          '" currently receives in school (check all that apply):"',
             },
         },
     )
