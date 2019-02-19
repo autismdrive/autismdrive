@@ -37,7 +37,8 @@ import app.model.questionnaires.education_self_questionnaire
 import app.model.questionnaires.employment_questionnaire
 import app.model.questionnaires.evaluation_history_dependent_questionnaire
 import app.model.questionnaires.evaluation_history_self_questionnaire
-import app.model.questionnaires.home_questionnaire
+import app.model.questionnaires.home_dependent_questionnaire
+import app.model.questionnaires.home_self_questionnaire
 import app.model.questionnaires.identification_questionnaire
 import app.model.questionnaires.supports_questionnaire
 
