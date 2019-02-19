@@ -223,9 +223,13 @@ class ClinicalDiagnosesDependentQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": '"Does " + (model.nickname || model.first_name || "Your child")'
+                    "template_options": {"description": ''
+                                         },
+                    "expression_properties": {
+                        "template_options.description": '"Does " + (formState.mainModel.preferred_name || "your child")'
                                                         ' + " CURRENTLY have any of the following diagnoses? '
-                                                        '(please check all that apply)"'},
+                                                        '(please check all that apply)"',
+                    },
                 },
                 "developmental_group": {
                     "fields": ["developmental", "developmental_other"],

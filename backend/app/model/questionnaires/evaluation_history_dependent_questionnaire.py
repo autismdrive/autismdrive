@@ -28,12 +28,16 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": '"Does " + formState.mainModel.preferred_name) + " self-identify as having Autism?"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + " self-identify as '
+                                          'having Autism?"',
             },
         },
     )
@@ -44,13 +48,16 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": '"Has " + formState.mainModel.preferred_name) + '
-                         '" been formally diagnosed with Autism Spectrum Disorder?"',
+                "label": '',
                 "required": True,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Has " + (formState.mainModel.preferred_name || "your child") + '
+                                          '" been formally diagnosed with Autism Spectrum Disorder?"',
             },
         },
     )
@@ -60,9 +67,12 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
             "display_order": 3,
             "type": "input",
             "template_options": {
-                "label": '"How old was " + formState.mainModel.preferred_name) + '
-                         '" when they were first diagnosed with ASD?"',
+                "label": '',
                 "required": True,
+            },
+            "expression_properties": {
+                "template_options.label": '"How old was " + (formState.mainModel.preferred_name || "your child") + '
+                                          '" when they were first diagnosed with ASD?"',
             },
         },
     )
@@ -72,7 +82,7 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
             "display_order": 4,
             "type": "select",
             "template_options": {
-                "label": '"Who first diagnosed " + (formState.mainModel.preferred_name) + " with ASD?"',
+                "label": '',
                 "required": True,
                 "options": [
                     {
@@ -88,6 +98,10 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
                     },
                     {"value": "diagnosisOther", "label": "Other"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Who first diagnosed " + (formState.mainModel.preferred_name || "your child")'
+                                          ' + " with ASD?"',
             },
         },
     )
@@ -106,7 +120,7 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
             "display_order": 6,
             "type": "select",
             "template_options": {
-                "label": '"Where did " + (formState.mainModel.preferred_name) + " receive this diagnosis?"',
+                "label": '',
                 "required": True,
                 "options": [
                     {
@@ -184,6 +198,10 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
                     },
                     {"value": "diagnosisOther", "label": "Other"},
                 ],
+            },
+            "expression_properties": {
+                "template_options.label": '"Where did " + (formState.mainModel.preferred_name || "your child") '
+                                          '+ " receive this diagnosis?"',
             },
         },
     )
@@ -291,8 +309,11 @@ class EvaluationHistoryDependentQuestionnaire(db.Model):
                     "display_order": 8,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": '"Has " + (formState.mainModel.preferred_name) + '
-                        '" ever been evaluated at any of the following centers?"'
+                        "label": ''
+                    },
+                    "expression_properties": {
+                        "template_options.label": '"Has " + (formState.mainModel.preferred_name || "your child") + '
+                        '" ever been evaluated at any of the following centers?"',
                     },
                 }
             },
