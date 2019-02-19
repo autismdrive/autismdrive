@@ -29,10 +29,10 @@
         ></app-participant-profile>
 
         <button
-          *ngIf="!isAlreadyEnrolled('self')"
+          *ngIf="!isAlreadyEnrolled('self_participant')"
           mat-flat-button
           color="primary"
-          (click)="addParticipant('self')"
+          (click)="addParticipant('self_participant')"
         >Enroll yourself</button>
 
         <button
