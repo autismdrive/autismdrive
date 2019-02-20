@@ -6,8 +6,8 @@ from app import db
 from app.question_service import QuestionService
 
 
-class ClinicalDiagnosesSelfQuestionnaire(db.Model):
-    __tablename__ = "clinical_diagnoses_self_questionnaire"
+class ClinicalDiagnosesQuestionnaire(db.Model):
+    __tablename__ = "clinical_diagnoses_questionnaire"
     __question_type__ = QuestionService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
@@ -223,8 +223,13 @@ class ClinicalDiagnosesSelfQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": "Do you CURRENTLY have any of the following diagnoses? "
-                                                        "(please check all that apply)"},
+                    "template_options": {"description": ""},
+                    "expression_properties": {
+                        "template_options.description": ""
+                        '(formState.mainModel.is_self ? "Do you" : "Does your '
+                        'child") + " CURRENTLY have any of the following '
+                        'diagnoses? (please check all that apply)"'
+                    },
                 },
                 "developmental_group": {
                     "fields": ["developmental", "developmental_other"],
@@ -260,9 +265,9 @@ class ClinicalDiagnosesSelfQuestionnaire(db.Model):
         return info
 
 
-class ClinicalDiagnosesSelfQuestionnaireSchema(ModelSchema):
+class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = ClinicalDiagnosesSelfQuestionnaire
+        model = ClinicalDiagnosesQuestionnaire
         fields = (
             "id",
             "last_updated",
@@ -279,7 +284,7 @@ class ClinicalDiagnosesSelfQuestionnaireSchema(ModelSchema):
         )
 
 
-class ClinicalDiagnosesSelfQuestionnaireMetaSchema(ModelSchema):
+class ClinicalDiagnosesQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = ClinicalDiagnosesSelfQuestionnaire
+        model = ClinicalDiagnosesQuestionnaire
         fields = ("get_meta",)

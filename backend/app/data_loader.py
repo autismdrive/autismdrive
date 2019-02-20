@@ -12,8 +12,7 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
-from app.model.questionnaires.clinical_diagnoses_dependent_questionnaire import ClinicalDiagnosesDependentQuestionnaire
-from app.model.questionnaires.clinical_diagnoses_self_questionnaire import ClinicalDiagnosesSelfQuestionnaire
+from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
 from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
@@ -177,15 +176,11 @@ class DataLoader():
                 UserParticipant).count())
         db.session.commit()
 
-    def load_clinical_diagnoses_questionnaires(self):
-        cd_dques = ClinicalDiagnosesDependentQuestionnaire(mental_health='ptsd', genetic='angelman')
-        db.session.add(cd_dques)
-        print("Clinical Diagnoses for Dependents loaded. There is now %i dependent clinical diagnoses record in the database." % db.session.query(
-            ClinicalDiagnosesDependentQuestionnaire).count())
-        cd_sques = ClinicalDiagnosesSelfQuestionnaire(mental_health='ptsd', genetic='angelman')
-        db.session.add(cd_sques)
-        print("Clinical Diagnoses for Self participants loaded. There is now %i self clinical diagnoses record in the database." % db.session.query(
-            ClinicalDiagnosesSelfQuestionnaire).count())
+    def load_clinical_diagnoses_questionnaire(self):
+        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
+        db.session.add(cd_ques)
+        print("Clinical Diagnoses loaded. There is now %i clinical diagnoses record in the database." % db.session.query(
+            ClinicalDiagnosesQuestionnaire).count())
         db.session.commit()
 
     def load_contact_questionnaire(self):
@@ -294,8 +289,7 @@ class DataLoader():
         return category
 
     def clear(self):
-        db.session.query(ClinicalDiagnosesDependentQuestionnaire).delete()
-        db.session.query(ClinicalDiagnosesSelfQuestionnaire).delete()
+        db.session.query(ClinicalDiagnosesQuestionnaire).delete()
         db.session.query(ContactQuestionnaire).delete()
         db.session.query(CurrentBehaviorsDependentQuestionnaire).delete()
         db.session.query(CurrentBehaviorsSelfQuestionnaire).delete()
