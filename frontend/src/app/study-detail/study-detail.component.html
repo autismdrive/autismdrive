@@ -13,13 +13,13 @@
   >
     <h1>{{study.title}}</h1>
     <p>{{study.description}}</p>
-    <div *ngIf="study.researcherDescription">
+    <div *ngIf="study.researcher_description">
       <h2>About the researchers</h2>
-      <p>{{study.researcherDescription}}</p>
+      <p>{{study.researcher_description}}</p>
     </div>
-    <div *ngIf="study.participantDescription">
+    <div *ngIf="study.participant_description">
       <h2>Who we're looking for</h2>
-      <p>{{study.participantDescription}}</p>
+      <p>{{study.participant_description}}</p>
     </div>
     <div *ngIf="study.outcomes">
       <h2>Benefits of participating</h2>
@@ -47,17 +47,17 @@
         <mat-card-title>Status</mat-card-title>
         <mat-card-content>
           <mat-list>
-            <mat-list-item *ngIf="study.enrollmentDate">
+            <mat-list-item *ngIf="study.enrollment_start_date">
               <a
                 matLine
                 [routerLink]="['/enroll']"
-              >study.enrollmentDate</a>
+              >{{study.enrollment_start_date}}</a>
             </mat-list-item>
-            <mat-list-item *ngIf="study.totalParticipants">
-              {{study.currentEnrolled}} / {{study.totalParticipants}} participants enrolled
+            <mat-list-item *ngIf="study.max_num_participants">
+              {{study.current_num_participants}} / {{study.max_num_participants}} participants enrolled
             </mat-list-item>
-            <mat-list-item *ngIf="study.studyStart && study.studyEnd">
-              Study runs from {{study.studyStart}} to {{study.studyEnd}}
+            <mat-list-item *ngIf="study.start_date && study.end_date">
+              Study runs from {{study.start_date}} to {{study.end_date}}
             </mat-list-item>
           </mat-list>
         </mat-card-content>
