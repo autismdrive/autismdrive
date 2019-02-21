@@ -47,6 +47,10 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
         info["school_services"]["template_options"]["label"] = "Please check the following services you currently " \
                                                                "receive through your academic program (check all " \
                                                                "that apply):"
+        info["placement_other"]["hide_expression"] = \
+            '!(model.self_placement && model.dependent_placement.schoolOther)'
+        info["current_grade"]["hide_expression"] = \
+            '!(model.self_placement && model.dependent_placement.highSchool)'
 
         return info
 

@@ -91,7 +91,6 @@ class EducationMixin(object):
             "display_order": 4.3,
             "type": "input",
             "template_options": {"placeholder": "Enter school placement"},
-            "hide_expression": '!(model.dependent_placement && model.dependent_placement.schoolOther)',
         },
     )
     current_grade = db.Column(
@@ -100,7 +99,6 @@ class EducationMixin(object):
             "display_order": 5,
             "type": "input",
             "template_options": {"placeholder": "Enter grade"},
-            "hide_expression": '!(model.dependent_placement && model.dependent_placement.grades1to12)',
         },
     )
     school_services = db.Column(

@@ -54,6 +54,10 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
         info["school_services"]["expression_properties"]["template_options.label"] = \
             '"Please check the following services " + (formState.mainModel.preferred_name || "your child") + ' \
             '" currently receives in school (check all that apply):"'
+        info["placement_other"]["hide_expression"] = \
+            '!(model.dependent_placement && model.dependent_placement.schoolOther)'
+        info["current_grade"]["hide_expression"] = \
+            '!(model.dependent_placement && model.dependent_placement.grades1to12)'
 
         return info
 
