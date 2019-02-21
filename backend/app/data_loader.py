@@ -12,15 +12,20 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
-from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
+from app.model.questionnaires.clinical_diagnoses_dependent_questionnaire import ClinicalDiagnosesDependentQuestionnaire
+from app.model.questionnaires.clinical_diagnoses_self_questionnaire import ClinicalDiagnosesSelfQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
-from app.model.questionnaires.current_behaviors_questionnaire import CurrentBehaviorsQuestionnaire
+from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
+from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
 from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
 from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
-from app.model.questionnaires.education_questionnaire import EducationQuestionnaire
+from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
+from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
 from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
-from app.model.questionnaires.evaluation_history_questionnaire import EvaluationHistoryQuestionnaire
-from app.model.questionnaires.home_questionnaire import HomeQuestionnaire
+from app.model.questionnaires.evaluation_history_dependent_questionnaire import EvaluationHistoryDependentQuestionnaire
+from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
+from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
+from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app import db
@@ -172,11 +177,15 @@ class DataLoader():
                 UserParticipant).count())
         db.session.commit()
 
-    def load_clinical_diagnoses_questionnaire(self):
-        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
-        db.session.add(cd_ques)
-        print("Clinical Diagnoses loaded.  There is now %i clinical diagnoses record in the database." % db.session.query(
-            ClinicalDiagnosesQuestionnaire).count())
+    def load_clinical_diagnoses_questionnaires(self):
+        cd_dques = ClinicalDiagnosesDependentQuestionnaire(mental_health='ptsd', genetic='angelman')
+        db.session.add(cd_dques)
+        print("Clinical Diagnoses for Dependents loaded. There is now %i dependent clinical diagnoses record in the database." % db.session.query(
+            ClinicalDiagnosesDependentQuestionnaire).count())
+        cd_sques = ClinicalDiagnosesSelfQuestionnaire(mental_health='ptsd', genetic='angelman')
+        db.session.add(cd_sques)
+        print("Clinical Diagnoses for Self participants loaded. There is now %i self clinical diagnoses record in the database." % db.session.query(
+            ClinicalDiagnosesSelfQuestionnaire).count())
         db.session.commit()
 
     def load_contact_questionnaire(self):
@@ -186,11 +195,15 @@ class DataLoader():
             ContactQuestionnaire).count())
         db.session.commit()
 
-    def load_current_behaviors_questionnaire(self):
-        cb_ques = CurrentBehaviorsQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
-        db.session.add(cb_ques)
-        print("Current Behaviors loaded.  There is now %i current behavior record in the database." % db.session.query(
-            CurrentBehaviorsQuestionnaire).count())
+    def load_current_behaviors_questionnaires(self):
+        cb_dques = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        db.session.add(cb_dques)
+        print("Current Behaviors for Dependents loaded.  There is now %i dependent current behavior record in the database." % db.session.query(
+            CurrentBehaviorsDependentQuestionnaire).count())
+        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        db.session.add(cb_sques)
+        print("Current Behaviors for Self participants loaded.  There is now %i self current behavior record in the database." % db.session.query(
+            CurrentBehaviorsSelfQuestionnaire).count())
         db.session.commit()
 
     def load_demographics_questionnaire(self):
@@ -208,11 +221,15 @@ class DataLoader():
             DevelopmentalQuestionnaire).count())
         db.session.commit()
 
-    def load_education_questionnaire(self):
-        e_ques = EducationQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
-        db.session.add(e_ques)
-        print("Education loaded.  There is now %i education record in the database." % db.session.query(
-            EducationQuestionnaire).count())
+    def load_education_questionnaires(self):
+        e_dques = EducationDependentQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
+        db.session.add(e_dques)
+        print("Education for Dependents loaded.  There is now %i dependent education record in the database." % db.session.query(
+            EducationDependentQuestionnaire).count())
+        e_sques = EducationSelfQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
+        db.session.add(e_sques)
+        print("Education for Self participants loaded.  There is now %i self education record in the database." % db.session.query(
+            EducationSelfQuestionnaire).count())
         db.session.commit()
 
     def load_employment_questionnaire(self):
@@ -222,18 +239,26 @@ class DataLoader():
             EmploymentQuestionnaire).count())
         db.session.commit()
 
-    def load_evaluation_history_questionnaire(self):
-        eh_ques = EvaluationHistoryQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
-        db.session.add(eh_ques)
-        print("Evaluation History loaded.  There is now %i evaluation history record in the database." % db.session.query(
-            EvaluationHistoryQuestionnaire).count())
+    def load_evaluation_history_questionnaires(self):
+        eh_dques = EvaluationHistoryDependentQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
+        db.session.add(eh_dques)
+        print("Evaluation History for Dependents loaded.  There is now %i dependent evaluation history record in the database." % db.session.query(
+            EvaluationHistoryDependentQuestionnaire).count())
+        eh_sques = EvaluationHistorySelfQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
+        db.session.add(eh_sques)
+        print("Evaluation History for Self participants loaded.  There is now %i self evaluation history record in the database." % db.session.query(
+            EvaluationHistorySelfQuestionnaire).count())
         db.session.commit()
 
-    def load_home_questionnaire(self):
-        h_ques = HomeQuestionnaire(self_living_situation="spouse", struggle_to_afford=True)
+    def load_home_questionnaires(self):
+        h_ques = HomeDependentQuestionnaire(dependent_living_situation="fullTimeGuardian", struggle_to_afford=True)
         db.session.add(h_ques)
-        print("Home loaded.  There is now %i home record in the database." % db.session.query(
-            HomeQuestionnaire).count())
+        print("Home for Dependents loaded.  There is now %i dependent home record in the database." % db.session.query(
+            HomeDependentQuestionnaire).count())
+        h_ques = HomeSelfQuestionnaire(self_living_situation="spouse", struggle_to_afford=True)
+        db.session.add(h_ques)
+        print("Home for Self participants loaded.  There is now %i self home record in the database." % db.session.query(
+            HomeSelfQuestionnaire).count())
         db.session.commit()
 
     def load_identification_questionnaire(self):
@@ -269,15 +294,20 @@ class DataLoader():
         return category
 
     def clear(self):
-        db.session.query(ClinicalDiagnosesQuestionnaire).delete()
+        db.session.query(ClinicalDiagnosesDependentQuestionnaire).delete()
+        db.session.query(ClinicalDiagnosesSelfQuestionnaire).delete()
         db.session.query(ContactQuestionnaire).delete()
-        db.session.query(CurrentBehaviorsQuestionnaire).delete()
+        db.session.query(CurrentBehaviorsDependentQuestionnaire).delete()
+        db.session.query(CurrentBehaviorsSelfQuestionnaire).delete()
         db.session.query(DemographicsQuestionnaire).delete()
         db.session.query(DevelopmentalQuestionnaire).delete()
-        db.session.query(EducationQuestionnaire).delete()
+        db.session.query(EducationDependentQuestionnaire).delete()
+        db.session.query(EducationSelfQuestionnaire).delete()
         db.session.query(EmploymentQuestionnaire).delete()
-        db.session.query(EvaluationHistoryQuestionnaire).delete()
-        db.session.query(HomeQuestionnaire).delete()
+        db.session.query(EvaluationHistoryDependentQuestionnaire).delete()
+        db.session.query(EvaluationHistorySelfQuestionnaire).delete()
+        db.session.query(HomeDependentQuestionnaire).delete()
+        db.session.query(HomeSelfQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()

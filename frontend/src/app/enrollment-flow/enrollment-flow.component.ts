@@ -20,7 +20,6 @@ export class EnrollmentFlowComponent implements OnInit {
   user: User;
   participant: Participant;
   flow: Flow;
-  stepData;
 
   isSelf = true;
   stepName: string;
@@ -72,6 +71,8 @@ export class EnrollmentFlowComponent implements OnInit {
 
               this.api.getQuestionnaireMeta(this.stepName).subscribe(q => {
                 this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
+                console.log('This is still loading? ' + this.loading);
+                console.log('The Step is set to ', this.step);
                 this.form = new FormArray([new FormGroup({})]);
                 this.options = {
                   formState: {
@@ -92,6 +93,7 @@ export class EnrollmentFlowComponent implements OnInit {
   ngOnInit() {
   }
 
+
   private _infoToFormlyForm(info, stepName, fieldsType = 'fields'): QuestionnaireStep {
     const step = new QuestionnaireStep({
       id: info.id,
@@ -103,45 +105,51 @@ export class EnrollmentFlowComponent implements OnInit {
     });
     const stepFields = [];
 
+    //  First, Process the table object.
+    const table = info['table'];
+    Object.keys(table).forEach(tableKey => {
+      step[toCamel(tableKey)] = table[tableKey];
+    });
+
+    // Next process the Field Groups
+    if ('field_groups' in info) {
+      const field_groups = info['field_groups'];
+      Object.keys(field_groups).forEach(wrapperKey => {
+        // Clone the wrapper object so we can delete the original later
+        const wrapper = this.clone(field_groups[wrapperKey]);
+        const fgFields = field_groups[wrapperKey].fields || [];
+        wrapper.key = wrapperKey;
+
+        if (wrapper.type === 'repeat') {
+          // Recursively process sub-forms and insert them into fieldArray.
+          // Fields will be inserted into 'fieldGroup', rather than 'fields' attribute.
+          wrapper.fieldArray = this._infoToFormlyForm(info[wrapperKey], wrapperKey, 'fieldGroup');
+        } else {
+          wrapper.fieldGroup = this._mapFieldnamesToFieldGroup(fgFields, info);
+
+          // Remove the fields array from the wrapper object,
+          // since all its child fields are now inside the
+          // fieldGroup attribute
+          delete wrapper.fields;
+        }
+        stepFields.push(keysToCamel(wrapper));
+      });
+    }
+
+    //  Handle the remaining fields.
     Object.keys(info).forEach(key => {
       const item = info[key];
-
-      if (key === 'table') {
-        Object.keys(item).forEach(tableKey => {
-          step[toCamel(tableKey)] = item[tableKey];
-        });
-      } else if (key === 'field_groups') {
-        Object.keys(item).forEach(wrapperKey => {
-
-          // Clone the wrapper object so we can delete the original later
-          const wrapper = this.clone(item[wrapperKey]);
-          const fgFields = item[wrapperKey].fields || [];
-          wrapper.key = wrapperKey;
-
-          if (wrapper.type === 'repeat') {
-            // Recursively process sub-forms and insert them into fieldArray.
-            // Fields will be inserted into 'fieldGroup', rather than 'fields' attribute.
-            wrapper.fieldArray = this._infoToFormlyForm(info[wrapperKey], wrapperKey, 'fieldGroup');
-          } else {
-            wrapper.fieldGroup = this._mapFieldnamesToFieldGroup(fgFields, info);
-
-            // Remove the fields array from the wrapper object,
-            // since all its child fields are now inside the
-            // fieldGroup attribute
-            delete wrapper.fields;
-          }
-
-          stepFields.push(keysToCamel(wrapper));
-        });
-      } else if (item) {
+      if (item && key !== 'table' && key !== 'field_groups') {
         item.key = key;
         item.name = key;
         stepFields.push(keysToCamel(item));
+        console.log('Also adding these fields, where key is : ' + key, this.clone(item));
       }
     });
 
     stepFields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     stepFields.forEach(f => step[fieldsType].push(f));
+    console.log(step);
     return step;
   }
 

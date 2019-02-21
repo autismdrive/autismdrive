@@ -6,8 +6,8 @@ from app import db
 from app.question_service import QuestionService
 
 
-class EvaluationHistoryQuestionnaire(db.Model):
-    __tablename__ = "evaluation_history_questionnaire"
+class EvaluationHistorySelfQuestionnaire(db.Model):
+    __tablename__ = "evaluation_history_self_questionnaire"
     __question_type__ = QuestionService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
@@ -28,16 +28,12 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Self-identify as having Autism?",
+                "label": "Do you self-identify as having Autism?",
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Do you" : "Does " + formState.mainModel.preferred_name) + '
-                '" self-identify as having Autism?"'
             },
         },
     )
@@ -48,16 +44,12 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Formal diagnosis of Autism?",
+                "label": "Have you been formally diagnosed with Autism Spectrum Disorder?",
                 "required": True,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
-                '" been formally diagnosed with Autism Spectrum Disorder?"'
             },
         },
     )
@@ -67,13 +59,8 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "display_order": 3,
             "type": "input",
             "template_options": {
-                "label": "Years old at first diagnosis?",
+                "label": "How old were you when you were first diagnosed with ASD?",
                 "required": True,
-            },
-            "expression_properties": {
-                "template_options.label": '"How old " + (formState.mainModel.is_self ? "were you " : "was " + formState.mainModel.preferred_name) + '
-                '" when " + (formState.mainModel.is_self ? "you " : "they ") + " were first diagnosed'
-                ' with ASD?"'
             },
         },
     )
@@ -83,7 +70,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "display_order": 4,
             "type": "select",
             "template_options": {
-                "label": "Who diagnosed?",
+                "label": "Who first diagnosed you with ASD?",
                 "required": True,
                 "options": [
                     {
@@ -99,10 +86,6 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     },
                     {"value": "diagnosisOther", "label": "Other"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"Who first diagnosed " + (formState.mainModel.is_self ? "you" : formState.mainModel.preferred_name) + '
-                '" with ASD?"'
             },
         },
     )
@@ -121,7 +104,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "display_order": 6,
             "type": "select",
             "template_options": {
-                "label": "Where diagnosed?",
+                "label": "Where did you receive this diagnosis?",
                 "required": True,
                 "options": [
                     {
@@ -200,10 +183,6 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     {"value": "diagnosisOther", "label": "Other"},
                 ],
             },
-            "expression_properties": {
-                "template_options.label": '"Where did " + (formState.mainModel.is_self ? "you" : formState.mainModel.preferred_name) + '
-                '" receive this diagnosis?"'
-            },
         },
     )
     where_diagnosed_other = db.Column(
@@ -222,7 +201,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "required": True,
+                "required": False,
                 "options": [
                     {
                         "value": "uva",
@@ -249,16 +228,12 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Permission to link?",
-                "required": True,
+                "label": "Do we have your permission to link your evaluation data to the UVA Autism Database?",
+                "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"Do we have your permission to link " + (!formState.mainModel.is_self ? "your" : formState.mainModel.preferred_name + "\'s") + '
-                '" evaluation data to the UVa Autism Database?"'
             },
             "hide_expression": "!(formState.mainModel.partner_centers_evaluation)",
         },
@@ -270,16 +245,12 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "IQ or intelligence test?",
+                "label": "Have you been given an IQ or intelligence test?",
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
-                '" been given an IQ or intelligence test?"'
             },
         },
     )
@@ -290,8 +261,7 @@ class EvaluationHistoryQuestionnaire(db.Model):
             "type": "input",
             "template_options": {"placeholder": "IQ score"},
             "expression_properties": {
-                "template_options.label": '"What was " + (formState.mainModel.is_self ? "your" : formState.mainModel.preferred_name + "\'s") + '
-                '" most recent IQ score?"'
+                "template_options.label": '"What was your most recent IQ score?"'
             },
             "hide_expression": "!(formState.mainModel.has_iq_test)",
         },
@@ -310,26 +280,22 @@ class EvaluationHistoryQuestionnaire(db.Model):
                     "display_order": 8,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": "Evaluation at partner institution?"
-                    },
-                    "expression_properties": {
-                        "template_options.label": '(formState.mainModel.is_self ? "Have you" : "Has " + formState.mainModel.preferred_name) + '
-                        '" ever been evaluated at any of the following centers?"'
+                        "label": "Have you ever been evaluated at any of the following centers?"
                     },
                 }
             },
         }
         for c in self.metadata.tables[
-            "evaluation_history_questionnaire"
+            "evaluation_history_self_questionnaire"
         ].columns:
             if c.info:
                 info[c.name] = c.info
         return info
 
 
-class EvaluationHistoryQuestionnaireSchema(ModelSchema):
+class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = EvaluationHistoryQuestionnaire
+        model = EvaluationHistorySelfQuestionnaire
         fields = (
             "id",
             "last_updated",
@@ -349,7 +315,7 @@ class EvaluationHistoryQuestionnaireSchema(ModelSchema):
         )
 
 
-class EvaluationHistoryQuestionnaireMetaSchema(ModelSchema):
+class EvaluationHistorySelfQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = EvaluationHistoryQuestionnaire
+        model = EvaluationHistorySelfQuestionnaire
         fields = ("get_meta",)

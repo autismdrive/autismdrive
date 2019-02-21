@@ -7,8 +7,8 @@ from app.question_service import QuestionService
 from app.model.questionnaires.housemate import Housemate
 
 
-class HomeQuestionnaire(db.Model):
-    __tablename__ = "home_questionnaire"
+class HomeSelfQuestionnaire(db.Model):
+    __tablename__ = "home_self_questionnaire"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
@@ -51,51 +51,13 @@ class HomeQuestionnaire(db.Model):
             "hide_expression": '!(model.self_living_situation && (model.self_living_situation === "livingOther"))',
         },
     )
-    dependent_living_situation = db.Column(
-        db.String,
-        info={
-            "display_order": 2.1,
-            "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
-            "template_options": {
-                "required": True,
-                "label": "",
-                "options": [
-                    {"value": "fullTimeGuardian", "label": "With me full-time"},
-                    {"value": "partTimeGuardian", "label": "With me part time"},
-                    {
-                        "value": "otherFamily",
-                        "label": "With other parent/guardian/family member ",
-                    },
-                    {"value": "residentialFacility", "label": "Residential facility"},
-                    {"value": "groupHome", "label": "Group home"},
-                    {"value": "livingOther", "label": "Other (please explain)"},
-                ],
-            },
-        },
-    )
-    dependent_living_other = db.Column(
-        db.String,
-        info={
-            "display_order": 2.2,
-            "type": "input",
-            "template_options": {"placeholder": ""},
-            "hide_expression": "!(model.dependent_living_situation && model.dependent_living_situation.livingOther)",
-            "expression_properties": {
-                "template_options.placeholder": '"Please describe "+ (model.nickname || model.first_name || "your child") + "\'s current living situation"'
-            },
-        },
-    )
     housemates = db.relationship(
         "Housemate",
-        backref=db.backref("home_questionnaire", lazy=True),
+        backref=db.backref("home_self_questionnaire", lazy=True),
         info={
             "display_order": 3,
             "type": "repeat",
-            "template_options": {"required": False, "label": "Who else lives there?"},
-            "expression_properties": {
-                "template_options.label": '"Who else lives with " + (formState.mainModel.is_self ? "you" : (model.nickname || model.first_name || "your child")) + "?"'
-            },
+            "template_options": {"required": False, "label": "Who else lives with you?"},
         },
     )
     struggle_to_afford = db.Column(
@@ -111,9 +73,6 @@ class HomeQuestionnaire(db.Model):
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"Do you " + (!formState.mainModel.is_self ? "or " + formState.mainModel.preferred_name + "\'s other caregivers" : "") + " ever struggle with being able to afford to pay for household needs, food, or security" + (!formState.mainModel.is_self ? " for the family" : "") + "?"'
             },
         },
     )
@@ -149,16 +108,6 @@ class HomeQuestionnaire(db.Model):
                     "template_options": {"label": "Current Living Situation"},
                     "hide_expression": "!formState.mainModel.is_self",
                 },
-                "dependent_living": {
-                    "fields": ["dependent_living_situation", "dependent_living_other"],
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Current Living Situation"},
-                    "hide_expression": "formState.mainModel.is_self",
-                    "expression_properties": {
-                        "template_options.label": '"Where does " + formState.mainModel.preferred_name + " currently live (select all that apply)?"'
-                    },
-                },
                 "housemates": {
                     "type": "repeat",
                     "display_order": 3,
@@ -168,12 +117,12 @@ class HomeQuestionnaire(db.Model):
                         "description": "Add a housemate",
                     },
                     "expression_properties": {
-                        "template_options.label": '"Who else lives with " + (formState.mainModel.is_self ? "you" : (model.nickname || model.first_name || "your child")) + "?"'
+                        "template_options.label": "Who else lives with you?"
                     },
                 },
             },
         }
-        for c in self.metadata.tables["home_questionnaire"].columns:
+        for c in self.metadata.tables["home_self_questionnaire"].columns:
             if c.info:
                 info[c.name] = c.info
 
@@ -182,9 +131,9 @@ class HomeQuestionnaire(db.Model):
         return info
 
 
-class HomeQuestionnaireSchema(ModelSchema):
+class HomeSelfQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = HomeQuestionnaire
+        model = HomeSelfQuestionnaire
         fields = (
             "id",
             "last_updated",
@@ -192,14 +141,12 @@ class HomeQuestionnaireSchema(ModelSchema):
             "user_id",
             "self_living_situation",
             "self_living_other",
-            "dependent_living_situation",
-            "dependent_living_other",
             "housemates",
             "struggle_to_afford",
         )
 
 
-class HomeQuestionnaireMetaSchema(ModelSchema):
+class HomeSelfQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = HomeQuestionnaire
+        model = HomeSelfQuestionnaire
         fields = ("get_meta",)

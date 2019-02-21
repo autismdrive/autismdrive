@@ -6,13 +6,15 @@ from app import db
 from app.question_service import QuestionService
 
 
-class EducationQuestionnaire(db.Model):
-    __tablename__ = "education_questionnaire"
+class EducationDependentQuestionnaire(db.Model):
+    __tablename__ = "education_dependent_questionnaire"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
@@ -26,7 +28,7 @@ class EducationQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Attends school",
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
@@ -34,7 +36,8 @@ class EducationQuestionnaire(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Do you attend an academic program, such as a school, college, or university?" : "Does " + (formState.mainModel.preferred_name || "your child") + " attend school?")'
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + '
+                                          '" attend school?"',
             },
         },
     )
@@ -53,39 +56,19 @@ class EducationQuestionnaire(db.Model):
         db.String,
         info={
             "display_order": 3,
-            "type": "input",
+            "type": "radio",
             "template_options": {
-                "label": "What type of school?",
+                "label": '',
                 "required": False,
+                "options":[
+                    {"value": "public", "label": "Public"},
+                    {"value": "private", "label": "Private"},
+                    {"value": "homeschool", "label": "Home School"},
+                ]
             },
             "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Is this a public school, private school, or are you home schooled?" : "Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:")'
+                "template_options.label": '"Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:"',
             },
-        },
-    )
-    self_placement = db.Column(
-        db.String,
-        info={
-            "display_order": 4.1,
-            "type": "select",
-            "template_options": {
-                "label": "What type of program is it?",
-                "required": False,
-                "options": [
-                    {
-                        "value": "highSchool",
-                        "label": "High school, please specify CURRENT GRADE below",
-                    },
-                    {
-                        "value": "vocational",
-                        "label": "Vocational school where I am learning job or life skills",
-                    },
-                    {"value": "college", "label": "College/university"},
-                    {"value": "graduate", "label": "Graduate school"},
-                    {"value": "schoolOther", "label": "Other"},
-                ],
-            },
-            "hide_expression": '!formState.mainModel.is_self',
         },
     )
     dependent_placement = db.Column(
@@ -94,7 +77,7 @@ class EducationQuestionnaire(db.Model):
             "display_order": 4.2,
             "type": "select",
             "template_options": {
-                "label": "",
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "daycare", "label": "Daycare center"},
@@ -113,9 +96,9 @@ class EducationQuestionnaire(db.Model):
                     {"value": "schoolOther", "label": "Other"},
                 ],
             },
-            "hide_expression": 'formState.mainModel.is_self',
             "expression_properties": {
-                "template_options.label": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s current grade/school placement?"'
+                "template_options.label": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s '
+                                          'current grade/school placement?"',
             },
         },
     )
@@ -125,7 +108,7 @@ class EducationQuestionnaire(db.Model):
             "display_order": 4.3,
             "type": "input",
             "template_options": {"placeholder": "Enter school placement"},
-            "hide_expression": '!((model.dependent_placement && model.dependent_placement.schoolOther) || (model.self_placement && model.self_placement.schoolOther))',
+            "hide_expression": '!(model.dependent_placement && model.dependent_placement.schoolOther)',
         },
     )
     current_grade = db.Column(
@@ -134,7 +117,7 @@ class EducationQuestionnaire(db.Model):
             "display_order": 5,
             "type": "input",
             "template_options": {"placeholder": "Enter grade"},
-            "hide_expression": '!((model.dependent_placement && model.dependent_placement.grades1to12) || (model.self_placement && model.self_placement.highSchool))',
+            "hide_expression": '!(model.dependent_placement && model.dependent_placement.grades1to12)',
         },
     )
     school_services = db.Column(
@@ -144,7 +127,7 @@ class EducationQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": "School services",
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "504mod", "label": "504 Modification Plan"},
@@ -180,7 +163,9 @@ class EducationQuestionnaire(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Please check the following services " + (formState.mainModel.is_self ? "you currently receive through your academic program (check all that apply):" : (formState.mainModel.preferred_name || "your child") + " currently receives in school (check all that apply):")'
+                "template_options.label": '"Please check the following services " + '
+                                          '(formState.mainModel.preferred_name || "your child") + '
+                                          '" currently receives in school (check all that apply):"',
             },
         },
     )
@@ -204,7 +189,6 @@ class EducationQuestionnaire(db.Model):
             "field_groups": {
                 "placement_group": {
                     "fields": [
-                        "self_placement",
                         "dependent_placement",
                         "placement_other",
                     ],
@@ -220,15 +204,15 @@ class EducationQuestionnaire(db.Model):
                 },
             },
         }
-        for c in self.metadata.tables["education_questionnaire"].columns:
+        for c in self.metadata.tables["education_dependent_questionnaire"].columns:
             if c.info:
                 info[c.name] = c.info
         return info
 
 
-class EducationQuestionnaireSchema(ModelSchema):
+class EducationDependentQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = EducationQuestionnaire
+        model = EducationDependentQuestionnaire
         fields = (
             "id",
             "last_updated",
@@ -237,7 +221,6 @@ class EducationQuestionnaireSchema(ModelSchema):
             "attends_school",
             "school_name",
             "school_type",
-            "self_placement",
             "dependent_placement",
             "placement_other",
             "current_grade",
@@ -246,7 +229,7 @@ class EducationQuestionnaireSchema(ModelSchema):
         )
 
 
-class EducationQuestionnaireMetaSchema(ModelSchema):
+class EducationDependentQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = EducationQuestionnaire
+        model = EducationDependentQuestionnaire
         fields = ("get_meta",)

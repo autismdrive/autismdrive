@@ -9,10 +9,15 @@ class Housemate(db.Model):
     __tablename__ = "housemate"
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
-    home_questionnaire_id = db.Column(
-        "home_questionnaire_id",
+    home_dependent_questionnaire_id = db.Column(
+        "home_dependent_questionnaire_id",
         db.Integer,
-        db.ForeignKey("home_questionnaire.id"),
+        db.ForeignKey("home_dependent_questionnaire.id"),
+    )
+    home_self_questionnaire_id = db.Column(
+        "home_self_questionnaire_id",
+        db.Integer,
+        db.ForeignKey("home_self_questionnaire.id"),
     )
     name = db.Column(
         db.String,

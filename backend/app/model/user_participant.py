@@ -1,7 +1,5 @@
 import enum
 
-from sqlalchemy import Enum
-
 from app import db
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -32,4 +30,4 @@ class UserParticipant(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     participant = db.relationship(Participant, backref='participant_users')
     user = db.relationship(User, backref='user_participants')
-    relationship = db.Column(Enum(Relationship))
+    relationship = db.Column(db.Enum(Relationship))

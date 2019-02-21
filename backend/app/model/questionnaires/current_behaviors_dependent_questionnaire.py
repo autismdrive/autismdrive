@@ -6,40 +6,20 @@ from app import db
 from app.question_service import QuestionService
 
 
-class CurrentBehaviorsQuestionnaire(db.Model):
-    __tablename__ = "current_behaviors_questionnaire"
+class CurrentBehaviorsDependentQuestionnaire(db.Model):
+    __tablename__ = "current_behaviors_dependent_questionnaire"
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_on_task_ms = db.Column(db.BigInteger, default=0)
+
     participant_id = db.Column(
         "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
     )
     user_id = db.Column(
         "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-    self_verbal_ability = db.Column(
-        db.String,
-        info={
-            "display_order": 1,
-            "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
-            "template_options": {
-                "label": "How do you best communicate?",
-                "required": False,
-                "options": [
-                    {"value": "verbal", "label": "Verbally"},
-                    {"value": "nonVerbal", "label": "Non-verbally"},
-                    {
-                        "value": "AACsystem",
-                        "label": "An alternative and augmentative communication (AAC) system "
-                        "(e.g., Picture exchange, sign language, ipad, etc)",
-                    },
-                ],
-            },
-            "hide_expression": "!(formState.mainModel.is_self)",
-        },
     )
     dependent_verbal_ability = db.Column(
         db.String,
@@ -47,21 +27,21 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             "display_order": 1,
             "type": "radio",
             "template_options": {
-                "label": '(formState.mainModel.preferred_name || "Your child") + "\'s current verbal ability:"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "nonVerbal", "label": "Non-verbal"},
                     {"value": "singleWords", "label": "Single Words"},
                     {"value": "phraseSpeech", "label": "Phrase Speech"},
-                    {
-                        "value": "fluentErrors",
-                        "label": "Fluent Speech with grammatical errors",
-                    },
+                    {"value": "fluentErrors", "label": "Fluent Speech with grammatical errors"},
                     {"value": "fluent", "label": "Fluent Speech"},
-                ],
+                ]
             },
-            "hide_expression": "(formState.mainModel.is_self)",
-        },
+            "expression_properties": {
+                "template_options.label": '(formState.mainModel.preferred_name || "Your child") + "\'s current '
+                                          'verbal ability:"'
+            },
+        }
     )
     concerning_behaviors = db.Column(
         db.String,
@@ -70,8 +50,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": '"Does " + (formState.mainModel.preferred_name || "your child") + "currently engage in the '
-                'following behaviors of concern?"',
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": "aggression", "label": "Aggression"},
@@ -122,7 +101,9 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                     {"value": "concerningOther", "label": "Other"},
                 ],
             },
-            "hide_expression": "(formState.mainModel.is_self)",
+            "expression_properties": {
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + " currently engage in the following behaviors of concern?"'
+            },
         },
     )
     concerning_behaviors_other = db.Column(
@@ -141,7 +122,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Academic Difficulties",
+                "label": '',
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
@@ -149,8 +130,8 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Do you " : "Does " + (formState.mainModel.preferred_name '
-                '|| "your child")) + "have any difficulties with academics?"'
+                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + '
+                                          '"have any difficulties with academics?"'
             },
         },
     )
@@ -161,7 +142,7 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
-                "label": "",
+                "label": '',
                 "required": True,
                 "options": [
                     {"value": "math", "label": "Math"},
@@ -171,8 +152,8 @@ class CurrentBehaviorsQuestionnaire(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"What areas of academics are difficult for " + (formState.mainModel.is_self ? "you?" : '
-                '(formState.mainModel.preferred_name || "your child"))'
+                "template_options.label": '"What areas of academics are difficult for " + '
+                                          '(formState.mainModel.preferred_name || "your child")'
             },
         },
     )
@@ -197,22 +178,21 @@ class CurrentBehaviorsQuestionnaire(db.Model):
             }
         }
         for c in self.metadata.tables[
-            "current_behaviors_questionnaire"
+            "current_behaviors_dependent_questionnaire"
         ].columns:
             if c.info:
                 info[c.name] = c.info
         return info
 
 
-class CurrentBehaviorsQuestionnaireSchema(ModelSchema):
+class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
     class Meta:
-        model = CurrentBehaviorsQuestionnaire
+        model = CurrentBehaviorsDependentQuestionnaire
         fields = (
             "id",
             "last_updated",
             "participant_id",
             "user_id",
-            "self_verbal_ability",
             "dependent_verbal_ability",
             "concerning_behaviors",
             "concerning_behaviors_other",
@@ -222,7 +202,7 @@ class CurrentBehaviorsQuestionnaireSchema(ModelSchema):
         )
 
 
-class CurrentBehaviorsQuestionnaireMetaSchema(ModelSchema):
+class CurrentBehaviorsDependentQuestionnaireMetaSchema(ModelSchema):
     class Meta:
-        model = CurrentBehaviorsQuestionnaire
+        model = CurrentBehaviorsDependentQuestionnaire
         fields = ("get_meta",)
