@@ -25,8 +25,7 @@ import app.model.questionnaires.medication
 import app.model.questionnaires.therapy
 # Questionnaires:
 import app.model.questionnaires.contact_questionnaire
-import app.model.questionnaires.clinical_diagnoses_dependent_questionnaire
-import app.model.questionnaires.clinical_diagnoses_self_questionnaire
+import app.model.questionnaires.clinical_diagnoses_questionnaire
 import app.model.questionnaires.current_behaviors_dependent_questionnaire
 import app.model.questionnaires.current_behaviors_self_questionnaire
 import app.model.questionnaires.demographics_questionnaire
