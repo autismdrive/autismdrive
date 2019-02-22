@@ -33,7 +33,6 @@ class CurrentBehaviorsMixin(object):
         info={
             "display_order": 3,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "label": '',
                 "required": False,
@@ -61,7 +60,8 @@ class CurrentBehaviorsMixin(object):
                     {"value": "other", "label": "Other"},
                 ],
             },
-            "expression_properties": {}
+            "expression_properties": {},
+            "hide_expression": "!(model.has_academic_difficulties)",
         },
     )
     academic_difficulty_other = db.Column(

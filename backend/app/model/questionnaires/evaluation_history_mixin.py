@@ -14,7 +14,7 @@ class EvaluationHistoryMixin(object):
         },
         "field_groups": {
             "partner_centers": {
-                "fields": ["partner_centers_evaluation"],
+                "fields": ["partner_centers_evaluation", "gives_permission_to_link_evaluation_data"],
                 "display_order": 8,
                 "wrappers": ["card"],
                 "template_options": {
@@ -203,7 +203,9 @@ class EvaluationHistoryMixin(object):
                 ],
             },
             "expression_properties": {},
-            "hide_expression": "!(formState.mainModel.partner_centers_evaluation)",
+            "hide_expression": "!(model.partner_centers_evaluation && (model.partner_centers_evaluation.uva "
+                               "|| model.partner_centers_evaluation.sjc || model.partner_centers_evaluation.via "
+                               "|| model.partner_centers_evaluation.fc || model.partner_centers_evaluation.inova))",
         },
     )
     has_iq_test = db.Column(

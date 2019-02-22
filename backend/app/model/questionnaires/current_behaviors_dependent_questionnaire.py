@@ -86,7 +86,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 info[c.name] = c.info
 
         info["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (formState.mainModel.preferred_name || "your child") + "have any difficulties with academics?"'
+            '"Does " + (formState.mainModel.preferred_name || "your child") + " have any difficulties with academics?"'
         info["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
             '"What areas of academics are difficult for " + (formState.mainModel.preferred_name || "your child")'
 
