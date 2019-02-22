@@ -7,7 +7,7 @@ from sqlalchemy import func
 from app import ma, db
 from app.model.category import Category
 from app.model.organization import Organization
-from app.model.participant import Participant
+from app.model.participant import Participant, Relationship
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.study import Study
@@ -15,7 +15,6 @@ from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
-from app.model.user_participant import UserParticipant, Relationship
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
@@ -295,19 +294,11 @@ class TrainingCategorySchema(ModelSchema):
 class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
-        fields = ('id', 'last_updated', 'first_name', 'last_name')
+        fields = ('id', '_links', 'last_updated', 'name', 'relationship')
     id = fields.Integer(required=False, allow_none=True)
-
-
-class UserParticipantsSchema(ModelSchema):
-    class Meta:
-        model = UserParticipant
-        fields = ('id', '_links', 'participant_id', 'user_id', 'participant', 'relationship')
-    participant = fields.Nested(ParticipantSchema, dump_only=True)
     relationship = EnumField(Relationship)
     _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
-        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
+        'self': ma.URLFor('api.participantendpoint', id='<participant_id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
     })
 
@@ -318,20 +309,8 @@ class UserSchema(ModelSchema):
         fields = ('id', 'last_updated', 'email', 'password', 'role',
                   'participants')
     password = fields.String(load_only=True)
-    participants = fields.Nested(UserParticipantsSchema, dump_only=True, many=True)
+    participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
     id = fields.Integer(required=False, allow_none=True)
-
-
-class ParticipantUsersSchema(ModelSchema):
-    class Meta:
-        model = UserParticipant
-        fields = ('id', '_links', 'participant_id', 'user_id', 'user')
-    user = fields.Nested(UserSchema, dump_only=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.userparticipantendpoint', id='<id>'),
-        'participant': ma.URLFor('api.participantendpoint', id='<participant_id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>')
-    })
 
 
 class StepSchema(Schema):

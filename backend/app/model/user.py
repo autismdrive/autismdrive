@@ -3,6 +3,7 @@ import jwt
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import app, db, RestException, bcrypt
+from app.model.participant import Participant
 
 
 class User(db.Model):
@@ -15,8 +16,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     email = db.Column(db.String, nullable=False, unique=True)
-    role = db.Column(db.String, default='Self')
-    participants = db.relationship("UserParticipant", back_populates="user")
+    role = db.Column(db.String, default='User')
+    participants = db.relationship(Participant, back_populates="user")
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
 

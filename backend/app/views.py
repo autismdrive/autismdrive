@@ -45,7 +45,6 @@ from app.resources.StudyAndCategoryEndpoint import (
     StudyCategoryListEndpoint
 )
 from app.resources.UserAndParticipantEndpoint import (
-    UserParticipantEndpoint,
     ParticipantBySessionEndpoint
 )
 from app.resources.ResourceAndCategoryEndpoint import (
@@ -125,16 +124,17 @@ endpoints = [
     (CategoryByTrainingEndpoint, "/training/<training_id>/category"),
     (TrainingCategoryListEndpoint, "/training_category"),
     (TrainingCategoryEndpoint, "/training_category/<id>"),
+
     # User Sessions
     (SessionEndpoint, "/session"),
     (SessionStatusEndpoint, '/session/status'),
-    (ParticipantBySessionEndpoint, "/session/participant/<relationship>"),
+    (ParticipantBySessionEndpoint, "/session/participant"),
+
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
     # Participants
     (ParticipantEndpoint, "/participant/<id>"),
-    (UserParticipantEndpoint, "/user_participant/<id>"),
     # Questionnaires
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireMetaEndpoint, "/q/<string:name>/meta"),

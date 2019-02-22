@@ -2,12 +2,34 @@
   *ngIf="user"
   class="profile mat-typography"
 >
+
+  <div *ngIf="state === possibleStates.NO_PARTICIPANT">
+    <h1>Welcome!</h1>
+    <p>Thank you for creating an account on Star Drive!  Please select the option
+      below that best describes you.</p>
+    <p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="addParticipant('self_participant')"
+    >Self Registration</button>
+    Select this button if you are primarily looking for resources, or studies for yourself.
+    </p>
+    <p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="addParticipant('dependent')"
+    >Dependent Registration</button>
+    Select this button if you are looking for resources and studies for a dependent.
+    </p>
+  </div>
+
+  <!--
   <h1 *ngIf="participantSelf">{{participantSelf.preferredName()}}’s profile</h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
-
-
 
     <app-loading
       *ngIf="loading"
@@ -48,3 +70,4 @@
 
   </div>
 </div>
+-->

@@ -24,8 +24,7 @@ from app.model.resource import StarResource
 from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
-from app.model.participant import Participant
-from app.model.user_participant import UserParticipant, Relationship
+from app.model.participant import Participant, Relationship
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
@@ -196,23 +195,19 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(db_category.id)
         return db_category
 
-    def construct_user(self, first_name="Stan", last_name="Ton", email="stan@staunton.com", role="Self"):
+    def construct_user(self, email="stan@staunton.com"):
 
-        user = User(email=email, role=role)
-        participant = Participant(first_name=first_name, last_name=last_name)
-        relation = UserParticipant(user=user, participant=participant, relationship=Relationship.self_participant)
+        user = User(email=email, role="user")
         db.session.add(user)
-        db.session.add(participant)
-        db.session.add(relation)
         db.session.commit()
 
         db_user = db.session.query(User).filter_by(email=user.email).first()
         self.assertEqual(db_user.email, user.email)
         return db_user
 
-    def construct_admin_user(self, first_name="Rich", last_name="Mond", email="rmond@virginia.gov", role="Admin"):
+    def construct_admin_user(self, email="rmond@virginia.gov", role="Admin"):
 
-        user = User(first_name=first_name, last_name=last_name, email=email, role=role)
+        user = User(email=email, role=role)
         db.session.add(user)
         db.session.commit()
 
@@ -220,13 +215,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_user.first_name, user.first_name)
         return db_user
 
-    def construct_participant(self, first_name="Wayne", last_name="Boro", user=None, relationship=None):
-        participant = Participant(first_name=first_name, last_name=last_name)
+    def construct_participant(self, user, relationship):
 
-        if user is not None and relationship is not None:
-            r = UserParticipant(participant=participant, user = user, relationship=relationship)
-            db.session.add(r)
-
+        participant = Participant(user = user, relationship=relationship)
         db.session.add(participant)
         db.session.commit()
 

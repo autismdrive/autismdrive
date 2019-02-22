@@ -1,11 +1,16 @@
 import { Participant } from './participant';
 import { User } from './user';
 
-export interface UserParticipant {
+export class UserParticipant {
+
+  static SELF_PARTICIPANT = 'self_participant';
+  static SELF_GUARDIAN = 'self_guardian';
+  static DEPENDENT = 'dependent';
+
   id: number;
   participant_id: number;
   user_id: number;
-  relationship: string;
+  relationship: String;
   participant: Participant;
   user?: User;
 }

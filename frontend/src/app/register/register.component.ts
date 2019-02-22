@@ -20,24 +20,6 @@ export class RegisterComponent implements OnInit {
   model: any = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'first_name',
-      type: 'input',
-      templateOptions: {
-        label: 'First Name:',
-        placeholder: 'Enter your first name',
-        required: true,
-      },
-    },
-    {
-      key: 'last_name',
-      type: 'input',
-      templateOptions: {
-        label: 'Last Name:',
-        placeholder: 'Enter your last name',
-        required: true,
-      },
-    },
-    {
       key: 'email',
       type: 'input',
       templateOptions: {
@@ -53,24 +35,7 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
-    this.user = {
-      id: null,
-      email: this.model['email'],
-      role: 'User',
-      participants: [
-        {
-          id: null,
-          user_id: null,
-          participant_id: null,
-          relationship: 'self',
-          participant: new Participant({
-            id: null,
-            first_name: this.model['first_name'],
-            last_name: this.model['last_name'],
-          })
-        }
-      ]
-    };
+    this.user = new User(null, this.model['email'], 'User');
   }
 
   ngOnInit() {
@@ -80,8 +45,6 @@ export class RegisterComponent implements OnInit {
     if (this.form.valid) {
       this.registerState = 'submitting';
       this.errorMessage = '';
-      this.user['first_name'] = this.model['first_name'];
-      this.user['last_name'] = this.model['last_name'];
       this.user['email'] = this.model['email'];
 
       this.api.addUser(this.user).subscribe(u => {
