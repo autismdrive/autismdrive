@@ -1,7 +1,0 @@
-id,particpant_id,user_id,relationship
-1,1,1,self_guardian
-2,2,2,self_guardian
-3,3,3,self_guardian
-4,4,1,dependent
-5,5,2,dependent
-6,6,3,dependent

@@ -77,7 +77,6 @@ def _load_data(data_loader):
     data_loader.load_trainings()
     data_loader.load_users()
     data_loader.load_participants()
-    data_loader.link_users_participants()
     data_loader.load_clinical_diagnoses_questionnaires()
     data_loader.load_contact_questionnaire()
     data_loader.load_current_behaviors_questionnaires()
