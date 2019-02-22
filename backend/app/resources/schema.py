@@ -296,9 +296,10 @@ class ParticipantSchema(ModelSchema):
         model = Participant
         fields = ('id', '_links', 'last_updated', 'name', 'relationship')
     id = fields.Integer(required=False, allow_none=True)
+    name = fields.Function(lambda obj: obj.get_name())
     relationship = EnumField(Relationship)
     _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.participantendpoint', id='<participant_id>'),
+        'self': ma.URLFor('api.participantendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
     })
 
