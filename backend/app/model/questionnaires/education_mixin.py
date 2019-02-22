@@ -134,6 +134,6 @@ class EducationMixin(object):
             "display_order": 6.2,
             "type": "input",
             "template_options": {"placeholder": "Enter service"},
-            "hide_expression": '!(model.school_services && (model.schoolServices.servicesOther))',
+            "hide_expression": '!(model.school_services && (model.schoolServices === "servicesOther"))',
         },
     )

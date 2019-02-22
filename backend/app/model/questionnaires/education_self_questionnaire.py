@@ -34,6 +34,7 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
         info["field_groups"]["placement_group"]["fields"] = [
             "self_placement",
             "placement_other",
+            "current_grade"
         ]
 
         for c in self.metadata.tables["education_self_questionnaire"].columns:

@@ -41,6 +41,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
         info["field_groups"]["placement_group"]["fields"] = [
             "dependent_placement",
             "placement_other",
+            "current_grade"
         ]
 
         for c in self.metadata.tables["education_dependent_questionnaire"].columns:
@@ -55,9 +56,9 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
             '"Please check the following services " + (formState.mainModel.preferred_name || "your child") + ' \
             '" currently receives in school (check all that apply):"'
         info["placement_other"]["hide_expression"] = \
-            '!(model.dependent_placement && model.dependent_placement.schoolOther)'
+            '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
         info["current_grade"]["hide_expression"] = \
-            '!(model.dependent_placement && model.dependent_placement.grades1to12)'
+            '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
         return info
 
