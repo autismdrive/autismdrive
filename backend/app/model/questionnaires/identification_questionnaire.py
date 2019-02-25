@@ -170,12 +170,18 @@ class IdentificationQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": ""},
-                    "expression_properties": {
-                        "template_options.description": '"Please answer the following questions about " + (formState.mainModel.is_self ? "yourself" : "your child or the person with autism on whom you are providing information") + ". (* indicates required response):"'
+                    "template_options": {
+                        "description": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Please answer the following questions about yourself (* indicates required response):",
+                                "self_guardian": "Please answer the following questions about yourself (* indicates required response):",
+                                "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information)",
+                            }
+                        }
                     },
                 },
                 "relationship": {
+                    "RELATIONSHIP_REQUIRED": ['dependent'],
                     "fields": [
                         "relationship_to_participant",
                         "relationship_to_participant_other",
@@ -185,7 +191,6 @@ class IdentificationQuestionnaire(db.Model):
                     "template_options": {
                         "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                     },
-                    "hide_expression": "formState.mainModel.is_self",
                 },
             },
         }

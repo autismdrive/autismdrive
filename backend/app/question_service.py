@@ -48,3 +48,9 @@ class QuestionService:
             print("Module does not exist:" + module_name)
             #   logging.('Module does not exist')
         return None
+
+    @staticmethod
+    def get_meta(questionnaire, participant):
+        meta = questionnaire.get_meta(participant);
+        # loops through the depths, checks, and replaces ....
+        return {"get_meta": meta};
