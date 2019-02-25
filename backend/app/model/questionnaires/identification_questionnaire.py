@@ -23,6 +23,7 @@ class IdentificationQuestionnaire(db.Model):
     relationship_to_participant = db.Column(
         db.String,
         info={
+            "RELATIONSHIP_REQUIRED": ['dependent'],
             "display_order": 1.1,
             "type": "radio",
             "default": "self",
@@ -38,7 +39,6 @@ class IdentificationQuestionnaire(db.Model):
                     {"value": "other", "label": "Other"},
                 ],
             },
-            "hide_expression": "(formState.mainModel.is_self)",
         },
     )
     relationship_to_participant_other = db.Column(
@@ -82,14 +82,17 @@ class IdentificationQuestionnaire(db.Model):
             "default_value": True,
             "template_options": {
                 "required": False,
-                "label": "Is this the preferred name?",
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Is this your preferred name?",
+                                "self_guardian": "Is this your preferred name?",
+                                "dependent": "Is this your child\'s preferred name?",
+                            }
+                        },
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"Is this your " + (!formState.mainModel.is_self ? "child\'s" : "") + " preferred name?"'
             },
         },
     )
@@ -107,9 +110,15 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 7,
             "type": "datepicker",
-            "template_options": {"required": True, "label": "Date of birth"},
-            "expression_properties": {
-                "template_options.label": '"Your " + (formState.mainModel.is_self ? "" : "child\'s") + " date of birth"'
+            "template_options": {
+                "required": True,
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your date of birth",
+                                "self_guardian": "Your date of birth",
+                                "dependent": "Your child\'s date of birth",
+                            }
+                        },
             },
         },
     )
@@ -120,10 +129,13 @@ class IdentificationQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "required": True,
-                "label": "City/municipality of birth",
-            },
-            "expression_properties": {
-                "template_options.label": '"Your " + (formState.mainModel.is_self ? "" : "child\'s") + " city/municipality of birth"'
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your city/municipality of birth",
+                                "self_guardian": "Your city/municipality of birth",
+                                "dependent": "Your child\'s city/municipality of birth",
+                            }
+                        },
             },
         },
     )
@@ -132,9 +144,15 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 9,
             "type": "input",
-            "template_options": {"required": True},
-            "expression_properties": {
-                "template_options.label": '"Your " + (formState.mainModel.is_self ? "" : "child\'s") + " state of birth"'
+            "template_options": {
+                "required": True,
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your state of birth",
+                                "self_guardian": "Your state of birth",
+                                "dependent": "Your child\'s state of birth",
+                            }
+                        },
             },
         },
     )
@@ -146,14 +164,17 @@ class IdentificationQuestionnaire(db.Model):
             "default": True,
             "template_options": {
                 "required": False,
-                "label": "Is the primary language English?",
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Is your primary language English?",
+                                "self_guardian": "Is your primary language English?",
+                                "dependent": "Is your child\'s primary language English?",
+                            }
+                        },
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"Is your " + (formState.mainModel.is_self ? "" : "child\'s") + " primary language English?"'
             },
         },
     )
