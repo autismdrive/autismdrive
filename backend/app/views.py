@@ -137,7 +137,7 @@ endpoints = [
     (ParticipantEndpoint, "/participant/<id>"),
     # Questionnaires
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
-    (QuestionnaireMetaEndpoint, "/q/<string:name>/meta"),
+    (QuestionnaireMetaEndpoint, "/q/<string:name>/meta/<string:participant_id>"),
     # Flow Endpoint
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),

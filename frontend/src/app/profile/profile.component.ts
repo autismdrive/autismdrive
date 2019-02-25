@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
-import { Participant } from '../participant';
 import {Router} from '@angular/router';
-import {FormlyFieldConfig} from '@ngx-formly/core';
 
 enum ProfileState {
   'NO_PARTICIPANT', 'PARTICIPANT', 'GUARDIAN'

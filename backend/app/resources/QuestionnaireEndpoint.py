@@ -14,6 +14,7 @@ from app import db, RestException
 #   * it has an id field called "id"
 #   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
+from app.model.participant import Participant
 from app.question_service import QuestionService
 
 
@@ -52,8 +53,10 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
 class QuestionnaireMetaEndpoint(flask_restful.Resource):
 
-    def get(self, name):
+    def get(self, name, participant_id):
+        participant = db.session.query(Participant).filter_by(id=participant_id).first()
         schema = QuestionService.get_meta_schema(name)
         class_ref = QuestionService.get_class(name)
         questionnaire = db.session.query(class_ref).first()
-        return schema.dump(questionnaire)
+        return QuestionService.get_meta(questionnaire, participant_id)
+#        return schema.dump(questionnaire)
