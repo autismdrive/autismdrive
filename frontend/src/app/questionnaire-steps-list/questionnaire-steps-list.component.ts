@@ -23,7 +23,7 @@ export class QuestionnaireStepsListComponent implements OnInit {
   ngOnInit() {
     if (this.stepNames && (this.stepNames.length > 0)) {
       this.stepNames.forEach((stepName, i) => {
-        this.api.getQuestionnaireMeta(stepName).subscribe(q => {
+        this.api.getQuestionnaireMeta(this.flow.name, stepName).subscribe(q => {
           const stepInfo = q.get_meta.table;
 
           this.steps[i] = new QuestionnaireStep({

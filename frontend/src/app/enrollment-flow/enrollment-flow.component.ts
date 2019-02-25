@@ -69,7 +69,7 @@ export class EnrollmentFlowComponent implements OnInit {
                 this.stepName = this.stepNames[0];
               }
 
-              this.api.getQuestionnaireMeta(this.stepName).subscribe(q => {
+              this.api.getQuestionnaireMeta(this.flowName, this.stepName).subscribe(q => {
                 this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
                 console.log('This is still loading? ' + this.loading);
                 console.log('The Step is set to ', this.step);
