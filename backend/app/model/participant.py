@@ -37,5 +37,5 @@ class Participant(db.Model):
         if self.identification:
             return self.identification.getName()
         else:
-            return "unknown"
+            return ""
 
