@@ -5,23 +5,23 @@
 
   <div *ngIf="state === possibleStates.NO_PARTICIPANT">
     <h1>Welcome!</h1>
-    <p>Thank you for creating an account on Star Drive!  Please select the option
-      below that best describes you.</p>
+    <p>Thank you for creating an account on Star Drive!  Please complete the following fields, and select
+    the button that most closely applies to your situation.</p>
     <p>
     <button
       mat-flat-button
       color="primary"
-      (click)="addParticipant('self_participant')"
-    >Self Registration</button>
+      (click)="enrollSelf($event)"
+    >Enroll Yourself</button>
     Select this button if you are primarily looking for resources, or studies for yourself.
     </p>
     <p>
     <button
       mat-flat-button
       color="primary"
-      (click)="addParticipant('dependent')"
-    >Dependent Registration</button>
-    Select this button if you are looking for resources and studies for a dependent.
+      (click)="enrollGuardian($event)"
+    >Enroll a Dependent</button>
+    Select this button if you are looking for resources and studies for your child or a legal dependent.
     </p>
   </div>
 

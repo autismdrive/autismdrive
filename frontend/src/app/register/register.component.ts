@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
-import { Participant } from '../participant';
 
 @Component({
   selector: 'app-register',

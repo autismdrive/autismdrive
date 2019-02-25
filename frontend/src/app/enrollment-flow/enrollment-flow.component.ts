@@ -21,7 +21,6 @@ export class EnrollmentFlowComponent implements OnInit {
   participant: Participant;
   flow: Flow;
 
-  isSelf = true;
   stepName: string;
   activeStep = 0;
   loading = true;
@@ -46,12 +45,13 @@ export class EnrollmentFlowComponent implements OnInit {
         this.flowName = params.flowName || '';
 
         if (params.hasOwnProperty('participantId')) {
+          console.log(`Called with a participant id of ${params.participantId}`);
+          console.log('User Participants: ', user.participants);
           this.participantId = parseInt(params.participantId, 10);
 
           for (const up of user.participants) {
-            if (up.participant_id === this.participantId) {
-              this.isSelf = up.relationship === 'self';
-              this.participant = new Participant(up.participant);
+            if (up.id === this.participantId) {
+              this.participant = up;
             }
           }
         } else {
@@ -80,8 +80,7 @@ export class EnrollmentFlowComponent implements OnInit {
                   }
                 };
 
-                this.model.is_self = this.isSelf;
-                this.model.preferred_name = this.participant.preferredName();
+                this.model.preferred_name = this.participant.name;
                 this.loading = false;
               });
             });
@@ -174,7 +173,6 @@ export class EnrollmentFlowComponent implements OnInit {
 
     // Rename the keys
     const options = {
-      relationship_to_participant: this.isSelf ? 'self' : 'dependent',
       participant_id: this.participantId
     };
     const pattern = /^(.*)\./gi;
