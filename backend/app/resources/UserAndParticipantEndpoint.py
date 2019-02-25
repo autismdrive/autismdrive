@@ -4,7 +4,7 @@ from marshmallow import ValidationError
 from sqlalchemy import exc
 
 from app import db, RestException, auth
-from app.model.participant import Participant
+from app.model.participant import Participant, Relationship
 from app.model.user import User
 from app.resources.schema import ParticipantSchema
 
@@ -24,12 +24,21 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
     @auth.login_required
     def post(self):
         request_data = request.get_json()
+        if 'relationship' in request_data:
+            if not Relationship.has_name(request_data['relationship']):
+                raise RestException(RestException.UNKNOWN_RELATIONSHIP,
+                                    details="Valid Options:" + ','.join(Relationship.options()))
+            else:
+                relationship = request_data['relationship']
+                request_data.pop('relationship', None)
+        else:
+            relationship = None
         if 'user_id' not in request_data:
             request_data['user_id'] = g.user.id
         try:
             load_result = self.schema.load(request_data).data
-            if load_result.user is None:
-                load_result.user = db.session.query(User).filter(User.id == request_data['user_id']).first()
+            load_result.user = db.session.query(User).filter(User.id == request_data['user_id']).first()
+            load_result.relationship = relationship
             db.session.add(load_result)
             db.session.commit()
             return self.schema.dump(load_result)

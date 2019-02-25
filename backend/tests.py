@@ -1709,8 +1709,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_participant(self):
-
-        p = {'id': 7}
+        p = {'id': 7, 'relationship': 'self_participant'}
         rv = self.app.post('/api/session/participant', data=json.dumps(p), content_type="application/json",
                            follow_redirects=True)
         self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
@@ -1725,11 +1724,10 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(participant.id)
         self.assertIsNotNone(participant.user_id)
 
-    def test_modify_participant_to_have_bad_relationship(self):
-        participant = {'id': 234, 'relationship': 'free loader'}
+    def test_create_participant_to_have_bad_relationship(self):
+        participant = {'id': 234, 'relationship': 'free_loader'}
         rv = self.app.post('/api/session/participant', data=json.dumps(participant),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
-        # self.assertSuccess(rv)
         self.assertEqual(400, rv.status_code, "you can't create a participant using an invalid relationship")
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["code"], "unknown_relationship")
