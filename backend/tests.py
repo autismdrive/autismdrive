@@ -1461,6 +1461,7 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         response['email'] = 'ed@edwardos.com'
+        response['role'] = 'admin'
         orig_date = response['last_updated']
         rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True, headers=headers)
@@ -1469,6 +1470,7 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['email'], 'ed@edwardos.com')
+        self.assertEqual(response['role'], 'admin')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_user(self):
@@ -1493,11 +1495,40 @@ class TestCase(unittest.TestCase):
     def test_create_user(self):
         user = {'email': "tara@spiders.org"}
         rv = self.app.post('api/user', data=json.dumps(user), content_type="application/json",
-                           follow_redirects=True)
+                           headers=self.logged_in_headers(), follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['email'], 'tara@spiders.org')
         self.assertIsNotNone(response['id'])
+
+    def test_create_user_with_bad_role(self):
+        user = {'email': "tara@spiders.org", 'role': 'web_weaver'}
+
+        # post should change unknown role to 'user'
+        rv = self.app.post('/api/user', data=json.dumps(user),
+                           content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['role'], 'user')
+
+    def test_non_admin_cannot_create_admin_user(self):
+        u = self.construct_user()
+
+        # post as non-admin user should make role 'user'
+        new_admin_user = {'email': "tara@spiders.org", 'role': 'admin'}
+        rv = self.app.post('/api/user', data=json.dumps(new_admin_user),
+                           content_type="application/json", follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['role'], 'user')
+
+        # post as admin user should allow to make role 'admin
+        new_admin_user = {'email': "tara@spiders.com", 'role': 'admin'}
+        rv = self.app.post('/api/user', data=json.dumps(new_admin_user),
+                           content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['role'], 'admin')
 
     def logged_in_headers(self, user=None):
         # If no user is provided, generate a dummy Admin user
