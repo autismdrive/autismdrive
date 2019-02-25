@@ -1,4 +1,4 @@
-import {Participant} from './participant';
+import { Participant } from './participant';
 
 
 export class User {
@@ -10,13 +10,16 @@ export class User {
   id: number;
   email: string;
   role: string;
+  relationship?: string;
   participants?: Participant[];
   last_updated?: Date;
 
-  constructor(id: number, email: string, role: string) {
-    this.id = id;
-    this.email = email;
-    this.role = role;
+  constructor(private _props) {
+    for (const propName in this._props) {
+      if (this._props.hasOwnProperty(propName)) {
+        this[propName] = this._props[propName];
+      }
+    }
   }
 
   hasSelf() {

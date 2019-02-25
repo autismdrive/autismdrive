@@ -5,28 +5,27 @@
 
   <div *ngIf="state === possibleStates.NO_PARTICIPANT">
     <h1>Welcome!</h1>
-    <p>Thank you for creating an account on Star Drive!  Please complete the following fields, and select
-    the button that most closely applies to your situation.</p>
+    <p>Thank you for creating an account on Star Drive! Please complete the following fields, and select
+      the button that most closely applies to your situation.</p>
     <p>
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="enrollSelf($event)"
-    >Enroll Yourself</button>
-    Select this button if you are primarily looking for resources, or studies for yourself.
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="enrollSelf($event)"
+      >Enroll Yourself</button>
+      Select this button if you are primarily looking for resources, or studies for yourself.
     </p>
     <p>
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="enrollGuardian($event)"
-    >Enroll a Dependent</button>
-    Select this button if you are looking for resources and studies for your child or a legal dependent.
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="enrollGuardian($event)"
+      >Enroll a Dependent</button>
+      Select this button if you are looking for resources and studies for your child or a legal dependent.
     </p>
   </div>
 
-  <!--
-  <h1 *ngIf="participantSelf">{{participantSelf.preferredName()}}’s profile</h1>
+  <h1 *ngIf="participantSelf">{{participantSelf.name}}’s profile</h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
@@ -46,8 +45,8 @@
         fxLayoutGap="40px"
       >
         <app-participant-profile
-          *ngFor="let userParticipant of userParticipants"
-          [userParticipant]="userParticipant"
+          *ngFor="let participant of participants"
+          [participant]="participant"
         ></app-participant-profile>
 
         <button
@@ -70,4 +69,3 @@
 
   </div>
 </div>
--->

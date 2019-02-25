@@ -34,7 +34,11 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
-    this.user = new User(null, this.model['email'], 'User');
+    this.user = new User({
+      id: null,
+      email: this.model['email'],
+      role: 'User'
+    });
   }
 
   ngOnInit() {

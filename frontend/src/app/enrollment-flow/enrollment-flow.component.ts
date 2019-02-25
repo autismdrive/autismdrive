@@ -38,18 +38,18 @@ export class EnrollmentFlowComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.api.getSession().subscribe(user => {
-      this.user = user;
+    this.api.getSession().subscribe(userProps => {
+      this.user = new User(userProps);
       this.route.params.subscribe(params => {
         this.stepName = params.stepName || '';
         this.flowName = params.flowName || '';
 
         if (params.hasOwnProperty('participantId')) {
           console.log(`Called with a participant id of ${params.participantId}`);
-          console.log('User Participants: ', user.participants);
+          console.log('User Participants: ', this.user.participants);
           this.participantId = parseInt(params.participantId, 10);
 
-          for (const up of user.participants) {
+          for (const up of this.user.participants) {
             if (up.id === this.participantId) {
               this.participant = up;
             }
@@ -81,6 +81,7 @@ export class EnrollmentFlowComponent implements OnInit {
                 };
 
                 this.model.preferred_name = this.participant.name;
+                this.model.is_self = this.user.isSelf(this.participant);
                 this.loading = false;
               });
             });

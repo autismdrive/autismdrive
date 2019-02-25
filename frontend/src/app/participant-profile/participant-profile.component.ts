@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Participant } from '../participant';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {User} from '../user';
+import { FormlyFieldConfig } from '@ngx-formly/core';
+import { User } from '../user';
 
 @Component({
   selector: 'app-participant-profile',
@@ -14,7 +14,6 @@ export class ParticipantProfileComponent implements OnInit {
   dummyImgUrl: string;
   percentComplete: number;
   numStudies: number;
-
 
   constructor(private router: Router) {
     this.dummyImgUrl = this.randomImgUrl();
@@ -41,7 +40,7 @@ export class ParticipantProfileComponent implements OnInit {
   }
 
   goEditEnroll($event) {
-    if (this.participant.relationship === User.SELF_PARTICIPANT)   {
+    if (this.participant.relationship === User.SELF_PARTICIPANT) {
       $event.preventDefault();
       this.router.navigate(['participant', this.participant.id, 'self_intake']);
     } else if (this.participant.relationship === User.DEPENDENT) {

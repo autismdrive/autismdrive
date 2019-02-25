@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
 
 enum ProfileState {
   'NO_PARTICIPANT', 'PARTICIPANT', 'GUARDIAN'
@@ -17,12 +17,10 @@ export class ProfileComponent implements OnInit {
   possibleStates = ProfileState;
   state = ProfileState.NO_PARTICIPANT;
   loading = true;
-  currentId: number;
 
   constructor(private api: ApiService, private router: Router) {
-    this.currentId = Math.floor(Math.random() * 99999999) + 999;
-    this.api.getSession().subscribe(user => {
-      this.user = user;
+    this.api.getSession().subscribe(userProps => {
+      this.user = new User(userProps);
       this.loading = false;
     }, error1 => {
       console.error(error1);
@@ -56,7 +54,7 @@ export class ProfileComponent implements OnInit {
     };
 
     this.api.addParticipant(options).subscribe(participant => {
-      console.log('Navigating to participant/', participant.id, '/', flow )
+      console.log('Navigating to participant/', participant.id, '/', flow)
       this.router.navigate(['participant', participant.id, flow]);
     });
   }
