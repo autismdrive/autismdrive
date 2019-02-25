@@ -5,7 +5,7 @@ from flask import request, g
 
 from app import RestException, db, auth
 from app.model.flow import Flow
-from app.model.participant import Participant
+from app.model.participant import Participant, Relationship
 from app.model.step_log import StepLog
 from app.resources.schema import FlowSchema
 from app.question_service import QuestionService
@@ -15,6 +15,7 @@ class Flows:
     @staticmethod
     def get_self_intake_flow():
         flow = Flow(name="self_intake")
+        flow.relationship = Relationship.self_participant;
         flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
@@ -30,6 +31,7 @@ class Flows:
     @staticmethod
     def get_dependent_intake_flow():
         flow = Flow(name="dependent_intake")
+        flow.relationship = Relationship.dependent;
         flow.add_step('identification_questionnaire')
         flow.add_step('demographics_questionnaire')
         flow.add_step('home_dependent_questionnaire')
@@ -44,6 +46,7 @@ class Flows:
     @staticmethod
     def get_guardian_intake_flow():
         flow = Flow(name="guardian_intake")
+        flow.relationship = Relationship.self_guardian;
         flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
@@ -89,6 +92,18 @@ class FlowListEndpoint(flask_restful.Resource):
 
     def get(self):
         return self.flows_schema.dump(Flows.get_all_flows()).data
+
+
+class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
+
+    def get(self, flow, questionnaire_name):
+        flow = Flows.get_flow_by_name(flow)
+        if flow is None:
+            raise RestException(RestException.NOT_FOUND)
+        class_ref = QuestionService.get_class(questionnaire_name)
+        questionnaire = db.session.query(class_ref).first()
+        return QuestionService.get_meta(questionnaire, flow.relationship)
+    #        return schema.dump(questionnaire)
 
 
 class FlowQuestionnaireEndpoint(flask_restful.Resource):

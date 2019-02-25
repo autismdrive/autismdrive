@@ -2954,35 +2954,46 @@ class TestCase(unittest.TestCase):
         self.assertEqual(Step.STATUS_COMPLETE, response['steps'][0]['status'])
         self.assertIsNotNone(response['steps'][0]['date_completed'])
 
-    def testQuestionnaireMeta(self):
+    def testQuestionnaireMetaIsRelationSpecific(self):
         self.construct_identification_questionnaire()
-        u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
-        rv = self.app.get('/api/q/identification_questionnaire/meta/%i' % p.id,
+        rv = self.app.get('/api/flow/self_intake/identification_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertIsNotNone(response["get_meta"]["field_groups"]["intro"]["template_options"]["description"])
+        self.assertEqual(response["get_meta"]["field_groups"]["intro"]["template_options"]["description"],
+                         "Please answer the following questions about yourself (* indicates required response):")
+
         self.assertIsNotNone(response["get_meta"]["birth_city"])
         self.assertIsNotNone(response["get_meta"]["birth_city"]["template_options"])
         self.assertIsNotNone(response["get_meta"]["birth_city"]["template_options"]["label"])
         self.assertEqual(response["get_meta"]["birth_city"]["template_options"]["label"],
-                         "Your City/municipality of birth")
+                         "Your city/municipality of birth")
 
-        # Convert Participant to a dependant
-        p.relationship = Relationship.dependent;
-        db.session.add(p)
-        db.session.commit()
-
-        rv = self.app.get('/api/q/identification_questionnaire/meta/%i' % p.id,
+        rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertIsNotNone(response["get_meta"]["birth_city"]["template_options"]["label"])
         self.assertEqual(response["get_meta"]["birth_city"]["template_options"]["label"],
-                         "Your Child's City/municipality of birth")
+                         "Your child's city/municipality of birth")
 
 
+    def testQuestionnaireMetaIsRelationRequiredFields(self):
+        self.construct_identification_questionnaire()
+        rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response["get_meta"]["field_groups"]["relationship"])
 
+        # Convert Participant to a dependant
+        rv = self.app.get('/api/flow/self_intake/identification_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertFalse("relationship" in response["get_meta"]["field_groups"])

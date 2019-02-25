@@ -10,8 +10,8 @@ from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
     FlowEndpoint,
     FlowListEndpoint,
-    FlowQuestionnaireEndpoint
-)
+    FlowQuestionnaireEndpoint,
+    FlowQuestionnaireMetaEndpoint)
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
 from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
@@ -34,8 +34,7 @@ from app.resources.OrganizationEndpoint import (
     OrganizationListEndpoint
 )
 from app.resources.QuestionnaireEndpoint import (
-    QuestionnaireEndpoint,
-    QuestionnaireMetaEndpoint
+    QuestionnaireEndpoint
 )
 from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
@@ -137,11 +136,11 @@ endpoints = [
     (ParticipantEndpoint, "/participant/<id>"),
     # Questionnaires
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
-    (QuestionnaireMetaEndpoint, "/q/<string:name>/meta/<string:participant_id>"),
     # Flow Endpoint
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),
     (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
+    (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
 ]
 
 # Add all endpoints to the API
