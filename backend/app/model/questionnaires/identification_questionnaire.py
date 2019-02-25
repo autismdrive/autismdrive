@@ -47,7 +47,7 @@ class IdentificationQuestionnaire(db.Model):
             "display_order": 1.2,
             "type": "input",
             "template_options": {"placeholder": "Enter your relationship"},
-            "hide_expression": 'formState.mainModel.is_self || !(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
+            "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
         },
     )
     first_name = db.Column(
