@@ -44,10 +44,11 @@ class IdentificationQuestionnaire(db.Model):
     relationship_to_participant_other = db.Column(
         db.String,
         info={
+            "RELATIONSHIP_REQUIRED": ['dependent'],
             "display_order": 1.2,
             "type": "input",
             "template_options": {"placeholder": "Enter your relationship"},
-            "hide_expression": 'formState.mainModel.is_self || !(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
+            "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other")',
         },
     )
     first_name = db.Column(
