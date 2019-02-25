@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import RestException, db, email_service, auth
 from app.model.email_log import EmailLog
-from app.model.user import User
+from app.model.user import User, Role
 from app.resources.schema import UserSchema
 from app.wrappers import requires_roles
 
@@ -19,14 +19,14 @@ class UserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, id):
-        if g.user.id != eval(id) and g.user.role != 'Admin':
+        if g.user.id != eval(id) and g.user.role != Role.admin:
             raise RestException(RestException.PERMISSION_DENIED)
         model = db.session.query(User).filter_by(id=id).first()
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
-    @requires_roles('Admin')
+    @requires_roles(Role.admin)
     def delete(self, id):
         db.session.query(User).filter_by(id=id).delete()
         db.session.commit()
@@ -34,7 +34,7 @@ class UserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def put(self, id):
-        if g.user.id != eval(id) and g.user.role != 'Admin':
+        if g.user.id != eval(id) and g.user.role != Role.admin:
             raise RestException(RestException.PERMISSION_DENIED)
         request_data = request.get_json()
         instance = db.session.query(User).filter_by(id=id).first()
@@ -52,7 +52,7 @@ class UserListEndpoint(flask_restful.Resource):
     userSchema = UserSchema()
 
     @auth.login_required
-    @requires_roles('Admin')
+    @requires_roles(Role.admin)
     def get(self):
         users = db.session.query(User).all()
         return self.usersSchema.dump(users)

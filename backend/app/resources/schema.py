@@ -14,7 +14,7 @@ from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
-from app.model.user import User
+from app.model.user import User, Role
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
@@ -293,10 +293,11 @@ class TrainingCategorySchema(ModelSchema):
 class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
-        fields = ('id', '_links', 'last_updated', 'name', 'relationship')
+        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id')
     id = fields.Integer(required=False, allow_none=True)
     name = fields.Function(lambda obj: obj.get_name())
     relationship = EnumField(Relationship)
+    user_id = fields.Integer(required=False, allow_none=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.participantendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
@@ -311,6 +312,8 @@ class UserSchema(ModelSchema):
     password = fields.String(load_only=True)
     participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
     id = fields.Integer(required=False, allow_none=True)
+    role = EnumField(Role)
+
 
 
 class StepSchema(Schema):

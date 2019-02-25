@@ -16,7 +16,7 @@ import string
 import datetime
 import unittest
 from app import db, app
-from app.model.user import User
+from app.model.user import User, Role
 from app.model.study import Study
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
@@ -196,7 +196,7 @@ class TestCase(unittest.TestCase):
 
     def construct_user(self, email="stan@staunton.com"):
 
-        user = User(email=email, role="user")
+        user = User(email=email, role=Role.user)
         db.session.add(user)
         db.session.commit()
 
@@ -204,24 +204,24 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_user.email, user.email)
         return db_user
 
-    def construct_admin_user(self, email="rmond@virginia.gov", role="Admin"):
+    def construct_admin_user(self, email="rmond@virginia.gov"):
 
-        user = User(email=email, role=role)
+        user = User(email=email, role=Role.admin)
         db.session.add(user)
         db.session.commit()
 
         db_user = db.session.query(User).filter_by(email=user.email).first()
-        self.assertEqual(db_user.first_name, user.first_name)
+        self.assertEqual(db_user.role, user.role)
         return db_user
 
     def construct_participant(self, user, relationship):
 
-        participant = Participant(user = user, relationship=relationship)
+        participant = Participant(user=user, relationship=relationship)
         db.session.add(participant)
         db.session.commit()
 
-        db_participant = db.session.query(Participant).filter_by(last_name=participant.last_name).first()
-        self.assertEqual(db_participant.first_name, participant.first_name)
+        db_participant = db.session.query(Participant).filter_by(id=participant.id).first()
+        self.assertEqual(db_participant.relationship, participant.relationship)
         return db_participant
 
     def construct_assistive_device(self, type='prosthetic', description='leg', timeframe='current',
@@ -244,15 +244,17 @@ class TestCase(unittest.TestCase):
 
         cdq = ClinicalDiagnosesQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
                                              genetic=genetic)
+        if user is None:
+            u = self.construct_user()
+            cdq.user_id = u.id
+        else:
+            u = user
+            cdq.user_id = u.id
+
         if participant is None:
-            cdq.participant_id = self.construct_participant().id
+            cdq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
             cdq.participant_id = participant.id
-
-        if user is None:
-            cdq.user_id = self.construct_user().id
-        else:
-            cdq.user_id = user.id
 
         db.session.add(cdq)
         db.session.commit()
@@ -266,15 +268,17 @@ class TestCase(unittest.TestCase):
 
         cq = ContactQuestionnaire(phone=phone, zip=zip,
                                   marketing_channel=marketing_channel)
+        if user is None:
+            u = self.construct_user()
+            cq.user_id = u.id
+        else:
+            u = user
+            cq.user_id = u.id
+
         if participant is None:
-            cq.participant_id = self.construct_participant().id
+            cq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
             cq.participant_id = participant.id
-
-        if user is None:
-            cq.user_id = self.construct_user().id
-        else:
-            cq.user_id = user.id
 
         db.session.add(cq)
         db.session.commit()
@@ -293,13 +297,6 @@ class TestCase(unittest.TestCase):
                                                     concerning_behaviors=concerning_behaviors,
                                                     has_academic_difficulties=has_academic_difficulties,
                                                     academic_difficulty_areas=academic_difficulty_areas)
-        if participant is None:
-            p = self.construct_participant()
-            cb.participant_id = p.id
-        else:
-            p = participant
-            cb.participant_id = p.id
-
         if user is None:
             u = self.construct_user()
             cb.user_id = u.id
@@ -307,9 +304,12 @@ class TestCase(unittest.TestCase):
             u = user
             cb.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.dependent)
-
-        db.session.add_all([cb, up])
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.dependent)
+            cb.participant_id = p.id
+        else:
+            p = participant
+            cb.participant_id = p.id
 
         db.session.add(cb)
         db.session.commit()
@@ -325,13 +325,6 @@ class TestCase(unittest.TestCase):
         cb = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability=self_verbal_ability,
                                                has_academic_difficulties=has_academic_difficulties,
                                                academic_difficulty_areas=academic_difficulty_areas)
-        if participant is None:
-            p = self.construct_participant()
-            cb.participant_id = p.id
-        else:
-            p = participant
-            cb.participant_id = p.id
-
         if user is None:
             u = self.construct_user()
             cb.user_id = u.id
@@ -339,9 +332,12 @@ class TestCase(unittest.TestCase):
             u = user
             cb.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
-
-        db.session.add_all([cb, up])
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+            cb.participant_id = p.id
+        else:
+            p = participant
+            cb.participant_id = p.id
 
         db.session.add(cb)
         db.session.commit()
@@ -355,15 +351,17 @@ class TestCase(unittest.TestCase):
 
         dq = DemographicsQuestionnaire(birth_sex=birth_sex, gender_identity=gender_identity,
                                        race_ethnicity=race_ethnicity)
+        if user is None:
+            u = self.construct_user(email="user@study.com")
+            dq.user_id = u.id
+        else:
+            u = user
+            dq.user_id = u.id
+
         if participant is None:
-            dq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+            dq.participant_id = self.construct_participant(user=u, relationship=Relationship.self_participant).id
         else:
             dq.participant_id = participant.id
-
-        if user is None:
-            dq.user_id = self.construct_user(email="user@study.com").id
-        else:
-            dq.user_id = user.id
 
         db.session.add(dq)
         db.session.commit()
@@ -379,15 +377,17 @@ class TestCase(unittest.TestCase):
                                         when_motor_milestones=when_motor_milestones,
                                         when_language_milestones=when_language_milestones,
                                         when_toileting_milestones=when_toileting_milestones)
+        if user is None:
+            u = self.construct_user(email="user@study.com")
+            dq.user_id = u.id
+        else:
+            u = user
+            dq.user_id = u.id
+
         if participant is None:
-            dq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+            dq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
             dq.participant_id = participant.id
-
-        if user is None:
-            dq.user_id = self.construct_user(email="user@study.com").id
-        else:
-            dq.user_id = user.id
 
         db.session.add(dq)
         db.session.commit()
@@ -401,13 +401,6 @@ class TestCase(unittest.TestCase):
 
         eq = EducationDependentQuestionnaire(attends_school=attends_school, school_name=school_name, school_type=school_type,
                                              dependent_placement=dependent_placement)
-        if participant is None:
-            p = self.construct_participant(first_name="Trina", last_name="Frina")
-            eq.participant_id = p.id
-        else:
-            p = participant
-            eq.participant_id = p.id
-
         if user is None:
             u = self.construct_user(email="user@study.com")
             eq.user_id = u.id
@@ -415,9 +408,14 @@ class TestCase(unittest.TestCase):
             u = user
             eq.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.dependent)
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.dependent)
+            eq.participant_id = p.id
+        else:
+            p = participant
+            eq.participant_id = p.id
 
-        db.session.add_all([eq, up])
+        db.session.add(eq)
         db.session.commit()
 
         db_eq = db.session.query(EducationDependentQuestionnaire).filter_by(participant_id=eq.participant_id).first()
@@ -429,12 +427,6 @@ class TestCase(unittest.TestCase):
 
         eq = EducationSelfQuestionnaire(attends_school=attends_school, school_name=school_name, school_type=school_type,
                                         self_placement=self_placement)
-        if participant is None:
-            p = self.construct_participant(first_name="Trina", last_name="Frina")
-            eq.participant_id = p.id
-        else:
-            p = participant
-            eq.participant_id = p.id
 
         if user is None:
             u = self.construct_user(email="user@study.com")
@@ -443,9 +435,14 @@ class TestCase(unittest.TestCase):
             u = user
             eq.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+            eq.participant_id = p.id
+        else:
+            p = participant
+            eq.participant_id = p.id
 
-        db.session.add_all([eq, up])
+        db.session.add(eq)
         db.session.commit()
 
         db_eq = db.session.query(EducationSelfQuestionnaire).filter_by(participant_id=eq.participant_id).first()
@@ -458,15 +455,17 @@ class TestCase(unittest.TestCase):
         eq = EmploymentQuestionnaire(is_currently_employed=is_currently_employed,
                                      employment_capacity=employment_capacity,
                                      has_employment_support=has_employment_support)
+        if user is None:
+            u = self.construct_user(email="user@study.com")
+            eq.user_id = u.id
+        else:
+            u = user
+            eq.user_id = u.id
+
         if participant is None:
-            eq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+            eq.participant_id = self.construct_participant(user=u, relationship=Relationship.self_participant).id
         else:
             eq.participant_id = participant.id
-
-        if user is None:
-            eq.user_id = self.construct_user(email="user@study.com").id
-        else:
-            eq.user_id = user.id
 
         db.session.add(eq)
         db.session.commit()
@@ -483,13 +482,6 @@ class TestCase(unittest.TestCase):
                                                       has_autism_diagnosis=has_autism_diagnosis,
                                                       years_old_at_first_diagnosis=years_old_at_first_diagnosis,
                                                       who_diagnosed=who_diagnosed)
-        if participant is None:
-            p = self.construct_participant(last_name="Silamona")
-            ehq.participant_id = p.id
-        else:
-            p = participant
-            ehq.participant_id = p.id
-
         if user is None:
             u = self.construct_user(email="user@study.com")
             ehq.user_id = u.id
@@ -497,9 +489,14 @@ class TestCase(unittest.TestCase):
             u = user
             ehq.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.dependent)
+            ehq.participant_id = p.id
+        else:
+            p = participant
+            ehq.participant_id = p.id
 
-        db.session.add_all([ehq, up])
+        db.session.add(ehq)
         db.session.commit()
 
         db_ehq = db.session.query(EvaluationHistoryDependentQuestionnaire).filter_by(participant_id=ehq.participant_id).first()
@@ -514,13 +511,6 @@ class TestCase(unittest.TestCase):
                                                  has_autism_diagnosis=has_autism_diagnosis,
                                                  years_old_at_first_diagnosis=years_old_at_first_diagnosis,
                                                  who_diagnosed=who_diagnosed)
-        if participant is None:
-            p = self.construct_participant(last_name="Silamona")
-            ehq.participant_id = p.id
-        else:
-            p = participant
-            ehq.participant_id = p.id
-
         if user is None:
             u = self.construct_user(email="user@study.com")
             ehq.user_id = u.id
@@ -528,9 +518,14 @@ class TestCase(unittest.TestCase):
             u = user
             ehq.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+            ehq.participant_id = p.id
+        else:
+            p = participant
+            ehq.participant_id = p.id
 
-        db.session.add_all([ehq, up])
+        db.session.add(ehq)
         db.session.commit()
 
         db_ehq = db.session.query(EvaluationHistorySelfQuestionnaire).filter_by(participant_id=ehq.participant_id).first()
@@ -541,12 +536,6 @@ class TestCase(unittest.TestCase):
                                                struggle_to_afford=False, participant=None, user=None):
 
         hq = HomeDependentQuestionnaire(dependent_living_situation=dependent_living_situation, struggle_to_afford=struggle_to_afford)
-        if participant is None:
-            p = self.construct_participant(last_name="Silamona")
-            hq.participant_id = p.id
-        else:
-            p = participant
-            hq.participant_id = p.id
 
         if user is None:
             u = self.construct_user(email="user@study.com")
@@ -555,9 +544,14 @@ class TestCase(unittest.TestCase):
             u = user
             hq.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.dependent)
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.dependent)
+            hq.participant_id = p.id
+        else:
+            p = participant
+            hq.participant_id = p.id
 
-        db.session.add_all([hq, up])
+        db.session.add(hq)
         db.session.commit()
 
         if housemates is None:
@@ -573,12 +567,6 @@ class TestCase(unittest.TestCase):
                                           participant=None, user=None):
 
         hq = HomeSelfQuestionnaire(self_living_situation=self_living_situation, struggle_to_afford=struggle_to_afford)
-        if participant is None:
-            p = self.construct_participant(last_name="Silamona")
-            hq.participant_id = p.id
-        else:
-            p = participant
-            hq.participant_id = p.id
 
         if user is None:
             u = self.construct_user(email="user@study.com")
@@ -587,9 +575,14 @@ class TestCase(unittest.TestCase):
             u = user
             hq.user_id = u.id
 
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.dependent)
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+            hq.participant_id = p.id
+        else:
+            p = participant
+            hq.participant_id = p.id
 
-        db.session.add_all([hq, up])
+        db.session.add(hq)
         db.session.commit()
 
         if housemates is None:
@@ -624,15 +617,17 @@ class TestCase(unittest.TestCase):
         iq = IdentificationQuestionnaire(relationship_to_participant=relationship_to_participant, first_name=first_name,
                                          is_first_name_preferred=is_first_name_preferred, nickname=nickname,
                                          birth_state=birth_state, is_english_primary=is_english_primary)
+        if user is None:
+            u = self.construct_user(email="user@study.com")
+            iq.user_id = u.id
+        else:
+            u = user
+            iq.user_id = u.id
+
         if participant is None:
-            iq.participant_id = self.construct_participant(first_name="Trina", last_name="Frina").id
+            iq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
             iq.participant_id = participant.id
-
-        if user is None:
-            iq.user_id = self.construct_user(email="user@study.com").id
-        else:
-            iq.user_id = user.id
 
         db.session.add(iq)
         db.session.commit()
@@ -672,15 +667,17 @@ class TestCase(unittest.TestCase):
     def construct_supports_questionnaire(self, medications=None, therapies=None, assistive_devices=None, participant=None, user=None):
 
         sq = SupportsQuestionnaire()
+        if user is None:
+            u = self.construct_user(email="user@supports.org")
+            sq.user_id = u.id
+        else:
+            u = user
+            sq.user_id = u.id
+
         if participant is None:
-            sq.participant_id = self.construct_participant(last_name="Cantorella").id
+            sq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
             sq.participant_id = participant.id
-
-        if user is None:
-            sq.user_id = self.construct_user(email="user@supports.org").id
-        else:
-            sq.user_id = user.id
 
         db.session.add(sq)
         db.session.commit()
@@ -1447,7 +1444,6 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        response['role'] = 'Owner'
         response['email'] = 'ed@edwardos.com'
         orig_date = response['last_updated']
         rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
@@ -1456,7 +1452,6 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['role'], 'Owner')
         self.assertEqual(response['email'], 'ed@edwardos.com')
         self.assertNotEqual(orig_date, response['last_updated'])
 
@@ -1480,13 +1475,12 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_user(self):
-        user = {'role':"Widow", 'email':"tara@spiders.org"}
+        user = {'email': "tara@spiders.org"}
         rv = self.app.post('api/user', data=json.dumps(user), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['email'], 'tara@spiders.org')
-        self.assertEqual(response['role'], 'Widow')
         self.assertIsNotNone(response['id'])
 
     def logged_in_headers(self, user=None):
@@ -1497,7 +1491,7 @@ class TestCase(unittest.TestCase):
                 email="admin@admin.org",
                 password="myPass457",
                 email_verified=True,
-                role="Admin")
+                role=Role.admin)
 
         # Add user if it's not already in database
         existing_user = None
@@ -1524,12 +1518,10 @@ class TestCase(unittest.TestCase):
         return dict(
             Authorization='Bearer ' + db_user.encode_auth_token().decode())
 
-    def test_create_user_with_password(self, first_name="Peter", id=8,
-                                       email="tyrion@got.com", role="User", password="peterpass"):
+    def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user, password="peterpass"):
         data = {
             "id": id,
-            "email": email,
-            "role": role
+            "email": email
         }
         rv = self.app.post(
             '/api/user',
@@ -1540,6 +1532,7 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         user = User.query.filter_by(id=id).first()
         user.password = password
+        user.role = role
         db.session.add(user)
         db.session.commit()
 
@@ -1549,7 +1542,7 @@ class TestCase(unittest.TestCase):
             headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(email, response["email"])
-        self.assertEqual(role, response["role"])
+        self.assertEqual(role.name, response["role"])
         self.assertEqual(True, user.is_correct_password(password))
 
         return user
@@ -1630,7 +1623,7 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(logs[-1].tracking_code)
 
     def test_participant_basics(self):
-        self.construct_participant()
+        self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent)
         p = db.session.query(Participant).first()
         self.assertIsNotNone(p)
         p_id = p.id
@@ -1640,8 +1633,7 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], p_id)
-        self.assertEqual(response["first_name"], p.first_name)
-        self.assertEqual(response["last_name"], p.last_name)
+        self.assertEqual(response["relationship"], p.relationship.name)
 
     def test_modify_participant_you_do_not_own(self):
         u = self.construct_user()
@@ -1653,7 +1645,7 @@ class TestCase(unittest.TestCase):
                 email="frankie@badfella.fr",
                 password="h@corleet",
                 email_verified=True,
-                role="User")
+                role=Role.user)
         participant = {'first_name': "Lil' Johnny", 'last_name': "Tables"}
         rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
                           follow_redirects=True)
@@ -1671,23 +1663,22 @@ class TestCase(unittest.TestCase):
         u = self.construct_user()
         p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
-        participant = {'first_name': "My brand new", 'last_name': "name"}
+        participant = {'id': 567}
         rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
                           follow_redirects=True, headers=headers)
         self.assertSuccess(rv)
         p = db.session.query(Participant).filter_by(id=p.id).first()
-        self.assertEqual("My brand new", p.first_name)
+        self.assertEqual(567, p.id)
 
     def test_modify_participant_basics_admin(self):
-        self.construct_participant()
+        self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent)
         p = db.session.query(Participant).first()
         self.assertIsNotNone(p)
         p_id = p.id
         rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        response['first_name'] = 'Edwarardo'
-        response['last_name'] = 'Better'
+        response['user_id'] = 234
         orig_date = response['last_updated']
         rv = self.app.put('/api/participant/%i' % p_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
@@ -1695,12 +1686,12 @@ class TestCase(unittest.TestCase):
         rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['first_name'], 'Edwarardo')
-        self.assertEqual(response['last_name'], 'Better')
+        self.assertEqual(response['user_id'], 234)
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_participant(self):
-        p = self.construct_participant()
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship=Relationship.dependent)
         p_id = p.id
         rv = self.app.get('api/participant/%i' % p_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
@@ -1719,38 +1710,33 @@ class TestCase(unittest.TestCase):
 
     def test_create_participant(self):
 
-        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
-        rv = self.app.post('/api/session/participant/dependent', data=json.dumps(participant), content_type="application/json",
+        p = {'id': 7}
+        rv = self.app.post('/api/session/participant', data=json.dumps(p), content_type="application/json",
                            follow_redirects=True)
         self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
 
         rv = self.app.post(
-            '/api/session/participant/dependent', data=json.dumps(participant),
+            '/api/session/participant', data=json.dumps(p),
             content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
 
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertIsNotNone(response["participant_id"])
-        self.assertIsNotNone(response["user_id"])
-        self.assertEqual("dependent", response["relationship"])
-        self.assertTrue("participant" in response)
-        self.assertEqual("Dorothy", response["participant"]["first_name"])
-        self.assertEqual("Edwards", response["participant"]["last_name"])
+        participant = db.session.query(Participant).filter_by(id=p['id']).first()
 
-    def test_create_participant_with_bad_relationship(self):
+        self.assertIsNotNone(participant.id)
+        self.assertIsNotNone(participant.user_id)
 
-        participant = {'first_name': "Dorothy", 'last_name': "Edwards"}
-        rv = self.app.post('/api/session/participant/free_loader', data=json.dumps(participant),
-                           content_type="application/json", follow_redirects=True,  headers=self.logged_in_headers())
+    def test_modify_participant_to_have_bad_relationship(self):
+        participant = {'id': 234, 'relationship': 'free loader'}
+        rv = self.app.post('/api/session/participant', data=json.dumps(participant),
+                           content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
+        # self.assertSuccess(rv)
         self.assertEqual(400, rv.status_code, "you can't create a participant using an invalid relationship")
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["code"], "unknown_relationship")
 
     def test_get_participant_by_user(self):
         u = self.construct_user()
-        p = self.construct_participant()
-        up = UserParticipant(user=u, participant=p, relationship=Relationship.self_participant)
-        db.session.add(up)
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         db.session.commit()
         rv = self.app.get(
             '/api/user/%i' % u.id,
@@ -1758,8 +1744,8 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(u.id, response['id'])
-        self.assertEqual(2, len(response['participants']))
-        self.assertEqual(p.first_name, response['participants'][1]["participant"]["first_name"])
+        self.assertEqual(1, len(response['participants']))
+        self.assertEqual(p.relationship.name, response['participants'][0]["relationship"])
 
     def test_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
@@ -2509,7 +2495,7 @@ class TestCase(unittest.TestCase):
         hq_id = hq.id
         rv = self.app.get('/api/q/home_dependent_questionnaire/%i' % hq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
-        response['participant_id'] = self.construct_participant(first_name="Solidaria").id
+        response['participant_id'] = self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent).id
         response['dependent_living_situation'] = 'caregiver'
         response['struggle_to_afford'] = True
         orig_date = response['last_updated']
@@ -2578,7 +2564,7 @@ class TestCase(unittest.TestCase):
         hq_id = hq.id
         rv = self.app.get('/api/q/home_self_questionnaire/%i' % hq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
-        response['participant_id'] = self.construct_participant(first_name="Solidaria").id
+        response['participant_id'] = self.construct_participant(user=self.construct_user(), relationship=Relationship.self_participant).id
         response['self_living_situation'] = 'caregiver'
         response['struggle_to_afford'] = True
         orig_date = response['last_updated']
@@ -2715,7 +2701,7 @@ class TestCase(unittest.TestCase):
         sq_id = sq.id
         rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
-        response['participant_id'] = self.construct_participant(first_name="Solidaria").id
+        response['participant_id'] = self.construct_participant(user=self.construct_user(), relationship=Relationship.self_participant).id
         orig_date = response['last_updated']
         rv = self.app.put('/api/q/supports_questionnaire/%i' % sq_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
