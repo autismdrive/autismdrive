@@ -87,6 +87,9 @@ export class EnrollmentFlowComponent implements OnInit {
                     .getQuestionnaire(this.stepName, questionnaireId)
                     .subscribe(qData => {
                       this.model = qData;
+
+                      console.log('this.model', this.model);
+
                       this._renderForm(q.get_meta);
                     });
                 } else {
@@ -151,6 +154,7 @@ export class EnrollmentFlowComponent implements OnInit {
           wrapper.fieldArray = this._infoToFormlyForm(info[wrapperKey], wrapperKey, 'fieldGroup');
         } else {
           wrapper.fieldGroup = this._mapFieldnamesToFieldGroup(fgFields, info);
+          this._moveModelDataIntoGroup(fgFields, wrapperKey);
 
           // Remove the fields array from the wrapper object,
           // since all its child fields are now inside the
@@ -222,6 +226,23 @@ export class EnrollmentFlowComponent implements OnInit {
 
   clone(o: any): any {
     return JSON.parse(JSON.stringify(o));
+  }
+
+  // Move previously-submitted data into corresponding
+  // location in model
+  private _moveModelDataIntoGroup(fieldNames: string[], groupName: string) {
+    console.log('this.model before', this.clone(this.model));
+
+    fieldNames.forEach(fieldName => {
+      console.log('fieldName', fieldName);
+      if (this.model.hasOwnProperty(groupName) && this.model.hasOwnProperty(fieldName)) {
+        this.model[groupName][fieldName] = this.clone(this.model[fieldName]);
+        delete this.model[fieldName];
+      }
+    });
+
+    console.log('this.model after', this.clone(this.model));
+
   }
 
   private _mapFieldnamesToFieldGroup(fieldnames: string[], parentObject) {
