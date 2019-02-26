@@ -1455,18 +1455,27 @@ class TestCase(unittest.TestCase):
     def test_modify_user_basics(self):
         self.construct_user()
         u = db.session.query(User).first()
-        headers = self.logged_in_headers(u)
+        admin_headers = self.logged_in_headers()
+        user_headers = self.logged_in_headers(u)
         self.assertIsNotNone(u)
-        rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
+        
+        # A user should be able to access and modify their user record, with the exception of making themselves Admin
+        rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=user_headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         response['email'] = 'ed@edwardos.com'
-        response['role'] = 'admin'
         orig_date = response['last_updated']
         rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True, headers=headers)
+                          follow_redirects=True, headers=user_headers)
         self.assertSuccess(rv)
-        rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=headers)
+
+        # Only Admin users can make other admin users
+        response['role'] = 'admin'
+        rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=admin_headers)
+        self.assertSuccess(rv)
+
+        rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=user_headers)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['email'], 'ed@edwardos.com')
@@ -1514,17 +1523,24 @@ class TestCase(unittest.TestCase):
     def test_non_admin_cannot_create_admin_user(self):
         u = self.construct_user()
 
-        # post as non-admin user should make role 'user'
+        # post should make role 'user'
         new_admin_user = {'email': "tara@spiders.org", 'role': 'admin'}
         rv = self.app.post('/api/user', data=json.dumps(new_admin_user),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['role'], 'user')
+        new_id = response['id']
 
-        # post as admin user should allow to make role 'admin
-        new_admin_user = {'email': "tara@spiders.com", 'role': 'admin'}
-        rv = self.app.post('/api/user', data=json.dumps(new_admin_user),
+        # put as non-admin user should keep role as 'user'
+        rv = self.app.put('/api/user/%i' % u.id, data=json.dumps({'email': u.email, 'role': 'admin'}),
+                           content_type="application/json", follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['role'], 'user')
+
+        # put as admin user should allow to make role 'admin'
+        rv = self.app.put('/api/user/%i' % new_id, data=json.dumps(new_admin_user),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
