@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Participant } from '../participant';
 import { User } from '../user';
+import { Flow } from '../flow';
+import { ApiService } from '../services/api/api.service';
 
 @Component({
   selector: 'app-participant-profile',
@@ -11,25 +13,34 @@ import { User } from '../user';
 export class ParticipantProfileComponent implements OnInit {
   @Input() participant: Participant;
   @Input() user: User;
+  flow: Flow;
   dummyImgUrl: string;
   percentComplete: number;
   numStudies: number;
 
-  constructor(private router: Router) {
+  constructor(
+    private api: ApiService,
+    private router: Router
+  ) {
     this.dummyImgUrl = this.randomImgUrl();
   }
 
   ngOnInit() {
-    if (isFinite(this.participant.percent_complete)) {
-      this.percentComplete = this.participant.percent_complete;
-    } else {
-      this.percentComplete = Math.ceil(Math.random() * 5) * 20;
+    if (this.participant) {
+      this.api
+        .getFlow(this.participant.getFlowName(), this.participant.id)
+        .subscribe(f => {
+          this.flow = new Flow(f);
+          console.log('this.flow', this.flow);
+          this.percentComplete = this.flow.percentComplete();
+          console.log('this.percentComplete', this.percentComplete);
+        });
     }
 
     if (isFinite(this.participant.num_studies_enrolled)) {
       this.numStudies = this.participant.num_studies_enrolled;
     } else {
-      this.numStudies = Math.floor(Math.random() * 5) + 1;
+      this.numStudies = 0;
     }
   }
 
