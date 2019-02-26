@@ -193,7 +193,9 @@ class DemographicsQuestionnaireSchema(ModelSchema):
             "user_id",
             "birth_sex",
             "gender_identity",
+            "gender_identity_other",
             "race_ethnicity",
+            "race_ethnicity_other",
         )
 
 
