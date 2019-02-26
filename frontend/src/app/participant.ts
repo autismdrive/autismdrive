@@ -3,7 +3,7 @@ import { User } from './user';
 export class Participant {
   id?: number;
   user_id: number;
-  user: User;
+  // user: User;
   relationship: String;
   last_updated?: Date;
   percent_complete?: number;
