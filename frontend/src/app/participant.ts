@@ -1,9 +1,8 @@
-import { User } from './user';
+import { ParticipantRelationship } from './participantRelationship';
 
 export class Participant {
   id?: number;
   user_id: number;
-  // user: User;
   relationship: String;
   last_updated?: Date;
   percent_complete?: number;
@@ -21,11 +20,11 @@ export class Participant {
 
   getFlowName(): string {
     switch (this.relationship) {
-      case User.DEPENDENT:
+      case ParticipantRelationship.DEPENDENT:
         return 'dependent_intake';
-      case User.SELF_GUARDIAN:
+      case ParticipantRelationship.SELF_GUARDIAN:
         return 'guardian_intake';
-      case User.SELF_PARTICIPANT:
+      case ParticipantRelationship.SELF_PARTICIPANT:
         return 'self_intake';
       default:
         return 'self_intake';

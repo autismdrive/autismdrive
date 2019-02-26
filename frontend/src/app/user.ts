@@ -1,17 +1,8 @@
 import { Participant } from './participant';
-import { Profile } from 'selenium-webdriver/firefox';
-
-export enum ProfileState {
-  NO_PARTICIPANT = 'NO_PARTICIPANT',
-  PARTICIPANT = 'PARTICIPANT',
-  GUARDIAN = 'GUARDIAN'
-}
+import { ParticipantRelationship } from './participantRelationship';
+import { ProfileState } from './profileState';
 
 export class User {
-
-  static SELF_PARTICIPANT = 'self_participant';
-  static SELF_GUARDIAN = 'self_guardian';
-  static DEPENDENT = 'dependent';
 
   id: number;
   email: string;
@@ -37,8 +28,8 @@ export class User {
   }
 
   isSelf(participant: Participant): boolean {
-    if (participant.relationship === User.SELF_GUARDIAN ||
-      participant.relationship === User.SELF_PARTICIPANT) {
+    if (participant.relationship === ParticipantRelationship.SELF_GUARDIAN ||
+      participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       return true;
     } else {
       return false;
@@ -56,7 +47,7 @@ export class User {
   getState() {
     if (this.getDependents().length > 0) {
       return ProfileState.GUARDIAN;
-    } else if (this.getSelf().relationship === User.SELF_PARTICIPANT) {
+    } else if (this.getSelf().relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       return ProfileState.PARTICIPANT;
     } else {
       return ProfileState.NO_PARTICIPANT;
