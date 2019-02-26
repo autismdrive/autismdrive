@@ -74,11 +74,23 @@ export class EnrollmentFlowComponent implements OnInit {
               console.log('this.stepName', this.stepName);
               console.log('this.stepNames', this.stepNames);
 
-
               this.api.getQuestionnaireMeta(this.flowName, this.stepName).subscribe(q => {
                 this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
                 console.log('This is still loading? ' + this.loading);
                 console.log('The Step is set to ', this.step);
+
+                // Load the form with previously-submitted data, if available
+                const fStep = this.flow.steps.find(s => this.stepName === s.name);
+                const questionnaireId = fStep.questionnaire_id;
+
+                if (isFinite(questionnaireId)) {
+                  this.api
+                    .getQuestionnaire(this.stepName, questionnaireId)
+                    .subscribe(qData => {
+                      this.model = qData;
+                    });
+                }
+
                 this.form = new FormArray([new FormGroup({})]);
                 this.options = {
                   formState: {

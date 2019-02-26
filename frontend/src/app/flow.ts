@@ -25,4 +25,5 @@ export interface Step {
   type: string;
   status: string;
   date_completed: Date;
+  questionnaire_id?: number;
 }
