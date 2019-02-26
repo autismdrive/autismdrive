@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
 import { Router } from '@angular/router';
+import { Participant } from '../participant';
 
 enum ProfileState {
   'NO_PARTICIPANT', 'PARTICIPANT', 'GUARDIAN'
@@ -51,14 +52,14 @@ export class ProfileComponent implements OnInit {
 
   addParticipantAndGoToFlow(relationship: string, flow: string) {
     this.loading = true;
-    const options = {
+    const newParticipant = new Participant({
       user_id: this.user.id,
       user: this.user,
       last_updated: new Date(),
       relationship: relationship
-    };
+    });
 
-    this.api.addParticipant(options).subscribe(participant => {
+    this.api.addParticipant(newParticipant).subscribe(participant => {
       console.log('Navigating to participant/', participant.id, '/', flow);
       this.router.navigate(['participant', participant.id, flow]);
     });
