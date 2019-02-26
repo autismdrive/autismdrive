@@ -179,6 +179,12 @@ class IdentificationQuestionnaire(db.Model):
         },
     )
 
+    def get_name(self):
+        if not self.is_first_name_preferred:
+            return self.nickname + ' ' + self.last_name
+        else:
+            return self.first_name + ' ' + self.last_name
+
     def get_meta(self):
         info = {
             "table": {
