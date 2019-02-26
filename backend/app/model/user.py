@@ -1,8 +1,23 @@
 import datetime
 import jwt
+import enum
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import app, db, RestException, bcrypt
+from app.model.participant import Participant
+
+
+class Role(enum.Enum):
+    admin = 1
+    user = 2
+
+    @classmethod
+    def has_name(cls, name):
+        return any(name == item.name for item in cls)
+
+    @classmethod
+    def options(cls):
+        return [item.name for item in cls]
 
 
 class User(db.Model):
@@ -15,14 +30,14 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     email = db.Column(db.String, nullable=False, unique=True)
-    role = db.Column(db.String, default='Self')
-    participants = db.relationship("UserParticipant", back_populates="user")
+    role = db.Column(db.Enum(Role))
+    participants = db.relationship(Participant, back_populates="user")
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
 
     def related_to_participant(self, participant_id):
         for p in self.participants:
-            if p.participant.id == participant_id:
+            if p.id == participant_id:
                 return True
         return False
 

@@ -6,10 +6,10 @@
         src="{{participant.avatar_img_url || dummyImgUrl}}"
       >
       <mat-card-title>
-        {{participant.preferredName()}}
+        {{participant.name}}
       </mat-card-title>
       <mat-card-subtitle>
-        {{(userParticipant.relationship === 'self_guardian') || (userParticipant.relationship === 'self_participant') ? 'You' : userParticipant.relationship | titlecase}}
+        {{user.isSelf(participant)? 'You' : participant.relationship | titlecase}}
         <div
           *ngIf="percentComplete < 100"
           class="mat-subheading-2"

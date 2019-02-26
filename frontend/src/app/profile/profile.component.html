@@ -2,49 +2,82 @@
   *ngIf="user"
   class="profile mat-typography"
 >
-  <h1 *ngIf="participantSelf">{{participantSelf.preferredName()}}’s profile</h1>
-  <div>
-    <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
-    <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
 
+  <div *ngIf="state === possibleStates.NO_PARTICIPANT">
+    <h1>Welcome!</h1>
+    <p>Thank you for creating an account on Star Drive! Please complete the following fields, and select
+      the button that most closely applies to your situation.</p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="enrollSelf($event)"
+    >Enroll Yourself</button>
+    <p>
+      Select this button if you are primarily looking for resources, or studies for yourself.
+    </p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="enrollGuardian($event)"
+    >Enroll a Dependent</button>
+    <p>
+      Select this button if you are looking for resources and studies for your child or a legal dependent.
+    </p>
+  </div>
 
+  <div *ngIf="state !== possibleStates.NO_PARTICIPANT">
+    <h1>{{user.getSelf() ? user.getSelf().name + '\'s': 'Your'}} profile</h1>
+    <div>
+      <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
+      <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
 
-    <app-loading
-      *ngIf="loading"
-      message="Loading..."
-    ></app-loading>
+      <app-loading
+        *ngIf="loading"
+        message="Loading..."
+      ></app-loading>
 
-    <div
-      fxLayout="row"
-      fxLayoutGap="40px"
-    >
       <div
-        fxFlex="60%"
-        fxLayout="column"
+        fxLayout="row"
         fxLayoutGap="40px"
       >
-        <app-participant-profile
-          *ngFor="let userParticipant of userParticipants"
-          [userParticipant]="userParticipant"
-        ></app-participant-profile>
+        <div
+          fxFlex="60%"
+          fxLayout="column"
+          fxLayoutGap="40px"
+        >
+          <app-participant-profile
+            *ngFor="let participant of user.participants"
+            [participant]="participant"
+            [user]="user"
+          ></app-participant-profile>
 
-        <button
-          *ngIf="!isAlreadyEnrolled('self_participant')"
-          mat-flat-button
-          color="primary"
-          (click)="addParticipant('self_participant')"
-        >Enroll yourself</button>
+          <button
+            *ngIf="!user.getSelf()"
+            mat-flat-button
+            color="primary"
+            (click)="enrollSelf($event)"
+          >Enroll yourself</button>
 
-        <button
-          mat-flat-button
-          color="primary"
-          (click)="addParticipant('dependent')"
-        >Enroll {{isAlreadyEnrolled('dependent') ? 'another' : 'a'}} dependent</button>
+          <button
+            *ngIf="user.getDependents().length === 0"
+            mat-flat-button
+            color="primary"
+            (click)="enrollGuardian($event)"
+          >Enroll a dependent</button>
+
+          <button
+            *ngIf="user.getDependents().length > 0"
+            mat-flat-button
+            color="primary"
+            (click)="enrollDependent($event)"
+          >Enroll another dependent</button>
+        </div>
+        <div fxFlex="40%">
+          [List of studies here]
+        </div>
       </div>
-      <div fxFlex="40%">
-        [List of studies here]
-      </div>
+
     </div>
-
   </div>
+
 </div>

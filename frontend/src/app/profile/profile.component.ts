@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
+import { ParticipantRelationship } from '../participantRelationship';
+import { ProfileState } from '../profileState';
+import { Router } from '@angular/router';
 import { Participant } from '../participant';
-import { UserParticipant } from '../user-participant';
 
 
 @Component({
@@ -12,39 +14,18 @@ import { UserParticipant } from '../user-participant';
 })
 export class ProfileComponent implements OnInit {
   user: User;
-  participantSelf: Participant;
-  stepName: string;
-  activeStep = 0;
+  possibleStates = ProfileState;
+  state = ProfileState.NO_PARTICIPANT;
   loading = true;
-  userParticipants: UserParticipant[];
-  currentId: number;
-  firstNames = [
-    'Bastian',
-    'Engywook',
-    'Gmorg',
-    'Moon Child',
-    'Rockbiter',
-    'Urgl',
-  ];
-  lastNames = [
-    'Funk',
-    'Funkleweizen',
-    'Funklestein',
-    'Funkadullah',
-    'Funkaswabi',
-    'Funkelhansen'
-  ]
 
-  constructor(private api: ApiService) {
-    this.currentId = Math.floor(Math.random() * 99999999) + 999;
-    this.api.getSession().subscribe(user => {
-      this.user = user;
-      this.userParticipants = user.participants;
-      this.userParticipants.forEach(up => {
-        if (up.relationship === 'self') {
-          this.participantSelf = new Participant(up.participant);
-        }
-      });
+  constructor(private api: ApiService, private router: Router) {
+    this.api.getSession().subscribe(userProps => {
+      this.user = new User(userProps);
+      console.log('this.user', this.user);
+      console.log('this.state', this.state);
+
+      this.state = this.user.getState();
+
       this.loading = false;
     }, error1 => {
       console.error(error1);
@@ -56,39 +37,33 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
   }
 
-  addParticipant(relationship: string) {
+  enrollSelf($event) {
+    $event.preventDefault();
+    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_PARTICIPANT, 'self_intake');
+  }
+
+  enrollGuardian($event) {
+    $event.preventDefault();
+    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_GUARDIAN, 'guardian_intake');
+  }
+
+  enrollDependent($event) {
+    $event.preventDefault();
+    this.addParticipantAndGoToFlow(ParticipantRelationship.DEPENDENT, 'dependent_intake');
+  }
+
+  addParticipantAndGoToFlow(relationship: string, flow: string) {
     this.loading = true;
-    const name = this.randomName();
-    const options = new Participant({
-      id: ++this.currentId,
+    const newParticipant = new Participant({
+      user_id: this.user.id,
+      user: this.user,
       last_updated: new Date(),
-      first_name: name.first,
-      last_name: name.last,
-      users: []
+      relationship: relationship
     });
 
-    this.api.addParticipant(relationship, options).subscribe(participant => {
-      this.api.getSession().subscribe(updatedUser => {
-        this.user = updatedUser;
-        this.userParticipants = updatedUser.participants;
-        this.loading = false;
-      });
+    this.api.addParticipant(newParticipant).subscribe(participant => {
+      console.log('Navigating to participant/', participant.id, '/', flow);
+      this.router.navigate(['participant', participant.id, flow]);
     });
   }
-
-  randomName() {
-    return {
-      first: this.firstNames[Math.floor(Math.random() * this.firstNames.length)],
-      last: this.lastNames[Math.floor(Math.random() * this.lastNames.length)],
-    };
-  }
-
-  isAlreadyEnrolled(relationship: string): boolean {
-    for (const up of this.user.participants) {
-      if (up.relationship === relationship) { return true; }
-    }
-
-    return false;
-  }
-
 }

@@ -15,15 +15,15 @@ class IdentificationQuestionnaire(db.Model):
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
+    participant_id = db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
+
     user_id = db.Column(
         "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
     )
     relationship_to_participant = db.Column(
         db.String,
         info={
+            "RELATIONSHIP_REQUIRED": ['dependent'],
             "display_order": 1.1,
             "type": "radio",
             "default": "self",
@@ -39,7 +39,6 @@ class IdentificationQuestionnaire(db.Model):
                     {"value": "other", "label": "Other"},
                 ],
             },
-            "hide_expression": "(formState.mainModel.is_self)",
         },
     )
     relationship_to_participant_other = db.Column(
@@ -48,7 +47,7 @@ class IdentificationQuestionnaire(db.Model):
             "display_order": 1.2,
             "type": "input",
             "template_options": {"placeholder": "Enter your relationship"},
-            "hide_expression": 'formState.mainModel.is_self || !(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
+            "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
         },
     )
     first_name = db.Column(
@@ -83,14 +82,17 @@ class IdentificationQuestionnaire(db.Model):
             "default_value": True,
             "template_options": {
                 "required": False,
-                "label": "Is this the preferred name?",
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Is this your preferred name?",
+                                "self_guardian": "Is this your preferred name?",
+                                "dependent": "Is this your child\'s preferred name?",
+                            }
+                        },
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
-            "expression_properties": {
-                "template_options.label": '"Is this your " + (!formState.mainModel.is_self ? "child\'s" : "") + " preferred name?"'
             },
         },
     )
@@ -108,9 +110,15 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 7,
             "type": "datepicker",
-            "template_options": {"required": True, "label": "Date of birth"},
-            "expression_properties": {
-                "template_options.label": '"Your " + (formState.mainModel.is_self ? "" : "child\'s") + " date of birth"'
+            "template_options": {
+                "required": True,
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your date of birth",
+                                "self_guardian": "Your date of birth",
+                                "dependent": "Your child\'s date of birth",
+                            }
+                        },
             },
         },
     )
@@ -121,10 +129,13 @@ class IdentificationQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "required": True,
-                "label": "City/municipality of birth",
-            },
-            "expression_properties": {
-                "template_options.label": '"Your " + (formState.mainModel.is_self ? "" : "child\'s") + " city/municipality of birth"'
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your city/municipality of birth",
+                                "self_guardian": "Your city/municipality of birth",
+                                "dependent": "Your child\'s city/municipality of birth",
+                            }
+                        },
             },
         },
     )
@@ -133,9 +144,15 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 9,
             "type": "input",
-            "template_options": {"required": True},
-            "expression_properties": {
-                "template_options.label": '"Your " + (formState.mainModel.is_self ? "" : "child\'s") + " state of birth"'
+            "template_options": {
+                "required": True,
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your state of birth",
+                                "self_guardian": "Your state of birth",
+                                "dependent": "Your child\'s state of birth",
+                            }
+                        },
             },
         },
     )
@@ -147,17 +164,26 @@ class IdentificationQuestionnaire(db.Model):
             "default": True,
             "template_options": {
                 "required": False,
-                "label": "Is the primary language English?",
+                "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Is your primary language English?",
+                                "self_guardian": "Is your primary language English?",
+                                "dependent": "Is your child\'s primary language English?",
+                            }
+                        },
                 "options": [
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
             },
-            "expression_properties": {
-                "template_options.label": '"Is your " + (formState.mainModel.is_self ? "" : "child\'s") + " primary language English?"'
-            },
         },
     )
+
+    def get_name(self):
+        if not self.is_first_name_preferred:
+            return self.nickname + ' ' + self.last_name
+        else:
+            return self.first_name + ' ' + self.last_name
 
     def get_meta(self):
         info = {
@@ -171,12 +197,18 @@ class IdentificationQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": ""},
-                    "expression_properties": {
-                        "template_options.description": '"Please answer the following questions about " + (formState.mainModel.is_self ? "yourself" : "your child or the person with autism on whom you are providing information") + ". (* indicates required response):"'
+                    "template_options": {
+                        "description": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Please answer the following questions about yourself (* indicates required response):",
+                                "self_guardian": "Please answer the following questions about yourself (* indicates required response):",
+                                "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information)",
+                            }
+                        }
                     },
                 },
                 "relationship": {
+                    "RELATIONSHIP_REQUIRED": ['dependent'],
                     "fields": [
                         "relationship_to_participant",
                         "relationship_to_participant_other",
@@ -186,7 +218,6 @@ class IdentificationQuestionnaire(db.Model):
                     "template_options": {
                         "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                     },
-                    "hide_expression": "formState.mainModel.is_self",
                 },
             },
         }

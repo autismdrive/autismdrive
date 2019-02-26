@@ -1,3 +1,4 @@
+import copy
 import importlib
 
 
@@ -48,3 +49,28 @@ class QuestionService:
             print("Module does not exist:" + module_name)
             #   logging.('Module does not exist')
         return None
+
+    @staticmethod
+    def get_meta(questionnaire, relationship):
+        meta = questionnaire.get_meta();
+        # loops through the depths, checks, and replaces ....
+        meta2 = QuestionService._recursive_relationship_changes(meta, relationship);
+        return {"get_meta": meta2};
+
+    @staticmethod
+    def _recursive_relationship_changes(meta, relationship):
+        meta_copy = {}
+        for k,v in meta.items():
+            if type(v) is dict:
+                if "RELATIONSHIP_SPECIFIC" in v:
+                    meta_copy[k] = meta[k]['RELATIONSHIP_SPECIFIC'][relationship.name]
+                elif "RELATIONSHIP_REQUIRED" in v:
+                    if relationship.name in meta[k]['RELATIONSHIP_REQUIRED']:
+                        meta_copy[k] = QuestionService._recursive_relationship_changes(v, relationship)
+                        # Otherwise, it should not be included in the copy.
+                else:
+                    meta_copy[k] = QuestionService._recursive_relationship_changes(v, relationship)
+            else:
+                meta_copy[k] = v
+        return meta_copy;
+

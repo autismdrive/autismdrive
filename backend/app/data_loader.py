@@ -31,8 +31,6 @@ from app import db
 from sqlalchemy import Sequence
 import csv
 
-from app.model.user_participant import UserParticipant
-
 
 class DataLoader():
     "Loads CSV files into the database"
@@ -156,25 +154,13 @@ class DataLoader():
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                participant = Participant(id=row[0], first_name=row[1], last_name=row[2])
+                participant = Participant(id=row[0], user_id=row[1], relationship=row[2])
                 db.session.add(participant)
                 self.__increment_id_sequence(Participant)
             print("Participants loaded.  There are now %i participants in the database." % db.session.query(
                 Participant).count())
         db.session.commit()
 
-    def link_users_participants(self):
-        with open(self.user_participant_file, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
-            next(reader, None)  # skip the headers
-            for row in reader:
-                user_particpant = UserParticipant(id=row[0], participant_id=row[1],
-                                                  user_id=row[2], relationship=row[3])
-                db.session.add(user_particpant)
-                self.__increment_id_sequence(UserParticipant)
-            print("Participants/Users linked.  There are now %i relationships in the database." % db.session.query(
-                UserParticipant).count())
-        db.session.commit()
 
     def load_clinical_diagnoses_questionnaire(self):
         cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
@@ -313,7 +299,6 @@ class DataLoader():
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()
-        db.session.query(UserParticipant).delete()
         db.session.query(Participant).delete()
         db.session.query(User).delete()
         db.session.commit()

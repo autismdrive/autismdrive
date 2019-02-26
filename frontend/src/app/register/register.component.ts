@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
-import { Participant } from '../participant';
 
 @Component({
   selector: 'app-register',
@@ -19,24 +18,6 @@ export class RegisterComponent implements OnInit {
   form = new FormGroup({});
   model: any = {};
   fields: FormlyFieldConfig[] = [
-    {
-      key: 'first_name',
-      type: 'input',
-      templateOptions: {
-        label: 'First Name:',
-        placeholder: 'Enter your first name',
-        required: true,
-      },
-    },
-    {
-      key: 'last_name',
-      type: 'input',
-      templateOptions: {
-        label: 'Last Name:',
-        placeholder: 'Enter your last name',
-        required: true,
-      },
-    },
     {
       key: 'email',
       type: 'input',
@@ -53,24 +34,11 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
-    this.user = {
+    this.user = new User({
       id: null,
       email: this.model['email'],
-      role: 'User',
-      participants: [
-        {
-          id: null,
-          user_id: null,
-          participant_id: null,
-          relationship: 'self',
-          participant: new Participant({
-            id: null,
-            first_name: this.model['first_name'],
-            last_name: this.model['last_name'],
-          })
-        }
-      ]
-    };
+      role: 'User'
+    });
   }
 
   ngOnInit() {
@@ -80,8 +48,6 @@ export class RegisterComponent implements OnInit {
     if (this.form.valid) {
       this.registerState = 'submitting';
       this.errorMessage = '';
-      this.user['first_name'] = this.model['first_name'];
-      this.user['last_name'] = this.model['last_name'];
       this.user['email'] = this.model['email'];
 
       this.api.addUser(this.user).subscribe(u => {

@@ -146,4 +146,8 @@ $animationDuration: 500ms;
       color: white;
     }
   }
+
+  .mat-drawer .mat-nav-list .mat-list-item {
+    min-width: 320px;
+  }
 }

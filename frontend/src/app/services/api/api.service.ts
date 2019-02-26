@@ -23,14 +23,15 @@ export class ApiService {
     category: '/api/category/<id>',
     categorylist: '/api/category',
     flow: '/api/flow/<name>/<participant_id>',
+    flowAnonymous: '/api/flow/<name>',
     flowlist: '/api/flow',
     flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
+    flowquestionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     organization: '/api/organization/<id>',
     organizationlist: '/api/organization',
-    participantbysession: '/api/session/participant/<relationship>',
+    participantbysession: '/api/session/participant',
     participant: '/api/participant/<id>',
     questionnaire: '/api/q/<name>/<id>',
-    questionnairemeta: '/api/q/<name>/meta',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
     resourcecategorylist: '/api/resource_category',
@@ -156,19 +157,25 @@ export class ApiService {
   }
 
   /** addParticipant */
-  addParticipant(relationship: string, participant: Participant): Observable<Participant> {
+  addParticipant(participant: Participant): Observable<Participant> {
     const url = this
-      ._endpointUrl('participantbysession')
-      .replace('<relationship>', relationship);
+      ._endpointUrl('participantbysession');
     return this.httpClient.post<Participant>(url, participant);
   }
 
   /** getFlow */
-  getFlow(flow: string, participantId: number): Observable<Flow> {
-    const url = this
-      ._endpointUrl('flow')
-      .replace('<name>', flow)
-      .replace('<participant_id>', participantId.toString());
+  getFlow(flow: string, participantId?: number): Observable<Flow> {
+    let url = '';
+    if (participantId) {
+      url = this
+        ._endpointUrl('flow')
+        .replace('<name>', flow)
+        .replace('<participant_id>', participantId.toString());
+    } else {
+      url = this
+        ._endpointUrl('flowAnonymous')
+        .replace('<name>', flow);
+    }
     return this.httpClient.get<Flow>(url).pipe(catchError(this._handleError));
   }
 
@@ -288,9 +295,12 @@ export class ApiService {
   }
 
   /** getQuestionnaireMeta */
-  getQuestionnaireMeta(name: string) {
-    const url = this._endpointUrl('questionnairemeta');
-    return this.httpClient.get<any>(url.replace('<name>', name))
+  getQuestionnaireMeta(flow: string, questionnaire_name: string) {
+    const url = this
+      ._endpointUrl('flowquestionnairemeta')
+      .replace('<flow>', flow)
+      .replace('<questionnaire_name>', questionnaire_name);
+    return this.httpClient.get<any>(url)
       .pipe(catchError(this._handleError));
   }
 

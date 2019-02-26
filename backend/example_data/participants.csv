@@ -1,7 +1,7 @@
-id,first_name,last_name
-1,Dan,Funk
-2,Eleanor,Graham
-3,Aaron,Louie
-4,Artax,Funk
-5,Attreyu,Graham
-6,Falkor,Louie
+id,user_id,relationship
+1,1,self_guardian
+2,2,self_guardian
+3,3,self_guardian
+4,1,dependent
+5,2,dependent
+6,3,dependent

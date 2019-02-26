@@ -28,6 +28,7 @@ class DemographicsQuestionnaire(db.Model):
             "type": "radio",
             "template_options": {
                 "required": True,
+                "label": "",
                 "options": [
                     {"value": "male", "label": "Male"},
                     {"value": "female", "label": "Female"},
@@ -35,7 +36,14 @@ class DemographicsQuestionnaire(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '(formState.mainModel.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " sex at birth"'
+                "template_options.label": {
+                    "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your sex at birth",
+                                "self_guardian": "Your sex at birth",
+                                "dependent": '(formState.mainModel.preferred_name || "your child") + "\'s" '
+                                             '+ " sex at birth"',
+                            }
+                },
             },
         },
     )
@@ -75,20 +83,11 @@ class DemographicsQuestionnaire(db.Model):
             "template_options": {
                 "required": True,
                 "options": [
-                    {
-                        "value": "raceBlack",
-                        "label": "Black / African / African American",
-                    },
+                    {"value": "raceBlack", "label": "Black / African / African American"},
                     {"value": "raceAsian", "label": "Asian / Asian American"},
                     {"value": "raceWhite", "label": "White / Caucasian"},
-                    {
-                        "value": "raceHispanic",
-                        "label": "Hispanic / Latin(o / a)",
-                    },
-                    {
-                        "value": "raceNative",
-                        "label": "Native American / Alaskan Native",
-                    },
+                    {"value": "raceHispanic", "label": "Hispanic / Latin(o / a)"},
+                    {"value": "raceNative", "label": "Native American / Alaskan Native"},
                     {"value": "racePacific", "label": "Pacific Islander"},
                     {"value": "raceNoAnswer", "label": "Prefer not to answer"},
                     {"value": "raceOther", "label": "Other"},
@@ -118,31 +117,53 @@ class DemographicsQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": ""},
-                    "expression_properties": {
-                        "template_options.description": '"Please answer the following questions about " + '
-                        '(formState.mainModel.is_self ? "yourself" : "your child or the person with autism on whom '
-                        'you are providing information") + " (* indicates required response):"'
+                    "template_options": {
+                        "description": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Please answer the following questions about yourself "
+                                                    "(* indicates required response):",
+                                "self_guardian": "Please answer the following questions about yourself "
+                                                 "(* indicates required response):",
+                                "dependent": "Please answer the following questions about your child or the person "
+                                             "with autism on whom you are providing information",
+                            }
+                        },
                     },
                 },
                 "gender": {
                     "fields": ["gender_identity", "gender_identity_other"],
                     "display_order": 2,
                     "wrappers": ["card"],
-                    "template_options": {"label": "Gender identity"},
+                    "template_options": {
+                        "label": ""
+                    },
                     "expression_properties": {
-                        "template_options.label": '(formState.mainModel.is_self ? "Your" : (model.nickname || model.first_name || "Your child") + "\'s") + " current gender identity '
-                        '(how " + (formState.mainModel.is_self ? "you describe yourself)*:" : (model.nickname || model.first_name || "your child")) + '
-                        '" describes themselves)*:"'
+                        "template_options.label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your current gender identity (how you describe yourself)*:",
+                                "self_guardian": "Your current gender identity (how you describe yourself)*:",
+                                "dependent": '(formState.mainModel.preferred_name || "Your child") + "\'s" + " current gender identity '
+                                             '(how " + (formState.mainModel.preferred_name || "your child") + " describes themselves)*:"',
+                            }
+                        }
                     },
                 },
                 "race": {
                     "fields": ["race_ethnicity", "race_ethnicity_other"],
                     "display_order": 3,
                     "wrappers": ["card"],
-                    "template_options": {"label": "Race/ethnicity"},
+                    "template_options": {
+                        "label": ""
+                    },
                     "expression_properties": {
-                        "template_options.label": '"What is " + (formState.mainModel.is_self ? "your" : (model.nickname || model.first_name || "your child") + "\'s") + " race/ethnicity? (select all that apply)"'
+                        "template_options.label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "What is your race/ethnicity? (select all that apply)",
+                                "self_guardian": "What is your race/ethnicity? (select all that apply)",
+                                "dependent": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s" + '
+                                             '" race/ethnicity? (select all that apply)"',
+                            }
+                        },
                     },
                 },
             },

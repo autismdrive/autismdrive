@@ -1,13 +1,14 @@
-
 <div
-  *ngIf="user"
+  *ngIf="user && flow"
   class="profile mat-typography"
 >
-  <h1>{{participant.preferredName()}}’s enrollment info</h1>
+  <h1 *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</h1>
+  <h1 *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
+    info</h1>
   <div>
     <mat-progress-bar
       mode="determinate"
-      [value]="10"
+      [value]="flow.percentComplete()"
     ></mat-progress-bar>
 
 

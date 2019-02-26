@@ -30,33 +30,15 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "template_options": {
                 "required": False,
                 "options": [
-                    {
-                        "value": "intellectual",
-                        "label": "Intellectual disability",
-                    },
-                    {
-                        "value": "globalDevelopmental",
-                        "label": "Global developmental delay",
-                    },
+                    {"value": "intellectual", "label": "Intellectual disability"},
+                    {"value": "globalDevelopmental", "label": "Global developmental delay"},
                     {"value": "learning", "label": "Learning disability"},
-                    {
-                        "value": "speechLanguage",
-                        "label": "Speech or language disorder",
-                    },
-                    {
-                        "value": "coordination",
-                        "label": "Developmental coordination disorder",
-                    },
+                    {"value": "speechLanguage", "label": "Speech or language disorder"},
+                    {"value": "coordination", "label": "Developmental coordination disorder"},
                     {"value": "deaf", "label": "Deaf/hard of hearing"},
                     {"value": "visual", "label": "Visual impairment"},
-                    {
-                        "value": "fetalAlcohol",
-                        "label": "Fetal alcohol spectrum disorder",
-                    },
-                    {
-                        "value": "developmentalOther",
-                        "label": "Other developmental condition",
-                    },
+                    {"value": "fetalAlcohol", "label": "Fetal alcohol spectrum disorder"},
+                    {"value": "developmentalOther", "label": "Other developmental condition"},
                 ],
             },
         },
@@ -82,36 +64,15 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "required": False,
                 "options": [
                     {"value": "anxiety", "label": "Anxiety Disorder"},
-                    {
-                        "value": "adhd",
-                        "label": "Attention-deficit/hyperactivity disorder (ADHD)",
-                    },
+                    {"value": "adhd", "label": "Attention-deficit/hyperactivity disorder (ADHD)"},
                     {"value": "bipolar", "label": "Bipolar Disorder"},
                     {"value": "depression", "label": "Depression"},
-                    {
-                        "value": "ocd",
-                        "label": "Obsessive compulsive disorder (OCD)",
-                    },
-                    {
-                        "value": "odd",
-                        "label": "Oppositional Defiant Disorder (ODD)",
-                    },
-                    {
-                        "value": "ptsd",
-                        "label": "Post-traumatic stress disorder (PTSD)",
-                    },
-                    {
-                        "value": "schizophrenia",
-                        "label": "Schizophrenia or Psychotic Disorder",
-                    },
-                    {
-                        "value": "tourette",
-                        "label": "Tourette Syndrome or Tic Disorder",
-                    },
-                    {
-                        "value": "mentalHealthOther",
-                        "label": "Other mental health condition",
-                    },
+                    {"value": "ocd", "label": "Obsessive compulsive disorder (OCD)"},
+                    {"value": "odd", "label": "Oppositional Defiant Disorder (ODD)"},
+                    {"value": "ptsd", "label": "Post-traumatic stress disorder (PTSD)"},
+                    {"value": "schizophrenia", "label": "Schizophrenia or Psychotic Disorder"},
+                    {"value": "tourette", "label": "Tourette Syndrome or Tic Disorder"},
+                    {"value": "mentalHealthOther", "label": "Other mental health condition"},
                 ],
             },
         },
@@ -136,24 +97,12 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "template_options": {
                 "required": False,
                 "options": [
-                    {
-                        "value": "gastrointestinal",
-                        "label": "Chronic Gastrointestinal (GI) problems",
-                    },
-                    {
-                        "value": "seizure",
-                        "label": "Epilepsy (seizure disorder)",
-                    },
-                    {
-                        "value": "insomnia",
-                        "label": "Insomnia (problems falling or staying asleep)",
-                    },
+                    {"value": "gastrointestinal", "label": "Chronic Gastrointestinal (GI) problems"},
+                    {"value": "seizure", "label": "Epilepsy (seizure disorder)"},
+                    {"value": "insomnia", "label": "Insomnia (problems falling or staying asleep)"},
                     {"value": "cerebralPalsy", "label": "Cerebral palsy"},
                     {"value": "asthma", "label": "Asthma"},
-                    {
-                        "value": "earInfections",
-                        "label": "Chronic ear infections",
-                    },
+                    {"value": "earInfections", "label": "Chronic ear infections"},
                     {"value": "medicalOther", "label": "Other health problem"},
                 ],
             },
@@ -178,25 +127,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "required": False,
                 "options": [
                     {"value": "fragileX", "label": "Fragile X syndrome"},
-                    {
-                        "value": "tuberousSclerosis",
-                        "label": "Tuberous Sclerosis",
-                    },
-                    {
-                        "value": "corneliaDeLange",
-                        "label": "Cornelia de Lange syndrome",
-                    },
+                    {"value": "tuberousSclerosis", "label": "Tuberous Sclerosis"},
+                    {"value": "corneliaDeLange", "label": "Cornelia de Lange syndrome"},
                     {"value": "down", "label": "Down syndrome"},
                     {"value": "angelman", "label": "Angelman syndrome"},
                     {"value": "rett", "label": "Rett syndrome"},
-                    {
-                        "value": "22q11.2deletion",
-                        "label": "22q11.2 Deletion syndrome",
-                    },
-                    {
-                        "value": "geneticOther",
-                        "label": "Other genetic condition",
-                    },
+                    {"value": "22q11.2deletion", "label": "22q11.2 Deletion syndrome"},
+                    {"value": "geneticOther", "label": "Other genetic condition"},
                 ],
             },
         },
@@ -223,12 +160,14 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     "fields": [],
                     "display_order": 0,
                     "wrappers": ["help"],
-                    "template_options": {"description": ""},
-                    "expression_properties": {
-                        "template_options.description": ""
-                        '(formState.mainModel.is_self ? "Do you" : "Does your '
-                        'child") + " CURRENTLY have any of the following '
-                        'diagnoses? (please check all that apply)"'
+                    "template_options": {
+                        "description": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Do you CURRENTLY have any of the following diagnoses? (please check all that apply)",
+                                "self_guardian": "Do you CURRENTLY have any of the following diagnoses? (please check all that apply)",
+                                "dependent": "Does your child CURRENTLY have any of the following diagnoses? (please check all that apply)",
+                            }
+                        },
                     },
                 },
                 "developmental_group": {

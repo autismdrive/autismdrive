@@ -1,12 +1,16 @@
 <mat-nav-list *ngFor="let step of steps">
   <a
-    *ngIf="step && step.name"
+    *ngIf="step && step.name && participant"
     mat-list-item
     [routerLink]="['/participant/' + participant.id + '/' + flow.name + '/' + step.name]"
     routerLinkActive="router-link-active"
-  >{{step.label}}</a>
+  >
+    {{step.label}}
+    <span fxFlex></span>
+    <mat-icon *ngIf="isStepComplete(step.name)">done</mat-icon>
+  </a>
 </mat-nav-list>
 
 <mat-nav-list *ngIf="steps.length === 0">
-  <a mat-list-item><span class="placeholder-link">Loading...</span></a>
+  <a mat-list-item>Loading...</a>
 </mat-nav-list>

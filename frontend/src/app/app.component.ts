@@ -30,8 +30,8 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.api.getSession().subscribe(u => {
-      this.user = u;
+    this.api.getSession().subscribe(userProps => {
+      this.user = new User(userProps);
     });
 
     const numMinutes = 1;
@@ -76,8 +76,8 @@ export class AppComponent implements OnInit {
             this.router.navigate(['timedout']);
           });
         } else {
-          this.api.getSession().subscribe(user => {
-            this.user = user;
+          this.api.getSession().subscribe(userProps => {
+            this.user = new User(userProps);
           });
         }
       });

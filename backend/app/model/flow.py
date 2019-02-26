@@ -19,6 +19,7 @@ class Flow:
     def __init__(self, name):
         self.name = name
         self.steps = []
+        self.relationship = ""
 
     def has_step(self, questionnaire_name):
         for q in self.steps:

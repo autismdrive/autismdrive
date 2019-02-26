@@ -1,7 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Participant } from '../participant';
-import { UserParticipant } from '../user-participant';
+import { User } from '../user';
+import { ParticipantRelationship } from '../participantRelationship';
+import { Flow } from '../flow';
+import { ApiService } from '../services/api/api.service';
 
 @Component({
   selector: 'app-participant-profile',
@@ -9,31 +12,36 @@ import { UserParticipant } from '../user-participant';
   styleUrls: ['./participant-profile.component.scss']
 })
 export class ParticipantProfileComponent implements OnInit {
-  @Input() userParticipant: UserParticipant;
-  participant: Participant;
+  @Input() participant: Participant;
+  @Input() user: User;
+  flow: Flow;
   dummyImgUrl: string;
   percentComplete: number;
   numStudies: number;
 
   constructor(
+    private api: ApiService,
     private router: Router
   ) {
     this.dummyImgUrl = this.randomImgUrl();
   }
 
   ngOnInit() {
-    this.participant = new Participant(this.userParticipant.participant);
-
-    if (isFinite(this.userParticipant.participant.percent_complete)) {
-      this.percentComplete = this.userParticipant.participant.percent_complete;
-    } else {
-      this.percentComplete = Math.ceil(Math.random() * 5) * 20;
+    if (this.participant) {
+      this.api
+        .getFlow(this.participant.getFlowName(), this.participant.id)
+        .subscribe(f => {
+          this.flow = new Flow(f);
+          console.log('this.flow', this.flow);
+          this.percentComplete = this.flow.percentComplete();
+          console.log('this.percentComplete', this.percentComplete);
+        });
     }
 
-    if (isFinite(this.userParticipant.participant.num_studies_enrolled)) {
-      this.numStudies = this.userParticipant.participant.num_studies_enrolled;
+    if (isFinite(this.participant.num_studies_enrolled)) {
+      this.numStudies = this.participant.num_studies_enrolled;
     } else {
-      this.numStudies = Math.floor(Math.random() * 5) + 1;
+      this.numStudies = 0;
     }
   }
 
@@ -44,10 +52,10 @@ export class ParticipantProfileComponent implements OnInit {
   }
 
   goEditEnroll($event) {
-    if (this.userParticipant.relationship == 'self') {
+    if (this.participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       $event.preventDefault();
       this.router.navigate(['participant', this.participant.id, 'self_intake']);
-    } else if (this.userParticipant.relationship == 'dependent') {
+    } else if (this.participant.relationship === ParticipantRelationship.DEPENDENT) {
       $event.preventDefault();
       this.router.navigate(['participant', this.participant.id, 'dependent_intake']);
     } else {
