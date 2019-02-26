@@ -35,7 +35,7 @@ class Participant(db.Model):
 
     def get_name(self):
         if self.identification:
-            return self.identification.getName()
+            return self.identification.get_name()
         else:
             return ""
 

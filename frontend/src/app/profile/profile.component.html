@@ -7,25 +7,26 @@
     <h1>Welcome!</h1>
     <p>Thank you for creating an account on Star Drive! Please complete the following fields, and select
       the button that most closely applies to your situation.</p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="enrollSelf($event)"
+    >Enroll Yourself</button>
     <p>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="enrollSelf($event)"
-      >Enroll Yourself</button>
       Select this button if you are primarily looking for resources, or studies for yourself.
     </p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="enrollGuardian($event)"
+    >Enroll a Dependent</button>
     <p>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="enrollGuardian($event)"
-      >Enroll a Dependent</button>
       Select this button if you are looking for resources and studies for your child or a legal dependent.
     </p>
   </div>
 
-  <h1 *ngIf="participantSelf">{{participantSelf.name}}’s profile</h1>
+  <h1 *ngIf="state === possibleStates.PARTICIPANT">{{user.getSelf() ? user.getSelf().name + '\'s': 'Your'}} profile
+  </h1>
   <div>
     <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
     <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
@@ -45,22 +46,31 @@
         fxLayoutGap="40px"
       >
         <app-participant-profile
-          *ngFor="let participant of participants"
+          *ngFor="let participant of user.participants"
           [participant]="participant"
+          [user]="user"
         ></app-participant-profile>
 
         <button
-          *ngIf="!isAlreadyEnrolled('self_participant')"
+          *ngIf="!user.getSelf()"
           mat-flat-button
           color="primary"
-          (click)="addParticipant('self_participant')"
+          (click)="enrollSelf($event)"
         >Enroll yourself</button>
 
         <button
+          *ngIf="user.getDependents().length === 0"
           mat-flat-button
           color="primary"
-          (click)="addParticipant('dependent')"
-        >Enroll {{isAlreadyEnrolled('dependent') ? 'another' : 'a'}} dependent</button>
+          (click)="enrollGuardian($event)"
+        >Enroll a dependent</button>
+
+        <button
+          *ngIf="user.getDependents().length > 0"
+          mat-flat-button
+          color="primary"
+          (click)="enrollGuardian($event)"
+        >Enroll another dependent</button>
       </div>
       <div fxFlex="40%">
         [List of studies here]

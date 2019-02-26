@@ -26,6 +26,7 @@ export class ApiService {
     flowAnonymous: '/api/flow/<name>',
     flowlist: '/api/flow',
     flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
+    flowquestionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     organization: '/api/organization/<id>',
     organizationlist: '/api/organization',
     participantbysession: '/api/session/participant',
@@ -159,21 +160,21 @@ export class ApiService {
   /** addParticipant */
   addParticipant(participant: Participant): Observable<Participant> {
     const url = this
-      ._endpointUrl('participantbysession')
+      ._endpointUrl('participantbysession');
     return this.httpClient.post<Participant>(url, participant);
   }
 
   /** getFlow */
   getFlow(flow: string, participantId?: number): Observable<Flow> {
     let url = '';
-    if(participantId) {
+    if (participantId) {
       url = this
         ._endpointUrl('flow')
         .replace('<name>', flow)
         .replace('<participant_id>', participantId.toString());
     } else {
-       url = this
-         ._endpointUrl('flowAnonymous')
+      url = this
+        ._endpointUrl('flowAnonymous')
         .replace('<name>', flow);
     }
     return this.httpClient.get<Flow>(url).pipe(catchError(this._handleError));

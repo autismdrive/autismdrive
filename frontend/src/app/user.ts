@@ -26,7 +26,7 @@ export class User {
     return this.getSelf() !== null;
   }
 
-  isSelf(participant: Participant): Boolean {
+  isSelf(participant: Participant): boolean {
     if (participant.relationship === User.SELF_GUARDIAN ||
       participant.relationship === User.SELF_PARTICIPANT) {
       return true;
@@ -36,18 +36,11 @@ export class User {
   }
 
   getSelf(): Participant {
-    this.participants.forEach(participant => {
-      if (participant.relationship === User.SELF_GUARDIAN ||
-        participant.relationship === User.SELF_PARTICIPANT) {
-        return (participant);
-      }
-    });
-    return null;
+    return this.participants.find(p => this.isSelf(p));
   }
 
   getDependents() {
-    return this.participants.filter(pr => pr.relationship === User.DEPENDENT);
+    return this.participants.filter(p => !this.isSelf(p));
   }
-
 
 }

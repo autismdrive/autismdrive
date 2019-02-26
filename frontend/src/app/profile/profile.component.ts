@@ -21,6 +21,8 @@ export class ProfileComponent implements OnInit {
   constructor(private api: ApiService, private router: Router) {
     this.api.getSession().subscribe(userProps => {
       this.user = new User(userProps);
+      console.log('this.user', this.user);
+
       this.loading = false;
     }, error1 => {
       console.error(error1);
@@ -37,12 +39,15 @@ export class ProfileComponent implements OnInit {
     this.addParticipantAndGoToFlow(User.SELF_PARTICIPANT, 'self_intake');
   }
 
-
   enrollGuardian($event) {
     $event.preventDefault();
     this.addParticipantAndGoToFlow(User.SELF_GUARDIAN, 'guardian_intake');
   }
 
+  enrollDependent($event) {
+    $event.preventDefault();
+    this.addParticipantAndGoToFlow(User.DEPENDENT, 'dependent_intake');
+  }
 
   addParticipantAndGoToFlow(relationship: string, flow: string) {
     this.loading = true;
@@ -54,7 +59,7 @@ export class ProfileComponent implements OnInit {
     };
 
     this.api.addParticipant(options).subscribe(participant => {
-      console.log('Navigating to participant/', participant.id, '/', flow)
+      console.log('Navigating to participant/', participant.id, '/', flow);
       this.router.navigate(['participant', participant.id, flow]);
     });
   }

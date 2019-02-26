@@ -9,7 +9,7 @@
         {{participant.name}}
       </mat-card-title>
       <mat-card-subtitle>
-        {{(participant.relationship === 'self_guardian') || (participant.relationship === 'self_participant') ? 'You' : participant.relationship | titlecase}}
+        {{user.isSelf(participant)? 'You' : participant.relationship | titlecase}}
         <div
           *ngIf="percentComplete < 100"
           class="mat-subheading-2"

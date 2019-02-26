@@ -3,7 +3,7 @@ import { ApiService } from '../services/api/api.service';
 import { QuestionnaireStep } from '../step';
 import { User } from '../user';
 import { Participant } from '../participant';
-import { Flow, Step } from '../flow';
+import { Flow } from '../flow';
 
 @Component({
   selector: 'app-questionnaire-steps-list',
@@ -21,6 +21,8 @@ export class QuestionnaireStepsListComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('this.flow', this.flow);
+
     if (this.stepNames && (this.stepNames.length > 0)) {
       this.stepNames.forEach((stepName, i) => {
         this.api.getQuestionnaireMeta(this.flow.name, stepName).subscribe(q => {
@@ -29,11 +31,16 @@ export class QuestionnaireStepsListComponent implements OnInit {
           this.steps[i] = new QuestionnaireStep({
             name: stepName,
             label: stepInfo.label,
-            description: stepInfo.description
+            description: stepInfo.description,
           });
         });
       });
     }
+  }
+
+  isStepComplete(stepName: string): boolean {
+    const step = this.flow.steps.find(s => s.name === stepName);
+    return step.status === 'COMPLETE';
   }
 
 }

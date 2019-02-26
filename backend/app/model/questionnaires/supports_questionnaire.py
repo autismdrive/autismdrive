@@ -44,11 +44,14 @@ class SupportsQuestionnaire(db.Model):
                     "display_order": 1,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": "Medications and/or vitamins",
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Do you take any medications and/or vitamins?",
+                                "self_guardian": "Do you take any medications and/or vitamins?",
+                                "dependent": "Does your child take any medications and/or vitamins?",
+                            }
+                        },
                         "description": "Add a medication",
-                    },
-                    "expression_properties": {
-                        "template_options.label": '(formState.mainModel.is_self ? "Do you" : "Does your child") + " take any medications and/or vitamins?"'
                     },
                 },
                 "therapies": {
@@ -56,11 +59,14 @@ class SupportsQuestionnaire(db.Model):
                     "display_order": 2,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": "Therapies and services",
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "What kinds of therapies and services do you currently receive?",
+                                "self_guardian": "What kinds of therapies and services do you currently receive?",
+                                "dependent": "What kinds of therapies and services does your child currently receive?",
+                            }
+                        },
                         "description": "Add a therapy or service",
-                    },
-                    "expression_properties": {
-                        "template_options.label": '"What kinds of therapies and services " + (formState.mainModel.is_self ? "do you" : "does your child") + " currently receive?"'
                     },
                 },
                 "assistive_devices": {
@@ -68,11 +74,17 @@ class SupportsQuestionnaire(db.Model):
                     "display_order": 3,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": "Assistive devices",
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Do you use an AAC (alternative & augmentative communication) "
+                                                    "system or other assistive device?",
+                                "self_guardian": "Do you use an AAC (alternative & augmentative communication) "
+                                                 "system or other assistive device?",
+                                "dependent": "Does your child use an AAC (alternative & augmentative communication) "
+                                             "system or other assistive device?",
+                            }
+                        },
                         "description": "Add an assistive device",
-                    },
-                    "expression_properties": {
-                        "template_options.label": '(formState.mainModel.is_self ? "Do you" : "Does your child") + " use an AAC (alternative & augmentative communication) system or other assistive device?"'
                     },
                 },
             },

@@ -59,6 +59,8 @@ export class EnrollmentFlowComponent implements OnInit {
         }
 
         if (isFinite(this.participantId) && (this.flowName !== '')) {
+          console.log('this.flowName', this.flowName);
+
           this.api
             .getFlow(this.flowName, this.participantId)
             .subscribe(f => {
