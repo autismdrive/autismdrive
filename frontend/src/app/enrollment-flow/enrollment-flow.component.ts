@@ -64,7 +64,7 @@ export class EnrollmentFlowComponent implements OnInit {
           this.api
             .getFlow(this.flowName, this.participantId)
             .subscribe(f => {
-              this.flow = f;
+              this.flow = new Flow(f);
               this.stepNames = f.steps.map(s => s.name);
 
               if (this.stepName === '') {
