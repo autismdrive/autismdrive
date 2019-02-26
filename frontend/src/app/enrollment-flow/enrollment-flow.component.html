@@ -1,5 +1,5 @@
 <div
-  *ngIf="user"
+  *ngIf="user && flow"
   class="profile mat-typography"
 >
   <h1 *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</h1>
