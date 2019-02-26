@@ -83,7 +83,9 @@ export class EnrollmentFlowComponent implements OnInit {
                 const fStep = this.flow.steps.find(s => this.stepName === s.name);
                 const questionnaireId = fStep.questionnaire_id;
 
-                if (isFinite(questionnaireId)) {
+                if ((typeof questionnaireId === 'number') && isFinite(questionnaireId)) {
+                  console.log('questionnaireId', questionnaireId);
+
                   this.api
                     .getQuestionnaire(this.stepName, questionnaireId)
                     .subscribe(qData => {
