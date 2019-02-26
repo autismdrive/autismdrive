@@ -178,7 +178,7 @@ class ContactQuestionnaire(db.Model):
             "template_options": {
                 "placeholder": "Where did you hear about us?"
             },
-            "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
+            "hide_expression": '!(formState.mainModel.marketing_channel && (formState.mainModel.marketing_channel === "other"))',
         },
     )
 
@@ -190,7 +190,7 @@ class ContactQuestionnaire(db.Model):
                 "description": "Please answer the following questions about YOURSELF (* indicates required response):",
             },
             "field_groups": {
-                "phone": {
+                "phone_group": {
                     "fields": [
                         "phone",
                         "phone_type",
