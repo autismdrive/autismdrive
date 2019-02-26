@@ -75,9 +75,6 @@ export class EnrollmentFlowComponent implements OnInit {
               console.log('this.stepNames', this.stepNames);
 
               this.api.getQuestionnaireMeta(this.flowName, this.stepName).subscribe(q => {
-                this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
-                console.log('This is still loading? ' + this.loading);
-                console.log('The Step is set to ', this.step);
 
                 // Load the form with previously-submitted data, if available
                 const fStep = this.flow.steps.find(s => this.stepName === s.name);
@@ -90,19 +87,11 @@ export class EnrollmentFlowComponent implements OnInit {
                     .getQuestionnaire(this.stepName, questionnaireId)
                     .subscribe(qData => {
                       this.model = qData;
+                      this._renderForm(q.get_meta);
                     });
+                } else {
+                  this._renderForm(q.get_meta);
                 }
-
-                this.form = new FormArray([new FormGroup({})]);
-                this.options = {
-                  formState: {
-                    mainModel: this.model
-                  }
-                };
-
-                this.model.preferred_name = this.participant.name;
-                this.model.is_self = this.user.isSelf(this.participant);
-                this.loading = false;
               });
             });
         }
@@ -113,6 +102,22 @@ export class EnrollmentFlowComponent implements OnInit {
   ngOnInit() {
   }
 
+  private _renderForm(info) {
+    this.step = this._infoToFormlyForm(info, this.stepName);
+    console.log('This is still loading? ' + this.loading);
+    console.log('The Step is set to ', this.step);
+
+    this.form = new FormArray([new FormGroup({})]);
+    this.options = {
+      formState: {
+        mainModel: this.model
+      }
+    };
+
+    this.model.preferred_name = this.participant.name;
+    this.model.is_self = this.user.isSelf(this.participant);
+    this.loading = false;
+  }
 
   private _infoToFormlyForm(info, stepName, fieldsType = 'fields'): QuestionnaireStep {
     const step = new QuestionnaireStep({
