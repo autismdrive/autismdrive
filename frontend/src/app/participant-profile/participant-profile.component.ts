@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Participant } from '../participant';
-import { FormlyFieldConfig } from '@ngx-formly/core';
 import { User } from '../user';
 
 @Component({
@@ -11,6 +10,7 @@ import { User } from '../user';
 })
 export class ParticipantProfileComponent implements OnInit {
   @Input() participant: Participant;
+  @Input() user: User;
   dummyImgUrl: string;
   percentComplete: number;
   numStudies: number;

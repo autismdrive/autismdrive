@@ -59,6 +59,8 @@ export class EnrollmentFlowComponent implements OnInit {
         }
 
         if (isFinite(this.participantId) && (this.flowName !== '')) {
+          console.log('this.flowName', this.flowName);
+
           this.api
             .getFlow(this.flowName, this.participantId)
             .subscribe(f => {
@@ -69,7 +71,11 @@ export class EnrollmentFlowComponent implements OnInit {
                 this.stepName = this.stepNames[0];
               }
 
-              this.api.getQuestionnaireMeta(this.stepName).subscribe(q => {
+              console.log('this.stepName', this.stepName);
+              console.log('this.stepNames', this.stepNames);
+
+
+              this.api.getQuestionnaireMeta(this.flowName, this.stepName).subscribe(q => {
                 this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
                 console.log('This is still loading? ' + this.loading);
                 console.log('The Step is set to ', this.step);
