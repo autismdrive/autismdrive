@@ -20,6 +20,10 @@ export class User {
         this[propName] = this._props[propName];
       }
     }
+
+    if (this.participants && (this.participants.length > 0)) {
+      this.participants = this.participants.map(p => new Participant(p));
+    }
   }
 
   hasSelf() {
