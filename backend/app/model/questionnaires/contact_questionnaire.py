@@ -178,7 +178,7 @@ class ContactQuestionnaire(db.Model):
             "template_options": {
                 "placeholder": "Where did you hear about us?"
             },
-            "hide_expression": '!(formState.mainModel.marketing_channel && (formState.mainModel.marketing_channel === "other"))',
+            "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
         },
     )
 
@@ -243,6 +243,7 @@ class ContactQuestionnaireSchema(ModelSchema):
             "state",
             "zip",
             "marketing_channel",
+            "marketing_other",
         )
 
 
