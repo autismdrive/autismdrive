@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
-import { User } from '../user';
+import { User, ProfileState } from '../user';
 import { Router } from '@angular/router';
 import { Participant } from '../participant';
 
-enum ProfileState {
-  'NO_PARTICIPANT', 'PARTICIPANT', 'GUARDIAN'
-}
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +20,9 @@ export class ProfileComponent implements OnInit {
     this.api.getSession().subscribe(userProps => {
       this.user = new User(userProps);
       console.log('this.user', this.user);
+      console.log('this.state', this.state);
+
+      this.state = this.user.getState();
 
       this.loading = false;
     }, error1 => {

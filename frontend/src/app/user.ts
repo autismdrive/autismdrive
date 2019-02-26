@@ -1,5 +1,11 @@
 import { Participant } from './participant';
+import { Profile } from 'selenium-webdriver/firefox';
 
+export enum ProfileState {
+  NO_PARTICIPANT = 'NO_PARTICIPANT',
+  PARTICIPANT = 'PARTICIPANT',
+  GUARDIAN = 'GUARDIAN'
+}
 
 export class User {
 
@@ -45,6 +51,17 @@ export class User {
 
   getDependents() {
     return this.participants.filter(p => !this.isSelf(p));
+  }
+
+  getState() {
+    if (this.getDependents().length > 0) {
+      return ProfileState.GUARDIAN;
+    } else if (this.getSelf().relationship === User.SELF_PARTICIPANT) {
+      return ProfileState.PARTICIPANT;
+    } else {
+      return ProfileState.NO_PARTICIPANT;
+    }
+
   }
 
 }
