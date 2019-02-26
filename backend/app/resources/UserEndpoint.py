@@ -57,14 +57,10 @@ class UserListEndpoint(flask_restful.Resource):
         users = db.session.query(User).all()
         return self.usersSchema.dump(users)
 
-    @auth.login_required
     def post(self):
         request_data = request.get_json()
         try:
-            if 'role' in request_data and request_data['role'] == 'admin' and g.user.role == Role.admin:
-                request_data['role'] = 'admin'
-            else:
-                request_data['role'] = 'user'
+            request_data['role'] = 'user'
             new_user, errors = self.userSchema.load(request_data)
             if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
             email_exists = db.session.query(exists().where(User.email == new_user.email)).scalar()
