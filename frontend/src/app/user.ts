@@ -45,14 +45,13 @@ export class User {
   }
 
   getState() {
-    if (this.getDependents().length > 0) {
+    if (this.getSelf() === undefined) {
+      return ProfileState.NO_PARTICIPANT;
+    } else if (this.getSelf().relationship === ParticipantRelationship.SELF_GUARDIAN) {
       return ProfileState.GUARDIAN;
     } else if (this.getSelf().relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       return ProfileState.PARTICIPANT;
-    } else {
-      return ProfileState.NO_PARTICIPANT;
     }
-
   }
 
 }

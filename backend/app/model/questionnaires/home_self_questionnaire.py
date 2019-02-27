@@ -36,7 +36,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "template_options": {
                 "placeholder": "Describe your current living situation"
             },
-            "hide_expression": '!(model.self_living_situation && model.self_living_situation["livingOther"] === true )',
+            "hide_expression": '!(model.self_living_situation && model.self_living_situation.livingOther)',
         },
     )
 
@@ -53,7 +53,6 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                 }
 
         info["field_groups"]["housemates"]["template_options"]["label"] = "Who else lives with you?"
-        info["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = ''
 
         for c in self.metadata.tables["home_self_questionnaire"].columns:
             if c.info:

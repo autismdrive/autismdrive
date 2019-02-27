@@ -51,6 +51,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "template_options": {
                 "placeholder": "Enter developmental condition"
             },
+
             "hide_expression": "!(model.developmental && (model.developmental.developmentalOther))",
         },
     )
