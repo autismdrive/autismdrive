@@ -75,32 +75,26 @@ export class EnrollmentFlowComponent implements OnInit {
               console.log('this.stepNames', this.stepNames);
 
               this.api.getQuestionnaireMeta(this.flowName, this.stepName).subscribe(q => {
-                this.step = this._infoToFormlyForm(q.get_meta, this.stepName);
-                console.log('This is still loading? ' + this.loading);
-                console.log('The Step is set to ', this.step);
 
                 // Load the form with previously-submitted data, if available
                 const fStep = this.flow.steps.find(s => this.stepName === s.name);
                 const questionnaireId = fStep.questionnaire_id;
 
-                if (isFinite(questionnaireId)) {
+                if ((typeof questionnaireId === 'number') && isFinite(questionnaireId)) {
+                  console.log('questionnaireId', questionnaireId);
+
                   this.api
                     .getQuestionnaire(this.stepName, questionnaireId)
                     .subscribe(qData => {
                       this.model = qData;
+
+                      console.log('this.model', this.model);
+
+                      this._renderForm(q.get_meta);
                     });
+                } else {
+                  this._renderForm(q.get_meta);
                 }
-
-                this.form = new FormArray([new FormGroup({})]);
-                this.options = {
-                  formState: {
-                    mainModel: this.model
-                  }
-                };
-
-                this.model.preferred_name = this.participant.name;
-                this.model.is_self = this.user.isSelf(this.participant);
-                this.loading = false;
               });
             });
         }
@@ -111,6 +105,22 @@ export class EnrollmentFlowComponent implements OnInit {
   ngOnInit() {
   }
 
+  private _renderForm(info) {
+    this.step = this._infoToFormlyForm(info, this.stepName);
+    console.log('This is still loading? ' + this.loading);
+    console.log('The Step is set to ', this.step);
+
+    this.form = new FormArray([new FormGroup({})]);
+    this.options = {
+      formState: {
+        mainModel: this.model
+      }
+    };
+
+    this.model.preferred_name = this.participant.name;
+    this.model.is_self = this.user.isSelf(this.participant);
+    this.loading = false;
+  }
 
   private _infoToFormlyForm(info, stepName, fieldsType = 'fields'): QuestionnaireStep {
     const step = new QuestionnaireStep({
@@ -144,6 +154,7 @@ export class EnrollmentFlowComponent implements OnInit {
           wrapper.fieldArray = this._infoToFormlyForm(info[wrapperKey], wrapperKey, 'fieldGroup');
         } else {
           wrapper.fieldGroup = this._mapFieldnamesToFieldGroup(fgFields, info);
+          this._moveModelDataIntoGroup(fgFields, wrapperKey);
 
           // Remove the fields array from the wrapper object,
           // since all its child fields are now inside the
@@ -215,6 +226,23 @@ export class EnrollmentFlowComponent implements OnInit {
 
   clone(o: any): any {
     return JSON.parse(JSON.stringify(o));
+  }
+
+  // Move previously-submitted data into corresponding
+  // location in model
+  private _moveModelDataIntoGroup(fieldNames: string[], groupName: string) {
+    console.log('this.model before', this.clone(this.model));
+
+    fieldNames.forEach(fieldName => {
+      console.log('fieldName', fieldName);
+      if (this.model.hasOwnProperty(groupName) && this.model.hasOwnProperty(fieldName)) {
+        this.model[groupName][fieldName] = this.clone(this.model[fieldName]);
+        delete this.model[fieldName];
+      }
+    });
+
+    console.log('this.model after', this.clone(this.model));
+
   }
 
   private _mapFieldnamesToFieldGroup(fieldnames: string[], parentObject) {

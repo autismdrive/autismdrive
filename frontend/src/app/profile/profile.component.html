@@ -25,57 +25,59 @@
     </p>
   </div>
 
-  <h1 *ngIf="state === possibleStates.PARTICIPANT">{{user.getSelf() ? user.getSelf().name + '\'s': 'Your'}} profile
-  </h1>
-  <div>
-    <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
-    <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
+  <div *ngIf="state !== possibleStates.NO_PARTICIPANT">
+    <h1>{{user.getSelf() ? user.getSelf().name + '\'s': 'Your'}} profile</h1>
+    <div>
+      <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
+      <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
 
-    <app-loading
-      *ngIf="loading"
-      message="Loading..."
-    ></app-loading>
+      <app-loading
+        *ngIf="loading"
+        message="Loading..."
+      ></app-loading>
 
-    <div
-      fxLayout="row"
-      fxLayoutGap="40px"
-    >
       <div
-        fxFlex="60%"
-        fxLayout="column"
+        fxLayout="row"
         fxLayoutGap="40px"
       >
-        <app-participant-profile
-          *ngFor="let participant of user.participants"
-          [participant]="participant"
-          [user]="user"
-        ></app-participant-profile>
+        <div
+          fxFlex="60%"
+          fxLayout="column"
+          fxLayoutGap="40px"
+        >
+          <app-participant-profile
+            *ngFor="let participant of user.participants"
+            [participant]="participant"
+            [user]="user"
+          ></app-participant-profile>
 
-        <button
-          *ngIf="!user.getSelf()"
-          mat-flat-button
-          color="primary"
-          (click)="enrollSelf($event)"
-        >Enroll yourself</button>
+          <button
+            *ngIf="!user.getSelf()"
+            mat-flat-button
+            color="primary"
+            (click)="enrollSelf($event)"
+          >Enroll yourself</button>
 
-        <button
-          *ngIf="user.getDependents().length === 0"
-          mat-flat-button
-          color="primary"
-          (click)="enrollGuardian($event)"
-        >Enroll a dependent</button>
+          <button
+            *ngIf="user.getDependents().length === 0"
+            mat-flat-button
+            color="primary"
+            (click)="enrollGuardian($event)"
+          >Enroll a dependent</button>
 
-        <button
-          *ngIf="user.getDependents().length > 0"
-          mat-flat-button
-          color="primary"
-          (click)="enrollDependent($event)"
-        >Enroll another dependent</button>
+          <button
+            *ngIf="user.getDependents().length > 0"
+            mat-flat-button
+            color="primary"
+            (click)="enrollDependent($event)"
+          >Enroll another dependent</button>
+        </div>
+        <div fxFlex="40%">
+          [List of studies here]
+        </div>
       </div>
-      <div fxFlex="40%">
-        [List of studies here]
-      </div>
+
     </div>
-
   </div>
+
 </div>

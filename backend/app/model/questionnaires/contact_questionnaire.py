@@ -190,7 +190,7 @@ class ContactQuestionnaire(db.Model):
                 "description": "Please answer the following questions about YOURSELF (* indicates required response):",
             },
             "field_groups": {
-                "phone": {
+                "phone_group": {
                     "fields": [
                         "phone",
                         "phone_type",
@@ -243,6 +243,7 @@ class ContactQuestionnaireSchema(ModelSchema):
             "state",
             "zip",
             "marketing_channel",
+            "marketing_other",
         )
 
 

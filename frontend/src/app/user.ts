@@ -1,11 +1,8 @@
 import { Participant } from './participant';
-
+import { ParticipantRelationship } from './participantRelationship';
+import { ProfileState } from './profileState';
 
 export class User {
-
-  static SELF_PARTICIPANT = 'self_participant';
-  static SELF_GUARDIAN = 'self_guardian';
-  static DEPENDENT = 'dependent';
 
   id: number;
   email: string;
@@ -31,8 +28,8 @@ export class User {
   }
 
   isSelf(participant: Participant): boolean {
-    if (participant.relationship === User.SELF_GUARDIAN ||
-      participant.relationship === User.SELF_PARTICIPANT) {
+    if (participant.relationship === ParticipantRelationship.SELF_GUARDIAN ||
+      participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       return true;
     } else {
       return false;
@@ -45,6 +42,17 @@ export class User {
 
   getDependents() {
     return this.participants.filter(p => !this.isSelf(p));
+  }
+
+  getState() {
+    if (this.getDependents().length > 0) {
+      return ProfileState.GUARDIAN;
+    } else if (this.getSelf().relationship === ParticipantRelationship.SELF_PARTICIPANT) {
+      return ProfileState.PARTICIPANT;
+    } else {
+      return ProfileState.NO_PARTICIPANT;
+    }
+
   }
 
 }

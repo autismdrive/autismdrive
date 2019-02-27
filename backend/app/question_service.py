@@ -52,10 +52,10 @@ class QuestionService:
 
     @staticmethod
     def get_meta(questionnaire, relationship):
-        meta = questionnaire.get_meta();
+        meta = questionnaire.get_meta()
         # loops through the depths, checks, and replaces ....
-        meta2 = QuestionService._recursive_relationship_changes(meta, relationship);
-        return {"get_meta": meta2};
+        meta2 = QuestionService._recursive_relationship_changes(meta, relationship)
+        return {"get_meta": meta2}
 
     @staticmethod
     def _recursive_relationship_changes(meta, relationship):
@@ -63,7 +63,8 @@ class QuestionService:
         for k,v in meta.items():
             if type(v) is dict:
                 if "RELATIONSHIP_SPECIFIC" in v:
-                    meta_copy[k] = meta[k]['RELATIONSHIP_SPECIFIC'][relationship.name]
+                    if relationship.name in meta[k]['RELATIONSHIP_SPECIFIC']:
+                        meta_copy[k] = meta[k]['RELATIONSHIP_SPECIFIC'][relationship.name]
                 elif "RELATIONSHIP_REQUIRED" in v:
                     if relationship.name in meta[k]['RELATIONSHIP_REQUIRED']:
                         meta_copy[k] = QuestionService._recursive_relationship_changes(v, relationship)
@@ -72,5 +73,5 @@ class QuestionService:
                     meta_copy[k] = QuestionService._recursive_relationship_changes(v, relationship)
             else:
                 meta_copy[k] = v
-        return meta_copy;
+        return meta_copy
 

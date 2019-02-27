@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
+import { ParticipantRelationship } from '../participantRelationship';
+import { ProfileState } from '../profileState';
 import { Router } from '@angular/router';
 import { Participant } from '../participant';
 
-enum ProfileState {
-  'NO_PARTICIPANT', 'PARTICIPANT', 'GUARDIAN'
-}
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +22,9 @@ export class ProfileComponent implements OnInit {
     this.api.getSession().subscribe(userProps => {
       this.user = new User(userProps);
       console.log('this.user', this.user);
+      console.log('this.state', this.state);
+
+      this.state = this.user.getState();
 
       this.loading = false;
     }, error1 => {
@@ -37,17 +39,17 @@ export class ProfileComponent implements OnInit {
 
   enrollSelf($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(User.SELF_PARTICIPANT, 'self_intake');
+    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_PARTICIPANT, 'self_intake');
   }
 
   enrollGuardian($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(User.SELF_GUARDIAN, 'guardian_intake');
+    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_GUARDIAN, 'guardian_intake');
   }
 
   enrollDependent($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(User.DEPENDENT, 'dependent_intake');
+    this.addParticipantAndGoToFlow(ParticipantRelationship.DEPENDENT, 'dependent_intake');
   }
 
   addParticipantAndGoToFlow(relationship: string, flow: string) {

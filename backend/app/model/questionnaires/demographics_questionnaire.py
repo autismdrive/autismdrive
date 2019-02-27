@@ -28,7 +28,12 @@ class DemographicsQuestionnaire(db.Model):
             "type": "radio",
             "template_options": {
                 "required": True,
-                "label": "",
+                "label": {
+                    "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your sex at birth",
+                                "self_guardian": "Your sex at birth"
+                            }
+                },
                 "options": [
                     {"value": "male", "label": "Male"},
                     {"value": "female", "label": "Female"},
@@ -38,8 +43,6 @@ class DemographicsQuestionnaire(db.Model):
             "expression_properties": {
                 "template_options.label": {
                     "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Your sex at birth",
-                                "self_guardian": "Your sex at birth",
                                 "dependent": '(formState.mainModel.preferred_name || "your child") + "\'s" '
                                              '+ " sex at birth"',
                             }
@@ -135,13 +138,16 @@ class DemographicsQuestionnaire(db.Model):
                     "display_order": 2,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": ""
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": 'Your current gender identity (how you describe yourself)*:',
+                                "self_guardian": 'Your current gender identity (how you describe yourself)*:',
+                            }
+                        }
                     },
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Your current gender identity (how you describe yourself)*:",
-                                "self_guardian": "Your current gender identity (how you describe yourself)*:",
                                 "dependent": '(formState.mainModel.preferred_name || "Your child") + "\'s" + " current gender identity '
                                              '(how " + (formState.mainModel.preferred_name || "your child") + " describes themselves)*:"',
                             }
@@ -153,13 +159,16 @@ class DemographicsQuestionnaire(db.Model):
                     "display_order": 3,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": ""
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "What is your race/ethnicity? (select all that apply)",
+                                "self_guardian": "What is your race/ethnicity? (select all that apply)",
+                            }
+                        }
                     },
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "What is your race/ethnicity? (select all that apply)",
-                                "self_guardian": "What is your race/ethnicity? (select all that apply)",
                                 "dependent": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s" + '
                                              '" race/ethnicity? (select all that apply)"',
                             }
@@ -184,7 +193,9 @@ class DemographicsQuestionnaireSchema(ModelSchema):
             "user_id",
             "birth_sex",
             "gender_identity",
+            "gender_identity_other",
             "race_ethnicity",
+            "race_ethnicity_other",
         )
 
 
