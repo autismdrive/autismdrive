@@ -27,7 +27,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s '
+                "template_options.label": '"What is " + (model.preferred_name || "your child") + "\'s '
                                           'current grade/school placement?"',
             },
         },
@@ -49,11 +49,11 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                 info[c.name] = c.info
 
         info["attends_school"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (formState.mainModel.preferred_name || "your child") + " attend school?"'
+            '"Does " + (model.preferred_name || "your child") + " attend school?"'
         info["school_type"]["expression_properties"]["template_options.label"] = \
-            '"Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:"'
+            '"Is " + (model.preferred_name || "your child") + "\'s school:"'
         info["school_services"]["expression_properties"]["template_options.label"] = \
-            '"Please check the following services " + (formState.mainModel.preferred_name || "your child") + ' \
+            '"Please check the following services " + (model.preferred_name || "your child") + ' \
             '" currently receives in school (check all that apply):"'
         info["placement_other"]["hide_expression"] = \
             '!(model.dependent_placement && model.dependent_placement === "schoolOther")'

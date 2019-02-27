@@ -43,7 +43,7 @@ class DemographicsQuestionnaire(db.Model):
             "expression_properties": {
                 "template_options.label": {
                     "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '(formState.mainModel.preferred_name || "your child") + "\'s" '
+                                "dependent": '(model.preferred_name || "your child") + "\'s" '
                                              '+ " sex at birth"',
                             }
                 },
@@ -148,8 +148,8 @@ class DemographicsQuestionnaire(db.Model):
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '(formState.mainModel.preferred_name || "Your child") + "\'s" + " current gender identity '
-                                             '(how " + (formState.mainModel.preferred_name || "your child") + " describes themselves)*:"',
+                                "dependent": '(model.preferred_name || "Your child") + "\'s" + " current gender identity '
+                                             '(how " + (model.preferred_name || "your child") + " describes themselves)*:"',
                             }
                         }
                     },
@@ -169,7 +169,7 @@ class DemographicsQuestionnaire(db.Model):
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s" + '
+                                "dependent": '"What is " + (model.preferred_name || "your child") + "\'s" + '
                                              '" race/ethnicity? (select all that apply)"',
                             }
                         },

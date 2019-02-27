@@ -23,7 +23,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     {"value": "family", "label": "With my family"},
                     {"value": "roommates", "label": "With roommates"},
                     {"value": "caregiver", "label": "With a paid caregiver"},
-                    {"value": "livingOther", "label": "self_living_situation"},
+                    {"value": "livingOther", "label": "Other"},
                 ],
             },
         },
@@ -36,7 +36,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "template_options": {
                 "placeholder": "Describe your current living situation"
             },
-            "hide_expression": '!(model.self_living_situation && (model.self_living_situation === "livingOther"))',
+            "hide_expression": '!(model.self_living_situation && model.self_living_situation["livingOther"] === true )',
         },
     )
 

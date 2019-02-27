@@ -117,7 +117,7 @@ class EvaluationHistoryMixin(object):
             "display_order": 5,
             "type": "input",
             "template_options": {"placeholder": "First diagnosed by"},
-            "hide_expression": '!(formState.mainModel.who_diagnosed && (formState.mainModel.who_diagnosed === "diagnosisOther"))',
+            "hide_expression": '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
         },
     )
     where_diagnosed = db.Column(
@@ -166,7 +166,7 @@ class EvaluationHistoryMixin(object):
             "display_order": 7,
             "type": "input",
             "template_options": {"placeholder": "Where diagnosed?"},
-            "hide_expression": '!(formState.mainModel.where_diagnosed && (formState.mainModel.where_diagnosed === "diagnosisOther"))',
+            "hide_expression": '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
         },
     )
     partner_centers_evaluation = db.Column(
@@ -232,6 +232,6 @@ class EvaluationHistoryMixin(object):
             "type": "input",
             "template_options": {"placeholder": "IQ score"},
             "expression_properties": {},
-            "hide_expression": "!(formState.mainModel.has_iq_test)",
+            "hide_expression": "!(model.has_iq_test)",
         },
     )

@@ -36,7 +36,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "template_options": {"placeholder": ""},
             "hide_expression": "!(model.dependent_living_situation && model.dependent_living_situation.livingOther)",
             "expression_properties": {
-                "template_options.placeholder": '"Please describe "+ (formState.mainModel.preferred_name) + "\'s current living situation"'
+                "template_options.placeholder": '"Please describe "+ (model.preferred_name) + "\'s current living situation"'
             },
         },
     )
@@ -52,13 +52,13 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     "wrappers": ["card"],
                     "template_options": {"label": "Current Living Situation"},
                     "expression_properties": {
-                        "template_options.label": '"Where does " + formState.mainModel.preferred_name + " currently '
+                        "template_options.label": '"Where does " + model.preferred_name + " currently '
                                                   'live (select all that apply)?"'
                     },
                 }
 
         info["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = \
-            '"Who else lives with " + formState.mainModel.preferred_name + "?"'
+            '"Who else lives with " + model.preferred_name + "?"'
         info["field_groups"]["housemates"]["template_options"]["label"] = ''
 
         for c in self.metadata.tables["home_dependent_questionnaire"].columns:
@@ -66,7 +66,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                 info[c.name] = c.info
 
         info["struggle_to_afford"]["expression_properties"]["template_options.label"] = \
-            '"Do you or " + (formState.mainModel.preferred_name) + "\'s other caregivers ever struggle with being ' \
+            '"Do you or " + (model.preferred_name) + "\'s other caregivers ever struggle with being ' \
             'able to afford to pay for household needs, food, or security for the family?"'
 
         info["housemates"] = Housemate().get_meta()

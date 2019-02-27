@@ -24,7 +24,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 ]
             },
             "expression_properties": {
-                "template_options.label": '(formState.mainModel.preferred_name || "Your child") + "\'s current '
+                "template_options.label": '(model.preferred_name || "Your child") + "\'s current '
                                           'verbal ability:"'
             },
         }
@@ -61,7 +61,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + '
+                "template_options.label": '"Does " + (model.preferred_name || "your child") + '
                                           '" currently engage in the following behaviors of concern?"'
             },
         },
@@ -86,9 +86,9 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 info[c.name] = c.info
 
         info["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (formState.mainModel.preferred_name || "your child") + " have any difficulties with academics?"'
+            '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
         info["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
-            '"What areas of academics are difficult for " + (formState.mainModel.preferred_name || "your child")'
+            '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
 
         return info
 
