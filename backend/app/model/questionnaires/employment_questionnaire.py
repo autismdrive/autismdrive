@@ -93,10 +93,3 @@ class EmploymentQuestionnaireSchema(ModelSchema):
         model = EmploymentQuestionnaire
         fields = ('id', 'last_updated', 'participant_id', 'user_id', 'is_currently_employed', 'employment_capacity',
                   'has_employment_support')
-
-
-class EmploymentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EmploymentQuestionnaire
-        fields = ('get_meta',)
-

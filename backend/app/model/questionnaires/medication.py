@@ -85,9 +85,3 @@ class MedicationSchema(ModelSchema):
             "timeframe",
             "notes",
         )
-
-
-class MedicationMetaSchema(ModelSchema):
-    class Meta:
-        model = Medication
-        fields = ("get_meta",)

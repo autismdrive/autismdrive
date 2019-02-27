@@ -51,9 +51,3 @@ class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
             "has_iq_test",
             "recent_iq_score",
         )
-
-
-class EvaluationHistorySelfQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EvaluationHistorySelfQuestionnaire
-        fields = ("get_meta",)

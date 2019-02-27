@@ -80,9 +80,3 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
-
-
-class HomeSelfQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = HomeSelfQuestionnaire
-        fields = ("get_meta",)

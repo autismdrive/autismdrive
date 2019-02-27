@@ -235,9 +235,3 @@ class AssistiveDeviceSchema(ModelSchema):
             "timeframe",
             "notes",
         )
-
-
-class AssistiveDeviceMetaSchema(ModelSchema):
-    class Meta:
-        model = AssistiveDevice
-        fields = ("get_meta",)

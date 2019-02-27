@@ -87,9 +87,3 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
-
-
-class HomeDependentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = HomeDependentQuestionnaire
-        fields = ("get_meta",)

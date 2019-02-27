@@ -57,9 +57,3 @@ class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
             "academic_difficulty_areas",
             "academic_difficulty_other",
         )
-
-
-class CurrentBehaviorsSelfQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = CurrentBehaviorsSelfQuestionnaire
-        fields = ("get_meta",)

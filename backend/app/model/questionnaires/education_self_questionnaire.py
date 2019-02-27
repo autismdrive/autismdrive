@@ -73,9 +73,3 @@ class EducationSelfQuestionnaireSchema(ModelSchema):
             "school_services",
             "school_services_other",
         )
-
-
-class EducationSelfQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EducationSelfQuestionnaire
-        fields = ("get_meta",)

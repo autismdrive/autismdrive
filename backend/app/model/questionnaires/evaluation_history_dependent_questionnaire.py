@@ -63,9 +63,3 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
             "has_iq_test",
             "recent_iq_score",
         )
-
-
-class EvaluationHistoryDependentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EvaluationHistoryDependentQuestionnaire
-        fields = ("get_meta",)

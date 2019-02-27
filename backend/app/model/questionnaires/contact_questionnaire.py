@@ -245,9 +245,3 @@ class ContactQuestionnaireSchema(ModelSchema):
             "marketing_channel",
             "marketing_other",
         )
-
-
-class ContactQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = ContactQuestionnaire
-        fields = ("get_meta",)

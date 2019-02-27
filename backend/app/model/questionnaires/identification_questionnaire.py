@@ -246,9 +246,3 @@ class IdentificationQuestionnaireSchema(ModelSchema):
             "birth_state",
             "is_english_primary",
         )
-
-
-class IdentificationQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = IdentificationQuestionnaire
-        fields = ("get_meta",)
