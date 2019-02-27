@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class ContactQuestionnaire(db.Model):
     __tablename__ = "contact_questionnaire"
+    __label__ = "Contact Information"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
@@ -184,11 +185,6 @@ class ContactQuestionnaire(db.Model):
 
     def get_meta(self):
         info = {
-            "table": {
-                "sensitive": "false",
-                "label": "Contact Information",
-                "description": "Please answer the following questions about YOURSELF (* indicates required response):",
-            },
             "field_groups": {
                 "phone_group": {
                     "fields": [

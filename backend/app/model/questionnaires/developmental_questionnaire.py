@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class DevelopmentalQuestionnaire(db.Model):
     __tablename__ = "developmental_questionnaire"
+    __label__ = "Birth and Developmental History"
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
@@ -118,13 +119,7 @@ class DevelopmentalQuestionnaire(db.Model):
     )
 
     def get_meta(self):
-        info = {
-            "table": {
-                "sensitive": False,
-                "label": "Birth and Developmental History",
-                "description": "",
-            }
-        }
+        info = {}
         for c in self.metadata.tables["developmental_questionnaire"].columns:
             if c.info:
                 info[c.name] = c.info

@@ -11,6 +11,7 @@ from app.model.questionnaires.assistive_device import AssistiveDevice
 
 class SupportsQuestionnaire(db.Model):
     __tablename__ = "supports_questionnaire"
+    __label__ = "Supports"
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
@@ -37,7 +38,6 @@ class SupportsQuestionnaire(db.Model):
 
     def get_meta(self):
         info = {
-            "table": {"sensitive": False, "label": "Supports"},
             "field_groups": {
                 "medications": {
                     "type": "repeat",

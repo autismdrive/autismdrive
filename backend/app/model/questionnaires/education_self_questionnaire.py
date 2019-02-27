@@ -6,6 +6,7 @@ from app.model.questionnaires.education_mixin import EducationMixin
 
 class EducationSelfQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_self_questionnaire"
+    __label__ = "Education"
 
     self_placement = db.Column(
         db.String,

@@ -6,6 +6,7 @@ from app.model.questionnaires.education_mixin import EducationMixin
 
 class EducationDependentQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
+    __label__ = "Education"
 
     dependent_placement = db.Column(
         db.String,

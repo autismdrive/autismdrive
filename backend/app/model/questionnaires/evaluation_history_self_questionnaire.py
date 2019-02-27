@@ -6,6 +6,7 @@ from app.model.questionnaires.evaluation_history_mixin import EvaluationHistoryM
 
 class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
     __tablename__ = "evaluation_history_self_questionnaire"
+    __label__ = "Evaluation History"
 
     def get_meta(self):
         info = {}

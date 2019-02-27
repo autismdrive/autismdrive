@@ -2927,12 +2927,15 @@ class TestCase(unittest.TestCase):
             if i['name'] == 'self_intake':
                 self.assertEqual(len(i['steps']), 10)
                 self.assertEqual(i['steps'][8]['name'], 'employment_questionnaire')
+                self.assertEqual(i['steps'][8]['label'], 'Employment')
             if i['name'] == 'dependent_intake':
                 self.assertEqual(len(i['steps']), 9)
                 self.assertEqual(i['steps'][5]['name'], 'developmental_questionnaire')
+                self.assertEqual(i['steps'][5]['label'], 'Birth and Developmental History')
             if i['name'] == 'guardian_intake':
                 self.assertEqual(len(i['steps']), 3)
                 self.assertEqual(i['steps'][1]['name'], 'contact_questionnaire')
+                self.assertEqual(i['steps'][1]['label'], 'Contact Information')
 
     def test_self_intake_flow_with_user(self):
         u = self.construct_user()
@@ -3013,3 +3016,14 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertFalse("relationship" in response["get_meta"]["field_groups"])
+
+    def test_meta_contains_table_details(self):
+        self.construct_identification_questionnaire()
+        rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual("identifying", response["get_meta"]["table"]["type"])
+        self.assertEqual("Identification", response["get_meta"]["table"]["label"])
+

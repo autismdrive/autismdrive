@@ -7,13 +7,9 @@ from app.question_service import QuestionService
 
 
 class CurrentBehaviorsMixin(object):
-    info = {
-        "table": {
-            "label": "Current Behaviors",
-            "description": "",
-        }
-    }
+    info = {}
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
+    __label__ = "Current Behaviors"
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)

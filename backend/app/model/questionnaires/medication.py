@@ -7,6 +7,7 @@ from app import db
 
 class Medication(db.Model):
     __tablename__ = "medication"
+    __label__ = "Medication"
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     supports_questionnaire_id = db.Column(
@@ -66,7 +67,7 @@ class Medication(db.Model):
     )
 
     def get_meta(self):
-        info = {"table": {"sensitive": False, "label": "Medication"}}
+        info = {}
         for c in self.metadata.tables["medication"].columns:
             if c.info:
                 info[c.name] = c.info

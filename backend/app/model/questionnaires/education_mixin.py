@@ -8,10 +8,6 @@ from app.question_service import QuestionService
 
 class EducationMixin(object):
     info = {
-        "table": {
-            "label": "Education",
-            "description": "",
-        },
         "field_groups": {
             "placement_group": {
                 "display_order": 4,

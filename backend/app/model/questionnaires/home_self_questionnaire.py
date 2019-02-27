@@ -7,6 +7,7 @@ from app.model.questionnaires.home_mixin import HomeMixin
 
 class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
+    __label__ = "Home"
 
     self_living_situation = db.Column(
         db.String,

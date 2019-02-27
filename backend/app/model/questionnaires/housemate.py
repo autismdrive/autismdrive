@@ -7,6 +7,8 @@ from app import db
 
 class Housemate(db.Model):
     __tablename__ = "housemate"
+    __label__ = "Housemate"
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     home_dependent_questionnaire_id = db.Column(
@@ -99,7 +101,7 @@ class Housemate(db.Model):
     )
 
     def get_meta(self):
-        info = {"table": {"sensitive": False, "label": "Housemate"}}
+        info = {}
         for c in self.metadata.tables["housemate"].columns:
             if c.info:
                 info[c.name] = c.info

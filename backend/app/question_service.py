@@ -47,9 +47,14 @@ class QuestionService:
     @staticmethod
     def get_meta(questionnaire, relationship):
         meta = questionnaire.get_meta()
+        if not "table" in meta:
+            meta["table"] = ""
+        meta["table"]["type"] = questionnaire.__question_type__
+        meta["table"]["label"] = questionnaire.__label__
+
         # loops through the depths, checks, and replaces ....
-        meta2 = QuestionService._recursive_relationship_changes(meta, relationship)
-        return {"get_meta": meta2}
+        meta_processed = QuestionService._recursive_relationship_changes(meta, relationship)
+        return {"get_meta": meta_processed}
 
     @staticmethod
     def _recursive_relationship_changes(meta, relationship):

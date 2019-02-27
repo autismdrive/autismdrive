@@ -7,6 +7,7 @@ from app.model.questionnaires.home_mixin import HomeMixin
 
 class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
+    __label__ = "Home"
 
     dependent_living_situation = db.Column(
         db.String,

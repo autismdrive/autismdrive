@@ -318,6 +318,7 @@ class UserSchema(ModelSchema):
 class StepSchema(Schema):
     name = fields.Str()
     type = fields.Str()
+    label = fields.Str()
     status = fields.Str()
     date_completed = fields.Date()
     questionnaire_id = fields.Integer()

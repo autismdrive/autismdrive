@@ -7,11 +7,8 @@ from app.question_service import QuestionService
 
 
 class EvaluationHistoryMixin(object):
+
     info = {
-        "table": {
-            "label": "Evaluation History",
-            "description": "",
-        },
         "field_groups": {
             "partner_centers": {
                 "fields": ["partner_centers_evaluation", "gives_permission_to_link_evaluation_data"],

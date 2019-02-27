@@ -7,6 +7,7 @@ from app import db
 
 class Therapy(db.Model):
     __tablename__ = "therapy"
+    __label__ = "Therapy or Service"
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     supports_questionnaire_id = db.Column(
@@ -123,7 +124,6 @@ class Therapy(db.Model):
 
     def get_meta(self):
         info = {
-            "table": {"sensitive": False, "label": "Therapy or Service"},
             "field_groups": {
                 "type": {
                     "fields": ["type", "type_other"],

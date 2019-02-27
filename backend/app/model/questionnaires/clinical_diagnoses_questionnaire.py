@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class ClinicalDiagnosesQuestionnaire(db.Model):
     __tablename__ = "clinical_diagnoses_questionnaire"
+    __label__ = "Clinical Diagnosis"
     __question_type__ = QuestionService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
@@ -151,11 +152,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
 
     def get_meta(self):
         info = {
-            "table": {
-                "sensitive": False,
-                "label": "Clinical Diagnoses",
-                "description": "",
-            },
             "field_groups": {
                 "intro": {
                     "fields": [],

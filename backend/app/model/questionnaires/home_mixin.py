@@ -8,7 +8,6 @@ from app.question_service import QuestionService
 
 class HomeMixin(object):
     info = {
-        "table": {"label": "Home"},
         "field_groups": {
             "housemates": {
                 "type": "repeat",
