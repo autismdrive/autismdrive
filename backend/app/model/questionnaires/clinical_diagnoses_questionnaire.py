@@ -222,9 +222,3 @@ class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
             "genetic",
             "genetic_other",
         )
-
-
-class ClinicalDiagnosesQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = ClinicalDiagnosesQuestionnaire
-        fields = ("get_meta",)

@@ -145,9 +145,3 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
             "when_language_milestones",
             "when_toileting_milestones",
         )
-
-
-class DevelopmentalQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = DevelopmentalQuestionnaire
-        fields = ("get_meta",)

@@ -23,12 +23,6 @@ class QuestionService:
         return QuestionService.str_to_class(module_name, schema_name)(many=many)
 
     @staticmethod
-    def get_meta_schema(name):
-        module_name = QuestionService.QUESTION_PACKAGE + "." + name
-        schema_name = QuestionService.camel_case_it(name) + "MetaSchema"
-        return QuestionService.str_to_class(module_name, schema_name)()
-
-    @staticmethod
     def camel_case_it(name):
         first, *rest = name.split('_')
         return first.capitalize() + ''.join(word.capitalize() for word in rest)

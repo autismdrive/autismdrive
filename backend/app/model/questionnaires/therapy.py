@@ -154,9 +154,3 @@ class TherapySchema(ModelSchema):
             "timeframe",
             "notes",
         )
-
-
-class TherapyMetaSchema(ModelSchema):
-    class Meta:
-        model = Therapy
-        fields = ("get_meta",)

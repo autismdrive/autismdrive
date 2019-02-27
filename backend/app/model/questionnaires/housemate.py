@@ -119,9 +119,3 @@ class HousemateSchema(ModelSchema):
             "age",
             "has_autism",
         )
-
-
-class HousemateMetaSchema(ModelSchema):
-    class Meta:
-        model = Housemate
-        fields = ("get_meta",)

@@ -109,9 +109,3 @@ class SupportsQuestionnaireSchema(ModelSchema):
             "therapies",
             "assistive_devices",
         )
-
-
-class SupportsQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = SupportsQuestionnaire
-        fields = ("get_meta",)

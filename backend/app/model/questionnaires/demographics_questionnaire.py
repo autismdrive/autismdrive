@@ -197,9 +197,3 @@ class DemographicsQuestionnaireSchema(ModelSchema):
             "race_ethnicity",
             "race_ethnicity_other",
         )
-
-
-class DemographicsQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = DemographicsQuestionnaire
-        fields = ("get_meta",)

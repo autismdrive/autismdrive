@@ -108,9 +108,3 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "academic_difficulty_areas",
             "academic_difficulty_other",
         )
-
-
-class CurrentBehaviorsDependentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = CurrentBehaviorsDependentQuestionnaire
-        fields = ("get_meta",)
