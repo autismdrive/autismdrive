@@ -41,6 +41,8 @@ class HomeMixin(object):
         return db.relationship(
             "Housemate",
             backref=db.backref(cls.__tablename__, lazy=True),
+            cascade="all, delete-orphan",
+            passive_deletes=True,
             info={
                 "display_order": 3,
                 "type": "repeat",
