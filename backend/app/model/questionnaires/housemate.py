@@ -114,7 +114,6 @@ class HousemateSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
-            "home_questionnaire_id",
             "name",
             "relationship",
             "relationship_other",
