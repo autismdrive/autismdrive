@@ -50,9 +50,9 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
                                                                "receive through your academic program (check all " \
                                                                "that apply):"
         info["placement_other"]["hide_expression"] = \
-            '!(model.self_placement && model.dependent_placement.schoolOther)'
+            '!(model.self_placement && model.self_placement.schoolOther)'
         info["current_grade"]["hide_expression"] = \
-            '!(model.self_placement && model.dependent_placement.highSchool)'
+            '!(model.self_placement && model.self_placement.highSchool)'
 
         return info
 
