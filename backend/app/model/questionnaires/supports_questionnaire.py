@@ -26,75 +26,78 @@ class SupportsQuestionnaire(db.Model):
         "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
     )
     medications = db.relationship(
-        "Medication", backref=db.backref("supports_questionnaire", lazy=True)
+        "Medication",
+        backref=db.backref("supports_questionnaire", lazy=True),
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )
     therapies = db.relationship(
-        "Therapy", backref=db.backref("supports_questionnaire", lazy=True)
+        "Therapy",
+        backref=db.backref("supports_questionnaire", lazy=True),
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )
     assistive_devices = db.relationship(
         "AssistiveDevice",
         backref=db.backref("supports_questionnaire", lazy=True),
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )
 
-    def get_meta(self):
-        info = {
-            "field_groups": {
-                "medications": {
-                    "type": "repeat",
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Do you take any medications and/or vitamins?",
-                                "self_guardian": "Do you take any medications and/or vitamins?",
-                                "dependent": "Does your child take any medications and/or vitamins?",
-                            }
-                        },
-                        "description": "Add a medication",
+    def get_field_groups(self):
+        return {
+            "medications": {
+                "type": "repeat",
+                "display_order": 1,
+                "wrappers": ["card"],
+                "fields": Medication().get_meta(),
+                "template_options": {
+                    "label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": "Do you take any medications and/or vitamins?",
+                            "self_guardian": "Do you take any medications and/or vitamins?",
+                            "dependent": "Does your child take any medications and/or vitamins?",
+                        }
                     },
-                },
-                "therapies": {
-                    "type": "repeat",
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "What kinds of therapies and services do you currently receive?",
-                                "self_guardian": "What kinds of therapies and services do you currently receive?",
-                                "dependent": "What kinds of therapies and services does your child currently receive?",
-                            }
-                        },
-                        "description": "Add a therapy or service",
-                    },
-                },
-                "assistive_devices": {
-                    "type": "repeat",
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Do you use an AAC (alternative & augmentative communication) "
-                                                    "system or other assistive device?",
-                                "self_guardian": "Do you use an AAC (alternative & augmentative communication) "
-                                                 "system or other assistive device?",
-                                "dependent": "Does your child use an AAC (alternative & augmentative communication) "
-                                             "system or other assistive device?",
-                            }
-                        },
-                        "description": "Add an assistive device",
-                    },
+                    "description": "Add a medication",
                 },
             },
+            "therapies": {
+                "type": "repeat",
+                "display_order": 2,
+                "wrappers": ["card"],
+                "fields": Therapy.get_meta(),
+                "template_options": {
+                    "label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": "What kinds of therapies and services do you currently receive?",
+                            "self_guardian": "What kinds of therapies and services do you currently receive?",
+                            "dependent": "What kinds of therapies and services does your child currently receive?",
+                        }
+                    },
+                    "description": "Add a therapy or service",
+                },
+            },
+            "assistive_devices": {
+                "type": "repeat",
+                "display_order": 3,
+                "wrappers": ["card"],
+                "fields": AssistiveDevice().get_meta(),
+                "template_options": {
+                    "label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": "Do you use an AAC (alternative & augmentative communication) "
+                                                "system or other assistive device?",
+                            "self_guardian": "Do you use an AAC (alternative & augmentative communication) "
+                                             "system or other assistive device?",
+                            "dependent": "Does your child use an AAC (alternative & augmentative communication) "
+                                         "system or other assistive device?",
+                        }
+                    },
+                    "description": "Add an assistive device",
+                },
+            }
         }
-
-        info["medications"] = Medication().get_meta()
-        info["therapies"] = Therapy().get_meta()
-        info["assistive_devices"] = AssistiveDevice().get_meta()
-
-        return info
 
 
 class SupportsQuestionnaireSchema(ModelSchema):

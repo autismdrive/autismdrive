@@ -34,34 +34,29 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(EducationMixin.info)
-
-        info["field_groups"]["placement_group"]["fields"] = [
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["placement_group"]["fields"] = [
             "dependent_placement",
             "placement_other",
             "current_grade"
         ]
+        return field_groups
 
-        for c in self.metadata.tables["education_dependent_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["attends_school"]["expression_properties"]["template_options.label"] = \
+    def update_meta(self, meta):
+        meta["attends_school"]["expression_properties"]["template_options.label"] = \
             '"Does " + (model.preferred_name || "your child") + " attend school?"'
-        info["school_type"]["expression_properties"]["template_options.label"] = \
+        meta["school_type"]["expression_properties"]["template_options.label"] = \
             '"Is " + (model.preferred_name || "your child") + "\'s school:"'
-        info["school_services"]["expression_properties"]["template_options.label"] = \
+        meta["school_services"]["expression_properties"]["template_options.label"] = \
             '"Please check the following services " + (model.preferred_name || "your child") + ' \
             '" currently receives in school (check all that apply):"'
-        info["placement_other"]["hide_expression"] = \
+        meta["placement_other"]["hide_expression"] = \
             '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
-        info["current_grade"]["hide_expression"] = \
+        meta["current_grade"]["hide_expression"] = \
             '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
-        return info
+        return meta
 
 
 class EducationDependentQuestionnaireSchema(ModelSchema):

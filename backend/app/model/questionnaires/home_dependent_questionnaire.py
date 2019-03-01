@@ -10,12 +10,13 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __label__ = "Home"
 
     dependent_living_situation = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": True,
                 "label": "",
                 "options": [
@@ -42,12 +43,9 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(HomeMixin.info)
-
-        info["field_groups"]["dependent_living"] = {
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["dependent_living"] = {
                     "fields": ["dependent_living_situation", "dependent_living_other"],
                     "display_order": 2,
                     "wrappers": ["card"],
@@ -58,21 +56,16 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     },
                 }
 
-        info["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = \
+        field_groups["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = \
             '"Who else lives with " + model.preferred_name + "?"'
-        info["field_groups"]["housemates"]["template_options"]["label"] = ''
+        field_groups["field_groups"]["housemates"]["template_options"]["label"] = ''
+        return field_groups;
 
-        for c in self.metadata.tables["home_dependent_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["struggle_to_afford"]["expression_properties"]["template_options.label"] = \
+    def update_meta(self, meta):
+        meta["struggle_to_afford"]["expression_properties"]["template_options.label"] = \
             '"Do you or " + (model.preferred_name) + "\'s other caregivers ever struggle with being ' \
             'able to afford to pay for household needs, food, or security for the family?"'
-
-        info["housemates"] = Housemate().get_meta()
-
-        return info
+        return meta
 
 
 class HomeDependentQuestionnaireSchema(ModelSchema):

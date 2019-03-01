@@ -218,8 +218,16 @@ class AssistiveDevice(db.Model):
         }
         for c in self.metadata.tables["assistive_device"].columns:
             if c.info:
-                info[c.name] = c.info
+                if c.name in info["field_groups"]["type"]["fields"]:
+                    info["field_groups"]["type"]["fields"].remove(c.name)
+                    info["field_groups"]["type"]["fields"].append(c.info)
+                else:
+                    info[c.name] = c.info
+
+
+
         return info
+
 
 
 class AssistiveDeviceSchema(ModelSchema):

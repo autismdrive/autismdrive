@@ -8,12 +8,13 @@ class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_self_questionnaire"
 
     self_verbal_ability = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "label": "How do you best communicate?",
                 "required": False,
                 "options": [
@@ -29,19 +30,13 @@ class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
+    def get_field_groups(self):
+        return super.get_field_groups()
 
-        info.update(CurrentBehaviorsMixin.info)
-
-        for c in self.metadata.tables["current_behaviors_self_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["has_academic_difficulties"]["template_options"]["label"] = "Do you have any difficulties with academics?"
-        info["academic_difficulty_areas"]["template_options"]["label"] = "What areas of academics are difficult for you?"
-
-        return info
+    def update_meta(self, meta):
+        meta["has_academic_difficulties"]["template_options"]["label"] = "Do you have any difficulties with academics?"
+        meta["academic_difficulty_areas"]["template_options"]["label"] = "What areas of academics are difficult for you?"
+        return meta
 
 
 class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):

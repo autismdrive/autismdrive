@@ -8,40 +8,34 @@ class EvaluationHistoryDependentQuestionnaire(db.Model, EvaluationHistoryMixin):
     __tablename__ = "evaluation_history_dependent_questionnaire"
     __label__ = "Evaluation History"
 
-    def get_meta(self):
-        info = {}
-
-        info.update(EvaluationHistoryMixin.info)
-
-        info["field_groups"]["partner_centers"]["expression_properties"]["template_options.label"] = \
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["partner_centers"]["expression_properties"]["template_options.label"] = \
             '"Has " + (model.preferred_name || "your child") + ' \
             '" ever been evaluated at any of the following centers?"'
 
-        for c in self.metadata.tables["evaluation_history_dependent_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["self_identifies_autistic"]["expression_properties"]["template_options.label"] = \
+    def update_meta(self, meta):
+        meta["self_identifies_autistic"]["expression_properties"]["template_options.label"] = \
             '"Does " + (model.preferred_name || "your child") + " self-identify as having Autism?"'
-        info["has_autism_diagnosis"]["expression_properties"]["template_options.label"] = \
+        meta["has_autism_diagnosis"]["expression_properties"]["template_options.label"] = \
             '"Has " + (model.preferred_name || "your child") + " been formally diagnosed with Autism ' \
             'Spectrum Disorder?"'
-        info["years_old_at_first_diagnosis"]["expression_properties"]["template_options.label"] = \
+        meta["years_old_at_first_diagnosis"]["expression_properties"]["template_options.label"] = \
             '"How old was " + (model.preferred_name || "your child") + " when they were first ' \
             'diagnosed with ASD?"'
-        info["who_diagnosed"]["expression_properties"]["template_options.label"] = \
+        meta["who_diagnosed"]["expression_properties"]["template_options.label"] = \
             '"Who first diagnosed " + (model.preferred_name || "your child") + " with ASD?"'
-        info["where_diagnosed"]["expression_properties"]["template_options.label"] = \
+        meta["where_diagnosed"]["expression_properties"]["template_options.label"] = \
             '"Where did " + (model.preferred_name || "your child") + " receive this diagnosis?"'
-        info["gives_permission_to_link_evaluation_data"]["expression_properties"]["template_options.label"] = \
+        meta["gives_permission_to_link_evaluation_data"]["expression_properties"]["template_options.label"] = \
             '"Do we have your permission to link " + (model.preferred_name + "\'s") + ' \
             '" evaluation data to the UVa Autism Database?"'
-        info["has_iq_test"]["expression_properties"]["template_options.label"] = \
+        meta["has_iq_test"]["expression_properties"]["template_options.label"] = \
             '"Has " + (model.preferred_name) + " been given an IQ or intelligence test?"'
-        info["recent_iq_score"]["expression_properties"]["template_options.label"] = \
+        meta["recent_iq_score"]["expression_properties"]["template_options.label"] = \
             '"What was " + (model.preferred_name + "\'s") + " most recent IQ score?"'
 
-        return info
+        return meta
 
 
 class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):

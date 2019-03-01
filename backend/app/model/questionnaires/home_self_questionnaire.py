@@ -43,30 +43,21 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(HomeMixin.info)
-
-        info["field_groups"]["self_living"] = {
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["housemates"]["template_options"]["label"] = "Who else lives with you?"
+        field_groups["self_living"] = {
                     "fields": ["self_living_situation", "self_living_other"],
                     "display_order": 1,
                     "wrappers": ["card"],
                     "template_options": {"label": "Current Living Situation"},
                 }
+        return field_groups
 
-        info["field_groups"]["housemates"]["template_options"]["label"] = "Who else lives with you?"
-
-        for c in self.metadata.tables["home_self_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["struggle_to_afford"]["template_options"]["label"] = \
+    def update_meta(self, meta):
+        meta["struggle_to_afford"]["template_options"]["label"] = \
             "Do you ever struggle with being able to afford to pay for household needs, food, or security?"
-
-        info["housemates"] = Housemate().get_meta()
-
-        return info
+        return meta
 
 
 class HomeSelfQuestionnaireSchema(ModelSchema):

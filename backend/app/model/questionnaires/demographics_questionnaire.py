@@ -79,12 +79,13 @@ class DemographicsQuestionnaire(db.Model):
         },
     )
     race_ethnicity = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": True,
                 "options": [
                     {"value": "raceBlack", "label": "Black / African / African American"},
@@ -109,9 +110,8 @@ class DemographicsQuestionnaire(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "intro": {
                     "fields": [],
                     "display_order": 0,
@@ -171,12 +171,7 @@ class DemographicsQuestionnaire(db.Model):
                         },
                     },
                 },
-            },
-        }
-        for c in self.metadata.tables["demographics_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+            }
 
 
 class DemographicsQuestionnaireSchema(ModelSchema):

@@ -59,6 +59,7 @@ pip3 install -r requirements.txt
 postgres -D /usr/local/var/postgres
 createuser --no-createdb --no-superuser --pwprompt ed_user
 createdb stardrive -O ed_user ed_platform
+createdb stardrive_test -O ed_user ed_platform
 ```
 
 * Debian

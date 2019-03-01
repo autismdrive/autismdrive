@@ -187,9 +187,8 @@ class IdentificationQuestionnaire(db.Model):
         else:
             return self.first_name + ' ' + self.last_name
 
-    def get_meta(self):
-        info = {
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "intro": {
                     "fields": [],
                     "display_order": 0,
@@ -216,13 +215,7 @@ class IdentificationQuestionnaire(db.Model):
                         "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                     },
                 },
-            },
-        }
-        for c in self.metadata.tables["identification_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
-
+            }
 
 class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:

@@ -73,16 +73,3 @@ class Medication(db.Model):
                 info[c.name] = c.info
         return info
 
-
-class MedicationSchema(ModelSchema):
-    class Meta:
-        model = Medication
-        fields = (
-            "id",
-            "last_updated",
-            "supports_questionnaire_id",
-            "name",
-            "dosage",
-            "timeframe",
-            "notes",
-        )

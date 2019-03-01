@@ -41,12 +41,13 @@ class CurrentBehaviorsMixin(object):
         },
     )
     academic_difficulty_areas = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 4,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "label": '',
                 "required": True,
                 "options": [
@@ -71,3 +72,6 @@ class CurrentBehaviorsMixin(object):
             "hide_expression": "!(model.academic_difficulty_areas && (model.academic_difficulty_areas.other))",
         },
     )
+
+    def get_field_groups(self):
+        return {}

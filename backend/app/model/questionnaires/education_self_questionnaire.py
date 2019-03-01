@@ -27,34 +27,28 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(EducationMixin.info)
-
-        info["field_groups"]["placement_group"]["fields"] = [
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["placement_group"]["fields"] = [
             "self_placement",
             "placement_other",
             "current_grade"
         ]
 
-        for c in self.metadata.tables["education_self_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["attends_school"]["template_options"]["label"] = "Do you attend an academic program, such as a school, " \
+    def update_meta(self, meta):
+        meta["attends_school"]["template_options"]["label"] = "Do you attend an academic program, such as a school, " \
                                                               "college, or university?"
-        info["school_type"]["template_options"]["label"] = "Is this a public school, private school, or are you home " \
+        meta["school_type"]["template_options"]["label"] = "Is this a public school, private school, or are you home " \
                                                            "schooled?"
-        info["school_services"]["template_options"]["label"] = "Please check the following services you currently " \
+        meta["school_services"]["template_options"]["label"] = "Please check the following services you currently " \
                                                                "receive through your academic program (check all " \
                                                                "that apply):"
-        info["placement_other"]["hide_expression"] = \
+        meta["placement_other"]["hide_expression"] = \
             '!(model.self_placement && model.self_placement.schoolOther)'
-        info["current_grade"]["hide_expression"] = \
+        meta["current_grade"]["hide_expression"] = \
             '!(model.self_placement && model.self_placement.highSchool)'
 
-        return info
+        return meta
 
 
 class EducationSelfQuestionnaireSchema(ModelSchema):

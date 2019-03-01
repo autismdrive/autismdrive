@@ -118,12 +118,8 @@ class DevelopmentalQuestionnaire(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {}
-        for c in self.metadata.tables["developmental_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+    def get_field_groups(self):
+        return {}
 
 
 class DevelopmentalQuestionnaireSchema(ModelSchema):

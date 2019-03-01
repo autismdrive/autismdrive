@@ -75,12 +75,8 @@ class EmploymentQuestionnaire(db.Model):
         }
     )
 
-    def get_meta(self):
-        info = {}
-        for c in self.metadata.tables['employment_questionnaire'].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+    def get_field_groups(self):
+        return {}
 
 
 class EmploymentQuestionnaireSchema(ModelSchema):

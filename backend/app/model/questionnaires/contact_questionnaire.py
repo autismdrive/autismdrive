@@ -183,9 +183,8 @@ class ContactQuestionnaire(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "phone_group": {
                     "fields": [
                         "phone",
@@ -211,14 +210,7 @@ class ContactQuestionnaire(db.Model):
                         "label": "How did you hear about us?"
                     },
                 },
-            },
-        }
-
-        for c in self.metadata.tables["contact_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        return info
+            }
 
 
 class ContactQuestionnaireSchema(ModelSchema):

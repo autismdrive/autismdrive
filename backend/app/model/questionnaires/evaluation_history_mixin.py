@@ -7,20 +7,6 @@ from app.question_service import QuestionService
 
 
 class EvaluationHistoryMixin(object):
-
-    info = {
-        "field_groups": {
-            "partner_centers": {
-                "fields": ["partner_centers_evaluation", "gives_permission_to_link_evaluation_data"],
-                "display_order": 8,
-                "wrappers": ["card"],
-                "template_options": {
-                    "label": ''
-                },
-                "expression_properties": {},
-            }
-        },
-    }
     __question_type__ = QuestionService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
@@ -167,12 +153,13 @@ class EvaluationHistoryMixin(object):
         },
     )
     partner_centers_evaluation = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 8.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": False,
                 "options": [
                     {"value": "uva", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation"
@@ -232,3 +219,16 @@ class EvaluationHistoryMixin(object):
             "hide_expression": "!(model.has_iq_test)",
         },
     )
+
+    def get_field_groups(self):
+        return {
+            "partner_centers": {
+                "fields": ["partner_centers_evaluation", "gives_permission_to_link_evaluation_data"],
+                "display_order": 8,
+                "wrappers": ["card"],
+                "template_options": {
+                    "label": ''
+                },
+                "expression_properties": {},
+            }
+        }

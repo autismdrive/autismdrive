@@ -7,21 +7,6 @@ from app.question_service import QuestionService
 
 
 class EducationMixin(object):
-    info = {
-        "field_groups": {
-            "placement_group": {
-                "display_order": 4,
-                "wrappers": ["card"],
-                "template_options": {"label": "Placement"},
-            },
-            "school_services_group": {
-                "fields": ["school_services", "school_services_other"],
-                "display_order": 6,
-                "wrappers": ["card"],
-                "template_options": {"label": "School Services"},
-            },
-        },
-    }
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
@@ -98,12 +83,13 @@ class EducationMixin(object):
         },
     )
     school_services = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 6.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "label": '',
                 "required": False,
                 "options": [
@@ -133,3 +119,18 @@ class EducationMixin(object):
             "hide_expression": '!(model.school_services && (model.school_services.servicesOther))',
         },
     )
+
+    def get_field_groups(self):
+        return {
+            "placement_group": {
+                "display_order": 4,
+                "wrappers": ["card"],
+                "template_options": {"label": "Placement"},
+            },
+            "school_services_group": {
+                "fields": ["school_services", "school_services_other"],
+                "display_order": 6,
+                "wrappers": ["card"],
+                "template_options": {"label": "School Services"},
+            },
+        }

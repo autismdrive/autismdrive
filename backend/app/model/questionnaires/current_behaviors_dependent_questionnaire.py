@@ -30,12 +30,13 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
         }
     )
     concerning_behaviors = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 2,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "label": '',
                 "required": False,
                 "options": [
@@ -76,21 +77,14 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
+    def get_field_groups(self):
+        return super.get_field_groups()
 
-        info.update(CurrentBehaviorsMixin.info)
-
-        for c in self.metadata.tables["current_behaviors_dependent_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
+    def update_meta(self, meta):
+        meta["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
             '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
-        info["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
+        meta["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
             '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
-
-        return info
 
 
 class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):

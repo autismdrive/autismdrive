@@ -116,6 +116,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         if not flow.has_step(questionnaire_name):
             raise RestException(RestException.NOT_IN_THE_FLOW)
         request_data = request.get_json()
+        request_data["user_id"] = g.user.id
         schema = QuestionService.get_schema(questionnaire_name)
         new_quest, errors = schema.load(request_data, session=db.session)
 

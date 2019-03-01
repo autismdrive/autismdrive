@@ -17,10 +17,10 @@ class QuestionService:
         return QuestionService.str_to_class(module_name, class_name)
 
     @staticmethod
-    def get_schema(name, many=False):
+    def get_schema(name, many=False, session=None):
         module_name = QuestionService.QUESTION_PACKAGE + "." + name
         schema_name = QuestionService.camel_case_it(name) + "Schema"
-        return QuestionService.str_to_class(module_name, schema_name)(many=many)
+        return QuestionService.str_to_class(module_name, schema_name)(many=many,session=session)
 
     @staticmethod
     def camel_case_it(name):
@@ -46,17 +46,47 @@ class QuestionService:
 
     @staticmethod
     def get_meta(questionnaire, relationship):
-        meta = questionnaire.get_meta()
+        meta = {}
+        meta['field_groups'] = questionnaire.get_field_groups()
+
+        # This will move fields referenced by the field groups into the group, but will otherwise add them
+        # the base meta object if they are not contained within a group.
+        for c in questionnaire.__table__.columns:
+            if c.info:
+                c.info['name'] = c.name
+                c.info['key'] = c.name
+                added = False
+                for group_name, value in meta['field_groups'].items():
+                    if "fields" in value:
+                        if c.name in value['fields']:
+                            meta['field_groups'][group_name]['fields'].remove(c.name)
+                            meta['field_groups'][group_name]['fields'].append(c.info)
+                            added = True
+                            print(c.name + "is in group")
+                if not added:
+                    meta[c.name] = c.info
+
+        try:
+            meta = questionnaire.update_meta(meta)
+        except AttributeError:
+            # Questionnaire doesn't have to implement this method.
+            pass
+
+        # Add table metadata
         if not "table" in meta:
-            meta["table"] = ""
-        meta["table"]["type"] = questionnaire.__question_type__
+            meta["table"] = {}
+        meta["table"]["question_type"] = questionnaire.__question_type__
         meta["table"]["label"] = questionnaire.__label__
 
         # loops through the depths, checks, and replaces ....
-        meta_processed = QuestionService._recursive_relationship_changes(meta, relationship)
-        return {"get_meta": meta_processed}
+        meta_relationed = QuestionService._recursive_relationship_changes(meta, relationship)
+        return {"get_meta": meta_relationed}
 
     @staticmethod
+    # this evil method recurses down through the metadata, removing items that have a
+    # RELATIONSHIP_REQUIRED, if the relationship isn't there and selecting the right
+    # content from a list, if RELATIONSHIP_SPECIFIC provides an array content for each
+    # possible type of relationship.
     def _recursive_relationship_changes(meta, relationship):
         meta_copy = {}
         for k,v in meta.items():
