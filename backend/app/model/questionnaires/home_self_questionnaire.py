@@ -1,7 +1,8 @@
+from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
-from app.model.questionnaires.housemate import Housemate
+from app.model.questionnaires.housemate import Housemate, HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
 
 
@@ -10,12 +11,13 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __label__ = "Home"
 
     self_living_situation = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": True,
                 "label": "Where do you currently live? (select all that apply)",
                 "options": [
@@ -37,7 +39,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "template_options": {
                 "placeholder": "Describe your current living situation"
             },
-            "hide_expression": '!(model.self_living_situation && model.self_living_situation.livingOther)',
+            "hide_expression": '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))',
         },
     )
 
@@ -68,6 +70,10 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
 
 
 class HomeSelfQuestionnaireSchema(ModelSchema):
+    @pre_load
+    def set_field_session(self, data):
+        self.fields['housemates'].schema.session = self.session
+
     class Meta:
         model = HomeSelfQuestionnaire
         fields = (
@@ -80,3 +86,4 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
+    housemates = fields.Nested(HousemateSchema, many=True)
