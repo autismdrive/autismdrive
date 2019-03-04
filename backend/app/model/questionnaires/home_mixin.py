@@ -45,15 +45,7 @@ class HomeMixin(object):
             "Housemate",
             backref=db.backref(cls.__tablename__, lazy=True),
             cascade="all, delete-orphan",
-            passive_deletes=True,
-            info={
-                "display_order": 3,
-                "type": "repeat",
-                "template_options": {
-                    "required": False,
-                    "label": ''
-                },
-            },
+            passive_deletes=True
         )
 
     struggle_to_afford = db.Column(
