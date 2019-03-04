@@ -3146,3 +3146,21 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(len(response["fields"]), 11)
+
+    def test_education_dependent_meta_contain_their_fields(self):
+        self.construct_education_dependent_questionnaire()
+        rv = self.app.get('/api/flow/dependent_intake/education_dependent_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(len(response["fields"]), 5)
+
+    def test_education_self_meta_contain_their_fields(self):
+        self.construct_education_self_questionnaire()
+        rv = self.app.get('/api/flow/self_intake/education_self_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(len(response["fields"]), 8)

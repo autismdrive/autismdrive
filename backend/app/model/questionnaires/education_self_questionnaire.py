@@ -8,6 +8,13 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_self_questionnaire"
     __label__ = "Education"
 
+    attends_school_label = "Do you attend an academic program, such as a school, college, or university?"
+    school_type_label = "Is this a public school, private school, or are you home schooled?"
+    school_services_label = "Please check the following services you currently receive through your academic program " \
+                            "(check all that apply):"
+    placement_other_label = '!(model.self_placement && model.self_placement.schoolOther)'
+    current_grade_label = '!(model.self_placement && model.self_placement.highSchool)'
+
     self_placement = db.Column(
         db.String,
         info={
@@ -34,21 +41,6 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
             "placement_other",
             "current_grade"
         ]
-
-    def update_meta(self, meta):
-        meta["attends_school"]["template_options"]["label"] = "Do you attend an academic program, such as a school, " \
-                                                              "college, or university?"
-        meta["school_type"]["template_options"]["label"] = "Is this a public school, private school, or are you home " \
-                                                           "schooled?"
-        meta["school_services"]["template_options"]["label"] = "Please check the following services you currently " \
-                                                               "receive through your academic program (check all " \
-                                                               "that apply):"
-        meta["placement_other"]["hide_expression"] = \
-            '!(model.self_placement && model.self_placement.schoolOther)'
-        meta["current_grade"]["hide_expression"] = \
-            '!(model.self_placement && model.self_placement.highSchool)'
-
-        return meta
 
 
 class EducationSelfQuestionnaireSchema(ModelSchema):
