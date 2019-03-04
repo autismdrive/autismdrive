@@ -7,6 +7,9 @@ from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMix
 class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_dependent_questionnaire"
 
+    has_academic_difficulties_label = '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
+    academic_difficulty_areas_label = '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
+
     dependent_verbal_ability = db.Column(
         db.String,
         info={
