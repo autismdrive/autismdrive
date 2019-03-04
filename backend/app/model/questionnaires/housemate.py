@@ -101,10 +101,12 @@ class Housemate(db.Model):
     )
 
     def get_meta(self):
-        info = {}
+        info = []
         for c in self.metadata.tables["housemate"].columns:
             if c.info:
-                info[c.name] = c.info
+                c.info['name'] = c.name
+                c.info['key'] = "housemate." + c.name
+                info.append(c.info)
         return info
 
 

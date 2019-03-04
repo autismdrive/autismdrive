@@ -66,7 +66,7 @@ class SupportsQuestionnaire(db.Model):
                 "type": "repeat",
                 "display_order": 2,
                 "wrappers": ["card"],
-                "fields": Therapy.get_meta(),
+                "fields": Therapy().get_meta(),
                 "template_options": {
                     "label": {
                         "RELATIONSHIP_SPECIFIC": {
