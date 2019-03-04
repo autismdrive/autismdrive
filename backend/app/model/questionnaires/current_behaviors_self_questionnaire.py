@@ -31,7 +31,7 @@ class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
     )
 
     def get_field_groups(self):
-        return super.get_field_groups()
+        return super().get_field_groups()
 
     def update_meta(self, meta):
         meta["has_academic_difficulties"]["template_options"]["label"] = "Do you have any difficulties with academics?"
