@@ -73,6 +73,7 @@ class QuestionService:
 
         for group,values in groups.items():
             values['name'] = group
+            values['key'] = group
 #            if value['type'] == 'repeat':
 #                value['fieldArray'] = value.pop('fields')
             if 'type' in values and values['type'] == 'repeat':

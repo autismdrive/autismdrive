@@ -105,7 +105,7 @@ class Housemate(db.Model):
         for c in self.metadata.tables["housemate"].columns:
             if c.info:
                 c.info['name'] = c.name
-                c.info['key'] = "housemate." + c.name
+                c.info['key'] =  c.name
                 info.append(c.info)
         return info
 
