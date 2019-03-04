@@ -143,7 +143,7 @@ export class FlowComponent implements OnInit {
     const fields = []
     for (const field of info.fields) {
       if (field.fieldArray) {
-        field.model = this.model;
+        field.fieldArray.model = this.model[field.name];
       }
       fields.push(keysToCamel(field));
 
