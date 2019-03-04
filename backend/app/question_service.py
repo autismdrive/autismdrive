@@ -47,8 +47,10 @@ class QuestionService:
     @staticmethod
     def get_meta(questionnaire, relationship):
         meta = {"table": {}}
-        meta["table"]['question_type'] = questionnaire.__question_type__
-        meta["table"]["label"] = questionnaire.__label__
+        if 'question_type' in meta['table']:
+            meta["table"]['question_type'] = questionnaire.__question_type__
+        if 'label' in meta['table']:
+            meta["table"]["label"] = questionnaire.__label__
         meta["fields"] = []
 
         groups = questionnaire.get_field_groups()
@@ -76,6 +78,10 @@ class QuestionService:
             values['key'] = group
 #            if value['type'] == 'repeat':
 #                value['fieldArray'] = value.pop('fields')
+            if "repeat_class" in values:
+                values['fields'] = QuestionService.get_meta(values["repeat_class"](), relationship)['fields']
+                values.pop('repeat_class')
+
             if 'type' in values and values['type'] == 'repeat':
                 values['fieldArray'] = {'fieldGroup': values.pop('fields')}
             meta['fields'].append(values)

@@ -1,12 +1,13 @@
 import datetime
 
+from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
 from app.question_service import QuestionService
-from app.model.questionnaires.therapy import Therapy
-from app.model.questionnaires.medication import Medication
-from app.model.questionnaires.assistive_device import AssistiveDevice
+from app.model.questionnaires.therapy import Therapy, TherapySchema
+from app.model.questionnaires.medication import Medication, MedicationSchema
+from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
 
 
 class SupportsQuestionnaire(db.Model):
@@ -50,7 +51,7 @@ class SupportsQuestionnaire(db.Model):
                 "type": "repeat",
                 "display_order": 1,
                 "wrappers": ["card"],
-                "fields": Medication().get_meta(),
+                "repeat_class": Medication,
                 "template_options": {
                     "label": {
                         "RELATIONSHIP_SPECIFIC": {
@@ -66,7 +67,7 @@ class SupportsQuestionnaire(db.Model):
                 "type": "repeat",
                 "display_order": 2,
                 "wrappers": ["card"],
-                "fields": Therapy().get_meta(),
+                "repeat_class": Therapy,
                 "template_options": {
                     "label": {
                         "RELATIONSHIP_SPECIFIC": {
@@ -82,7 +83,7 @@ class SupportsQuestionnaire(db.Model):
                 "type": "repeat",
                 "display_order": 3,
                 "wrappers": ["card"],
-                "fields": AssistiveDevice().get_meta(),
+                "repeat_class": AssistiveDevice,
                 "template_options": {
                     "label": {
                         "RELATIONSHIP_SPECIFIC": {
@@ -101,6 +102,12 @@ class SupportsQuestionnaire(db.Model):
 
 
 class SupportsQuestionnaireSchema(ModelSchema):
+    @pre_load
+    def set_field_session(self, data):
+        self.fields['medications'].schema.session = self.session
+        self.fields['therapies'].schema.session = self.session
+        self.fields['assistive_devices'].schema.session = self.session
+
     class Meta:
         model = SupportsQuestionnaire
         fields = (
@@ -112,3 +119,6 @@ class SupportsQuestionnaireSchema(ModelSchema):
             "therapies",
             "assistive_devices",
         )
+    medications = fields.Nested(MedicationSchema, many=True)
+    therapies = fields.Nested(TherapySchema, many=True)
+    assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)

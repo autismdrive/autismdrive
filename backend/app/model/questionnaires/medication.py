@@ -66,10 +66,11 @@ class Medication(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {}
-        for c in self.metadata.tables["medication"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+    def get_field_groups(self):
+        return {}
 
+
+class MedicationSchema(ModelSchema):
+    class Meta:
+        model = Medication
+        fields = ("name", "dosage", "time_frame", "notes")

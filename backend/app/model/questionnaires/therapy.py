@@ -122,22 +122,17 @@ class Therapy(db.Model):
         },
     )
 
-    def get_meta(self):
+    def get_field_groups(self):
         info = {
-            "field_groups": {
-                "type": {
-                    "fields": ["type", "type_other"],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": "Type of therapy or service"
-                    },
-                }
-            },
+            "type_group": {
+                "fields": ["type", "type_other"],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {
+                    "label": "Type of therapy or service"
+                },
+            }
         }
-        for c in self.metadata.tables["therapy"].columns:
-            if c.info:
-                info[c.name] = c.info
         return info
 
 
