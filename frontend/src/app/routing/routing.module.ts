@@ -14,7 +14,7 @@ import { ResourceDetailComponent } from '../resource-detail/resource-detail.comp
 import { StudyDetailComponent } from '../study-detail/study-detail.component';
 import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { QuestionnaireStepComponent } from '../questionnaire-step/questionnaire-step.component';
-import { EnrollmentFlowComponent } from '../enrollment-flow/enrollment-flow.component';
+import { FlowComponent } from '../flow/flow.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { LogoutComponent } from '../logout/logout.component';
 
@@ -29,13 +29,7 @@ const routes: Routes = [
     data: { title: 'Reset your STAR Drive password', hideHeader: true }
   },
   { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' } },
-  { path: 'participant/:participantId', component: EnrollmentFlowComponent, data: { title: 'Your STAR Drive Account' } },
-  { path: 'participant/:participantId/:flowName', component: EnrollmentFlowComponent, data: { title: 'Your STAR Drive Account' } },
-  {
-    path: 'participant/:participantId/:flowName/:stepName',
-    component: EnrollmentFlowComponent,
-    data: { title: 'Your STAR Drive Account' }
-  },
+  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' } },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },

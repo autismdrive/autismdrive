@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { QuestionnaireStep } from '../step';
 import { User } from '../user';
+import {Step} from '../step';
 
 @Component({
   selector: 'app-questionnaire-step',
@@ -9,7 +9,7 @@ import { User } from '../user';
 })
 export class QuestionnaireStepComponent implements OnInit {
   @Input() user: User;
-  step: QuestionnaireStep;
+  step: Step;
 
   constructor() { }
 
