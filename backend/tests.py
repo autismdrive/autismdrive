@@ -3058,7 +3058,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(Step.STATUS_COMPLETE, response['steps'][0]['status'])
         self.assertIsNotNone(response['steps'][0]['date_completed'])
 
-    def testQuestionnaireMetaIsRelationSpecific(self):
+    def test_questionnaire_meta_is_relation_specific(self):
         self.construct_identification_questionnaire()
         rv = self.app.get('/api/flow/self_intake/identification_questionnaire/meta',
                           follow_redirects=True,
@@ -3084,8 +3084,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response["get_meta"]["birth_city"]["template_options"]["label"],
                          "Your child's city/municipality of birth")
 
-
-    def testQuestionnaireMetaIsRelationRequiredFields(self):
+    def test_questionnaire_meta_has_relation_required_fields(self):
         self.construct_identification_questionnaire()
         rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
                           follow_redirects=True,
