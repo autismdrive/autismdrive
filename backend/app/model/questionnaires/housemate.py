@@ -100,14 +100,8 @@ class Housemate(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = []
-        for c in self.metadata.tables["housemate"].columns:
-            if c.info:
-                c.info['name'] = c.name
-                c.info['key'] =  c.name
-                info.append(c.info)
-        return info
+    def get_field_groups(self):
+        return {}
 
 
 class HousemateSchema(ModelSchema):

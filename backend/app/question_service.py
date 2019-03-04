@@ -75,10 +75,10 @@ class QuestionService:
 
         for group,values in groups.items():
             values['name'] = group
-            values['key'] = group
 #            if value['type'] == 'repeat':
 #                value['fieldArray'] = value.pop('fields')
             if "repeat_class" in values:
+                values['key'] = group  # Only include the key on the group if an actual sub-class exists.
                 values['fields'] = QuestionService.get_meta(values["repeat_class"](), relationship)['fields']
                 values.pop('repeat_class')
 

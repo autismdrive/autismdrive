@@ -37,6 +37,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.CAN_NOT_DELETE)
         return
 
+
     @auth.login_required
     def put(self, name, id):
         class_ref = QuestionService.get_class(name)
@@ -44,6 +45,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         schema = QuestionService.get_schema(name, session=db.session)
         request_data = request.get_json()
         updated, errors = schema.load(request_data, instance=instance)
+
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.now()

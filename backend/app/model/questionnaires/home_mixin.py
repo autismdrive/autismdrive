@@ -21,7 +21,7 @@ class HomeMixin(object):
                     "type": "repeat",
                     "display_order": 3,
                     "wrappers": ["card"],
-                    "fields": Housemate().get_meta(),
+                    "repeat_class": Housemate,
                     "template_options": {
                         "label": "Who else lives there?",
                         "description": "Add a housemate",
