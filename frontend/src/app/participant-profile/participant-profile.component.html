@@ -3,7 +3,8 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="{{participant.avatar_img_url || dummyImgUrl}}"
+        src="/assets/avatars/{{participant.icon || '086'}}.svg"
+        [ngStyle]="{'background-color': participant.color || '#CCC'}"
       >
       <mat-card-title>
         {{participant.name}}
