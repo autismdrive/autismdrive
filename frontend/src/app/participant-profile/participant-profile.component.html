@@ -3,8 +3,9 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="/assets/avatars/{{participant.icon || '086'}}.svg"
+        src="/assets/avatars/{{participant.icon || '082'}}.svg"
         [ngStyle]="{'background-color': participant.color || '#CCC'}"
+        (click)="chooseAvatar($event, participant)"
       >
       <mat-card-title>
         {{participant.name}}

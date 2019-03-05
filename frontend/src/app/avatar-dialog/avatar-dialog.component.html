@@ -1,0 +1,36 @@
+<h1 mat-dialog-title>Select avatar for {{data.participant.id}}</h1>
+<div mat-dialog-content>
+  <p>Pick an image</p>
+  <mat-form-field>
+    <mat-select>
+      <mat-option
+        *ngFor="let avatarImage of avatarImages"
+        [value]="avatarImage"
+      >
+        <img src="/assets/avatars/{{avatarImage}}.svg"> {{avatarImage}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <p>Pick a color</p>
+  <mat-form-field>
+    <mat-select>
+      <mat-option
+        *ngFor="let avatarColor of avatarColors"
+        [value]="avatarColor"
+      >
+        <span
+          class="color-swatch"
+          [ngStyle]="{'background-color': avatarColor}"
+        ></span>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+</div>
+<div mat-dialog-actions>
+  <button
+    mat-button
+    (click)="onNoClick()"
+  >No Thanks</button>
+</div>
