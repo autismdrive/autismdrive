@@ -48,22 +48,28 @@ class HomeMixin(object):
             passive_deletes=True
         )
 
-    struggle_to_afford = db.Column(
-        db.Boolean,
-        info={
-            "display_order": 4,
-            "type": "radio",
-            "default_value": False,
-            "template_options": {
-                "required": False,
-                "label": '',
-                "options": [
-                    {"value": True, "label": "Yes"},
-                    {"value": False, "label": "No"},
-                ],
+    @declared_attr
+    def struggle_to_afford(cls):
+        return db.Column(
+            db.Boolean,
+            info={
+                "display_order": 4,
+                "type": "radio",
+                "default_value": False,
+                "template_options": {
+                    "required": False,
+                    "label": '',
+                    "options": [
+                        {"value": True, "label": "Yes"},
+                        {"value": False, "label": "No"},
+                    ],
+                },
+                "expression_properties": {
+                    "template_options": {
+                        "label": cls.struggle_to_afford
+                    }
+                },
             },
-            "expression_properties": {},
-        },
-    )
+        )
 
 

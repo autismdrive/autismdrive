@@ -9,6 +9,9 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
 
+    struggle_to_afford_label = '"Do you or " + (model.preferred_name) + "\'s other caregivers ever struggle with being ' \
+                               'able to afford to pay for household needs, food, or security for the family?"'
+
     dependent_living_situation = db.Column(
         db.ARRAY(db.String),
         info={
@@ -59,13 +62,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
         field_groups["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = \
             '"Who else lives with " + model.preferred_name + "?"'
         field_groups["field_groups"]["housemates"]["template_options"]["label"] = ''
-        return field_groups;
-
-    def update_meta(self, meta):
-        meta["struggle_to_afford"]["expression_properties"]["template_options.label"] = \
-            '"Do you or " + (model.preferred_name) + "\'s other caregivers ever struggle with being ' \
-            'able to afford to pay for household needs, food, or security for the family?"'
-        return meta
+        return field_groups
 
 
 class HomeDependentQuestionnaireSchema(ModelSchema):
