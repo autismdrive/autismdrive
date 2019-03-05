@@ -68,6 +68,7 @@ import { ParticipantProfileComponent } from './participant-profile/participant-p
 import { IntervalService } from './services/interval/interval.service';
 import { TimedoutComponent } from './timed-out/timed-out.component';
 import { LogoutComponent } from './logout/logout.component';
+import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -122,7 +123,8 @@ export class FormlyConfig {
     FlowComponent,
     ParticipantProfileComponent,
     TimedoutComponent,
-    LogoutComponent
+    LogoutComponent,
+    FlowCompleteComponent
   ],
   imports: [
     BrowserAnimationsModule,

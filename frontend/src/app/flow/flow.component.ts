@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import {Form, FormArray, FormGroup} from '@angular/forms';
+import { Form, FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import {FieldArrayType, FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import { keysToCamel} from 'src/util/snakeToCamel';
+import { FieldArrayType, FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { keysToCamel } from 'src/util/snakeToCamel';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
 import { Participant } from '../participant';
-import {Flow} from '../flow';
-import {Step, StepStatus} from '../step';
+import { Flow } from '../flow';
+import { Step, StepStatus } from '../step';
 
 
 @Component({
@@ -162,13 +162,13 @@ export class FlowComponent implements OnInit {
     if (this.currentStep().questionnaire_id > 0) {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
-        this.loadFlow(this.flow.name);
-      });
+          this.loadFlow(this.flow.name);
+        });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
         .subscribe(() => {
           this.loadFlow(this.flow.name);
-      });
+        });
     }
   }
 
