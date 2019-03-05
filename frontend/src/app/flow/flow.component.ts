@@ -26,7 +26,7 @@ export class FlowComponent implements OnInit {
 
   model: any = {};
   form: FormArray;
-  fields: FormlyFieldConfig;
+  fields = [];
   options: FormlyFormOptions;
 
   static clone(o: any): any {
@@ -83,6 +83,8 @@ export class FlowComponent implements OnInit {
       this.loadActiveStep();
     } else {
       console.log('This flow is already completed.');
+      this.activeStep = 0;
+      this.loadActiveStep();
     }
   }
 
@@ -121,7 +123,6 @@ export class FlowComponent implements OnInit {
 
 
   private renderForm(step: Step, q_meta) {
-    this.fields = {};
     this.fields = this.infoToForm(q_meta);
     console.log('Model: ', this.model);
     console.log('Fields: ', this.fields);
@@ -140,7 +141,7 @@ export class FlowComponent implements OnInit {
   }
 
   private infoToForm(info) {
-    const fields = []
+    const fields = [];
     for (const field of info.fields) {
       if (field.fieldArray) {
         field.fieldArray.model = this.model[field.name];
@@ -152,55 +153,6 @@ export class FlowComponent implements OnInit {
     return fields;
   }
 
-  private _infoToFormlyForm(info, fieldsType = 'fields'): FormlyFieldConfig {
-
-    console.log("info", info);
-    return info.fields;
-    const stepFields = [];
-    const formlyFields = {};
-
-    // Next process the Field Groups
-    if ('field_groups' in info) {
-      const field_groups = info['field_groups'];
-      Object.keys(field_groups).forEach(wrapperKey => {
-        // Clone the wrapper object so we can delete the original later
-        const wrapper = FlowComponent.clone(field_groups[wrapperKey]);
-        const fgFields = field_groups[wrapperKey].fields || [];
-
-        if (wrapper.type === 'repeat') {
-
-          wrapper.fieldArray = fgFields;
-
-
-        } else {
-          wrapper.fieldGroup = fgFields; // this._mapFieldnamesToFieldGroup(fgFields, info);
-          wrapper.fieldGroup.model = this.model;
-          console.log('FieldGroup: ', wrapper.fieldGroup);
-          // Remove the fields array from the wrapper object,
-          // since all its child fields are now inside the
-          // fieldGroup attribute
-          delete wrapper.fields;
-        }
-        stepFields.push(keysToCamel(wrapper));
-      });
-    }
-
-    //  Handle the remaining fields.
-    Object.keys(info).forEach(key => {
-      const item = info[key];
-      if (item && key !== 'table' && key !== 'field_groups') {
-        item.key = key;
-        item.name = key;
-        stepFields.push(keysToCamel(item));
-      }
-    });
-
-    stepFields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
-    formlyFields[fieldsType] = [];
-    stepFields.forEach(f => formlyFields[fieldsType].push(f));
-    // console.log('The Fields Are ', formlyFields);
-    return formlyFields;
-  }
 
   submit() {
     // force the correct participant id.
