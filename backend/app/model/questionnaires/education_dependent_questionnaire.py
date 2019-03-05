@@ -12,8 +12,8 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
     school_type_label = '"Is " + (model.preferred_name || "your child") + "\'s school:"'
     school_services_label = '"Please check the following services " + (model.preferred_name || "your child") + ' \
                             '" currently receives in school (check all that apply):"'
-    placement_other_label = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
-    current_grade_label = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
+    placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
+    current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
     dependent_placement = db.Column(
         db.String,

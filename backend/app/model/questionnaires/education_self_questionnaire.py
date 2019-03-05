@@ -12,8 +12,8 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
     school_type_label = '"Is this a public school, private school, or are you home schooled?"'
     school_services_label = '"Please check the following services you currently receive through your academic " \
                             "program (check all that apply):"'
-    placement_other_label = '!(model.self_placement && model.self_placement.schoolOther)'
-    current_grade_label = '!(model.self_placement && model.self_placement.highSchool)'
+    placement_other_hide_expression = '!(model.self_placement && model.self_placement.schoolOther)'
+    current_grade_hide_expression = '!(model.self_placement && model.self_placement.highSchool)'
 
     self_placement = db.Column(
         db.String,
