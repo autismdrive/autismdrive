@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { ApiService } from '../services/api/api.service';
 import { Flow } from '../flow';
 import { Step } from '../step';
@@ -8,8 +8,9 @@ import { Step } from '../step';
   templateUrl: './questionnaire-steps-list.component.html',
   styleUrls: ['./questionnaire-steps-list.component.scss'],
 })
-export class QuestionnaireStepsListComponent implements OnInit {
+export class QuestionnaireStepsListComponent implements OnInit, OnChanges {
   @Input() flow: Flow;
+  @Input() stepIndex: number;
   @Output()
   stepSelected: EventEmitter<Step> = new EventEmitter();
   stepName: string;
@@ -17,8 +18,12 @@ export class QuestionnaireStepsListComponent implements OnInit {
   constructor(private api: ApiService) {
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.stepName = this.flow.steps[this.stepIndex].name;
+  }
+
   ngOnInit() {
-    this.stepName = this.flow.steps[0].name;
+    this.stepName = this.flow.steps[this.stepIndex].name;
   }
 
   selectStep(step: Step) {

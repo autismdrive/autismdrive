@@ -6,7 +6,10 @@
   <h1 *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
     info</h1>
   <div>
+    <app-flow-complete *ngIf="flow.percentComplete() === 100">
+    </app-flow-complete>
     <mat-progress-bar
+      *ngIf="flow.percentComplete() < 100"
       mode="determinate"
       [value]="flow.percentComplete()"
     ></mat-progress-bar>
@@ -24,6 +27,7 @@
       >
         <app-questionnaire-steps-list
           [flow]="flow"
+          [stepIndex]="activeStep"
           (stepSelected)="goToStep($event)"
         >
         </app-questionnaire-steps-list>
