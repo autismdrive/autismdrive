@@ -69,7 +69,7 @@ export class ParticipantProfileComponent implements OnInit {
 
   chooseAvatar($event, participant): void {
     const dialogRef = this.dialog.open(AvatarDialogComponent, {
-      width: '250px',
+      width: `${window.innerWidth / 2}px`,
       data: { participant: participant }
     });
 

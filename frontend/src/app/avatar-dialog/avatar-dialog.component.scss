@@ -1,3 +1,106 @@
-mat-option .mat-option-text {
+$avatar_image_height: 96px;
+$color_swatch_height: 64px;
+$border_width: 8px;
+$button_padding: 48px;
+.avatar {
   height: 128px;
+  width: 128px;
+  border-radius: 50%;
+  img {
+    height: 128px;
+    width: 128px;
+  }
+}
+
+.avatar-images-row,
+.color-swatches-row {
+  position: relative;
+  overflow: hidden;
+  padding: 0px;
+  .scroll-left,
+  .scroll-right {
+    position: absolute;
+    height: 100%;
+    top: 0px;
+  }
+  .scroll-left,
+  .scroll-left:hover,
+  .scroll-left:active,
+  .scroll-left:focus {
+    background-image: linear-gradient(to right, #FFFFFFFF, #FFFFFFFF, #FFFFFF00);
+    left: 0px;
+    padding-right: $button_padding;
+  }
+  .scroll-right,
+  .scroll-right:hover,
+  .scroll-right:active,
+  .scroll-right:focus {
+    background-image: linear-gradient(to right, #FFFFFF00, #FFFFFFFF, #FFFFFFFF);
+    right: 0px;
+    padding-left: $button_padding;
+  }
+}
+
+.avatar-images,
+.color-swatches {
+  width: 100%;
+  overflow-x: scroll;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+}
+
+.avatar-images {
+  height: ($avatar_image_height + $border_width * 2);
+}
+
+.color-swatches {
+  height: ($color_swatch_height + $border_width * 2);
+}
+
+.color-swatch,
+.avatar-image {
+  border-color: transparent;
+  display: inline-block;
+  background: transparent;
+  border: transparent;
+  outline: none;
+  margin: 0px 0px 0px 10px;
+  padding: 0px;
+  border-radius: 50%;
+  &:first-of-type {
+    margin-left: ($button_padding * 2);
+  }
+  &:last-of-type {
+    margin-right: ($button_padding * 2);
+  }
+}
+
+.color-swatch {
+  width: $color_swatch_height;
+  height: $color_swatch_height;
+  &.color-swatch-active {
+    width: ($color_swatch_height + $border_width * 2);
+    height: ($color_swatch_height + $border_width * 2);
+  }
+}
+
+.avatar-image {
+  width: $avatar_image_height;
+  height: $avatar_image_height;
+  background: #EEEEEE;
+  img {
+    width: $avatar_image_height;
+    height: $avatar_image_height;
+  }
+  &.avatar-image-active {
+    width: ($avatar_image_height + $border_width * 2);
+    height: ($avatar_image_height + $border_width * 2);
+  }
+}
+
+.color-swatch-active,
+.avatar-image-active {
+  border-width: $border_width;
+  border-style: solid;
+  border-color: #999999;
 }
