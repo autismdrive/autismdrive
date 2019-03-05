@@ -2,13 +2,15 @@ $avatar_image_height: 96px;
 $color_swatch_height: 64px;
 $border_width: 8px;
 $button_padding: 48px;
+$white_1: rgba(255, 255, 255, 1);
+$white_0: rgba(255, 255, 255, 0);
 .avatar {
-  height: 128px;
-  width: 128px;
+  height: ($avatar_image_height * 2);
+  width: ($avatar_image_height * 2);
   border-radius: 50%;
   img {
-    height: 128px;
-    width: 128px;
+    height: ($avatar_image_height * 2);
+    width: ($avatar_image_height * 2);
   }
 }
 
@@ -27,7 +29,7 @@ $button_padding: 48px;
   .scroll-left:hover,
   .scroll-left:active,
   .scroll-left:focus {
-    background-image: linear-gradient(to right, #FFFFFFFF, #FFFFFFFF, #FFFFFF00);
+    background-image: linear-gradient(to right, $white_1, $white_1, $white_0);
     left: 0px;
     padding-right: $button_padding;
   }
@@ -35,7 +37,7 @@ $button_padding: 48px;
   .scroll-right:hover,
   .scroll-right:active,
   .scroll-right:focus {
-    background-image: linear-gradient(to right, #FFFFFF00, #FFFFFFFF, #FFFFFFFF);
+    background-image: linear-gradient(to right, $white_0, $white_1, $white_1);
     right: 0px;
     padding-left: $button_padding;
   }
@@ -59,10 +61,11 @@ $button_padding: 48px;
 
 .color-swatch,
 .avatar-image {
-  border-color: transparent;
+  border-width: $border_width;
+  border-style: solid;
+  border-color: white;
   display: inline-block;
   background: transparent;
-  border: transparent;
   outline: none;
   margin: 0px 0px 0px 10px;
   padding: 0px;
@@ -78,29 +81,19 @@ $button_padding: 48px;
 .color-swatch {
   width: $color_swatch_height;
   height: $color_swatch_height;
-  &.color-swatch-active {
-    width: ($color_swatch_height + $border_width * 2);
-    height: ($color_swatch_height + $border_width * 2);
-  }
 }
 
 .avatar-image {
-  width: $avatar_image_height;
-  height: $avatar_image_height;
+  width: ($avatar_image_height + ($border_width * 2));
+  height: ($avatar_image_height + ($border_width * 2));
   background: #EEEEEE;
   img {
     width: $avatar_image_height;
     height: $avatar_image_height;
   }
-  &.avatar-image-active {
-    width: ($avatar_image_height + $border_width * 2);
-    height: ($avatar_image_height + $border_width * 2);
-  }
 }
 
 .color-swatch-active,
 .avatar-image-active {
-  border-width: $border_width;
-  border-style: solid;
   border-color: #999999;
 }

@@ -3,6 +3,7 @@ import { Participant } from '../participant';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ParticipantProfileComponent } from '../participant-profile/participant-profile.component';
 import { ApiService } from '../services/api/api.service';
+import { ParticipantRelationship } from '../participantRelationship';
 
 export interface DialogData {
   participant: Participant;
@@ -32,6 +33,9 @@ export class AvatarDialogComponent implements OnInit {
       this.avatarColors[i] = `hsl(${i * 16},100%,80%)`;
     }
 
+    this.selectedIcon = this.data.participant.avatar_icon || '001';
+    this.selectedColor = this.data.participant.avatar_color || `hsl(0,100%,80%)`;
+
     this.dialogRef.afterOpen().subscribe(() => {
       const imageEl = document.getElementsByClassName('avatar-image-active')[0] as HTMLElement;
       const colorEl = document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
@@ -54,12 +58,34 @@ export class AvatarDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  getPrompt(): string {
+    const isSelf = this.data.participant.relationship !== ParticipantRelationship.DEPENDENT;
+    const subj = isSelf ? 'your' : `${this.data.participant.name || 'your child'}'s`;
+    return `Choose ${subj} avatar`;
+  }
+
   setColor(color: string) {
     this.selectedColor = color;
   }
 
   setImage(image: string) {
     this.selectedIcon = image;
+  }
+
+  isSelectedImage(avatarImage: string): boolean {
+    if (this.selectedIcon) {
+      return avatarImage === this.selectedIcon;
+    } else {
+      return avatarImage === this.data.participant.avatar_icon;
+    }
+  }
+
+  isSelectedColor(avatarColor: string): boolean {
+    if (this.selectedColor) {
+      return avatarColor === this.selectedColor;
+    } else {
+      return avatarColor === this.data.participant.avatar_color;
+    }
   }
 
   scroll($event: MouseEvent, className: string, direction: string) {
