@@ -1,4 +1,4 @@
-from marshmallow import fields
+from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
@@ -68,6 +68,10 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
 
 
 class HomeDependentQuestionnaireSchema(ModelSchema):
+    @pre_load
+    def set_field_session(self, data):
+        self.fields['housemates'].schema.session = self.session
+
     class Meta:
         model = HomeDependentQuestionnaire
         fields = (

@@ -39,7 +39,9 @@ class CurrentBehaviorsMixin(object):
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {}
+                "expression_properties": {
+                    "template_options.label": cls.has_academic_difficulties_label,
+                },
             },
         )
 

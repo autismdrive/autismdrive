@@ -31,14 +31,15 @@ class EvaluationHistoryMixin(object):
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
-                    "label": cls.self_identifies_autistic_label,
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.self_identifies_autistic_label
+                },
             },
         )
 
@@ -51,14 +52,15 @@ class EvaluationHistoryMixin(object):
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
-                    "label": cls.has_autism_diagnosis_label,
                     "required": True,
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.has_autism_diagnosis_label
+                },
             },
         )
 
@@ -70,10 +72,11 @@ class EvaluationHistoryMixin(object):
                 "display_order": 3,
                 "type": "input",
                 "template_options": {
-                    "label": cls.years_old_at_first_diagnosis_label,
                     "required": True,
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.years_old_at_first_diagnosis_label
+                },
             },
         )
 
@@ -85,7 +88,6 @@ class EvaluationHistoryMixin(object):
                 "display_order": 4,
                 "type": "select",
                 "template_options": {
-                    "label": cls.who_diagnosed_label,
                     "required": True,
                     "options": [
                         {
@@ -102,7 +104,9 @@ class EvaluationHistoryMixin(object):
                         {"value": "diagnosisOther", "label": "Other"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.who_diagnosed_label,
+                },
             },
         )
 
@@ -124,7 +128,6 @@ class EvaluationHistoryMixin(object):
                 "display_order": 6,
                 "type": "select",
                 "template_options": {
-                    "label": cls.where_diagnosed_label,
                     "required": True,
                     "options": [
                         {"value": "1uvaDp", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children's Rehabilitation Center, KCRC)"},
@@ -155,7 +158,9 @@ class EvaluationHistoryMixin(object):
                         {"value": "diagnosisOther", "label": "Other"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.where_diagnosed_label,
+                },
             },
         )
 
@@ -199,14 +204,15 @@ class EvaluationHistoryMixin(object):
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
-                    "label": cls.gives_permission_to_link_evaluation_data_label,
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.gives_permission_to_link_evaluation_data_label,
+                },
                 "hide_expression": "!(model.partner_centers_evaluation && (model.partner_centers_evaluation.uva "
                                    "|| model.partner_centers_evaluation.sjc || model.partner_centers_evaluation.via "
                                    "|| model.partner_centers_evaluation.fc || model.partner_centers_evaluation.inova))",
@@ -222,14 +228,15 @@ class EvaluationHistoryMixin(object):
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
-                    "label": cls.has_iq_test_label,
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.has_iq_test_label,
+                },
             },
         )
 
@@ -241,10 +248,11 @@ class EvaluationHistoryMixin(object):
                 "display_order": 11,
                 "type": "input",
                 "template_options": {
-                    "label": cls.recent_iq_score_label,
                     "placeholder": "IQ score"
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.recent_iq_score_label
+                },
                 "hide_expression": "!(model.has_iq_test)",
             },
         )

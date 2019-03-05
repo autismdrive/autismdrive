@@ -8,10 +8,10 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_self_questionnaire"
     __label__ = "Education"
 
-    attends_school_label = "Do you attend an academic program, such as a school, college, or university?"
-    school_type_label = "Is this a public school, private school, or are you home schooled?"
-    school_services_label = "Please check the following services you currently receive through your academic program " \
-                            "(check all that apply):"
+    attends_school_label = '"Do you attend an academic program, such as a school, college, or university?"'
+    school_type_label = '"Is this a public school, private school, or are you home schooled?"'
+    school_services_label = '"Please check the following services you currently receive through your academic " \
+                            "program (check all that apply):"'
     placement_other_label = '!(model.self_placement && model.self_placement.schoolOther)'
     current_grade_label = '!(model.self_placement && model.self_placement.highSchool)'
 

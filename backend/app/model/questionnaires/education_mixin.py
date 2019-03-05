@@ -31,14 +31,15 @@ class EducationMixin(object):
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
-                    "label": cls.attends_school_label,
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {}
+                "expression_properties": {
+                    "template_options.label": cls.attends_school_label,
+                },
             },
         )
 
@@ -62,7 +63,6 @@ class EducationMixin(object):
                 "display_order": 3,
                 "type": "radio",
                 "template_options": {
-                    "label": cls.school_type_label,
                     "required": False,
                     "options":[
                         {"value": "public", "label": "Public"},
@@ -70,7 +70,9 @@ class EducationMixin(object):
                         {"value": "homeschool", "label": "Home School"},
                     ]
                 },
-                "expression_properties": {}
+                "expression_properties": {
+                    "template_options.label": cls.school_type_label,
+                },
             },
         )
 
