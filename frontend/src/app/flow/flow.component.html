@@ -22,7 +22,10 @@
         [mode]="'side'"
         [opened]="true"
       >
-        <app-questionnaire-steps-list [flow]="flow" (stepSelected)="goToStep($event)">
+        <app-questionnaire-steps-list
+          [flow]="flow"
+          (stepSelected)="goToStep($event)"
+        >
         </app-questionnaire-steps-list>
       </mat-drawer>
       <mat-drawer-content>

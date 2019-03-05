@@ -65,9 +65,7 @@ class HomeMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options": {
-                        "label": cls.struggle_to_afford_label
-                    }
+                    "template_options.label": cls.struggle_to_afford_label
                 },
             },
         )

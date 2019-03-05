@@ -60,10 +60,9 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     },
                 }
 
-        field_groups["housemates"]["expression_properties"]["template_options.label"] = \
-            '"Who else lives with " + model.preferred_name + "?"'
+        field_groups["housemates"]["expression_properties"]["template_options"] = \
+            {"label": '"Who else lives with " + (model.preferred_name) + "?"'}
 
-        field_groups["housemates"]["template_options"]["label"] = ''
         return field_groups
 
 

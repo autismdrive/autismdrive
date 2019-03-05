@@ -1,11 +1,14 @@
 <mat-nav-list *ngFor="let step of flow.steps">
-  <span (click)="selectStep(step)">
+  <mat-list-item
+    (click)="selectStep(step)"
+    [ngClass]="{'active': stepName === step.name}"
+  >
     {{step.label}}
     <span fxFlex></span>
     <mat-icon *ngIf="step.status === 'COMPLETE'">done</mat-icon>
-  </span>
+  </mat-list-item>
 </mat-nav-list>
 
 <mat-nav-list *ngIf="flow.steps.length === 0">
-  <a mat-list-item>Loading...</a>
+  <mat-list-item>Loading...</mat-list-item>
 </mat-nav-list>

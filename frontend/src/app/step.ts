@@ -3,6 +3,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 export interface Step {
   name: string;
   question_type: string;
+  description: string;
   label: string;
   status: string;
   date_completed: Date;
