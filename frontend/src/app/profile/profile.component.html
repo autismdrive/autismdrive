@@ -59,10 +59,10 @@
           >Enroll yourself</button>
 
           <button
-            *ngIf="user.getDependents().length === 0"
+            *ngIf="user.getSelf() && user.getDependents().length === 0"
             mat-flat-button
             color="primary"
-            (click)="enrollGuardian($event)"
+            (click)="enrollDependent($event)"
           >Enroll a dependent</button>
 
           <button

@@ -1,7 +1,8 @@
+from marshmallow import fields
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
-from app.model.questionnaires.housemate import Housemate
+from app.model.questionnaires.housemate import Housemate, HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
 
 
@@ -59,9 +60,10 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     },
                 }
 
-        field_groups["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = \
+        field_groups["housemates"]["expression_properties"]["template_options.label"] = \
             '"Who else lives with " + model.preferred_name + "?"'
-        field_groups["field_groups"]["housemates"]["template_options"]["label"] = ''
+
+        field_groups["housemates"]["template_options"]["label"] = ''
         return field_groups
 
 
@@ -78,3 +80,4 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
+    housemates = fields.Nested(HousemateSchema, many=True)
