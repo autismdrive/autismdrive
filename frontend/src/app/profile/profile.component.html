@@ -26,7 +26,7 @@
   </div>
 
   <div *ngIf="state !== possibleStates.NO_PARTICIPANT">
-    <h1>{{user.getSelf() ? user.getSelf().name + '\'s': 'Your'}} profile</h1>
+    <h1>{{user.getSelf().name ? user.getSelf().name + '\'s': 'Your'}} profile</h1>
     <div>
       <h2>Your STAR DRIVE Profile is only 10% complete!</h2>
       <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
