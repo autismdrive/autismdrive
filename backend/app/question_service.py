@@ -122,7 +122,11 @@ class QuestionService:
                 meta_copy[k] = []
                 for sv in v:
                     if type(sv) is dict:
-                        meta_copy[k].append(QuestionService._recursive_relationship_changes(sv, relationship))
+                        if "RELATIONSHIP_REQUIRED" in sv and not relationship.name in sv['RELATIONSHIP_REQUIRED']:
+                            # skip it.
+                            pass
+                        else:
+                            meta_copy[k].append(QuestionService._recursive_relationship_changes(sv, relationship))
                     else:
                         meta_copy[k].append(sv)
             else:
