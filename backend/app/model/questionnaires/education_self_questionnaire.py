@@ -41,6 +41,7 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
             "placement_other",
             "current_grade"
         ]
+        return field_groups
 
 
 class EducationSelfQuestionnaireSchema(ModelSchema):
