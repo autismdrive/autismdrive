@@ -10,7 +10,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
     __label__ = "Home"
 
-    struggle_to_afford_label = "Do you ever struggle with being able to afford to pay for household needs, food, or security?"
+    struggle_to_afford_label = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
 
     self_living_situation = db.Column(
         db.ARRAY(db.String),
