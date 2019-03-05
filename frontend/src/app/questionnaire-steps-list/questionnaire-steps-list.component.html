@@ -1,16 +1,14 @@
-<mat-nav-list *ngFor="let step of steps">
-  <a
-    *ngIf="step && step.name && participant"
-    mat-list-item
-    [routerLink]="['/participant/' + participant.id + '/' + flow.name + '/' + step.name]"
-    routerLinkActive="router-link-active"
+<mat-nav-list *ngFor="let step of flow.steps">
+  <mat-list-item
+    (click)="selectStep(step)"
+    [ngClass]="{'active': stepName === step.name}"
   >
     {{step.label}}
     <span fxFlex></span>
-    <mat-icon *ngIf="isStepComplete(step.name)">done</mat-icon>
-  </a>
+    <mat-icon *ngIf="step.status === 'COMPLETE'">done</mat-icon>
+  </mat-list-item>
 </mat-nav-list>
 
-<mat-nav-list *ngIf="steps.length === 0">
-  <a mat-list-item>Loading...</a>
+<mat-nav-list *ngIf="flow.steps.length === 0">
+  <mat-list-item>Loading...</mat-list-item>
 </mat-nav-list>

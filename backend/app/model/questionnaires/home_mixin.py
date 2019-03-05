@@ -21,7 +21,7 @@ class HomeMixin(object):
                     "type": "repeat",
                     "display_order": 3,
                     "wrappers": ["card"],
-                    "fields": Housemate().get_meta(),
+                    "repeat_class": Housemate,
                     "template_options": {
                         "label": "Who else lives there?",
                         "description": "Add a housemate",
@@ -45,33 +45,29 @@ class HomeMixin(object):
             "Housemate",
             backref=db.backref(cls.__tablename__, lazy=True),
             cascade="all, delete-orphan",
-            passive_deletes=True,
+            passive_deletes=True
+        )
+
+    @declared_attr
+    def struggle_to_afford(cls):
+        return db.Column(
+            db.Boolean,
             info={
-                "display_order": 3,
-                "type": "repeat",
+                "display_order": 4,
+                "type": "radio",
+                "default_value": False,
                 "template_options": {
                     "required": False,
-                    "label": ''
+                    "label": '',
+                    "options": [
+                        {"value": True, "label": "Yes"},
+                        {"value": False, "label": "No"},
+                    ],
+                },
+                "expression_properties": {
+                    "template_options.label": cls.struggle_to_afford_label
                 },
             },
         )
-
-    struggle_to_afford = db.Column(
-        db.Boolean,
-        info={
-            "display_order": 4,
-            "type": "radio",
-            "default_value": False,
-            "template_options": {
-                "required": False,
-                "label": '',
-                "options": [
-                    {"value": True, "label": "Yes"},
-                    {"value": False, "label": "No"},
-                ],
-            },
-            "expression_properties": {},
-        },
-    )
 
 

@@ -46,8 +46,15 @@ class QuestionService:
 
     @staticmethod
     def get_meta(questionnaire, relationship):
-        meta = {}
-        meta['field_groups'] = questionnaire.get_field_groups()
+        meta = {"table": {}}
+        if 'question_type' in meta['table']:
+            meta["table"]['question_type'] = questionnaire.__question_type__
+        if 'label' in meta['table']:
+            meta["table"]["label"] = questionnaire.__label__
+        meta["fields"] = []
+
+        groups = questionnaire.get_field_groups()
+        if groups is None: groups = {}
 
         # This will move fields referenced by the field groups into the group, but will otherwise add them
         # the base meta object if they are not contained within a group.
@@ -56,31 +63,42 @@ class QuestionService:
                 c.info['name'] = c.name
                 c.info['key'] = c.name
                 added = False
-                for group_name, value in meta['field_groups'].items():
-                    if "fields" in value:
-                        if c.name in value['fields']:
-                            meta['field_groups'][group_name]['fields'].remove(c.name)
-                            meta['field_groups'][group_name]['fields'].append(c.info)
+                for group, values in groups.items():
+                    if "fields" in values:
+                        if c.name in values['fields']:
+                            values['fields'].remove(c.name)
+                            if'fieldGroup' not in values: values['fieldGroup'] = []
+                            values['fieldGroup'].append(c.info)
                             added = True
-                            print(c.name + "is in group")
                 if not added:
-                    meta[c.name] = c.info
+                    meta['fields'].append(c.info)
 
-        try:
-            meta = questionnaire.update_meta(meta)
-        except AttributeError:
+        for group,values in groups.items():
+            values['name'] = group
+#            if value['type'] == 'repeat':
+#                value['fieldArray'] = value.pop('fields')
+            if "repeat_class" in values:
+                values['key'] = group  # Only include the key on the group if an actual sub-class exists.
+                values['fields'] = QuestionService.get_meta(values["repeat_class"](), relationship)['fields']
+                values.pop('repeat_class')
+
+            if 'type' in values and values['type'] == 'repeat':
+                values['fieldArray'] = {'fieldGroup': values.pop('fields')}
+            meta['fields'].append(values)
+
+
+  #      try:
+   #         meta = questionnaire.update_meta(meta)
+#        except AttributeError:
             # Questionnaire doesn't have to implement this method.
-            pass
+ #           pass
 
-        # Add table metadata
-        if not "table" in meta:
-            meta["table"] = {}
-        meta["table"]["question_type"] = questionnaire.__question_type__
-        meta["table"]["label"] = questionnaire.__label__
+
+        # Rename filed_groups to be "
 
         # loops through the depths, checks, and replaces ....
         meta_relationed = QuestionService._recursive_relationship_changes(meta, relationship)
-        return {"get_meta": meta_relationed}
+        return meta_relationed
 
     @staticmethod
     # this evil method recurses down through the metadata, removing items that have a
@@ -100,6 +118,17 @@ class QuestionService:
                         # Otherwise, it should not be included in the copy.
                 else:
                     meta_copy[k] = QuestionService._recursive_relationship_changes(v, relationship)
+            elif type(v) is list:
+                meta_copy[k] = []
+                for sv in v:
+                    if type(sv) is dict:
+                        if "RELATIONSHIP_REQUIRED" in sv and not relationship.name in sv['RELATIONSHIP_REQUIRED']:
+                            # skip it.
+                            pass
+                        else:
+                            meta_copy[k].append(QuestionService._recursive_relationship_changes(sv, relationship))
+                    else:
+                        meta_copy[k].append(sv)
             else:
                 meta_copy[k] = v
         return meta_copy

@@ -63,12 +63,13 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
-import { EnrollmentFlowComponent } from './enrollment-flow/enrollment-flow.component';
+import { FlowComponent } from './flow/flow.component';
 import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 import { IntervalService } from './services/interval/interval.service';
 import { TimedoutComponent } from './timed-out/timed-out.component';
 import { LogoutComponent } from './logout/logout.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
+import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -120,11 +121,12 @@ export class FormlyConfig {
     QuestionnaireStepsListComponent,
     QuestionnaireStepComponent,
     RepeatSectionComponent,
-    EnrollmentFlowComponent,
+    FlowComponent,
     ParticipantProfileComponent,
     TimedoutComponent,
     LogoutComponent,
-    AvatarDialogComponent
+    AvatarDialogComponent,
+    FlowCompleteComponent
   ],
   imports: [
     BrowserAnimationsModule,

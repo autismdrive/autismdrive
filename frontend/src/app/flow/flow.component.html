@@ -6,7 +6,10 @@
   <h1 *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
     info</h1>
   <div>
+    <app-flow-complete *ngIf="flow.percentComplete() === 100">
+    </app-flow-complete>
     <mat-progress-bar
+      *ngIf="flow.percentComplete() < 100"
       mode="determinate"
       [value]="flow.percentComplete()"
     ></mat-progress-bar>
@@ -19,52 +22,54 @@
 
     <mat-drawer-container *ngIf="!loading">
       <mat-drawer
-        *ngIf="user && stepNames"
         [mode]="'side'"
         [opened]="true"
       >
         <app-questionnaire-steps-list
-          [user]="user"
-          [participant]="participant"
           [flow]="flow"
-          [stepNames]="stepNames"
-        ></app-questionnaire-steps-list>
+          [stepIndex]="activeStep"
+          (stepSelected)="goToStep($event)"
+        >
+        </app-questionnaire-steps-list>
       </mat-drawer>
       <mat-drawer-content>
         <form
-          *ngIf="form && model && step && options"
+          *ngIf="form && model && fields && options"
           [formGroup]="form"
           class="pad-2"
         >
-          <h1>{{ step.label }}</h1>
-          <p>{{ step.description }}</p>
+          <h1>{{ currentStep().label }}</h1>
+          <p>{{ currentStep().description }}</p>
 
           <formly-form
             [form]="form.at(activeStep)"
             [model]="model"
-            [fields]="step.fields"
+            [fields]="fields"
             [options]="options"
           >
           </formly-form>
 
           <div class="button-row">
+            <!--
             <button
               mat-flat-button
               type="button"
               (click)="prevStep(activeStep)"
             >Back</button>
+            -->
             <button
               mat-flat-button
               type="button"
-              [disabled]="!form.at(activeStep).valid"
-              (click)="nextStep(activeStep)"
+              (click)="submit()"
             >Save &amp; Next</button>
+            <!--
             <button
               mat-flat-button
               [disabled]="!form.valid"
               type="submit"
               (click)="submit()"
             >Submit</button>
+            -->
           </div>
         </form>
       </mat-drawer-content>

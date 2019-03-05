@@ -10,6 +10,8 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
     __label__ = "Home"
 
+    struggle_to_afford_label = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
+
     self_living_situation = db.Column(
         db.ARRAY(db.String),
         info={
@@ -53,11 +55,6 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     "template_options": {"label": "Current Living Situation"},
                 }
         return field_groups
-
-    def update_meta(self, meta):
-        meta["struggle_to_afford"]["template_options"]["label"] = \
-            "Do you ever struggle with being able to afford to pay for household needs, food, or security?"
-        return meta
 
 
 class HomeSelfQuestionnaireSchema(ModelSchema):

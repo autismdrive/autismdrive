@@ -8,6 +8,13 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
     __label__ = "Education"
 
+    attends_school_label = '"Does " + (model.preferred_name || "your child") + " attend school?"'
+    school_type_label = '"Is " + (model.preferred_name || "your child") + "\'s school:"'
+    school_services_label = '"Please check the following services " + (model.preferred_name || "your child") + ' \
+                            '" currently receives in school (check all that apply):"'
+    placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
+    current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
+
     dependent_placement = db.Column(
         db.String,
         info={
@@ -42,21 +49,6 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
             "current_grade"
         ]
         return field_groups
-
-    def update_meta(self, meta):
-        meta["attends_school"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (model.preferred_name || "your child") + " attend school?"'
-        meta["school_type"]["expression_properties"]["template_options.label"] = \
-            '"Is " + (model.preferred_name || "your child") + "\'s school:"'
-        meta["school_services"]["expression_properties"]["template_options.label"] = \
-            '"Please check the following services " + (model.preferred_name || "your child") + ' \
-            '" currently receives in school (check all that apply):"'
-        meta["placement_other"]["hide_expression"] = \
-            '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
-        meta["current_grade"]["hide_expression"] = \
-            '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
-
-        return meta
 
 
 class EducationDependentQuestionnaireSchema(ModelSchema):

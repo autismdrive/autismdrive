@@ -4,7 +4,10 @@ from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.participant import Participant
+from app.model.questionnaires.assistive_device import AssistiveDevice
 from app.model.questionnaires.housemate import Housemate
+from app.model.questionnaires.medication import Medication
+from app.model.questionnaires.therapy import Therapy
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
@@ -291,6 +294,9 @@ class DataLoader():
         db.session.query(HomeDependentQuestionnaire).delete()
         db.session.query(HomeSelfQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
+        db.session.query(Medication).delete();
+        db.session.query(AssistiveDevice).delete();
+        db.session.query(Therapy).delete();
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()
         db.session.query(ResourceCategory).delete()

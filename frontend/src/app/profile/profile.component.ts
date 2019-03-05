@@ -62,8 +62,8 @@ export class ProfileComponent implements OnInit {
     });
 
     this.api.addParticipant(newParticipant).subscribe(participant => {
-      console.log('Navigating to participant/', participant.id, '/', flow);
-      this.router.navigate(['participant', participant.id, flow]);
+      console.log('Navigating to flow/', flow, '/', participant.id);
+      this.router.navigate(['flow', flow,  participant.id]);
     });
   }
 }

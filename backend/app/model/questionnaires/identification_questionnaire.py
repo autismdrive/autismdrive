@@ -234,4 +234,6 @@ class IdentificationQuestionnaireSchema(ModelSchema):
             "birth_city",
             "birth_state",
             "is_english_primary",
+            "relationship_to_participant",
+            "relationship_to_participant_other"
         )

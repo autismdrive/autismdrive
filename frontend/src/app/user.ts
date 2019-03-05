@@ -44,6 +44,15 @@ export class User {
     return this.participants.filter(p => !this.isSelf(p));
   }
 
+  getParticipantById(participantId: number): Participant  {
+    for (const p of this.participants) {
+      if (p.id === participantId) {
+        return p;
+      }
+    }
+    throw Error('The user does not have a participant with the given id.');
+  }
+
   getState() {
     if (this.getSelf() === undefined) {
       return ProfileState.NO_PARTICIPANT;

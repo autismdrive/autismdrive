@@ -7,6 +7,9 @@ from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMix
 class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_self_questionnaire"
 
+    has_academic_difficulties_label = "Do you have any difficulties with academics?"
+    academic_difficulty_areas_label = "What areas of academics are difficult for you?"
+
     self_verbal_ability = db.Column(
         db.ARRAY(db.String),
         info={
@@ -31,12 +34,7 @@ class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
     )
 
     def get_field_groups(self):
-        return super.get_field_groups()
-
-    def update_meta(self, meta):
-        meta["has_academic_difficulties"]["template_options"]["label"] = "Do you have any difficulties with academics?"
-        meta["academic_difficulty_areas"]["template_options"]["label"] = "What areas of academics are difficult for you?"
-        return meta
+        return super().get_field_groups()
 
 
 class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):

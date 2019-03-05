@@ -205,29 +205,15 @@ class AssistiveDevice(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {
-            "field_groups": {
-                "type": {
-                    "fields": ["type", "type_other"],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Type of assistive device"},
-                }
-            },
+    def get_field_groups(self):
+        return {
+            "type": {
+                "fields": ["type", "type_other"],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {"label": "Type of assistive device"},
+            }
         }
-        for c in self.metadata.tables["assistive_device"].columns:
-            if c.info:
-                if c.name in info["field_groups"]["type"]["fields"]:
-                    info["field_groups"]["type"]["fields"].remove(c.name)
-                    info["field_groups"]["type"]["fields"].append(c.info)
-                else:
-                    info[c.name] = c.info
-
-
-
-        return info
-
 
 
 class AssistiveDeviceSchema(ModelSchema):

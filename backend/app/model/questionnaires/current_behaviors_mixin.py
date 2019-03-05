@@ -24,43 +24,51 @@ class CurrentBehaviorsMixin(object):
     def user_id(cls):
         return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
 
-    has_academic_difficulties = db.Column(
-        db.Boolean,
-        info={
-            "display_order": 3,
-            "type": "radio",
-            "template_options": {
-                "label": '',
-                "required": False,
-                "options": [
-                    {"value": True, "label": "Yes"},
-                    {"value": False, "label": "No"},
-                ],
+    @declared_attr
+    def has_academic_difficulties(cls):
+        return db.Column(
+            db.Boolean,
+            info={
+                "display_order": 3,
+                "type": "radio",
+                "template_options": {
+                    "label": cls.has_academic_difficulties_label,
+                    "required": False,
+                    "options": [
+                        {"value": True, "label": "Yes"},
+                        {"value": False, "label": "No"},
+                    ],
+                },
+                "expression_properties": {
+                    "template_options.label": cls.has_academic_difficulties_label,
+                },
             },
-            "expression_properties": {}
-        },
-    )
-    academic_difficulty_areas = db.Column(
-        db.ARRAY(db.String),
-        info={
-            "display_order": 4,
-            "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
-            "template_options": {
-                "type": "array",
-                "label": '',
-                "required": True,
-                "options": [
-                    {"value": "math", "label": "Math"},
-                    {"value": "reading", "label": "Reading"},
-                    {"value": "writing", "label": "Writing"},
-                    {"value": "other", "label": "Other"},
-                ],
+        )
+
+    @declared_attr
+    def academic_difficulty_areas(cls):
+        return db.Column(
+            db.ARRAY(db.String),
+            info={
+                "display_order": 4,
+                "type": "multicheckbox",
+                "class_name": "vertical-checkbox-group",
+                "template_options": {
+                    "type": "array",
+                    "label": cls.academic_difficulty_areas_label,
+                    "required": True,
+                    "options": [
+                        {"value": "math", "label": "Math"},
+                        {"value": "reading", "label": "Reading"},
+                        {"value": "writing", "label": "Writing"},
+                        {"value": "other", "label": "Other"},
+                    ],
+                },
+                "expression_properties": {},
+                "hide_expression": "!(model.has_academic_difficulties)",
             },
-            "expression_properties": {},
-            "hide_expression": "!(model.has_academic_difficulties)",
-        },
-    )
+        )
+
     academic_difficulty_other = db.Column(
         db.String,
         info={

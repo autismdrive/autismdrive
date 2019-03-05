@@ -22,22 +22,27 @@ class EducationMixin(object):
     def user_id(cls):
         return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
 
-    attends_school = db.Column(
-        db.Boolean,
-        info={
-            "display_order": 1,
-            "type": "radio",
-            "default_value": True,
-            "template_options": {
-                "required": False,
-                "options": [
-                    {"value": True, "label": "Yes"},
-                    {"value": False, "label": "No"},
-                ],
+    @declared_attr
+    def attends_school(cls):
+        return db.Column(
+            db.Boolean,
+            info={
+                "display_order": 1,
+                "type": "radio",
+                "default_value": True,
+                "template_options": {
+                    "required": False,
+                    "options": [
+                        {"value": True, "label": "Yes"},
+                        {"value": False, "label": "No"},
+                    ],
+                },
+                "expression_properties": {
+                    "template_options.label": cls.attends_school_label,
+                },
             },
-            "expression_properties": {}
-        },
-    )
+        )
+
     school_name = db.Column(
         db.String,
         info={
@@ -49,67 +54,87 @@ class EducationMixin(object):
             },
         },
     )
-    school_type = db.Column(
-        db.String,
-        info={
-            "display_order": 3,
-            "type": "radio",
-            "template_options": {
-                "label": '',
-                "required": False,
-                "options":[
-                    {"value": "public", "label": "Public"},
-                    {"value": "private", "label": "Private"},
-                    {"value": "homeschool", "label": "Home School"},
-                ]
+
+    @declared_attr
+    def school_type(cls):
+        return db.Column(
+            db.String,
+            info={
+                "display_order": 3,
+                "type": "radio",
+                "template_options": {
+                    "required": False,
+                    "options":[
+                        {"value": "public", "label": "Public"},
+                        {"value": "private", "label": "Private"},
+                        {"value": "homeschool", "label": "Home School"},
+                    ]
+                },
+                "expression_properties": {
+                    "template_options.label": cls.school_type_label,
+                },
             },
-            "expression_properties": {}
-        },
-    )
-    placement_other = db.Column(
-        db.String,
-        info={
-            "display_order": 4.3,
-            "type": "input",
-            "template_options": {"placeholder": "Enter school placement"},
-        },
-    )
-    current_grade = db.Column(
-        db.String,
-        info={
-            "display_order": 5,
-            "type": "input",
-            "template_options": {"placeholder": "Enter grade"},
-        },
-    )
-    school_services = db.Column(
-        db.ARRAY(db.String),
-        info={
-            "display_order": 6.1,
-            "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
-            "template_options": {
-                "type": "array",
-                "label": '',
-                "required": False,
-                "options": [
-                    {"value": "504mod", "label": "504 Modification Plan"},
-                    {"value": "iep", "label": "Individualized Education Program (IEP)"},
-                    {"value": "1:1aide", "label": "1:1 aide or paraprofessional in classroom"},
-                    {"value": "partTimeInstruction", "label": "Part-time specialized instruction in a resource room or "
-                                                              "special education classroom"},
-                    {"value": "fullTimeInstruction", "label": "Full-time specialized instruction in a resource room or "
-                                                              "special education classroom"},
-                    {"value": "specializedSchool", "label": "Specialized school for special learning needs"},
-                    {"value": "dayTreatment", "label": "Day treatment or residential center"},
-                    {"value": "disabilitySupports", "label": "Disability supports services (at college/vocational "
-                                                             "school)"},
-                    {"value": "servicesOther", "label": "Other"},
-                ],
+        )
+
+    @declared_attr
+    def placement_other(cls):
+        return db.Column(
+            db.String,
+            info={
+                "display_order": 4.3,
+                "type": "input",
+                "template_options": {
+                    "placeholder": "Enter school placement"
+                },
+                "hide_expression": cls.placement_other_hide_expression,
             },
-            "expression_properties": {}
-        },
-    )
+        )
+
+    @declared_attr
+    def current_grade(cls):
+        return db.Column(
+            db.String,
+            info={
+                "display_order": 5,
+                "type": "input",
+                "template_options": {
+                    "placeholder": "Enter grade"
+                },
+                "hide_expression": cls.current_grade_hide_expression,
+            },
+        )
+
+    @declared_attr
+    def school_services(cls):
+        return db.Column(
+            db.ARRAY(db.String),
+            info={
+                "display_order": 6.1,
+                "type": "multicheckbox",
+                "class_name": "vertical-checkbox-group",
+                "template_options": {
+                    "type": "array",
+                    "label": cls.school_services_label,
+                    "required": False,
+                    "options": [
+                        {"value": "504mod", "label": "504 Modification Plan"},
+                        {"value": "iep", "label": "Individualized Education Program (IEP)"},
+                        {"value": "1:1aide", "label": "1:1 aide or paraprofessional in classroom"},
+                        {"value": "partTimeInstruction", "label": "Part-time specialized instruction in a resource room or "
+                                                                  "special education classroom"},
+                        {"value": "fullTimeInstruction", "label": "Full-time specialized instruction in a resource room or "
+                                                                  "special education classroom"},
+                        {"value": "specializedSchool", "label": "Specialized school for special learning needs"},
+                        {"value": "dayTreatment", "label": "Day treatment or residential center"},
+                        {"value": "disabilitySupports", "label": "Disability supports services (at college/vocational "
+                                                                 "school)"},
+                        {"value": "servicesOther", "label": "Other"},
+                    ],
+                },
+                "expression_properties": {}
+            },
+        )
+
     school_services_other = db.Column(
         db.String,
         info={
