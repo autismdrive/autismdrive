@@ -315,17 +315,13 @@ class UserSchema(ModelSchema):
     role = EnumField(Role)
 
 
-
 class StepSchema(Schema):
     name = fields.Str()
     type = fields.Str()
+    label = fields.Str()
     status = fields.Str()
     date_completed = fields.Date()
     questionnaire_id = fields.Integer()
-    _links = ma.Hyperlinks({
-        'questionnaire': ma.URLFor('api.questionnaireendpoint', name='<name>', id='<questionnaire_id>'),
-        'questionnaire_meta': ma.URLFor('api.questionnairemetaendpoint', name='<name>')
-    })
 
 
 class FlowSchema(Schema):

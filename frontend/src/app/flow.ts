@@ -1,3 +1,6 @@
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {Step} from './step';
+
 export class Flow {
   name: string;
   steps: Step[];
@@ -10,6 +13,10 @@ export class Flow {
     }
   }
 
+  isComplete(): boolean {
+    return this.percentComplete() === 1;
+  }
+
   percentComplete(): number {
     if (this.steps && (this.steps.length > 0)) {
       const completeSteps = this.steps.filter(s => s.status === 'COMPLETE');
@@ -18,12 +25,4 @@ export class Flow {
       return 0;
     }
   }
-}
-
-export interface Step {
-  name: string;
-  type: string;
-  status: string;
-  date_completed: Date;
-  questionnaire_id?: number;
 }

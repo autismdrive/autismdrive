@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class IdentificationQuestionnaire(db.Model):
     __tablename__ = "identification_questionnaire"
+    __label__ = "Identification"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
@@ -44,6 +45,7 @@ class IdentificationQuestionnaire(db.Model):
     relationship_to_participant_other = db.Column(
         db.String,
         info={
+            "RELATIONSHIP_REQUIRED": ['dependent'],
             "display_order": 1.2,
             "type": "input",
             "template_options": {"placeholder": "Enter your relationship"},
@@ -185,14 +187,8 @@ class IdentificationQuestionnaire(db.Model):
         else:
             return self.first_name + ' ' + self.last_name
 
-    def get_meta(self):
-        info = {
-            "table": {
-                "sensitive": False,
-                "label": "Identification",
-                "description": "",
-            },
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "intro": {
                     "fields": [],
                     "display_order": 0,
@@ -219,13 +215,7 @@ class IdentificationQuestionnaire(db.Model):
                         "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                     },
                 },
-            },
-        }
-        for c in self.metadata.tables["identification_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
-
+            }
 
 class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:
@@ -244,10 +234,6 @@ class IdentificationQuestionnaireSchema(ModelSchema):
             "birth_city",
             "birth_state",
             "is_english_primary",
+            "relationship_to_participant",
+            "relationship_to_participant_other"
         )
-
-
-class IdentificationQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = IdentificationQuestionnaire
-        fields = ("get_meta",)

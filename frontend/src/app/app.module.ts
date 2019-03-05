@@ -63,7 +63,7 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
-import { EnrollmentFlowComponent } from './enrollment-flow/enrollment-flow.component';
+import { FlowComponent } from './flow/flow.component';
 import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 import { IntervalService } from './services/interval/interval.service';
 import { TimedoutComponent } from './timed-out/timed-out.component';
@@ -119,7 +119,7 @@ export class FormlyConfig {
     QuestionnaireStepsListComponent,
     QuestionnaireStepComponent,
     RepeatSectionComponent,
-    EnrollmentFlowComponent,
+    FlowComponent,
     ParticipantProfileComponent,
     TimedoutComponent,
     LogoutComponent

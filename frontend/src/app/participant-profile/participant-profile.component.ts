@@ -54,13 +54,13 @@ export class ParticipantProfileComponent implements OnInit {
   goEditEnroll($event) {
     if (this.participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       $event.preventDefault();
-      this.router.navigate(['participant', this.participant.id, 'self_intake']);
+      this.router.navigate(['flow', 'self_intake', this.participant.id]);
     } else if (this.participant.relationship === ParticipantRelationship.DEPENDENT) {
       $event.preventDefault();
-      this.router.navigate(['participant', this.participant.id, 'dependent_intake']);
+      this.router.navigate(['flow', 'dependent_intake', this.participant.id]);
     } else {
       $event.preventDefault();
-      this.router.navigate(['participant', this.participant.id, 'guardian_intake']);
+      this.router.navigate(['flow', 'guardian_intake', this.participant.id]);
     }
   }
 }

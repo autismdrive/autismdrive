@@ -1,9 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { ApiService } from '../services/api/api.service';
-import { QuestionnaireStep } from '../step';
-import { User } from '../user';
-import { Participant } from '../participant';
-import { Flow } from '../flow';
+import {Flow} from '../flow';
+import {Step} from '../step';
 
 @Component({
   selector: 'app-questionnaire-steps-list',
@@ -11,36 +9,19 @@ import { Flow } from '../flow';
   styleUrls: ['./questionnaire-steps-list.component.scss'],
 })
 export class QuestionnaireStepsListComponent implements OnInit {
-  @Input() user: User;
-  @Input() participant: Participant;
   @Input() flow: Flow;
-  @Input() stepNames: string[];
-  steps: QuestionnaireStep[] = [];
+
+  @Output()
+  stepSelected: EventEmitter<Step> = new EventEmitter();
 
   constructor(private api: ApiService) {
   }
 
   ngOnInit() {
-    console.log('this.flow', this.flow);
-
-    if (this.stepNames && (this.stepNames.length > 0)) {
-      this.stepNames.forEach((stepName, i) => {
-        this.api.getQuestionnaireMeta(this.flow.name, stepName).subscribe(q => {
-          const stepInfo = q.get_meta.table;
-
-          this.steps[i] = new QuestionnaireStep({
-            name: stepName,
-            label: stepInfo.label,
-            description: stepInfo.description,
-          });
-        });
-      });
-    }
   }
 
-  isStepComplete(stepName: string): boolean {
-    const step = this.flow.steps.find(s => s.name === stepName);
-    return step.status === 'COMPLETE';
+  selectStep(step: Step) {
+    this.stepSelected.emit(step);
   }
 
 }

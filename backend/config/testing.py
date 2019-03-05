@@ -1,7 +1,8 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join("./", "TEST_DB")
+SQLALCHEMY_DATABASE_URI = "postgresql://ed_user:ed_pass@localhost/stardrive_test"
+
 TESTING = True
 CORS_ENABLED = True
 DEBUG = False

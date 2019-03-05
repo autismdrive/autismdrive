@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class DemographicsQuestionnaire(db.Model):
     __tablename__ = "demographics_questionnaire"
+    __label__ = "Demographics"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 8
 
@@ -28,7 +29,12 @@ class DemographicsQuestionnaire(db.Model):
             "type": "radio",
             "template_options": {
                 "required": True,
-                "label": "",
+                "label": {
+                    "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "Your sex at birth",
+                                "self_guardian": "Your sex at birth"
+                            }
+                },
                 "options": [
                     {"value": "male", "label": "Male"},
                     {"value": "female", "label": "Female"},
@@ -38,9 +44,7 @@ class DemographicsQuestionnaire(db.Model):
             "expression_properties": {
                 "template_options.label": {
                     "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Your sex at birth",
-                                "self_guardian": "Your sex at birth",
-                                "dependent": '(formState.mainModel.preferred_name || "your child") + "\'s" '
+                                "dependent": '(model.preferred_name || "your child") + "\'s" '
                                              '+ " sex at birth"',
                             }
                 },
@@ -75,12 +79,13 @@ class DemographicsQuestionnaire(db.Model):
         },
     )
     race_ethnicity = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": True,
                 "options": [
                     {"value": "raceBlack", "label": "Black / African / African American"},
@@ -105,14 +110,8 @@ class DemographicsQuestionnaire(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {
-            "table": {
-                "sensitive": False,
-                "label": "Demographics",
-                "description": "",
-            },
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "intro": {
                     "fields": [],
                     "display_order": 0,
@@ -135,15 +134,18 @@ class DemographicsQuestionnaire(db.Model):
                     "display_order": 2,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": ""
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": 'Your current gender identity (how you describe yourself)*:',
+                                "self_guardian": 'Your current gender identity (how you describe yourself)*:',
+                            }
+                        }
                     },
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Your current gender identity (how you describe yourself)*:",
-                                "self_guardian": "Your current gender identity (how you describe yourself)*:",
-                                "dependent": '(formState.mainModel.preferred_name || "Your child") + "\'s" + " current gender identity '
-                                             '(how " + (formState.mainModel.preferred_name || "your child") + " describes themselves)*:"',
+                                "dependent": '(model.preferred_name || "Your child") + "\'s" + " current gender identity '
+                                             '(how " + (model.preferred_name || "your child") + " describes themselves)*:"',
                             }
                         }
                     },
@@ -153,25 +155,23 @@ class DemographicsQuestionnaire(db.Model):
                     "display_order": 3,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": ""
+                        "label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "What is your race/ethnicity? (select all that apply)",
+                                "self_guardian": "What is your race/ethnicity? (select all that apply)",
+                            }
+                        }
                     },
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "What is your race/ethnicity? (select all that apply)",
-                                "self_guardian": "What is your race/ethnicity? (select all that apply)",
-                                "dependent": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s" + '
+                                "dependent": '"What is " + (model.preferred_name || "your child") + "\'s" + '
                                              '" race/ethnicity? (select all that apply)"',
                             }
                         },
                     },
                 },
-            },
-        }
-        for c in self.metadata.tables["demographics_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+            }
 
 
 class DemographicsQuestionnaireSchema(ModelSchema):
@@ -184,11 +184,7 @@ class DemographicsQuestionnaireSchema(ModelSchema):
             "user_id",
             "birth_sex",
             "gender_identity",
+            "gender_identity_other",
             "race_ethnicity",
+            "race_ethnicity_other",
         )
-
-
-class DemographicsQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = DemographicsQuestionnaire
-        fields = ("get_meta",)

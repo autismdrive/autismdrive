@@ -5,9 +5,10 @@ class Step:
     STATUS_COMPLETE = "COMPLETE"
     STATUS_INCOMPLETE = "INCOMPLETE"
 
-    def __init__(self, name, question_type):
+    def __init__(self, name, question_type, label):
         self.name = name
         self.type = question_type
+        self.label = label
         self.status = self.STATUS_INCOMPLETE
         self.date_completed = None
         self.questionnaire_id = None
@@ -37,5 +38,5 @@ class Flow:
     def add_step(self, questionnaireName):
         if not self.has_step(questionnaireName):
             q = QuestionService.get_class(questionnaireName)()
-            step = Step(questionnaireName, q.__question_type__)
+            step = Step(questionnaireName, q.__question_type__, q.__label__)
             self.steps.append(step)

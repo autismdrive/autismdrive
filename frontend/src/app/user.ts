@@ -44,15 +44,23 @@ export class User {
     return this.participants.filter(p => !this.isSelf(p));
   }
 
+  getParticipantById(participantId: number): Participant  {
+    for (const p of this.participants) {
+      if (p.id === participantId) {
+        return p;
+      }
+    }
+    throw Error('The user does not have a participant with the given id.');
+  }
+
   getState() {
-    if (this.getDependents().length > 0) {
+    if (this.getSelf() === undefined) {
+      return ProfileState.NO_PARTICIPANT;
+    } else if (this.getSelf().relationship === ParticipantRelationship.SELF_GUARDIAN) {
       return ProfileState.GUARDIAN;
     } else if (this.getSelf().relationship === ParticipantRelationship.SELF_PARTICIPANT) {
       return ProfileState.PARTICIPANT;
-    } else {
-      return ProfileState.NO_PARTICIPANT;
     }
-
   }
 
 }

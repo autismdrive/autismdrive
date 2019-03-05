@@ -6,6 +6,14 @@ from app.model.questionnaires.education_mixin import EducationMixin
 
 class EducationDependentQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
+    __label__ = "Education"
+
+    attends_school_label = '"Does " + (model.preferred_name || "your child") + " attend school?"'
+    school_type_label = '"Is " + (model.preferred_name || "your child") + "\'s school:"'
+    school_services_label = '"Please check the following services " + (model.preferred_name || "your child") + ' \
+                            '" currently receives in school (check all that apply):"'
+    placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
+    current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
     dependent_placement = db.Column(
         db.String,
@@ -27,40 +35,20 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"What is " + (formState.mainModel.preferred_name || "your child") + "\'s '
+                "template_options.label": '"What is " + (model.preferred_name || "your child") + "\'s '
                                           'current grade/school placement?"',
             },
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(EducationMixin.info)
-
-        info["field_groups"]["placement_group"]["fields"] = [
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["placement_group"]["fields"] = [
             "dependent_placement",
             "placement_other",
             "current_grade"
         ]
-
-        for c in self.metadata.tables["education_dependent_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["attends_school"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (formState.mainModel.preferred_name || "your child") + " attend school?"'
-        info["school_type"]["expression_properties"]["template_options.label"] = \
-            '"Is " + (formState.mainModel.preferred_name || "your child") + "\'s school:"'
-        info["school_services"]["expression_properties"]["template_options.label"] = \
-            '"Please check the following services " + (formState.mainModel.preferred_name || "your child") + ' \
-            '" currently receives in school (check all that apply):"'
-        info["placement_other"]["hide_expression"] = \
-            '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
-        info["current_grade"]["hide_expression"] = \
-            '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
-
-        return info
+        return field_groups
 
 
 class EducationDependentQuestionnaireSchema(ModelSchema):
@@ -80,9 +68,3 @@ class EducationDependentQuestionnaireSchema(ModelSchema):
             "school_services",
             "school_services_other",
         )
-
-
-class EducationDependentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EducationDependentQuestionnaire
-        fields = ("get_meta",)

@@ -7,6 +7,8 @@ from app import db
 
 class Housemate(db.Model):
     __tablename__ = "housemate"
+    __label__ = "Housemate"
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     home_dependent_questionnaire_id = db.Column(
@@ -54,7 +56,7 @@ class Housemate(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Relationship to " + (formState.mainModel.is_self ? "you" : (model.nickname || model.first_name || "your child"))'
+                "template_options.label": '"Relationship to " + (model.is_self ? "you" : (model.nickname || model.first_name || "your child"))'
             },
         },
     )
@@ -98,12 +100,8 @@ class Housemate(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {"table": {"sensitive": False, "label": "Housemate"}}
-        for c in self.metadata.tables["housemate"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+    def get_field_groups(self):
+        return {}
 
 
 class HousemateSchema(ModelSchema):
@@ -112,16 +110,9 @@ class HousemateSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
-            "home_questionnaire_id",
             "name",
             "relationship",
             "relationship_other",
             "age",
             "has_autism",
         )
-
-
-class HousemateMetaSchema(ModelSchema):
-    class Meta:
-        model = Housemate
-        fields = ("get_meta",)

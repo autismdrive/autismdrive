@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class ClinicalDiagnosesQuestionnaire(db.Model):
     __tablename__ = "clinical_diagnoses_questionnaire"
+    __label__ = "Clinical Diagnosis"
     __question_type__ = QuestionService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
@@ -22,12 +23,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
     )
     developmental = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": False,
                 "options": [
                     {"value": "intellectual", "label": "Intellectual disability"},
@@ -51,16 +53,18 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "template_options": {
                 "placeholder": "Enter developmental condition"
             },
+
             "hide_expression": "!(model.developmental && (model.developmental.developmentalOther))",
         },
     )
     mental_health = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 2,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": False,
                 "options": [
                     {"value": "anxiety", "label": "Anxiety Disorder"},
@@ -89,12 +93,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         },
     )
     medical = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": False,
                 "options": [
                     {"value": "gastrointestinal", "label": "Chronic Gastrointestinal (GI) problems"},
@@ -118,12 +123,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         },
     )
     genetic = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 4.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": False,
                 "options": [
                     {"value": "fragileX", "label": "Fragile X syndrome"},
@@ -148,14 +154,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {
-            "table": {
-                "sensitive": False,
-                "label": "Clinical Diagnoses",
-                "description": "",
-            },
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "intro": {
                     "fields": [],
                     "display_order": 0,
@@ -194,14 +194,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     "wrappers": ["card"],
                     "template_options": {"label": "Genetic Conditions"},
                 },
-            },
-        }
-        for c in self.metadata.tables[
-            "clinical_diagnoses_questionnaire"
-        ].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+            }
 
 
 class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
@@ -221,9 +214,3 @@ class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
             "genetic",
             "genetic_other",
         )
-
-
-class ClinicalDiagnosesQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = ClinicalDiagnosesQuestionnaire
-        fields = ("get_meta",)

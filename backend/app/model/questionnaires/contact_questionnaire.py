@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class ContactQuestionnaire(db.Model):
     __tablename__ = "contact_questionnaire"
+    __label__ = "Contact Information"
     __question_type__ = QuestionService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
 
@@ -178,18 +179,12 @@ class ContactQuestionnaire(db.Model):
             "template_options": {
                 "placeholder": "Where did you hear about us?"
             },
-            "hide_expression": '!(formState.mainModel.marketing_channel && (formState.mainModel.marketing_channel === "other"))',
+            "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
         },
     )
 
-    def get_meta(self):
-        info = {
-            "table": {
-                "sensitive": "false",
-                "label": "Contact Information",
-                "description": "Please answer the following questions about YOURSELF (* indicates required response):",
-            },
-            "field_groups": {
+    def get_field_groups(self):
+        return {
                 "phone_group": {
                     "fields": [
                         "phone",
@@ -215,14 +210,7 @@ class ContactQuestionnaire(db.Model):
                         "label": "How did you hear about us?"
                     },
                 },
-            },
-        }
-
-        for c in self.metadata.tables["contact_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        return info
+            }
 
 
 class ContactQuestionnaireSchema(ModelSchema):
@@ -243,10 +231,5 @@ class ContactQuestionnaireSchema(ModelSchema):
             "state",
             "zip",
             "marketing_channel",
+            "marketing_other",
         )
-
-
-class ContactQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = ContactQuestionnaire
-        fields = ("get_meta",)

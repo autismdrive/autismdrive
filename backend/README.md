@@ -59,6 +59,7 @@ pip3 install -r requirements.txt
 postgres -D /usr/local/var/postgres
 createuser --no-createdb --no-superuser --pwprompt ed_user
 createdb stardrive -O ed_user ed_platform
+createdb stardrive_test -O ed_user ed_platform
 ```
 
 * Debian
@@ -66,6 +67,7 @@ createdb stardrive -O ed_user ed_platform
 sudo su postgres
 createuser --no-createdb --no-superuser --pwprompt ed_user
 createdb stardrive -O ed_user ed_platform
+createdb stardrive_test -O ed_user ed_platform
 exit
 ```
 If you are using Ubuntu you will likely need to [enable PSQL](https://help.ubuntu.com/community/PostgreSQL#Managing_users_and_rights) to manage its own users.
@@ -239,8 +241,10 @@ token, and then redirect again to the front end, passing that token along as a G
 ## Testing
 
 ### Run backend tests
+Make sure you have set up your test database (see Database Setup above)
 In the `backend` directory, execute the following command:
 ```BASH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
 python tests.py
+

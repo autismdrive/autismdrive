@@ -7,6 +7,9 @@ from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMix
 class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_dependent_questionnaire"
 
+    has_academic_difficulties_label = '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
+    academic_difficulty_areas_label = '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
+
     dependent_verbal_ability = db.Column(
         db.String,
         info={
@@ -24,18 +27,19 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 ]
             },
             "expression_properties": {
-                "template_options.label": '(formState.mainModel.preferred_name || "Your child") + "\'s current '
+                "template_options.label": '(model.preferred_name || "Your child") + "\'s current '
                                           'verbal ability:"'
             },
         }
     )
     concerning_behaviors = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 2,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "label": '',
                 "required": False,
                 "options": [
@@ -61,7 +65,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Does " + (formState.mainModel.preferred_name || "your child") + '
+                "template_options.label": '"Does " + (model.preferred_name || "your child") + '
                                           '" currently engage in the following behaviors of concern?"'
             },
         },
@@ -76,21 +80,14 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
+    def get_field_groups(self):
+        return super().get_field_groups()
 
-        info.update(CurrentBehaviorsMixin.info)
-
-        for c in self.metadata.tables["current_behaviors_dependent_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (formState.mainModel.preferred_name || "your child") + " have any difficulties with academics?"'
-        info["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
-            '"What areas of academics are difficult for " + (formState.mainModel.preferred_name || "your child")'
-
-        return info
+    def update_meta(self, meta):
+        meta["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
+            '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
+        meta["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
+            '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
 
 
 class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
@@ -108,9 +105,3 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "academic_difficulty_areas",
             "academic_difficulty_other",
         )
-
-
-class CurrentBehaviorsDependentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = CurrentBehaviorsDependentQuestionnaire
-        fields = ("get_meta",)

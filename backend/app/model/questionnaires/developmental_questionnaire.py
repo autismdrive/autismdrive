@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class DevelopmentalQuestionnaire(db.Model):
     __tablename__ = "developmental_questionnaire"
+    __label__ = "Birth and Developmental History"
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
@@ -65,7 +66,7 @@ class DevelopmentalQuestionnaire(db.Model):
             },
             "expression_properties": {
                 "template_options.label": '"When did " + '
-                '(formState.mainModel.preferred_name || "Your child") + '
+                '(model.preferred_name || "Your child") + '
                 '" reach their motor developmental milestones '
                 '(e.g., walking, crawling, etc.)?"'
             },
@@ -88,7 +89,7 @@ class DevelopmentalQuestionnaire(db.Model):
             },
             "expression_properties": {
                 "template_options.label": '"When did " + '
-                '(formState.mainModel.preferred_name || "Your child") + '
+                '(model.preferred_name || "Your child") + '
                 '" reach their speech/language developmental milestones '
                 '(e.g., babbling, using first words and phrases)?"'
             },
@@ -111,24 +112,14 @@ class DevelopmentalQuestionnaire(db.Model):
             },
             "expression_properties": {
                 "template_options.label": '"When did " + '
-                '(formState.mainModel.preferred_name || "Your child") + '
+                '(model.preferred_name || "Your child") + '
                 '" reach their toileting milestones (e.g., potty training)?"'
             },
         },
     )
 
-    def get_meta(self):
-        info = {
-            "table": {
-                "sensitive": False,
-                "label": "Birth and Developmental History",
-                "description": "",
-            }
-        }
-        for c in self.metadata.tables["developmental_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+    def get_field_groups(self):
+        return {}
 
 
 class DevelopmentalQuestionnaireSchema(ModelSchema):
@@ -145,9 +136,3 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
             "when_language_milestones",
             "when_toileting_milestones",
         )
-
-
-class DevelopmentalQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = DevelopmentalQuestionnaire
-        fields = ("get_meta",)

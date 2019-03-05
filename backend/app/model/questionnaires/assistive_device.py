@@ -7,6 +7,7 @@ from app import db
 
 class AssistiveDevice(db.Model):
     __tablename__ = "assistive_device"
+    __label__ = "Assistive Device"
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     supports_questionnaire_id = db.Column(
@@ -204,22 +205,15 @@ class AssistiveDevice(db.Model):
         },
     )
 
-    def get_meta(self):
-        info = {
-            "table": {"sensitive": False, "label": "AssistiveDevice"},
-            "field_groups": {
-                "type": {
-                    "fields": ["type", "type_other"],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Type of assistive device"},
-                }
-            },
+    def get_field_groups(self):
+        return {
+            "type": {
+                "fields": ["type", "type_other"],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {"label": "Type of assistive device"},
+            }
         }
-        for c in self.metadata.tables["assistive_device"].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
 
 
 class AssistiveDeviceSchema(ModelSchema):
@@ -235,9 +229,3 @@ class AssistiveDeviceSchema(ModelSchema):
             "timeframe",
             "notes",
         )
-
-
-class AssistiveDeviceMetaSchema(ModelSchema):
-    class Meta:
-        model = AssistiveDevice
-        fields = ("get_meta",)

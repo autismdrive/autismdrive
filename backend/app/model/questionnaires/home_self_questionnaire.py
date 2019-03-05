@@ -1,20 +1,25 @@
+from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
-from app.model.questionnaires.housemate import Housemate
+from app.model.questionnaires.housemate import Housemate, HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
 
 
 class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
+    __label__ = "Home"
+
+    struggle_to_afford_label = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
 
     self_living_situation = db.Column(
-        db.String,
+        db.ARRAY(db.String),
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
             "class_name": "vertical-checkbox-group",
             "template_options": {
+                "type": "array",
                 "required": True,
                 "label": "Where do you currently live? (select all that apply)",
                 "options": [
@@ -23,7 +28,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     {"value": "family", "label": "With my family"},
                     {"value": "roommates", "label": "With roommates"},
                     {"value": "caregiver", "label": "With a paid caregiver"},
-                    {"value": "livingOther", "label": "self_living_situation"},
+                    {"value": "livingOther", "label": "Other"},
                 ],
             },
         },
@@ -36,38 +41,27 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "template_options": {
                 "placeholder": "Describe your current living situation"
             },
-            "hide_expression": '!(model.self_living_situation && (model.self_living_situation === "livingOther"))',
+            "hide_expression": '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))',
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(HomeMixin.info)
-
-        info["field_groups"]["self_living"] = {
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["housemates"]["template_options"]["label"] = "Who else lives with you?"
+        field_groups["self_living"] = {
                     "fields": ["self_living_situation", "self_living_other"],
                     "display_order": 1,
                     "wrappers": ["card"],
                     "template_options": {"label": "Current Living Situation"},
                 }
-
-        info["field_groups"]["housemates"]["template_options"]["label"] = "Who else lives with you?"
-        info["field_groups"]["housemates"]["expression_properties"]["template_options.label"] = ''
-
-        for c in self.metadata.tables["home_self_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["struggle_to_afford"]["template_options"]["label"] = \
-            "Do you ever struggle with being able to afford to pay for household needs, food, or security?"
-
-        info["housemates"] = Housemate().get_meta()
-
-        return info
+        return field_groups
 
 
 class HomeSelfQuestionnaireSchema(ModelSchema):
+    @pre_load
+    def set_field_session(self, data):
+        self.fields['housemates'].schema.session = self.session
+
     class Meta:
         model = HomeSelfQuestionnaire
         fields = (
@@ -80,9 +74,4 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
-
-
-class HomeSelfQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = HomeSelfQuestionnaire
-        fields = ("get_meta",)
+    housemates = fields.Nested(HousemateSchema, many=True)

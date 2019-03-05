@@ -4,6 +4,10 @@ from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.participant import Participant
+from app.model.questionnaires.assistive_device import AssistiveDevice
+from app.model.questionnaires.housemate import Housemate
+from app.model.questionnaires.medication import Medication
+from app.model.questionnaires.therapy import Therapy
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
@@ -236,7 +240,7 @@ class DataLoader():
         db.session.add(h_ques)
         print("Home for Dependents loaded.  There is now %i dependent home record in the database." % db.session.query(
             HomeDependentQuestionnaire).count())
-        h_ques = HomeSelfQuestionnaire(self_living_situation="spouse", struggle_to_afford=True)
+        h_ques = HomeSelfQuestionnaire(self_living_situation=["spouse"], struggle_to_afford=True)
         db.session.add(h_ques)
         print("Home for Self participants loaded.  There is now %i self home record in the database." % db.session.query(
             HomeSelfQuestionnaire).count())
@@ -286,9 +290,13 @@ class DataLoader():
         db.session.query(EmploymentQuestionnaire).delete()
         db.session.query(EvaluationHistoryDependentQuestionnaire).delete()
         db.session.query(EvaluationHistorySelfQuestionnaire).delete()
+        db.session.query(Housemate).delete()
         db.session.query(HomeDependentQuestionnaire).delete()
         db.session.query(HomeSelfQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
+        db.session.query(Medication).delete();
+        db.session.query(AssistiveDevice).delete();
+        db.session.query(Therapy).delete();
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()
         db.session.query(ResourceCategory).delete()

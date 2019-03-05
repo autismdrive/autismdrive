@@ -7,6 +7,7 @@ from app import db
 
 class Therapy(db.Model):
     __tablename__ = "therapy"
+    __label__ = "Therapy or Service"
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     supports_questionnaire_id = db.Column(
@@ -121,23 +122,17 @@ class Therapy(db.Model):
         },
     )
 
-    def get_meta(self):
+    def get_field_groups(self):
         info = {
-            "table": {"sensitive": False, "label": "Therapy or Service"},
-            "field_groups": {
-                "type": {
-                    "fields": ["type", "type_other"],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": "Type of therapy or service"
-                    },
-                }
-            },
+            "type_group": {
+                "fields": ["type", "type_other"],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {
+                    "label": "Type of therapy or service"
+                },
+            }
         }
-        for c in self.metadata.tables["therapy"].columns:
-            if c.info:
-                info[c.name] = c.info
         return info
 
 
@@ -154,9 +149,3 @@ class TherapySchema(ModelSchema):
             "timeframe",
             "notes",
         )
-
-
-class TherapyMetaSchema(ModelSchema):
-    class Meta:
-        model = Therapy
-        fields = ("get_meta",)

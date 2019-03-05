@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 
 class EmploymentQuestionnaire(db.Model):
     __tablename__ = 'employment_questionnaire'
+    __label__ = "Employment"
     __question_type__ = QuestionService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 2
 
@@ -74,18 +75,8 @@ class EmploymentQuestionnaire(db.Model):
         }
     )
 
-    def get_meta(self):
-        info = {
-            'table': {
-                'sensitive': False,
-                'label': 'Employment',
-                'description': '',
-            }
-        }
-        for c in self.metadata.tables['employment_questionnaire'].columns:
-            if c.info:
-                info[c.name] = c.info
-        return info
+    def get_field_groups(self):
+        return {}
 
 
 class EmploymentQuestionnaireSchema(ModelSchema):
@@ -93,10 +84,3 @@ class EmploymentQuestionnaireSchema(ModelSchema):
         model = EmploymentQuestionnaire
         fields = ('id', 'last_updated', 'participant_id', 'user_id', 'is_currently_employed', 'employment_capacity',
                   'has_employment_support')
-
-
-class EmploymentQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EmploymentQuestionnaire
-        fields = ('get_meta',)
-

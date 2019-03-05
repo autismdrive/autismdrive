@@ -1,18 +1,15 @@
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
-export class QuestionnaireStep {
-  id: number;
+export interface Step {
   name: string;
+  question_type: string;
   label: string;
-  description: string;
-  fields?: FormlyFieldConfig[];
-  fieldGroup?: FormlyFieldConfig[];
+  status: string;
+  date_completed: Date;
+  questionnaire_id?: number;
+}
 
-  constructor(private _props) {
-    for (const propName in this._props) {
-      if (this._props.hasOwnProperty(propName)) {
-        this[propName] = this._props[propName];
-      }
-    }
-  }
+export class StepStatus {
+  public static readonly COMPLETE = 'COMPLETE';
+  public static readonly INCOMPLETE = 'INCOMPLETE';
 }

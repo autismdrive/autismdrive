@@ -6,6 +6,14 @@ from app.model.questionnaires.education_mixin import EducationMixin
 
 class EducationSelfQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_self_questionnaire"
+    __label__ = "Education"
+
+    attends_school_label = '"Do you attend an academic program, such as a school, college, or university?"'
+    school_type_label = '"Is this a public school, private school, or are you home schooled?"'
+    school_services_label = '"Please check the following services you currently receive through your academic " \
+                            "program (check all that apply):"'
+    placement_other_hide_expression = '!(model.self_placement && model.self_placement.schoolOther)'
+    current_grade_hide_expression = '!(model.self_placement && model.self_placement.highSchool)'
 
     self_placement = db.Column(
         db.String,
@@ -26,34 +34,13 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
         },
     )
 
-    def get_meta(self):
-        info = {}
-
-        info.update(EducationMixin.info)
-
-        info["field_groups"]["placement_group"]["fields"] = [
+    def get_field_groups(self):
+        field_groups = super().get_field_groups()
+        field_groups["placement_group"]["fields"] = [
             "self_placement",
             "placement_other",
             "current_grade"
         ]
-
-        for c in self.metadata.tables["education_self_questionnaire"].columns:
-            if c.info:
-                info[c.name] = c.info
-
-        info["attends_school"]["template_options"]["label"] = "Do you attend an academic program, such as a school, " \
-                                                              "college, or university?"
-        info["school_type"]["template_options"]["label"] = "Is this a public school, private school, or are you home " \
-                                                           "schooled?"
-        info["school_services"]["template_options"]["label"] = "Please check the following services you currently " \
-                                                               "receive through your academic program (check all " \
-                                                               "that apply):"
-        info["placement_other"]["hide_expression"] = \
-            '!(model.self_placement && model.dependent_placement.schoolOther)'
-        info["current_grade"]["hide_expression"] = \
-            '!(model.self_placement && model.dependent_placement.highSchool)'
-
-        return info
 
 
 class EducationSelfQuestionnaireSchema(ModelSchema):
@@ -73,9 +60,3 @@ class EducationSelfQuestionnaireSchema(ModelSchema):
             "school_services",
             "school_services_other",
         )
-
-
-class EducationSelfQuestionnaireMetaSchema(ModelSchema):
-    class Meta:
-        model = EducationSelfQuestionnaire
-        fields = ("get_meta",)
