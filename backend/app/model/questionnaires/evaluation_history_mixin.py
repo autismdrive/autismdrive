@@ -213,9 +213,7 @@ class EvaluationHistoryMixin(object):
                 "expression_properties": {
                     "template_options.label": cls.gives_permission_to_link_evaluation_data_label,
                 },
-                "hide_expression": "!(model.partner_centers_evaluation && (model.partner_centers_evaluation.uva "
-                                   "|| model.partner_centers_evaluation.sjc || model.partner_centers_evaluation.via "
-                                   "|| model.partner_centers_evaluation.fc || model.partner_centers_evaluation.inova))",
+                "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0))',
             },
         )
 
