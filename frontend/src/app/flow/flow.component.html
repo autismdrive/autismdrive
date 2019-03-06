@@ -42,7 +42,7 @@
           <p>{{ currentStep().description }}</p>
 
           <formly-form
-            [form]="form.at(activeStep)"
+            [form]="form"
             [model]="model"
             [fields]="fields"
             [options]="options"
@@ -58,9 +58,11 @@
             >Back</button>
             -->
             <button
+              *ngIf="form"
               mat-flat-button
               type="button"
               (click)="submit()"
+              [disabled]="!form.valid"
             >Save &amp; Next</button>
             <!--
             <button

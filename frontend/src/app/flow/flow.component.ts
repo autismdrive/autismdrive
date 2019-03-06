@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Form, FormArray, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FieldArrayType, FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { FormlyFormOptions } from '@ngx-formly/core';
 import { keysToCamel } from 'src/util/snakeToCamel';
 import { ApiService } from '../services/api/api.service';
 import { User } from '../user';
@@ -25,7 +25,7 @@ export class FlowComponent implements OnInit {
   loading = true;
 
   model: any = {};
-  form: FormArray;
+  form: FormGroup;
   fields = [];
   options: FormlyFormOptions;
 
@@ -128,7 +128,7 @@ export class FlowComponent implements OnInit {
     console.log('Fields: ', this.fields);
     console.log('Step:', step);
 
-    this.form = new FormArray([new FormGroup({})]);
+    this.form = new FormGroup({});
     this.options = {
       formState: {
         mainModel: this.model
