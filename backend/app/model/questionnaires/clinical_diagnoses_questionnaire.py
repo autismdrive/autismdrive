@@ -41,6 +41,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     {"value": "visual", "label": "Visual impairment"},
                     {"value": "fetalAlcohol", "label": "Fetal alcohol spectrum disorder"},
                     {"value": "developmentalOther", "label": "Other developmental condition"},
+                    {"value": "noDisclose", "label": "I choose not to disclose"},
                 ],
             },
         },
@@ -77,6 +78,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     {"value": "schizophrenia", "label": "Schizophrenia or Psychotic Disorder"},
                     {"value": "tourette", "label": "Tourette Syndrome or Tic Disorder"},
                     {"value": "mentalHealthOther", "label": "Other mental health condition"},
+                    {"value": "noDisclose", "label": "I choose not to disclose"},
                 ],
             },
         },
@@ -109,6 +111,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     {"value": "asthma", "label": "Asthma"},
                     {"value": "earInfections", "label": "Chronic ear infections"},
                     {"value": "medicalOther", "label": "Other health problem"},
+                    {"value": "noDisclose", "label": "I choose not to disclose"},
                 ],
             },
         },
@@ -140,6 +143,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     {"value": "rett", "label": "Rett syndrome"},
                     {"value": "22q11.2deletion", "label": "22q11.2 Deletion syndrome"},
                     {"value": "geneticOther", "label": "Other genetic condition"},
+                    {"value": "noDisclose", "label": "I choose not to disclose"},
                 ],
             },
         },
@@ -161,11 +165,18 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     "display_order": 0,
                     "wrappers": ["help"],
                     "template_options": {
-                        "description": {
+                        "label": {
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Do you CURRENTLY have any of the following diagnoses? (please check all that apply)",
                                 "self_guardian": "Do you CURRENTLY have any of the following diagnoses? (please check all that apply)",
                                 "dependent": "Does your child CURRENTLY have any of the following diagnoses? (please check all that apply)",
+                            }
+                        },
+                        "description": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": "You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies.",
+                                "self_guardian": "You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies.",
+                                "dependent": "You may choose not to disclose confidential health information, however, this may cause to your child to be excluded from some studies.",
                             }
                         },
                     },
