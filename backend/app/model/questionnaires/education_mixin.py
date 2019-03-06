@@ -114,7 +114,6 @@ class EducationMixin(object):
                 "class_name": "vertical-checkbox-group",
                 "template_options": {
                     "type": "array",
-                    "label": cls.school_services_label,
                     "required": False,
                     "options": [
                         {"value": "504mod", "label": "504 Modification Plan"},
@@ -131,7 +130,9 @@ class EducationMixin(object):
                         {"value": "servicesOther", "label": "Other"},
                     ],
                 },
-                "expression_properties": {}
+                "expression_properties": {
+                    "template_options.label": cls.school_services_label,
+                },
             },
         )
 
