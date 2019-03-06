@@ -21,6 +21,7 @@ class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
         field_groups = super().get_field_groups()
         field_groups["partner_centers"]["template_options"]["label"] = \
             "Have you ever been evaluated at any of the following centers?"
+        return field_groups
 
 
 class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
