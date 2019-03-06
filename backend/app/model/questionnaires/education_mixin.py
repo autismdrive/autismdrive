@@ -141,7 +141,7 @@ class EducationMixin(object):
             "display_order": 6.2,
             "type": "input",
             "template_options": {"placeholder": "Describe additional services"},
-            "hide_expression": '!(model.school_services && (model.school_services.servicesOther))',
+            "hide_expression": '!(model.school_services && model.school_services.includes("servicesOther"))',
         },
     )
 

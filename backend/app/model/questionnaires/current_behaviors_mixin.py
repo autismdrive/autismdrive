@@ -77,7 +77,7 @@ class CurrentBehaviorsMixin(object):
             "template_options": {
                 "placeholder": "Enter area of academic difficulty"
             },
-            "hide_expression": "!(model.academic_difficulty_areas && (model.academic_difficulty_areas.other))",
+            "hide_expression": '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))',
         },
     )
 

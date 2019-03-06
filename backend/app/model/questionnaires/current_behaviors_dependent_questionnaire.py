@@ -76,7 +76,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
             "display_order": 2.2,
             "type": "input",
             "template_options": {"placeholder": "Enter concerning behavior"},
-            "hide_expression": "!(model.concerning_behaviors && (model.concerning_behaviors.concerningOther))",
+            "hide_expression": '!(model.concerning_behaviors && model.concerning_behaviors.includes("concerningOther"))',
         },
     )
 

@@ -40,7 +40,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "display_order": 2.2,
             "type": "input",
             "template_options": {"placeholder": ""},
-            "hide_expression": "!(model.dependent_living_situation && model.dependent_living_situation.livingOther)",
+            "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
             "expression_properties": {
                 "template_options.placeholder": '"Please describe "+ (model.preferred_name) + "\'s current living situation"'
             },

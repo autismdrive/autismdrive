@@ -106,7 +106,7 @@ class DemographicsQuestionnaire(db.Model):
             "display_order": 3.2,
             "type": "input",
             "template_options": {"placeholder": "Enter race/ethnicity"},
-            "hide_expression": "!(model.race_ethnicity && (model.race_ethnicity.raceOther))",
+            "hide_expression": '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))',
         },
     )
 

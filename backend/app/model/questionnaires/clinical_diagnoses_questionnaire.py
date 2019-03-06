@@ -54,7 +54,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "placeholder": "Enter developmental condition"
             },
 
-            "hide_expression": "!(model.developmental && (model.developmental.developmentalOther))",
+            "hide_expression": '!(model.developmental && model.developmental.includes("developmentalOther"))',
         },
     )
     mental_health = db.Column(
@@ -89,7 +89,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "template_options": {
                 "placeholder": "Enter mental health condition"
             },
-            "hide_expression": "!(model.mental_health && (model.mental_health.mentalHealthOther))",
+            "hide_expression": '!(model.mental_health && model.mental_health.includes("mentalHealthOther"))',
         },
     )
     medical = db.Column(
@@ -119,7 +119,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "display_order": 3.2,
             "type": "input",
             "template_options": {"placeholder": "Enter medical condition"},
-            "hide_expression": "!(model.medical && (model.medical.medicalOther))",
+            "hide_expression": '!(model.medical && model.medical.includes("medicalOther"))',
         },
     )
     genetic = db.Column(
@@ -150,7 +150,7 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "display_order": 4.2,
             "type": "input",
             "template_options": {"placeholder": "Enter genetic condition"},
-            "hide_expression": "!(model.genetic && (model.genetic.geneticOther))",
+            "hide_expression": '!(model.genetic && model.genetic.includes("geneticOther"))',
         },
     )
 
