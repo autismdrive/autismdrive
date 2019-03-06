@@ -15,22 +15,6 @@ class HomeMixin(object):
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
-    def get_field_groups(self):
-        field_groups = {
-                "housemates": {
-                    "type": "repeat",
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "repeat_class": Housemate,
-                    "template_options": {
-                        "label": "Who else lives there?",
-                        "description": "Add a housemate",
-                    },
-                    "expression_properties": {},
-                },
-            }
-        return field_groups
-
     @declared_attr
     def participant_id(cls):
         return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
@@ -70,4 +54,18 @@ class HomeMixin(object):
             },
         )
 
-
+    def get_field_groups(self):
+        field_groups = {
+                "housemates": {
+                    "type": "repeat",
+                    "display_order": 3,
+                    "wrappers": ["card"],
+                    "repeat_class": Housemate,
+                    "template_options": {
+                        "label": "Who else lives there?",
+                        "description": "Add a housemate",
+                    },
+                    "expression_properties": {},
+                },
+            }
+        return field_groups

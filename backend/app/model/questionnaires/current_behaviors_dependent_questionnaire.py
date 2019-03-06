@@ -83,12 +83,6 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
     def get_field_groups(self):
         return super().get_field_groups()
 
-    def update_meta(self, meta):
-        meta["has_academic_difficulties"]["expression_properties"]["template_options.label"] = \
-            '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
-        meta["academic_difficulty_areas"]["expression_properties"]["template_options.label"] = \
-            '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
-
 
 class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
     class Meta:

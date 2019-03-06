@@ -22,6 +22,7 @@ class EvaluationHistoryDependentQuestionnaire(db.Model, EvaluationHistoryMixin):
         field_groups["partner_centers"]["expression_properties"]["template_options.label"] = \
             '"Has " + (model.preferred_name || "your child") + ' \
             '" ever been evaluated at any of the following centers?"'
+        return field_groups
 
 
 class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
