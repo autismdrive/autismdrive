@@ -24,6 +24,8 @@ export class Participant {
         return 'dependent_intake';
       case ParticipantRelationship.SELF_GUARDIAN:
         return 'guardian_intake';
+      case ParticipantRelationship.SELF_PROFESSIONAL:
+        return 'professional_intake';
       case ParticipantRelationship.SELF_PARTICIPANT:
         return 'self_intake';
       default:
