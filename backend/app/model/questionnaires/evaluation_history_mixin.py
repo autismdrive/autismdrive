@@ -23,32 +23,11 @@ class EvaluationHistoryMixin(object):
         return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
 
     @declared_attr
-    def self_identifies_autistic(cls):
-        return db.Column(
-            db.Boolean,
-            info={
-                "display_order": 1,
-                "type": "radio",
-                "default_value": True,
-                "template_options": {
-                    "required": False,
-                    "options": [
-                        {"value": True, "label": "Yes"},
-                        {"value": False, "label": "No"},
-                    ],
-                },
-                "expression_properties": {
-                    "template_options.label": cls.self_identifies_autistic_label
-                },
-            },
-        )
-
-    @declared_attr
     def has_autism_diagnosis(cls):
         return db.Column(
             db.Boolean,
             info={
-                "display_order": 2,
+                "display_order": 1,
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
@@ -60,6 +39,27 @@ class EvaluationHistoryMixin(object):
                 },
                 "expression_properties": {
                     "template_options.label": cls.has_autism_diagnosis_label
+                },
+            },
+        )
+
+    @declared_attr
+    def self_identifies_autistic(cls):
+        return db.Column(
+            db.Boolean,
+            info={
+                "display_order": 2,
+                "type": "radio",
+                "default_value": True,
+                "template_options": {
+                    "required": False,
+                    "options": [
+                        {"value": True, "label": "Yes"},
+                        {"value": False, "label": "No"},
+                    ],
+                },
+                "expression_properties": {
+                    "template_options.label": cls.self_identifies_autistic_label
                 },
             },
         )
@@ -190,6 +190,7 @@ class EvaluationHistoryMixin(object):
                     {"value": "via", "label": "Virginia Institute of Autism (VIA)"},
                     {"value": "fc", "label": "Faison Center"},
                     {"value": "inova", "label": "INOVA Health System"},
+                    {"value": "none", "label": "None of the above"},
                 ],
             },
         },
