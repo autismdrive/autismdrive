@@ -195,6 +195,10 @@ flask db merge -m "merge cc4610a6ece3 and 2679ef53e0bd" cc4610a6ece3 2679ef53e0b
 ```
 This will auto-generate a new migration that ties the streams together.
 
+### Migrations with Enum columns
+Alembic probably will not generate migrations that do everything that you need them to do when it comes to handling Enum values. 
+Look at migration versions 2fd0ab60fe3a_.py and 5fb917adc751_.py to see some examples of handling enum additions and changes.
+
 ## Best Practices
 There are a few things I hope to do consistently for this project, to avoid some pitfalls from the [Cadre Academy site](https://education.cadre.virginia.edu/#/home).  When adding code please follow these guidelines:
 
