@@ -183,12 +183,9 @@ class AssistiveDevice(db.Model):
                 "label": "",
                 "required": False,
                 "options": [
-                    {"value": "current", "label": "Currently receiving"},
-                    {"value": "past", "label": "Received in the past"},
-                    {
-                        "value": "futureInterest",
-                        "label": "Interested in receiving",
-                    },
+                    {"value": "current", "label": "Currently using"},
+                    {"value": "past", "label": "Used in the past"},
+                    {"value": "futureInterest", "label": "Interested in using"},
                 ],
             },
         },
