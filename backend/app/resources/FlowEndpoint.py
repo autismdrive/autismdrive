@@ -59,6 +59,7 @@ class Flows:
         flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
+        flow.add_step('professional_profile_questionnaire')
         return flow
 
     @staticmethod

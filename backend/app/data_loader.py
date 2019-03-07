@@ -30,6 +30,7 @@ from app.model.questionnaires.evaluation_history_self_questionnaire import Evalu
 from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
 from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app import db
 from sqlalchemy import Sequence
@@ -255,6 +256,13 @@ class DataLoader():
             IdentificationQuestionnaire).count())
         db.session.commit()
 
+    def load_professional_profile_questionnaire(self):
+        pp_ques = ProfessionalProfileQuestionnaire()
+        db.session.add(pp_ques)
+        print("Professional Profile loaded.  There is now %i professional profile record in the database." % db.session.query(
+            ProfessionalProfileQuestionnaire).count())
+        db.session.commit()
+
     def load_supports_questionnaire(self):
         s_ques = SupportsQuestionnaire()
         db.session.add(s_ques)
@@ -294,9 +302,10 @@ class DataLoader():
         db.session.query(HomeDependentQuestionnaire).delete()
         db.session.query(HomeSelfQuestionnaire).delete()
         db.session.query(IdentificationQuestionnaire).delete()
-        db.session.query(Medication).delete();
-        db.session.query(AssistiveDevice).delete();
-        db.session.query(Therapy).delete();
+        db.session.query(ProfessionalProfileQuestionnaire).delete()
+        db.session.query(Medication).delete()
+        db.session.query(AssistiveDevice).delete()
+        db.session.query(Therapy).delete()
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()
         db.session.query(ResourceCategory).delete()
