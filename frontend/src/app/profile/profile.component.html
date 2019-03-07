@@ -11,7 +11,7 @@
       mat-flat-button
       color="primary"
       (click)="enrollSelf($event)"
-    >Enroll Yourself</button>
+    >Enroll Yourself as a person with Autism</button>
     <p>
       Select this button if you are primarily looking for resources, or studies for yourself.
     </p>
@@ -22,6 +22,14 @@
     >Enroll a Dependent</button>
     <p>
       Select this button if you are looking for resources and studies for your child or a legal dependent.
+    </p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="enrollProfessional($event)"
+    >Enroll Yourself as a Professional</button>
+    <p>
+      Select this button if you are a professional primarily looking for resources, or studies for yourself.
     </p>
   </div>
 

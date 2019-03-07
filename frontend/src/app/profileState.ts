@@ -1,5 +1,0 @@
-export enum ProfileState {
-  NO_PARTICIPANT = 'NO_PARTICIPANT',
-  PARTICIPANT = 'PARTICIPANT',
-  GUARDIAN = 'GUARDIAN'
-}
