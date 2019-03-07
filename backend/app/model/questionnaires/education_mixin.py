@@ -29,7 +29,6 @@ class EducationMixin(object):
             info={
                 "display_order": 1,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": False,
                     "options": [
@@ -127,6 +126,7 @@ class EducationMixin(object):
                         {"value": "dayTreatment", "label": "Day treatment or residential center"},
                         {"value": "disabilitySupports", "label": "Disability supports services (at college/vocational "
                                                                  "school)"},
+                        {"value": "servicesNone", "label": "None of the above"},
                         {"value": "servicesOther", "label": "Other"},
                     ],
                 },
