@@ -5,7 +5,20 @@
       fxLayoutAlign="start end"
       id="hero"
     >
-      <h1 class="mat-display-2">JOIN THE AUTISM REGISTRY</h1>
+      <div
+        fxLayout="column"
+        fxLayoutGap="4%"
+      >
+        <h1 class="mat-display-2">JOIN THE AUTISM REGISTRY</h1>
+        <div fxFlex="60%">
+          <button
+            mat-button
+            (click)="goTerms($event)"
+          >
+            Get started now
+          </button>
+        </div>
+      </div>
     </div>
     <p>Caption describing study and what participant is doing</p>
   </div>
