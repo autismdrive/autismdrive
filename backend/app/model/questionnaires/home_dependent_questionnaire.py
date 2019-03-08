@@ -60,8 +60,9 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     },
                 }
 
-        field_groups["housemates"]["expression_properties"]["template_options"] = \
-            {"label": '"Who else lives with " + (model.preferred_name) + "?"'}
+        # As housemates is a different model, it does not work to put the dependent's name into the label
+        # in the same way we have done for other labels (model.preferred_name will return undefined)
+        field_groups["housemates"]["template_options"]["label"] = "Who else lives with your child?"
 
         return field_groups
 
