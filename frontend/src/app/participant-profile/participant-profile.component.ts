@@ -5,6 +5,8 @@ import { User } from '../user';
 import { ParticipantRelationship } from '../participantRelationship';
 import { Flow } from '../flow';
 import { ApiService } from '../services/api/api.service';
+import { AvatarDialogComponent } from '../avatar-dialog/avatar-dialog.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-participant-profile',
@@ -21,7 +23,8 @@ export class ParticipantProfileComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    public dialog: MatDialog
   ) {
     this.dummyImgUrl = this.randomImgUrl();
   }
@@ -62,5 +65,16 @@ export class ParticipantProfileComponent implements OnInit {
       $event.preventDefault();
       this.router.navigate(['flow', 'guardian_intake', this.participant.id]);
     }
+  }
+
+  chooseAvatar($event, participant): void {
+    const dialogRef = this.dialog.open(AvatarDialogComponent, {
+      width: `${window.innerWidth / 2}px`,
+      data: { participant: participant }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 }

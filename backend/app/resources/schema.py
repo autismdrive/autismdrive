@@ -293,7 +293,7 @@ class TrainingCategorySchema(ModelSchema):
 class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
-        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id')
+        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color')
     id = fields.Integer(required=False, allow_none=True)
     name = fields.Function(lambda obj: obj.get_name())
     relationship = EnumField(Relationship)

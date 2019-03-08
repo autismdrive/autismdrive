@@ -7,8 +7,9 @@ export class Participant {
   last_updated?: Date;
   percent_complete?: number;
   num_studies_enrolled?: number;
-  avatar_img_url?: string;
   name?: string;
+  avatar_color?: string;
+  avatar_icon?: string;
 
   constructor(private _props) {
     for (const propName in this._props) {
