@@ -1,0 +1,89 @@
+<div
+  class="mat-typography"
+  *ngIf="data.participant"
+>
+  <div mat-dialog-content>
+    <h1 mat-dialog-title>{{getPrompt()}}</h1>
+
+    <div
+      fxLayout="column"
+      fxLayoutAlign="center center"
+    >
+      <div
+        class="avatar"
+        [ngStyle]="{'background-color': selectedColor || data.participant.avatar_color}"
+      >
+        <img src="/assets/avatars/{{selectedIcon || data.participant.avatar_icon}}.svg">
+      </div>
+    </div>
+    <p>Pick an image</p>
+
+    <div class="avatar-images-row">
+      <button
+        mat-button
+        class="scroll-left"
+        (click)="scroll($event, 'avatar-images', 'left')"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <div class="avatar-images">
+        <button
+          *ngFor="let avatarImage of avatarImages"
+          class="avatar-image"
+          (click)="setImage(avatarImage)"
+          [ngClass]="{'avatar-image-active': isSelectedImage(avatarImage)}"
+        >
+          <img src="/assets/avatars/{{avatarImage}}.svg" />
+        </button>
+      </div>
+      <button
+        mat-button
+        class="scroll-right"
+        (click)="scroll($event, 'avatar-images', 'right')"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+
+
+    <p>Pick a color</p>
+    <div class="color-swatches-row">
+      <button
+        mat-button
+        class="scroll-left"
+        (click)="scroll($event, 'color-swatches', 'left')"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <div class="color-swatches">
+        <button
+          *ngFor="let avatarColor of avatarColors"
+          (click)="setColor(avatarColor)"
+          class="color-swatch"
+          [ngStyle]="{'background-color': avatarColor}"
+          [ngClass]="{'color-swatch-active': isSelectedColor(avatarColor)}"
+        >&nbsp;
+        </button>
+      </div>
+      <button
+        mat-button
+        class="scroll-right"
+        (click)="scroll($event, 'color-swatches', 'right')"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+
+  </div>
+  <div mat-dialog-actions>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="onSubmit()"
+    >Save</button>
+    <button
+      mat-button
+      (click)="onNoClick()"
+    >Cancel</button>
+  </div>
+</div>

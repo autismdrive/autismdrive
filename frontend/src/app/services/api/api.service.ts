@@ -164,6 +164,12 @@ export class ApiService {
     return this.httpClient.post<Participant>(url, participant);
   }
 
+  updateParticipant(participant: Participant): Observable<Participant> {
+    const url = this
+      ._endpointUrl('participantbysession');
+    return this.httpClient.post<Participant>(url, participant);
+  }
+
   /** getFlow */
   getFlow(flow: string, participantId?: number): Observable<Flow> {
     let url = '';
