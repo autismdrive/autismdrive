@@ -32,6 +32,8 @@ class Participant(db.Model):
     user = db.relationship("User", back_populates="participants")
     identification = db.relationship(IdentificationQuestionnaire, uselist=False)
     relationship = db.Column(db.Enum(Relationship))
+    avatar_icon = db.Column(db.String)
+    avatar_color = db.Column(db.String)
 
     def get_name(self):
         if self.identification:

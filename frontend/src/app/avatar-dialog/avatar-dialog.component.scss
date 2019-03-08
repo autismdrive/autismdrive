@@ -1,0 +1,99 @@
+$avatar_image_height: 96px;
+$color_swatch_height: 64px;
+$border_width: 8px;
+$button_padding: 48px;
+$white_1: rgba(255, 255, 255, 1);
+$white_0: rgba(255, 255, 255, 0);
+.avatar {
+  height: ($avatar_image_height * 2);
+  width: ($avatar_image_height * 2);
+  border-radius: 50%;
+  img {
+    height: ($avatar_image_height * 2);
+    width: ($avatar_image_height * 2);
+  }
+}
+
+.avatar-images-row,
+.color-swatches-row {
+  position: relative;
+  overflow: hidden;
+  padding: 0px;
+  .scroll-left,
+  .scroll-right {
+    position: absolute;
+    height: 100%;
+    top: 0px;
+  }
+  .scroll-left,
+  .scroll-left:hover,
+  .scroll-left:active,
+  .scroll-left:focus {
+    background-image: linear-gradient(to right, $white_1, $white_1, $white_0);
+    left: 0px;
+    padding-right: $button_padding;
+  }
+  .scroll-right,
+  .scroll-right:hover,
+  .scroll-right:active,
+  .scroll-right:focus {
+    background-image: linear-gradient(to right, $white_0, $white_1, $white_1);
+    right: 0px;
+    padding-left: $button_padding;
+  }
+}
+
+.avatar-images,
+.color-swatches {
+  width: 100%;
+  overflow-x: scroll;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+}
+
+.avatar-images {
+  height: ($avatar_image_height + $border_width * 2);
+}
+
+.color-swatches {
+  height: ($color_swatch_height + $border_width * 2);
+}
+
+.color-swatch,
+.avatar-image {
+  border-width: $border_width;
+  border-style: solid;
+  border-color: white;
+  display: inline-block;
+  background: transparent;
+  outline: none;
+  margin: 0px 0px 0px 10px;
+  padding: 0px;
+  border-radius: 50%;
+  &:first-of-type {
+    margin-left: ($button_padding * 2);
+  }
+  &:last-of-type {
+    margin-right: ($button_padding * 2);
+  }
+}
+
+.color-swatch {
+  width: $color_swatch_height;
+  height: $color_swatch_height;
+}
+
+.avatar-image {
+  width: ($avatar_image_height + ($border_width * 2));
+  height: ($avatar_image_height + ($border_width * 2));
+  background: #EEEEEE;
+  img {
+    width: $avatar_image_height;
+    height: $avatar_image_height;
+  }
+}
+
+.color-swatch-active,
+.avatar-image-active {
+  border-color: #999999;
+}
