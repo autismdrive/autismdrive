@@ -61,6 +61,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                     {"value": "stealing", "label": "Stealing"},
                     {"value": "verbalAggression", "label": "Verbal aggression (profanity or verbal threats)"},
                     {"value": "tantrums", "label": "Tantrums"},
+                    {"value": "noDisclose", "label": "I choose not to disclose"},
                     {"value": "concerningOther", "label": "Other"},
                 ],
             },

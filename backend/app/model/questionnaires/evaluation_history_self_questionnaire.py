@@ -8,9 +8,9 @@ class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
     __tablename__ = "evaluation_history_self_questionnaire"
     __label__ = "Evaluation History"
 
-    self_identifies_autistic_label = '"Do you self-identify as having Autism?"'
     has_autism_diagnosis_label = '"Have you been formally diagnosed with Autism Spectrum Disorder?"'
-    years_old_at_first_diagnosis_label = '"How old were you when you were first diagnosed with ASD?"'
+    self_identifies_autistic_label = '"Do you have autism?"'
+    years_old_at_first_diagnosis_label = '"How old were you (in years) when you were first diagnosed with ASD?"'
     who_diagnosed_label = '"Who first diagnosed you with ASD?"'
     where_diagnosed_label = '"Where did you receive this diagnosis?"'
     gives_permission_to_link_evaluation_data_label = '"Do we have your permission to link your evaluation data to the UVA Autism Database?"'

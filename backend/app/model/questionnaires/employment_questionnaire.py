@@ -69,6 +69,7 @@ class EmploymentQuestionnaire(db.Model):
                 'required': False,
                 'options': [
                     {'value': True, 'label': 'Yes'},
+                    {'value': True, 'label': 'No, but I am interested'},
                     {'value': False, 'label': 'No'}
                 ]
             }

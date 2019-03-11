@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Form, FormArray, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import { keysToCamel } from 'src/util/snakeToCamel';
@@ -25,7 +25,7 @@ export class FlowComponent implements OnInit {
   loading = true;
 
   model: any = {};
-  form: FormArray;
+  form: FormGroup;
   fields = [];
   options: FormlyFormOptions;
 
@@ -62,9 +62,21 @@ export class FlowComponent implements OnInit {
       });
   }
 
+  updateParticipant(participantId: number){
+    this.api.getParticipant(participantId).subscribe(
+      p => {
+        this.participant = p;
+      }
+    );
+  }
+
   goToNextAvailableStep() {
+    // get the participant back first to catch any changes to the preferred name
+    this.updateParticipant(this.participant.id);
+
     // Go to the next incomplete step.  Loop back around to the beginning of steps, in case an
     // earlier step is incomplete.  NOTE:  You will stay on the current step if it is not complete.
+
     console.log('The flow is ' + this.flow.percentComplete() + '% complete.');
     if (this.flow.percentComplete() < 100) {
       let index = this.activeStep;
@@ -89,6 +101,9 @@ export class FlowComponent implements OnInit {
   }
 
   goToStep(step: Step) {
+    // get the participant back first to catch any changes to the preferred name
+    this.updateParticipant(this.participant.id);
+
     console.log('Requested to set the step to ' + step.name);
     for (let i = 0; i < this.flow.steps.length; i++) {
       if (this.flow.steps[i].name === step.name) {
@@ -128,7 +143,7 @@ export class FlowComponent implements OnInit {
     console.log('Fields: ', this.fields);
     console.log('Step:', step);
 
-    this.form = new FormArray([new FormGroup({})]);
+    this.form = new FormGroup({});
     this.options = {
       formState: {
         mainModel: this.model

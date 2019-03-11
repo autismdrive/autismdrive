@@ -32,7 +32,6 @@ class CurrentBehaviorsMixin(object):
                 "display_order": 3,
                 "type": "radio",
                 "template_options": {
-                    "label": cls.has_academic_difficulties_label,
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
@@ -55,7 +54,6 @@ class CurrentBehaviorsMixin(object):
                 "class_name": "vertical-checkbox-group",
                 "template_options": {
                     "type": "array",
-                    "label": cls.academic_difficulty_areas_label,
                     "required": True,
                     "options": [
                         {"value": "math", "label": "Math"},
@@ -64,7 +62,9 @@ class CurrentBehaviorsMixin(object):
                         {"value": "other", "label": "Other"},
                     ],
                 },
-                "expression_properties": {},
+                "expression_properties": {
+                    "template_options.label": cls.academic_difficulty_areas_label,
+                },
                 "hide_expression": "!(model.has_academic_difficulties)",
             },
         )

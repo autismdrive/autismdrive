@@ -29,7 +29,6 @@ class EducationMixin(object):
             info={
                 "display_order": 1,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": False,
                     "options": [
@@ -114,7 +113,6 @@ class EducationMixin(object):
                 "class_name": "vertical-checkbox-group",
                 "template_options": {
                     "type": "array",
-                    "label": cls.school_services_label,
                     "required": False,
                     "options": [
                         {"value": "504mod", "label": "504 Modification Plan"},
@@ -128,10 +126,13 @@ class EducationMixin(object):
                         {"value": "dayTreatment", "label": "Day treatment or residential center"},
                         {"value": "disabilitySupports", "label": "Disability supports services (at college/vocational "
                                                                  "school)"},
+                        {"value": "servicesNone", "label": "None of the above"},
                         {"value": "servicesOther", "label": "Other"},
                     ],
                 },
-                "expression_properties": {}
+                "expression_properties": {
+                    "template_options.label": cls.school_services_label,
+                },
             },
         )
 

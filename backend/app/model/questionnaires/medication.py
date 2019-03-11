@@ -46,10 +46,7 @@ class Medication(db.Model):
                 "options": [
                     {"value": "current", "label": "Currently taking"},
                     {"value": "past", "label": "Received in the past"},
-                    {
-                        "value": "futureInterest",
-                        "label": "Interested in receiving",
-                    },
+                    {"value": "futureInterest", "label": "Interested in receiving"},
                 ],
             },
         },

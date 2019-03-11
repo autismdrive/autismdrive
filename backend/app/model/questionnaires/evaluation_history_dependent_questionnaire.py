@@ -10,7 +10,7 @@ class EvaluationHistoryDependentQuestionnaire(db.Model, EvaluationHistoryMixin):
 
     self_identifies_autistic_label = '"Does " + (model.preferred_name || "your child") + " self-identify as having Autism?"'
     has_autism_diagnosis_label = '"Has " + (model.preferred_name || "your child") + " been formally diagnosed with Autism Spectrum Disorder?"'
-    years_old_at_first_diagnosis_label = '"How old was " + (model.preferred_name || "your child") + " when they were first diagnosed with ASD?"'
+    years_old_at_first_diagnosis_label = '"How old (in years) was " + (model.preferred_name || "your child") + " when they were first diagnosed with ASD?"'
     who_diagnosed_label = '"Who first diagnosed " + (model.preferred_name || "your child") + " with ASD?"'
     where_diagnosed_label = '"Where did " + (model.preferred_name || "your child") + " receive this diagnosis?"'
     gives_permission_to_link_evaluation_data_label = '"Do we have your permission to link " + (model.preferred_name + "\'s") + " evaluation data to the UVa Autism Database?"'

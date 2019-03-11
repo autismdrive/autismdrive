@@ -28,6 +28,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                     {"value": "preschool", "label": "Preschool"},
                     {"value": "kindergarten", "label": "Kindergarten"},
                     {"value": "grades1to12", "label": "1st through 12th grade, please specify CURRENT GRADE below"},
+                    {"value": "homeSchool", "label": "Home schooled"},
                     {"value": "vocational", "label": "Vocational school where I am learning job or life skills"},
                     {"value": "college", "label": "College/university"},
                     {"value": "graduate", "label": "Graduate school"},
