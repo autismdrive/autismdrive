@@ -15,7 +15,7 @@ class Flows:
     @staticmethod
     def get_self_intake_flow():
         flow = Flow(name="self_intake")
-        flow.relationship = Relationship.self_participant;
+        flow.relationship = Relationship.self_participant
         flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
@@ -31,7 +31,7 @@ class Flows:
     @staticmethod
     def get_dependent_intake_flow():
         flow = Flow(name="dependent_intake")
-        flow.relationship = Relationship.dependent;
+        flow.relationship = Relationship.dependent
         flow.add_step('identification_questionnaire')
         flow.add_step('demographics_questionnaire')
         flow.add_step('home_dependent_questionnaire')
@@ -46,10 +46,20 @@ class Flows:
     @staticmethod
     def get_guardian_intake_flow():
         flow = Flow(name="guardian_intake")
-        flow.relationship = Relationship.self_guardian;
+        flow.relationship = Relationship.self_guardian
         flow.add_step('identification_questionnaire')
         flow.add_step('contact_questionnaire')
         flow.add_step('demographics_questionnaire')
+        return flow
+
+    @staticmethod
+    def get_professional_intake_flow():
+        flow = Flow(name="professional_intake")
+        flow.relationship = Relationship.self_professional
+        flow.add_step('identification_questionnaire')
+        flow.add_step('contact_questionnaire')
+        flow.add_step('demographics_questionnaire')
+        flow.add_step('professional_profile_questionnaire')
         return flow
 
     @staticmethod
@@ -57,7 +67,8 @@ class Flows:
         flows = [
             Flows.get_self_intake_flow(),
             Flows.get_dependent_intake_flow(),
-            Flows.get_guardian_intake_flow()
+            Flows.get_guardian_intake_flow(),
+            Flows.get_professional_intake_flow()
         ]
         return flows
 
@@ -69,6 +80,8 @@ class Flows:
             return Flows.get_dependent_intake_flow()
         if name == 'guardian_intake':
             return Flows.get_guardian_intake_flow()
+        if name == 'professional_intake':
+            return Flows.get_professional_intake_flow()
 
 
 class FlowEndpoint(flask_restful.Resource):

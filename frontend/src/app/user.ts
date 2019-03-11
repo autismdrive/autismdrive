@@ -1,6 +1,5 @@
 import { Participant } from './participant';
 import { ParticipantRelationship } from './participantRelationship';
-import { ProfileState } from './profileState';
 
 export class User {
 
@@ -29,7 +28,8 @@ export class User {
 
   isSelf(participant: Participant): boolean {
     if (participant.relationship === ParticipantRelationship.SELF_GUARDIAN ||
-      participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
+      participant.relationship === ParticipantRelationship.SELF_PARTICIPANT ||
+      participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
       return true;
     } else {
       return false;
@@ -51,16 +51,6 @@ export class User {
       }
     }
     throw Error('The user does not have a participant with the given id.');
-  }
-
-  getState() {
-    if (this.getSelf() === undefined) {
-      return ProfileState.NO_PARTICIPANT;
-    } else if (this.getSelf().relationship === ParticipantRelationship.SELF_GUARDIAN) {
-      return ProfileState.GUARDIAN;
-    } else if (this.getSelf().relationship === ParticipantRelationship.SELF_PARTICIPANT) {
-      return ProfileState.PARTICIPANT;
-    }
   }
 
 }

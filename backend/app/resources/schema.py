@@ -38,6 +38,7 @@ import app.model.questionnaires.evaluation_history_self_questionnaire
 import app.model.questionnaires.home_dependent_questionnaire
 import app.model.questionnaires.home_self_questionnaire
 import app.model.questionnaires.identification_questionnaire
+import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
 
 

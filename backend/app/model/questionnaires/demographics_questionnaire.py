@@ -32,7 +32,8 @@ class DemographicsQuestionnaire(db.Model):
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Your sex at birth",
-                                "self_guardian": "Your sex at birth"
+                                "self_guardian": "Your sex at birth",
+                                "self_professional": "Your sex at birth"
                             }
                 },
                 "options": [
@@ -123,6 +124,8 @@ class DemographicsQuestionnaire(db.Model):
                                                     "(* indicates required response):",
                                 "self_guardian": "Please answer the following questions about yourself "
                                                  "(* indicates required response):",
+                                "self_professional": "Please answer the following questions about yourself "
+                                                 "(* indicates required response):",
                                 "dependent": "Please answer the following questions about your child or the person "
                                              "with autism on whom you are providing information",
                             }
@@ -138,6 +141,7 @@ class DemographicsQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": 'Your current gender identity (how you describe yourself)*:',
                                 "self_guardian": 'Your current gender identity (how you describe yourself)*:',
+                                "self_professional": 'Your current gender identity (how you describe yourself)*:',
                             }
                         }
                     },
@@ -159,6 +163,7 @@ class DemographicsQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "What is your race/ethnicity? (select all that apply)",
                                 "self_guardian": "What is your race/ethnicity? (select all that apply)",
+                                "self_professional": "What is your race/ethnicity? (select all that apply)",
                             }
                         }
                     },

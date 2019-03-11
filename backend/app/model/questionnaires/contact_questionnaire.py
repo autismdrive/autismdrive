@@ -145,27 +145,12 @@ class ContactQuestionnaire(db.Model):
                 "required": True,
                 "options": [
                     {"value": "internet", "label": "Internet"},
-                    {
-                        "value": "health_care_provider",
-                        "label": "Health care provider (doctor, speech therapist, etc)",
-                    },
+                    {"value": "health_care_provider", "label": "Health care provider (doctor, speech therapist, etc)"},
                     {"value": "school", "label": "Teacher or school"},
-                    {
-                        "value": "word_of_mouth",
-                        "label": "Word of mouth (friend, family member, etc)",
-                    },
-                    {
-                        "value": "community_event",
-                        "label": "Community event (autism walk, resource fair, etc.)",
-                    },
-                    {
-                        "value": "media",
-                        "label": "Television or radio (CNN, NPR, local news, etc.)",
-                    },
-                    {
-                        "value": "research_study",
-                        "label": "While participating in a research study",
-                    },
+                    {"value": "word_of_mouth", "label": "Word of mouth (friend, family member, etc)"},
+                    {"value": "community_event", "label": "Community event (autism walk, resource fair, etc.)"},
+                    {"value": "media", "label": "Television or radio (CNN, NPR, local news, etc.)"},
+                    {"value": "research_study", "label": "While participating in a research study"},
                     {"value": "other", "label": "Other"},
                 ],
             },

@@ -1685,6 +1685,28 @@ class TestCase(unittest.TestCase):
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
+    def test_participant_relationships(self):
+        u = self.construct_user()
+        participant = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        dependent = self.construct_participant(user=u, relationship=Relationship.dependent)
+        professional = self.construct_participant(user=u, relationship=Relationship.self_professional)
+        rv = self.app.get('/api/user/%i' % u.id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], u.id)
+        self.assertEqual(len(response["participants"]), 4)
+        self.assertEqual(response["participants"][0]["id"], participant.id)
+        self.assertEqual(response["participants"][0]["relationship"], 'self_participant')
+        self.assertEqual(response["participants"][1]["id"], guardian.id)
+        self.assertEqual(response["participants"][1]["relationship"], 'self_guardian')
+        self.assertEqual(response["participants"][2]["id"], dependent.id)
+        self.assertEqual(response["participants"][2]["relationship"], 'dependent')
+        self.assertEqual(response["participants"][3]["id"], professional.id)
+        self.assertEqual(response["participants"][3]["relationship"], 'self_professional')
+
     def test_participant_basics(self):
         self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent)
         p = db.session.query(Participant).first()
@@ -3118,7 +3140,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("self_living_situation",response["get_meta"]["field_groups"]["self_living"]["fields"][0]["name"])
+        self.assertEqual("self_living_situation", response["get_meta"]["field_groups"]["self_living"]["fields"][0]["name"])
 
     def test_support_meta_contain_their_fields(self):
         self.construct_supports_questionnaire()
@@ -3127,7 +3149,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("self_living_situation",response["get_meta"]["field_groups"]["self_living"]["fields"][0]["name"])
+        self.assertEqual("self_living_situation", response["get_meta"]["field_groups"]["self_living"]["fields"][0]["name"])
 
     def test_evaluation_history_dependent_meta_contain_their_fields(self):
         self.construct_evaluation_history_dependent_questionnaire()
