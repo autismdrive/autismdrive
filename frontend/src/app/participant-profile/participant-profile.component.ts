@@ -61,6 +61,9 @@ export class ParticipantProfileComponent implements OnInit {
     } else if (this.participant.relationship === ParticipantRelationship.DEPENDENT) {
       $event.preventDefault();
       this.router.navigate(['flow', 'dependent_intake', this.participant.id]);
+    } else if (this.participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
+      $event.preventDefault();
+      this.router.navigate(['flow', 'professional_intake', this.participant.id]);
     } else {
       $event.preventDefault();
       this.router.navigate(['flow', 'guardian_intake', this.participant.id]);

@@ -88,6 +88,7 @@ class IdentificationQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Is this your preferred name?",
                                 "self_guardian": "Is this your preferred name?",
+                                "self_professional": "Is this your preferred name?",
                                 "dependent": "Is this your child\'s preferred name?",
                             }
                         },
@@ -118,6 +119,7 @@ class IdentificationQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Your date of birth",
                                 "self_guardian": "Your date of birth",
+                                "self_professional": "Your date of birth",
                                 "dependent": "Your child\'s date of birth",
                             }
                         },
@@ -135,6 +137,7 @@ class IdentificationQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Your city/municipality of birth",
                                 "self_guardian": "Your city/municipality of birth",
+                                "self_professional": "Your city/municipality of birth",
                                 "dependent": "Your child\'s city/municipality of birth",
                             }
                         },
@@ -152,6 +155,7 @@ class IdentificationQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Your state of birth",
                                 "self_guardian": "Your state of birth",
+                                "self_professional": "Your state of birth",
                                 "dependent": "Your child\'s state of birth",
                             }
                         },
@@ -170,6 +174,7 @@ class IdentificationQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Is your primary language English?",
                                 "self_guardian": "Is your primary language English?",
+                                "self_professional": "Is your primary language English?",
                                 "dependent": "Is your child\'s primary language English?",
                             }
                         },
@@ -198,6 +203,7 @@ class IdentificationQuestionnaire(db.Model):
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "Please answer the following questions about yourself (* indicates required response):",
                                 "self_guardian": "Please answer the following questions about yourself (* indicates required response):",
+                                "self_professional": "Please answer the following questions about yourself (* indicates required response):",
                                 "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information)",
                             }
                         }
@@ -216,6 +222,7 @@ class IdentificationQuestionnaire(db.Model):
                     },
                 },
             }
+
 
 class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:

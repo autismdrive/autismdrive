@@ -87,6 +87,7 @@ def _load_data(data_loader):
     data_loader.load_evaluation_history_questionnaires()
     data_loader.load_home_questionnaires()
     data_loader.load_identification_questionnaire()
+    data_loader.load_professional_profile_questionnaire()
     data_loader.load_supports_questionnaire()
 
 

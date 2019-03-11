@@ -12,6 +12,7 @@ class Relationship(enum.Enum):
     self_participant = 1
     self_guardian = 2
     dependent = 3
+    self_professional = 4
 
     @classmethod
     def has_name(cls, name):
