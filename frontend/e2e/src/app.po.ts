@@ -35,8 +35,9 @@ export class AppPage {
   }
 
   async clickLinkTo(route: string) {
-    this.waitForClickable(`[ng-reflect-router-link=${route}]`);
-    this.clickElement(`[ng-reflect-router-link=${route}]`);
+    const selector = `[href="#${route}"]`;
+    this.waitForClickable(selector);
+    this.clickElement(selector);
     const url = await this.getUrl();
     expect(url.split('#')[1]).toEqual(route);
   }
