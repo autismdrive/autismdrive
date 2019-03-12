@@ -62,7 +62,7 @@ export class FlowComponent implements OnInit {
       });
   }
 
-  updateParticipant(participantId: number){
+  updateParticipant(participantId: number) {
     this.api.getParticipant(participantId).subscribe(
       p => {
         this.participant = p;
