@@ -7,8 +7,8 @@ from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMix
 class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_dependent_questionnaire"
 
-    has_academic_difficulties_label = '"Does " + (model.preferred_name || "your child") + " have any difficulties with academics?"'
-    academic_difficulty_areas_label = '"What areas of academics are difficult for " + (model.preferred_name || "your child")'
+    has_academic_difficulties_label = '"Does " + (formState.preferredName || "your child") + " have any difficulties with academics?"'
+    academic_difficulty_areas_label = '"What areas of academics are difficult for " + (formState.preferredName || "your child")'
 
     dependent_verbal_ability = db.Column(
         db.String,
@@ -27,7 +27,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 ]
             },
             "expression_properties": {
-                "template_options.label": '(model.preferred_name || "Your child") + "\'s current '
+                "template_options.label": '(formState.preferredName || "Your child") + "\'s current '
                                           'verbal ability:"'
             },
         }
@@ -66,7 +66,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Does " + (model.preferred_name || "your child") + '
+                "template_options.label": '"Does " + (formState.preferredName || "your child") + '
                                           '" currently engage in the following behaviors of concern?"'
             },
         },

@@ -165,21 +165,24 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                     "display_order": 0,
                     "wrappers": ["help"],
                     "template_options": {
-                        "label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Do you CURRENTLY have any of the following diagnoses? (please check all that apply)",
-                                "self_guardian": "Do you CURRENTLY have any of the following diagnoses? (please check all that apply)",
-                                "dependent": "Does your child CURRENTLY have any of the following diagnoses? (please check all that apply)",
-                            }
-                        },
+                        "label": "",
                         "description": {
                             "RELATIONSHIP_SPECIFIC": {
                                 "self_participant": "You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies.",
                                 "self_guardian": "You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies.",
-                                "dependent": "You may choose not to disclose confidential health information, however, this may cause to your child to be excluded from some studies.",
+                                "dependent": "You may choose not to disclose confidential health information, however, this may cause your child to be excluded from some studies.",
                             }
                         },
                     },
+                    "expression_properties": {
+                        "template_options.label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
+                                "self_guardian": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
+                                "dependent": '"Does " + (formState.preferredName || "your child") + " CURRENTLY have any of the following diagnoses? (please check all that apply)"',
+                            }
+                        }
+                    }
                 },
                 "developmental_group": {
                     "fields": ["developmental", "developmental_other"],

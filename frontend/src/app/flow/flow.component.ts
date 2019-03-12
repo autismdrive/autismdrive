@@ -62,7 +62,7 @@ export class FlowComponent implements OnInit {
       });
   }
 
-  updateParticipant(participantId: number){
+  updateParticipant(participantId: number) {
     this.api.getParticipant(participantId).subscribe(
       p => {
         this.participant = p;
@@ -146,12 +146,11 @@ export class FlowComponent implements OnInit {
     this.form = new FormGroup({});
     this.options = {
       formState: {
-        mainModel: this.model
+        mainModel: this.model,
+        preferredName: this.participant.name,
+        isSelf: this.user.isSelf(this.participant),
       }
     };
-
-    this.model.preferred_name = this.participant.name;
-    this.model.is_self = this.user.isSelf(this.participant);
     this.loading = false;
   }
 

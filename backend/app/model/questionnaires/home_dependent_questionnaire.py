@@ -10,7 +10,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
 
-    struggle_to_afford_label = '"Do you or " + (model.preferred_name) + "\'s other caregivers ever struggle with being ' \
+    struggle_to_afford_label = '"Do you or " + (formState.preferredName) + "\'s other caregivers ever struggle with being ' \
                                'able to afford to pay for household needs, food, or security for the family?"'
 
     dependent_living_situation = db.Column(
@@ -42,7 +42,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "template_options": {"placeholder": ""},
             "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
             "expression_properties": {
-                "template_options.placeholder": '"Please describe "+ (model.preferred_name) + "\'s current living situation"'
+                "template_options.placeholder": '"Please describe "+ (formState.preferredName) + "\'s current living situation"'
             },
         },
     )
@@ -55,14 +55,16 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     "wrappers": ["card"],
                     "template_options": {"label": "Current Living Situation"},
                     "expression_properties": {
-                        "template_options.label": '"Where does " + model.preferred_name + " currently '
+                        "template_options.label": '"Where does " + formState.preferredName + " currently '
                                                   'live (select all that apply)?"'
                     },
                 }
 
         # As housemates is a different model, it does not work to put the dependent's name into the label
-        # in the same way we have done for other labels (model.preferred_name will return undefined)
-        field_groups["housemates"]["template_options"]["label"] = "Who else lives with your child?"
+        # in the same way we have done for other labels (formState.preferredName will return undefined)
+        field_groups["housemates"]["expression_properties"] = {
+            "template_options.label" : '"Who else lives with " + formState.preferredName + "?"'
+        }
 
         return field_groups
 
