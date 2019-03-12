@@ -163,7 +163,6 @@ export class FlowComponent implements OnInit {
       fields.push(keysToCamel(field));
 
     }
-    fields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     return fields;
   }
 
