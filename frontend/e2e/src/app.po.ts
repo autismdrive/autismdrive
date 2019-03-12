@@ -38,8 +38,8 @@ export class AppPage {
     const selector = `[href="#${route}"]`;
     this.waitForClickable(selector);
     this.clickElement(selector);
-    const url = await this.getUrl();
-    expect(url.split('#')[1]).toEqual(route);
+    const actualRoute = await this.getRoute();
+    expect(actualRoute).toEqual(route);
   }
 
   getParagraphText() {
@@ -74,5 +74,10 @@ export class AppPage {
 
   getUrl() {
     return browser.getCurrentUrl();
+  }
+
+  async getRoute() {
+    const url = await this.getUrl();
+    return url.split('#')[1];
   }
 }

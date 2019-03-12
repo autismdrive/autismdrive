@@ -67,6 +67,46 @@ describe('Anonymous User', () => {
     expect(page.getElements('#agree').count()).toEqual(1);
     expect(page.getElements('#cancel').count()).toEqual(1);
     page.clickElement('#cancel');
+    expect(page.getRoute()).toEqual('/home');
+  });
+
+  it('should display login form', () => {
+    page.waitForClickable('#login-button');
+    page.clickElement('#login-button');
+    expect(page.getElements('app-login').count()).toEqual(1);
+    expect(page.getElements('[id*="input_email"]').count()).toEqual(1);
+    expect(page.getElements('[id*="input_password"]').count()).toEqual(1);
+    page.clickElement('#cancel');
+    expect(page.getRoute()).toEqual('/home');
+  });
+
+  it('should display forgot password form', () => {
+    page.waitForClickable('#login-button');
+    page.clickElement('#login-button');
+    expect(page.getElements('app-login').count()).toEqual(1);
+    page.waitForClickable('#forgot_password');
+    page.clickElement('#forgot_password');
+    expect(page.getElements('app-forgot-password').count()).toEqual(1);
+    expect(page.getElements('[id*="input_email"]').count()).toEqual(1);
+    expect(page.getElements('[id*="input_password"]').count()).toEqual(0);
+    expect(page.getElements('#cancel').count()).toEqual(1);
+    expect(page.getElements('#submit').count()).toEqual(1);
+    expect(page.getElements('#register').count()).toEqual(1);
+    page.clickElement('#cancel');
+    expect(page.getRoute()).toEqual('/home');
+  });
+
+  it('should display register form', () => {
+    page.waitForClickable('#login-button');
+    page.clickElement('#login-button');
+    expect(page.getElements('app-login').count()).toEqual(1);
+    page.waitForClickable('#register');
+    page.clickElement('#register');
+    expect(page.getElements('app-terms').count()).toEqual(1);
+    expect(page.getElements('#agree').count()).toEqual(1);
+    expect(page.getElements('#cancel').count()).toEqual(1);
+    page.clickElement('#cancel');
+    expect(page.getRoute()).toEqual('/home');
   });
 
 });
