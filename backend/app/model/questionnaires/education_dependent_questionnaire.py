@@ -8,9 +8,9 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
     __label__ = "Education"
 
-    attends_school_label = '"Does " + (model.preferred_name || "your child") + " attend school?"'
-    school_type_label = '"Is " + (model.preferred_name || "your child") + "\'s school:"'
-    school_services_label = '"Please check the following services " + (model.preferred_name || "your child") + ' \
+    attends_school_label = '"Does " + (formState.preferredName || "your child") + " attend school?"'
+    school_type_label = '"Is " + (formState.preferredName || "your child") + "\'s school:"'
+    school_services_label = '"Please check the following services " + (formState.preferredName || "your child") + ' \
                             '" currently receives in school (check all that apply):"'
     placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
@@ -36,7 +36,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"What is " + (model.preferred_name || "your child") + "\'s '
+                "template_options.label": '"What is " + (formState.preferredName || "your child") + "\'s '
                                           'current grade/school placement?"',
             },
         },

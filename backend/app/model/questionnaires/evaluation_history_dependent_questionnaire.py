@@ -8,19 +8,19 @@ class EvaluationHistoryDependentQuestionnaire(db.Model, EvaluationHistoryMixin):
     __tablename__ = "evaluation_history_dependent_questionnaire"
     __label__ = "Evaluation History"
 
-    self_identifies_autistic_label = '"Does " + (model.preferred_name || "your child") + " self-identify as having Autism?"'
-    has_autism_diagnosis_label = '"Has " + (model.preferred_name || "your child") + " been formally diagnosed with Autism Spectrum Disorder?"'
-    years_old_at_first_diagnosis_label = '"How old (in years) was " + (model.preferred_name || "your child") + " when they were first diagnosed with ASD?"'
-    who_diagnosed_label = '"Who first diagnosed " + (model.preferred_name || "your child") + " with ASD?"'
-    where_diagnosed_label = '"Where did " + (model.preferred_name || "your child") + " receive this diagnosis?"'
-    gives_permission_to_link_evaluation_data_label = '"Do we have your permission to link " + (model.preferred_name + "\'s") + " evaluation data to the UVa Autism Database?"'
-    has_iq_test_label = '"Has " + (model.preferred_name) + " been given an IQ or intelligence test?"'
-    recent_iq_score_label = '"What was " + (model.preferred_name + "\'s") + " most recent IQ score?"'
+    self_identifies_autistic_label = '"Does " + (formState.preferredName || "your child") + " self-identify as having Autism?"'
+    has_autism_diagnosis_label = '"Has " + (formState.preferredName || "your child") + " been formally diagnosed with Autism Spectrum Disorder?"'
+    years_old_at_first_diagnosis_label = '"How old (in years) was " + (formState.preferredName || "your child") + " when they were first diagnosed with ASD?"'
+    who_diagnosed_label = '"Who first diagnosed " + (formState.preferredName || "your child") + " with ASD?"'
+    where_diagnosed_label = '"Where did " + (formState.preferredName || "your child") + " receive this diagnosis?"'
+    gives_permission_to_link_evaluation_data_label = '"Do we have your permission to link " + (formState.preferredName + "\'s") + " evaluation data to the UVa Autism Database?"'
+    has_iq_test_label = '"Has " + (formState.preferredName) + " been given an IQ or intelligence test?"'
+    recent_iq_score_label = '"What was " + (formState.preferredName + "\'s") + " most recent IQ score?"'
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
         field_groups["partner_centers"]["expression_properties"]["template_options.label"] = \
-            '"Has " + (model.preferred_name || "your child") + ' \
+            '"Has " + (formState.preferredName || "your child") + ' \
             '" ever been evaluated at any of the following centers?"'
         return field_groups
 

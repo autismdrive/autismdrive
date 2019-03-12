@@ -146,12 +146,11 @@ export class FlowComponent implements OnInit {
     this.form = new FormGroup({});
     this.options = {
       formState: {
-        mainModel: this.model
+        mainModel: this.model,
+        preferredName: this.participant.name,
+        isSelf: this.user.isSelf(this.participant),
       }
     };
-
-    this.model.preferred_name = this.participant.name;
-    this.model.is_self = this.user.isSelf(this.participant);
     this.loading = false;
   }
 
@@ -164,7 +163,6 @@ export class FlowComponent implements OnInit {
       fields.push(keysToCamel(field));
 
     }
-    fields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     return fields;
   }
 

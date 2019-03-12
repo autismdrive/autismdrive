@@ -56,7 +56,14 @@ class Housemate(db.Model):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Relationship to " + (model.is_self ? "you" : (model.nickname || model.first_name || "your child"))'
+                "template_options.label": {
+                    "RELATIONSHIP_SPECIFIC": {
+                        "self_participant": '"Relationship to you"',
+                        "self_guardian": '"Relationship to you"',
+                        "self_professional": '"Relationship to you"',
+                        "dependent": '"Relationship to " + (formState.preferredName || "your child")'
+                    }
+                }
             },
         },
     )
@@ -96,7 +103,7 @@ class Housemate(db.Model):
                     {"value": True, "label": "Yes"},
                     {"value": False, "label": "No"},
                 ],
-            },
+            }
         },
     )
 
