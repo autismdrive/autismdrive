@@ -60,5 +60,13 @@ describe('Anonymous User', () => {
     page.clickLinkTo('/home');
   });
 
+  it('should display terms and conditions when Create Account button is clicked', () => {
+    page.waitForClickable('#register-button');
+    page.clickElement('#register-button');
+    expect(page.getElements('app-terms').count()).toEqual(1);
+    expect(page.getElements('#agree').count()).toEqual(1);
+    expect(page.getElements('#cancel').count()).toEqual(1);
+    page.clickElement('#cancel');
+  });
 
 });
