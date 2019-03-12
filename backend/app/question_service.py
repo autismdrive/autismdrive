@@ -46,11 +46,16 @@ class QuestionService:
 
     @staticmethod
     def get_meta(questionnaire, relationship):
+        __tablename__ = "identification_questionnaire"
+        __label__ = "Identification"
+        __question_type__ = QuestionService.TYPE_IDENTIFYING
+
         meta = {"table": {}}
-        if 'question_type' in meta['table']:
+        try:
             meta["table"]['question_type'] = questionnaire.__question_type__
-        if 'label' in meta['table']:
             meta["table"]["label"] = questionnaire.__label__
+        except:
+            pass  # If these fields don't exist, just keep going.
         meta["fields"] = []
 
         groups = questionnaire.get_field_groups()
@@ -69,11 +74,15 @@ class QuestionService:
                             values['fields'].remove(c.name)
                             if'fieldGroup' not in values: values['fieldGroup'] = []
                             values['fieldGroup'].append(c.info)
+                            values['fieldGroup'] = sorted(values['fieldGroup'],
+                                                          key=lambda field: field['display_order'])
                             added = True
+                    # Sort the fields
+
                 if not added:
                     meta['fields'].append(c.info)
 
-        for group,values in groups.items():
+        for group, values in groups.items():
             values['name'] = group
 #            if value['type'] == 'repeat':
 #                value['fieldArray'] = value.pop('fields')
@@ -86,15 +95,8 @@ class QuestionService:
                 values['fieldArray'] = {'fieldGroup': values.pop('fields')}
             meta['fields'].append(values)
 
-
-  #      try:
-   #         meta = questionnaire.update_meta(meta)
-#        except AttributeError:
-            # Questionnaire doesn't have to implement this method.
- #           pass
-
-
-        # Rename filed_groups to be "
+        # Sort the fields
+        meta['fields'] = sorted(meta['fields'], key=lambda field: field['display_order'])
 
         # loops through the depths, checks, and replaces ....
         meta_relationed = QuestionService._recursive_relationship_changes(meta, relationship)
