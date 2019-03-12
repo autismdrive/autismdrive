@@ -15,8 +15,13 @@ describe('Anonymous User', () => {
 
   it('should display utility navigation', () => {
     expect(page.getElements('#utility-nav').count()).toEqual(1);
+  });
+
+  it('should display logged-out state in utility navigation', () => {
     expect(page.getElements('#register-button').count()).toEqual(1);
     expect(page.getElements('#login-button').count()).toEqual(1);
+    expect(page.getElements('#profile-button').count()).toEqual(0);
+    expect(page.getElements('#logout-button').count()).toEqual(0);
   });
 
   it('should display primary navigation', () => {
