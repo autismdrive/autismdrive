@@ -122,6 +122,12 @@ class TestCase(unittest.TestCase):
         for endpoint in endpoints:
             self.assertEqual(response[endpoint[0]], endpoint[1])
 
+    def get_field_from_response(self, response, name):
+        for field in response['fields']:
+            if field["name"] == name:
+                return field
+
+
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            image_url="assets/image.svg", image_caption="An inspiring photograph of great renown",
                            street_address1="123 Some Pl", street_address2="Apt. 45",
@@ -3087,14 +3093,16 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertIsNotNone(response["get_meta"]["field_groups"]["intro"]["template_options"]["description"])
-        self.assertEqual(response["get_meta"]["field_groups"]["intro"]["template_options"]["description"],
+        intro = self.get_field_from_response(response, "intro");
+        self.assertIsNotNone(intro["template_options"]["description"])
+        self.assertEqual(intro["template_options"]["description"],
                          "Please answer the following questions about yourself (* indicates required response):")
 
-        self.assertIsNotNone(response["get_meta"]["birth_city"])
-        self.assertIsNotNone(response["get_meta"]["birth_city"]["template_options"])
-        self.assertIsNotNone(response["get_meta"]["birth_city"]["template_options"]["label"])
-        self.assertEqual(response["get_meta"]["birth_city"]["template_options"]["label"],
+        birth_city = self.get_field_from_response(response, "birth_city");
+        self.assertIsNotNone(birth_city)
+        self.assertIsNotNone(birth_city["template_options"])
+        self.assertIsNotNone(birth_city["template_options"]["label"])
+        self.assertEqual(birth_city["template_options"]["label"],
                          "Your city/municipality of birth")
 
         rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
@@ -3102,8 +3110,9 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertIsNotNone(response["get_meta"]["birth_city"]["template_options"]["label"])
-        self.assertEqual(response["get_meta"]["birth_city"]["template_options"]["label"],
+        birth_city = self.get_field_from_response(response, "birth_city");
+        self.assertIsNotNone(birth_city["template_options"]["label"])
+        self.assertEqual(birth_city["template_options"]["label"],
                          "Your child's city/municipality of birth")
 
     def test_questionnaire_meta_has_relation_required_fields(self):
@@ -3113,7 +3122,8 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertIsNotNone(response["get_meta"]["field_groups"]["relationship"])
+        relationship = self.get_field_from_response(response, "relationship")
+        self.assertIsNotNone(relationship)
 
         # Convert Participant to a dependant
         rv = self.app.get('/api/flow/self_intake/identification_questionnaire/meta',
@@ -3121,7 +3131,8 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertFalse("relationship" in response["get_meta"]["field_groups"])
+        relationship = self.get_field_from_response(response, "relationship")
+        self.assertIsNone(relationship)
 
     def test_meta_contains_table_details(self):
         self.construct_identification_questionnaire()
@@ -3130,8 +3141,8 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("identifying", response["get_meta"]["table"]["question_type"])
-        self.assertEqual("Identification", response["get_meta"]["table"]["label"])
+        self.assertEqual("identifying", response["table"]["question_type"])
+        self.assertEqual("Identification", response["table"]["label"])
 
     def test_meta_field_groups_contain_their_fields(self):
         self.construct_home_self_questionnaire()
@@ -3140,7 +3151,8 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("self_living_situation", response["get_meta"]["field_groups"]["self_living"]["fields"][0]["name"])
+        self_living = self.get_field_from_response(response, "self_living")
+        self.assertEqual("self_living_situation", self_living["fieldGroup"][0]["name"])
 
     def test_support_meta_contain_their_fields(self):
         self.construct_supports_questionnaire()
@@ -3149,7 +3161,9 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("self_living_situation", response["get_meta"]["field_groups"]["self_living"]["fields"][0]["name"])
+        assistive_devices = self.get_field_from_response(response, "assistive_devices")
+        self.assertIsNotNone(assistive_devices["fieldArray"]["fieldGroup"][0])
+        self.assertEqual("type", assistive_devices["fieldArray"]["fieldGroup"][0]["name"])
 
     def test_evaluation_history_dependent_meta_contain_their_fields(self):
         self.construct_evaluation_history_dependent_questionnaire()
@@ -3158,7 +3172,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(len(response["fields"]), 11)
+        self.assertEqual(len(response["fields"]), 10)
 
     def test_evaluation_history_self_meta_contain_their_fields(self):
         self.construct_evaluation_history_self_questionnaire()
@@ -3167,7 +3181,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(len(response["fields"]), 11)
+        self.assertEqual(len(response["fields"]), 10)
 
     def test_education_dependent_meta_contain_their_fields(self):
         self.construct_education_dependent_questionnaire()
@@ -3185,4 +3199,18 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(len(response["fields"]), 8)
+        self.assertEqual(len(response["fields"]), 5)
+
+    def test_meta_fields_are_ordered(self):
+        self.construct_education_self_questionnaire()
+        rv = self.app.get('/api/flow/self_intake/education_self_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1,  response["fields"][0]["display_order"])
+        self.assertEqual(2,  response["fields"][1]["display_order"])
+        self.assertEqual(3,  response["fields"][2]["display_order"])
+
+        self.assertEqual(6.1, response['fields'][4]["fieldGroup"][0]["display_order"]);
+        self.assertEqual(6.2, response['fields'][4]["fieldGroup"][1]["display_order"]);
