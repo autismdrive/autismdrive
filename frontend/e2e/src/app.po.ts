@@ -30,10 +30,6 @@ export class AppPage {
     return browser.executeScript(`return window.sessionStorage.getItem('${key}');`);
   }
 
-  navigateToHome() {
-    return browser.get('/');
-  }
-
   async clickLinkTo(route: string) {
     const selector = `[href="#${route}"]`;
     this.waitForClickable(selector);
@@ -80,4 +76,28 @@ export class AppPage {
     const url = await this.getUrl();
     return url.split('#')[1];
   }
+
+  inputText(selector: string, textToEnter: string) {
+    expect(this.getElements(selector).count()).toEqual(1);
+    const field = this.getElement(selector);
+    field.sendKeys(textToEnter);
+    expect(field.getAttribute('value')).toEqual(textToEnter);
+  }
+
+  navigateToHome() {
+    return browser.get('/');
+  }
+
+  clickAndExpectRoute(clickSelector: string, expectedRoute: string) {
+    this.waitForClickable(clickSelector);
+    this.clickElement(clickSelector);
+    expect(this.getRoute()).toEqual(expectedRoute);
+  }
+
+  getRandomString(length: number) {
+    const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    return Array(length).join().split(',').map(() => s.charAt(Math.floor(Math.random() * s.length))).join('');
+  }
+
+
 }
