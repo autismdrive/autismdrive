@@ -70,6 +70,7 @@ import { TimedoutComponent } from './timed-out/timed-out.component';
 import { LogoutComponent } from './logout/logout.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
+import { FlowIntroComponent } from './flow-intro/flow-intro.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -126,7 +127,8 @@ export class FormlyConfig {
     TimedoutComponent,
     LogoutComponent,
     AvatarDialogComponent,
-    FlowCompleteComponent
+    FlowCompleteComponent,
+    FlowIntroComponent
   ],
   imports: [
     BrowserAnimationsModule,
