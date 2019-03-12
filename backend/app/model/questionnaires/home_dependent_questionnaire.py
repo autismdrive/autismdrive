@@ -59,11 +59,8 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                                                   'live (select all that apply)?"'
                     },
                 }
-
-        # As housemates is a different model, it does not work to put the dependent's name into the label
-        # in the same way we have done for other labels (formState.preferredName will return undefined)
         field_groups["housemates"]["expression_properties"] = {
-            "template_options.label" : '"Who else lives with " + formState.preferredName + "?"'
+            "template_options.label": '"Who else lives with " + formState.preferredName + "?"'
         }
 
         return field_groups
