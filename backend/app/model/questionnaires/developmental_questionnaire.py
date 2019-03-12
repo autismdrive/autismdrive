@@ -66,7 +66,7 @@ class DevelopmentalQuestionnaire(db.Model):
             },
             "expression_properties": {
                 "template_options.label": '"When did " + '
-                '(model.preferred_name || "Your child") + '
+                '(formState.preferredName || "Your child") + '
                 '" reach their motor developmental milestones '
                 '(e.g., walking, crawling, etc.)?"'
             },
@@ -89,7 +89,7 @@ class DevelopmentalQuestionnaire(db.Model):
             },
             "expression_properties": {
                 "template_options.label": '"When did " + '
-                '(model.preferred_name || "Your child") + '
+                '(formState.preferredName || "Your child") + '
                 '" reach their speech/language developmental milestones '
                 '(e.g., babbling, using first words and phrases)?"'
             },
@@ -112,7 +112,7 @@ class DevelopmentalQuestionnaire(db.Model):
             },
             "expression_properties": {
                 "template_options.label": '"When did " + '
-                '(model.preferred_name || "Your child") + '
+                '(formState.preferredName || "Your child") + '
                 '" reach their toileting milestones (e.g., potty training)?"'
             },
         },

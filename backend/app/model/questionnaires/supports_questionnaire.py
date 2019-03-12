@@ -53,15 +53,18 @@ class SupportsQuestionnaire(db.Model):
                 "wrappers": ["card"],
                 "repeat_class": Medication,
                 "template_options": {
-                    "label": {
-                        "RELATIONSHIP_SPECIFIC": {
-                            "self_participant": "Do you take any medications and/or vitamins?",
-                            "self_guardian": "Do you take any medications and/or vitamins?",
-                            "dependent": "Does your child take any medications and/or vitamins?",
-                        }
-                    },
+                    "label": "",
                     "description": "Add a medication",
                 },
+                "expression_properties": {
+                    "template_options.label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"Do you take any medications and/or vitamins?"',
+                            "self_guardian": '"Do you take any medications and/or vitamins?"',
+                            "dependent": '"Does " + (formState.preferredName || "your child")  + " take any medications and/or vitamins?"',
+                        }
+                    }
+                }
             },
             "therapies": {
                 "type": "repeat",
@@ -69,15 +72,18 @@ class SupportsQuestionnaire(db.Model):
                 "wrappers": ["card"],
                 "repeat_class": Therapy,
                 "template_options": {
-                    "label": {
-                        "RELATIONSHIP_SPECIFIC": {
-                            "self_participant": "What kinds of therapies and services do you currently receive?",
-                            "self_guardian": "What kinds of therapies and services do you currently receive?",
-                            "dependent": "What kinds of therapies and services does your child currently receive?",
-                        }
-                    },
+                    "label": "",
                     "description": "Add a therapy or service",
                 },
+                "expression_properties": {
+                    "template_options.label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"What kinds of therapies and services do you currently receive?"',
+                            "self_guardian": '"What kinds of therapies and services do you currently receive?"',
+                            "dependent": '"What kinds of therapies and services does " + (formState.preferredName || "your child")  + " currently receive?"',
+                        }
+                    }
+                }
             },
             "assistive_devices": {
                 "type": "repeat",
@@ -85,18 +91,18 @@ class SupportsQuestionnaire(db.Model):
                 "wrappers": ["card"],
                 "repeat_class": AssistiveDevice,
                 "template_options": {
-                    "label": {
-                        "RELATIONSHIP_SPECIFIC": {
-                            "self_participant": "Do you use an AAC (alternative & augmentative communication) "
-                                                "system or other assistive device?",
-                            "self_guardian": "Do you use an AAC (alternative & augmentative communication) "
-                                             "system or other assistive device?",
-                            "dependent": "Does your child use an AAC (alternative & augmentative communication) "
-                                         "system or other assistive device?",
-                        }
-                    },
+                    "label": '',
                     "description": "Add an assistive device",
                 },
+                "expression_properties": {
+                    "template_options.label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": '"Do you use an AAC (alternative & augmentative communication) system or other assistive device?"',
+                                "self_guardian": '"Do you use an AAC (alternative & augmentative communication) system or other assistive device?"',
+                                "dependent": '"Does " + (formState.preferredName || "your child")  + " use an AAC (alternative & augmentative communication) system or other assistive device?"',
+                            }
+                        }
+                }
             }
         }
 

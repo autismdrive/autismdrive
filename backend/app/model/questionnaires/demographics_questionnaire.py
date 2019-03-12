@@ -45,7 +45,7 @@ class DemographicsQuestionnaire(db.Model):
             "expression_properties": {
                 "template_options.label": {
                     "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '(model.preferred_name || "your child") + "\'s" '
+                                "dependent": '(formState.preferredName || "your child") + "\'s" '
                                              '+ " sex at birth"',
                             }
                 },
@@ -113,25 +113,6 @@ class DemographicsQuestionnaire(db.Model):
 
     def get_field_groups(self):
         return {
-                "intro": {
-                    "fields": [],
-                    "display_order": 0,
-                    "wrappers": ["help"],
-                    "template_options": {
-                        "description": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Please answer the following questions about yourself "
-                                                    "(* indicates required response):",
-                                "self_guardian": "Please answer the following questions about yourself "
-                                                 "(* indicates required response):",
-                                "self_professional": "Please answer the following questions about yourself "
-                                                 "(* indicates required response):",
-                                "dependent": "Please answer the following questions about your child or the person "
-                                             "with autism on whom you are providing information",
-                            }
-                        },
-                    },
-                },
                 "gender": {
                     "fields": ["gender_identity", "gender_identity_other"],
                     "display_order": 2,
@@ -148,8 +129,8 @@ class DemographicsQuestionnaire(db.Model):
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '(model.preferred_name || "Your child") + "\'s" + " current gender identity '
-                                             '(how " + (model.preferred_name || "your child") + " describes themselves)*:"',
+                                "dependent": '(formState.preferredName || "Your child") + "\'s" + " current gender identity '
+                                             '(how " + (formState.preferredName || "your child") + " describes themselves)*:"',
                             }
                         }
                     },
@@ -170,7 +151,7 @@ class DemographicsQuestionnaire(db.Model):
                     "expression_properties": {
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '"What is " + (model.preferred_name || "your child") + "\'s" + '
+                                "dependent": '"What is " + (formState.preferredName || "your child") + "\'s" + '
                                              '" race/ethnicity? (select all that apply)"',
                             }
                         },
