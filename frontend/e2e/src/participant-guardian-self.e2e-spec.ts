@@ -1,7 +1,7 @@
 import { AppPage } from './app-page.po';
 import { GlobalHeaderUseCases } from './use-cases/global-header.po';
 
-describe('Anonymous User', () => {
+describe('Participant (Guardian - Self)', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let randomEmail;
