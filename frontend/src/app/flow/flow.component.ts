@@ -31,6 +31,8 @@ export class FlowComponent implements OnInit {
   flowState = FlowState;
   state = FlowState.LOADING;
 
+  sidebarOpen = true;
+
   model: any = {};
   form: FormGroup;
   fields = [];
@@ -157,9 +159,7 @@ export class FlowComponent implements OnInit {
     this.form = new FormGroup({});
     this.options = {
       formState: {
-        mainModel: this.model,
-        preferredName: this.participant.name,
-        isSelf: this.user.isSelf(this.participant),
+        mainModel: this.model
       }
     };
     this.state = this.flowState.SHOW_FORM;
@@ -174,6 +174,7 @@ export class FlowComponent implements OnInit {
       fields.push(keysToCamel(field));
 
     }
+    fields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     return fields;
   }
 
