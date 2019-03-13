@@ -241,8 +241,13 @@ python tests.py
 ```
 
 ### Run frontend tests
-Make sure you have the database, backend, and frontend all running, with a freshly-cleared and re-seeded database.
-In the `frontend` directory, execute the following command:
+Make sure you have the database, backend, and frontend all running.
+
+Execute the following at the top level of the repository, which will clear and re-seed the database, then run all e2e tests:
+```BASH
+./test-e2e.sh
+```
+Alternatively, to run the e2e tests without reseeding first, execute the following command in the `frontend` directory:
 ```BASH
 ng e2e --dev-server-target=
 ```
