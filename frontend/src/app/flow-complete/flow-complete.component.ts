@@ -22,4 +22,14 @@ export class FlowCompleteComponent implements OnInit {
     this.router.navigate(['profile']);
   }
 
+  goStudies($event) {
+    $event.preventDefault();
+    this.router.navigate(['studies']);
+  }
+
+  goResources($event) {
+    $event.preventDefault();
+    this.router.navigate(['resources']);
+  }
+
 }
