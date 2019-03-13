@@ -28,15 +28,6 @@ export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 apt-get install postgresql postgresql-client
 ```
 
-#### ElasticSearch
-MacOS
-```BASH
-brew install elasticsearch
-```
-
-Debian:
-[follow these instructions](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html).
-
 #### Angular
 ```BASH
 npm install -g @angular/cli
@@ -102,16 +93,7 @@ Place your s3 credentials in this file (will need to get a copy from someone els
 ### Load in the seed data
 This will pull in initial values into the database.
 ```BASH
-flask loadicons
 flask initdb
-flask initindex
-```
-
-### Starting Elastic Search
-Elastic Search (on Debian at least) may not start up automatically.  In these cases, you can start it
-when you need it by running:
-```BASH
-sudo service elasticsearch start
 ```
 
 ## Add a config file
@@ -121,9 +103,26 @@ mkdir instance && cp -r config instance/config && cp instance/config/default.py 
 ```
 
 ## Run the app
-Execute the following at the top level of the repository to start PostgreSQL, ElasticSearch, flask, and Angular all in one command:
+Execute the following at the top level of the repository to start PostgreSQL, flask, and Angular all in one command:
 ```BASH
 ./start.sh
+```
+
+Or you can run these 3 commands separately:
+
+Database:
+```BASH
+./start-db.sh
+```
+
+Backend:
+```BASH
+./start-backend.sh
+```
+
+Frontend:
+```BASH
+./start-frontend.sh
 ```
 
 Alternatively, you could start each of the services individually, using the commands below.
@@ -131,11 +130,6 @@ Alternatively, you could start each of the services individually, using the comm
 ### Start PostgreSQL
 ```BASH
 pg_ctl -D /usr/local/var/postgres start
-```
-
-### Start ElasticSearch
-```BASH
-elasticsearch
 ```
 
 ### Start the backend app
@@ -169,9 +163,6 @@ Also note that mail is handled differently for tests. Make sure that your instan
 
 TESTING = False
 
-
-
-
 ## Maintenance
 
 ### Clear out the database, indexes, and reseed the database
@@ -180,12 +171,8 @@ This will remove all data from the database, delete all information from the Ela
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
 flask cleardb
-flask clearindex
 flask db upgrade
-flask db migrate
-flask loadicons
 flask initdb
-flask initindex
 ```
 
 ### Migration Conflicts
@@ -196,7 +183,7 @@ flask db merge -m "merge cc4610a6ece3 and 2679ef53e0bd" cc4610a6ece3 2679ef53e0b
 This will auto-generate a new migration that ties the streams together.
 
 ### Migrations with Enum columns
-Alembic probably will not generate migrations that do everything that you need them to do when it comes to handling Enum values. 
+Alembic probably will not generate migrations that do everything that you need them to do when it comes to handling Enum values.
 Look at migration versions 2fd0ab60fe3a_.py and 5fb917adc751_.py to see some examples of handling enum additions and changes.
 
 ## Best Practices
@@ -251,4 +238,16 @@ In the `backend` directory, execute the following command:
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
 python tests.py
+```
 
+### Run frontend tests
+Make sure you have the database, backend, and frontend all running.
+
+Execute the following at the top level of the repository, which will clear and re-seed the database, then run all e2e tests:
+```BASH
+./test-e2e.sh
+```
+Alternatively, to run the e2e tests without reseeding first, execute the following command in the `frontend` directory:
+```BASH
+ng e2e --dev-server-target=
+```

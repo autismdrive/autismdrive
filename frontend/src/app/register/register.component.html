@@ -36,23 +36,26 @@
             mat-flat-button
             type="submit"
             color="primary"
+            id="submit"
           >Next</button>
           <button
             mat-flat-button
             (click)="goHome($event)"
             color="accent"
+            id="cancel"
           >Cancel</button>
         </footer>
         <footer *ngIf="registerState === 'submitting'">
           <app-loading></app-loading>
         </footer>
-        <footer *ngIf="registerState === 'wait_for_email'">
-          <b>Account Created! </b>
+        <footer *ngIf="registerState === 'wait_for_email'" id="confirmation_message">
+          <h1>Account Created!</h1>
           <p>Please check your email to complete the signin process.</p>
           <button
             color="primary"
             (click)="goHome($event)"
             mat-flat-button
+            id="continue"
           >
             Continue
           </button>
