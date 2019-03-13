@@ -74,6 +74,8 @@
  */
 import 'zone.js/dist/zone';  // Included with Angular CLI.
 
+// Required by some of the Angular Material components.
+import 'hammerjs';
 
 /***************************************************************************************************
  * APPLICATION IMPORTS
