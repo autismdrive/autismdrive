@@ -85,6 +85,6 @@ export class AppComponent implements OnInit {
   }
 
   isLoggedIn() {
-    return (this.timeLeftInSession > 0) && this.user && this.user.email;
+    return this.user && this.user.email;
   }
 }

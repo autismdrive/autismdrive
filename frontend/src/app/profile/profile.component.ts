@@ -23,6 +23,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(private api: ApiService, private router: Router) {
     this.api.getSession().subscribe(userProps => {
+      console.log('ProfileComponent constructor getSession userProps', userProps);
+
       this.user = new User(userProps);
       this.state = this.getState();
 

@@ -20,6 +20,13 @@ export class GlobalHeaderUseCases {
     expect(this.page.getElements('#logout-button').count()).toEqual(0);
   }
 
+  displayLoggedInState() {
+    expect(this.page.getElements('#register-button').count()).toEqual(0);
+    expect(this.page.getElements('#login-button').count()).toEqual(0);
+    expect(this.page.getElements('#profile-button').count()).toEqual(1);
+    expect(this.page.getElements('#logout-button').count()).toEqual(1);
+  }
+
   displayPrimaryNav() {
     expect(this.page.getElements('#primary-nav').count()).toEqual(1);
     expect(this.page.getElements('#enroll-button').count()).toEqual(1);
