@@ -9,6 +9,12 @@ import { Participant } from '../participant';
 import { Flow } from '../flow';
 import { Step, StepStatus } from '../step';
 
+enum FlowState {
+  INTRO = 'intro',
+  LOADING = 'loading',
+  COMPLETE = 'complete',
+  SHOW_FORM = 'form',
+}
 
 @Component({
   selector: 'app-flow',
@@ -22,7 +28,8 @@ export class FlowComponent implements OnInit {
   flow: Flow;
 
   activeStep = 0;
-  loading = true;
+  flowState = FlowState;
+  state = FlowState.LOADING;
 
   model: any = {};
   form: FormGroup;
@@ -58,7 +65,11 @@ export class FlowComponent implements OnInit {
       .subscribe(f => {
         this.flow = new Flow(f);
         console.log('Flow Loaded:' + this.flow.name);
-        this.goToNextAvailableStep();
+        if (this.flow.percentComplete() === 0) {
+          this.state = this.flowState.INTRO;
+        } else {
+          this.goToNextAvailableStep();
+        }
       });
   }
 
@@ -95,8 +106,8 @@ export class FlowComponent implements OnInit {
       this.loadActiveStep();
     } else {
       console.log('This flow is already completed.');
-      this.activeStep = 0;
-      this.loadActiveStep();
+      this.state = FlowState.COMPLETE;
+      this.scrollToTop();
     }
   }
 
@@ -151,7 +162,7 @@ export class FlowComponent implements OnInit {
         isSelf: this.user.isSelf(this.participant),
       }
     };
-    this.loading = false;
+    this.state = this.flowState.SHOW_FORM;
   }
 
   private infoToForm(info) {
@@ -184,5 +195,11 @@ export class FlowComponent implements OnInit {
         });
     }
   }
-
+  scrollToTop() {
+      window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }
 }

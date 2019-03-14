@@ -46,7 +46,7 @@ class EmploymentQuestionnaire(db.Model):
         info={
             'display_order': 1.2,
             'type': 'radio',
-            'default_value': True,
+            'default_value': 'n/a',
             'template_options': {
                 'label': 'In what capacity?',
                 'required': False,
@@ -59,7 +59,7 @@ class EmploymentQuestionnaire(db.Model):
         }
     )
     has_employment_support = db.Column(
-        db.Boolean,
+        db.String,
         info={
             'display_order': 2,
             'type': 'radio',
@@ -68,9 +68,9 @@ class EmploymentQuestionnaire(db.Model):
                          'vocational training?',
                 'required': False,
                 'options': [
-                    {'value': True, 'label': 'Yes'},
-                    {'value': True, 'label': 'No, but I am interested'},
-                    {'value': False, 'label': 'No'}
+                    {'value': 'yes', 'label': 'Yes'},
+                    {'value':  'No, but I am interested', 'label': 'No, but I am interested'},
+                    {'value':  'No', 'label': 'No'}
                 ]
             }
         }
