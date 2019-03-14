@@ -55,6 +55,7 @@ class CurrentBehaviorsMixin(object):
                 "template_options": {
                     "type": "array",
                     "label": "Area of difficulty",
+                    "appearance": "standard",
                     "required": True,
                     "options": [
                         {"value": "math", "label": "Math"},
@@ -76,7 +77,8 @@ class CurrentBehaviorsMixin(object):
             "display_order": 4.2,
             "type": "input",
             "template_options": {
-                "label": "Enter area of academic difficulty"
+                "label": "Enter area of academic difficulty",
+                "appearance": "standard"
             },
             "hide_expression": '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))',
         },

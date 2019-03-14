@@ -85,7 +85,8 @@ class EducationMixin(object):
                 "display_order": 4.3,
                 "type": "input",
                 "template_options": {
-                    "label": "Enter school placement"
+                    "label": "Enter school placement",
+                    "appearance": "standard"
                 },
                 "hide_expression": cls.placement_other_hide_expression,
             },
@@ -99,7 +100,8 @@ class EducationMixin(object):
                 "display_order": 5,
                 "type": "input",
                 "template_options": {
-                    "label": "School grade level"
+                    "label": "School grade level",
+                    "appearance": "standard"
                 },
                 "hide_expression": cls.current_grade_hide_expression,
             },

@@ -49,6 +49,7 @@ class EmploymentQuestionnaire(db.Model):
             'default_value': 'n/a',
             'template_options': {
                 'label': 'In what capacity?',
+                "appearance": "standard",
                 'required': False,
                 'options': [
                     {'value': 'fullTime', 'label': 'Full time (> 35 hours per week)'},

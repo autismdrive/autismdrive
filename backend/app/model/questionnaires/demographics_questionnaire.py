@@ -89,7 +89,10 @@ class DemographicsQuestionnaire(db.Model):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter gender identity"},
+            "template_options": {
+                "label": "Enter gender identity",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.gender_identity && (model.gender_identity === "genderOther"))',
         },
     )
@@ -120,7 +123,10 @@ class DemographicsQuestionnaire(db.Model):
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter race/ethnicity"},
+            "template_options": {
+                "label": "Enter race/ethnicity",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))',
         },
     )
