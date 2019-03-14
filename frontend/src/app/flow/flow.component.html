@@ -24,9 +24,8 @@
 
     <mat-drawer-container>
       <mat-drawer #sidenav
-        [mode]="'side'"
-        [opened]="sidebarOpen"
-      >
+        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [(opened)]="sidebarOpen">
           <app-questionnaire-steps-list
             [flow]="flow"
             [stepIndex]="activeStep"

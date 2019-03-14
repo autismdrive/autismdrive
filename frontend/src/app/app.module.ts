@@ -5,6 +5,7 @@ import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
+  MAT_LABEL_GLOBAL_OPTIONS,
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
@@ -24,7 +25,8 @@ import {
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MAT_FORM_FIELD_DEFAULT_OPTIONS
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -71,6 +73,7 @@ import { LogoutComponent } from './logout/logout.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
+import {OverlayContainer} from '@angular/cdk/overlay';
 
 @Injectable()
 export class FormlyConfig {
@@ -174,9 +177,16 @@ export class FormlyConfig {
       multi: true
     },
     ApiService,
-    IntervalService
+    IntervalService,
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'outline' }
+    }
   ],
   bootstrap: [AppComponent],
   entryComponents: [AvatarDialogComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(overlayContainer: OverlayContainer) {
+    overlayContainer.getContainerElement().classList.add('stardrive-theme');
+  }
+}

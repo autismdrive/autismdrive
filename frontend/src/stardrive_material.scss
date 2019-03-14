@@ -31,25 +31,41 @@ $animationDuration: 500ms;
       padding-bottom: 6px;
     }
   }
-  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
-    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
+//  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+//    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
+//  }
+
+  // Worried we will get complaints about text sizes being too small, but it
+  // is all relative inside the material form fields, so we can globally set
+  // the font-size for all forms here.
+  mat-form-field.mat-form-field {
+    font-size: 16px;
   }
-  .mat-radio-group {
-    outline: none;
+
+  // This keeps the hint/description text on form fields from
+  // overlaying the next field or sliding off the bottom of a card.
+  .mat-form-field-wrapper .mat-form-field-subscript-wrapper {
+    position: static;
   }
-  .vertical-radio-group,
-  .vertical-checkbox-group {
-    display: inline-flex;
-    flex-direction: column;
-    .mat-radio-button,
+
+  // I don't like this, but for reasons I can't find, I messed up
+  // the radio button positions and they need padding to look right.
+  mat-radio-button {
+      padding: 5px 15px 0 0;
+  }
+
+  // This handles the proper display of multi-checkox
+  formly-field-mat-multicheckbox {
     .mat-checkbox {
       margin: 5px;
+      padding-right: 16px;
+      display: block;
+      .mat-checkbox-layout {
+        white-space: normal;
+      }
     }
   }
-  .mat-radio-button,
-  .mat-checkbox {
-    padding-right: 16px;
-  }
+
   .alert {
     padding: 2em;
     text-align: center;
@@ -70,4 +86,8 @@ $animationDuration: 500ms;
     background-color: mat-color($stardrive-primary, default, 1);
     color: white;
   }
+}
+
+.stardrive-theme {
+  @include angular-material-theme($stardrive-theme);
 }

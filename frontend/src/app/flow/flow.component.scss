@@ -11,7 +11,10 @@
 .pad-7 { padding: 7em; }
 .pad-8 { padding: 8em; }
 
-.button-row button { margin-right: 8px; }
+.button-row button {
+  margin-right: 8px;
+  margin-top: 35px; // avoid form description overlaps
+}
 
 mat-drawer-container {
   min-height: 100vh;
@@ -21,3 +24,4 @@ mat-drawer-container {
 mat-drawer-content {
   background-color: white;
 }
+
