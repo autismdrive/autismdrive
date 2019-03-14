@@ -21,10 +21,8 @@ export class LogoutComponent implements OnInit {
 
   ngOnInit() { }
 
-  goHome() {
-    const prevUrl = localStorage.getItem('prev_url') || '/';
-    this.router.navigateByUrl(prevUrl);
-    localStorage.clear();
-    sessionStorage.clear();
+  goHome($event) {
+    $event.preventDefault();
+    this.router.navigate(['home']);
   }
 }
