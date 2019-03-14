@@ -8,10 +8,9 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_self_questionnaire"
     __label__ = "Education"
 
-    attends_school_label = '"Do you attend an academic program, such as a school, college, or university?"'
-    school_type_label = '"Is this a public school, private school, or are you home schooled?"'
-    school_services_label = '"Please check all school services that you are currently receiving through your academic " \
-                            "program (check all that apply):"'
+    attends_school_desc = '"Do you attend an academic program, such as a school, college, or university?"'
+    school_type_desc = '"Is this a public school, private school, or are you home schooled?"'
+    school_services_desc = '"Please check all school services that you are currently receiving through your academic program (check all that apply):"'
     placement_other_hide_expression = '!(model.self_placement && model.self_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.self_placement && model.self_placement === "highSchool")'
 
@@ -21,10 +20,10 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
             "display_order": 4.1,
             "type": "select",
             "template_options": {
-                "label": "What type of program is it?",
+                "label": "Program Type",
                 "required": False,
                 "options": [
-                    {"value": "highSchool", "label": "High school, please specify CURRENT GRADE below"},
+                    {"value": "highSchool", "label": "High school"},
                     {"value": "vocational", "label": "Vocational school where I am learning job or life skills"},
                     {"value": "college", "label": "College/university"},
                     {"value": "graduate", "label": "Graduate school"},

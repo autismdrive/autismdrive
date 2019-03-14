@@ -42,14 +42,14 @@ class HomeMixin(object):
                 "default_value": False,
                 "template_options": {
                     "required": False,
-                    "label": '',
+                    "label": 'Financial Struggles',
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.struggle_to_afford_label
+                    "template_options.description": cls.struggle_to_afford_desc
                 },
             },
         )

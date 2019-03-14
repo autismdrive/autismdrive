@@ -32,6 +32,7 @@ class CurrentBehaviorsMixin(object):
                 "display_order": 3,
                 "type": "radio",
                 "template_options": {
+                    "label": "Academic Difficulties",
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
@@ -39,7 +40,7 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.has_academic_difficulties_label,
+                    "template_options.description": cls.has_academic_difficulties_desc,
                 },
             },
         )
@@ -51,9 +52,9 @@ class CurrentBehaviorsMixin(object):
             info={
                 "display_order": 4,
                 "type": "multicheckbox",
-                "class_name": "vertical-checkbox-group",
                 "template_options": {
                     "type": "array",
+                    "label": "Area of difficulty",
                     "required": True,
                     "options": [
                         {"value": "math", "label": "Math"},
@@ -63,7 +64,7 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.academic_difficulty_areas_label,
+                    "template_options.description": cls.academic_difficulty_areas_desc,
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
             },
@@ -75,7 +76,7 @@ class CurrentBehaviorsMixin(object):
             "display_order": 4.2,
             "type": "input",
             "template_options": {
-                "placeholder": "Enter area of academic difficulty"
+                "label": "Enter area of academic difficulty"
             },
             "hide_expression": '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))',
         },

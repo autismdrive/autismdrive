@@ -51,8 +51,8 @@ class EmploymentQuestionnaire(db.Model):
                 'label': 'In what capacity?',
                 'required': False,
                 'options': [
-                    {'value': 'fullTime', 'label': 'Full time (At least 35 hours per week)'},
-                    {'value': 'partTime', 'label': 'Part time (0-34 hours per week)'}
+                    {'value': 'fullTime', 'label': 'Full time (> 35 hours per week)'},
+                    {'value': 'partTime', 'label': 'Part time'}
                 ]
             },
             'hide_expression': '!(model.is_currently_employed)',
@@ -64,8 +64,9 @@ class EmploymentQuestionnaire(db.Model):
             'display_order': 2,
             'type': 'radio',
             'template_options': {
-                'label': 'Do you currently receive supports to help you work successfully, such as job coaching or '
-                         'vocational training?',
+                'label': 'Receiving Support?',
+                'description': 'Do you currently receive supports to help you work successfully, such as job coaching '
+                         'or vocational training?',
                 'required': False,
                 'options': [
                     {'value': 'yes', 'label': 'Yes'},

@@ -46,7 +46,6 @@ class ProfessionalProfileQuestionnaire(db.Model):
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -105,7 +104,6 @@ class ProfessionalProfileQuestionnaire(db.Model):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,

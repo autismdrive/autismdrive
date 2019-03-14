@@ -10,18 +10,17 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
     __label__ = "Home"
 
-    struggle_to_afford_label = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
+    struggle_to_afford_desc = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
 
     self_living_situation = db.Column(
         db.ARRAY(db.String),
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": True,
-                "label": "Where do you currently live? (select all that apply)",
+                "description": "(select all that apply)",
                 "options": [
                     {"value": "alone", "label": "On my own"},
                     {"value": "spouse", "label": "With a spouse or significant other"},
@@ -52,7 +51,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     "fields": ["self_living_situation", "self_living_other"],
                     "display_order": 1,
                     "wrappers": ["card"],
-                    "template_options": {"label": "Current Living Situation"},
+                    "template_options": {"label": "Where do your currently live?"},
                 }
         return field_groups
 

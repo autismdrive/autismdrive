@@ -30,7 +30,8 @@ class ContactQuestionnaire(db.Model):
             "template_options": {
                 "required": True,
                 "type": "tel",
-                "label": "Preferred phone number (including area code)",
+                "label": "Preferred number",
+                "description": "(including area code)",
             },
             "validators": {"validation": ["phone"]},
         },
@@ -41,7 +42,7 @@ class ContactQuestionnaire(db.Model):
             "display_order": 1.2,
             "type": "radio",
             "template_options": {
-                "label": "",
+                "label": "Type",
                 "placeholder": "",
                 "description": "",
                 "required": True,
@@ -59,7 +60,8 @@ class ContactQuestionnaire(db.Model):
             "type": "radio",
             "default_value": True,
             "template_options": {
-                "label": "Is it okay to leave a voicemail message at this number?",
+                "label": "Leave voicemail?",
+                "description": "Is it okay to leave a voicemail message at this number?",
                 "required": False,
                 "options": [
                     {"value": True, "label": "Yes"},
@@ -74,7 +76,8 @@ class ContactQuestionnaire(db.Model):
             "display_order": 1.4,
             "type": "textarea",
             "template_options": {
-                "label": "Some research studies might involve a phone call. "
+                "label": "Best times to call",
+                "description": "Some research studies might involve a phone call. "
                 "If that’s the case, when would be the best times "
                 "of day to call you?",
                 "required": False,
@@ -187,9 +190,15 @@ class ContactQuestionnaire(db.Model):
                     "wrappers": ["card"],
                     "template_options": {"label": "Address"},
                 },
+                "email": {
+                    "fields": ["email"],
+                    "display_order": 4,
+                    "wrappers": ["card"],
+                    "template_options": {"label": "Email"},
+                },
                 "marketing": {
                     "fields": ["marketing_channel", "marketing_other"],
-                    "display_order": 4,
+                    "display_order": 5,
                     "wrappers": ["card"],
                     "template_options": {
                         "label": "How did you hear about us?"

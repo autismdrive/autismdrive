@@ -27,7 +27,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -63,7 +62,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         info={
             "display_order": 2,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -99,7 +97,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -130,7 +127,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
         info={
             "display_order": 4.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,

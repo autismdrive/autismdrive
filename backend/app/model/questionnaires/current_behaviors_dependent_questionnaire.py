@@ -7,8 +7,8 @@ from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMix
 class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_dependent_questionnaire"
 
-    has_academic_difficulties_label = '"Does " + (formState.preferredName || "your child") + " have any difficulties with academics?"'
-    academic_difficulty_areas_label = '"What areas of academics are difficult for " + (formState.preferredName || "your child")'
+    has_academic_difficulties_desc = '"Does " + (formState.preferredName || "your child") + " have any difficulties with academics?"'
+    academic_difficulty_areas_desc = '"What areas of academics are difficult for " + (formState.preferredName || "your child")'
 
     dependent_verbal_ability = db.Column(
         db.String,
@@ -37,7 +37,6 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
         info={
             "display_order": 2,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "label": '',
