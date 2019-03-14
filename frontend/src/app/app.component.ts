@@ -83,4 +83,8 @@ export class AppComponent implements OnInit {
       });
     }
   }
+
+  isLoggedIn() {
+    return this.user && this.user.email;
+  }
 }
