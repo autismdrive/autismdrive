@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivationEnd, ActivationStart, Router } from '@angular/router';
-import { ApiService } from './services/api/api.service';
-import { User } from './user';
-import { IntervalService } from './services/interval/interval.service';
+import { ApiService } from './_services/api/api.service';
+import { User } from './_models/user';
+import { IntervalService } from './_services/interval/interval.service';
 
 @Component({
   selector: 'app-root',

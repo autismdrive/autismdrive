@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../services/api/api.service';
-import { User } from '../user';
-import { ParticipantRelationship } from '../participantRelationship';
+import { ApiService } from '../_services/api/api.service';
+import { User } from '../_models/user';
+import { ParticipantRelationship } from '../_models/participantRelationship';
 import { Router } from '@angular/router';
-import { Participant } from '../participant';
+import { Participant } from '../_models/participant';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',

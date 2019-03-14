@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { Participant } from '../participant';
-import { User } from '../user';
-import { ParticipantRelationship } from '../participantRelationship';
-import { Flow } from '../flow';
-import { ApiService } from '../services/api/api.service';
+import { Participant } from '../_models/participant';
+import { User } from '../_models/user';
+import { ParticipantRelationship } from '../_models/participantRelationship';
+import { Flow } from '../_models/flow';
+import { ApiService } from '../_services/api/api.service';
 import { AvatarDialogComponent } from '../avatar-dialog/avatar-dialog.component';
 import { MatDialog } from '@angular/material';
 

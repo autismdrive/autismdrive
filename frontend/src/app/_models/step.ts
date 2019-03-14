@@ -1,4 +1,3 @@
-import { FormlyFieldConfig } from '@ngx-formly/core';
 
 export interface Step {
   name: string;

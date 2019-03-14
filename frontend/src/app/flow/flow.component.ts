@@ -3,11 +3,11 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import { keysToCamel } from 'src/util/snakeToCamel';
-import { ApiService } from '../services/api/api.service';
-import { User } from '../user';
-import { Participant } from '../participant';
-import { Flow } from '../flow';
-import { Step, StepStatus } from '../step';
+import { ApiService } from '../_services/api/api.service';
+import { User } from '../_models/user';
+import { Participant } from '../_models/participant';
+import { Flow } from '../_models/flow';
+import { Step, StepStatus } from '../_models/step';
 import {MediaMatcher} from '@angular/cdk/layout';
 
 enum FlowState {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Study } from '../study';
-import { ApiService } from '../services/api/api.service';
+import { Study } from '../_models/study';
+import { ApiService } from '../_services/api/api.service';
 
 @Component({
   selector: 'app-studies',

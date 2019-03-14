@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Flow} from '../flow';
+import {Flow} from '../_models/flow';
 import {Router} from '@angular/router';
 
 @Component({

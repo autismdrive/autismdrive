@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Flow } from '../../flow';
-import { Participant } from '../../participant';
-import { Resource } from '../../resource';
-import { Study } from '../../study';
-import { Training } from '../../training';
-import { User } from '../../user';
+import { Flow } from '../../_models/flow';
+import { Participant } from '../../_models/participant';
+import { Resource } from '../../_models/resource';
+import { Study } from '../../_models/study';
+import { Training } from '../../_models/training';
+import { User } from '../../_models/user';
 
 @Injectable()
 export class ApiService {
