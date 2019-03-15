@@ -53,4 +53,14 @@ describe('Participant (Guardian - Self)', () => {
   it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
+  // Enrollment Flow
+  it('should display a menu link to all steps of the flow');
+  it('should display completed status of each step');
+  it('should navigate to each step of the flow');
+  it('should fill out the required fields for each step');
+  it('should check off steps as complete');
+  it('should display progress on the Profile screen');
+  it('should allow user to view/edit non-sensitive responses');
+  it('should not allow user to view or edit sensitive responses');
+
 });
