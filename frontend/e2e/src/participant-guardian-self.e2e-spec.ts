@@ -2,12 +2,14 @@ import { AppPage } from './app-page.po';
 import { GlobalHeaderUseCases } from './use-cases/global-header.po';
 import { LoginUseCases } from './use-cases/login.po';
 import { ProfileUseCases } from './use-cases/profile.po';
+import { EnrollUseCases } from './use-cases/enroll.po';
 
 describe('Participant (Guardian - Self)', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
   let profileUseCases: ProfileUseCases;
+  let enrollUseCases: EnrollUseCases;
   let randomEmail;
   const email = 'aaron@sartography.com';
   const password = 'alouie3';
@@ -17,6 +19,7 @@ describe('Participant (Guardian - Self)', () => {
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
     profileUseCases = new ProfileUseCases(page);
+    enrollUseCases = new EnrollUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
     page.navigateToHome();
   });
@@ -54,8 +57,8 @@ describe('Participant (Guardian - Self)', () => {
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
   // Enrollment Flow
-  it('should display a menu link to all steps of the flow');
-  it('should display completed status of each step');
+  it('should display a menu link to all steps of the flow', () => enrollUseCases.displayMenuLinks());
+  it('should display completed status of each step', () => enrollUseCases.displayCompletedStatus());
   it('should navigate to each step of the flow');
   it('should fill out the required fields for each step');
   it('should check off steps as complete');
