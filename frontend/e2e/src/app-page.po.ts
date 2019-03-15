@@ -88,10 +88,14 @@ export class AppPage {
     return browser.get('/');
   }
 
-  clickAndExpectRoute(clickSelector: string, expectedRoute: string) {
+  clickAndExpectRoute(clickSelector: string, expectedRoute: string | RegExp) {
     this.waitForClickable(clickSelector);
     this.clickElement(clickSelector);
-    expect(this.getRoute()).toEqual(expectedRoute);
+    if (typeof expectedRoute === 'string') {
+      expect(this.getRoute()).toEqual(expectedRoute);
+    } else {
+      expect(this.getRoute()).toMatch(expectedRoute);
+    }
   }
 
   getRandomString(length: number) {

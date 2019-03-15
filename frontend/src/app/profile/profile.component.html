@@ -59,20 +59,23 @@
             *ngFor="let participant of user.participants"
             [participant]="participant"
             [user]="user"
+            id="participant_{{participant.id}}"
           ></app-participant-profile>
 
-          <button
+          <!-- <button
             *ngIf="!user.getSelf()"
             mat-flat-button
             color="primary"
             (click)="enrollSelf($event)"
-          >Enroll yourself</button>
+            id="edit_enroll_guardian"
+          >Enroll yourself</button> -->
 
           <button
             *ngIf="user.getSelf() && user.getDependents().length === 0"
             mat-flat-button
             color="primary"
             (click)="enrollDependent($event)"
+            id="enroll_first_dependent"
           >Enroll a dependent</button>
 
           <button
@@ -80,6 +83,7 @@
             mat-flat-button
             color="primary"
             (click)="enrollDependent($event)"
+            id="enroll_another_dependent"
           >Enroll another dependent</button>
         </div>
         <div fxFlex="40%">

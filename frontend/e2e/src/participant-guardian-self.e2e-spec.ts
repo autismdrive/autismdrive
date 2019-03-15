@@ -1,11 +1,13 @@
 import { AppPage } from './app-page.po';
 import { GlobalHeaderUseCases } from './use-cases/global-header.po';
 import { LoginUseCases } from './use-cases/login.po';
+import { ProfileUseCases } from './use-cases/profile.po';
 
 describe('Participant (Guardian - Self)', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
+  let profileUseCases: ProfileUseCases;
   let randomEmail;
   const email = 'aaron@sartography.com';
   const password = 'alouie3';
@@ -14,6 +16,7 @@ describe('Participant (Guardian - Self)', () => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
+    profileUseCases = new ProfileUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
     page.navigateToHome();
   });
@@ -43,5 +46,11 @@ describe('Participant (Guardian - Self)', () => {
   // !!! TO DO - This test is failing due to user object at app component level not
   // being updated on login. Need to completely refactor authentication to fix this.
   xit('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
+
+  // Profile
+  it('should display profile screen', () => profileUseCases.displayProfileScreen());
+  it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
+  it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
 });
