@@ -27,6 +27,8 @@ export class RegisterComponent implements OnInit {
         placeholder: 'Enter email',
         required: true,
       },
+      validators: {
+        validation: ['email']},
     },
   ];
   constructor(
