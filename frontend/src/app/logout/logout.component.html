@@ -11,12 +11,12 @@
     fxFlex="50%"
     class="message"
   >
-    <app-logo (click)="goHome()"></app-logo>
+    <app-logo (click)="goHome($event)"></app-logo>
     <h1>You have been logged out.</h1>
     <button
       id="ok-button"
       mat-flat-button
-      (click)="goHome()"
+      (click)="goHome($event)"
       color="primary"
     >Ok</button>
   </div>

@@ -7,15 +7,15 @@ from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMix
 class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_self_questionnaire"
 
-    has_academic_difficulties_label = '"Do you have any difficulties with academics?"'
-    academic_difficulty_areas_label = '"What areas of academics are difficult for you?"'
+    has_academic_difficulties_desc = '"Do you have any difficulties with academics?"'
+    academic_difficulty_areas_desc = '"What areas of academics are difficult for you?"'
+
 
     self_verbal_ability = db.Column(
         db.ARRAY(db.String),
         info={
             "display_order": 1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "label": "How do you best communicate?",

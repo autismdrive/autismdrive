@@ -1,17 +1,50 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
 .profile {
   margin: 2%;
 }
 
-.pad-1 { padding: 1em; }
-.pad-2 { padding: 2em; }
-.pad-3 { padding: 3em; }
-.pad-4 { padding: 4em; }
-.pad-5 { padding: 5em; }
-.pad-6 { padding: 6em; }
-.pad-7 { padding: 7em; }
-.pad-8 { padding: 8em; }
+.pad-1 {
+  padding: 1em;
+}
 
-.button-row button { margin-right: 8px; }
+.pad-2 {
+  padding: 2em;
+}
+
+.pad-3 {
+  padding: 3em;
+}
+
+.pad-4 {
+  padding: 4em;
+}
+
+.pad-5 {
+  padding: 5em;
+}
+
+.pad-6 {
+  padding: 6em;
+}
+
+.pad-7 {
+  padding: 7em;
+}
+
+.pad-8 {
+  padding: 8em;
+}
+
+.button-row button {
+  margin-right: 8px;
+  margin-top: 35px; // avoid form description overlaps
+}
 
 mat-drawer-container {
   min-height: 100vh;
@@ -20,4 +53,14 @@ mat-drawer-container {
 
 mat-drawer-content {
   background-color: white;
+}
+
+h1 {
+  position: relative;
+}
+
+h1 small {
+  position: absolute;
+  right: 0px;
+  color: mat-color($stardrive-primary, default, 1);
 }

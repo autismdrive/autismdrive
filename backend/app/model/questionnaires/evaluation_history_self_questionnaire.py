@@ -13,9 +13,9 @@ class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
     years_old_at_first_diagnosis_label = '"How old were you (in years) when you were first diagnosed with ASD?"'
     who_diagnosed_label = '"Who first diagnosed you with ASD?"'
     where_diagnosed_label = '"Where did you receive this diagnosis?"'
-    gives_permission_to_link_evaluation_data_label = '"Do we have your permission to link your evaluation data to the UVA Autism Database?"'
-    has_iq_test_label = '"Have you been given an IQ or intelligence test?"'
-    recent_iq_score_label = '"What was your most recent IQ score?"'
+    gives_permission_to_link_evaluation_data_desc = '"Do we have your permission to link your evaluation data to the UVA Autism Database?"'
+    has_iq_test_desc = '"Have you been given an IQ or intelligence test?"'
+    recent_iq_score_desc = '"What was your most recent IQ score?"'
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()

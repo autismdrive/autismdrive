@@ -30,6 +30,7 @@ class EducationMixin(object):
                 "display_order": 1,
                 "type": "radio",
                 "template_options": {
+                    "label": "Attend a school or program?",
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
@@ -37,7 +38,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.attends_school_label,
+                    "template_options.description": cls.attends_school_desc,
                 },
             },
         )
@@ -48,7 +49,7 @@ class EducationMixin(object):
             "display_order": 2,
             "type": "input",
             "template_options": {
-                "label": "What is the name of the school or program?",
+                "label": "Name of the school or program",
                 "required": False,
             },
         },
@@ -62,6 +63,7 @@ class EducationMixin(object):
                 "display_order": 3,
                 "type": "radio",
                 "template_options": {
+                    "label": "Type of School",
                     "required": False,
                     "options":[
                         {"value": "public", "label": "Public"},
@@ -70,7 +72,7 @@ class EducationMixin(object):
                     ]
                 },
                 "expression_properties": {
-                    "template_options.label": cls.school_type_label,
+                    "template_options.description": cls.school_type_desc,
                 },
             },
         )
@@ -83,7 +85,8 @@ class EducationMixin(object):
                 "display_order": 4.3,
                 "type": "input",
                 "template_options": {
-                    "placeholder": "Enter school placement"
+                    "label": "Enter school placement",
+                    "appearance": "standard"
                 },
                 "hide_expression": cls.placement_other_hide_expression,
             },
@@ -97,7 +100,8 @@ class EducationMixin(object):
                 "display_order": 5,
                 "type": "input",
                 "template_options": {
-                    "placeholder": "Enter grade"
+                    "label": "School grade level",
+                    "appearance": "standard"
                 },
                 "hide_expression": cls.current_grade_hide_expression,
             },
@@ -110,7 +114,6 @@ class EducationMixin(object):
             info={
                 "display_order": 6.1,
                 "type": "multicheckbox",
-                "class_name": "vertical-checkbox-group",
                 "template_options": {
                     "type": "array",
                     "required": False,
@@ -131,7 +134,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.school_services_label,
+                    "template_options.description": cls.school_services_desc,
                 },
             },
         )
@@ -141,7 +144,7 @@ class EducationMixin(object):
         info={
             "display_order": 6.2,
             "type": "input",
-            "template_options": {"placeholder": "Describe additional services"},
+            "template_options": {"label": "Describe additional services"},
             "hide_expression": '!(model.school_services && model.school_services.includes("servicesOther"))',
         },
     )

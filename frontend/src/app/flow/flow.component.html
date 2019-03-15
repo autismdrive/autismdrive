@@ -2,9 +2,6 @@
   *ngIf="user && flow"
   class="profile mat-typography"
 >
-  <h1 *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</h1>
-  <h1 *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
-    info</h1>
   <div>
     <mat-progress-bar
       *ngIf="flow.percentComplete() < 100"
@@ -12,23 +9,33 @@
       [value]="flow.percentComplete()"
     ></mat-progress-bar>
 
-
     <app-loading
       *ngIf="state === flowState.LOADING"
       message="Loading..."
     ></app-loading>
 
-    <mat-drawer-container *ngIf="state !== flowState.LOADING">
-      <mat-drawer
-        [mode]="'side'"
-        [opened]="true"
-      >
-        <app-questionnaire-steps-list
-          [flow]="flow"
-          [stepIndex]="activeStep"
-          (stepSelected)="goToStep($event)"
-        >
-        </app-questionnaire-steps-list>
+    <div  *ngIf="state !== flowState.LOADING">
+      <h1>
+        <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+        <span *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</span>
+        <span *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
+      info</span>
+        <small class="mat-small">
+          <span id="num_completed_steps">{{numCompletedSteps()}}</span> of
+          <span id="num_total_steps">{{numTotalSteps()}}</span> steps complete
+        </small>
+      </h1>
+
+    <mat-drawer-container>
+      <mat-drawer #sidenav
+        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [(opened)]="sidebarOpen">
+          <app-questionnaire-steps-list
+            [flow]="flow"
+            [stepIndex]="activeStep"
+            (stepSelected)="goToStep($event)"
+          >
+          </app-questionnaire-steps-list>
       </mat-drawer>
       <mat-drawer-content>
         <app-flow-complete *ngIf="state === flowState.COMPLETE" [flow]="flow">
@@ -81,4 +88,6 @@
       </mat-drawer-content>
     </mat-drawer-container>
   </div>
+  </div>
+
 </div>

@@ -46,7 +46,6 @@ class ProfessionalProfileQuestionnaire(db.Model):
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -96,7 +95,10 @@ class ProfessionalProfileQuestionnaire(db.Model):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {"placeholder": "Describe professional identity"},
+            "template_options": {
+                "label": "Describe professional identity",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.professional_identity && model.professional_identity.includes("profOther"))',
         },
     )
@@ -105,7 +107,6 @@ class ProfessionalProfileQuestionnaire(db.Model):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -146,7 +147,10 @@ class ProfessionalProfileQuestionnaire(db.Model):
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter other interests"},
+            "template_options": {
+                "label": "Enter other interests",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.learning_interests && model.learning_interests.includes("learnOther"))',
         },
     )

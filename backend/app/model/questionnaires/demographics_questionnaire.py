@@ -67,6 +67,20 @@ class DemographicsQuestionnaire(db.Model):
                     {"value": "genderOther", "label": "Other"},
                     {"value": "no_answer", "label": "Prefer not to answer"},
                 ],
+                "label": "Your current gender identity:",
+                "description": "(how you describe yourself)"
+            },
+            "expression_properties": {
+                "template_options.label": {
+                    "RELATIONSHIP_SPECIFIC": {
+                        "dependent": '(formState.preferredName || "Your child") + "\'s current gender identity"',
+                    }
+                },
+                "template_options.description": {
+                    "RELATIONSHIP_SPECIFIC": {
+                        "dependent": '"(how " + (formState.preferredName || "your child") + " describes themselves):"',
+                    }
+                }
             },
         },
     )
@@ -75,7 +89,10 @@ class DemographicsQuestionnaire(db.Model):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter gender identity"},
+            "template_options": {
+                "label": "Enter gender identity",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.gender_identity && (model.gender_identity === "genderOther"))',
         },
     )
@@ -84,7 +101,6 @@ class DemographicsQuestionnaire(db.Model):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": True,
@@ -98,6 +114,7 @@ class DemographicsQuestionnaire(db.Model):
                     {"value": "raceNoAnswer", "label": "Prefer not to answer"},
                     {"value": "raceOther", "label": "Other"},
                 ],
+                "description": "(select all that apply)"
             },
         },
     )
@@ -106,7 +123,10 @@ class DemographicsQuestionnaire(db.Model):
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter race/ethnicity"},
+            "template_options": {
+                "label": "Enter race/ethnicity",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))',
         },
     )
@@ -114,26 +134,12 @@ class DemographicsQuestionnaire(db.Model):
     def get_field_groups(self):
         return {
                 "gender": {
-                    "fields": ["gender_identity", "gender_identity_other"],
+                    "fields": ["birth_sex", "gender_identity", "gender_identity_other"],
                     "display_order": 2,
                     "wrappers": ["card"],
                     "template_options": {
-                        "label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": 'Your current gender identity (how you describe yourself)*:',
-                                "self_guardian": 'Your current gender identity (how you describe yourself)*:',
-                                "self_professional": 'Your current gender identity (how you describe yourself)*:',
-                            }
-                        }
-                    },
-                    "expression_properties": {
-                        "template_options.label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '(formState.preferredName || "Your child") + "\'s" + " current gender identity '
-                                             '(how " + (formState.preferredName || "your child") + " describes themselves)*:"',
-                            }
-                        }
-                    },
+                        "label": "Gender"
+                    }
                 },
                 "race": {
                     "fields": ["race_ethnicity", "race_ethnicity_other"],
@@ -142,9 +148,9 @@ class DemographicsQuestionnaire(db.Model):
                     "template_options": {
                         "label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "What is your race/ethnicity? (select all that apply)",
-                                "self_guardian": "What is your race/ethnicity? (select all that apply)",
-                                "self_professional": "What is your race/ethnicity? (select all that apply)",
+                                "self_participant": "What is your race/ethnicity?",
+                                "self_guardian": "What is your race/ethnicity?",
+                                "self_professional": "What is your race/ethnicity?",
                             }
                         }
                     },
@@ -152,7 +158,7 @@ class DemographicsQuestionnaire(db.Model):
                         "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
                                 "dependent": '"What is " + (formState.preferredName || "your child") + "\'s" + '
-                                             '" race/ethnicity? (select all that apply)"',
+                                             '" race/ethnicity?"',
                             }
                         },
                     },

@@ -48,7 +48,10 @@ class IdentificationQuestionnaire(db.Model):
             "RELATIONSHIP_REQUIRED": ['dependent'],
             "display_order": 1.2,
             "type": "input",
-            "template_options": {"placeholder": "Enter your relationship"},
+            "template_options": {
+                "label": "Enter your relationship",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
         },
     )
@@ -104,7 +107,11 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 6,
             "type": "input",
-            "template_options": {"label": "Nickname", "required": False},
+            "template_options": {
+                "label": "Nickname",
+                "required": False,
+                "appearance": "standard"
+            },
             "hide_expression": "model.is_first_name_preferred",
         },
     )

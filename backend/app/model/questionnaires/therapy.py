@@ -76,7 +76,8 @@ class Therapy(db.Model):
             "display_order": 1.2,
             "type": "textarea",
             "template_options": {
-                "placeholder": "Enter therapy or service",
+                "label": "Enter therapy or service",
+                "appearance": "standard",
                 "required": False,
             },
             "hide_expression": '!(model.type && (model.type === "other"))',

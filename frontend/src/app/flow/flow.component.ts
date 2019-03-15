@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
@@ -8,6 +8,7 @@ import { User } from '../user';
 import { Participant } from '../participant';
 import { Flow } from '../flow';
 import { Step, StepStatus } from '../step';
+import {MediaMatcher} from '@angular/cdk/layout';
 
 enum FlowState {
   INTRO = 'intro',
@@ -21,7 +22,10 @@ enum FlowState {
   templateUrl: './flow.component.html',
   styleUrls: ['./flow.component.scss']
 })
-export class FlowComponent implements OnInit {
+export class FlowComponent implements OnInit, OnDestroy {
+
+  mobileQuery: MediaQueryList;
+  private _mobileQueryListener: () => void;
 
   user: User;
   participant: Participant;
@@ -30,6 +34,8 @@ export class FlowComponent implements OnInit {
   activeStep = 0;
   flowState = FlowState;
   state = FlowState.LOADING;
+
+  sidebarOpen = true;
 
   model: any = {};
   form: FormGroup;
@@ -43,8 +49,13 @@ export class FlowComponent implements OnInit {
   constructor(
     private api: ApiService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    changeDetectorRef: ChangeDetectorRef,
+    media: MediaMatcher
   ) {
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
     this.api.getSession().subscribe(userProps => {
       this.user = new User(userProps);
       console.log('User Loaded:' + this.user.id);
@@ -57,6 +68,10 @@ export class FlowComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 
   loadFlow(flowName: string) {
@@ -124,6 +139,9 @@ export class FlowComponent implements OnInit {
       }
     }
     this.loadActiveStep();
+    if (this.mobileQuery.matches) {
+      this.sidebarOpen = false;
+    }
   }
 
   currentStep(): Step {
@@ -158,8 +176,7 @@ export class FlowComponent implements OnInit {
     this.options = {
       formState: {
         mainModel: this.model,
-        preferredName: this.participant.name,
-        isSelf: this.user.isSelf(this.participant),
+        preferredName: this.participant.name
       }
     };
     this.state = this.flowState.SHOW_FORM;
@@ -174,9 +191,9 @@ export class FlowComponent implements OnInit {
       fields.push(keysToCamel(field));
 
     }
+    fields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     return fields;
   }
-
 
   submit() {
     // force the correct participant id.
@@ -187,19 +204,30 @@ export class FlowComponent implements OnInit {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
           this.loadFlow(this.flow.name);
+          this.scrollToTop();
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
         .subscribe(() => {
           this.loadFlow(this.flow.name);
+          this.scrollToTop();
         });
     }
   }
+
   scrollToTop() {
-      window.scroll({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-    }
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  numCompletedSteps() {
+    return this.flow.steps.filter(s => s.status === StepStatus.COMPLETE).length;
+  }
+
+  numTotalSteps() {
+    return this.flow.steps.length;
+  }
 }

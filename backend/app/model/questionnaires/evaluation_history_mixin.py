@@ -32,13 +32,14 @@ class EvaluationHistoryMixin(object):
                 "default_value": True,
                 "template_options": {
                     "required": True,
+                    "label": "Formal Diagnosis?",
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.has_autism_diagnosis_label
+                    "template_options.description": cls.has_autism_diagnosis_label
                 },
             },
         )
@@ -72,10 +73,11 @@ class EvaluationHistoryMixin(object):
                 "display_order": 3,
                 "type": "input",
                 "template_options": {
+                    "label": "Age at Diagnosis",
                     "required": True,
                 },
                 "expression_properties": {
-                    "template_options.label": cls.years_old_at_first_diagnosis_label
+                    "template_options.description": cls.years_old_at_first_diagnosis_label
                 },
             },
         )
@@ -89,6 +91,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "required": True,
+                    "label": "First Diagnosed by:",
                     "options": [
                         {
                             "value": "pediatrician",
@@ -105,7 +108,7 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.who_diagnosed_label,
+                    "template_options.description": cls.who_diagnosed_label,
                 },
             },
         )
@@ -115,7 +118,10 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 5,
             "type": "input",
-            "template_options": {"placeholder": "First diagnosed by"},
+            "template_options": {
+                "label": "First diagnosed by",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
         },
     )
@@ -129,6 +135,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "required": True,
+                    "label": "Diagnosed At",
                     "options": [
                         {"value": "1uvaDp", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children's Rehabilitation Center, KCRC)"},
                         {"value": "2sjcCse", "label": "Sheila Johnson Center or Curry School of Education"},
@@ -159,7 +166,7 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.where_diagnosed_label,
+                    "template_options.description": cls.where_diagnosed_label,
                 },
             },
         )
@@ -169,7 +176,10 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 7,
             "type": "input",
-            "template_options": {"placeholder": "Where diagnosed?"},
+            "template_options": {
+                "label": "Where diagnosed?",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
         },
     )
@@ -179,7 +189,6 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 8.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": False,
@@ -205,6 +214,8 @@ class EvaluationHistoryMixin(object):
                 "type": "radio",
                 "default_value": True,
                 "template_options": {
+                    "label": "Permission to Link Data",
+                    "appearance": "standard",
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
@@ -212,7 +223,7 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.gives_permission_to_link_evaluation_data_label,
+                    "template_options.description": cls.gives_permission_to_link_evaluation_data_desc,
                 },
                 "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0))',
             },
@@ -228,13 +239,14 @@ class EvaluationHistoryMixin(object):
                 "default_value": True,
                 "template_options": {
                     "required": False,
+                    "label": "Taken an IQ Test?",
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.has_iq_test_label,
+                    "template_options.description": cls.has_iq_test_desc,
                 },
             },
         )
@@ -247,10 +259,11 @@ class EvaluationHistoryMixin(object):
                 "display_order": 11,
                 "type": "input",
                 "template_options": {
-                    "placeholder": "IQ score"
+                    "label": "IQ Score",
+                    "appearance": "standard",
                 },
                 "expression_properties": {
-                    "template_options.label": cls.recent_iq_score_label
+                    "template_options.description": cls.recent_iq_score_desc
                 },
                 "hide_expression": "!(model.has_iq_test)",
             },

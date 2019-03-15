@@ -8,10 +8,9 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
     __label__ = "Education"
 
-    attends_school_label = '"Does " + (formState.preferredName || "your child") + " attend school?"'
-    school_type_label = '"Is " + (formState.preferredName || "your child") + "\'s school:"'
-    school_services_label = '"Please check the following services " + (formState.preferredName || "your child") + ' \
-                            '" currently receives in school (check all that apply):"'
+    attends_school_desc = '"Does " + (formState.preferredName || "your child") + " attend school?"'
+    school_type_desc = '"Is " + (formState.preferredName || "your child") + "\'s school:"'
+    school_services_desc = '"Please check the following services " + (formState.preferredName || "your child") + "currently receives in school (check all that apply):"'
     placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 

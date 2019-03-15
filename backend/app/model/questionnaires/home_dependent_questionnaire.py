@@ -10,7 +10,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
 
-    struggle_to_afford_label = '"Do you or " + (formState.preferredName) + "\'s other caregivers ever struggle with being ' \
+    struggle_to_afford_desc = '"Do you or " + (formState.preferredName) + "\'s other caregivers ever struggle with being ' \
                                'able to afford to pay for household needs, food, or security for the family?"'
 
     dependent_living_situation = db.Column(
@@ -18,7 +18,6 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
-            "class_name": "vertical-checkbox-group",
             "template_options": {
                 "type": "array",
                 "required": True,
@@ -39,10 +38,13 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {"placeholder": ""},
+            "template_options": {
+                "label": "",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
             "expression_properties": {
-                "template_options.placeholder": '"Please describe "+ (formState.preferredName) + "\'s current living situation"'
+                "template_options.label": '"Please describe "+ (formState.preferredName) + "\'s current living situation"'
             },
         },
     )

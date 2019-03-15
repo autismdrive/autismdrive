@@ -103,9 +103,5 @@ export class LoginUseCases {
     this.page.inputText('[id*="input_email"]', email);
     this.page.inputText('[id*="input_password"]', password);
     this.page.clickAndExpectRoute('#submit', '/profile');
-    expect(this.page.getElements('app-profile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_self').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_guardian').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_professional').count()).toEqual(1);
   }
 }
