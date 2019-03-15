@@ -26,7 +26,7 @@
   <div *ngIf="flow.name === 'professional_intake'">
     <p>Thank you for providing us with your information.</p>
     <p>Now we recommend you check out our <a (click)="goStudies($event)">list of active studies</a>, or search through
-    the <a (click)="goServices($event)">available services and resources.</a></p>
+    the <a (click)="goResources($event)">available services and resources.</a></p>
   </div>
 
   <p>You can continue to edit any unlocked questionnaires by selecting them from the
@@ -43,13 +43,13 @@
       mat-flat-button
       type="button"
       color="primary"
-      (click)="goProfile($event)"
+      (click)="goStudies($event)"
     >View Studies</button>
     <button
       mat-flat-button
       type="button"
       color="primary"
-      (click)="goProfile($event)"
+      (click)="goResources($event)"
     >Search Resources</button>
   </div>
 
