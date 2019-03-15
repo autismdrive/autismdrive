@@ -9,6 +9,7 @@ import { Participant } from '../_models/participant';
 import { Flow } from '../_models/flow';
 import { Step, StepStatus } from '../_models/step';
 import {MediaMatcher} from '@angular/cdk/layout';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 enum FlowState {
   INTRO = 'intro',
@@ -48,17 +49,19 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: ApiService,
+    private authenticationService: AuthenticationService,
     private router: Router,
     private route: ActivatedRoute,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher
   ) {
+    // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
-    this.api.getSession().subscribe(userProps => {
-      this.user = new User(userProps);
-      console.log('User Loaded:' + this.user.id);
+
+    this.authenticationService.refresh().subscribe(user => {
+      this.user = user;
       this.route.params.subscribe(params => {
         this.participant = this.user.getParticipantById(parseInt(params.participantId, 10));
         console.log('Participant loaded:' + this.participant.id);

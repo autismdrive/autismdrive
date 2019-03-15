@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
@@ -41,6 +41,7 @@ export class ApiService {
     rootcategorylist: '/api/category/root',
     session: '/api/session',
     sessionstatus: '/api/session/status',
+    sessionparticipants: '/api/session/participant',
     studybycategory: '/api/category/<category_id>/study',
     studycategory: '/api/study_category/<id>',
     studycategorylist: '/api/study_category',
@@ -55,64 +56,9 @@ export class ApiService {
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
-    login_password: '/api/login_password',
-    reset_password: '/api/reset_password',
   };
 
   constructor(private httpClient: HttpClient) {
-  }
-
-  /** getSession */
-  public getSession(): Observable<User> {
-    if (localStorage.getItem('token')) {
-      return this.httpClient.get<User>(this._endpointUrl('session'))
-        .pipe(catchError(this._handleError));
-    } else {
-      return observableOf(null);
-    }
-  }
-
-  /** openSession */
-  openSession(token: string): Observable<User> {
-    if (token) {
-      localStorage.setItem('token', token);
-    }
-    return this.getSession();
-  }
-
-  /** getSessionStatus */
-  getSessionStatus(): Observable<number> {
-    const token: string = localStorage.getItem('token');
-    if (token) {
-      return this.httpClient.get<number>(this._endpointUrl('sessionstatus'))
-        .pipe(catchError(this.sessionStatusError));
-    } else {
-      return observableOf(0);
-    }
-  }
-
-  // Special error handler for get Session Status clears out the users local session if we get
-  // an unauthorized message.
-  private sessionStatusError(error: HttpErrorResponse) {
-    if (error.status === 401) {
-      localStorage.removeItem('token');
-    }
-    return this._handleError(error);
-  }
-
-  /** closeSession */
-  closeSession(): Observable<User> {
-    localStorage.removeItem('token');
-    return this.httpClient.delete<User>(this._endpointUrl('session'));
-  }
-
-  /** login - An alternative to single sign on, allow users to log into the system with a user name and password.
- * email_token is not required, only send this if user is logging in for the first time
- * after an email verification link. */
-  login(email: string, password: string, email_token = ''): Observable<any> {
-    const options = { email, password, email_token };
-    return this.httpClient.post(this._endpointUrl('login_password'), options)
-      .pipe(catchError(this._handleError));
   }
 
   private _handleError(error: HttpErrorResponse) {
@@ -126,27 +72,17 @@ export class ApiService {
     } else {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong,
-      console.error(
-        `Backend returned a status code ${error.status}, ` +
-        `Code was: ${JSON.stringify(error.error.code)}, ` +
-        `Message was: ${JSON.stringify(error.error.message)}`);
-      message = error.error.message;
-      // If this was a 401 error, re-verify they have a valid session.
-      if (error.error.code === 401) {
-        this.getSession();
+      let errorMessage = `Backend returned a status code ${error.status}, `;
+      if (error.error) {
+          errorMessage +=
+            `Code was: ${JSON.stringify(error.error.code)}, ` +
+            `Message was: ${JSON.stringify(error.error.message)}`;
       }
+      console.error(errorMessage);
     }
     // return an observable with a user-facing error message
     // FIXME: Log all error messages to Google Analytics
     return throwError(message);
-  }
-
-  /** resetPassword
-   * Reset password */
-  resetPassword(newPassword: string, email_token: string): Observable<string> {
-    const reset = { password: newPassword, email_token: email_token };
-    return this.httpClient.post<string>(this._endpointUrl('reset_password'), reset)
-      .pipe(catchError(this._handleError));
   }
 
   /** sendResetPasswordEmail
@@ -161,20 +97,29 @@ export class ApiService {
   addParticipant(participant: Participant): Observable<Participant> {
     const url = this
       ._endpointUrl('participantbysession');
-    return this.httpClient.post<Participant>(url, participant);
+    return this.httpClient.post<Participant>(url, participant)
+      .pipe(
+        map(participantJson => new Participant(participantJson)),
+        catchError(this._handleError));
   }
 
   /** updateParticipant */
   updateParticipant(participant: Participant): Observable<Participant> {
     const url = this
       ._endpointUrl('participantbysession');
-    return this.httpClient.post<Participant>(url, participant);
+    return this.httpClient.post<Participant>(url, participant)
+      .pipe(
+        map(participantJson => new Participant(participantJson)),
+        catchError(this._handleError));
   }
+
 
   /** Get Participant */
   getParticipant(id: number): Observable<Participant> {
     return this.httpClient.get<Participant>(this._endpointUrl('participant').replace('<id>', id.toString()))
-      .pipe(catchError(this._handleError));
+      .pipe(
+        map(participantJson => new Participant(participantJson)),
+        catchError(this._handleError));
   }
 
   /** getFlow */
@@ -190,7 +135,10 @@ export class ApiService {
         ._endpointUrl('flowAnonymous')
         .replace('<name>', flow);
     }
-    return this.httpClient.get<Flow>(url).pipe(catchError(this._handleError));
+    return this.httpClient.get<Flow>(url)
+      .pipe(
+        map(json => new Flow(json)),
+        catchError(this._handleError));
   }
 
   // Add Study
@@ -286,7 +234,9 @@ export class ApiService {
   // addUser
   addUser(user: User): Observable<User> {
     return this.httpClient.post<User>(this._endpointUrl('userlist'), user)
-      .pipe(catchError(this._handleError));
+      .pipe(
+        map(json => new User(json)),
+        catchError(this._handleError));
   }
 
   /** submitQuestionnaire */

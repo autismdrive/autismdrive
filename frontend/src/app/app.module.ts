@@ -40,7 +40,6 @@ import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
 import { ApiService } from './_services/api/api.service';
 import { AppComponent } from './app.component';
-import { AuthInterceptor } from './AuthInterceptor';
 import { EnrollComponent } from './enroll/enroll.component';
 import { FiltersComponent } from './filters/filters.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
@@ -74,6 +73,8 @@ import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
 import {OverlayContainer} from '@angular/cdk/overlay';
+import {JwtInterceptor} from './_routing/jwt-interceptor';
+import {ErrorInterceptor} from './_routing/error-interceptor';
 
 @Injectable()
 export class FormlyConfig {
@@ -171,16 +172,11 @@ export class FormlyConfig {
     RoutingModule
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     ApiService,
     IntervalService,
-    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
-      useValue: { appearance: 'outline' }
-    }
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,  useValue: { appearance: 'outline' }}
   ],
   bootstrap: [AppComponent],
   entryComponents: [AvatarDialogComponent]

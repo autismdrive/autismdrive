@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router} from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-password-reset',
@@ -59,7 +60,7 @@ export class PasswordResetComponent implements OnInit {
   ];
 
   constructor(
-    private api: ApiService,
+    private authenticationService: AuthenticationService,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
@@ -81,19 +82,14 @@ export class PasswordResetComponent implements OnInit {
       this.formState = 'submitting';
       this.errorMessage = '';
 
-      this.api.resetPassword(this.model['password']['password'], this.token).subscribe(auth_token => {
-          this.formState = 'complete';
-          this.changeDetectorRef.detectChanges();
-          this.api.openSession(auth_token['token']).subscribe(session => {
-              this.router.navigate(['profile']);
-          });
+      this.authenticationService.resetPassword(this.model['password']['password'], this.token).subscribe(
+        data => {
+          this.router.navigate(['profile']);
         }, error1 => {
           this.formState = 'form';
           this.errorMessage = error1;
           this.changeDetectorRef.detectChanges();
         });
-    }
+      }
   }
-
-
 }
