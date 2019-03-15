@@ -71,8 +71,8 @@ class EmploymentQuestionnaire(db.Model):
                 'required': False,
                 'options': [
                     {'value': 'yes', 'label': 'Yes'},
-                    {'value':  'No, but I am interested', 'label': 'No, but I am interested'},
-                    {'value':  'No', 'label': 'No'}
+                    {'value': 'interested', 'label': 'No, but I am interested'},
+                    {'value': 'no', 'label': 'No'}
                 ]
             }
         }
