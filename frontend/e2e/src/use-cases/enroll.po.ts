@@ -23,4 +23,14 @@ export class EnrollUseCases {
     const totalNumLinks = incompleteLinks.length + completeLinks.length;
     expect(totalNumLinks).toEqual(numSteps);
   }
+
+  navigateToEachStep() {
+    this.page.getElements('app-questionnaire-steps-list .step-link').each(link => {
+      link.click();
+      this.page.waitForVisible('form');
+      this.page.waitForAnimations();
+      expect(this.page.getElement('form h1').getText()).toEqual(link.getText());
+      expect(this.page.getElements('form mat-form-field').count()).toBeGreaterThan(0);
+    });
+  }
 }

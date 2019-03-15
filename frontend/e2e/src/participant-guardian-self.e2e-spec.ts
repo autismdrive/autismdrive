@@ -59,7 +59,7 @@ describe('Participant (Guardian - Self)', () => {
   // Enrollment Flow
   it('should display a menu link to all steps of the flow', () => enrollUseCases.displayMenuLinks());
   it('should display completed status of each step', () => enrollUseCases.displayCompletedStatus());
-  it('should navigate to each step of the flow');
+  it('should navigate to each step of the flow', () => enrollUseCases.navigateToEachStep());
   it('should fill out the required fields for each step');
   it('should check off steps as complete');
   it('should display progress on the Profile screen');
