@@ -144,7 +144,10 @@ class EducationMixin(object):
         info={
             "display_order": 6.2,
             "type": "input",
-            "template_options": {"label": "Describe additional services"},
+            "template_options": {
+                "label": "Describe additional services",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.school_services && model.school_services.includes("servicesOther"))',
         },
     )
