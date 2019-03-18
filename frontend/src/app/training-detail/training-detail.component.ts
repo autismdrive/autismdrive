@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../services/api/api.service';
-import { Training } from '../training';
+import { ApiService } from '../_services/api/api.service';
+import { Training } from '../_models/training';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

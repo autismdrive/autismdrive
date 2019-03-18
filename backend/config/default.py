@@ -16,9 +16,9 @@ FRONTEND_AUTH_CALLBACK = SITE_URL + "/#/session"
 FRONTEND_EMAIL_RESET = SITE_URL + "/#/reset_password/"
 
 MAIL_SERVER = 'smtp.mailtrap.io'
-MAIL_PORT = 25
+MAIL_PORT = 2525
 MAIL_USE_SSL = False
-MAIL_USE_TLS = False
+MAIL_USE_TLS = True
 MAIL_USERNAME = "YOUR-MAILTRAP-NAME - Copy these lines to your instance/config! edit there."
 MAIL_PASSWORD = "YOUR-MAILTRAP-PASSWORD - Copy these lines to your instance/config! edit there."
 MAIL_DEFAULT_SENDER='someaddress@fake.com'

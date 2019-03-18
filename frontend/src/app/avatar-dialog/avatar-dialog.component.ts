@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, Inject, OnChanges, SimpleChanges } from '@angular/core';
-import { Participant } from '../participant';
+import { Participant } from '../_models/participant';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ParticipantProfileComponent } from '../participant-profile/participant-profile.component';
-import { ApiService } from '../services/api/api.service';
-import { ParticipantRelationship } from '../participantRelationship';
+import { ApiService } from '../_services/api/api.service';
+import { ParticipantRelationship } from '../_models/participantRelationship';
 
 export interface DialogData {
   participant: Participant;

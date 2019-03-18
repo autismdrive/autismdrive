@@ -45,10 +45,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
-
-  // !!! TO DO - This test is failing due to user object at app component level not
-  // being updated on login. Need to completely refactor authentication to fix this.
-  xit('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
+  it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
 
   // Profile
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
