@@ -165,7 +165,8 @@ class ContactQuestionnaire(db.Model):
             "display_order": 4.2,
             "type": "input",
             "template_options": {
-                "placeholder": "Please specify how you heard about us"
+                "label": "Please specify how you heard about us",
+                "appearance": "standard"
             },
             "hide_expression": '!(model.marketing_channel && (model.marketing_channel === "other"))',
         },

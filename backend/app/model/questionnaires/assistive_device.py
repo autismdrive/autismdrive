@@ -159,7 +159,8 @@ class AssistiveDevice(db.Model):
             "display_order": 1.2,
             "type": "textarea",
             "template_options": {
-                "placeholder": "Enter assistive device",
+                "label": "Enter assistive device",
+                "appearance": "standard",
                 "required": False,
             },
             "hide_expression": '!(model.type && (model.type === "other"))',

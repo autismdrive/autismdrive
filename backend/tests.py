@@ -1464,7 +1464,7 @@ class TestCase(unittest.TestCase):
         admin_headers = self.logged_in_headers()
         user_headers = self.logged_in_headers(u)
         self.assertIsNotNone(u)
-        
+
         # A user should be able to access and modify their user record, with the exception of making themselves Admin
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=user_headers)
         self.assertSuccess(rv)
@@ -2450,7 +2450,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['is_currently_employed'] = False
         response['employment_capacity'] = None
-        response['has_employment_support'] = True
+        response['has_employment_support'] = 'yes'
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
@@ -2465,7 +2465,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['is_currently_employed'], False)
         self.assertEqual(response['employment_capacity'], None)
-        self.assertEqual(response['has_employment_support'], True)
+        self.assertEqual(response['has_employment_support'], 'yes')
         self.assertEqual(response['user_id'], u2.id)
         self.assertNotEqual(orig_date, response['last_updated'])
 

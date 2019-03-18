@@ -49,6 +49,7 @@ class EmploymentQuestionnaire(db.Model):
             'default_value': 'n/a',
             'template_options': {
                 'label': 'In what capacity?',
+                "appearance": "standard",
                 'required': False,
                 'options': [
                     {'value': 'fullTime', 'label': 'Full time (> 35 hours per week)'},
@@ -70,8 +71,8 @@ class EmploymentQuestionnaire(db.Model):
                 'required': False,
                 'options': [
                     {'value': 'yes', 'label': 'Yes'},
-                    {'value':  'No, but I am interested', 'label': 'No, but I am interested'},
-                    {'value':  'No', 'label': 'No'}
+                    {'value': 'interested', 'label': 'No, but I am interested'},
+                    {'value': 'no', 'label': 'No'}
                 ]
             }
         }

@@ -119,7 +119,9 @@ class EvaluationHistoryMixin(object):
             "display_order": 5,
             "type": "input",
             "template_options": {
-                "placeholder": "First diagnosed by"},
+                "label": "First diagnosed by",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
         },
     )
@@ -174,7 +176,10 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 7,
             "type": "input",
-            "template_options": {"placeholder": "Where diagnosed?"},
+            "template_options": {
+                "label": "Where diagnosed?",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
         },
     )
@@ -210,6 +215,7 @@ class EvaluationHistoryMixin(object):
                 "default_value": True,
                 "template_options": {
                     "label": "Permission to Link Data",
+                    "appearance": "standard",
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
@@ -254,6 +260,7 @@ class EvaluationHistoryMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "IQ Score",
+                    "appearance": "standard",
                 },
                 "expression_properties": {
                     "template_options.description": cls.recent_iq_score_desc

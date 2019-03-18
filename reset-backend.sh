@@ -11,4 +11,4 @@ cd $BACKEND_PATH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
 flask db upgrade
-flask initdb
+flask reset

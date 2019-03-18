@@ -20,6 +20,10 @@
         <span *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</span>
         <span *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
       info</span>
+        <small class="mat-small">
+          <span id="num_completed_steps">{{numCompletedSteps()}}</span> of
+          <span id="num_total_steps">{{numTotalSteps()}}</span> steps complete
+        </small>
       </h1>
 
     <mat-drawer-container>

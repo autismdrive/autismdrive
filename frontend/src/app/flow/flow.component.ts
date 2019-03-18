@@ -198,7 +198,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     return fields;
   }
 
-
   submit() {
     // force the correct participant id.
     this.model['participant_id'] = this.participant.id;
@@ -208,19 +207,30 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
           this.loadFlow(this.flow.name);
+          this.scrollToTop();
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
         .subscribe(() => {
           this.loadFlow(this.flow.name);
+          this.scrollToTop();
         });
     }
   }
+
   scrollToTop() {
-      window.scroll({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-    }
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  numCompletedSteps() {
+    return this.flow.steps.filter(s => s.status === StepStatus.COMPLETE).length;
+  }
+
+  numTotalSteps() {
+    return this.flow.steps.length;
+  }
 }

@@ -44,6 +44,7 @@ class DevelopmentalQuestionnaire(db.Model):
             "type": "textarea",
             "template_options": {
                 "label": "Please describe:",
+                "appearance": "standard",
                 "required": False,
             },
             'hide_expression': '!model.had_birth_complications',

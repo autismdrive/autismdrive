@@ -38,10 +38,13 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {"placeholder": ""},
+            "template_options": {
+                "label": "",
+                "appearance": "standard"
+            },
             "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
             "expression_properties": {
-                "template_options.placeholder": '"Please describe "+ (formState.preferredName) + "\'s current living situation"'
+                "template_options.label": '"Please describe "+ (formState.preferredName) + "\'s current living situation"'
             },
         },
     )
