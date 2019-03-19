@@ -60,13 +60,6 @@
           </formly-form>
 
           <div class="button-row">
-            <!--
-            <button
-              mat-flat-button
-              type="button"
-              (click)="prevStep(activeStep)"
-            >Back</button>
-            -->
             <button
               *ngIf="form"
               mat-flat-button
@@ -74,15 +67,15 @@
               (click)="submit()"
               color="primary"
               [disabled]="!form.valid"
+              id="save-next-button"
             >Save &amp; Next</button>
-            <!--
             <button
+              *ngIf="form"
               mat-flat-button
-              [disabled]="!form.valid"
-              type="submit"
-              (click)="submit()"
-            >Submit</button>
-            -->
+              type="button"
+              [routerLink]="['/profile']"
+              id="cancel-button"
+            >Cancel</button>
           </div>
         </form>
       </mat-drawer-content>

@@ -1,6 +1,21 @@
 @import '../node_modules/@angular/material/theming';
 // Define a custom typography config that overrides the font-family
-$custom-typography: mat-typography-config( $font-family: 'Roboto, sans-serif', $headline: mat-typography-level(32px, 48px, 700), $body-1: mat-typography-level(16px, 24px, 500), $body-2: mat-typography-level(16px, 24px, 700), $caption: mat-typography-level(16px, 24px, 500), $button: mat-typography-level(16px, 24px, 500));
+
+$custom-typography: mat-typography-config(
+  $display-4:     mat-typography-level(2.5rem, 1, 800, '"bodoni-urw", serif'),
+  $display-3:     mat-typography-level(2.25rem, 1, 800, '"bodoni-urw", serif'),
+  $display-2:     mat-typography-level(2rem, 1, 800, '"bodoni-urw", serif'),
+  $display-1:     mat-typography-level(1.75rem, 1, 800, '"bodoni-urw", serif'),
+  $headline:      mat-typography-level(1.625rem, 1, 500, '"bodoni-urw", serif'),
+  $title:         mat-typography-level(1.5rem, 1, 700, '"bodoni-urw", serif'),
+  $subheading-2:  mat-typography-level(1.375rem, 1, 500, '"bodoni-urw", serif'),
+  $subheading-1:  mat-typography-level(1.25rem, 1, 500, '"bodoni-urw", serif'),
+  $body-2:        mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+  $body-1:        mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+  $caption:       mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+  $button:        mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+  $input:         mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif')
+);
 @include mat-core($custom-typography);
 $mat-blue: ( 50: #F1F5F7, // Modified, was #e0e6ed
 100: #b3c1d3, 200: #8097b6, 300: #4d6d98, 400: #264e82, 500: #002f6c, 600: #002a64, 700: #002359, 800: #001d4f, 900: #00123d, A100: #738cff, A200: #4062ff, A400: #0d38ff, A700: #002bf2, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #ffffff, 400: #ffffff, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #ffffff, A400: #ffffff, A700: #ffffff, ));
@@ -15,6 +30,7 @@ $animationDuration: 500ms;
 @mixin stardrive-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
+
   button {
     &.btn-xl {
       font-size: 24px;
@@ -88,6 +104,7 @@ $animationDuration: 500ms;
     background-color: mat-color($stardrive-primary, default, 1);
     color: white;
   }
+
 }
 
 .stardrive-theme {

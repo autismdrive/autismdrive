@@ -4,17 +4,8 @@
 @import '../../stardrive_material';
 // Load the STAR DRIVE Theme
 @include stardrive-theme($stardrive-theme);
-
-.highlight {
-  padding: 2em;
-  color: white;
-  background-color: #777777;
-  height: 300px;
-}
-
 .action {
   padding: 2em;
-
   button {
     margin: 1em;
   }
@@ -29,27 +20,73 @@
   }
 }
 
+.highlight {
+  padding: 2em;
+  color: white;
+  background-color: #777777;
+  height: 300px;
+}
+
 #hero {
+  position: relative;
   background-image: url('/assets/home/hero.jpg');
   background-position: 50% 50%;
   background-size: cover;
-
   h1.mat-display-2 {
     margin: 0px;
-    text-shadow: 0 0 5px rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.5);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 1.0), 0 0 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    z-index: 2;
   }
 }
 
-#news1, #news2, #news3 {
+#news1,
+#news2,
+#news3 {
+  position: relative;
   background-position: 50% 50%;
   background-size: cover;
-
-  h2, h4 {
+  h2,
+  h4 {
+    color: white;
     margin: 0px;
-    text-shadow: 0 0 5px rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.5);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 1.0), 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 2;
   }
 }
 
-#news1 { background-image: url('/assets/home/news1.jpg'); }
-#news2 { background-image: url('/assets/home/news2.jpg'); }
-#news3 { background-image: url('/assets/home/news3.jpg'); }
+#news1 {
+  background-image: url('/assets/home/news1.jpg');
+}
+
+#news2 {
+  background-image: url('/assets/home/news2.jpg');
+}
+
+#news3 {
+  background-image: url('/assets/home/news3.jpg');
+}
+
+.highlight:after {
+  content: '';
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: linear-gradient(
+    rgba(0,0,0,0.8) 0%,
+    rgba(0,0,0,0.3) 40%,
+    rgba(0,0,0,0.1) 60%,
+    rgba(0,0,0,0) 100%,
+  ), linear-gradient(
+    90deg,
+    mat-color($stardrive-primary, 600, 1) 0%,
+    mat-color($stardrive-primary, 600, 0) 40%,
+    mat-color($stardrive-accent, 600, 0) 60%,
+    mat-color($stardrive-accent, 600, 1) 100%
+  );
+  background-blend-mode: saturation;
+  z-index: 1;
+  mix-blend-mode: multiply;
+}
