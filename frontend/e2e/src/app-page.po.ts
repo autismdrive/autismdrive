@@ -1,4 +1,12 @@
-import { browser, by, element, ExpectedConditions, ElementFinder, ElementArrayFinder, WebElement } from 'protractor';
+import {
+  browser,
+  by,
+  element,
+  ElementArrayFinder,
+  ElementFinder,
+  ExpectedConditions,
+  Key
+} from 'protractor';
 
 export class AppPage {
 
@@ -117,4 +125,10 @@ export class AppPage {
     });
   }
 
+  tabThroughAllFields() {
+    this.getElements('formly-field').each(ff => {
+      browser.actions().sendKeys(Key.TAB);
+      expect(ff.isSelected()).toBeTruthy();
+    });
+  }
 }
