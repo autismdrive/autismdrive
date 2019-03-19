@@ -104,4 +104,11 @@ export class LoginUseCases {
     this.page.inputText('[id*="input_password"]', password);
     this.page.clickAndExpectRoute('#submit', '/profile');
   }
+
+  logout() {
+    this.page.waitForClickable('#logout-button');
+    this.page.clickElement('#logout-button');
+    expect(this.page.getElements('app-logout').count()).toEqual(1);
+    this.page.clickAndExpectRoute('#ok-button', '/home');
+  }
 }

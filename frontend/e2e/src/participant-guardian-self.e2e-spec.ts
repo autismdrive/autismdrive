@@ -51,6 +51,11 @@ describe('Participant (Guardian - Self)', () => {
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
   it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should display avatars for each participant', () => profileUseCases.displayAvatars());
+  it('should display the avatar selection dialog', () => profileUseCases.displayAvatarDialog());
+  it('should edit the avatar image', () => profileUseCases.editAvatarImg());
+  it('should edit the avatar color', () => profileUseCases.editAvatarColor());
+  it('should save changes to the avatar', () => profileUseCases.saveAvatar());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
   // Enrollment Flow
@@ -63,4 +68,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should allow user to view/edit non-sensitive responses');
   it('should not allow user to view or edit sensitive responses');
 
+  // Log out
+  it('should log out', () => loginUseCases.logout());
+  it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
 });
