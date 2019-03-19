@@ -33,7 +33,7 @@
           color="primary"
           (click)="goEditEnroll($event)"
           id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
-        >Edit enrollment info</a>
+        >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</a>
 
       </mat-card-subtitle>
     </mat-card-header>
