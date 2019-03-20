@@ -32,6 +32,7 @@ export class ApiService {
     participantbysession: '/api/session/participant',
     participant: '/api/participant/<id>',
     questionnaire: '/api/q/<name>/<id>',
+    questionnaireList: '/api/q/<name>',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
@@ -239,7 +240,16 @@ export class ApiService {
         catchError(this._handleError));
   }
 
-  /** submitQuestionnaire */
+  /** getQuestionnaireList */
+  getQuestionnaireList(name: string) {
+    const url = this
+      ._endpointUrl('questionnaireList')
+      .replace('<name>', name);
+    return this.httpClient.get<object>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getQuestionnaire */
   getQuestionnaire(name: string, id: number) {
     const url = this
       ._endpointUrl('questionnaire')

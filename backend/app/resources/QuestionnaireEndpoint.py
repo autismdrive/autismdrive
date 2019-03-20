@@ -54,4 +54,10 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         return schema.dump(updated)
 
 
+class QuestionnaireListEndpoint(flask_restful.Resource):
 
+    def get(self, name):
+        class_ref = QuestionService.get_class(name)
+        schema = QuestionService.get_schema(name, many=True)
+        questionnaires = db.session.query(class_ref).all()
+        return schema.dump(questionnaires)
