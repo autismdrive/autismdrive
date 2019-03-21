@@ -31,4 +31,12 @@ export class AdminHomeComponent implements OnInit {
     )
   }
 
+  snakeToUpperCase(s) {
+    return s.replace(/([-_][a-z]|^[a-z])/ig, ($1) => {
+      return $1.toUpperCase()
+        .replace('-', ' ')
+        .replace('_', ' ');
+    });
+  }
+
 }
