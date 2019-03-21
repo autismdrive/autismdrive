@@ -76,6 +76,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { JwtInterceptor } from './_routing/jwt-interceptor';
 import { ErrorInterceptor } from './_routing/error-interceptor';
 import { AdminHomeComponent } from './admin-home/admin-home.component';
+import { QuestionnaireDataTableComponent } from './questionnaire-data-table/questionnaire-data-table.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -134,7 +135,8 @@ export class FormlyConfig {
     AvatarDialogComponent,
     FlowCompleteComponent,
     FlowIntroComponent,
-    AdminHomeComponent
+    AdminHomeComponent,
+    QuestionnaireDataTableComponent
   ],
   imports: [
     BrowserAnimationsModule,
