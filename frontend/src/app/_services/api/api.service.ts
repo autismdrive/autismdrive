@@ -33,6 +33,7 @@ export class ApiService {
     participant: '/api/participant/<id>',
     questionnaire: '/api/q/<name>/<id>',
     questionnaireList: '/api/q/<name>',
+    questionnaireNames: '/api/q',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
@@ -238,6 +239,14 @@ export class ApiService {
       .pipe(
         map(json => new User(json)),
         catchError(this._handleError));
+  }
+
+  /** getQuestionnaireNames */
+  getQuestionnaireNames() {
+    const url = this
+      ._endpointUrl('questionnaireNames');
+    return this.httpClient.get<any>(url)
+      .pipe(catchError(this._handleError));
   }
 
   /** getQuestionnaireList */

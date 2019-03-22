@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../_services/api/api.service';
 
 @Component({
   selector: 'app-admin-home',
@@ -6,18 +7,18 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./admin-home.component.scss']
 })
 export class AdminHomeComponent implements OnInit {
-  questionnaire_names = [
-    'identification_questionnaire',
-    'demographics_questionnaire',
-    'contact_questionnaire',
-    'developmental_questionnaire',
-    'education_self_questionnaire',
-    'education_dependent_questionnaire'
-  ];
+  questionnaire_names = [];
 
-  constructor() { }
+  constructor(
+    private api: ApiService
+  ) { }
 
   ngOnInit() {
+    this.api.getQuestionnaireNames().subscribe(
+      file_names => {
+        this.questionnaire_names = file_names;
+      }
+    )
   }
 
 }
