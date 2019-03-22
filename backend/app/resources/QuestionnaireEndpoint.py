@@ -1,5 +1,6 @@
 import datetime
 import flask_restful
+import os
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import db, RestException, auth
@@ -61,3 +62,18 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
         schema = QuestionService.get_schema(name, many=True)
         questionnaires = db.session.query(class_ref).all()
         return schema.dump(questionnaires)
+
+
+class QuestionnaireNamesEndpoint(flask_restful.Resource):
+
+    def get(self):
+        all_file_names = os.listdir('./app/model/questionnaires')
+        non_questionnaires = ['mixin', '__']
+        questionnaire_file_names = []
+        for index, file_name in enumerate(all_file_names):
+            if any(string in file_name for string in non_questionnaires):
+                pass
+            else:
+                f = file_name.replace(".py", "")
+                questionnaire_file_names.append(f)
+        return questionnaire_file_names

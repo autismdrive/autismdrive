@@ -35,7 +35,8 @@ from app.resources.OrganizationEndpoint import (
 )
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
-    QuestionnaireListEndpoint
+    QuestionnaireListEndpoint,
+    QuestionnaireNamesEndpoint
 )
 from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
@@ -136,6 +137,7 @@ endpoints = [
     # Participants
     (ParticipantEndpoint, "/participant/<id>"),
     # Questionnaires
+    (QuestionnaireNamesEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     # Flow Endpoint
