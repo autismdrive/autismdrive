@@ -2,7 +2,8 @@ import { Component, EventEmitter, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../services/api/api.service';
+import { ApiService } from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-login',
@@ -40,7 +41,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private api: ApiService
+    private authenticationService: AuthenticationService
   ) {
     this.route.params.subscribe(params => {
       if ('email_token' in params) {
@@ -56,23 +57,18 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     if (this.form.valid) {
-      this.api.login(model['email'], model['password'], this.emailToken).subscribe(
-        token => {
-          this.api.openSession(token['token']).subscribe(
-            user => {
-              this.router.navigate(['profile']);
-              this.loading = false;
+      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
+          data => {
+            this.router.navigate(['profile']);
+          },
+          error => {
+            if (error) {
+              this.errorEmitter.emit(error);
+            } else {
+              this.errorEmitter.emit('An unexpected error occurred. Please contact support');
             }
-          );
-        }, error1 => {
-          this.loading = false;
-          if (error1) {
-            this.errorEmitter.emit(error1);
-          } else {
-            this.errorEmitter.emit('An unexpected error occurred. Please contact support');
-          }
-        }
-      );
+            this.loading = false;
+          });
     } else {
       this.loading = false;
       this.errorEmitter.emit('Please enter a valid email address and password.');

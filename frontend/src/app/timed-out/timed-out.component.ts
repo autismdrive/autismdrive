@@ -1,6 +1,6 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { fadeTransition } from '../animations/animations';
+import { fadeTransition } from '../_animations/animations';
 
 @Component({
   selector: 'app-timedout',

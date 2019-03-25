@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/cor
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../services/api/api.service';
-import { User } from '../user';
+import { ApiService } from '../_services/api/api.service';
+import { User } from '../_models/user';
 
 @Component({
   selector: 'app-register',
@@ -27,6 +27,8 @@ export class RegisterComponent implements OnInit {
         placeholder: 'Enter email',
         required: true,
       },
+      validators: {
+        validation: ['email']},
     },
   ];
   constructor(

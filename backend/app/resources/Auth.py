@@ -10,6 +10,8 @@ from app.model.email_log import EmailLog
 from app.model.user import User
 from flask import jsonify, g, request, Blueprint
 
+from app.resources.schema import UserSchema
+
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/api')
 
 
@@ -28,7 +30,8 @@ def confirm_email(email_token):
     db.session.commit()
 
     auth_token = user.encode_auth_token().decode()
-    return jsonify({"token": auth_token})
+    user.token = auth_token;
+    return user
 
 
 @auth_blueprint.route('/login_password', methods=["GET", "POST"])
@@ -36,6 +39,7 @@ def login_password():
     request_data = request.get_json()
     email = request_data['email']
     user = User.query.filter(func.lower(User.email) == email.lower()).first()
+    schema = UserSchema(many=False)
 
     if user is None:
         raise RestException(RestException.LOGIN_FAILURE)
@@ -44,13 +48,14 @@ def login_password():
             # redirect users back to the front end, include the new auth token.
             auth_token = user.encode_auth_token().decode()
             g.user = user
-            return jsonify({"token": auth_token})
+            user.token = auth_token
+            return schema.jsonify(user)
         else:
             raise RestException(RestException.LOGIN_FAILURE)
     else:
         if 'email_token' in request_data:
-            g.user = user
-            return confirm_email(request_data['email_token'])
+            g.user = confirm_email(request_data['email_token'])
+            return schema.jsonify(user)
         else:
             raise RestException(RestException.CONFIRM_EMAIL)
 
@@ -87,9 +92,9 @@ def reset_password():
     user.password = password
     db.session.add(user)
     db.session.commit()
-
     auth_token = user.encode_auth_token().decode()
-    return jsonify({"token": auth_token})
+    user.token = auth_token
+    return UserSchema().jsonify(user)
 
 
 @auth.verify_token

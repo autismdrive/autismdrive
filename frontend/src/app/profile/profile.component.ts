@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../services/api/api.service';
-import { User } from '../user';
-import { ParticipantRelationship } from '../participantRelationship';
+import { ApiService } from '../_services/api/api.service';
+import { User } from '../_models/user';
+import { ParticipantRelationship } from '../_models/participantRelationship';
 import { Router } from '@angular/router';
-import { Participant } from '../participant';
+import { Participant } from '../_models/participant';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -21,26 +22,29 @@ export class ProfileComponent implements OnInit {
   state = ProfileState.NO_PARTICIPANT;
   loading = true;
 
-  constructor(private api: ApiService, private router: Router) {
-    this.api.getSession().subscribe(userProps => {
-      console.log('ProfileComponent constructor getSession userProps', userProps);
+  constructor(private authenticationService: AuthenticationService,
+              private api: ApiService,
+              private router: Router) {
 
-      this.user = new User(userProps);
-      this.state = this.getState();
-
-      this.loading = false;
-    }, error1 => {
-      console.error(error1);
-      this.user = null;
-      this.loading = false;
-    });
+    this.authenticationService.refresh().subscribe(
+      user => {
+        this.user = user;
+        this.state = this.getState();
+        this.loading = false;
+      }, error1 => {
+        console.error(error1);
+        this.user = null;
+        this.loading = false;
+      });
   }
 
   ngOnInit() {
   }
 
   getState() {
-    if (this.user.getSelf() === undefined) {
+    if (!this.user) {  // can happen if user logs out from this page.
+      return null;
+    } else if (this.user.getSelf() === undefined) {
       return ProfileState.NO_PARTICIPANT;
     } else {
       return ProfileState.PARTICIPANT;

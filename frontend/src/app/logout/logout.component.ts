@@ -1,6 +1,6 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { fadeTransition } from '../animations/animations';
-import { ApiService } from '../services/api/api.service';
+import { fadeTransition } from '../_animations/animations';
+import { ApiService } from '../_services/api/api.service';
 import { Router } from '@angular/router';
 
 @Component({
