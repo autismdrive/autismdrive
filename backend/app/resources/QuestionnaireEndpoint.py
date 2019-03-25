@@ -57,6 +57,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
 class QuestionnaireListEndpoint(flask_restful.Resource):
 
+    @auth.login_required
     def get(self, name):
         class_ref = QuestionService.get_class(name)
         schema = QuestionService.get_schema(name, many=True)
