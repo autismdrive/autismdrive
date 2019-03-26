@@ -168,7 +168,7 @@ class DataLoader():
 
 
     def load_clinical_diagnoses_questionnaire(self):
-        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
+        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health=['ptsd'], genetic=['angelman'])
         db.session.add(cd_ques)
         print("Clinical Diagnoses loaded. There is now %i clinical diagnoses record in the database." % db.session.query(
             ClinicalDiagnosesQuestionnaire).count())
@@ -194,7 +194,7 @@ class DataLoader():
 
     def load_demographics_questionnaire(self):
         d_ques = DemographicsQuestionnaire(user_id=1, birth_sex='male', gender_identity='intersex',
-                                           race_ethnicity="raceAsian")
+                                           race_ethnicity=["raceAsian"])
         db.session.add(d_ques)
         print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
             DemographicsQuestionnaire).count())
@@ -237,7 +237,7 @@ class DataLoader():
         db.session.commit()
 
     def load_home_questionnaires(self):
-        h_ques = HomeDependentQuestionnaire(dependent_living_situation="fullTimeGuardian", struggle_to_afford=True)
+        h_ques = HomeDependentQuestionnaire(dependent_living_situation=["fullTimeGuardian"], struggle_to_afford=True)
         db.session.add(h_ques)
         print("Home for Dependents loaded.  There is now %i dependent home record in the database." % db.session.query(
             HomeDependentQuestionnaire).count())
