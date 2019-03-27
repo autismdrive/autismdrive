@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { ApiService } from '../_services/api/api.service';
+import { snakeToUpperCase } from '../../util/snakeToUpper';
 
 @Component({
   selector: 'app-questionnaire-data-view',
@@ -40,12 +41,5 @@ export class QuestionnaireDataViewComponent implements OnInit {
     return this.currentQuestionnaire;
   }
 
-  snakeToUpperCase(s) {
-    return s.replace(/([-_][a-z]|^[a-z])/ig, ($1) => {
-      return $1.toUpperCase()
-        .replace('-', ' ')
-        .replace('_', ' ');
-    });
-  }
-
+  get snakeToUpperCase(){ return snakeToUpperCase }
 }

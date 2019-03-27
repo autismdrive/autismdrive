@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { QuestionnaireDataSource } from '../_models/questionnaire_data_source';
+import { snakeToUpperCase } from '../../util/snakeToUpper';
 
 @Component({
   selector: 'app-questionnaire-data-table',
@@ -14,8 +15,9 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   dataSource: QuestionnaireDataSource;
   displayedColumns = [];
 
+
   constructor(
-    private api: ApiService
+    private api: ApiService,
   ) {}
 
   ngOnChanges() {
@@ -37,12 +39,5 @@ export class QuestionnaireDataTableComponent implements OnChanges {
     );
   }
 
-  snakeToUpperCase(s) {
-    return s.replace(/([-_][a-z]|^[a-z])/ig, ($1) => {
-      return $1.toUpperCase()
-        .replace('-', ' ')
-        .replace('_', ' ');
-    });
-  }
-
+  get snakeToUpperCase(){ return snakeToUpperCase }
 }
