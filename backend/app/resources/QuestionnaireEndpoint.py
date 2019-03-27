@@ -4,6 +4,8 @@ import os
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import db, RestException, auth
+from app.model.user import Role
+from app.wrappers import requires_roles
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -58,6 +60,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 class QuestionnaireListEndpoint(flask_restful.Resource):
 
     @auth.login_required
+    @requires_roles(Role.admin)
     def get(self, name):
         class_ref = QuestionService.get_class(name)
         schema = QuestionService.get_schema(name, many=True)
