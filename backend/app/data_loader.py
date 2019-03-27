@@ -175,7 +175,7 @@ class DataLoader():
         db.session.commit()
 
     def load_contact_questionnaire(self):
-        c_ques = ContactQuestionnaire(phone=555-555-1234, contact_times='Weekdays at 5AM', email='charlie@brown.com')
+        c_ques = ContactQuestionnaire(phone='555-555-1234', contact_times='Weekdays at 5AM', email='charlie@brown.com')
         db.session.add(c_ques)
         print("Contact loaded.  There is now %i contact record in the database." % db.session.query(
             ContactQuestionnaire).count())
