@@ -28,11 +28,11 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
   load_columns() {
     this.displayedColumns = [];
-    this.api.getQuestionnaireList(this.questionnaire_name).subscribe(
+    this.api.getQuestionnaireListMeta(this.questionnaire_name).subscribe(
       result => {
-        for (let field in result[0]) {
-          if (!this.displayedColumns.includes(field)){
-            this.displayedColumns.push(field);
+        for (let fieldIndex in result['fields']) {
+          if (!this.displayedColumns.includes(result['fields'][fieldIndex].name)){
+            this.displayedColumns.push(result['fields'][fieldIndex].name);
           }
         }
       }

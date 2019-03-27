@@ -33,6 +33,7 @@ export class ApiService {
     participant: '/api/participant/<id>',
     questionnaire: '/api/q/<name>/<id>',
     questionnaireList: '/api/q/<name>',
+    questionnaireListMeta: '/api/q/<name>/meta',
     questionnaireNames: '/api/q',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     resourcebycategory: '/api/category/<category_id>/resource',
@@ -253,6 +254,15 @@ export class ApiService {
   getQuestionnaireList(name: string) {
     const url = this
       ._endpointUrl('questionnaireList')
+      .replace('<name>', name);
+    return this.httpClient.get<object>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getQuestionnaireListMeta */
+  getQuestionnaireListMeta(name: string) {
+    const url = this
+      ._endpointUrl('questionnaireListMeta')
       .replace('<name>', name);
     return this.httpClient.get<object>(url)
       .pipe(catchError(this._handleError));
