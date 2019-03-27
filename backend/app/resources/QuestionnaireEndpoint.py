@@ -68,6 +68,35 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
         return schema.dump(questionnaires)
 
 
+class QuestionnaireListMetaEndpoint(flask_restful.Resource):
+
+    def get(self, name):
+        class_ref = QuestionService.get_class(name)
+        questionnaire = db.session.query(class_ref).first()
+        meta = {"table": {}}
+        try:
+            meta["table"]['question_type'] = questionnaire.__question_type__
+            meta["table"]["label"] = questionnaire.__label__
+        except:
+            pass  # If these fields don't exist, just keep going.
+        meta["fields"] = []
+
+        # This will move fields referenced by the field groups into the group, but will otherwise add them
+        # the base meta object if they are not contained within a group.
+        for c in questionnaire.__table__.columns:
+            if c.info:
+                c.info['name'] = c.name
+                c.info['key'] = c.name
+                meta['fields'].append(c.info)
+            else:
+                meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0})
+
+        # Sort the fields
+        meta['fields'] = sorted(meta['fields'], key=lambda field: field['display_order'])
+
+        return meta
+
+
 class QuestionnaireNamesEndpoint(flask_restful.Resource):
 
     def get(self):
