@@ -7,7 +7,7 @@
     </h1>
     <mat-drawer-container>
       <mat-drawer #sidenav
-        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [mode]='over'
         [(opened)]="sidebarOpen">
           <mat-nav-list *ngFor="let qn of questionnaire_names">
             <mat-list-item
