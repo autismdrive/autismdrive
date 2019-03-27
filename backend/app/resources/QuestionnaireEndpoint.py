@@ -80,4 +80,4 @@ class QuestionnaireNamesEndpoint(flask_restful.Resource):
             else:
                 f = file_name.replace(".py", "")
                 questionnaire_file_names.append(f)
-        return questionnaire_file_names
+        return sorted(questionnaire_file_names)
