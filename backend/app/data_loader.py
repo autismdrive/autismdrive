@@ -186,7 +186,7 @@ class DataLoader():
         db.session.add(cb_dques)
         print("Current Behaviors for Dependents loaded.  There is now %i dependent current behavior record in the database." % db.session.query(
             CurrentBehaviorsDependentQuestionnaire).count())
-        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability=["nonVerbal"], has_academic_difficulties=True)
         db.session.add(cb_sques)
         print("Current Behaviors for Self participants loaded.  There is now %i self current behavior record in the database." % db.session.query(
             CurrentBehaviorsSelfQuestionnaire).count())
