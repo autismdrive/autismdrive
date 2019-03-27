@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { QuestionnaireDataSource } from '../_models/questionnaire_data_source';
 
@@ -7,7 +7,7 @@ import { QuestionnaireDataSource } from '../_models/questionnaire_data_source';
   templateUrl: './questionnaire-data-table.component.html',
   styleUrls: ['./questionnaire-data-table.component.scss']
 })
-export class QuestionnaireDataTableComponent implements OnInit {
+export class QuestionnaireDataTableComponent implements OnChanges {
   @Input()
   questionnaire_name: string;
 
@@ -16,22 +16,25 @@ export class QuestionnaireDataTableComponent implements OnInit {
 
   constructor(
     private api: ApiService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnChanges() {
     this.dataSource = new QuestionnaireDataSource(this.api);
     this.dataSource.loadQuestionnaires(this.questionnaire_name);
     this.load_columns();
   }
 
   load_columns() {
+    this.displayedColumns = [];
     this.api.getQuestionnaireList(this.questionnaire_name).subscribe(
       result => {
         for (let field in result[0]) {
-          this.displayedColumns.push(field);
+          if (!this.displayedColumns.includes(field)){
+            this.displayedColumns.push(field);
+          }
         }
       }
-    )
+    );
   }
 
   snakeToUpperCase(s) {
