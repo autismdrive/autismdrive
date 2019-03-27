@@ -16,3 +16,6 @@ class Training(db.Model):
     image_caption = db.Column(db.String)
     website = db.Column(db.String)
     categories = db.relationship("TrainingCategory", back_populates="training")
+
+    def indexable_content(self):
+        return ' '.join(filter(None, (self.description, self.outcomes_description)))

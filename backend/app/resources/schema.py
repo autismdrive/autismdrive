@@ -1,6 +1,6 @@
+from flask_marshmallow.sqla import ModelSchema
 from marshmallow import fields, Schema, post_load
 from marshmallow_enum import EnumField
-from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
 
@@ -305,7 +305,16 @@ class ParticipantSchema(ModelSchema):
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
     })
 
+
 class SearchSchema(ma.Schema):
+
+    class HitSchema(ma.Schema):
+        id = fields.Integer()
+        content = fields.Str()
+        title = fields.Str()
+        type = fields.Str()
+        last_updated = fields.Date()
+        highlights = fields.Str()
 
     class FilterSchema(ma.Schema):
         field = fields.Str()
@@ -331,7 +340,7 @@ class SearchSchema(ma.Schema):
     sort = fields.Str()
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
-    resources = fields.List(fields.Dict(), dump_only=True)
+    hits = fields.List(ma.Nested(HitSchema))
     facets = ma.List(ma.Nested(FacetSchema), dump_only=True)
     ordered = True
 

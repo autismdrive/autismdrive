@@ -21,7 +21,7 @@ class ResourceEndpoint(flask_restful.Resource):
     def delete(self, id):
         resource = db.session.query(StarResource).filter_by(id=id).delete()
         try:
-            elastic_index.remove_resource(resource, 'Resource')
+            elastic_index.remove_document(resource, 'Resource')
         except:
             print("unable to remove record from elastic index, might not exist.")
         db.session.commit()
@@ -35,7 +35,7 @@ class ResourceEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()
-        elastic_index.update_resource(updated, 'Resource')
+        elastic_index.update_document(updated, 'Resource')
         return self.schema.dump(updated)
 
 
@@ -54,7 +54,7 @@ class ResourceListEndpoint(flask_restful.Resource):
             load_result = self.resourceSchema.load(request_data).data
             db.session.add(load_result)
             db.session.commit()
-            elastic_index.add_resource(load_result, 'Resource')
+            elastic_index.add_document(load_result, 'Resource')
             return self.resourceSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,

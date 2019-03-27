@@ -24,3 +24,9 @@ class Study(db.Model):
     categories = db.relationship("StudyCategory", back_populates="study")
 
     # we'll change current_num_participants to a count of related participants if that's how we connect things.
+
+    def indexable_content(self):
+        return ' '.join(filter(None, (self.description,
+                        self.outcomes_description,
+                        self.participant_description,
+                        self.researcher_description)))

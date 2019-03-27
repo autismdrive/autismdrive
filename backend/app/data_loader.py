@@ -285,7 +285,7 @@ class DataLoader:
         return category
 
     def build_index(self):
-        elastic_index.load_resources(db.session.query(StarResource).all(),
+        elastic_index.load_documents(db.session.query(StarResource).all(),
                                      db.session.query(Study).all(),
                                      db.session.query(Training).all()
                                      )

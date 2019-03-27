@@ -1,10 +1,28 @@
-from flask import logging
-
-from elasticsearch_dsl import DocType, Date, Float, Keyword, Text, \
-    Index, Search, analyzer, Nested, Integer, analysis, Q, tokenizer
+from elasticsearch_dsl import Date,  Keyword, Text, Index, analyzer, Integer, tokenizer, Document
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
+
+autocomplete = analyzer('autocomplete',
+                        tokenizer=tokenizer('ngram', 'edge_ngram', min_gram=2, max_gram=15,
+                                            token_chars=["letter", "digit"]),
+                        filter=['lowercase']
+                        )
+autocomplete_search = analyzer('autocomplete_search',
+                               tokenizer=tokenizer('lowercase')
+                               )
+
+
+# Star Documents are ElastciSearch documents and be used to index a Study, Training, or Resource
+class StarDocument(Document):
+    type = Keyword()
+    id = Integer()
+    title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    last_updated = Date()
+    content = Text()
+    organization = Keyword()
+    website = Keyword()
+    category = Keyword(multi=True)
 
 
 class ElasticIndex:
@@ -16,12 +34,11 @@ class ElasticIndex:
         self.establish_connection(app.config['ELASTIC_SEARCH'])
         self.index_prefix = app.config['ELASTIC_SEARCH']["index_prefix"]
 
-        self.resource_index_name = '%s_resources' % self.index_prefix
-        self.resource_index = Index(self.resource_index_name)
-        self.resource_index.doc_type(ElasticResource)
-
+        self.index_name = '%s_resources' % self.index_prefix
+        self.index = Index(self.index_name)
+        self.index.doc_type(StarDocument)
         try:
-            ElasticResource.init()
+            self.index.create()
         except:
             self.logger.info("Failed to create the index(s).  They may already exist.")
 
@@ -49,104 +66,77 @@ class ElasticIndex:
     def clear(self):
         try:
             self.logger.info("Clearing the index.")
-            self.resource_index.delete(ignore=404)
-            ElasticResource.init()
+            self.index.delete(ignore=404)
+            self.index.create()
         except:
             self.logger.error("Failed to delete the indices.  They night not exist.")
 
-    def remove_resource(self, resource, rtype, flush=True):
-        obj = self.get_resource(resource, rtype)
+    def remove_document(self, document, flush=True):
+        obj = self.get_document(document)
         obj.delete()
         if flush:
-            self.resource_index.flush()
+            self.index.flush()
 
-    def get_resource(self, resource, rtype):
-        if rtype is 'Resource':
-            return ElasticResource.get(id='resource_' + str(resource.id))
-        elif rtype is 'Study':
-            return ElasticResource.get(id='study_' + str(resource.id))
-        elif rtype is 'Training':
-            return ElasticResource.get(id='training_' + str(resource.id))
+    @staticmethod
+    def _get_id(document):
+        return document.__tablename__.lower() + '_' + str(document.id)
 
-    def update_resource(self, resource, rtype, flush=True):
+    def get_document(self, document):
+        uid = self._get_id(document)
+        return StarDocument.get(id=uid, index=self.index_name)
+
+    def update_document(self, document, flush=True):
         # update is the same as add, as it will overwrite.  Better to have code in one place.
-        self.add_resource(resource, rtype, flush)
+        self.add_document(document, flush)
 
-    def add_resource(self, r, t, flush=True):
-        er = ElasticResource(id=r.id,
-                             type=t,
-                             title=r.title,
-                             description=r.description,
-                             last_updated = r.last_updated,
-                             website=r.website,
-                             category=[]
-                             )
+    def add_document(self, document, flush=True):
+        doc = StarDocument(id=document.id,
+                           type=document.__tablename__,
+                           title=document.title,
+                           last_updated=document.last_updated,
+                           content=document.indexable_content(),
+                           website=document.website,
+                           category=[]
+                           )
 
-        if er.type == 'Resource':
-            er.meta = {'id': 'resource_' + str(r.id)}
+        doc.meta.id = self._get_id(document)
 
-        if er.type == 'Study':
-            er.meta = {'id': 'study_' + str(r.id)}
+        if document.organization is not None:
+            doc.organization = document.organization.name
 
-        if er.type == 'Training':
-            er.meta = {'id': 'training_' + str(r.id)}
+        for cat in document.categories:
+            doc.category.append(cat.category.name)
 
-        if r.organization is not None:
-            er.organization = r.organization.name
-
-        for cat in r.categories:
-            er.category.append(cat.category.name)
-
-        ElasticResource.save(er)
+        StarDocument.save(doc, index=self.index_name)
         if flush:
-            self.resource_index.flush()
+            self.index.flush()
 
-    def load_resources(self, resources, studies, trainings):
+    def load_documents(self, resources, studies, trainings):
         print("Loading search records of resources, studies, and trainings into %s" % self.index_prefix)
         for r in resources:
-            self.add_resource(r, t='Resource', flush=False)
+            self.add_document(r, flush=False)
         for s in studies:
-            self.add_resource(s, t='Study', flush=False)
+            self.add_document(s, flush=False)
         for t in trainings:
-            self.add_resource(t, t='Training', flush=False)
-        self.resource_index.flush()
+            self.add_document(t, flush=False)
+        self.index.flush()
 
-    def search_resources(self, search):
-        resource_search = ResourceSearch(search.query, search.jsonFilters(), index=self.resource_index_name)
-        resource_search = resource_search[search.start:search.start + search.size]
-        return resource_search.execute()
-
-
-autocomplete = analyzer('autocomplete',
-                        tokenizer=tokenizer('ngram', 'edge_ngram', min_gram=2, max_gram=15, token_chars=["letter","digit"]),
-                        filter=['lowercase']
-)
-autocomplete_search = analyzer('autocomplete_search',
-                               tokenizer=tokenizer('lowercase')
-)
+    def search(self, search):
+        document_search = DocumentSearch(search.query, search.jsonFilters(), index=self.index_name)
+        document_search = document_search[search.start:search.start + search.size]
+        return document_search.execute()
 
 
-class ElasticResource(DocType):
-    type = Keyword()
-    id = Integer()
-    title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
-    last_updated = Date()
-    description = Text()
-    organization = Keyword()
-    website = Keyword()
-    category = Keyword(multi=True)
-
-
-class ResourceSearch(elasticsearch_dsl.FacetedSearch):
+class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     def __init__(self, *args, **kwargs):
         self.index = kwargs["index"]
 #        self.date_restriction = kwargs["date_restriction"]
         kwargs.pop("index")
 #        kwargs.pop("date_restriction")
-        super(ResourceSearch, self).__init__(*args, **kwargs)
+        super(DocumentSearch, self).__init__(*args, **kwargs)
 
-    doc_types = [ElasticResource]
-    fields = ['title^10', 'description^5', 'category^2', 'organization', 'website']
+    doc_types = [StarDocument]
+    fields = ['title^10', 'content^5', 'category^2', 'organization', 'website']
 
     facets = {
         'Type': elasticsearch_dsl.TermsFacet(field='type'),
@@ -154,8 +144,9 @@ class ResourceSearch(elasticsearch_dsl.FacetedSearch):
         'Category': elasticsearch_dsl.TermsFacet(field='category')
     }
 
-    def search(self):
-        ' Override search to add your own filters '
-        s = super(ResourceSearch, self).search()
-        return s
+    def highlight(self, search):
+        return search.highlight('content', fragment_size=50)
 
+    def search(self):
+        s = super(DocumentSearch, self).search()
+        return s

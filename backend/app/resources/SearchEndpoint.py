@@ -3,11 +3,8 @@ import flask_restful
 from flask import request
 
 from app import elastic_index, RestException
-from app.model.resource import StarResource
-from app.model.study import Study
-from app.model.training import Training
-from app.model.search import Facet, FacetCount, Filter, Search
-from app.resources.schema import SearchSchema, StarResourceSchema, StudySchema, TrainingSchema
+from app.model.search import Facet, FacetCount, Hit
+from app.resources.schema import SearchSchema
 
 
 class SearchEndpoint(flask_restful.Resource):
@@ -18,7 +15,7 @@ class SearchEndpoint(flask_restful.Resource):
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         try:
-            results = elastic_index.search_resources(search)
+            results = elastic_index.search(search)
         except elasticsearch.ElasticsearchException as e:
             raise RestException(RestException.ELASTIC_ERROR)
 
@@ -33,23 +30,10 @@ class SearchEndpoint(flask_restful.Resource):
                     FacetCount(category, hit_count, is_selected))
             search.facets.append(facet)
 
-        resources = []
-        studies = []
-        trainings = []
+        search.hits = []
         for hit in results:
-            if hit.type == "Resource":
-                resource = StarResource.query.filter_by(id=hit.id).first()
-                if resource is not None:
-                    resources.append(resource)
-            elif hit.type == "Study":
-                study = Study.query.filter_by(id=hit.id).first()
-                if study is not None:
-                    studies.append(study)
-            elif hit.type == "Training":
-                training = Training.query.filter_by(id=hit.id).first()
-                if training is not None:
-                    trainings.append(training)
-        search.resources = StarResourceSchema().dump(resources, many=True).data
-        search.resources.extend(StudySchema().dump(studies, many=True).data)
-        search.resources.extend(TrainingSchema().dump(trainings, many=True).data)
+            highlights = "...".join(hit.meta.highlight.content)
+            hit = Hit(hit.id, hit.content, hit.title, hit.type, hit.last_updated, highlights)
+            search.hits.append(hit)
+
         return SearchSchema().jsonify(search)

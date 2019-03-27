@@ -142,6 +142,9 @@ endpoints = [
     (FlowListEndpoint, "/flow"),
     (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
+    # Search Endpoint
+    (SearchEndpoint, "/search"),
+
 ]
 
 # Add all endpoints to the API
