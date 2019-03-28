@@ -1,0 +1,135 @@
+<div
+  fxLayout="row"
+  fxLayout.xs="column"
+  fxLayoutAlign="center"
+  class="mat-typography"
+>
+  <div fxFlex="75%">
+    <form
+      [ngClass]="{'search-box': true, 'hidden-results': hideResults}"
+      [formGroup]="searchForm"
+    >
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          #searchInput
+          type="search"
+          [formControl]="searchBox"
+          placeholder="Search"
+          value="{{query.query}}"
+          autofocus
+        >
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </form>
+  </div>
+</div>
+
+<mat-sidenav-container
+  [id]="'sidenavContainer'"
+  class="mat-typography"
+  [hasBackdrop]="false"
+>
+  <mat-sidenav
+    #sidenav
+    class="sidenav"
+  >
+    <h2>
+      <span>Filters</span>
+      <div class="spacer"></div>
+      <button
+        mat-icon-button
+        (click)="sidenav.close()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </h2>
+    <div class="spacer"></div>
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let facet of query.facets">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{facet.field}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          <mat-list-item
+            *ngFor="let count of facet.facetCounts"
+            (click)="addFilter(facet.field, count.category)"
+          >
+            {{count.category}}
+            <div class="spacer"></div>
+            {{count.hit_count}}
+          </mat-list-item>
+        </mat-list>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Sort Results
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          <mat-list-item (click)="sortByRelevance()">
+            Search Relevance
+            <div class="spacer"></div>
+          </mat-list-item>
+          <mat-list-item (click)="sortByDate()">
+            Recently Updated
+            <div class="spacer"></div>
+          </mat-list-item>
+        </mat-list>
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <ul class="applied-filters">
+      <li *ngIf="!sidenav.opened">
+        <button
+          mat-icon-button
+          (click)="sidenav.open()"
+        >
+          <i class="material-icons">add_circle_outline</i>
+        </button>
+        Add a filter
+      </li>
+      <li *ngIf="query.query">
+        <button
+          mat-icon-button
+          (click)="updateQuery()"
+        >
+          <i class="material-icons">remove_circle_outline</i>
+        </button>
+        Search: {{query.query}}
+      </li>
+
+      <li *ngFor="let filter of query.filters">
+        <button
+          mat-icon-button
+          (click)="removeFilter(filter)"
+        >
+          <i class="material-icons">remove_circle_outline</i>
+        </button>
+        {{filter.field}} : {{filter.value}}
+      </li>
+    </ul>
+
+    <div [hidden]="loading || hideResults">
+      <app-search-result *ngFor="let hit of query.hits" [contentType]="hit.type"
+        [description]="hit.highlights" [title]="hit.title" [url]="hit.url">
+      </app-search-result>
+    </div>
+
+
+    <div [hidden]="loading || hideResults">
+      <mat-paginator
+        [length]="query.total"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+        (page)="updatePage()"
+      >
+      </mat-paginator>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

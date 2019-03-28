@@ -19,6 +19,7 @@ import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { LogoutComponent } from '../logout/logout.component';
 import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
 import {AuthGuard} from './auth-guard';
+import {SearchComponent} from '../search/search.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -42,6 +43,7 @@ const routes: Routes = [
   { path: 'logout', component: LogoutComponent, data: { title: 'You have been logged out.', hideHeader: true } },
   { path: 'timedout', component: TimedoutComponent, data: { title: 'Your session has timed out.', hideHeader: true } },
   { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
+  { path: 'search', component: SearchComponent, data: { title: 'Search' } },
 ];
 
 @NgModule({

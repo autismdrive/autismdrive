@@ -9,6 +9,7 @@ import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
 import { Training } from '../../_models/training';
 import { User } from '../../_models/user';
+import {Query} from '../../_models/query';
 
 @Injectable()
 export class ApiService {
@@ -39,6 +40,7 @@ export class ApiService {
     resource: '/api/resource/<id>',
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
+    search: '/api/search',
     session: '/api/session',
     sessionstatus: '/api/session/status',
     sessionparticipants: '/api/session/participant',
@@ -62,7 +64,7 @@ export class ApiService {
   }
 
   private _handleError(error: HttpErrorResponse) {
-    let message = 'Something bad happened; please try again lather.';
+    const message = 'Something bad happened; please try again lather.';
 
     console.error(error);
 
@@ -274,6 +276,12 @@ export class ApiService {
       .replace('<flow>', flow)
       .replace('<questionnaire_name>', questionnaire_name);
     return this.httpClient.post<object>(url, options)
+      .pipe(catchError(this._handleError));
+  }
+
+  search(query: Query): Observable<Query> {
+    const url = this._endpointUrl('search');
+    return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }
 

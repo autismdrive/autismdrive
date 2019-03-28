@@ -1,0 +1,73 @@
+// Import theming functions
+@import '~@angular/material/theming';
+@import '../../stardrive_material';
+
+// Load the UVA Theme
+@include stardrive-theme($stardrive-theme);
+
+form.search-box {
+  background: transparent;
+  border-radius: 5px;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  display: flex;
+  transition: $animationDuration ease-in-out padding-top;
+
+  &.hidden-results {
+    padding-top: 100px;
+  }
+
+  mat-form-field, mat-hint {
+    flex: 2 0 auto;
+  }
+}
+
+#tiles {
+  padding-top: 1em;
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+::ng-deep mat-sidenav-container#sidenavContainer {
+  min-height: 100vh;
+
+  ::ng-deep .mat-sidenav {
+    width: 100%;
+
+    h2 {
+      display: flex;
+      margin-left: 24px;
+      line-height: 2.2;
+
+      span {
+        flex: 1 1 auto;
+      }
+    }
+  }
+
+  @media screen and (min-width: 720px) {
+    ::ng-deep .mat-sidenav {
+      width: 400px;
+    }
+  }
+
+  .applied-filters > li {
+    list-style: none;
+  }
+
+  mat-list-item {
+    cursor: pointer;
+  }
+
+  mat-list-item:hover {
+    background-color: mat-color($stardrive-primary, 100)
+  }
+
+  button {
+    flex: 0 0 auto;
+    border: none;
+  }
+}
+
+
+

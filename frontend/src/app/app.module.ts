@@ -26,7 +26,7 @@ import {
   MatStepperModule,
   MatTableModule,
   MatToolbarModule,
-  MAT_FORM_FIELD_DEFAULT_OPTIONS
+  MAT_FORM_FIELD_DEFAULT_OPTIONS, MatPaginatorModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -75,6 +75,7 @@ import { FlowIntroComponent } from './flow-intro/flow-intro.component';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {JwtInterceptor} from './_routing/jwt-interceptor';
 import {ErrorInterceptor} from './_routing/error-interceptor';
+import {SearchComponent} from './search/search.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -117,6 +118,7 @@ export class FormlyConfig {
     StudiesComponent,
     TermsComponent,
     FiltersComponent,
+    SearchComponent,
     SearchResultComponent,
     ResourceDetailComponent,
     StudyDetailComponent,
@@ -132,7 +134,7 @@ export class FormlyConfig {
     LogoutComponent,
     AvatarDialogComponent,
     FlowCompleteComponent,
-    FlowIntroComponent
+    FlowIntroComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -167,6 +169,7 @@ export class FormlyConfig {
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
+    MatPaginatorModule,
     NgProgressModule,
     ReactiveFormsModule,
     RoutingModule
