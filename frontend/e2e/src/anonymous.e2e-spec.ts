@@ -36,5 +36,4 @@ describe('Anonymous User', () => {
   it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
-
 });

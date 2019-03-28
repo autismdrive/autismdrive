@@ -51,16 +51,27 @@ describe('Participant (Guardian - Self)', () => {
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
   it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should display avatars for each participant', () => profileUseCases.displayAvatars());
+  it('should display the avatar selection dialog', () => profileUseCases.displayAvatarDialog());
+  it('should edit the avatar image', () => profileUseCases.editAvatarImg());
+  it('should edit the avatar color', () => profileUseCases.editAvatarColor());
+  it('should save changes to the avatar', () => profileUseCases.saveAvatar());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
   // Enrollment Flow
   it('should display a menu link to all steps of the flow', () => enrollUseCases.displayMenuLinks());
   it('should display completed status of each step', () => enrollUseCases.displayCompletedStatus());
   it('should navigate to each step of the flow', () => enrollUseCases.navigateToEachStep());
-  it('should fill out the required fields for each step');
+  it('should cancel editing enrollment info', () => enrollUseCases.cancelEditing());
+  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
+  it('should display instructions for the entire flow', () => enrollUseCases.displayInstructions());
+  it('should fill out the required fields for each step', () => enrollUseCases.fillOutRequiredFields());
   it('should check off steps as complete');
   it('should display progress on the Profile screen');
   it('should allow user to view/edit non-sensitive responses');
   it('should not allow user to view or edit sensitive responses');
 
+  // Log out
+  it('should log out', () => loginUseCases.logout());
+  it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
 });

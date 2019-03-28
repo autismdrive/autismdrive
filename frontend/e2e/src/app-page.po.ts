@@ -1,4 +1,12 @@
-import { browser, by, element, ExpectedConditions } from 'protractor';
+import {
+  browser,
+  by,
+  element,
+  ElementArrayFinder,
+  ElementFinder,
+  ExpectedConditions,
+  Key
+} from 'protractor';
 
 export class AppPage {
 
@@ -60,12 +68,20 @@ export class AppPage {
     return this.getElement(selector).isDisplayed();
   }
 
-  getElement(selector: string) {
+  getElement(selector: string): ElementFinder {
     return element.all(by.css(selector)).first();
   }
 
-  getElements(selector: string) {
+  getElements(selector: string): ElementArrayFinder {
     return element.all(by.css(selector));
+  }
+
+  getChildElement(selector: string, parentElement: ElementFinder) {
+    return parentElement.element(by.css(selector));
+  }
+
+  getChildElements(selector: string, parentElement: ElementArrayFinder) {
+    return parentElement.all(by.css(selector));
   }
 
   getUrl() {
@@ -103,5 +119,16 @@ export class AppPage {
     return Array(length).join().split(',').map(() => s.charAt(Math.floor(Math.random() * s.length))).join('');
   }
 
+  scrollTo(selector: string) {
+    this.getElement(selector).then(el => {
+      el.scrollIntoView(false);
+    });
+  }
 
+  tabThroughAllFields() {
+    this.getElements('formly-field').each(ff => {
+      browser.actions().sendKeys(Key.TAB);
+      expect(ff.isSelected()).toBeTruthy();
+    });
+  }
 }

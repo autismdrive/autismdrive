@@ -1,10 +1,23 @@
 @import '../node_modules/@angular/material/theming';
 // Define a custom typography config that overrides the font-family
-$custom-typography: mat-typography-config( $font-family: 'Roboto, sans-serif', $headline: mat-typography-level(32px, 48px, 700), $body-1: mat-typography-level(16px, 24px, 500), $body-2: mat-typography-level(16px, 24px, 700), $caption: mat-typography-level(16px, 24px, 500), $button: mat-typography-level(16px, 24px, 500));
+
+$custom-typography: mat-typography-config($display-4: mat-typography-level(2.5rem, 1, 800, '"bodoni-urw", serif'),
+$display-3: mat-typography-level(2.25rem, 1, 800, '"bodoni-urw", serif'),
+$display-2: mat-typography-level(2rem, 1, 800, '"bodoni-urw", serif'),
+$display-1: mat-typography-level(1.75rem, 1, 800, '"bodoni-urw", serif'),
+$headline: mat-typography-level(1.625rem, 1, 500, '"bodoni-urw", serif'),
+$title: mat-typography-level(1.5rem, 1, 700, '"bodoni-urw", serif'),
+$subheading-2: mat-typography-level(1.375rem, 1, 500, '"bodoni-urw", serif'),
+$subheading-1: mat-typography-level(1.25rem, 1, 500, '"bodoni-urw", serif'),
+$body-2: mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+$body-1: mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+$caption: mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+$button: mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'),
+$input: mat-typography-level(1rem, 1.5, 400, '"franklin-gothic-urw",sans-serif'));
 @include mat-core($custom-typography);
-$mat-blue: ( 50: #F1F5F7, // Modified, was #e0e6ed
-100: #b3c1d3, 200: #8097b6, 300: #4d6d98, 400: #264e82, 500: #002f6c, 600: #002a64, 700: #002359, 800: #001d4f, 900: #00123d, A100: #738cff, A200: #4062ff, A400: #0d38ff, A700: #002bf2, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #ffffff, 400: #ffffff, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #ffffff, A400: #ffffff, A700: #ffffff, ));
-$mat-orange: ( 50: #fceee0, 100: #f7d5b3, 200: #f2b980, 300: #ed9c4d, 400: #e98726, 500: #e57200, 600: #e26a00, 700: #de5f00, 800: #da5500, 900: #d34200, A100: #fffcfb, A200: #ffd5c8, A400: #ffaf95, A700: #ff9b7b, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #000000, 400: #000000, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #000000, A400: #000000, A700: #000000, ));
+$mat-blue: (50: #F1F5F7, // Modified, was #e0e6ed
+100: #b3c1d3, 200: #8097b6, 300: #4d6d98, 400: #264e82, 500: #002f6c, 600: #002a64, 700: #002359, 800: #001d4f, 900: #00123d, A100: #738cff, A200: #4062ff, A400: #0d38ff, A700: #002bf2, contrast: (50: #000000, 100: #000000, 200: #000000, 300: #ffffff, 400: #ffffff, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #ffffff, A400: #ffffff, A700: #ffffff, ));
+$mat-orange: (50: #fceee0, 100: #f7d5b3, 200: #f2b980, 300: #ed9c4d, 400: #e98726, 500: #e57200, 600: #e26a00, 700: #de5f00, 800: #da5500, 900: #d34200, A100: #fffcfb, A200: #ffd5c8, A400: #ffaf95, A700: #ff9b7b, contrast: (50: #000000, 100: #000000, 200: #000000, 300: #000000, 400: #000000, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #000000, A400: #000000, A700: #000000, ));
 $stardrive-primary: mat-palette($mat-blue);
 $stardrive-accent: mat-palette($mat-orange);
 $stardrive-warn: mat-palette($mat-red);
@@ -12,9 +25,11 @@ $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardr
 $easeDuration: 300ms;
 $animationDuration: 500ms;
 @include angular-material-theme($stardrive-theme);
+
 @mixin stardrive-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
+
   button {
     &.btn-xl {
       font-size: 24px;
@@ -23,6 +38,7 @@ $animationDuration: 500ms;
       padding-top: 8px;
       padding-bottom: 8px;
     }
+
     &.btn-lg {
       font-size: 20px;
       padding-left: 20px;
@@ -31,9 +47,10 @@ $animationDuration: 500ms;
       padding-bottom: 6px;
     }
   }
-//  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
-//    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
-//  }
+
+  //  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  //    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
+  //  }
 
   // Worried we will get complaints about text sizes being too small, but it
   // is all relative inside the material form fields, so we can globally set
@@ -51,7 +68,7 @@ $animationDuration: 500ms;
   // I don't like this, but for reasons I can't find, I messed up
   // the radio button positions and they need padding to look right.
   mat-radio-button {
-      padding: 5px 15px 0 0;
+    padding: 5px 15px 0 0;
   }
 
   // This handles the proper display of multi-checkox
@@ -60,6 +77,7 @@ $animationDuration: 500ms;
       margin: 5px;
       padding-right: 16px;
       display: block;
+
       .mat-checkbox-layout {
         white-space: normal;
       }
@@ -76,17 +94,70 @@ $animationDuration: 500ms;
       background-color: mat-color($stardrive-primary, 50, 1);
       color: black;
     }
+
     &.alert-warn {
       background-color: mat-color($stardrive-warn, 900, 1);
       color: white;
     }
   }
+
   .mat-drawer .mat-nav-list .mat-list-item {
     min-width: 320px;
   }
+
   .mat-drawer .mat-nav-list .mat-list-item.active {
     background-color: mat-color($stardrive-primary, default, 1);
     color: white;
+  }
+
+  .highlight {
+    position: relative;
+    background-position: 50% 50%;
+    background-size: cover;
+    padding: 2em;
+    height: 300px;
+
+    * {
+      z-index: 2;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h5,
+    p {
+      color: white;
+      margin: 0px;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 1.0), 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    p {
+      font-size: smaller;
+    }
+  }
+
+  .highlight:after {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    background: linear-gradient(rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.15) 40%,
+      rgba(0, 0, 0, 0.05) 60%,
+      rgba(0, 0, 0, 0) 100%,
+      ), linear-gradient(90deg,
+      mat-color($stardrive-primary, 600, 0.8) 0%,
+      mat-color($stardrive-primary, 600, 0) 40%,
+      mat-color($stardrive-accent, 600, 0) 60%,
+      mat-color($stardrive-accent, 600, 0.8) 100%);
+    background-blend-mode: saturation;
+    z-index: 1;
+    mix-blend-mode: multiply;
+    pointer-events: none;
   }
 }
 

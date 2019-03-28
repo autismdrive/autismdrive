@@ -41,11 +41,11 @@ export class AvatarDialogComponent implements OnInit {
       const colorEl = document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
 
       if (imageEl) {
-        const x = imageEl.offsetLeft + imageEl.clientWidth / 2 - imageEl.parentElement.clientWidth / 2;
+        const x = imageEl.offsetLeft - imageEl.clientWidth * 1.25 - imageEl.parentElement.clientWidth;
         imageEl.parentElement.scrollTo({ left: x });
       }
       if (colorEl) {
-        const x = colorEl.offsetLeft + colorEl.clientWidth / 2 - colorEl.parentElement.clientWidth / 2;
+        const x = colorEl.offsetLeft - colorEl.clientWidth * 3 - colorEl.parentElement.clientWidth;
         colorEl.parentElement.scrollTo({ left: x });
       }
     });
