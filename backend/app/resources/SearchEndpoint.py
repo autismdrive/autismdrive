@@ -32,7 +32,9 @@ class SearchEndpoint(flask_restful.Resource):
 
         search.hits = []
         for hit in results:
-            highlights = "...".join(hit.meta.highlight.content)
+            highlights = "";
+            if "highlight" in hit.meta:
+                highlights = "...".join(hit.meta.highlight.content)
             hit = Hit(hit.id, hit.content, hit.title, hit.type, hit.last_updated, highlights)
             search.hits.append(hit)
 

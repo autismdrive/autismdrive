@@ -340,7 +340,7 @@ class SearchSchema(ma.Schema):
     sort = fields.Str()
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
-    hits = fields.List(ma.Nested(HitSchema))
+    hits = fields.List(ma.Nested(HitSchema), dump_only=True)
     facets = ma.List(ma.Nested(FacetSchema), dump_only=True)
     ordered = True
 
