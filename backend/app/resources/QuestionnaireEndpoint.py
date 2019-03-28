@@ -88,6 +88,8 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
                 c.info['name'] = c.name
                 c.info['key'] = c.name
                 meta['fields'].append(c.info)
+            elif c.type.python_type == datetime.datetime:
+                meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0, 'type': 'DATETIME'})
             else:
                 meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0})
 

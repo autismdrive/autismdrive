@@ -14,6 +14,7 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
   dataSource: QuestionnaireDataSource;
   displayedColumns = [];
+  columnNames = [];
 
 
   constructor(
@@ -28,15 +29,29 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
   load_columns() {
     this.displayedColumns = [];
+    this.columnNames = [];
     this.api.getQuestionnaireListMeta(this.questionnaire_name).subscribe(
       result => {
         for (let fieldIndex in result['fields']) {
-          if (!this.displayedColumns.includes(result['fields'][fieldIndex].name)){
-            this.displayedColumns.push(result['fields'][fieldIndex].name);
+          let column = result['fields'][fieldIndex];
+          if (!this.displayedColumns.includes(column.name)){
+            this.displayedColumns.push({'name': column.name, 'type': column.type});
+          }
+          if (!this.columnNames.includes(column.name)){
+            this.columnNames.push(column.name);
           }
         }
       }
     );
+  }
+
+  format_element(element, column) {
+    if (column.type == 'DATETIME') {
+      let date = new Date(element[column.name]);
+      return date.toUTCString();
+    } else {
+      return element[column.name];
+    }
   }
 
   get snakeToUpperCase(){ return snakeToUpperCase }
