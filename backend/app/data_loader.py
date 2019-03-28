@@ -270,6 +270,34 @@ class DataLoader():
             SupportsQuestionnaire).count())
         db.session.commit()
 
+    def load_assistive_devices(self):
+        ad = AssistiveDevice()
+        db.session.add(ad)
+        print("Assistive Device loaded.  There is now %i assistive device record in the database." % db.session.query(
+            AssistiveDevice).count())
+        db.session.commit()
+
+    def load_housemate(self):
+        hm = Housemate()
+        db.session.add(hm)
+        print("Housemate loaded.  There is now %i housemate record in the database." % db.session.query(
+            Housemate).count())
+        db.session.commit()
+
+    def load_medication(self):
+        m = Medication()
+        db.session.add(m)
+        print("Medication loaded.  There is now %i medication record in the database." % db.session.query(
+            Medication).count())
+        db.session.commit()
+
+    def load_therapy(self):
+        t = Therapy()
+        db.session.add(t)
+        print("Therapy loaded.  There is now %i therapy record in the database." % db.session.query(
+            Therapy).count())
+        db.session.commit()
+
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
         if organization is None:
