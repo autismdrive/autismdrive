@@ -30,6 +30,15 @@
     <div id="utility-nav">
       <a
         mat-button
+        [routerLink]="[ '/search' ]"
+        routerLinkActive="selected"
+        id="search-button"
+      >
+        <mat-icon>search</mat-icon>
+        Search
+      </a>
+      <a
+        mat-button
         *ngIf="!currentUser"
         [routerLink]="[ '/terms' ]"
         routerLinkActive="selected"
