@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from app import db, RestException, auth
 from app.model.user import Role
 from app.wrappers import requires_roles
+from data_export_service import DataExport
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -39,7 +40,6 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)
         return
-
 
     @auth.login_required
     def put(self, name, id):
@@ -112,3 +112,11 @@ class QuestionnaireNamesEndpoint(flask_restful.Resource):
                 f = file_name.replace(".py", "")
                 questionnaire_file_names.append(f)
         return sorted(questionnaire_file_names)
+
+
+class QuestionnaireDataExportEndpoint(flask_restful.Resource):
+
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self, name):
+        return DataExport.export(name=name)
