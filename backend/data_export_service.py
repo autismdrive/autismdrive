@@ -1,5 +1,5 @@
 # Thanks to https://gist.github.com/piersstorey/b32583f0cc5cba0a38a11c2b123af687
-
+import os
 import io
 import xlsxwriter
 from flask import Response
@@ -16,6 +16,19 @@ def get_questionnaire(name):
     return schema.dump(q)
 
 
+def get_questionnaire_names():
+    all_file_names = os.listdir('./app/model/questionnaires')
+    non_questionnaires = ['mixin', '__']
+    questionnaire_file_names = []
+    for index, file_name in enumerate(all_file_names):
+        if any(string in file_name for string in non_questionnaires):
+            pass
+        else:
+            f = file_name.replace(".py", "")
+            questionnaire_file_names.append(f)
+    return sorted(questionnaire_file_names)
+
+
 class DataExport:
     def export(name):
         try:
@@ -26,38 +39,46 @@ class DataExport:
             # Create an in-memory output file for the new workbook.
             output = io.BytesIO()
 
+            if name == 'all':
+                # Get Questionnaire Names
+                questionnaire_names = get_questionnaire_names()
+            else:
+                questionnaire_names = [name]
+
             # Create workbook
             workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-            worksheet = workbook.add_worksheet(name[:30])
 
             # Add a bold format to use to highlight cells.
             bold = workbook.add_format({'bold': True})
 
-            # Some data we want to write to the worksheet.
-            questionnaires = get_questionnaire(name=name)
+            for name in questionnaire_names:
+                worksheet = workbook.add_worksheet(name[:30])
 
-            # Start from the first cell. Rows and columns are zero indexed.
-            row = 0
-            col = 0
+                # Some data we want to write to the worksheet.
+                questionnaires = get_questionnaire(name=name)
 
-            # Write the column headers.
-            for key in questionnaires[0][0]:
-                worksheet.write(row, col, key, bold)
-                col += 1
-            row += 1
-
-            # Iterate over the data and write it out row by row.
-            for item in questionnaires[0]:
+                # Start from the first cell. Rows and columns are zero indexed.
+                row = 0
                 col = 0
-                for key in item:
-                    if isinstance(item[key], list):
-                        list_string = ''
-                        for str in item[key]:
-                            list_string + str + ', '
-                    else:
-                        worksheet.write(row, col, item[key])
-                        col += 1
+
+                # Write the column headers.
+                for key in questionnaires[0][0]:
+                    worksheet.write(row, col, key, bold)
+                    col += 1
                 row += 1
+
+                # Iterate over the data and write it out row by row.
+                for item in questionnaires[0]:
+                    col = 0
+                    for key in item:
+                        if isinstance(item[key], list):
+                            list_string = ''
+                            for str in item[key]:
+                                list_string + str + ', '
+                        else:
+                            worksheet.write(row, col, item[key])
+                            col += 1
+                    row += 1
 
             # Close the workbook before streaming the data.
             workbook.close()
