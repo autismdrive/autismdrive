@@ -211,20 +211,4 @@ class ContactQuestionnaire(db.Model):
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
-        fields = (
-            "id",
-            "last_updated",
-            "user_id",
-            "participant_id",
-            "phone",
-            "phone_type",
-            "can_leave_voicemail",
-            "contact_times",
-            "email",
-            "street_address",
-            "city",
-            "state",
-            "zip",
-            "marketing_channel",
-            "marketing_other",
-        )
+        ordered = True

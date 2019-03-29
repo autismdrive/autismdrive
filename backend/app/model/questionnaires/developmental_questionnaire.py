@@ -126,14 +126,4 @@ class DevelopmentalQuestionnaire(db.Model):
 class DevelopmentalQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DevelopmentalQuestionnaire
-        fields = (
-            "id",
-            "last_updated",
-            "participant_id",
-            "user_id",
-            "had_birth_complications",
-            "birth_complications_description",
-            "when_motor_milestones",
-            "when_language_milestones",
-            "when_toileting_milestones",
-        )
+        ordered = True

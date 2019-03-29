@@ -116,15 +116,7 @@ class SupportsQuestionnaireSchema(ModelSchema):
 
     class Meta:
         model = SupportsQuestionnaire
-        fields = (
-            "id",
-            "last_updated",
-            "participant_id",
-            "user_id",
-            "medications",
-            "therapies",
-            "assistive_devices",
-        )
+        ordered = True
     medications = fields.Nested(MedicationSchema, many=True)
     therapies = fields.Nested(TherapySchema, many=True)
     assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)

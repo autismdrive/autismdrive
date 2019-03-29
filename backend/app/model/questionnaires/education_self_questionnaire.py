@@ -60,3 +60,4 @@ class EducationSelfQuestionnaireSchema(ModelSchema):
             "school_services",
             "school_services_other",
         )
+        ordered = True
