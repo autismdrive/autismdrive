@@ -6,6 +6,7 @@ import {Component, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {Filter, Hit, Query} from '../_models/query';
 import {ApiService} from '../_services/api/api.service';
 import { SearchService } from '../_services/api/search.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-search',
@@ -13,8 +14,7 @@ import { SearchService } from '../_services/api/search.service';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit {
-  @Input() query: Query;
-
+  query: Query;
   showFilters = false;
   searchForm: FormGroup;
   searchBox: FormControl;
@@ -34,7 +34,11 @@ export class SearchComponent implements OnInit {
     private renderer: Renderer2,
     private searchService: SearchService
   ) {
+    this.searchService.currentQuery.subscribe(q => {
+      console.log('SearchComponent currentQuery subscribe callback', q);
 
+      this.query = q;
+    });
     this.route.queryParamMap.subscribe(qParams => {
       let words = '';
       const filters: Filter[] = [];
@@ -47,11 +51,11 @@ export class SearchComponent implements OnInit {
         }
       }
 
-      this.query = new Query({
+      this.searchService.search(new Query({
         query: words,
         filters: filters,
         size: this.pageSize,
-      });
+      })).subscribe();
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -96,8 +100,8 @@ export class SearchComponent implements OnInit {
   updateUrl(query: Query) {
     const queryArray: string[] = [];
 
-    if (query.hasOwnProperty('query') && query.words) {
-      queryArray.push(`query=${query.words}`);
+    if (query.hasOwnProperty('words') && query.words) {
+      queryArray.push(`words=${query.words}`);
     }
 
     for (const filter of query.filters) {

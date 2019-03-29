@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatInput } from '@angular/material';
-import { ActivationEnd, ActivationStart, Router, ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivationEnd, ActivationStart, Router } from '@angular/router';
 import { User } from './_models/user';
 import { AuthenticationService } from './_services/api/authentication-service';
 import { SearchService } from './_services/api/search.service';
@@ -21,7 +21,6 @@ export class AppComponent implements OnInit {
   public constructor(
     private authenticationService: AuthenticationService,
     private router: Router,
-    private route: ActivatedRoute,
     private searchService: SearchService
   ) {
     this.router.events.subscribe((e) => {
@@ -56,14 +55,13 @@ export class AppComponent implements OnInit {
     const value: string = this.searchInput && this.searchInput.value;
 
     if (value && (value.length > 0)) {
-
       // Redirect to search screen if not there yet
       if (this.router.url.split('/')[1] === 'search') {
         const q = this.searchService.currentQueryValue || new Query({});
         q.words = value;
         this.searchService.search(q).subscribe();
       } else {
-        this.router.navigateByUrl(`/search/filter?query=${value}`);
+        this.router.navigateByUrl(`/search/filter?words=${value}`);
       }
     }
   }

@@ -17,7 +17,7 @@
           type="search"
           [formControl]="searchBox"
           placeholder="Search"
-          value="{{query.query}}"
+          value="{{query.words}}"
           autofocus
         >
         <mat-icon matSuffix>search</mat-icon>
@@ -95,14 +95,14 @@
         </button>
         Add a filter
       </li>
-      <li *ngIf="query.query">
+      <li *ngIf="query.words">
         <button
           mat-icon-button
           (click)="updateQuery()"
         >
           <i class="material-icons">remove_circle_outline</i>
         </button>
-        Search: {{query.query}}
+        Search: {{query.words}}
       </li>
 
       <li *ngFor="let filter of query.filters">

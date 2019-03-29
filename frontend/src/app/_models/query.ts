@@ -28,6 +28,7 @@ export class Hit {
   content: string;
   last_updated: Date;
   highlights: string;
+  url?: string;
 
   constructor(private _props) {
     for (const propName in this._props) {
