@@ -334,7 +334,7 @@ class SearchSchema(ma.Schema):
         field = fields.Str()
         facetCounts = ma.List(ma.Nested(FacetCountSchema))
 
-    query = fields.Str()
+    words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
     sort = fields.Str()

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, UrlSegment } from '@angular/router';
 import { EnrollComponent } from '../enroll/enroll.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { HomeComponent } from '../home/home.component';
@@ -20,6 +20,17 @@ import { LogoutComponent } from '../logout/logout.component';
 import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
 import {AuthGuard} from './auth-guard';
 import {SearchComponent} from '../search/search.component';
+
+export function searchFilterMatcher(url: UrlSegment[]) {
+  if (
+    (url.length === 2) &&
+    (url[0].path === ('search')) &&
+    (url[1].path === ('filter'))
+  ) {
+    return { consumed: url };
+  }
+  return null;
+}
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -44,6 +55,8 @@ const routes: Routes = [
   { path: 'timedout', component: TimedoutComponent, data: { title: 'Your session has timed out.', hideHeader: true } },
   { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
   { path: 'search', component: SearchComponent, data: { title: 'Search' } },
+  { path: 'search/:query', component: SearchComponent, data: { title: 'Search Resources' } },
+  { matcher: searchFilterMatcher, component: SearchComponent, data: { title: 'Search' } },
 ];
 
 @NgModule({

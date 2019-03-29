@@ -6,6 +6,7 @@
 >
   <div fxFlex="75%">
     <form
+      *ngIf="false"
       [ngClass]="{'search-box': true, 'hidden-results': hideResults}"
       [formGroup]="searchForm"
     >
@@ -116,8 +117,13 @@
     </ul>
 
     <div [hidden]="loading || hideResults">
-      <app-search-result *ngFor="let hit of query.hits" [contentType]="hit.type"
-        [description]="hit.highlights" [title]="hit.title" [url]="hit.url">
+      <app-search-result
+        *ngFor="let hit of query.hits"
+        [contentType]="hit.type"
+        [description]="hit.highlights"
+        [title]="hit.title"
+        [url]="hit.url"
+      >
       </app-search-result>
     </div>
 

@@ -2,7 +2,7 @@ import datetime
 
 
 class Search:
-    query = ""
+    words = ""
     filters = []
     total = 0
     hits = []
@@ -11,8 +11,8 @@ class Search:
     size = 0
     sort = None
 
-    def __init__(self, query="", filters=[], start=0, size=10, sort=None):
-        self.query = query
+    def __init__(self, words="", filters=[], start=0, size=10, sort=None):
+        self.words = words
         self.filters = filters
         self.start = start
         self.size = size

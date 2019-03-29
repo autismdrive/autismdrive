@@ -5,6 +5,7 @@ import { debounceTime } from 'rxjs/operators';
 import {Component, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {Filter, Hit, Query} from '../_models/query';
 import {ApiService} from '../_services/api/api.service';
+import { SearchService } from '../_services/api/search.service';
 
 @Component({
   selector: 'app-search',
@@ -30,29 +31,27 @@ export class SearchComponent implements OnInit {
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private searchService: SearchService
   ) {
 
     this.route.queryParamMap.subscribe(qParams => {
-      let query = '';
+      let words = '';
       const filters: Filter[] = [];
 
       for (const key of qParams.keys) {
-        if (key === 'query') {
-          query = qParams.get(key);
+        if (key === 'words') {
+          words = qParams.get(key);
         } else {
           filters.push({ field: key, value: qParams.get(key) });
         }
       }
 
-      this.query = {
-        query: query,
+      this.query = new Query({
+        query: words,
         filters: filters,
-        facets: [],
         size: this.pageSize,
-        start: 0,
-        sort: '_score'
-      };
+      });
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -67,7 +66,7 @@ export class SearchComponent implements OnInit {
       searchBox: this.searchBox
     });
 
-    this.searchBox.setValue(this.query.query);
+    this.searchBox.setValue(this.query.words);
     this.searchBox.valueChanges.pipe(
       debounceTime(300)).subscribe(query => {
         this.updateQuery(query);
@@ -86,9 +85,9 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  updateQuery(query) {
+  updateQuery(words: string) {
     this.hideResults = false;
-    this.query.query = query;
+    this.query.words = words;
     this.query.start = 0;
     this.paginator.firstPage();
     this.doSearch();
@@ -97,8 +96,8 @@ export class SearchComponent implements OnInit {
   updateUrl(query: Query) {
     const queryArray: string[] = [];
 
-    if (query.hasOwnProperty('query') && query.query) {
-      queryArray.push(`query=${query.query}`);
+    if (query.hasOwnProperty('query') && query.words) {
+      queryArray.push(`query=${query.words}`);
     }
 
     for (const filter of query.filters) {
@@ -114,13 +113,13 @@ export class SearchComponent implements OnInit {
     this.loading = true;
 
     this.hideResults = (
-      (this.query.query === '') &&
+      (this.query.words === '') &&
       (this.query.filters.length === 0)
     );
 
     this.updateUrl(this.query);
 
-    this.api.search(this.query).subscribe(
+    this.searchService.search(this.query).subscribe(
       (query) => {
         this.loading = false;
         this.query = query;
@@ -128,7 +127,7 @@ export class SearchComponent implements OnInit {
       }
     );
     if ((<any>window).gtag) {
-      (<any>window).gtag('event', this.query.query, {
+      (<any>window).gtag('event', this.query.words, {
         'event_category': 'search'
       });
     }

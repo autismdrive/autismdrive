@@ -1468,8 +1468,8 @@ class TestCase(unittest.TestCase):
 
     def test_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'query': 'rainbows', 'filters': []}
-        world_query = {'query': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows', 'filters': []}
+        world_query = {'words': 'world', 'filters': []}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
         search_results = self.search(world_query)
@@ -1494,8 +1494,8 @@ class TestCase(unittest.TestCase):
 
     def test_study_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'query': 'rainbows', 'filters': []}
-        world_query = {'query': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows', 'filters': []}
+        world_query = {'words': 'world', 'filters': []}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
         search_results = self.search(world_query)
@@ -1516,8 +1516,8 @@ class TestCase(unittest.TestCase):
 
     def test_training_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'query': 'rainbows', 'filters': []}
-        world_query = {'query': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows', 'filters': []}
+        world_query = {'words': 'world', 'filters': []}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
         search_results = self.search(world_query)
@@ -1538,8 +1538,8 @@ class TestCase(unittest.TestCase):
 
     def test_modify_resource_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'query': 'rainbows', 'filters': []}
-        world_query = {'query': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows', 'filters': []}
+        world_query = {'words': 'world', 'filters': []}
         # create the resource
         resource = self.construct_resource(
             title='space unicorn', description="delivering rainbows")
@@ -1565,8 +1565,8 @@ class TestCase(unittest.TestCase):
         self.assertEqual(resource.id, search_results['hits'][0]['id'])
 
     def test_delete_search_item(self):
-        rainbow_query = {'query': 'rainbows', 'filters': []}
-        world_query = {'query': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows', 'filters': []}
+        world_query = {'words': 'world', 'filters': []}
         resource = self.construct_resource(
             title='space unicorn', description="delivering rainbows")
         search_results = self.search(rainbow_query)

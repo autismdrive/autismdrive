@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Date,  Keyword, Text, Index, analyzer, Integer, tokenizer, Document
+from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
@@ -122,7 +122,7 @@ class ElasticIndex:
         self.index.flush()
 
     def search(self, search):
-        document_search = DocumentSearch(search.query, search.jsonFilters(), index=self.index_name)
+        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name)
         document_search = document_search[search.start:search.start + search.size]
         return document_search.execute()
 

@@ -40,4 +40,20 @@
     margin-bottom: 56px;
   }
 
+  #search-bar, #search-button {
+    display: inline-flex;
+
+    &.hidden {
+      display: block;
+      position: fixed;
+      top: 0px;
+      left: 100%;
+    }
+  }
+
+  ::ng-deep #search-field .mat-form-field-infix {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-top-width: 0px;
+  }
 }
