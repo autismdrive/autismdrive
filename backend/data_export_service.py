@@ -50,11 +50,11 @@ class DataExport:
         # Add a bold format to use to highlight cells.
         bold = workbook.add_format({'bold': True})
 
-        for name in questionnaire_names:
-            worksheet = workbook.add_worksheet(name[:30])
+        for qname in questionnaire_names:
+            worksheet = workbook.add_worksheet(qname[:30])
 
             # Some data we want to write to the worksheet.
-            questionnaires = get_questionnaire(name=name)
+            questionnaires = get_questionnaire(name=qname)
 
             # Start from the first cell. Rows and columns are zero indexed.
             row = 0
@@ -88,7 +88,7 @@ class DataExport:
         # Add output to response
         response.data = output.read()
 
-        # Set filname and mimetype
+        # Set filname
         file_name = 'export_{}_{}.xlsx'.format(name, datetime.now())
 
         # HTTP headers for forcing file download
