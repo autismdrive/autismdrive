@@ -168,14 +168,14 @@ class DataLoader():
 
 
     def load_clinical_diagnoses_questionnaire(self):
-        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health='ptsd', genetic='angelman')
+        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health=['ptsd'], genetic=['angelman'])
         db.session.add(cd_ques)
         print("Clinical Diagnoses loaded. There is now %i clinical diagnoses record in the database." % db.session.query(
             ClinicalDiagnosesQuestionnaire).count())
         db.session.commit()
 
     def load_contact_questionnaire(self):
-        c_ques = ContactQuestionnaire(phone=555-555-1234, contact_times='Weekdays at 5AM', email='charlie@brown.com')
+        c_ques = ContactQuestionnaire(phone='555-555-1234', contact_times='Weekdays at 5AM', email='charlie@brown.com')
         db.session.add(c_ques)
         print("Contact loaded.  There is now %i contact record in the database." % db.session.query(
             ContactQuestionnaire).count())
@@ -186,7 +186,7 @@ class DataLoader():
         db.session.add(cb_dques)
         print("Current Behaviors for Dependents loaded.  There is now %i dependent current behavior record in the database." % db.session.query(
             CurrentBehaviorsDependentQuestionnaire).count())
-        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability='nonVerbal', has_academic_difficulties=True)
+        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability=["nonVerbal"], has_academic_difficulties=True)
         db.session.add(cb_sques)
         print("Current Behaviors for Self participants loaded.  There is now %i self current behavior record in the database." % db.session.query(
             CurrentBehaviorsSelfQuestionnaire).count())
@@ -194,7 +194,7 @@ class DataLoader():
 
     def load_demographics_questionnaire(self):
         d_ques = DemographicsQuestionnaire(user_id=1, birth_sex='male', gender_identity='intersex',
-                                           race_ethnicity="raceAsian")
+                                           race_ethnicity=["raceAsian"])
         db.session.add(d_ques)
         print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
             DemographicsQuestionnaire).count())
@@ -237,7 +237,7 @@ class DataLoader():
         db.session.commit()
 
     def load_home_questionnaires(self):
-        h_ques = HomeDependentQuestionnaire(dependent_living_situation="fullTimeGuardian", struggle_to_afford=True)
+        h_ques = HomeDependentQuestionnaire(dependent_living_situation=["fullTimeGuardian"], struggle_to_afford=True)
         db.session.add(h_ques)
         print("Home for Dependents loaded.  There is now %i dependent home record in the database." % db.session.query(
             HomeDependentQuestionnaire).count())
@@ -268,6 +268,34 @@ class DataLoader():
         db.session.add(s_ques)
         print("Supports loaded.  There is now %i supports record in the database." % db.session.query(
             SupportsQuestionnaire).count())
+        db.session.commit()
+
+    def load_assistive_devices(self):
+        ad = AssistiveDevice()
+        db.session.add(ad)
+        print("Assistive Device loaded.  There is now %i assistive device record in the database." % db.session.query(
+            AssistiveDevice).count())
+        db.session.commit()
+
+    def load_housemate(self):
+        hm = Housemate()
+        db.session.add(hm)
+        print("Housemate loaded.  There is now %i housemate record in the database." % db.session.query(
+            Housemate).count())
+        db.session.commit()
+
+    def load_medication(self):
+        m = Medication()
+        db.session.add(m)
+        print("Medication loaded.  There is now %i medication record in the database." % db.session.query(
+            Medication).count())
+        db.session.commit()
+
+    def load_therapy(self):
+        t = Therapy()
+        db.session.add(t)
+        print("Therapy loaded.  There is now %i therapy record in the database." % db.session.query(
+            Therapy).count())
         db.session.commit()
 
     def get_org_by_name(self, org_name):

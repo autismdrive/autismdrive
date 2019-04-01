@@ -72,9 +72,12 @@ import { LogoutComponent } from './logout/logout.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
-import {OverlayContainer} from '@angular/cdk/overlay';
-import {JwtInterceptor} from './_routing/jwt-interceptor';
-import {ErrorInterceptor} from './_routing/error-interceptor';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { JwtInterceptor } from './_routing/jwt-interceptor';
+import { ErrorInterceptor } from './_routing/error-interceptor';
+import { AdminHomeComponent } from './admin-home/admin-home.component';
+import { QuestionnaireDataTableComponent } from './questionnaire-data-table/questionnaire-data-table.component';
+import { QuestionnaireDataViewComponent } from './questionnaire-data-view/questionnaire-data-view.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -132,7 +135,10 @@ export class FormlyConfig {
     LogoutComponent,
     AvatarDialogComponent,
     FlowCompleteComponent,
-    FlowIntroComponent
+    FlowIntroComponent,
+    AdminHomeComponent,
+    QuestionnaireDataTableComponent,
+    QuestionnaireDataViewComponent
   ],
   imports: [
     BrowserAnimationsModule,

@@ -1,0 +1,30 @@
+<div
+  class="mat-typography"
+>
+  <div>
+    <h1>
+      <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+    </h1>
+    <mat-drawer-container>
+      <mat-drawer #sidenav
+        [mode]='over'
+        [(opened)]="sidebarOpen">
+          <mat-nav-list *ngFor="let qn of questionnaire_names">
+            <mat-list-item
+              (click)="selectQuestionnaire(qn)"
+            >
+              {{ snakeToUpperCase(qn)}}
+              <span fxFlex></span>
+            </mat-list-item>
+          </mat-nav-list>
+      </mat-drawer>
+      <mat-drawer-content
+        *ngIf="currentQuestionnaire"
+        class="pad-2"
+      >
+        <app-questionnaire-data-table [questionnaire_name]="currentQuestionnaire"></app-questionnaire-data-table>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </div>
+
+</div>

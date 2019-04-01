@@ -52,7 +52,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     "fields": ["self_living_situation", "self_living_other"],
                     "display_order": 1,
                     "wrappers": ["card"],
-                    "template_options": {"label": "Where do your currently live?"},
+                    "template_options": {"label": "Where do you currently live?"},
                 }
         return field_groups
 
