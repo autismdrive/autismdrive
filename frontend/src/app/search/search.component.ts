@@ -1,23 +1,24 @@
-import { FormControl, FormGroup } from '@angular/forms';
-import { MatInput, MatPaginator, MatSidenav } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime } from 'rxjs/operators';
-import {Component, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {Filter, Hit, Query} from '../_models/query';
-import {ApiService} from '../_services/api/api.service';
+import { Location } from '@angular/common';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  ViewChild
+} from '@angular/core';
+import { MatPaginator, MatSidenav } from '@angular/material';
+import { ActivatedRoute } from '@angular/router';
+import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   query: Query;
   showFilters = false;
-  searchForm: FormGroup;
-  searchBox: FormControl;
   loading = true;
   hideResults = true;
   filters: Filter[];
@@ -25,20 +26,13 @@ export class SearchComponent implements OnInit {
 
   @ViewChild('sidenav') public sideNav: MatSidenav;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild('searchInput', { read: MatInput }) public searchInput: MatInput;
 
   constructor(
-    private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router,
     private renderer: Renderer2,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private location: Location
   ) {
-    this.searchService.currentQuery.subscribe(q => {
-      console.log('SearchComponent currentQuery subscribe callback', q);
-
-      this.query = q;
-    });
     this.route.queryParamMap.subscribe(qParams => {
       let words = '';
       const filters: Filter[] = [];
@@ -51,11 +45,13 @@ export class SearchComponent implements OnInit {
         }
       }
 
-      this.searchService.search(new Query({
-        query: words,
+      this.query = new Query({
+        words: words,
         filters: filters,
         size: this.pageSize,
-      })).subscribe();
+      });
+
+      this.doSearch();
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -64,29 +60,20 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.doSearch();
-    this.searchBox = new FormControl();
-    this.searchForm = new FormGroup({
-      searchBox: this.searchBox
-    });
+  }
 
-    this.searchBox.setValue(this.query.words);
-    this.searchBox.valueChanges.pipe(
-      debounceTime(300)).subscribe(query => {
-        this.updateQuery(query);
-      });
-
-    this.searchInput.focus();
+  ngOnDestroy(): void {
+    this.searchService.reset();
   }
 
   private checkWindowWidth(): void {
     if (window.innerWidth > 768) {
       this.sideNav.mode = 'side';
-      this.sideNav.opened = false;
     } else {
       this.sideNav.mode = 'over';
-      this.sideNav.opened = false;
     }
+
+    this.sideNav.opened = this.showFilters;
   }
 
   updateQuery(words: string) {
@@ -109,27 +96,26 @@ export class SearchComponent implements OnInit {
     }
 
     const url = queryArray.length > 0 ? `/search/filter?${queryArray.join('&')}` : '/search';
-    this.router.navigateByUrl(url);
-
+    this.location.go(url);
   }
 
   doSearch() {
     this.loading = true;
-
-    this.hideResults = (
-      (this.query.words === '') &&
-      (this.query.filters.length === 0)
-    );
-
     this.updateUrl(this.query);
-
-    this.searchService.search(this.query).subscribe(
-      (query) => {
-        this.loading = false;
+    this.searchService
+      .search(this.query)
+      .subscribe(query => {
         this.query = query;
+
+        this.hideResults = (
+          (this.query.words === '') &&
+          (this.query.filters.length === 0)
+        );
+
+        this.loading = false;
+
         this.checkWindowWidth();
-      }
-    );
+      });
     if ((<any>window).gtag) {
       (<any>window).gtag('event', this.query.words, {
         'event_category': 'search'
@@ -155,7 +141,11 @@ export class SearchComponent implements OnInit {
     this.query.filters.push({ field: field, value: value });
     this.showFilters = false;
     this.query.start = 0;
-    this.paginator.firstPage();
+
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+
     this.doSearch();
   }
 
@@ -164,7 +154,13 @@ export class SearchComponent implements OnInit {
     if (index > -1) {
       this.query.filters.splice(index, 1);
     }
-    this.showFilters = false;
+
+    // Show filters if all filters have been removed.
+    this.showFilters = this.query.filters.length === 0;
+    if (this.showFilters) {
+      this.sideNav.open();
+    }
+
     this.query.start = 0;
     this.doSearch();
   }

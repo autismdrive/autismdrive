@@ -28,30 +28,7 @@
     <span fxFlex></span>
 
     <div id="utility-nav">
-      <a
-        mat-button
-        id="search-button"
-        (click)="toggleSearch()"
-        [ngClass]="{'hidden': searching}"
-      >
-        <mat-icon>search</mat-icon>
-        Search
-      </a>
-      <div
-        id="search-bar"
-        [ngClass]="{'hidden': !searching}"
-      >
-        <mat-form-field id="search-field">
-          <input
-            matInput
-            #searchInput
-            placeholder="Search"
-            (keyup)="updateSearch()"
-            autofocus
-          >
-          <mat-icon matSuffix (click)="toggleSearch()">cancel</mat-icon>
-        </mat-form-field>
-      </div>
+      <app-search-box></app-search-box>
 
       <a
         mat-button

@@ -1,7 +1,20 @@
+// Import theming functions
+@import '~@angular/material/theming';
+@import '../../stardrive_material';
+
+// Load the UVA Theme
+@include stardrive-theme($stardrive-theme);
+
 .title {
   margin: 0px;
 }
 
 .type {
   text-transform: uppercase;
+  white-space: nowrap;
+  color: mat-color($stardrive-primary, 300, 1);
+}
+
+::ng-deep .highlights em {
+  font-weight: 700;
 }

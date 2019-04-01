@@ -4,7 +4,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
   MAT_LABEL_GLOBAL_OPTIONS,
@@ -78,6 +78,7 @@ import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TimedoutComponent } from './timed-out/timed-out.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
+import { SearchBoxComponent } from './search-box/search-box.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -136,6 +137,7 @@ export class FormlyConfig {
     TermsComponent,
     TimedoutComponent,
     TrainingDetailComponent,
+    SearchBoxComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -148,8 +150,9 @@ export class FormlyConfig {
     FormlyMatDatepickerModule,
     FormlyMaterialModule,
     FormlyModule.forRoot(FormlyConfig.config),
+    FormsModule,
     HttpClientModule,
-    MarkdownModule,
+    MarkdownModule.forRoot(),
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,

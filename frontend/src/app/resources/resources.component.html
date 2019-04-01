@@ -10,13 +10,11 @@
     fxFlex="50%"
     fxLayout="column"
     fxLayoutGap="40px"
+    *ngIf="query && query.hits"
   >
     <app-search-result
-      *ngFor="let resource of resources"
-      [title]="resource.title"
-      [contentType]="'resource'"
-      [description]="resource.description"
-      [url]="'/#/resource/' + resource.id"
+      *ngFor="let hit of query.hits"
+      [hit]="hit"
     ></app-search-result>
   </div>
 </div>

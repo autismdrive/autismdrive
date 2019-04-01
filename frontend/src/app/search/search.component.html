@@ -1,31 +1,3 @@
-<div
-  fxLayout="row"
-  fxLayout.xs="column"
-  fxLayoutAlign="center"
-  class="mat-typography"
->
-  <div fxFlex="75%">
-    <form
-      *ngIf="false"
-      [ngClass]="{'search-box': true, 'hidden-results': hideResults}"
-      [formGroup]="searchForm"
-    >
-      <mat-form-field appearance="outline">
-        <input
-          matInput
-          #searchInput
-          type="search"
-          [formControl]="searchBox"
-          placeholder="Search"
-          value="{{query.words}}"
-          autofocus
-        >
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </form>
-  </div>
-</div>
-
 <mat-sidenav-container
   [id]="'sidenavContainer'"
   class="mat-typography"
@@ -40,7 +12,7 @@
       <div class="spacer"></div>
       <button
         mat-icon-button
-        (click)="sidenav.close()"
+        (click)="sideNav.close()"
       >
         <mat-icon>close</mat-icon>
       </button>
@@ -59,8 +31,8 @@
             (click)="addFilter(facet.field, count.category)"
           >
             {{count.category}}
-            <div class="spacer"></div>
-            {{count.hit_count}}
+            <div fxFlex></div>
+            <span class="hit-count">{{count.hit_count}}</span>
           </mat-list-item>
         </mat-list>
       </mat-expansion-panel>
@@ -85,57 +57,56 @@
     </mat-accordion>
   </mat-sidenav>
   <mat-sidenav-content>
-    <ul class="applied-filters">
-      <li *ngIf="!sidenav.opened">
-        <button
-          mat-icon-button
-          (click)="sidenav.open()"
-        >
-          <i class="material-icons">add_circle_outline</i>
-        </button>
-        Add a filter
-      </li>
-      <li *ngIf="query.words">
-        <button
-          mat-icon-button
-          (click)="updateQuery()"
-        >
-          <i class="material-icons">remove_circle_outline</i>
-        </button>
-        Search: {{query.words}}
-      </li>
+    <div class="container">
+      <div class="row">
+        <ul class="applied-filters">
+          <li *ngIf="!sideNav.opened">
+            <button
+              mat-icon-button
+              (click)="sideNav.open()"
+            >
+              <i class="material-icons">add_circle_outline</i>
+            </button>
+            Add a filter
+          </li>
+          <li *ngIf="query.words">
+            <button
+              mat-icon-button
+              (click)="updateQuery()"
+            >
+              <i class="material-icons">remove_circle_outline</i>
+            </button>
+            Search: {{query.words}}
+          </li>
 
-      <li *ngFor="let filter of query.filters">
-        <button
-          mat-icon-button
-          (click)="removeFilter(filter)"
-        >
-          <i class="material-icons">remove_circle_outline</i>
-        </button>
-        {{filter.field}} : {{filter.value}}
-      </li>
-    </ul>
+          <li *ngFor="let filter of query.filters">
+            <button
+              mat-icon-button
+              (click)="removeFilter(filter)"
+            >
+              <i class="material-icons">remove_circle_outline</i>
+            </button>
+            {{filter.field}} : {{filter.value}}
+          </li>
+        </ul>
 
-    <div [hidden]="loading || hideResults">
-      <app-search-result
-        *ngFor="let hit of query.hits"
-        [contentType]="hit.type"
-        [description]="hit.highlights"
-        [title]="hit.title"
-        [url]="hit.url"
-      >
-      </app-search-result>
-    </div>
+        <div *ngIf="!(loading || hideResults)">
+          <app-search-result
+            *ngFor="let hit of query.hits"
+            [hit]="hit"
+          >
+          </app-search-result>
+          <mat-paginator
+            [length]="query.total"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+            (page)="updatePage()"
+          >
+          </mat-paginator>
+        </div>
 
+      </div>
 
-    <div [hidden]="loading || hideResults">
-      <mat-paginator
-        [length]="query.total"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
-        (page)="updatePage()"
-      >
-      </mat-paginator>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

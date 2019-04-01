@@ -1,0 +1,18 @@
+<div id="search-bar">
+  <mat-form-field id="search-field">
+    <input
+      #searchInput
+      matInput
+      type="text"
+      placeholder="Search"
+      (keyup)="updateSearch()"
+      [(ngModel)]="words"
+      autofocus
+    >
+    <mat-icon
+      [ngClass]="{'ghost': !hasWords()}"
+      matSuffix
+      (click)="clearSearch()"
+    >cancel</mat-icon>
+  </mat-form-field>
+</div>

@@ -30,6 +30,38 @@ $animationDuration: 500ms;
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
 
+  .container {
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    grid-template-columns: 1fr;
+
+    // XS
+    @media (min-width: 576px) {
+      .row { width: 90%; }
+    }
+
+    // SM
+    @media (min-width: 576px) {
+      .row { width: 90%; }
+    }
+
+    // MD
+    @media (min-width: 768px) {
+      .row { width: 90%; }
+    }
+
+    // LG
+    @media (min-width: 992px) {
+      .row { width: 90%; }
+    }
+
+    // XL
+    @media (min-width: 1200px) {
+      .row { width: 90%; max-width: 1216px; }
+    }
+  }
+
   button {
     &.btn-xl {
       font-size: 24px;
