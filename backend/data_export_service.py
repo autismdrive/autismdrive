@@ -31,86 +31,86 @@ def get_questionnaire_names():
 
 class DataExport:
     def export(name):
-        try:
-            # Flask response
-            response = Response()
-            response.status_code = 200
+        # Flask response
+        response = Response()
+        response.status_code = 200
 
-            # Create an in-memory output file for the new workbook.
-            output = io.BytesIO()
+        # Create an in-memory output file for the new workbook.
+        output = io.BytesIO()
 
-            if name == 'all':
-                # Get Questionnaire Names
-                questionnaire_names = get_questionnaire_names()
-            else:
-                questionnaire_names = [name]
+        if name == 'all':
+            # Get Questionnaire Names
+            questionnaire_names = get_questionnaire_names()
+        else:
+            questionnaire_names = [name]
 
-            # Create workbook
-            workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        # Create workbook
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
 
-            # Add a bold format to use to highlight cells.
-            bold = workbook.add_format({'bold': True})
+        # Add a bold format to use to highlight cells.
+        bold = workbook.add_format({'bold': True})
 
-            for name in questionnaire_names:
-                worksheet = workbook.add_worksheet(name[:30])
+        for name in questionnaire_names:
+            worksheet = workbook.add_worksheet(name[:30])
 
-                # Some data we want to write to the worksheet.
-                questionnaires = get_questionnaire(name=name)
+            # Some data we want to write to the worksheet.
+            questionnaires = get_questionnaire(name=name)
 
-                # Start from the first cell. Rows and columns are zero indexed.
-                row = 0
+            # Start from the first cell. Rows and columns are zero indexed.
+            row = 0
+            col = 0
+
+            # Write the column headers.
+            for key in questionnaires[0][0]:
+                worksheet.write(row, col, key, bold)
+                col += 1
+            row += 1
+
+            # Iterate over the data and write it out row by row.
+            for item in questionnaires[0]:
                 col = 0
-
-                # Write the column headers.
-                for key in questionnaires[0][0]:
-                    worksheet.write(row, col, key, bold)
-                    col += 1
+                for key in item:
+                    if isinstance(item[key], list):
+                        list_string = ''
+                        for value in item[key]:
+                            list_string + str(value) + ', '
+                    else:
+                        worksheet.write(row, col, item[key])
+                        col += 1
                 row += 1
 
-                # Iterate over the data and write it out row by row.
-                for item in questionnaires[0]:
-                    col = 0
-                    for key in item:
-                        if isinstance(item[key], list):
-                            list_string = ''
-                            for str in item[key]:
-                                list_string + str + ', '
-                        else:
-                            worksheet.write(row, col, item[key])
-                            col += 1
-                    row += 1
+        # Close the workbook before streaming the data.
+        workbook.close()
 
-            # Close the workbook before streaming the data.
-            workbook.close()
+        # Rewind the buffer.
+        output.seek(0)
 
-            # Rewind the buffer.
-            output.seek(0)
+        # Add output to response
+        response.data = output.read()
 
-            # Add output to response
-            response.data = output.read()
+        # Set filname and mimetype
+        file_name = 'export_{}_{}.xlsx'.format(name, datetime.now())
 
-            # Set filname and mimetype
-            file_name = 'export_{}_{}.xlsx'.format(name, datetime.now())
+        # HTTP headers for forcing file download
+        response_headers = Headers({
+            'Pragma': "public",  # required,
+            'Expires': '0',
+            'Cache-Control': 'must-revalidate, private',  # required for certain browsers
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': 'attachment; filename=\"%s\";' % file_name,
+            'Content-Transfer-Encoding': 'binary',
+            'Access-Control-Expose-Headers': 'x-filename',
+            'x-filename': file_name,
+            'Content-Length': len(response.data)
+        })
 
-            # HTTP headers for forcing file download
-            response_headers = Headers({
-                'Pragma': "public",  # required,
-                'Expires': '0',
-                'Cache-Control': 'must-revalidate, private',  # required for certain browsers
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename=\"%s\";' % file_name,
-                'Content-Transfer-Encoding': 'binary',
-                'Content-Length': len(response.data)
-            })
+        # Add headers
+        response.headers = response_headers
 
-            # Add headers
-            response.headers = response_headers
+        # jquery.fileDownload.js requirements
+        response.set_cookie('fileDownload', 'true', path='/')
 
-            # jquery.fileDownload.js requirements
-            response.set_cookie('fileDownload', 'true', path='/')
+        # Return the response
+        return response
 
-            # Return the response
-            return response
 
-        except Exception as e:
-            print(e)
