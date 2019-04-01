@@ -41,5 +41,25 @@ export class QuestionnaireDataViewComponent implements OnInit {
     return this.currentQuestionnaire;
   }
 
+  exportAll() {
+    console.log('clicking the button for export all');
+    this.api.exportQuestionnaire( 'all').subscribe( data => {
+      console.log('data', data);
+      const filename = data.headers.get('content-disposition').split(';')[1].split('=')[1].replace(/\"/g, '');
+      let blob = new Blob([data.body], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+      let url = URL.createObjectURL(blob);
+      const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
+
+      a.href = url;
+      a.download = filename;
+      window.document.body.appendChild(a);
+      a.click();
+      window.document.body.removeChild(a);
+      URL.revokeObjectURL(url)
+    });
+  }
+
+
+
   get snakeToUpperCase(){ return snakeToUpperCase }
 }
