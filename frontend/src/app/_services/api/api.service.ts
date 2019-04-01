@@ -274,7 +274,7 @@ export class ApiService {
     const url = this
       ._endpointUrl('questionnaireExport')
       .replace('<name>', name);
-    return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'})
+    return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
       // .pipe(catchError(this._handleError));
   }
 

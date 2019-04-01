@@ -43,11 +43,12 @@ export class QuestionnaireDataViewComponent implements OnInit {
 
   exportAll() {
     console.log('clicking the button for export all');
-    this.api.exportQuestionnaire( 'all').subscribe( data => {
-      console.log('data', data);
-      const filename = data.headers.get('content-disposition').split(';')[1].split('=')[1].replace(/\"/g, '');
-      let blob = new Blob([data.body], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-      let url = URL.createObjectURL(blob);
+    this.api.exportQuestionnaire( 'all').subscribe( response => {
+      console.log('data', response);
+      const filename = response.headers.get('x-filename');
+      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+
+      const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
 
       a.href = url;
@@ -55,11 +56,9 @@ export class QuestionnaireDataViewComponent implements OnInit {
       window.document.body.appendChild(a);
       a.click();
       window.document.body.removeChild(a);
-      URL.revokeObjectURL(url)
+      URL.revokeObjectURL(url);
     });
   }
 
-
-
-  get snakeToUpperCase(){ return snakeToUpperCase }
+  get snakeToUpperCase() { return snakeToUpperCase; }
 }
