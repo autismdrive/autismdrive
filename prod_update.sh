@@ -11,10 +11,12 @@ cp /home/ubuntu/star_config.py ./backend/instance/config.py
 
 if [ "$1" == "prod" ]; then
     echo "Building for production."
+elif [ "$1" == "private" ]; then
+    echo "Building for private staging server."
 elif [ "$1" == "staging" ]; then
     echo "Building for staging."
 else
-    echo "Please specify environment (prod/staging)"
+    echo "Please specify environment (prod/private/staging)"
     exit
 fi
 
@@ -32,20 +34,17 @@ source ./backend/python-env/bin/activate
 export FLASK_APP=${HOME_DIR}/backend/app/__init__.py
 eval 'cd ${HOME_DIR}/backend && pip3 install -r requirements.txt'
 
-# Load up the staging environment
-if [ "$ENV" == "staging" ]; then
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask cleardb'
-fi
+# Load up the staging environment, not going to do this for a bitr.
+#if [ "$ENV" == "staging" ]; then
+#eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask cleardb'
+#fi
 
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask db upgrade'
 
-if [ "$ENV" == "staging" ]; then
- eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initdb'
-fi
 
 # clear and rebuild the index (uncomment when this is working)
-# eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
-# eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
+eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
+eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
 
 # Rebuild the front end.
 eval 'cd ${HOME_DIR}/frontend && npm install'
