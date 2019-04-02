@@ -1,15 +1,15 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError } from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { catchError, map } from 'rxjs/operators';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
+import { Query } from '../../_models/query';
 import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
 import { Training } from '../../_models/training';
 import { User } from '../../_models/user';
-import {Query} from '../../_models/query';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class ApiService {
@@ -33,6 +33,10 @@ export class ApiService {
     participantbysession: '/api/session/participant',
     participant: '/api/participant/<id>',
     questionnaire: '/api/q/<name>/<id>',
+    questionnaireList: '/api/q/<name>',
+    questionnaireListMeta: '/api/q/<name>/meta',
+    questionnaireNames: '/api/q',
+    questionnaireExport: '/api/q/<name>/export',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
@@ -64,7 +68,7 @@ export class ApiService {
   }
 
   private _handleError(error: HttpErrorResponse) {
-    const message = 'Something bad happened; please try again lather.';
+    const message = 'Something bad happened; please try again later.';
 
     console.error(error);
 
@@ -76,9 +80,9 @@ export class ApiService {
       // The response body may contain clues as to what went wrong,
       let errorMessage = `Backend returned a status code ${error.status}, `;
       if (error.error) {
-          errorMessage +=
-            `Code was: ${JSON.stringify(error.error.code)}, ` +
-            `Message was: ${JSON.stringify(error.error.message)}`;
+        errorMessage +=
+          `Code was: ${JSON.stringify(error.error.code)}, ` +
+          `Message was: ${JSON.stringify(error.error.message)}`;
       }
       console.error(errorMessage);
     }
@@ -241,7 +245,42 @@ export class ApiService {
         catchError(this._handleError));
   }
 
-  /** submitQuestionnaire */
+  /** getQuestionnaireNames */
+  getQuestionnaireNames() {
+    const url = this
+      ._endpointUrl('questionnaireNames');
+    return this.httpClient.get<any>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getQuestionnaireList */
+  getQuestionnaireList(name: string) {
+    const url = this
+      ._endpointUrl('questionnaireList')
+      .replace('<name>', name);
+    return this.httpClient.get<object>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getQuestionnaireListMeta */
+  getQuestionnaireListMeta(name: string) {
+    const url = this
+      ._endpointUrl('questionnaireListMeta')
+      .replace('<name>', name);
+    return this.httpClient.get<object>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** exportQuestionnaire */
+  exportQuestionnaire(name: string): Observable<any> {
+    const url = this
+      ._endpointUrl('questionnaireExport')
+      .replace('<name>', name);
+    return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
+    // .pipe(catchError(this._handleError));
+  }
+
+  /** getQuestionnaire */
   getQuestionnaire(name: string, id: number) {
     const url = this
       ._endpointUrl('questionnaire')

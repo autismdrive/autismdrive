@@ -1,8 +1,12 @@
 import datetime
 import flask_restful
+import os
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import db, RestException, auth
+from app.model.user import Role
+from app.wrappers import requires_roles
+from data_export_service import DataExport
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -37,7 +41,6 @@ class QuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.CAN_NOT_DELETE)
         return
 
-
     @auth.login_required
     def put(self, name, id):
         class_ref = QuestionService.get_class(name)
@@ -54,4 +57,66 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         return schema.dump(updated)
 
 
+class QuestionnaireListEndpoint(flask_restful.Resource):
 
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self, name):
+        class_ref = QuestionService.get_class(name)
+        schema = QuestionService.get_schema(name, many=True)
+        questionnaires = db.session.query(class_ref).all()
+        return schema.dump(questionnaires)
+
+
+class QuestionnaireListMetaEndpoint(flask_restful.Resource):
+
+    def get(self, name):
+        class_ref = QuestionService.get_class(name)
+        questionnaire = db.session.query(class_ref).first()
+        meta = {"table": {}}
+        try:
+            meta["table"]['question_type'] = questionnaire.__question_type__
+            meta["table"]["label"] = questionnaire.__label__
+        except:
+            pass  # If these fields don't exist, just keep going.
+        meta["fields"] = []
+
+        # This will move fields referenced by the field groups into the group, but will otherwise add them
+        # the base meta object if they are not contained within a group.
+        for c in questionnaire.__table__.columns:
+            if c.info:
+                c.info['name'] = c.name
+                c.info['key'] = c.name
+                meta['fields'].append(c.info)
+            elif c.type.python_type == datetime.datetime:
+                meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0, 'type': 'DATETIME'})
+            else:
+                meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0})
+
+        # Sort the fields
+        meta['fields'] = sorted(meta['fields'], key=lambda field: field['display_order'])
+
+        return meta
+
+
+class QuestionnaireNamesEndpoint(flask_restful.Resource):
+
+    def get(self):
+        all_file_names = os.listdir('./app/model/questionnaires')
+        non_questionnaires = ['mixin', '__']
+        questionnaire_file_names = []
+        for index, file_name in enumerate(all_file_names):
+            if any(string in file_name for string in non_questionnaires):
+                pass
+            else:
+                f = file_name.replace(".py", "")
+                questionnaire_file_names.append(f)
+        return sorted(questionnaire_file_names)
+
+
+class QuestionnaireDataExportEndpoint(flask_restful.Resource):
+
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self, name):
+        return DataExport.export(name=name)

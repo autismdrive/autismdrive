@@ -102,3 +102,4 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "academic_difficulty_areas",
             "academic_difficulty_other",
         )
+        ordered = True

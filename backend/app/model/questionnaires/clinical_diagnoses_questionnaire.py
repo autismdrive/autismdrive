@@ -219,17 +219,4 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
 class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ClinicalDiagnosesQuestionnaire
-        fields = (
-            "id",
-            "last_updated",
-            "participant_id",
-            "user_id",
-            "developmental",
-            "developmental_other",
-            "mental_health",
-            "mental_health_other",
-            "medical",
-            "medical_other",
-            "genetic",
-            "genetic_other",
-        )
+        ordered = True

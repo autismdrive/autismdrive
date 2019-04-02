@@ -52,6 +52,16 @@
       </a>
       <a
         mat-button
+        *ngIf="currentUser && currentUser.role == 'admin'"
+        [routerLink]="[ '/admin' ]"
+        routerLinkActive="selected"
+        id="admin-button"
+      >
+        <mat-icon>build</mat-icon>
+        Admin
+      </a>
+      <a
+        mat-button
         *ngIf="currentUser"
         [routerLink]="[ '/profile' ]"
         routerLinkActive="selected"

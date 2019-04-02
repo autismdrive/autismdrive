@@ -12,7 +12,7 @@ class QuestionService:
 
     @staticmethod
     def get_class(name):
-        module_name = QuestionService.QUESTION_PACKAGE + "." + name;
+        module_name = QuestionService.QUESTION_PACKAGE + "." + name
         class_name = QuestionService.camel_case_it(name)
         return QuestionService.str_to_class(module_name, class_name)
 
@@ -20,7 +20,7 @@ class QuestionService:
     def get_schema(name, many=False, session=None):
         module_name = QuestionService.QUESTION_PACKAGE + "." + name
         schema_name = QuestionService.camel_case_it(name) + "Schema"
-        return QuestionService.str_to_class(module_name, schema_name)(many=many,session=session)
+        return QuestionService.str_to_class(module_name, schema_name)(many=many, session=session)
 
     @staticmethod
     def camel_case_it(name):
@@ -46,10 +46,6 @@ class QuestionService:
 
     @staticmethod
     def get_meta(questionnaire, relationship):
-        __tablename__ = "identification_questionnaire"
-        __label__ = "Identification"
-        __question_type__ = QuestionService.TYPE_IDENTIFYING
-
         meta = {"table": {}}
         try:
             meta["table"]['question_type'] = questionnaire.__question_type__

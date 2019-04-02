@@ -70,4 +70,4 @@ class Medication(db.Model):
 class MedicationSchema(ModelSchema):
     class Meta:
         model = Medication
-        fields = ("name", "dosage", "time_frame", "notes")
+        ordered = True

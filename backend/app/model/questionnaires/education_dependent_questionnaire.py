@@ -68,3 +68,4 @@ class EducationDependentQuestionnaireSchema(ModelSchema):
             "school_services",
             "school_services_other",
         )
+        ordered = True

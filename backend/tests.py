@@ -248,8 +248,8 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_ad.description, ad.description)
         return db_ad
 
-    def construct_clinical_diagnoses_questionnaire(self, developmental='speechLanguage', mental_health='ocd',
-                                                   medical='insomnia', genetic='corneliaDeLange', participant=None,
+    def construct_clinical_diagnoses_questionnaire(self, developmental=['speechLanguage'], mental_health=['ocd'],
+                                                   medical=['insomnia'], genetic=['corneliaDeLange'], participant=None,
                                                    user=None):
 
         cdq = ClinicalDiagnosesQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
@@ -298,9 +298,9 @@ class TestCase(unittest.TestCase):
         return db_cq
 
     def construct_current_behaviors_dependent_questionnaire(self, dependent_verbal_ability='fluent',
-                                                            concerning_behaviors='hoarding',
+                                                            concerning_behaviors=['hoarding'],
                                                             has_academic_difficulties=True,
-                                                            academic_difficulty_areas='math',
+                                                            academic_difficulty_areas=['math'],
                                                             participant=None, user=None):
 
         cb = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability=dependent_verbal_ability,
@@ -3224,12 +3224,12 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        intro = self.get_field_from_response(response, "intro");
+        intro = self.get_field_from_response(response, "intro")
         self.assertIsNotNone(intro["template_options"]["description"])
         self.assertEqual(intro["template_options"]["description"],
                          "Please answer the following questions about yourself (* indicates required response):")
 
-        birth_city = self.get_field_from_response(response, "birth_city");
+        birth_city = self.get_field_from_response(response, "birth_city")
         self.assertIsNotNone(birth_city)
         self.assertIsNotNone(birth_city["template_options"])
         self.assertIsNotNone(birth_city["template_options"]["label"])
@@ -3241,7 +3241,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        birth_city = self.get_field_from_response(response, "birth_city");
+        birth_city = self.get_field_from_response(response, "birth_city")
         self.assertIsNotNone(birth_city["template_options"]["label"])
         self.assertEqual(birth_city["template_options"]["label"],
                          "Your child's city/municipality of birth")
@@ -3339,9 +3339,56 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1,  response["fields"][0]["display_order"])
-        self.assertEqual(2,  response["fields"][1]["display_order"])
-        self.assertEqual(3,  response["fields"][2]["display_order"])
+        self.assertEqual(1, response["fields"][0]["display_order"])
+        self.assertEqual(2, response["fields"][1]["display_order"])
+        self.assertEqual(3, response["fields"][2]["display_order"])
 
-        self.assertEqual(6.1, response['fields'][4]["fieldGroup"][0]["display_order"]);
-        self.assertEqual(6.2, response['fields'][4]["fieldGroup"][1]["display_order"]);
+        self.assertEqual(6.1, response['fields'][4]["fieldGroup"][0]["display_order"])
+        self.assertEqual(6.2, response['fields'][4]["fieldGroup"][1]["display_order"])
+
+    def test_questionnaire_names_list_basics(self):
+        rv = self.app.get('/api/q',
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual("assistive_device", response[0])
+        self.assertEqual("education_dependent_questionnaire", response[7])
+        self.assertEqual("home_self_questionnaire", response[13])
+        self.assertEqual("therapy", response[19])
+        self.assertEqual(20, len(response))
+
+    def test_questionnaire_list_meta_basics(self):
+        self.construct_education_self_questionnaire()
+        rv = self.app.get('/api/q/education_self_questionnaire/meta',
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual("id", response["fields"][0]["name"])
+        self.assertEqual("user_id", response["fields"][4]["name"])
+        self.assertEqual("school_type", response["fields"][7]["name"])
+        self.assertEqual("school_services_other", response["fields"][12]["name"])
+        self.assertEqual(13, len(response["fields"]))
+
+    def test_questionnaire_list_basics(self):
+        self.construct_current_behaviors_dependent_questionnaire()
+        rv = self.app.get('/api/q/current_behaviors_dependent_questionnaire',
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(["math"], response[0]["academic_difficulty_areas"])
+        self.assertEqual("fluent", response[0]["dependent_verbal_ability"])
+        self.assertEqual(1, response[0]["id"])
+
+    def test_non_admin_cannot_view_questionnaire_list(self):
+        user = self.construct_user(email='regularUser@user.com')
+        admin = self.construct_admin_user(email='adminUser@user.com')
+        self.construct_contact_questionnaire()
+        rv = self.app.get('/api/q/contact_questionnaire', content_type="application/json")
+        self.assertEqual(401, rv.status_code)
+        rv = self.app.get('/api/q/contact_questionnaire', content_type="application/json", headers=self.logged_in_headers(user=user))
+        self.assertEqual(403, rv.status_code)
+        rv = self.app.get('/api/q/contact_questionnaire', content_type="application/json", headers=self.logged_in_headers(user=admin))
+        self.assertSuccess(rv)

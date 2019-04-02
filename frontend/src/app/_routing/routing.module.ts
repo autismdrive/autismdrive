@@ -1,25 +1,27 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, UrlSegment } from '@angular/router';
+import { AdminHomeComponent } from '../admin-home/admin-home.component';
 import { EnrollComponent } from '../enroll/enroll.component';
+import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
+import { FlowComponent } from '../flow/flow.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { HomeComponent } from '../home/home.component';
 import { LoginComponent } from '../login/login.component';
+import { LogoutComponent } from '../logout/logout.component';
 import { PasswordResetComponent } from '../password-reset/password-reset.component';
 import { ProfileComponent } from '../profile/profile.component';
-import { RegisterComponent } from '../register/register.component';
-import { ResourcesComponent } from '../resources/resources.component';
-import { StudiesComponent } from '../studies/studies.component';
-import { TermsComponent } from '../terms/terms.component';
-import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
-import { StudyDetailComponent } from '../study-detail/study-detail.component';
-import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { QuestionnaireStepComponent } from '../questionnaire-step/questionnaire-step.component';
-import { FlowComponent } from '../flow/flow.component';
+import { RegisterComponent } from '../register/register.component';
+import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
+import { ResourcesComponent } from '../resources/resources.component';
+import { SearchComponent } from '../search/search.component';
+import { StudiesComponent } from '../studies/studies.component';
+import { StudyDetailComponent } from '../study-detail/study-detail.component';
+import { TermsComponent } from '../terms/terms.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
-import { LogoutComponent } from '../logout/logout.component';
-import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
-import {AuthGuard} from './auth-guard';
-import {SearchComponent} from '../search/search.component';
+import { TrainingDetailComponent } from '../training-detail/training-detail.component';
+import { AdminGuard } from './admin-guard';
+import { AuthGuard } from './auth-guard';
 
 export function searchFilterMatcher(url: UrlSegment[]) {
   if (
@@ -43,8 +45,8 @@ const routes: Routes = [
     data: { title: 'Reset your STAR Drive password', hideHeader: true }
   },
   { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
-  { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' } , canActivate: [AuthGuard]},
-  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' } , canActivate: [AuthGuard]},
+  { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard] },
+  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
@@ -57,6 +59,7 @@ const routes: Routes = [
   { path: 'search', component: SearchComponent, data: { title: 'Search' } },
   { path: 'search/:query', component: SearchComponent, data: { title: 'Search Resources' } },
   { matcher: searchFilterMatcher, component: SearchComponent, data: { title: 'Search' } },
+  { path: 'admin', component: AdminHomeComponent, data: { title: 'Admin' }, canActivate: [AdminGuard] },
 ];
 
 @NgModule({

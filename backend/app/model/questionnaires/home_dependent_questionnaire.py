@@ -85,4 +85,5 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
+        ordered = True
     housemates = fields.Nested(HousemateSchema, many=True)

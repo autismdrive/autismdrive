@@ -115,12 +115,4 @@ class Housemate(db.Model):
 class HousemateSchema(ModelSchema):
     class Meta:
         model = Housemate
-        fields = (
-            "id",
-            "last_updated",
-            "name",
-            "relationship",
-            "relationship_other",
-            "age",
-            "has_autism",
-        )
+        ordered = True

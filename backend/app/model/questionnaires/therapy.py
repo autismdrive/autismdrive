@@ -140,13 +140,4 @@ class Therapy(db.Model):
 class TherapySchema(ModelSchema):
     class Meta:
         model = Therapy
-        fields = (
-            "id",
-            "last_updated",
-            "supports_questionnaire_id",
-            "type",
-            "type_other",
-            "description",
-            "timeframe",
-            "notes",
-        )
+        ordered = True

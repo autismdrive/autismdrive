@@ -4,7 +4,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
   MAT_LABEL_GLOBAL_OPTIONS,
@@ -50,6 +50,7 @@ import { RoutingModule } from './_routing/routing.module';
 import { ApiService } from './_services/api/api.service';
 import { SearchService } from './_services/api/search.service';
 import { IntervalService } from './_services/interval/interval.service';
+import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { AppComponent } from './app.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { EnrollComponent } from './enroll/enroll.component';
@@ -66,11 +67,14 @@ import { LogoutComponent } from './logout/logout.component';
 import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
+import { QuestionnaireDataTableComponent } from './questionnaire-data-table/questionnaire-data-table.component';
+import { QuestionnaireDataViewComponent } from './questionnaire-data-view/questionnaire-data-view.component';
 import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
 import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
 import { RegisterComponent } from './register/register.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { ResourcesComponent } from './resources/resources.component';
+import { SearchBoxComponent } from './search-box/search-box.component';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { SearchComponent } from './search/search.component';
 import { StudiesComponent } from './studies/studies.component';
@@ -78,7 +82,6 @@ import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TimedoutComponent } from './timed-out/timed-out.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
-import { SearchBoxComponent } from './search-box/search-box.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -104,14 +107,18 @@ export class FormlyConfig {
 
 @NgModule({
   declarations: [
+    AdminHomeComponent,
     AppComponent,
+    AvatarDialogComponent,
     AvatarDialogComponent,
     CardWrapperComponent,
     EnrollComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,
+    FlowCompleteComponent,
     FlowComponent,
+    FlowIntroComponent,
     FlowIntroComponent,
     ForgotPasswordComponent,
     HelpWrapperComponent,
@@ -120,15 +127,19 @@ export class FormlyConfig {
     LoginComponent,
     LogoComponent,
     LogoutComponent,
+    LogoutComponent,
     ParticipantProfileComponent,
     PasswordResetComponent,
     ProfileComponent,
+    QuestionnaireDataTableComponent,
+    QuestionnaireDataViewComponent,
     QuestionnaireStepComponent,
     QuestionnaireStepsListComponent,
     RegisterComponent,
     RepeatSectionComponent,
     ResourceDetailComponent,
     ResourcesComponent,
+    SearchBoxComponent,
     SearchComponent,
     SearchResultComponent,
     SearchResultComponent,
@@ -137,7 +148,6 @@ export class FormlyConfig {
     TermsComponent,
     TimedoutComponent,
     TrainingDetailComponent,
-    SearchBoxComponent,
   ],
   imports: [
     BrowserAnimationsModule,

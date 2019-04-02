@@ -85,5 +85,4 @@ class EmploymentQuestionnaire(db.Model):
 class EmploymentQuestionnaireSchema(ModelSchema):
     class Meta:
         model = EmploymentQuestionnaire
-        fields = ('id', 'last_updated', 'participant_id', 'user_id', 'is_currently_employed', 'employment_capacity',
-                  'has_employment_support')
+        ordered = True

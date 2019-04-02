@@ -8,6 +8,7 @@ export class User {
   participants?: Participant[];
   last_updated?: Date;
   token?: string;
+  role?: string;
 
   constructor(private _props) {
     for (const propName in this._props) {

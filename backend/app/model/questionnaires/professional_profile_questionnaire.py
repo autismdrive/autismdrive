@@ -220,17 +220,4 @@ class ProfessionalProfileQuestionnaire(db.Model):
 class ProfessionalProfileQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ProfessionalProfileQuestionnaire
-        fields = (
-            'id',
-            'last_updated',
-            'participant_id',
-            'user_id',
-            'purpose',
-            'professional_identity',
-            'professional_identity_other',
-            'learning_interests',
-            'learning_interests_other',
-            'currently_work_with_autistic',
-            'previous_work_with_autistic',
-            'length_work_with_autistic'
-        )
+        ordered = True
