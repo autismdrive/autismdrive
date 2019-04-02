@@ -18,7 +18,7 @@
     </div>
     <mat-drawer-container>
       <mat-drawer #sidenav
-        [mode]='over'
+        [mode]='"over"'
         [(opened)]="sidebarOpen">
           <mat-nav-list *ngFor="let qn of questionnaire_names">
             <mat-list-item
