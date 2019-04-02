@@ -169,14 +169,4 @@ class DemographicsQuestionnaire(db.Model):
 class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
-        fields = (
-            "id",
-            "last_updated",
-            "participant_id",
-            "user_id",
-            "birth_sex",
-            "gender_identity",
-            "gender_identity_other",
-            "race_ethnicity",
-            "race_ethnicity_other",
-        )
+        ordered = True

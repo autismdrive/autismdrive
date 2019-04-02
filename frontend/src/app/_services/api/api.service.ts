@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError } from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
@@ -35,6 +35,7 @@ export class ApiService {
     questionnaireList: '/api/q/<name>',
     questionnaireListMeta: '/api/q/<name>/meta',
     questionnaireNames: '/api/q',
+    questionnaireExport: '/api/q/<name>/export',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
@@ -65,7 +66,7 @@ export class ApiService {
   }
 
   private _handleError(error: HttpErrorResponse) {
-    let message = 'Something bad happened; please try again lather.';
+    let message = 'Something bad happened; please try again later.';
 
     console.error(error);
 
@@ -266,6 +267,15 @@ export class ApiService {
       .replace('<name>', name);
     return this.httpClient.get<object>(url)
       .pipe(catchError(this._handleError));
+  }
+
+  /** exportQuestionnaire */
+  exportQuestionnaire(name: string): Observable<any> {
+    const url = this
+      ._endpointUrl('questionnaireExport')
+      .replace('<name>', name);
+    return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
+      // .pipe(catchError(this._handleError));
   }
 
   /** getQuestionnaire */

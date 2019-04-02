@@ -217,13 +217,4 @@ class AssistiveDevice(db.Model):
 class AssistiveDeviceSchema(ModelSchema):
     class Meta:
         model = AssistiveDevice
-        fields = (
-            "id",
-            "last_updated",
-            "supports_questionnaire_id",
-            "type",
-            "type_other",
-            "description",
-            "timeframe",
-            "notes",
-        )
+        ordered = True

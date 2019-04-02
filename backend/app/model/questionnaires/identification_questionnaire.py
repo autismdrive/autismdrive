@@ -234,20 +234,4 @@ class IdentificationQuestionnaire(db.Model):
 class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:
         model = IdentificationQuestionnaire
-        fields = (
-            "id",
-            "last_updated",
-            "participant_id",
-            "user_id",
-            "first_name",
-            "middle_name",
-            "last_name",
-            "nickname",
-            "is_first_name_preferred",
-            "birthdate",
-            "birth_city",
-            "birth_state",
-            "is_english_primary",
-            "relationship_to_participant",
-            "relationship_to_participant_other"
-        )
+        ordered = True

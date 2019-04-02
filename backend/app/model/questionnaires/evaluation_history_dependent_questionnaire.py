@@ -45,3 +45,4 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
             "has_iq_test",
             "recent_iq_score",
         )
+        ordered = True
