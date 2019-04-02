@@ -7,7 +7,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { MatPaginator, MatSidenav } from '@angular/material';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 
@@ -29,6 +29,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private renderer: Renderer2,
     private searchService: SearchService,
     private location: Location
@@ -52,6 +53,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
 
       this.doSearch();
+
+      this.showFilters = qParams.keys.length === 0;
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -76,12 +79,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.sideNav.opened = this.showFilters;
   }
 
-  updateQuery(words: string) {
-    this.hideResults = false;
-    this.query.words = words;
+  removeWords() {
+    this.query.words = '';
     this.query.start = 0;
     this.paginator.firstPage();
     this.doSearch();
+    this.updateFilters();
   }
 
   updateUrl(query: Query) {
@@ -96,7 +99,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     const url = queryArray.length > 0 ? `/search/filter?${queryArray.join('&')}` : '/search';
-    this.location.go(url);
+    // this.location.go(url);
+    this.router.navigateByUrl(url);
   }
 
   doSearch() {
@@ -155,12 +159,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.query.filters.splice(index, 1);
     }
 
-    // Show filters if all filters have been removed.
-    this.showFilters = this.query.filters.length === 0;
-    if (this.showFilters) {
-      this.sideNav.open();
-    }
-
+    this.updateFilters();
     this.query.start = 0;
     this.doSearch();
   }
@@ -171,4 +170,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.doSearch();
   }
 
+  // Show filters if all filters have been removed.
+  updateFilters() {
+    this.showFilters = this.query.filters.length === 0;
+    if (this.showFilters) {
+      this.sideNav.open();
+    }
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatInput } from '@angular/material';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SearchService } from '../_services/api/search.service';
 import { debounce } from 'rxjs/operators';
 import { timer } from 'rxjs';
@@ -13,11 +13,17 @@ import { timer } from 'rxjs';
 export class SearchBoxComponent implements OnInit {
   @ViewChild('searchInput', { read: MatInput }) public searchInput: MatInput;
   words = '';
+  queryParams: Params;
 
   constructor(
+    private route: ActivatedRoute,
     private router: Router,
     private searchService: SearchService
   ) {
+    this.route
+      .queryParams
+      .pipe(debounce(() => timer(1000)))
+      .subscribe(qp => this.queryParams = qp);
     this.searchService
       .currentQuery
       .pipe(debounce(() => timer(1000)))
@@ -37,19 +43,18 @@ export class SearchBoxComponent implements OnInit {
     }
   }
 
-  clearSearch() {
-    this.words = '';
-
-    if (this.isSearchPage()) {
-      this.router.navigateByUrl('/search');
+  updateSearch(removeWords: boolean) {
+    if (removeWords) {
+      this.words = '';
     }
-  }
 
-  updateSearch() {
-    const value: string = this.searchInput && this.searchInput.value;
+    const newParams = JSON.parse(JSON.stringify(this.queryParams));
+    const words: string = this.searchInput && this.searchInput.value || '';
+    newParams.words = removeWords ? undefined : words;
+    const hasFilters = Object.keys(newParams).length > 0;
 
-    if (value && (value.length > 0)) {
-      this.router.navigateByUrl(`/search/filter?words=${value}`);
+    if (hasFilters) {
+      this.router.navigate(['/search/filter'], { queryParams: newParams,  skipLocationChange: true });
     } else {
       this.router.navigateByUrl('/search');
     }

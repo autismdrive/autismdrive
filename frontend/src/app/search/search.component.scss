@@ -51,8 +51,13 @@ form.search-box {
     }
   }
 
-  .applied-filters > li {
-    list-style: none;
+  .applied-filters {
+    margin-left: 0px;
+
+    li {
+      list-style: none;
+      margin-left: 0px;
+    }
   }
 
   mat-list-item {

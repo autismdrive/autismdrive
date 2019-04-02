@@ -29,9 +29,6 @@ export class SearchService {
   private loadQuery(queryDict): Query {
     if (queryDict && queryDict.hits) {
       const query = new Query(queryDict);
-
-      console.log('query', query);
-
       localStorage.setItem('currentQuery', JSON.stringify(queryDict));
       this.querySubject.next(query);
       this.currentQuery = this.querySubject.asObservable();

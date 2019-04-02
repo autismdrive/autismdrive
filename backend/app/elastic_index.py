@@ -19,7 +19,7 @@ class StarDocument(Document):
     id = Integer()
     title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     last_updated = Date()
-    content = Text()
+    content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     organization = Keyword()
     website = Keyword()
     category = Keyword(multi=True)
