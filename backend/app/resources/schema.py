@@ -1,5 +1,5 @@
 from flask_marshmallow.sqla import ModelSchema
-from marshmallow import fields, Schema
+from marshmallow import fields, Schema, post_load
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 
@@ -10,6 +10,7 @@ from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
+from app.model.search import Filter, Search
 from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.training import Training
@@ -303,6 +304,49 @@ class ParticipantSchema(ModelSchema):
         'self': ma.URLFor('api.participantendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
     })
+
+
+class SearchSchema(ma.Schema):
+
+    class HitSchema(ma.Schema):
+        id = fields.Integer()
+        content = fields.Str()
+        title = fields.Str()
+        type = fields.Str()
+        last_updated = fields.Date()
+        highlights = fields.Str()
+
+    class FilterSchema(ma.Schema):
+        field = fields.Str()
+        value = fields.Raw()
+
+        @post_load
+        def make_filter(self, data):
+            return Filter(**data)
+
+    class FacetSchema(ma.Schema):
+
+        class FacetCountSchema(ma.Schema):
+            category = fields.Str()
+            hit_count = fields.Integer()
+            is_selected = fields.Boolean()
+
+        field = fields.Str()
+        facetCounts = ma.List(ma.Nested(FacetCountSchema))
+
+    words = fields.Str()
+    start = fields.Integer()
+    size = fields.Integer()
+    sort = fields.Str()
+    filters = ma.List(ma.Nested(FilterSchema))
+    total = fields.Integer(dump_only=True)
+    hits = fields.List(ma.Nested(HitSchema), dump_only=True)
+    facets = ma.List(ma.Nested(FacetSchema), dump_only=True)
+    ordered = True
+
+    @post_load
+    def make_search(self, data):
+        return Search(**data)
 
 
 class UserSchema(ModelSchema):

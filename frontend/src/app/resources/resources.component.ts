@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
+import { Query, Hit } from '../_models/query';
 
 @Component({
   selector: 'app-resources',
@@ -8,7 +9,7 @@ import { Resource } from '../_models/resource';
   styleUrls: ['./resources.component.scss']
 })
 export class ResourcesComponent implements OnInit {
-  resources: Resource[];
+  query: Query;
 
   constructor(
     private api: ApiService
@@ -20,7 +21,10 @@ export class ResourcesComponent implements OnInit {
   }
 
   loadResources() {
-    this.api.getResources().subscribe(resources => this.resources = resources);
+    const query = new Query({
+      filters: [{field: 'Type', value: 'resource'}]
+    });
+    this.api.search(query).subscribe(q => this.query = q);
   }
 
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { Hit } from '../_models/query';
 
 @Component({
   selector: 'app-search-result',
@@ -6,10 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./search-result.component.scss']
 })
 export class SearchResultComponent implements OnInit {
-  @Input() url: string;
-  @Input() title: string;
-  @Input() contentType: string;
-  @Input() description: string;
+  @Input() hit: Hit;
 
   constructor() { }
 

@@ -1,14 +1,15 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of as observableOf, throwError } from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { catchError, map } from 'rxjs/operators';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
+import { Query } from '../../_models/query';
 import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
 import { Training } from '../../_models/training';
 import { User } from '../../_models/user';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class ApiService {
@@ -43,6 +44,7 @@ export class ApiService {
     resource: '/api/resource/<id>',
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
+    search: '/api/search',
     session: '/api/session',
     sessionstatus: '/api/session/status',
     sessionparticipants: '/api/session/participant',
@@ -66,7 +68,7 @@ export class ApiService {
   }
 
   private _handleError(error: HttpErrorResponse) {
-    let message = 'Something bad happened; please try again later.';
+    const message = 'Something bad happened; please try again later.';
 
     console.error(error);
 
@@ -78,9 +80,9 @@ export class ApiService {
       // The response body may contain clues as to what went wrong,
       let errorMessage = `Backend returned a status code ${error.status}, `;
       if (error.error) {
-          errorMessage +=
-            `Code was: ${JSON.stringify(error.error.code)}, ` +
-            `Message was: ${JSON.stringify(error.error.message)}`;
+        errorMessage +=
+          `Code was: ${JSON.stringify(error.error.code)}, ` +
+          `Message was: ${JSON.stringify(error.error.message)}`;
       }
       console.error(errorMessage);
     }
@@ -274,8 +276,8 @@ export class ApiService {
     const url = this
       ._endpointUrl('questionnaireExport')
       .replace('<name>', name);
-    return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
-      // .pipe(catchError(this._handleError));
+    return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
+    // .pipe(catchError(this._handleError));
   }
 
   /** getQuestionnaire */
@@ -313,6 +315,12 @@ export class ApiService {
       .replace('<flow>', flow)
       .replace('<questionnaire_name>', questionnaire_name);
     return this.httpClient.post<object>(url, options)
+      .pipe(catchError(this._handleError));
+  }
+
+  search(query: Query): Observable<Query> {
+    const url = this._endpointUrl('search');
+    return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }
 

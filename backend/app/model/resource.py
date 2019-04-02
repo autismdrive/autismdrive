@@ -22,3 +22,6 @@ class StarResource(db.Model):
     phone = db.Column(db.String)
     website = db.Column(db.String)
     categories = db.relationship("ResourceCategory", back_populates="resource")
+
+    def indexable_content(self):
+        return self.description

@@ -1,6 +1,21 @@
+mat-card-header {
+  position: relative;
+}
+
 [mat-card-avatar] {
   width: 100px;
   height: 100px;
+}
+
+mat-card-header:before {
+  content: 'Change';
+  position: absolute;
+  width: 100px;
+  left: 0px;
+  bottom: 16px;
+  text-align: center;
+  font-size: 12px;
+  pointer-events: none;
 }
 
 mat-card-subtitle {

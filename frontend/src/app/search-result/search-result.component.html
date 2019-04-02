@@ -1,13 +1,14 @@
-<div class="result-item mat-typography">
+<div class="result-item mat-typography" *ngIf="hit">
   <div
     fxLayout="row"
     fxLayoutAlign="space-between"
   >
     <a
       class="title mat-h2"
-      href="{{url}}"
-    >{{title}}</a>
-    <span class="type">{{contentType}}</span>
+      href="{{hit.url}}"
+    >{{hit.title}}</a>
+    <span class="type">{{hit.type}}</span>
   </div>
-  <p class="description">{{description}}</p>
+  <markdown *ngIf="hit.highlights" class="highlights">{{hit.highlights}}</markdown>
+  <p *ngIf="!hit.highlights" class="description">{{hit.content}}</p>
 </div>

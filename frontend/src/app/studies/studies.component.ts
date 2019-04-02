@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Study } from '../_models/study';
 import { ApiService } from '../_services/api/api.service';
+import { Query } from '../_models/query';
 
 @Component({
   selector: 'app-studies',
@@ -8,7 +8,7 @@ import { ApiService } from '../_services/api/api.service';
   styleUrls: ['./studies.component.scss']
 })
 export class StudiesComponent implements OnInit {
-  studies: Study[];
+  query: Query;
 
   constructor(private api: ApiService) {
     this.loadStudies();
@@ -18,7 +18,10 @@ export class StudiesComponent implements OnInit {
   }
 
   loadStudies() {
-    this.api.getStudies().subscribe(studies => this.studies = studies);
+    const query = new Query({
+      filters: [{field: 'Type', value: 'study'}]
+    });
+    this.api.search(query).subscribe(q => this.query = q);
   }
 
 }

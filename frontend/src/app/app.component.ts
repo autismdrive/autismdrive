@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivationEnd, ActivationStart, Router } from '@angular/router';
-import { ApiService } from './_services/api/api.service';
 import { User } from './_models/user';
-import { IntervalService } from './_services/interval/interval.service';
-import {AuthenticationService} from './_services/api/authentication-service';
+import { AuthenticationService } from './_services/api/authentication-service';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +16,6 @@ export class AppComponent implements OnInit {
   public constructor(
     private authenticationService: AuthenticationService,
     private router: Router,
-    private intervalService: IntervalService
   ) {
     this.router.events.subscribe((e) => {
       if (e instanceof ActivationStart || e instanceof ActivationEnd) {

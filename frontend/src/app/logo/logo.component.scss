@@ -1,6 +1,10 @@
 #logo {
   img {
-    height: 80px;
+    min-width: 40px;
+    max-width: 200px;
+    min-height: 40px;
+    max-height: 80px;
+    width: auto;
     margin-top: 1em;
     margin-bottom: 1em;
     margin-right: 1em;

@@ -3,7 +3,7 @@ import { ParticipantRelationship } from './participantRelationship';
 export class Participant {
   id?: number;
   user_id: number;
-  relationship: String;
+  relationship: string;
   last_updated?: Date;
   percent_complete?: number;
   num_studies_enrolled?: number;

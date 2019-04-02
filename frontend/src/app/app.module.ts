@@ -1,10 +1,12 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
+  MAT_FORM_FIELD_DEFAULT_OPTIONS,
   MAT_LABEL_GLOBAL_OPTIONS,
   MatButtonModule,
   MatCardModule,
@@ -18,6 +20,7 @@ import {
   MatInputModule,
   MatListModule,
   MatNativeDateModule,
+  MatPaginatorModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatSelectModule,
@@ -25,8 +28,7 @@ import {
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule,
-  MAT_FORM_FIELD_DEFAULT_OPTIONS
+  MatToolbarModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -38,46 +40,48 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
-import { ApiService } from './_services/api/api.service';
-import { AppComponent } from './app.component';
-import { EnrollComponent } from './enroll/enroll.component';
-import { FiltersComponent } from './filters/filters.component';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
 import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './_forms/validators/formly.validator';
+import { ErrorInterceptor } from './_routing/error-interceptor';
+import { JwtInterceptor } from './_routing/jwt-interceptor';
+import { RoutingModule } from './_routing/routing.module';
+import { ApiService } from './_services/api/api.service';
+import { SearchService } from './_services/api/search.service';
+import { IntervalService } from './_services/interval/interval.service';
+import { AdminHomeComponent } from './admin-home/admin-home.component';
+import { AppComponent } from './app.component';
+import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
+import { EnrollComponent } from './enroll/enroll.component';
+import { FiltersComponent } from './filters/filters.component';
+import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
+import { FlowIntroComponent } from './flow-intro/flow-intro.component';
+import { FlowComponent } from './flow/flow.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { HomeComponent } from './home/home.component';
 import { LoadingComponent } from './loading/loading.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
+import { LogoutComponent } from './logout/logout.component';
+import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
+import { QuestionnaireDataTableComponent } from './questionnaire-data-table/questionnaire-data-table.component';
+import { QuestionnaireDataViewComponent } from './questionnaire-data-view/questionnaire-data-view.component';
 import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
 import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
 import { RegisterComponent } from './register/register.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { ResourcesComponent } from './resources/resources.component';
-import { RoutingModule } from './_routing/routing.module';
+import { SearchBoxComponent } from './search-box/search-box.component';
 import { SearchResultComponent } from './search-result/search-result.component';
+import { SearchComponent } from './search/search.component';
 import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
-import { TrainingDetailComponent } from './training-detail/training-detail.component';
-import { FlowComponent } from './flow/flow.component';
-import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
-import { IntervalService } from './_services/interval/interval.service';
 import { TimedoutComponent } from './timed-out/timed-out.component';
-import { LogoutComponent } from './logout/logout.component';
-import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
-import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
-import { FlowIntroComponent } from './flow-intro/flow-intro.component';
-import { OverlayContainer } from '@angular/cdk/overlay';
-import { JwtInterceptor } from './_routing/jwt-interceptor';
-import { ErrorInterceptor } from './_routing/error-interceptor';
-import { AdminHomeComponent } from './admin-home/admin-home.component';
-import { QuestionnaireDataTableComponent } from './questionnaire-data-table/questionnaire-data-table.component';
-import { QuestionnaireDataViewComponent } from './questionnaire-data-view/questionnaire-data-view.component';
+import { TrainingDetailComponent } from './training-detail/training-detail.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -101,44 +105,49 @@ export class FormlyConfig {
   };
 }
 
-
 @NgModule({
   declarations: [
+    AdminHomeComponent,
     AppComponent,
+    AvatarDialogComponent,
+    AvatarDialogComponent,
     CardWrapperComponent,
     EnrollComponent,
     FiltersComponent,
+    FiltersComponent,
+    FlowCompleteComponent,
+    FlowCompleteComponent,
+    FlowComponent,
+    FlowIntroComponent,
+    FlowIntroComponent,
     ForgotPasswordComponent,
+    HelpWrapperComponent,
     HomeComponent,
+    LoadingComponent,
     LoginComponent,
     LogoComponent,
+    LogoutComponent,
+    LogoutComponent,
+    ParticipantProfileComponent,
     PasswordResetComponent,
     ProfileComponent,
+    QuestionnaireDataTableComponent,
+    QuestionnaireDataViewComponent,
+    QuestionnaireStepComponent,
+    QuestionnaireStepsListComponent,
     RegisterComponent,
+    RepeatSectionComponent,
+    ResourceDetailComponent,
     ResourcesComponent,
+    SearchBoxComponent,
+    SearchComponent,
+    SearchResultComponent,
     SearchResultComponent,
     StudiesComponent,
-    TermsComponent,
-    FiltersComponent,
-    SearchResultComponent,
-    ResourceDetailComponent,
     StudyDetailComponent,
-    TrainingDetailComponent,
-    LoadingComponent,
-    HelpWrapperComponent,
-    QuestionnaireStepsListComponent,
-    QuestionnaireStepComponent,
-    RepeatSectionComponent,
-    FlowComponent,
-    ParticipantProfileComponent,
+    TermsComponent,
     TimedoutComponent,
-    LogoutComponent,
-    AvatarDialogComponent,
-    FlowCompleteComponent,
-    FlowIntroComponent,
-    AdminHomeComponent,
-    QuestionnaireDataTableComponent,
-    QuestionnaireDataViewComponent
+    TrainingDetailComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -148,17 +157,16 @@ export class FormlyConfig {
     CovalentTextEditorModule,
     FileDropModule,
     FlexLayoutModule,
+    FormlyMatDatepickerModule,
     FormlyMaterialModule,
     FormlyModule.forRoot(FormlyConfig.config),
+    FormsModule,
     HttpClientModule,
-    MarkdownModule,
+    MarkdownModule.forRoot(),
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
-    MatNativeDateModule,
-    MatSidenavModule,
-    FormlyMatDatepickerModule,
     MatDatepickerModule,
     MatExpansionModule,
     MatFormFieldModule,
@@ -166,23 +174,27 @@ export class FormlyConfig {
     MatIconModule,
     MatInputModule,
     MatListModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatSelectModule,
+    MatSidenavModule,
     MatSlideToggleModule,
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
     NgProgressModule,
     ReactiveFormsModule,
-    RoutingModule
+    RoutingModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
     ApiService,
     IntervalService,
-    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,  useValue: { appearance: 'outline' }}
+    SearchService,
   ],
   bootstrap: [AppComponent],
   entryComponents: [AvatarDialogComponent]

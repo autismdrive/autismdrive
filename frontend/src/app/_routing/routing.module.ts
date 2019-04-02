@@ -1,26 +1,38 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, UrlSegment } from '@angular/router';
 import { AdminHomeComponent } from '../admin-home/admin-home.component';
 import { EnrollComponent } from '../enroll/enroll.component';
+import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
+import { FlowComponent } from '../flow/flow.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { HomeComponent } from '../home/home.component';
 import { LoginComponent } from '../login/login.component';
+import { LogoutComponent } from '../logout/logout.component';
 import { PasswordResetComponent } from '../password-reset/password-reset.component';
 import { ProfileComponent } from '../profile/profile.component';
-import { RegisterComponent } from '../register/register.component';
-import { ResourcesComponent } from '../resources/resources.component';
-import { StudiesComponent } from '../studies/studies.component';
-import { TermsComponent } from '../terms/terms.component';
-import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
-import { StudyDetailComponent } from '../study-detail/study-detail.component';
-import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { QuestionnaireStepComponent } from '../questionnaire-step/questionnaire-step.component';
-import { FlowComponent } from '../flow/flow.component';
+import { RegisterComponent } from '../register/register.component';
+import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
+import { ResourcesComponent } from '../resources/resources.component';
+import { SearchComponent } from '../search/search.component';
+import { StudiesComponent } from '../studies/studies.component';
+import { StudyDetailComponent } from '../study-detail/study-detail.component';
+import { TermsComponent } from '../terms/terms.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
-import { LogoutComponent } from '../logout/logout.component';
-import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
-import { AuthGuard } from './auth-guard';
+import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { AdminGuard } from './admin-guard';
+import { AuthGuard } from './auth-guard';
+
+export function searchFilterMatcher(url: UrlSegment[]) {
+  if (
+    (url.length === 2) &&
+    (url[0].path === ('search')) &&
+    (url[1].path === ('filter'))
+  ) {
+    return { consumed: url };
+  }
+  return null;
+}
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -44,6 +56,9 @@ const routes: Routes = [
   { path: 'logout', component: LogoutComponent, data: { title: 'You have been logged out.', hideHeader: true } },
   { path: 'timedout', component: TimedoutComponent, data: { title: 'Your session has timed out.', hideHeader: true } },
   { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
+  { path: 'search', component: SearchComponent, data: { title: 'Search' } },
+  { path: 'search/:query', component: SearchComponent, data: { title: 'Search Resources' } },
+  { matcher: searchFilterMatcher, component: SearchComponent, data: { title: 'Search' } },
   { path: 'admin', component: AdminHomeComponent, data: { title: 'Admin' }, canActivate: [AdminGuard] },
 ];
 

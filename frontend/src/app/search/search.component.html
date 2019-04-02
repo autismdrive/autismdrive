@@ -1,0 +1,112 @@
+<mat-sidenav-container
+  [id]="'sidenavContainer'"
+  class="mat-typography"
+  [hasBackdrop]="false"
+>
+  <mat-sidenav
+    #sidenav
+    class="sidenav"
+  >
+    <h2>
+      <span>Filters</span>
+      <div class="spacer"></div>
+      <button
+        mat-icon-button
+        (click)="sideNav.close()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </h2>
+    <div class="spacer"></div>
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let facet of query.facets">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{facet.field}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          <mat-list-item
+            *ngFor="let count of facet.facetCounts"
+            (click)="addFilter(facet.field, count.category)"
+          >
+            {{count.category}}
+            <div fxFlex></div>
+            <span class="hit-count">{{count.hit_count}}</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Sort Results
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          <mat-list-item (click)="sortByRelevance()">
+            Search Relevance
+            <div class="spacer"></div>
+          </mat-list-item>
+          <mat-list-item (click)="sortByDate()">
+            Recently Updated
+            <div class="spacer"></div>
+          </mat-list-item>
+        </mat-list>
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="container">
+      <div class="row">
+        <ul class="applied-filters">
+          <li *ngIf="!sideNav.opened">
+            <button
+              mat-icon-button
+              (click)="sideNav.open()"
+            >
+              <i class="material-icons">add_circle_outline</i>
+            </button>
+            Add a filter
+          </li>
+          <li *ngIf="query.words">
+            <button
+              mat-icon-button
+              (click)="updateQuery()"
+            >
+              <i class="material-icons">remove_circle_outline</i>
+            </button>
+            Search: {{query.words}}
+          </li>
+
+          <li *ngFor="let filter of query.filters">
+            <button
+              mat-icon-button
+              (click)="removeFilter(filter)"
+            >
+              <i class="material-icons">remove_circle_outline</i>
+            </button>
+            {{filter.field}} : {{filter.value}}
+          </li>
+        </ul>
+
+        <div *ngIf="!(loading || hideResults)">
+          <app-search-result
+            *ngFor="let hit of query.hits"
+            [hit]="hit"
+          >
+          </app-search-result>
+          <mat-paginator
+            [length]="query.total"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+            (page)="updatePage()"
+          >
+          </mat-paginator>
+        </div>
+
+      </div>
+
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -6,6 +6,7 @@
         src="/assets/avatars/{{participant.avatar_icon || '001'}}.svg"
         [ngStyle]="{'background-color': participant.avatar_color || '#CCC'}"
         (click)="chooseAvatar($event, participant)"
+        id="avatar_{{participant.id}}"
       >
       <mat-card-title>
         {{participant.name}}
@@ -32,7 +33,7 @@
           color="primary"
           (click)="goEditEnroll($event)"
           id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
-        >Edit enrollment info</a>
+        >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</a>
 
       </mat-card-subtitle>
     </mat-card-header>

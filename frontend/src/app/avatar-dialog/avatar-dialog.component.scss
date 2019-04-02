@@ -16,36 +16,49 @@ $white_0: rgba(255, 255, 255, 0);
 
 .avatar-images-row,
 .color-swatches-row {
-  position: relative;
-  overflow: hidden;
-  padding: 0px;
+  display: grid;
+  grid-gap: 0px;
+
+  /* Small devices (landscape phones, 576px and up) */
+  @media (min-width: 576px) {
+    grid-template-columns: 1fr 4fr 1fr;
+  }
+
+  /* Medium devices (tablets, 768px and up) */
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 6fr 1fr;
+  }
+
+  /* Large devices (desktops, 992px and up) */
+  @media (min-width: 992px) {
+    grid-template-columns: 1fr 8fr 1fr;
+  }
+
+  /* Extra large devices (large desktops, 1200px and up) */
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 10fr 1fr;
+  }
+
   .scroll-left,
   .scroll-right {
-    position: absolute;
     height: 100%;
-    top: 0px;
   }
   .scroll-left,
   .scroll-left:hover,
   .scroll-left:active,
   .scroll-left:focus {
     background-image: linear-gradient(to right, $white_1, $white_1, $white_0);
-    left: 0px;
-    padding-right: $button_padding;
   }
   .scroll-right,
   .scroll-right:hover,
   .scroll-right:active,
   .scroll-right:focus {
     background-image: linear-gradient(to right, $white_0, $white_1, $white_1);
-    right: 0px;
-    padding-left: $button_padding;
   }
 }
 
 .avatar-images,
 .color-swatches {
-  width: 100%;
   overflow-x: scroll;
   white-space: nowrap;
   scroll-behavior: smooth;
@@ -70,12 +83,12 @@ $white_0: rgba(255, 255, 255, 0);
   margin: 0px 0px 0px 10px;
   padding: 0px;
   border-radius: 50%;
-  &:first-of-type {
-    margin-left: ($button_padding * 2);
-  }
-  &:last-of-type {
-    margin-right: ($button_padding * 2);
-  }
+  // &:first-of-type {
+  //   margin-left: ($button_padding * 2);
+  // }
+  // &:last-of-type {
+  //   margin-right: ($button_padding * 2);
+  // }
 }
 
 .color-swatch {

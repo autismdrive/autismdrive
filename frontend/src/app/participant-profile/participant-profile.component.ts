@@ -17,7 +17,6 @@ export class ParticipantProfileComponent implements OnInit {
   @Input() participant: Participant;
   @Input() user: User;
   flow: Flow;
-  dummyImgUrl: string;
   percentComplete: number;
   numStudies: number;
 
@@ -26,7 +25,6 @@ export class ParticipantProfileComponent implements OnInit {
     private router: Router,
     public dialog: MatDialog
   ) {
-    this.dummyImgUrl = this.randomImgUrl();
   }
 
   ngOnInit() {
@@ -46,12 +44,6 @@ export class ParticipantProfileComponent implements OnInit {
     } else {
       this.numStudies = 0;
     }
-  }
-
-  randomImgUrl() {
-    const gender = Math.random() > 0.5 ? 'men' : 'women';
-    const id = Math.floor(Math.random() * 100);
-    return `https://randomuser.me/api/portraits/med/${gender}/${id}.jpg`;
   }
 
   goEditEnroll($event) {

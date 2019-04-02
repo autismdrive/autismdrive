@@ -8,6 +8,7 @@ import click
 import os
 from flask_marshmallow import Marshmallow
 
+from app.elastic_index import ElasticIndex
 from app.email_service import EmailService
 from app.rest_exception import RestException
 
@@ -44,6 +45,9 @@ auth = HTTPTokenAuth('Bearer')
 
 # Password Encryption
 bcrypt = Bcrypt(app)
+
+# Search System
+elastic_index = ElasticIndex(app)
 
 # Constructing for a problem when building urls when the id is null.
 # there is a fix in the works for this, see
@@ -113,13 +117,33 @@ def cleardb():
 
 
 @app.cli.command()
+def initindex():
+    """Delete all information from the elastic search Index."""
+    click.echo('Loading data into Elastic Search')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.build_index()
+
+
+@app.cli.command()
+def clearindex():
+    """Delete all information from the elasticsearch index"""
+    click.echo('Removing Data from Elastic Search')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.clear_index()
+
+
+@app.cli.command()
 def reset():
     """Remove all data and recreate it from the example data files"""
     click.echo('Rebuilding the databases from the example data files')
     from app import data_loader
     data_loader = data_loader.DataLoader()
+    data_loader.clear_index()
     data_loader.clear()
     _load_data(data_loader)
+    data_loader.build_index()
 
 
 from app import views

@@ -6,6 +6,7 @@ from flask_restful import reqparse
 
 from app import app
 from app.resources.Auth import auth_blueprint
+from app.resources.SearchEndpoint import SearchEndpoint
 from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
     FlowEndpoint,
@@ -149,6 +150,9 @@ endpoints = [
     (FlowListEndpoint, "/flow"),
     (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
+    # Search Endpoint
+    (SearchEndpoint, "/search"),
+
 ]
 
 # Add all endpoints to the API
