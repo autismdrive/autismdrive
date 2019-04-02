@@ -1,6 +1,7 @@
 import datetime
 
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 from app import db
 from app.question_service import QuestionService
@@ -170,3 +171,5 @@ class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
         ordered = True
+    participant_id = fields.Integer()
+    user_id = fields.Integer()
