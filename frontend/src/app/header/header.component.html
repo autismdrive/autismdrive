@@ -1,10 +1,34 @@
-<mat-toolbar-row id="uva-header" [@toggle]="toggle">
-  <div class="uva-logo"><img src="/assets/logo/UVA_STAR-logo.svg"></div>
-  <span fxFlex></span>
-  <div class="uva-links">
-    <a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/people">People</a>
-    <a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/research-projects">Research</a>
-    <a href="https://curry.virginia.edu/news-0">News</a>
-    <a [routerLink]="[ '/' ]">Registry</a>
+<div
+  id="uva-header"
+  [@toggle]="toggle"
+  fxLayout="row"
+  fxLayoutAlign="center center"
+>
+  <div
+    class="uva-logo"
+    fxFlex
+  ><a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star"><img
+        src="/assets/logo/UVA_STAR-logo.svg"
+      ></a></div>
+  <span fxFlex fxShow.md="false"></span>
+  <button mat-button fxShow.gt-sm="false">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <div
+    class="uva-links"
+    fxFlex
+    fxShow.lt-md="false"
+  >
+    <ul
+      fxLayout="row"
+      fxLayoutAlign="center center"
+    >
+      <li><a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/people">People</a></li>
+      <li><a
+          href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/research-projects">Research</a>
+      </li>
+      <li><a href="https://curry.virginia.edu/news-0">News</a></li>
+      <li><a [routerLink]="[ '/' ]">Registry</a></li>
+    </ul>
   </div>
-</mat-toolbar-row>
+</div>
