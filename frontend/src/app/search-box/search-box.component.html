@@ -5,14 +5,14 @@
       matInput
       type="text"
       placeholder="Search"
-      (keyup)="updateSearch()"
+      (keyup)="updateSearch(false)"
       [(ngModel)]="words"
       autofocus
     >
     <mat-icon
       [ngClass]="{'ghost': !hasWords()}"
       matSuffix
-      (click)="clearSearch()"
+      (click)="updateSearch(true)"
     >cancel</mat-icon>
   </mat-form-field>
 </div>
