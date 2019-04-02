@@ -1,0 +1,10 @@
+<mat-toolbar-row id="uva-header" [@toggle]="toggle">
+  <div class="uva-logo"><img src="/assets/logo/UVA_STAR-logo.svg"></div>
+  <span fxFlex></span>
+  <div class="uva-links">
+    <a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/people">People</a>
+    <a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/research-projects">Research</a>
+    <a href="https://curry.virginia.edu/news-0">News</a>
+    <a [routerLink]="[ '/' ]">Registry</a>
+  </div>
+</mat-toolbar-row>
