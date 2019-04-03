@@ -1,4 +1,8 @@
 <div
+  id="header-bg"
+  [@toggleBackground]="toggle"
+></div>
+<div
   id="uva-header"
   [@toggleHide]="toggle"
   fxLayout="row"
@@ -7,28 +11,20 @@
   <div
     class="uva-logo"
     fxFlex
-  ><a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"><img
+  ><a
+      href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"><img
         src="/assets/logo/UVA_STAR-logo.svg"
       ></a></div>
   <span
     fxFlex
     fxShow.md="false"
   ></span>
-  <button
-    mat-button
-    fxShow.gt-sm="false"
-  >
-    <mat-icon>menu</mat-icon>
-  </button>
   <div
-    class="uva-links"
+    id="uva-links"
     fxFlex
-    fxShow.lt-md="false"
+    *ngIf="!mobileQuery.matches"
   >
-    <ul
-      fxLayout="row"
-      fxLayoutAlign="center center"
-    >
+    <ul>
       <li><a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/people">People</a></li>
       <li><a
           href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/research-projects">Research</a>
@@ -44,88 +40,199 @@
   fxLayoutAlign="center center"
   [@toggleDock]="toggle"
 >
-<mat-toolbar>
-  <mat-toolbar-row
-    id="menu-bar"
-    fxLayout="row"
-  >
-    <app-logo variant="light"></app-logo>
-    <div id="primary-nav">
-      <a
-        mat-button
-        [routerLink]="[ '/enroll' ]"
-        routerLinkActive="selected"
-        id="enroll-button"
-      >Join the Autism Registry</a>
-      <a
-        mat-button
-        [routerLink]="[ '/studies' ]"
-        routerLinkActive="selected"
-        id="studies-button"
-      >Current studies</a>
-      <a
-        mat-button
-        [routerLink]="[ '/resources' ]"
-        routerLinkActive="selected"
-        id="resources-button"
-      >Training & Resources</a>
-    </div>
+  <mat-toolbar>
+    <mat-toolbar-row
+      id="menu-bar"
+      fxLayout="row"
+    >
+      <app-logo variant="light"></app-logo>
+      <div
+        id="primary-nav"
+        *ngIf="!mobileQuery.matches"
+      >
+        <a
+          mat-button
+          [routerLink]="[ '/enroll' ]"
+          routerLinkActive="selected"
+          id="enroll-button"
+        >Join the Autism Registry</a>
+        <a
+          mat-button
+          [routerLink]="[ '/studies' ]"
+          routerLinkActive="selected"
+          id="studies-button"
+        >Current studies</a>
+        <a
+          mat-button
+          [routerLink]="[ '/resources' ]"
+          routerLinkActive="selected"
+          id="resources-button"
+        >Training & Resources</a>
+      </div>
 
-    <span fxFlex></span>
+      <span fxFlex></span>
 
-    <div id="utility-nav">
-      <app-search-box></app-search-box>
+      <div
+        id="utility-nav"
+        *ngIf="!mobileQuery.matches"
+      >
+        <app-search-box variant="dark-bg"></app-search-box>
 
-      <a
+        <a
+          mat-button
+          *ngIf="!currentUser"
+          [routerLink]="[ '/terms' ]"
+          routerLinkActive="selected"
+          id="register-button"
+        >
+          <mat-icon>person_add</mat-icon>
+          Create Account
+        </a>
+        <a
+          mat-button
+          *ngIf="!currentUser"
+          [routerLink]="[ '/login' ]"
+          routerLinkActive="selected"
+          id="login-button"
+        >
+          <mat-icon>account_circle</mat-icon>
+          Sign in
+        </a>
+        <a
+          mat-button
+          *ngIf="currentUser && currentUser.role == 'admin'"
+          [routerLink]="[ '/admin' ]"
+          routerLinkActive="selected"
+          id="admin-button"
+        >
+          <mat-icon>build</mat-icon>
+          Admin
+        </a>
+        <a
+          mat-button
+          *ngIf="currentUser"
+          [routerLink]="[ '/profile' ]"
+          routerLinkActive="selected"
+          id="profile-button"
+        >
+          <mat-icon>account_circle</mat-icon>
+          Visit Profile
+        </a>
+        <a
+          mat-button
+          *ngIf="currentUser"
+          (click)="goLogout($event)"
+          id="logout-button"
+        >
+          <mat-icon>exit_to_app</mat-icon>
+          Logout
+        </a>
+      </div>
+      <button
         mat-button
-        *ngIf="!currentUser"
-        [routerLink]="[ '/terms' ]"
-        routerLinkActive="selected"
-        id="register-button"
+        (click)="toggleMenu()"
+        *ngIf="mobileQuery.matches"
+        [color]="menuVisible ? '' : 'accent'"
       >
-        <mat-icon>person_add</mat-icon>
-        Create Account
-      </a>
-      <a
-        mat-button
-        *ngIf="!currentUser"
-        [routerLink]="[ '/login' ]"
-        routerLinkActive="selected"
-        id="login-button"
-      >
-        <mat-icon>account_circle</mat-icon>
-        Sign in
-      </a>
-      <a
-        mat-button
-        *ngIf="currentUser && currentUser.role == 'admin'"
-        [routerLink]="[ '/admin' ]"
-        routerLinkActive="selected"
-        id="admin-button"
-      >
-        <mat-icon>build</mat-icon>
-        Admin
-      </a>
-      <a
-        mat-button
-        *ngIf="currentUser"
-        [routerLink]="[ '/profile' ]"
-        routerLinkActive="selected"
-        id="profile-button"
-      >
-        <mat-icon>account_circle</mat-icon>
-        Visit Profile
-      </a>
-      <a
-        mat-button
-        *ngIf="currentUser"
-        (click)="goLogout($event)"
-        id="logout-button"
-      >
-        <mat-icon>exit_to_app</mat-icon>
-        Logout
-      </a>
-    </div>
-  </mat-toolbar-row>
-</mat-toolbar>
+        <mat-icon>menu</mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+</div>
+<div
+  id="mobile-menu"
+  *ngIf="mobileQuery.matches"
+  [@toggleMobileMenu]="menuState"
+  class="mat-typography"
+>
+  <mat-nav-list>
+    <a
+      mat-list-item
+      href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/people"
+    >People</a>
+    <a
+      mat-list-item
+      href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/research-projects"
+    >Research</a>
+    <a
+      mat-list-item
+      href="https://curry.virginia.edu/news-0"
+    >News</a>
+    <a
+      mat-list-item
+      [routerLink]="[ '/' ]"
+    >Registry</a>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <app-search-box *ngIf="mobileQuery.matches" variant="light-bg"></app-search-box>
+    </mat-list-item>
+    <a
+      mat-list-item
+      *ngIf="!currentUser"
+      [routerLink]="[ '/terms' ]"
+      routerLinkActive="selected"
+      id="register-button-mobile"
+    >
+      <mat-icon>person_add</mat-icon>
+      Create Account
+    </a>
+    <a
+      mat-list-item
+      *ngIf="!currentUser"
+      [routerLink]="[ '/login' ]"
+      routerLinkActive="selected"
+      id="login-button-mobile"
+    >
+      <mat-icon>account_circle</mat-icon>
+      Sign in
+    </a>
+    <a
+      mat-list-item
+      *ngIf="currentUser && currentUser.role == 'admin'"
+      [routerLink]="[ '/admin' ]"
+      routerLinkActive="selected"
+      id="admin-button-mobile"
+    >
+      <mat-icon>build</mat-icon>
+      Admin
+    </a>
+    <a
+      mat-list-item
+      *ngIf="currentUser"
+      [routerLink]="[ '/profile' ]"
+      routerLinkActive="selected"
+      id="profile-button-mobile"
+    >
+      <mat-icon>account_circle</mat-icon>
+      Visit Profile
+    </a>
+    <a
+      mat-list-item
+      *ngIf="currentUser"
+      (click)="goLogout($event)"
+      id="logout-button-mobile"
+    >
+      <mat-icon>exit_to_app</mat-icon>
+      Logout
+    </a>
+    <mat-divider></mat-divider>
+    <a
+      mat-list-item
+      [routerLink]="[ '/enroll' ]"
+      routerLinkActive="selected"
+      id="enroll-button-mobile"
+    >Join the Autism Registry</a>
+    <a
+      mat-list-item
+      [routerLink]="[ '/studies' ]"
+      routerLinkActive="selected"
+      id="studies-button-mobile"
+    >Current studies</a>
+    <a
+      mat-list-item
+      [routerLink]="[ '/resources' ]"
+      routerLinkActive="selected"
+      id="resources-button-mobile"
+    >Training & Resources</a>
+  </mat-nav-list>
 </div>

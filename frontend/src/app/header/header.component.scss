@@ -2,6 +2,44 @@
 @import '~@angular/material/theming';
 @import '../../stardrive_material';
 
+
+#menu-bar {
+  mat-toolbar-row {
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  #primary-nav, #utility-nav {
+    .mat-button {
+      &.selected {
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
+        border-bottom-color: white;
+      }
+    }
+  }
+
+  #primary-nav .mat-button,
+  #utility-nav .mat-button {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+}
+
+
+#header-bg {
+  background-color: mat-color($stardrive-primary, 500);
+  position: fixed;
+  top: ($header-height * -1);
+  width: 100%;
+  height: $header-height;
+  z-index: 98;
+}
+
 #uva-header {
   position: fixed;
   top: 0;
@@ -15,11 +53,16 @@
     min-width: 320px;
   }
 
-  .uva-links {
+  #uva-links {
 
     ul {
       list-style: none;
       margin: 0px;
+      display: flex;
+      align-items: center;
+      justify-items: center;
+      align-content: center;
+      justify-content: center;
     }
 
     li {
@@ -91,4 +134,12 @@
     background-color: mat-color($stardrive-primary, 500);
     color: white;
   }
+}
+
+#mobile-menu {
+  position: fixed;
+  top: -100vh;
+  width: 100%;
+  background-color: white;
+  z-index: 99;
 }

@@ -5,7 +5,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { AfterViewInit, Component, HostBinding, Input } from '@angular/core';
+import { AfterViewInit, Component, HostBinding, Input, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -18,6 +18,7 @@ import {
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
 import { Router } from '@angular/router';
+import { MediaMatcher } from '@angular/cdk/layout';
 
 enum VisibilityState {
   Visible = 'visible',
@@ -34,10 +35,21 @@ enum Direction {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   animations: [
+    trigger('toggleMobileMenu', [
+      state(
+        VisibilityState.Hidden,
+        style({ top: '-100vh' })
+      ),
+      state(
+        VisibilityState.Visible,
+        style({ top: '152px' })
+      ),
+      transition('* => *', animate('500ms ease-in'))
+    ]),
     trigger('toggleHide', [
       state(
         VisibilityState.Hidden,
-        style({ transform: 'translateY(-100%)' })
+        style({ transform: 'translateY(-200%)' })
       ),
       state(
         VisibilityState.Visible,
@@ -55,24 +67,67 @@ enum Direction {
         style({ top: '88px' })
       ),
       transition('* => *', animate('500ms ease-in'))
+    ]),
+    trigger('toggleBackground', [
+      state(
+        VisibilityState.Hidden,
+        style({ top: '-88px' })
+      ),
+      state(
+        VisibilityState.Visible,
+        style({ top: '0px' })
+      ),
+      transition('* => *', animate('500ms ease-in'))
     ])
   ]
 })
-export class HeaderComponent implements AfterViewInit {
+export class HeaderComponent implements AfterViewInit, OnDestroy {
   private isVisible = true;
   @Input() currentUser: User;
+  menuVisible = false;
+  mobileQuery: MediaQueryList;
+  private _mobileQueryListener: () => void;
 
   get toggle(): VisibilityState {
     return this.isVisible ? VisibilityState.Visible : VisibilityState.Hidden;
   }
 
+  get menuState(): VisibilityState {
+    console.log('this.menuVisible', this.menuVisible);
+    return this.menuVisible ? VisibilityState.Visible : VisibilityState.Hidden;
+  }
+
   constructor(
+    changeDetectorRef: ChangeDetectorRef,
     private authenticationService: AuthenticationService,
-    private router: Router
-  ) { }
+    private router: Router,
+    media: MediaMatcher,
+  ) {
+    this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
+  }
 
   // https://gist.github.com/zetsnotdead/08cc5632f3427d41254068d322807c51
   ngAfterViewInit() {
+    this.watchScrollEvents();
+  }
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
+  }
+
+  goLogout($event: MouseEvent) {
+    $event.preventDefault();
+    this.authenticationService.logout();
+    this.router.navigate(['logout']);
+  }
+
+  toggleMenu() {
+    this.menuVisible = !this.menuVisible;
+  }
+
+  watchScrollEvents() {
     const scroll$ = fromEvent(window, 'scroll').pipe(
       throttleTime(10),
       map(() => window.pageYOffset),
@@ -86,17 +141,11 @@ export class HeaderComponent implements AfterViewInit {
       filter(direction => direction === Direction.Up)
     );
 
-    const scrollDown = scroll$.pipe(
+    const scrollDown$ = scroll$.pipe(
       filter(direction => direction === Direction.Down)
     );
 
     scrollUp$.subscribe(() => (this.isVisible = true));
-    scrollDown.subscribe(() => (this.isVisible = false));
-  }
-
-  goLogout($event: MouseEvent) {
-    $event.preventDefault();
-    this.authenticationService.logout();
-    this.router.navigate(['logout']);
+    scrollDown$.subscribe(() => (this.isVisible = false));
   }
 }

@@ -87,16 +87,18 @@ $stardrive-warn: mat-palette($mat-red);
 $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
 $easeDuration: 300ms;
 $animationDuration: 500ms;
+$uva-header-height: 88px;
+$site-header-height: 64px;
+$header-height: ($uva-header-height + $site-header-height);
+
 @include angular-material-theme($stardrive-theme);
 
 @mixin stardrive-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
-  $parent-header-height: 88px;
-  $site-header-height: 64px;
 
   body {
-    padding-top: ($parent-header-height + $site-header-height);
+    padding-top: $header-height;
   }
 
   .container {
