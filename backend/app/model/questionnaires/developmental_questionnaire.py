@@ -128,5 +128,4 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DevelopmentalQuestionnaire
         ordered = True
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
+        include_fk = True

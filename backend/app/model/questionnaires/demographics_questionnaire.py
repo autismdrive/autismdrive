@@ -171,5 +171,4 @@ class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
         ordered = True
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
+        include_fk = True

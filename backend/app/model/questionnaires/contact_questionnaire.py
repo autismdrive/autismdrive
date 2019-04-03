@@ -213,5 +213,4 @@ class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
         ordered = True
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
+        include_fk = True

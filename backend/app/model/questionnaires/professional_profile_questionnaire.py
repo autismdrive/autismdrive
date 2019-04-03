@@ -222,5 +222,4 @@ class ProfessionalProfileQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ProfessionalProfileQuestionnaire
         ordered = True
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
+        include_fk = True

@@ -236,5 +236,4 @@ class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:
         model = IdentificationQuestionnaire
         ordered = True
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
+        include_fk = True

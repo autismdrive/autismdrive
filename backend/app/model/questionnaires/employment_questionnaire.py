@@ -87,5 +87,4 @@ class EmploymentQuestionnaireSchema(ModelSchema):
     class Meta:
         model = EmploymentQuestionnaire
         ordered = True
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
+        include_fk = True
