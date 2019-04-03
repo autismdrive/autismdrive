@@ -15,6 +15,8 @@ import random
 import string
 import datetime
 import unittest
+import openpyxl
+import io
 from app import db, app, elastic_index
 from app.model.user import User, Role
 from app.model.study import Study
@@ -44,6 +46,7 @@ from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQ
 from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
 from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
@@ -255,7 +258,7 @@ class TestCase(unittest.TestCase):
         cdq = ClinicalDiagnosesQuestionnaire(developmental=developmental, mental_health=mental_health, medical=medical,
                                              genetic=genetic)
         if user is None:
-            u = self.construct_user()
+            u = self.construct_user(email='clinic@questionnaire.com')
             cdq.user_id = u.id
         else:
             u = user
@@ -279,7 +282,7 @@ class TestCase(unittest.TestCase):
         cq = ContactQuestionnaire(phone=phone, zip=zip,
                                   marketing_channel=marketing_channel)
         if user is None:
-            u = self.construct_user()
+            u = self.construct_user(email='contact@questionnaire.com')
             cq.user_id = u.id
         else:
             u = user
@@ -308,7 +311,7 @@ class TestCase(unittest.TestCase):
                                                     has_academic_difficulties=has_academic_difficulties,
                                                     academic_difficulty_areas=academic_difficulty_areas)
         if user is None:
-            u = self.construct_user()
+            u = self.construct_user(email='cbd@questionnaire.com')
             cb.user_id = u.id
         else:
             u = user
@@ -337,7 +340,7 @@ class TestCase(unittest.TestCase):
                                                has_academic_difficulties=has_academic_difficulties,
                                                academic_difficulty_areas=academic_difficulty_areas)
         if user is None:
-            u = self.construct_user()
+            u = self.construct_user(email='cbs@questionnaire.com')
             cb.user_id = u.id
         else:
             u = user
@@ -363,7 +366,7 @@ class TestCase(unittest.TestCase):
         dq = DemographicsQuestionnaire(birth_sex=birth_sex, gender_identity=gender_identity,
                                        race_ethnicity=race_ethnicity)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='demograph@questionnaire.com')
             dq.user_id = u.id
         else:
             u = user
@@ -390,7 +393,7 @@ class TestCase(unittest.TestCase):
                                         when_language_milestones=when_language_milestones,
                                         when_toileting_milestones=when_toileting_milestones)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='develop@questionnaire.com')
             dq.user_id = u.id
         else:
             u = user
@@ -416,7 +419,7 @@ class TestCase(unittest.TestCase):
                                              school_type=school_type,
                                              dependent_placement=dependent_placement)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='edudep@questionnaire.com')
             eq.user_id = u.id
         else:
             u = user
@@ -444,7 +447,7 @@ class TestCase(unittest.TestCase):
                                         self_placement=self_placement)
 
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='eduself@questionnaire.com')
             eq.user_id = u.id
         else:
             u = user
@@ -471,7 +474,7 @@ class TestCase(unittest.TestCase):
                                      employment_capacity=employment_capacity,
                                      has_employment_support=has_employment_support)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='employ@questionnaire.com')
             eq.user_id = u.id
         else:
             u = user
@@ -500,7 +503,7 @@ class TestCase(unittest.TestCase):
                                                       years_old_at_first_diagnosis=years_old_at_first_diagnosis,
                                                       who_diagnosed=who_diagnosed)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='evaldep@questionnaire.com')
             ehq.user_id = u.id
         else:
             u = user
@@ -530,7 +533,7 @@ class TestCase(unittest.TestCase):
                                                  years_old_at_first_diagnosis=years_old_at_first_diagnosis,
                                                  who_diagnosed=who_diagnosed)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='evalself@questionnaire.com')
             ehq.user_id = u.id
         else:
             u = user
@@ -558,7 +561,7 @@ class TestCase(unittest.TestCase):
                                         struggle_to_afford=struggle_to_afford)
 
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='homedep@questionnaire.com')
             hq.user_id = u.id
         else:
             u = user
@@ -590,7 +593,7 @@ class TestCase(unittest.TestCase):
         hq = HomeSelfQuestionnaire(self_living_situation=self_living_situation, struggle_to_afford=struggle_to_afford)
 
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='homeself@questionnaire.com')
             hq.user_id = u.id
         else:
             u = user
@@ -639,7 +642,7 @@ class TestCase(unittest.TestCase):
                                          is_first_name_preferred=is_first_name_preferred, nickname=nickname,
                                          birth_state=birth_state, is_english_primary=is_english_primary)
         if user is None:
-            u = self.construct_user(email="user@study.com")
+            u = self.construct_user(email='ident@questionnaire.com')
             iq.user_id = u.id
         else:
             u = user
@@ -656,6 +659,40 @@ class TestCase(unittest.TestCase):
         db_iq = db.session.query(IdentificationQuestionnaire).filter_by(participant_id=iq.participant_id).first()
         self.assertEqual(db_iq.nickname, iq.nickname)
         return db_iq
+
+    def construct_professional_questionnaire(self, purpose="profResearch",
+                                             professional_identity=["artTher", "profOther"],
+                                             professional_identity_other="Astronaut",
+                                             learning_interests=["insuranceCov", "learnOther"],
+                                             learning_interests_other="Data plotting using dried fruit",
+                                             currently_work_with_autistic=True, previous_work_with_autistic=False,
+                                             length_work_with_autistic='3 minutes', participant=None, user=None):
+
+        pq = ProfessionalProfileQuestionnaire(purpose=purpose, professional_identity=professional_identity,
+                                              professional_identity_other=professional_identity_other,
+                                              learning_interests=learning_interests,
+                                              learning_interests_other=learning_interests_other,
+                                              currently_work_with_autistic=currently_work_with_autistic,
+                                              previous_work_with_autistic=previous_work_with_autistic,
+                                              length_work_with_autistic=length_work_with_autistic)
+        if user is None:
+            u = self.construct_user(email='prof@questionnaire.com')
+            pq.user_id = u.id
+        else:
+            u = user
+            pq.user_id = u.id
+
+        if participant is None:
+            pq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
+        else:
+            pq.participant_id = participant.id
+
+        db.session.add(pq)
+        db.session.commit()
+
+        db_pq = db.session.query(ProfessionalProfileQuestionnaire).filter_by(participant_id=pq.participant_id).first()
+        self.assertEqual(db_pq.learning_interests, pq.learning_interests)
+        return db_pq
 
     def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
                              notes='I feel better than ever!', supports_questionnaire=None):
@@ -690,7 +727,7 @@ class TestCase(unittest.TestCase):
 
         sq = SupportsQuestionnaire()
         if user is None:
-            u = self.construct_user(email="user@supports.org")
+            u = self.construct_user(email='support@questionnaire.com')
             sq.user_id = u.id
         else:
             u = user
@@ -722,6 +759,26 @@ class TestCase(unittest.TestCase):
         db_sq = db.session.query(SupportsQuestionnaire).filter_by(participant_id=sq.participant_id).first()
         self.assertEqual(db_sq.last_updated, sq.last_updated)
         return db_sq
+
+    def construct_all_questionnaires(self):
+        user = self.construct_user()
+        participant = self.construct_participant(user=user, relationship=Relationship.dependent)
+        self.construct_clinical_diagnoses_questionnaire(user=user, participant=participant)
+        self.construct_contact_questionnaire(user=user, participant=participant)
+        self.construct_current_behaviors_dependent_questionnaire(user=user, participant=participant)
+        self.construct_current_behaviors_self_questionnaire(user=user, participant=participant)
+        self.construct_demographics_questionnaire(user=user, participant=participant)
+        self.construct_developmental_questionnaire(user=user, participant=participant)
+        self.construct_education_dependent_questionnaire(user=user, participant=participant)
+        self.construct_education_self_questionnaire(user=user, participant=participant)
+        self.construct_employment_questionnaire(user=user, participant=participant)
+        self.construct_evaluation_history_dependent_questionnaire(user=user, participant=participant)
+        self.construct_evaluation_history_self_questionnaire(user=user, participant=participant)
+        self.construct_home_dependent_questionnaire(user=user, participant=participant)
+        self.construct_home_self_questionnaire(user=user, participant=participant)
+        self.construct_identification_questionnaire(user=user, participant=participant)
+        self.construct_professional_questionnaire(user=user, participant=participant)
+        self.construct_supports_questionnaire(user=user, participant=participant)
 
     def test_resource_basics(self):
         self.construct_resource()
@@ -3392,3 +3449,58 @@ class TestCase(unittest.TestCase):
         self.assertEqual(403, rv.status_code)
         rv = self.app.get('/api/q/contact_questionnaire', content_type="application/json", headers=self.logged_in_headers(user=admin))
         self.assertSuccess(rv)
+
+    def test_export_single_questionnaire(self):
+        self.construct_current_behaviors_dependent_questionnaire()
+        rv = self.app.get('/api/q/current_behaviors_dependent_questionnaire/export',
+                          follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        wb = openpyxl.load_workbook(io.BytesIO(rv.data))
+        ws = wb.get_active_sheet()
+        self.assertEqual(ws, wb.active)
+        self.assertEqual('id', ws['A1'].value)
+        self.assertEqual('last_updated', ws['B1'].value)
+        self.assertEqual('participant_id', ws['C1'].value)
+        self.assertEqual('user_id', ws['D1'].value)
+        self.assertEqual('dependent_verbal_ability', ws['E1'].value)
+        self.assertEqual('concerning_behaviors', ws['F1'].value)
+        self.assertEqual('concerning_behaviors_other', ws['G1'].value)
+        self.assertEqual('has_academic_difficulties', ws['H1'].value)
+        self.assertEqual('academic_difficulty_areas', ws['I1'].value)
+        self.assertEqual('academic_difficulty_other', ws['J1'].value)
+        self.assertEqual(10, ws.max_column)
+        self.assertEqual(2, ws.max_row)
+
+    def test_export_all_questionnaires(self):
+        self.construct_all_questionnaires()
+        rv = self.app.get('/api/q/all/export', follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        wb = openpyxl.load_workbook(io.BytesIO(rv.data))
+        ws = wb.get_active_sheet()
+        self.assertEqual(ws, wb.active)
+        self.assertEqual(2, ws.max_row)
+        self.assertEqual(20, len(wb.worksheets))
+        self.assertEqual('assistive_device', wb.worksheets[0].title)
+        self.assertEqual('clinical_diagnoses_questionnai', wb.worksheets[1].title)
+        self.assertEqual('contact_questionnaire', wb.worksheets[2].title)
+        self.assertEqual('current_behaviors_dependent_qu', wb.worksheets[3].title)
+        self.assertEqual('current_behaviors_self_questio', wb.worksheets[4].title)
+        self.assertEqual('demographics_questionnaire', wb.worksheets[5].title)
+        self.assertEqual('developmental_questionnaire', wb.worksheets[6].title)
+        self.assertEqual('education_dependent_questionna', wb.worksheets[7].title)
+        self.assertEqual('education_self_questionnaire', wb.worksheets[8].title)
+        self.assertEqual('employment_questionnaire', wb.worksheets[9].title)
+        self.assertEqual('evaluation_history_dependent_q', wb.worksheets[10].title)
+        self.assertEqual('evaluation_history_self_questi', wb.worksheets[11].title)
+        self.assertEqual('home_dependent_questionnaire', wb.worksheets[12].title)
+        self.assertEqual('home_self_questionnaire', wb.worksheets[13].title)
+        self.assertEqual('housemate', wb.worksheets[14].title)
+        self.assertEqual('identification_questionnaire', wb.worksheets[15].title)
+        self.assertEqual('medication', wb.worksheets[16].title)
+        self.assertEqual('professional_profile_questionn', wb.worksheets[17].title)
+        self.assertEqual('supports_questionnaire', wb.worksheets[18].title)
+        self.assertEqual('therapy', wb.worksheets[19].title)
