@@ -5,7 +5,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { AfterViewInit, Component, HostBinding } from '@angular/core';
+import { AfterViewInit, Component, HostBinding, Input } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -15,6 +15,9 @@ import {
   share,
   throttleTime
 } from 'rxjs/operators';
+import { User } from '../_models/user';
+import { AuthenticationService } from '../_services/api/authentication-service';
+import { Router } from '@angular/router';
 
 enum VisibilityState {
   Visible = 'visible',
@@ -31,14 +34,25 @@ enum Direction {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   animations: [
-    trigger('toggle', [
+    trigger('toggleHide', [
       state(
         VisibilityState.Hidden,
-        style({ transform: 'translateY(-100%)', boxShadow: 'none' })
+        style({ transform: 'translateY(-100%)' })
       ),
       state(
         VisibilityState.Visible,
-        style({ transform: 'translateY(0)', boxShadow: '0px 10px rgba(0,0,0,0.3)' })
+        style({ transform: 'translateY(0)' })
+      ),
+      transition('* => *', animate('500ms ease-in'))
+    ]),
+    trigger('toggleDock', [
+      state(
+        VisibilityState.Hidden,
+        style({ top: '0px' })
+      ),
+      state(
+        VisibilityState.Visible,
+        style({ top: '88px' })
       ),
       transition('* => *', animate('500ms ease-in'))
     ])
@@ -46,12 +60,16 @@ enum Direction {
 })
 export class HeaderComponent implements AfterViewInit {
   private isVisible = true;
+  @Input() currentUser: User;
 
   get toggle(): VisibilityState {
     return this.isVisible ? VisibilityState.Visible : VisibilityState.Hidden;
   }
 
-  constructor() { }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private router: Router
+  ) { }
 
   // https://gist.github.com/zetsnotdead/08cc5632f3427d41254068d322807c51
   ngAfterViewInit() {
@@ -74,5 +92,11 @@ export class HeaderComponent implements AfterViewInit {
 
     scrollUp$.subscribe(() => (this.isVisible = true));
     scrollDown.subscribe(() => (this.isVisible = false));
+  }
+
+  goLogout($event: MouseEvent) {
+    $event.preventDefault();
+    this.authenticationService.logout();
+    this.router.navigate(['logout']);
   }
 }

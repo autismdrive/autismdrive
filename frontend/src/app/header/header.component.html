@@ -1,6 +1,6 @@
 <div
   id="uva-header"
-  [@toggle]="toggle"
+  [@toggleHide]="toggle"
   fxLayout="row"
   fxLayoutAlign="center center"
 >
@@ -10,8 +10,14 @@
   ><a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star"><img
         src="/assets/logo/UVA_STAR-logo.svg"
       ></a></div>
-  <span fxFlex fxShow.md="false"></span>
-  <button mat-button fxShow.gt-sm="false">
+  <span
+    fxFlex
+    fxShow.md="false"
+  ></span>
+  <button
+    mat-button
+    fxShow.gt-sm="false"
+  >
     <mat-icon>menu</mat-icon>
   </button>
   <div
@@ -31,4 +37,95 @@
       <li><a [routerLink]="[ '/' ]">Registry</a></li>
     </ul>
   </div>
+</div>
+<div
+  id="site-header"
+  fxLayout="row"
+  fxLayoutAlign="center center"
+  [@toggleDock]="toggle"
+>
+<mat-toolbar>
+  <mat-toolbar-row
+    id="menu-bar"
+    fxLayout="row"
+  >
+    <app-logo></app-logo>
+    <div id="primary-nav">
+      <a
+        mat-button
+        [routerLink]="[ '/enroll' ]"
+        routerLinkActive="selected"
+        id="enroll-button"
+      >Join the Autism Registry</a>
+      <a
+        mat-button
+        [routerLink]="[ '/studies' ]"
+        routerLinkActive="selected"
+        id="studies-button"
+      >Current studies</a>
+      <a
+        mat-button
+        [routerLink]="[ '/resources' ]"
+        routerLinkActive="selected"
+        id="resources-button"
+      >Training & Resources</a>
+    </div>
+
+    <span fxFlex></span>
+
+    <div id="utility-nav">
+      <app-search-box></app-search-box>
+
+      <a
+        mat-button
+        *ngIf="!currentUser"
+        [routerLink]="[ '/terms' ]"
+        routerLinkActive="selected"
+        id="register-button"
+      >
+        <mat-icon>person_add</mat-icon>
+        Create Account
+      </a>
+      <a
+        mat-button
+        *ngIf="!currentUser"
+        [routerLink]="[ '/login' ]"
+        routerLinkActive="selected"
+        id="login-button"
+      >
+        <mat-icon>account_circle</mat-icon>
+        Sign in
+      </a>
+      <a
+        mat-button
+        *ngIf="currentUser && currentUser.role == 'admin'"
+        [routerLink]="[ '/admin' ]"
+        routerLinkActive="selected"
+        id="admin-button"
+      >
+        <mat-icon>build</mat-icon>
+        Admin
+      </a>
+      <a
+        mat-button
+        *ngIf="currentUser"
+        [routerLink]="[ '/profile' ]"
+        routerLinkActive="selected"
+        id="profile-button"
+      >
+        <mat-icon>account_circle</mat-icon>
+        Visit Profile
+      </a>
+      <a
+        mat-button
+        *ngIf="currentUser"
+        (click)="goLogout($event)"
+        id="logout-button"
+      >
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </a>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
 </div>
