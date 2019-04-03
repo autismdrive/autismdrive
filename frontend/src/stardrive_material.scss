@@ -92,9 +92,11 @@ $animationDuration: 500ms;
 @mixin stardrive-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
+  $parent-header-height: 88px;
+  $site-header-height: 64px;
 
   body {
-    padding-top: 88px;
+    padding-top: ($parent-header-height + $site-header-height);
   }
 
   .container {

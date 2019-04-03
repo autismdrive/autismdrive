@@ -1,12 +1,31 @@
 #logo {
-  img {
-    min-width: 40px;
-    max-width: 200px;
-    min-height: 40px;
-    max-height: 80px;
-    width: auto;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    margin-right: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.dark-lg, &.light-lg {
+    img {
+      min-width: 120px;
+      max-width: 600px;
+      min-height: 120px;
+      max-height: 240px;
+      width: 100%;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      margin-right: 1em;
+    }
+  }
+
+  &.dark, &.light {
+    img {
+      min-width: 40px;
+      max-width: 200px;
+      min-height: 40px;
+      max-height: 80px;
+      width: auto;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      margin-right: 1em;
+    }
   }
 }
