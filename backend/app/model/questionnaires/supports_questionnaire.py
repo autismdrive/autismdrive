@@ -117,6 +117,7 @@ class SupportsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = SupportsQuestionnaire
         ordered = True
+        include_fk = True
     medications = fields.Nested(MedicationSchema, many=True)
     therapies = fields.Nested(TherapySchema, many=True)
     assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)

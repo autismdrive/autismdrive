@@ -170,3 +170,4 @@ class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DemographicsQuestionnaire
         ordered = True
+        include_fk = True

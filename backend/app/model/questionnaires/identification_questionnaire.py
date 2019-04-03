@@ -235,3 +235,4 @@ class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta:
         model = IdentificationQuestionnaire
         ordered = True
+        include_fk = True

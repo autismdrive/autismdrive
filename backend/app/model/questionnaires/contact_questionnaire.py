@@ -212,3 +212,4 @@ class ContactQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ContactQuestionnaire
         ordered = True
+        include_fk = True

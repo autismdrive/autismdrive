@@ -86,3 +86,4 @@ class EmploymentQuestionnaireSchema(ModelSchema):
     class Meta:
         model = EmploymentQuestionnaire
         ordered = True
+        include_fk = True

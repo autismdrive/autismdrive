@@ -127,3 +127,4 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
     class Meta:
         model = DevelopmentalQuestionnaire
         ordered = True
+        include_fk = True

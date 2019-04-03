@@ -221,3 +221,4 @@ class ProfessionalProfileQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ProfessionalProfileQuestionnaire
         ordered = True
+        include_fk = True

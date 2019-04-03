@@ -220,3 +220,4 @@ class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
     class Meta:
         model = ClinicalDiagnosesQuestionnaire
         ordered = True
+        include_fk = True
