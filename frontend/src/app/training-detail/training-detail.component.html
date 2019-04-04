@@ -1,79 +1,87 @@
 <div
   *ngIf="training"
-  class="mat-typography"
-  fxLayout="row"
-  fxLayoutGap="20px"
+  class="container"
   id="training"
 >
   <div
-    id="training-details"
-    fxFlex="60%"
-    fxLayout="column"
+    class="row"
+    fxLayout="row"
     fxLayoutGap="20px"
   >
-    <h1>{{training.title}}</h1>
-    <img
-      *ngIf="training.image"
-      [src]="training.image"
-    >
-    <caption *ngIf="training.image && training.imageCaption">{{training.imageCaption}}</caption>
-    <h2>About this training</h2>
-    <p>{{training.description}}</p>
     <div
+      id="training-details"
+      fxFlex="60%"
       fxLayout="column"
       fxLayoutGap="20px"
     >
-      <button
-        mat-flat-button
-        color="primary"
+      <h1>{{training.title}}</h1>
+      <img
+        *ngIf="training.image"
+        [src]="training.image"
       >
-        Begin module
-        <mat-icon>chevron_right</mat-icon>
-      </button>
+      <caption *ngIf="training.image && training.imageCaption">{{training.imageCaption}}</caption>
+      <h2>About this training</h2>
+      <p>{{training.description}}</p>
+      <div
+        fxLayout="column"
+        fxLayoutGap="20px"
+      >
+        <button
+          mat-flat-button
+          color="primary"
+        >
+          Begin module
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
     </div>
-  </div>
-  <div
-    id="training-meta"
-    fxFlex="40%"
-    fxLayout="column"
-    fxLayoutGap="20px"
-  >
-    <div id="training-categories">
-      <mat-chip-list>
-        <mat-chip *ngFor="let tc of training.training_categories">{{tc.category.name}}</mat-chip>
-      </mat-chip-list>
-    </div>
-    <div id="training-related">
-      <mat-card>
-        <mat-card-title>Related</mat-card-title>
-        <mat-card-content>
-          <h2>Resources</h2>
-          <mat-list>
-            <mat-list-item>
-              <a
-                matLine
-                href="/#/resource/1"
-              >Resource 1</a>
-              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium
-                doloremque laudantium, totam rem aperiam...</p>
-            </mat-list-item>
-          </mat-list>
+    <div
+      id="training-meta"
+      fxFlex="40%"
+      fxLayout="column"
+      fxLayoutGap="20px"
+    >
+      <div id="training-categories">
+        <mat-chip-list>
+          <mat-chip *ngFor="let tc of training.training_categories">{{tc.category.name}}</mat-chip>
+        </mat-chip-list>
+      </div>
+      <div id="training-related">
+        <mat-card>
+          <mat-card-title>Related</mat-card-title>
+          <mat-card-content>
+            <h2>Resources</h2>
+            <mat-list>
+              <mat-list-item>
+                <a
+                  matLine
+                  href="/#/resource/1"
+                >Resource 1</a>
+                <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium
+                  doloremque laudantium, totam rem aperiam...</p>
+              </mat-list-item>
+            </mat-list>
 
-          <h2>Research Studies</h2>
-          <mat-list>
-            <mat-list-item>
-              <a
-                matLine
-                href="/#/study/1"
-              >Study 1</a>
-              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium
-                doloremque laudantium, totam rem aperiam...</p>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
+            <h2>Research Studies</h2>
+            <mat-list>
+              <mat-list-item>
+                <a
+                  matLine
+                  href="/#/study/1"
+                >Study 1</a>
+                <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium
+                  doloremque laudantium, totam rem aperiam...</p>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
+
   </div>
-  <app-loading *ngIf="!training" message="Loading..."></app-loading>
+  <app-loading
+    *ngIf="!training"
+    message="Loading..."
+  ></app-loading>
