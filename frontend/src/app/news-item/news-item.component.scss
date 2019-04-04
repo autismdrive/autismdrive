@@ -1,15 +1,108 @@
 .news-item {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas: "leftCol rightCol";
+
+  @media screen and (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media screen and (min-width: 768px) {
+    grid-template-areas: "leftCol rightCol";
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .content {
+    position: relative;
+    display: grid;
+    align-content: center;
+
+    @media screen and (max-width: 767px) {
+      text-align: center;
+      padding: 2em;
+    }
+
+    @media screen and (min-width: 768px) {
+      padding: 0 4em 0 8em;
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('/assets/theme/starburst.svg');
+      background-position: top center;
+      background-repeat: no-repeat;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .item-type {
+      text-transform: uppercase;
+    }
+
+    h3 {
+      font-size: 2.25rem;
+
+      &:after {
+        content: '';
+        background-color: #e57200;
+        width: 6.25rem;
+        height: .125rem;
+        display: block;
+
+        @media screen and (max-width: 767px) {
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        @media screen and (min-width: 768px) {
+          margin: 0.45em 0;
+        }
+
+      }
+    }
+
+    p {
+      font-style: italic;
+      font-size: 1.125rem;
+      line-height: 1.666;
+    }
+  }
 
   &.even {
-    .image { grid-area: leftCol; }
-    .content { grid-area: rightCol; }
+    .image {
+      @media screen and (min-width: 768px) {
+        grid-area: leftCol;
+      }
+    }
+
+    .content {
+      @media screen and (min-width: 768px) {
+        grid-area: rightCol;
+      }
+
+      &:before {
+        left: -50%;
+      }
+    }
   }
 
   &.odd {
-    .image { grid-area: rightCol; }
-    .content { grid-area: leftCol; }
+    .image {
+      @media screen and (min-width: 768px) {
+        grid-area: rightCol;
+      }
+    }
+
+    .content {
+      @media screen and (min-width: 768px) {
+        grid-area: leftCol;
+      }
+
+      &:before {
+        right: -50%;
+      }
+    }
   }
 }

@@ -14,4 +14,7 @@ export class NewsItemComponent implements OnInit {
   ngOnInit() {
   }
 
+  isEven(i: number) {
+    return i % 2 === 0;
+  }
 }
