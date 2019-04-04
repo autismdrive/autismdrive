@@ -1,27 +1,33 @@
-<div class="enroll mat-typography">
-  <div>
-    <div
-      fxLayoutAlign="start end"
-      id="hero"
-      class="highlight"
-    >
-      <div
-        fxLayout="column"
-        fxLayoutGap="4%"
-      >
-        <h1 class="mat-display-2">JOIN THE AUTISM REGISTRY</h1>
-        <div fxFlex="60%">
-          <button
-            mat-button
-            (click)="goTerms($event)"
-          >
-            Get started now
-          </button>
-        </div>
-      </div>
+<div
+  id="hero"
+  class="gradient-overlay container"
+>
+  <div class="row">
+    <div class="border-box">
+      <p>Get individualized access to autism research opportunities and resources.</p>
     </div>
-    <p>Caption describing study and what participant is doing</p>
   </div>
+</div>
+<div
+  class="action"
+  fxLayout="column"
+  fxLayoutAlign="center center"
+>
+  <h1>Join the Autism Registry</h1>
+  <div id="cta">
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="goTerms($event)"
+      class="btn-lg"
+    >
+      Get started now
+    </button>
+  </div>
+</div>
+
+
+<div class="enroll mat-typography">
   <div
     fxLayout="row"
     fxLayout.xs="column"
@@ -35,31 +41,28 @@
         ignite discovery, improve systems of care, and equip communities with best practices
         to support people with autism across the lifespan. STAR brings together researchers,
         community partners, individuals with autism and their families to identify challenges
-        and co-develop innovative solutions. </p>
+        and co-develop innovative solutions.</p>
       <h2>AUTISM DRIVE</h2>
       <p>The AUTISM DRIVE (Data System for Research Integration, Visualization & Exchange)
         was developed as a dynamic system for secure collection and sharing of knowledge and
-        information.  The DRIVE helps researchers collaborate with the autism community to gain
+        information. The DRIVE helps researchers collaborate with the autism community to gain
         insights into autism and to develop meaningful solutions to challenges experienced by
-        individuals with autism and their families.  It also provides individualized online
+        individuals with autism and their families. It also provides individualized online
         access to training and resources for individuals with autism, their families, and the
         professionals who support them.</p>
       <h2>About the Autism Registry</h2>
       <p>The purpose of the Autism Registry is to connect individuals with autism and their
         families with research opportunities and resources in their own communities.
         By joining the Registry, we can share information with you that is tailored to your
-        needs and interests.  We can also match you with research opportunities that might
-        be a good fit for you and your family.  Your participation will help us learn more
-        about autism so we can create new solutions to achieve positive outcomes.  Register now!</p>
+        needs and interests. We can also match you with research opportunities that might
+        be a good fit for you and your family. Your participation will help us learn more
+        about autism so we can create new solutions to achieve positive outcomes. Register now!</p>
     </div>
-    <div
-      fxFlex="40%"
-    >
+    <div fxFlex="40%">
       <div
-        class="highlight"
+        class="gradient-overlay"
         id="feature"
       ></div>
-      <p>Caption describing study and what participant is doing</p>
     </div>
   </div>
   <div fxLayoutAlign="center center">

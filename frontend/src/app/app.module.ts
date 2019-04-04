@@ -83,6 +83,7 @@ import { TermsComponent } from './terms/terms.component';
 import { TimedoutComponent } from './timed-out/timed-out.component';
 import { TrainingDetailComponent } from './training-detail/training-detail.component';
 import { HeaderComponent } from './header/header.component';
+import { NewsItemComponent } from './news-item/news-item.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -150,6 +151,7 @@ export class FormlyConfig {
     TimedoutComponent,
     TrainingDetailComponent,
     HeaderComponent,
+    NewsItemComponent,
   ],
   imports: [
     BrowserAnimationsModule,

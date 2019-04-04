@@ -1,0 +1,15 @@
+.news-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "leftCol rightCol";
+
+  &.even {
+    .image { grid-area: leftCol; }
+    .content { grid-area: rightCol; }
+  }
+
+  &.odd {
+    .image { grid-area: rightCol; }
+    .content { grid-area: leftCol; }
+  }
+}
