@@ -103,6 +103,11 @@
         }
       }
 
+      a.selected:after {
+        background-color: mat-color($stardrive-accent, 500);
+        bottom: 0px;
+      }
+
       &:hover {
         background-color: white;
 
@@ -142,12 +147,13 @@
   width: 100%;
   background-color: mat-color($stardrive-primary, 500);
   color: white;
-  z-index: 99;
+  z-index: 97;
   padding: 1em;
   display: grid;
-  grid-gap: 1em;
+  grid-gap: 0.25em;
   grid-template-columns: 1fr;
   justify-content: stretch;
 
   .mat-button { text-align: left; }
+  app-search-box { text-align: center; }
 }

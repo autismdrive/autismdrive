@@ -5,7 +5,15 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { AfterViewInit, Component, HostBinding, Input, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { MediaMatcher } from '@angular/cdk/layout';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy
+} from '@angular/core';
+import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -17,8 +25,6 @@ import {
 } from 'rxjs/operators';
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
-import { Router } from '@angular/router';
-import { MediaMatcher } from '@angular/cdk/layout';
 
 enum VisibilityState {
   Visible = 'visible',
@@ -82,18 +88,17 @@ enum Direction {
   ]
 })
 export class HeaderComponent implements AfterViewInit, OnDestroy {
-  private isVisible = true;
+  private headerVisible = true;
   @Input() currentUser: User;
   menuVisible = false;
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
 
-  get toggle(): VisibilityState {
-    return this.isVisible ? VisibilityState.Visible : VisibilityState.Hidden;
+  get headerState(): VisibilityState {
+    return this.headerVisible ? VisibilityState.Visible : VisibilityState.Hidden;
   }
 
   get menuState(): VisibilityState {
-    console.log('this.menuVisible', this.menuVisible);
     return this.menuVisible ? VisibilityState.Visible : VisibilityState.Hidden;
   }
 
@@ -145,7 +150,13 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
       filter(direction => direction === Direction.Down)
     );
 
-    scrollUp$.subscribe(() => (this.isVisible = true));
-    scrollDown$.subscribe(() => (this.isVisible = false));
+    scrollUp$.subscribe(() => {
+      this.headerVisible = true;
+    });
+
+    scrollDown$.subscribe(() => {
+      this.headerVisible = false;
+      this.menuVisible = false;
+    });
   }
 }
