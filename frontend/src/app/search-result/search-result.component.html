@@ -1,4 +1,11 @@
-<div class="result-item mat-typography" *ngIf="hit">
+<div
+  *ngIf="hit"
+  [ngClass]="{
+  'result-item': true,
+  'mat-typography': true,
+  'featured-item': isFeatured
+}"
+>
   <div
     fxLayout="row"
     fxLayoutAlign="space-between"
@@ -7,8 +14,23 @@
       class="title mat-h2"
       href="/#/{{hit.type}}/{{hit.id}}"
     >{{hit.title}}</a>
-    <span class="type">{{hit.type}}</span>
+    <a mat-button
+        [routerLink]="[ '/search/filter' ]"
+        [queryParams]="{'Type': hit.type}"
+        class="type"
+      >{{hit.type}}</a>
   </div>
-  <markdown *ngIf="hit.highlights" class="highlights">{{hit.highlights}}</markdown>
-  <p *ngIf="!hit.highlights" class="description">{{hit.content}}</p>
+  <markdown
+    *ngIf="hit.highlights"
+    class="highlights"
+  >{{hit.highlights}}</markdown>
+  <p
+    *ngIf="!hit.highlights"
+    class="description"
+  >{{hit.content}}</p>
+  <a
+    *ngIf="isFeatured"
+    class="chevron-link"
+    href="/#/{{hit.type}}/{{hit.id}}"
+  >View {{hit.type}} Details</a>
 </div>

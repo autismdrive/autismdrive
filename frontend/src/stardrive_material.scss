@@ -104,9 +104,10 @@ $header-height: ($uva-header-height + $site-header-height);
     }
 
     // XS
-    @media (min-width: 576px) {
+    @media (max-width: 575px) {
       .row {
-        width: 90%;
+        padding-left: 2em;
+        padding-right: 2em;
       }
     }
 
@@ -114,6 +115,8 @@ $header-height: ($uva-header-height + $site-header-height);
     @media (min-width: 576px) {
       .row {
         width: 90%;
+        padding-left: 0;
+        padding-right: 0;
       }
     }
 

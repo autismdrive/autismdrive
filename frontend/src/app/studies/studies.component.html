@@ -18,7 +18,6 @@
       knowledge sharing.  Our research ranges from basic neuroscience to applied practice.
       The ultimate goal of this work is to empower individuals with autism, their families,
       and their communities to achieve positive outcomes and quality of life.</p>
-    <h2>Search Current Studies:</h2>
   </div>
 <div
   fxLayout="row"
@@ -33,9 +32,11 @@
     fxLayoutGap="40px"
     *ngIf="query && query.hits"
   >
+    <h1>Current Studies</h1>
     <app-search-result
       *ngFor="let hit of query.hits"
       [hit]="hit"
+      [isFeatured]="true"
     ></app-search-result>
   </div>
 </div>

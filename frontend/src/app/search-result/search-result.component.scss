@@ -5,6 +5,10 @@
 // Load the UVA Theme
 @include stardrive-theme($stardrive-theme);
 
+.result-item {
+  margin-top: 2em;
+}
+
 .title {
   margin: 0px;
 }
@@ -17,4 +21,30 @@
 
 ::ng-deep .highlights em {
   font-weight: 700;
+}
+
+
+.featured-item {
+  position: relative;
+
+  &:after {
+    content: '';
+    background-image: url('/assets/theme/orange-dotted-border-x.png');
+    background-repeat: repeat-x;
+    width: 100%;
+    height: 4px;
+    display: block;
+    position: absolute;
+    top: -2em;
+    left: 0;
+  }
+
+  .title {
+    color: mat-color($stardrive-primary, 500, 1);
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    line-height: 1;
+    font-size: 1.625rem;
+  }
 }
