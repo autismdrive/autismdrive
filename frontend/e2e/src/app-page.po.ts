@@ -5,8 +5,10 @@ import {
   ElementArrayFinder,
   ElementFinder,
   ExpectedConditions,
-  Key
+  Key,
+  WebDriver
 } from 'protractor';
+import { protractor } from 'protractor/built/ptor';
 
 export class AppPage {
 
@@ -126,9 +128,24 @@ export class AppPage {
   }
 
   tabThroughAllFields() {
-    this.getElements('formly-field').each(ff => {
-      browser.actions().sendKeys(Key.TAB);
-      expect(ff.isSelected()).toBeTruthy();
+    this.getElements('formly-field').each(async (ff) => {
+      console.log('\n\n\n\n*******************************************\n\n');
+      browser.actions().sendKeys(Key.TAB).perform();
+
+      browser.switchTo().activeElement().then(e => {
+        e.getAttribute('class').then(c => {
+          console.log('\n\nactiveElement.class:\n', c);
+        });
+      });
+
+      ff.getWebElement().then(e => {
+        e.getAttribute('class').then(c => {
+          console.log('\n\nexpectedElement.class:\n', c);
+        });
+      });
+
+      expect(ff.equals(browser.switchTo().activeElement())).toBeTruthy();
+      console.log('\n\n*******************************************\n\n\n\n');
     });
   }
 }

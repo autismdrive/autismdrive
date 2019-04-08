@@ -29,32 +29,32 @@ export class EnrollUseCases {
       link.click();
       this.page.waitForVisible('form');
       this.page.waitForAnimations();
-      expect(this.page.getElement('form h1').getText()).toEqual(link.getText());
+      expect(this.page.getElement('form h1').getText().then(s => s.toLowerCase())).toEqual(link.getText().then(s => s.toLowerCase()));
       expect(this.page.getElements('form mat-form-field').count()).toBeGreaterThan(0);
     });
   }
 
   cancelEditing() {
-    expect(this.page.getElement('#cancel-button').count()).toEqual(1);
+    expect(this.page.getElements('#cancel-button').count()).toEqual(1);
     this.page.clickAndExpectRoute('#cancel-button', '/profile');
   }
 
   displayInstructions() {
-    expect(this.page.getElement('app-flow-intro').count()).toEqual(1);
-    expect(this.page.getElement('#instructions').count()).toEqual(1);
-    expect(this.page.getElement('#next-button').count()).toEqual(1);
-    expect(this.page.getElement('[id*="_input_"]').count()).toEqual(0);
+    expect(this.page.getElements('app-flow-intro').count()).toEqual(1);
+    expect(this.page.getElements('#instructions').count()).toEqual(1);
+    expect(this.page.getElements('#next-button').count()).toEqual(1);
+    expect(this.page.getElements('[id*="_input_"]').count()).toEqual(0);
     this.page.clickElement('#next-button');
-    expect(this.page.getElement('[id*="_input_"]').count()).toBeGreaterThanOrEqual(1);
+    expect(this.page.getElements('[id*="_input_"]').count()).toBeGreaterThanOrEqual(1);
   }
 
   fillOutRequiredFields() {
-    expect(this.page.getElement('save-next-button[disabled]').count()).toEqual(1);
-    expect(this.page.getElement('.mat-form-field-required-marker').count()).toBeGreaterThanOrEqual(1);
+    expect(this.page.getElements('#save-next-button[disabled]').count()).toEqual(1);
+    expect(this.page.getElements('.mat-form-field-required-marker').count()).toBeGreaterThanOrEqual(1);
     this.page.tabThroughAllFields();
     expect(this.page.getElements('mat-error formly-validation-message').count()).toBeGreaterThan(0);
     this.page.getElements('input[aria-invalid="true"]').sendKeys(this.page.getRandomString(8));
-    expect(this.page.getElement('save-next-button[disabled]').count()).toEqual(0);
+    expect(this.page.getElements('#save-next-button[disabled]').count()).toEqual(0);
     expect(this.page.getElements('mat-error formly-validation-message').count()).toEqual(0);
   }
 }
