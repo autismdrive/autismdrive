@@ -1,16 +1,17 @@
 <div
   *ngIf="resource"
-  id="resource"
   class="container"
+  id="resource"
 >
   <div
     class="row"
     fxLayout="row"
+    fxLayout.lt-lg="column"
     fxLayoutGap="40px"
   >
     <div
       id="resource-details"
-      fxFlex="60%"
+      fxFlex.gt-md="60%"
       fxLayout="column"
       fxLayoutGap="40px"
     >
@@ -42,7 +43,7 @@
     </div>
     <div
       id="resource-meta"
-      fxFlex="40%"
+      fxFlex.gt-md="40%"
       fxLayout="column"
       fxLayoutGap="20px"
     >
@@ -78,27 +79,25 @@
         <mat-card>
           <mat-card-title>Related</mat-card-title>
           <mat-card-content>
-            <h2>Resources</h2>
             <mat-list>
+              <h3 mat-subheader>Resources</h3>
               <mat-list-item>
                 <a
-                  matLine
+                  mat-line
                   href="/#/resource/1"
                 >Resource 1</a>
-                <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                   accusantium
                   doloremque laudantium, totam rem aperiam...</p>
               </mat-list-item>
-            </mat-list>
 
-            <h2>Research Studies</h2>
-            <mat-list>
+              <h3 mat-subheader>Research Studies</h3>
               <mat-list-item>
                 <a
-                  matLine
+                  mat-line
                   href="/#/study/1"
                 >Study 1</a>
-                <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                   accusantium
                   doloremque laudantium, totam rem aperiam...</p>
               </mat-list-item>
