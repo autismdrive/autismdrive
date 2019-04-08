@@ -5,6 +5,10 @@
 // Load the STAR DRIVE Theme
 @include stardrive-theme($stardrive-theme);
 
+p.intro {
+  padding: 0 20px 0 20px;
+}
+
 .action {
   padding: 2em;
 
