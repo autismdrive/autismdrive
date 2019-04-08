@@ -51,17 +51,11 @@
           <mat-card-title>Status</mat-card-title>
           <mat-card-content>
             <mat-list>
-              <mat-list-item *ngIf="study.enrollment_start_date">
-                <a
-                  matLine
-                  [routerLink]="['/enroll']"
-                >{{study.enrollment_start_date}}</a>
-              </mat-list-item>
               <mat-list-item *ngIf="study.max_num_participants">
                 {{study.current_num_participants}} / {{study.max_num_participants}} participants enrolled
               </mat-list-item>
               <mat-list-item *ngIf="study.start_date && study.end_date">
-                Study runs from {{study.start_date}} to {{study.end_date}}
+                Study runs from {{study.start_date | date:'longDate'}} to {{study.end_date | date:'longDate'}}
               </mat-list-item>
             </mat-list>
           </mat-card-content>
