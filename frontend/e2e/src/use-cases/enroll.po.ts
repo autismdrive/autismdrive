@@ -28,7 +28,8 @@ export class EnrollUseCases {
     this.page.getElements('app-questionnaire-steps-list .step-link').each(link => {
       link.click();
       this.page.waitForVisible('form');
-      this.page.waitForAnimations();
+      this.page.waitForVisible('form h1');
+      // this.page.waitForAnimations();
       expect(this.page.getElement('form h1').getText().then(s => s.toLowerCase())).toEqual(link.getText().then(s => s.toLowerCase()));
       expect(this.page.getElements('form mat-form-field').count()).toBeGreaterThan(0);
     });
@@ -52,8 +53,8 @@ export class EnrollUseCases {
     expect(this.page.getElements('#save-next-button[disabled]').count()).toEqual(1);
     expect(this.page.getElements('.mat-form-field-required-marker').count()).toBeGreaterThanOrEqual(1);
     this.page.tabThroughAllFields();
-    expect(this.page.getElements('mat-error formly-validation-message').count()).toBeGreaterThan(0);
-    this.page.getElements('input[aria-invalid="true"]').sendKeys(this.page.getRandomString(8));
+    expect(this.page.getElements('.ng-invalid').count()).toBeGreaterThan(0);
+    this.page.fillOutInvalidFields();
     expect(this.page.getElements('#save-next-button[disabled]').count()).toEqual(0);
     expect(this.page.getElements('mat-error formly-validation-message').count()).toEqual(0);
   }
