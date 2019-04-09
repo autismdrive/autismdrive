@@ -20,6 +20,7 @@ export class AuthenticationService {
     const userDict = JSON.parse(localStorage.getItem('currentUser'));
     if (userDict) {
       this.currentUserSubject = new BehaviorSubject<User>(new User(userDict));
+      this.refresh();  // Make sure the api still considers the in-memory user as valid.
     } else {
       this.currentUserSubject = new BehaviorSubject<User>(null);
     }
