@@ -1,104 +1,104 @@
 <div
   *ngIf="study"
-  class="mat-typography"
-  fxLayout="row"
-  fxLayoutGap="20px"
+  class="container"
   id="study"
 >
   <div
-    id="study-details"
-    fxFlex="60%"
-    fxLayout="column"
-    fxLayoutGap="20px"
+    class="row"
+    fxLayout="row"
+    fxLayout.lt-lg="column"
+    fxLayoutGap="40px"
   >
-    <h1>{{study.title}}</h1>
-    <p>{{study.description}}</p>
-    <div *ngIf="study.researcher_description">
-      <h2>About the researchers</h2>
-      <p>{{study.researcher_description}}</p>
-    </div>
-    <div *ngIf="study.participant_description">
-      <h2>Who we're looking for</h2>
-      <p>{{study.participant_description}}</p>
-    </div>
-    <div *ngIf="study.outcomes">
-      <h2>Benefits of participating</h2>
-      <p>{{study.outcomes}}</p>
+    <div
+      id="study-details"
+      fxFlex.gt-md="60%"
+      fxLayout="column"
+      fxLayoutGap="40px"
+    >
+      <h1>{{study.title}}</h1>
+      <p>{{study.description}}</p>
+      <div *ngIf="study.researcher_description">
+        <h2>About the researchers</h2>
+        <p>{{study.researcher_description}}</p>
+      </div>
+      <div *ngIf="study.participant_description">
+        <h2>Who we're looking for</h2>
+        <p>{{study.participant_description}}</p>
+      </div>
+      <div *ngIf="study.outcomes">
+        <h2>Benefits of participating</h2>
+        <p>{{study.outcomes}}</p>
+      </div>
+      <div
+        fxLayout="column"
+        fxLayoutGap="20px"
+      >
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="goEnroll($event)"
+        >Enroll in this study</button>
+      </div>
     </div>
     <div
+      id="study-meta"
+      fxFlex.gt-md="40%"
       fxLayout="column"
       fxLayoutGap="20px"
     >
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="goEnroll($event)"
-      >Enroll in this study</button>
-    </div>
-  </div>
-  <div
-    id="study-meta"
-    fxFlex="40%"
-    fxLayout="column"
-    fxLayoutGap="20px"
-  >
-    <div id="study-contact">
-      <mat-card>
-        <mat-card-title>Status</mat-card-title>
-        <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngIf="study.enrollment_start_date">
-              <a
-                matLine
-                [routerLink]="['/enroll']"
-              >{{study.enrollment_start_date}}</a>
-            </mat-list-item>
-            <mat-list-item *ngIf="study.max_num_participants">
-              {{study.current_num_participants}} / {{study.max_num_participants}} participants enrolled
-            </mat-list-item>
-            <mat-list-item *ngIf="study.start_date && study.end_date">
-              Study runs from {{study.start_date}} to {{study.end_date}}
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div id="study-categories">
-      <mat-chip-list>
-        <mat-chip *ngFor="let sc of study.study_categories">{{sc.category.name}}</mat-chip>
-      </mat-chip-list>
-    </div>
-    <div id="study-related">
-      <mat-card>
-        <mat-card-title>Related</mat-card-title>
-        <mat-card-content>
-          <h2>Resources</h2>
-          <mat-list>
-            <mat-list-item>
-              <a
-                matLine
-                href="/#/resource/1"
-              >Resource 1</a>
-              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium
-                doloremque laudantium, totam rem aperiam...</p>
-            </mat-list-item>
-          </mat-list>
+      <div id="study-contact">
+        <mat-card>
+          <mat-card-title>Status</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngIf="study.max_num_participants">
+                {{study.current_num_participants}} / {{study.max_num_participants}} participants enrolled
+              </mat-list-item>
+              <mat-list-item *ngIf="study.start_date && study.end_date">
+                Study runs from {{study.start_date | date:'longDate'}} to {{study.end_date | date:'longDate'}}
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div id="study-categories">
+        <app-category-chips [categories]="study.study_categories"></app-category-chips>
+      </div>
+      <div id="study-related">
+        <mat-card>
+          <mat-card-title>Related</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <h3 mat-subheader>Resources</h3>
+              <mat-list-item>
+                <a
+                  mat-line
+                  href="/#/resource/1"
+                >Resource 1</a>
+                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium
+                  doloremque laudantium, totam rem aperiam...</p>
+              </mat-list-item>
 
-          <h2>Research Studies</h2>
-          <mat-list>
-            <mat-list-item>
-              <a
-                matLine
-                href="/#/study/1"
-              >Study 1</a>
-              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium
-                doloremque laudantium, totam rem aperiam...</p>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
+              <h3 mat-subheader>Research Studies</h3>
+              <mat-list-item>
+                <a
+                  mat-line
+                  href="/#/study/1"
+                >Study 1</a>
+                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium
+                  doloremque laudantium, totam rem aperiam...</p>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
   </div>
-  <app-loading *ngIf="!study" message="Loading..."></app-loading>
+</div>
+
+<app-loading
+  *ngIf="!study"
+  message="Loading..."
+></app-loading>

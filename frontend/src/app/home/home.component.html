@@ -1,17 +1,20 @@
-<div class="mat-typography">
-  <div
-    id="hero"
-    class="highlight"
-    fxLayoutAlign="start end"
-  >
-    <h1 class="mat-display-2">Driving discovery</h1>
+<div
+  id="hero"
+  class="gradient-overlay container"
+>
+  <div class="row">
+    <div class="border-box">
+      <h1>Driving discovery</h1>
+    </div>
   </div>
+</div>
+<div class="container mat-typography">
   <div
-    class="action"
+    class="row action"
     fxLayout="column"
     fxLayoutAlign="center center"
   >
-    <h3>Improving the lives of individuals with autism and their families through ground-breaking research and innovative models for care, support, and education.</h3>
+    <p class="intro">Improving the lives of individuals with autism and their families through ground-breaking research and innovative models for care, support, and education.</p>
     <div id="cta">
       <button
         mat-flat-button
@@ -32,40 +35,9 @@
     </div>
   </div>
   <div
-    class="news"
-    fxLayout.gt-md="row"
-    fxLayout.lt-md="column"
+    class="row news"
+    fxLayout="column"
   >
-    <mat-card
-      id="news1"
-      class="highlight"
-      fxLayout="column"
-      fxLayoutAlign="end start"
-      fxFlex="33%"
-    >
-      <h4>RESEARCH STUDY</h4>
-      <h2>New ABC study to explore XYZ in 2019</h2>
-    </mat-card>
-    <mat-card
-      id="news2"
-      class="highlight"
-      fxLayout="column"
-      fxLayoutAlign="end start"
-      fxFlex="33%"
-    >
-      <h4>COMMUNITY RESOURCE</h4>
-      <h2>Charlottesville support group for XYZ</h2>
-    </mat-card>
-    <mat-card
-      id="news3"
-      class="highlight"
-      fxLayout="column"
-      fxLayoutAlign="end start"
-      fxFlex="33%"
-    >
-      <h4>COMMUNITY RESOURCE</h4>
-      <h2>Charlottesville support group for XYZ</h2>
-    </mat-card>
+    <app-news-item *ngFor="let item of newsItems" [item]="item"></app-news-item>
   </div>
-
 </div>

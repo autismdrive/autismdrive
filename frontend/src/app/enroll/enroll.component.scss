@@ -7,23 +7,11 @@
 
 .enroll {
   margin: 1em;
-
-  button {
-    padding: 0 5%;
-    color: white;
-    background-color: #0d87e9;
-    font-size: larger;
-  }
 }
 
 #hero {
   background-image: url('/assets/enroll/hero.jpg');
   background-position: 50% 20%;
-
-  h1.mat-display-2 {
-    margin: 0px;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 1.0), 0 0 10px rgba(0, 0, 0, 0.5);
-  }
 }
 
 #feature {

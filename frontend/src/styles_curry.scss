@@ -2034,3 +2034,29 @@ div.more {
     margin: 2cm;
   }
 }
+
+.chevron-link {
+  font-size: 1.125rem;
+  line-height: 1;
+  display: block;
+  margin: 0.325em 0;
+  color: #002f6c;
+  text-decoration: none;
+  margin-bottom: 0;
+  font-family: "franklin-gothic-urw",sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+
+  &:before {
+    content: '';
+    width: 22px;
+    height: 22px;
+    background-image: url('/assets/theme/chevron-circle-right.svg');
+    display: inline-block;
+    background-repeat: no-repeat;
+    margin-right: .5rem;
+    vertical-align: middle;
+  }
+}

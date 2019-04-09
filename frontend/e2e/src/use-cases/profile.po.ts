@@ -85,7 +85,7 @@ export class ProfileUseCases {
   }
 
   async navigateToGuardianFlow() {
-    const btnEl = this.page.getElement('[id^=edit_enroll_self_guardian_');
+    const btnEl = this.page.getElement('[id^=edit_enroll_self_guardian_]');
     const btnId: string = await btnEl.getAttribute('id');
     const participantId = btnId.replace('edit_enroll_self_guardian_', '');
     this.page.clickAndExpectRoute(`#${btnId}`, `/flow/guardian_intake/${participantId}`);

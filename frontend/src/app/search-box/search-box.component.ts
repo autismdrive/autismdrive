@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { MatInput } from '@angular/material';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SearchService } from '../_services/api/search.service';
@@ -14,6 +14,7 @@ export class SearchBoxComponent implements OnInit {
   @ViewChild('searchInput', { read: MatInput }) public searchInput: MatInput;
   words = '';
   queryParams: Params;
+  @Input() variant: string;
 
   constructor(
     private route: ActivatedRoute,

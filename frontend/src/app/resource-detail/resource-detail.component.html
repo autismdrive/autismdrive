@@ -1,109 +1,115 @@
 <div
   *ngIf="resource"
-  class="mat-typography"
-  fxLayout="row"
-  fxLayoutGap="20px"
+  class="container"
   id="resource"
 >
   <div
-    id="resource-details"
-    fxFlex="60%"
-    fxLayout="column"
-    fxLayoutGap="20px"
+    class="row"
+    fxLayout="row"
+    fxLayout.lt-lg="column"
+    fxLayoutGap="40px"
   >
-    <h1>{{resource.title}}</h1>
-    <img
-      *ngIf="resource.image"
-      [src]="resource.image"
-    >
-    <caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>
-    <h2>About this resource</h2>
-    <p>{{resource.description}}</p>
     <div
+      id="resource-details"
+      fxFlex.gt-md="60%"
+      fxLayout="column"
+      fxLayoutGap="40px"
+    >
+      <h1>{{resource.title}}</h1>
+      <img
+        *ngIf="resource.image"
+        [src]="resource.image"
+      >
+      <caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>
+      <h2>About this resource</h2>
+      <p>{{resource.description}}</p>
+      <div
+        fxLayout="column"
+        fxLayoutGap="20px"
+      >
+        <button
+          *ngIf="resource.phone"
+          mat-flat-button
+          color="primary"
+          (click)="goPhone($event)"
+        >Call {{resource.phone}}</button>
+        <button
+          *ngIf="resource.website"
+          mat-stroked-button
+          color="primary"
+          (click)="goWebsite($event)"
+        >Visit website</button>
+      </div>
+    </div>
+    <div
+      id="resource-meta"
+      fxFlex.gt-md="40%"
       fxLayout="column"
       fxLayoutGap="20px"
     >
-      <button
-        *ngIf="resource.phone"
-        mat-flat-button
-        color="primary"
-        (click)="goPhone($event)"
-      >Call {{resource.phone}}</button>
-      <button
-        *ngIf="resource.website"
-        mat-stroked-button
-        color="primary"
-        (click)="goWebsite($event)"
-      >Visit website</button>
-    </div>
-  </div>
-  <div
-    id="resource-meta"
-    fxFlex="40%"
-    fxLayout="column"
-    fxLayoutGap="20px"
-  >
-    <div id="resource-contact">
-      <mat-card>
-        <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
-        <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngIf="resource.streetAddress1">
-              <mat-icon>address</mat-icon>
-              <address>
-                {{resource.streetAddress1}}
-                {{resource.streetAddress2}}
-                {{resource.city}}, {{resource.state}} {{resource.zip}}
-              </address>
-            </mat-list-item>
-            <mat-list-item *ngIf="resource.phone">
-              <mat-icon>phone</mat-icon>
-              <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
-            </mat-list-item>
-            <mat-list-item *ngIf="resource.website">
-              <mat-icon>link</mat-icon>
-              <a href="{{resource.website}}">{{resource.website}}</a>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div id="resource-categories">
-      <mat-chip-list>
-        <mat-chip *ngFor="let rc of resource.resource_categories">{{rc.category.name}}</mat-chip>
-      </mat-chip-list>
-    </div>
-    <div id="resource-related">
-      <mat-card>
-        <mat-card-title>Related</mat-card-title>
-        <mat-card-content>
-          <h2>Resources</h2>
-          <mat-list>
-            <mat-list-item>
-              <a
-                matLine
-                href="/#/resource/1"
-              >Resource 1</a>
-              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium
-                doloremque laudantium, totam rem aperiam...</p>
-            </mat-list-item>
-          </mat-list>
+      <div id="resource-contact">
+        <mat-card>
+          <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngIf="resource.streetAddress1">
+                <mat-icon>address</mat-icon>
+                <address>
+                  {{resource.streetAddress1}}
+                  {{resource.streetAddress2}}
+                  {{resource.city}}, {{resource.state}} {{resource.zip}}
+                </address>
+              </mat-list-item>
+              <mat-list-item *ngIf="resource.phone">
+                <mat-icon>phone</mat-icon>
+                <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
+              </mat-list-item>
+              <mat-list-item *ngIf="resource.website">
+                <mat-icon>link</mat-icon>
+                <a href="{{resource.website}}">{{resource.website}}</a>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div id="resource-categories">
+        <app-category-chips [categories]="resource.resource_categories"></app-category-chips>
+      </div>
+      <div id="resource-related">
+        <mat-card>
+          <mat-card-title>Related</mat-card-title>
+          <mat-card-content>
+            <mat-list>
+              <h3 mat-subheader>Resources</h3>
+              <mat-list-item>
+                <a
+                  mat-line
+                  href="/#/resource/1"
+                >Resource 1</a>
+                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium
+                  doloremque laudantium, totam rem aperiam...</p>
+              </mat-list-item>
 
-          <h2>Research Studies</h2>
-          <mat-list>
-            <mat-list-item>
-              <a
-                matLine
-                href="/#/study/1"
-              >Study 1</a>
-              <p matLine>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium
-                doloremque laudantium, totam rem aperiam...</p>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
+              <h3 mat-subheader>Research Studies</h3>
+              <mat-list-item>
+                <a
+                  mat-line
+                  href="/#/study/1"
+                >Study 1</a>
+                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium
+                  doloremque laudantium, totam rem aperiam...</p>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
   </div>
-  <app-loading *ngIf="!resource" message="Loading..."></app-loading>
+</div>
+
+<app-loading
+  *ngIf="!resource"
+  message="Loading..."
+></app-loading>

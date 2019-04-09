@@ -1,4 +1,5 @@
-#search-bar, #search-button {
+#search-bar,
+#search-button {
   display: inline-flex;
 
   &.hidden {
@@ -9,11 +10,33 @@
   }
 }
 
-::ng-deep #search-field .mat-form-field-infix {
-  padding-top: 6px;
-  padding-bottom: 6px;
-  border-top-width: 0px;
+::ng-deep #search-bar {
+  &.dark-bg {
+    .mat-form-field-appearance-outline .mat-form-field-outline {
+      color: white;
+    }
+
+    mat-form-field {
+      .mat-hint,
+      input,
+      ::placeholder,
+      .mat-form-field-label {
+        color: white;
+      }
+    }
+  }
+
+  .mat-form-field-wrapper {
+    padding: 6px 0px 0px 0px;
+  }
+
+  .mat-form-field-infix {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-top-width: 0px;
+  }
 }
+
 
 .ghost {
   opacity: 0;

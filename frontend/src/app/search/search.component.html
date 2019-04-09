@@ -94,6 +94,7 @@
           <app-search-result
             *ngFor="let hit of query.hits"
             [hit]="hit"
+            [isFeatured]="false"
           >
           </app-search-result>
           <mat-paginator

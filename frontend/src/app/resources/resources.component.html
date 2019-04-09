@@ -12,9 +12,11 @@
     fxLayoutGap="40px"
     *ngIf="query && query.hits"
   >
+    <h1>Training &amp; Resources</h1>
     <app-search-result
       *ngFor="let hit of query.hits"
       [hit]="hit"
+      [isFeatured]="true"
     ></app-search-result>
   </div>
 </div>
