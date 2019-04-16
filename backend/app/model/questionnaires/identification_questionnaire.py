@@ -209,7 +209,7 @@ class IdentificationQuestionnaire(db.Model):
                                 "self_participant": "Please answer the following questions about yourself (* indicates required response):",
                                 "self_guardian": "Please answer the following questions about yourself (* indicates required response):",
                                 "self_professional": "Please answer the following questions about yourself (* indicates required response):",
-                                "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information)",
+                                "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information",
                             }
                         }
                     },
