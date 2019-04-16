@@ -303,7 +303,7 @@ class TestCase(unittest.TestCase):
     def construct_current_behaviors_dependent_questionnaire(self, dependent_verbal_ability='fluent',
                                                             concerning_behaviors=['hoarding'],
                                                             has_academic_difficulties=True,
-                                                            academic_difficulty_areas=['math'],
+                                                            academic_difficulty_areas=['math', 'writing'],
                                                             participant=None, user=None):
 
         cb = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability=dependent_verbal_ability,
@@ -3466,9 +3466,11 @@ class TestCase(unittest.TestCase):
         self.assertEqual('user_id', ws['D1'].value)
         self.assertEqual('dependent_verbal_ability', ws['E1'].value)
         self.assertEqual('concerning_behaviors', ws['F1'].value)
+        self.assertEqual('hoarding, ', ws['F2'].value)
         self.assertEqual('concerning_behaviors_other', ws['G1'].value)
         self.assertEqual('has_academic_difficulties', ws['H1'].value)
         self.assertEqual('academic_difficulty_areas', ws['I1'].value)
+        self.assertEqual('math, writing, ', ws['I2'].value)
         self.assertEqual('academic_difficulty_other', ws['J1'].value)
         self.assertEqual(10, ws.max_column)
         self.assertEqual(2, ws.max_row)
