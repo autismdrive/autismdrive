@@ -84,7 +84,6 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 5,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "required": False,
                 "label": {
@@ -174,7 +173,6 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 10,
             "type": "radio",
-            "default": True,
             "template_options": {
                 "required": False,
                 "label": {

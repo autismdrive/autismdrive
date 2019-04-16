@@ -39,7 +39,6 @@ class HomeMixin(object):
             info={
                 "display_order": 4,
                 "type": "radio",
-                "default_value": False,
                 "template_options": {
                     "required": False,
                     "label": 'Financial Struggles',

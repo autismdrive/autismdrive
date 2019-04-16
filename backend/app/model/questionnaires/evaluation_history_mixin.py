@@ -29,7 +29,6 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 1,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": True,
                     "label": "Formal Diagnosis?",
@@ -51,7 +50,6 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 2,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": False,
                     "options": [
