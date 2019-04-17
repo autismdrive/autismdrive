@@ -223,7 +223,7 @@ class EvaluationHistoryMixin(object):
                 "expression_properties": {
                     "template_options.description": cls.gives_permission_to_link_evaluation_data_desc,
                 },
-                "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0))',
+                "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0) && !model.partner_centers_evaluation.includes("none"))',
             },
         )
 
