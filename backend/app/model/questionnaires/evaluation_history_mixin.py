@@ -72,12 +72,19 @@ class EvaluationHistoryMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "Age at Diagnosis",
+                    "type": 'number',
+                    "max": 130,
                 },
                 "expression_properties": {
                     "template_options.description": cls.years_old_at_first_diagnosis_label,
                     "template_options.required": 'model.has_autism_diagnosis'
                 },
                 "hide_expression": '!(model.has_autism_diagnosis)',
+                "validation": {
+                    "messages": {
+                        "max": 'Please enter age in years',
+                    }
+                }
             },
         )
 
