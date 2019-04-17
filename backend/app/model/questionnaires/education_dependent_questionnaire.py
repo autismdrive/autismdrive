@@ -38,6 +38,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                 "template_options.label": '"What is " + (formState.preferredName || "your child") + "\'s '
                                           'current grade/school placement?"',
             },
+            "hide_expression": '!(model.attends_school)',
         },
     )
 
