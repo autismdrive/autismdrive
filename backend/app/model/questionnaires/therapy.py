@@ -87,14 +87,6 @@ class Therapy(db.Model):
             "hide_expression": '!(model.type && (model.type === "other"))',
         },
     )
-    description = db.Column(
-        db.String,
-        info={
-            "display_order": 2,
-            "type": "textarea",
-            "template_options": {"label": "Description", "required": False},
-        },
-    )
     timeframe = db.Column(
         db.String,
         info={

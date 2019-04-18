@@ -237,10 +237,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_participant.relationship, participant.relationship)
         return db_participant
 
-    def construct_assistive_device(self, type='prosthetic', description='leg', timeframe='current',
+    def construct_assistive_device(self, type='prosthetic', timeframe='current',
                                    notes='I love my new leg!', supports_questionnaire=None):
 
-        ad = AssistiveDevice(type=type, description=description, timeframe=timeframe, notes=notes)
+        ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             ad.supports_questionnaire_id = supports_questionnaire.id
 
@@ -248,7 +248,7 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_ad = db.session.query(AssistiveDevice).filter_by(last_updated=ad.last_updated).first()
-        self.assertEqual(db_ad.description, ad.description)
+        self.assertEqual(db_ad.notes, ad.notes)
         return db_ad
 
     def construct_clinical_diagnoses_questionnaire(self, developmental=['speechLanguage'], mental_health=['ocd'],
@@ -708,10 +708,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_m.dosage, m.dosage)
         return db_m
 
-    def construct_therapy(self, type='behavioral', description='Discrete Trial Training', timeframe='current',
-                          notes='Small steps', supports_questionnaire=None):
+    def construct_therapy(self, type='behavioral', timeframe='current', notes='Small steps',
+                          supports_questionnaire=None):
 
-        t = Therapy(type=type, description=description, timeframe=timeframe, notes=notes)
+        t = Therapy(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             t.supports_questionnaire_id = supports_questionnaire.id
 
@@ -719,7 +719,7 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_t = db.session.query(Therapy).filter_by(last_updated=t.last_updated).first()
-        self.assertEqual(db_t.description, t.description)
+        self.assertEqual(db_t.notes, t.notes)
         return db_t
 
     def construct_supports_questionnaire(self, medications=None, therapies=None, assistive_devices=None,
@@ -3435,7 +3435,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(["math"], response[0]["academic_difficulty_areas"])
+        self.assertEqual(["math", "writing"], response[0]["academic_difficulty_areas"])
         self.assertEqual("fluent", response[0]["dependent_verbal_ability"])
         self.assertEqual(1, response[0]["id"])
 
