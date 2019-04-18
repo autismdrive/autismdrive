@@ -31,7 +31,11 @@ class Therapy(db.Model):
                     {"value": "physical", "label": "Physical Therapy"},
                     {
                         "value": "behavioral",
-                        "label": "Behavioral Therapy (ABA, Lovaas, Discrete Trial Training, Pivotal response training, early start Denver model, etc.)",
+                        "label": "Behavior Therapy (ABA, Lovaas, Discrete Trial Training)",
+                    },
+                    {
+                        "value": "natDevBehavioral",
+                        "label": "Naturalistic Developmental Behavioral (Pivotal Response Training, Early Start Denver Model, JASPER, etc)",
                     },
                     {
                         "value": "developmental",
