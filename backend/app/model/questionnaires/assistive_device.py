@@ -95,36 +95,6 @@ class AssistiveDevice(db.Model):
                         "group": "Computer software and hardware",
                     },
                     {
-                        "value": "autoPageTurn",
-                        "label": "Automatic page turners",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "bookHold",
-                        "label": "Book holders",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "reachExtend",
-                        "label": "Devices to extend reach",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "pencilGrip",
-                        "label": "Pencil grips",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "handleGrip",
-                        "label": "Specialized handles and grips",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "utensils",
-                        "label": "Utensils",
-                        "group": "Adaptive Tools",
-                    },
-                    {
                         "value": "adaptSwitch",
                         "label": "Adaptive switches",
                         "group": "ADA Building Modifications",
