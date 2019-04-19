@@ -8,6 +8,7 @@ from app.question_service import QuestionService
 from app.model.questionnaires.therapy import Therapy, TherapySchema
 from app.model.questionnaires.medication import Medication, MedicationSchema
 from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
+from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative, AlternativeAugmentativeSchema
 
 
 class SupportsQuestionnaire(db.Model):
@@ -40,6 +41,12 @@ class SupportsQuestionnaire(db.Model):
     )
     assistive_devices = db.relationship(
         "AssistiveDevice",
+        backref=db.backref("supports_questionnaire", lazy=True),
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
+    alternative_augmentative = db.relationship(
+        "AlternativeAugmentative",
         backref=db.backref("supports_questionnaire", lazy=True),
         cascade="all, delete-orphan",
         passive_deletes=True
@@ -97,9 +104,28 @@ class SupportsQuestionnaire(db.Model):
                 "expression_properties": {
                     "template_options.label": {
                             "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": '"Do you use an AAC (alternative & augmentative communication) system or other assistive device?"',
-                                "self_guardian": '"Do you use an AAC (alternative & augmentative communication) system or other assistive device?"',
-                                "dependent": '"Does " + (formState.preferredName || "your child")  + " use an AAC (alternative & augmentative communication) system or other assistive device?"',
+                                "self_participant": '"Do you use an assistive device?"',
+                                "self_guardian": '"Do you use an assistive device?"',
+                                "dependent": '"Does " + (formState.preferredName || "your child")  + " use an assistive device?"',
+                            }
+                        }
+                }
+            },
+            "alternative_augmentative": {
+                "type": "repeat",
+                "display_order": 3,
+                "wrappers": ["card"],
+                "repeat_class": AlternativeAugmentative,
+                "template_options": {
+                    "label": '',
+                    "description": "Add AAC",
+                },
+                "expression_properties": {
+                    "template_options.label": {
+                            "RELATIONSHIP_SPECIFIC": {
+                                "self_participant": '"Do you use an AAC (alternative & augmentative communication) system?"',
+                                "self_guardian": '"Do you use an AAC (alternative & augmentative communication) system?"',
+                                "dependent": '"Does " + (formState.preferredName || "your child")  + " use an AAC (alternative & augmentative communication) system?"',
                             }
                         }
                 }
@@ -112,6 +138,7 @@ class SupportsQuestionnaireSchema(ModelSchema):
     def set_field_session(self, data):
         self.fields['medications'].schema.session = self.session
         self.fields['therapies'].schema.session = self.session
+        self.fields['alternative_augmentative'].schema.session = self.session
         self.fields['assistive_devices'].schema.session = self.session
 
     class Meta:
@@ -121,3 +148,4 @@ class SupportsQuestionnaireSchema(ModelSchema):
     medications = fields.Nested(MedicationSchema, many=True)
     therapies = fields.Nested(TherapySchema, many=True)
     assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)
+    alternative_augmentative = fields.Nested(AlternativeAugmentativeSchema, many=True)
