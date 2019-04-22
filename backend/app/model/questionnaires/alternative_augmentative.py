@@ -1,6 +1,7 @@
 import datetime
 
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 from app import db
 
@@ -101,3 +102,13 @@ class AlternativeAugmentativeSchema(ModelSchema):
     class Meta:
         model = AlternativeAugmentative
         ordered = True
+        fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other", "timeframe", "notes",
+                  "participant_id", "user_id")
+    participant_id = fields.Method('get_participant_id')
+    user_id = fields.Method('get_user_id')
+
+    def get_participant_id(self, obj):
+        return obj.supports_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        return obj.supports_questionnaire.user_id
