@@ -11,7 +11,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __label__ = "Home"
 
     struggle_to_afford_desc = '"Do you or " + (formState.preferredName) + "\'s other caregivers ever struggle with being ' \
-                               'able to afford to pay for household needs, food, or security for the family?"'
+                              'able to afford to pay for household needs, food, or security for the family?"'
 
     dependent_living_situation = db.Column(
         db.ARRAY(db.String),
@@ -52,15 +52,16 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     def get_field_groups(self):
         field_groups = super().get_field_groups()
         field_groups["dependent_living"] = {
-                    "fields": ["dependent_living_situation", "dependent_living_other"],
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Current Living Situation"},
-                    "expression_properties": {
-                        "template_options.label": '"Where does " + formState.preferredName + " currently '
-                                                  'live (select all that apply)?"'
-                    },
-                }
+            "fields": ["dependent_living_situation", "dependent_living_other"],
+            "display_order": 2,
+            "wrappers": ["card"],
+            "template_options": {"label": "Current Living Situation"},
+            "expression_properties": {
+                "template_options.label": '"Where does " + formState.preferredName + " currently '
+                                          'live (select all that apply)?"'
+            }
+        }
+        field_groups["housemates"]["hide_expression"] = '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
         field_groups["housemates"]["expression_properties"] = {
             "template_options.label": '"Who else lives with " + formState.preferredName + "?"'
         }
