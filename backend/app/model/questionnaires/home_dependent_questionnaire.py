@@ -52,15 +52,17 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
     def get_field_groups(self):
         field_groups = super().get_field_groups()
         field_groups["dependent_living"] = {
-                    "fields": ["dependent_living_situation", "dependent_living_other"],
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Current Living Situation"},
-                    "expression_properties": {
-                        "template_options.label": '"Where does " + (formState.preferredName || "your child") + " currently '
-                                                  'live (select all that apply)?"'
-                    },
-                }
+            "fields": ["dependent_living_situation", "dependent_living_other"],
+            "display_order": 2,
+            "wrappers": ["card"],
+            "template_options": {"label": "Current Living Situation"},
+            "expression_properties": {
+                "template_options.label": '"Where does " + (formState.preferredName || "your child") + " currently '
+                                          'live (select all that apply)?"'
+            }
+        }
+        field_groups["housemates"]["hide_expression"] = '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
+
         field_groups["housemates"]["expression_properties"] = {
             "template_options.label": '"Who else lives with " + (formState.preferredName || "your child") + "?"'
         }
