@@ -238,7 +238,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_participant.relationship, participant.relationship)
         return db_participant
 
-    def construct_assistive_device(self, type='prosthetic', timeframe='current',
+    def construct_assistive_device(self, type_group='mobility', type='prosthetic', timeframe='current',
                                    notes='I love my new leg!', supports_questionnaire=None):
 
         ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
@@ -250,6 +250,8 @@ class TestCase(unittest.TestCase):
 
         db_ad = db.session.query(AssistiveDevice).filter_by(last_updated=ad.last_updated).first()
         self.assertEqual(db_ad.notes, ad.notes)
+        self.assertEqual(db_ad.type_group, ad.type_group)
+        self.assertEqual(db_ad.type, ad.type)
         return db_ad
 
     def construct_alternative_augmentative(self, type='lowTechAAC', timeframe='current', notes='We use pen and paper', supports_questionnaire=None):
@@ -3131,7 +3133,7 @@ class TestCase(unittest.TestCase):
         self.construct_medication(name='Iocane Powder', supports_questionnaire=sq)
         self.construct_therapy(type='socialSkills', supports_questionnaire=sq)
         self.construct_alternative_augmentative(type='highTechAAC', supports_questionnaire=sq)
-        self.construct_assistive_device(type='scooter', supports_questionnaire=sq)
+        self.construct_assistive_device(type_group='hearing', type='hearingAid', notes='Your ears you keep and I\'ll tell you why.', supports_questionnaire=sq)
         rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id, content_type="application/json",
                           headers=self.logged_in_headers())
         self.assertSuccess(rv)
