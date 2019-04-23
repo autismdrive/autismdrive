@@ -73,7 +73,9 @@ class DataExport:
                     if isinstance(item[key], list):
                         list_string = ''
                         for value in item[key]:
-                            list_string + str(value) + ', '
+                            list_string = list_string + str(value) + ', '
+                        worksheet.write(row, col, list_string)
+                        col += 1
                     else:
                         worksheet.write(row, col, item[key])
                         col += 1

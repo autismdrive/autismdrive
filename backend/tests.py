@@ -31,6 +31,7 @@ from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
 from app.model.questionnaires.assistive_device import AssistiveDevice
+from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -237,10 +238,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_participant.relationship, participant.relationship)
         return db_participant
 
-    def construct_assistive_device(self, type='prosthetic', description='leg', timeframe='current',
+    def construct_assistive_device(self, type_group='mobility', type='prosthetic', timeframe='current',
                                    notes='I love my new leg!', supports_questionnaire=None):
 
-        ad = AssistiveDevice(type=type, description=description, timeframe=timeframe, notes=notes)
+        ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             ad.supports_questionnaire_id = supports_questionnaire.id
 
@@ -248,8 +249,23 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_ad = db.session.query(AssistiveDevice).filter_by(last_updated=ad.last_updated).first()
-        self.assertEqual(db_ad.description, ad.description)
+        self.assertEqual(db_ad.notes, ad.notes)
+        self.assertEqual(db_ad.type_group, ad.type_group)
+        self.assertEqual(db_ad.type, ad.type)
         return db_ad
+
+    def construct_alternative_augmentative(self, type='lowTechAAC', timeframe='current', notes='We use pen and paper', supports_questionnaire=None):
+
+        aac = AlternativeAugmentative(type=type, timeframe=timeframe, notes=notes)
+        if supports_questionnaire is not None:
+            aac.supports_questionnaire_id = supports_questionnaire.id
+
+        db.session.add(aac)
+        db.session.commit()
+
+        db_aac = db.session.query(AlternativeAugmentative).filter_by(last_updated=aac.last_updated).first()
+        self.assertEqual(db_aac.notes, aac.notes)
+        return db_aac
 
     def construct_clinical_diagnoses_questionnaire(self, developmental=['speechLanguage'], mental_health=['ocd'],
                                                    medical=['insomnia'], genetic=['corneliaDeLange'], participant=None,
@@ -303,7 +319,7 @@ class TestCase(unittest.TestCase):
     def construct_current_behaviors_dependent_questionnaire(self, dependent_verbal_ability='fluent',
                                                             concerning_behaviors=['hoarding'],
                                                             has_academic_difficulties=True,
-                                                            academic_difficulty_areas=['math'],
+                                                            academic_difficulty_areas=['math', 'writing'],
                                                             participant=None, user=None):
 
         cb = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability=dependent_verbal_ability,
@@ -708,10 +724,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_m.dosage, m.dosage)
         return db_m
 
-    def construct_therapy(self, type='behavioral', description='Discrete Trial Training', timeframe='current',
-                          notes='Small steps', supports_questionnaire=None):
+    def construct_therapy(self, type='behavioral', timeframe='current', notes='Small steps',
+                          supports_questionnaire=None):
 
-        t = Therapy(type=type, description=description, timeframe=timeframe, notes=notes)
+        t = Therapy(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             t.supports_questionnaire_id = supports_questionnaire.id
 
@@ -719,11 +735,11 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_t = db.session.query(Therapy).filter_by(last_updated=t.last_updated).first()
-        self.assertEqual(db_t.description, t.description)
+        self.assertEqual(db_t.notes, t.notes)
         return db_t
 
     def construct_supports_questionnaire(self, medications=None, therapies=None, assistive_devices=None,
-                                         participant=None, user=None):
+                                         alternative_augmentative=None, participant=None, user=None):
 
         sq = SupportsQuestionnaire()
         if user is None:
@@ -745,6 +761,11 @@ class TestCase(unittest.TestCase):
             self.construct_assistive_device(supports_questionnaire=sq)
         else:
             sq.assistive_devices = assistive_devices
+
+        if alternative_augmentative is None:
+            self.construct_alternative_augmentative(supports_questionnaire=sq)
+        else:
+            sq.alternative_augmentative = alternative_augmentative
 
         if medications is None:
             self.construct_medication(supports_questionnaire=sq)
@@ -3111,13 +3132,15 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         self.construct_medication(name='Iocane Powder', supports_questionnaire=sq)
         self.construct_therapy(type='socialSkills', supports_questionnaire=sq)
-        self.construct_assistive_device(type='scooter', supports_questionnaire=sq)
+        self.construct_alternative_augmentative(type='highTechAAC', supports_questionnaire=sq)
+        self.construct_assistive_device(type_group='hearing', type='hearingAid', notes='Your ears you keep and I\'ll tell you why.', supports_questionnaire=sq)
         rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id, content_type="application/json",
                           headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(len(response['medications']), 2)
         self.assertEqual(len(response['therapies']), 2)
+        self.assertEqual(len(response['alternative_augmentative']), 2)
         self.assertEqual(len(response['assistive_devices']), 2)
         self.assertNotEqual(orig_date, response['last_updated'])
 
@@ -3409,11 +3432,11 @@ class TestCase(unittest.TestCase):
                           content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("assistive_device", response[0])
-        self.assertEqual("education_dependent_questionnaire", response[7])
-        self.assertEqual("home_self_questionnaire", response[13])
-        self.assertEqual("therapy", response[19])
-        self.assertEqual(20, len(response))
+        self.assertEqual("assistive_device", response[1])
+        self.assertEqual("education_dependent_questionnaire", response[8])
+        self.assertEqual("home_self_questionnaire", response[14])
+        self.assertEqual("therapy", response[20])
+        self.assertEqual(21, len(response))
 
     def test_questionnaire_list_meta_basics(self):
         self.construct_education_self_questionnaire()
@@ -3435,7 +3458,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(["math"], response[0]["academic_difficulty_areas"])
+        self.assertEqual(["math", "writing"], response[0]["academic_difficulty_areas"])
         self.assertEqual("fluent", response[0]["dependent_verbal_ability"])
         self.assertEqual(1, response[0]["id"])
 
@@ -3466,9 +3489,11 @@ class TestCase(unittest.TestCase):
         self.assertEqual('user_id', ws['D1'].value)
         self.assertEqual('dependent_verbal_ability', ws['E1'].value)
         self.assertEqual('concerning_behaviors', ws['F1'].value)
+        self.assertEqual('hoarding, ', ws['F2'].value)
         self.assertEqual('concerning_behaviors_other', ws['G1'].value)
         self.assertEqual('has_academic_difficulties', ws['H1'].value)
         self.assertEqual('academic_difficulty_areas', ws['I1'].value)
+        self.assertEqual('math, writing, ', ws['I2'].value)
         self.assertEqual('academic_difficulty_other', ws['J1'].value)
         self.assertEqual(10, ws.max_column)
         self.assertEqual(2, ws.max_row)
@@ -3483,24 +3508,25 @@ class TestCase(unittest.TestCase):
         ws = wb.get_active_sheet()
         self.assertEqual(ws, wb.active)
         self.assertEqual(2, ws.max_row)
-        self.assertEqual(20, len(wb.worksheets))
-        self.assertEqual('assistive_device', wb.worksheets[0].title)
-        self.assertEqual('clinical_diagnoses_questionnai', wb.worksheets[1].title)
-        self.assertEqual('contact_questionnaire', wb.worksheets[2].title)
-        self.assertEqual('current_behaviors_dependent_qu', wb.worksheets[3].title)
-        self.assertEqual('current_behaviors_self_questio', wb.worksheets[4].title)
-        self.assertEqual('demographics_questionnaire', wb.worksheets[5].title)
-        self.assertEqual('developmental_questionnaire', wb.worksheets[6].title)
-        self.assertEqual('education_dependent_questionna', wb.worksheets[7].title)
-        self.assertEqual('education_self_questionnaire', wb.worksheets[8].title)
-        self.assertEqual('employment_questionnaire', wb.worksheets[9].title)
-        self.assertEqual('evaluation_history_dependent_q', wb.worksheets[10].title)
-        self.assertEqual('evaluation_history_self_questi', wb.worksheets[11].title)
-        self.assertEqual('home_dependent_questionnaire', wb.worksheets[12].title)
-        self.assertEqual('home_self_questionnaire', wb.worksheets[13].title)
-        self.assertEqual('housemate', wb.worksheets[14].title)
-        self.assertEqual('identification_questionnaire', wb.worksheets[15].title)
-        self.assertEqual('medication', wb.worksheets[16].title)
-        self.assertEqual('professional_profile_questionn', wb.worksheets[17].title)
-        self.assertEqual('supports_questionnaire', wb.worksheets[18].title)
-        self.assertEqual('therapy', wb.worksheets[19].title)
+        self.assertEqual(21, len(wb.worksheets))
+        self.assertEqual('alternative_augmentative', wb.worksheets[0].title)
+        self.assertEqual('assistive_device', wb.worksheets[1].title)
+        self.assertEqual('clinical_diagnoses_questionnai', wb.worksheets[2].title)
+        self.assertEqual('contact_questionnaire', wb.worksheets[3].title)
+        self.assertEqual('current_behaviors_dependent_qu', wb.worksheets[4].title)
+        self.assertEqual('current_behaviors_self_questio', wb.worksheets[5].title)
+        self.assertEqual('demographics_questionnaire', wb.worksheets[6].title)
+        self.assertEqual('developmental_questionnaire', wb.worksheets[7].title)
+        self.assertEqual('education_dependent_questionna', wb.worksheets[8].title)
+        self.assertEqual('education_self_questionnaire', wb.worksheets[9].title)
+        self.assertEqual('employment_questionnaire', wb.worksheets[10].title)
+        self.assertEqual('evaluation_history_dependent_q', wb.worksheets[11].title)
+        self.assertEqual('evaluation_history_self_questi', wb.worksheets[12].title)
+        self.assertEqual('home_dependent_questionnaire', wb.worksheets[13].title)
+        self.assertEqual('home_self_questionnaire', wb.worksheets[14].title)
+        self.assertEqual('housemate', wb.worksheets[15].title)
+        self.assertEqual('identification_questionnaire', wb.worksheets[16].title)
+        self.assertEqual('medication', wb.worksheets[17].title)
+        self.assertEqual('professional_profile_questionn', wb.worksheets[18].title)
+        self.assertEqual('supports_questionnaire', wb.worksheets[19].title)
+        self.assertEqual('therapy', wb.worksheets[20].title)

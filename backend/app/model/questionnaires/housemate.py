@@ -96,7 +96,6 @@ class Housemate(db.Model):
         info={
             "display_order": 3.5,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "label": "Does this relation have autism?",
                 "required": False,

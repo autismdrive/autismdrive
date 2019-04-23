@@ -2,6 +2,7 @@ from app.model.category import Category
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.participant import Participant
+from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.assistive_device import AssistiveDevice
 from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.medication import Medication
@@ -268,6 +269,13 @@ class DataLoader:
             SupportsQuestionnaire).count())
         db.session.commit()
 
+    def load_alternative_augmentative(self):
+        aac = AlternativeAugmentative()
+        db.session.add(aac)
+        print("AAC loaded.  There is now %i AAC record in the database." % db.session.query(
+            AlternativeAugmentative).count())
+        db.session.commit()
+
     def load_assistive_devices(self):
         ad = AssistiveDevice()
         db.session.add(ad)
@@ -340,6 +348,7 @@ class DataLoader:
         db.session.query(IdentificationQuestionnaire).delete()
         db.session.query(ProfessionalProfileQuestionnaire).delete()
         db.session.query(Medication).delete()
+        db.session.query(AlternativeAugmentative).delete()
         db.session.query(AssistiveDevice).delete()
         db.session.query(Therapy).delete()
         db.session.query(SupportsQuestionnaire).delete()

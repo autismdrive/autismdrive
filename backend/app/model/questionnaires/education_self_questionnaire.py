@@ -30,6 +30,7 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
                     {"value": "schoolOther", "label": "Other"},
                 ],
             },
+            "hide_expression": '!(model.attends_school)',
         },
     )
 

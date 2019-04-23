@@ -113,7 +113,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         console.log('Processing index :' + index);
         index++;
         while (index !== this.activeStep) {
-          if (this.flow.steps[index].status !== StepStatus.COMPLETE) {
+          if (this.flow.steps[index] && this.flow.steps[index].status !== StepStatus.COMPLETE) {
             this.activeStep = index;
             break;
           }

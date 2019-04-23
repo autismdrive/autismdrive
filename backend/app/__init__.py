@@ -93,6 +93,7 @@ def _load_data(data_loader):
     data_loader.load_identification_questionnaire()
     data_loader.load_professional_profile_questionnaire()
     data_loader.load_supports_questionnaire()
+    data_loader.load_alternative_augmentative()
     data_loader.load_assistive_devices()
     data_loader.load_housemate()
     data_loader.load_medication()

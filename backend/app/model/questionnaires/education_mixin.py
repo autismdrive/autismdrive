@@ -38,7 +38,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.attends_school_desc,
+                    "template_options.label": cls.attends_school_desc,
                 },
             },
         )
@@ -52,6 +52,7 @@ class EducationMixin(object):
                 "label": "Name of the school or program",
                 "required": False,
             },
+            "hide_expression": '!(model.attends_school)',
         },
     )
 
@@ -72,8 +73,9 @@ class EducationMixin(object):
                     ]
                 },
                 "expression_properties": {
-                    "template_options.description": cls.school_type_desc,
+                    "template_options.label": cls.school_type_desc,
                 },
+                "hide_expression": '!(model.attends_school)',
             },
         )
 
@@ -134,8 +136,9 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.school_services_desc,
+                    "template_options.label": cls.school_services_desc,
                 },
+                "hide_expression": '!(model.attends_school)',
             },
         )
 
@@ -158,11 +161,13 @@ class EducationMixin(object):
                 "display_order": 4,
                 "wrappers": ["card"],
                 "template_options": {"label": "Placement"},
+                "hide_expression": '!(model.attends_school)',
             },
             "school_services_group": {
                 "fields": ["school_services", "school_services_other"],
                 "display_order": 6,
                 "wrappers": ["card"],
                 "template_options": {"label": "School Services"},
+                "hide_expression": '!(model.attends_school)',
             },
         }
