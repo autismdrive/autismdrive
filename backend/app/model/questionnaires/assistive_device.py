@@ -179,7 +179,6 @@ class AssistiveDevice(db.Model):
         info={
             "display_order": 3,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "label": "",
                 "required": False,
