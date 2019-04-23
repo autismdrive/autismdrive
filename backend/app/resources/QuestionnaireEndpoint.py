@@ -116,7 +116,18 @@ class QuestionnaireNamesEndpoint(flask_restful.Resource):
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):
 
+    @staticmethod
+    def request_wants_json():
+        best = request.accept_mimetypes \
+            .best_match(['application/json', 'text/html'])
+        return best == 'application/json' and \
+               request.accept_mimetypes[best] > \
+               request.accept_mimetypes['text/html']
+
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
-        return DataExport.export(name=name)
+        if self.request_wants_json():
+            return DataExport.export_json(name=name)
+        else:
+            return DataExport.export_xls(name=name)

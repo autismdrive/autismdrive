@@ -138,6 +138,7 @@ endpoints = [
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
     # Participants
+    (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
     # Questionnaires
     (QuestionnaireNamesEndpoint, "/q"),

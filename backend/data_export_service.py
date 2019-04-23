@@ -30,7 +30,14 @@ def get_questionnaire_names():
 
 
 class DataExport:
-    def export(name):
+
+    @staticmethod
+    def export_json(name):
+        # Some data we want to write to the worksheet.
+        return get_questionnaire(name=name)
+
+    @staticmethod
+    def export_xls(name):
         # Flask response
         response = Response()
         response.status_code = 200
