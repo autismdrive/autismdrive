@@ -13,13 +13,12 @@ import base64
 import quopri
 import random
 import string
-import datetime
 import unittest
 import openpyxl
 import io
 from app import db, app, elastic_index
 from app.model.user import User, Role
-from app.model.study import Study
+from app.model.study import Study, Status
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
 from app.model.resource import StarResource
@@ -151,17 +150,13 @@ class TestCase(unittest.TestCase):
         return db_resource
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
-                        researcher_description="Fantastic people work on this fantastic study. You should be impressed",
+                        pi_description="Fantastic people work on this fantastic study. You should be impressed",
                         participant_description="Even your pet hamster could benefit from participating in this study",
-                        outcomes_description="You can expect to have your own rainbow following you around after participating",
-                        enrollment_start_date=datetime.date(2019, 1, 20), current_num_participants="54",
-                        max_num_participants="5000",
-                        start_date=datetime.date(2019, 2, 1), end_date=datetime.date(2019, 3, 31)):
+                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
 
-        study = Study(title=title, description=description, researcher_description=researcher_description,
-                      participant_description=participant_description, outcomes_description=outcomes_description,
-                      enrollment_start_date=enrollment_start_date, current_num_participants=current_num_participants,
-                      max_num_participants=max_num_participants, start_date=start_date, end_date=end_date)
+        study = Study(title=title, description=description, pi_description=pi_description,
+                      participant_description=participant_description, benefit_description=benefit_description,
+                      status=Status.currently_enrolling)
         study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()
@@ -886,8 +881,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
-        response['outcomes_description'] = 'Better fluids for you and your car, Duh.'
-        response['max_num_participants'] = '2'
+        response['benefit_description'] = 'Better fluids for you and your car, Duh.'
         orig_date = response['last_updated']
         rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -897,8 +891,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
-        self.assertEqual(response['outcomes_description'], 'Better fluids for you and your car, Duh.')
-        self.assertEqual(response['max_num_participants'], 2)
+        self.assertEqual(response['benefit_description'], 'Better fluids for you and your car, Duh.')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_study(self):
@@ -914,13 +907,13 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_study(self):
-        study = {'title': "Study of Studies", 'outcomes_description': "This study will change your life."}
+        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life."}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Study of Studies')
-        self.assertEqual(response['outcomes_description'], 'This study will change your life.')
+        self.assertEqual(response['benefit_description'], 'This study will change your life.')
         self.assertIsNotNone(response['id'])
 
     def test_training_basics(self):

@@ -11,7 +11,7 @@ from app.model.participant import Participant, Relationship
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search
-from app.model.study import Study
+from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
@@ -191,12 +191,12 @@ class ResourceCategorySchema(ModelSchema):
 class StudySchema(ModelSchema):
     class Meta:
         model = Study
-        fields = ('id', 'title', 'last_updated', 'description', 'researcher_description', 'participant_description',
-                  'outcomes_description', 'enrollment_start_date', 'enrollment_end_date', 'current_num_participants',
-                  'max_num_participants', 'start_date', 'end_date', 'website', 'organization_id', 'organization',
-                  'study_categories', '_links')
+        fields = ('id', 'title', 'last_updated', 'description', 'participant_description', 'benefit_description',
+                  'principal_investigator', 'pi_description', 'pi_bio_link', 'organization_id', 'organization',
+                  'location', 'status', 'study_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
+    status = EnumField(Status)
     study_categories = fields.Nested(CategoriesOnStudySchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyendpoint', id='<id>'),
