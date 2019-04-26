@@ -26,9 +26,7 @@ class Study(db.Model):
     description = db.Column(db.String)
     participant_description = db.Column(db.String)
     benefit_description = db.Column(db.String)
-    principal_investigator = db.Column(db.String)
-    pi_description = db.Column(db.String)
-    pi_bio_link = db.Column(db.String)
+    investigators = db.relationship("StudyInvestigator", back_populates="study")
     organization_id = db.Column('organization_id', db.Integer,
                                 db.ForeignKey('organization.id'))
     location = db.Column(db.String)
@@ -39,6 +37,4 @@ class Study(db.Model):
         return ' '.join(filter(None, (self.description,
                                       self.participant_description,
                                       self.benefit_description,
-                                      self.principal_investigator,
-                                      self.pi_description,
                                       self.location)))

@@ -1,5 +1,6 @@
 from app.model.category import Category
 from app.model.email_log import EmailLog
+from app.model.investigator import Investigator
 from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
@@ -10,8 +11,9 @@ from app.model.questionnaires.therapy import Therapy
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
-from app.model.study import Study
+from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
+from app.model.study_investigator import StudyInvestigator
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User
@@ -93,22 +95,34 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[12]) if row[12] else None
-                study = Study(id=row[0], title=row[1], description=row[2], researcher_description=row[3],
-                              participant_description=row[4], outcomes_description=row[5], enrollment_start_date=row[6],
-                              enrollment_end_date=row[7], current_num_participants=row[8], max_num_participants=row[9],
-                              start_date=row[10], end_date=row[11], organization=org)
+                org = self.get_org_by_name(row[4]) if row[4] else None
+                study = Study(title=row[0], description=row[1], participant_description=row[2],
+                              benefit_description=row[3], organization=org, location=row[5], status=Status.currently_enrolling)
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(13, 17):
+                for i in range(7, 10):
                     if not row[i]: continue
                     category = self.get_category_by_name(row[i])
-                    study_id = eval(row[0])
+                    study_id = study.id
                     category_id = category.id
 
                     study_category = StudyCategory(study_id=study_id, category_id=category_id)
                     db.session.add(study_category)
+                if row[10]:
+                    investigator = Investigator(name=row[10], title=row[11],
+                                                organization_id=self.get_org_by_name(row[12]).id, bio_link=row[13])
+                    db.session.add(investigator)
+                    db.session.commit()
+                    study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
+                    db.session.add(study_investigator)
+                if row[14]:
+                    investigator = Investigator(name=row[14], title=row[15],
+                                                organization_id=self.get_org_by_name(row[16]).id, bio_link=row[17])
+                    db.session.add(investigator)
+                    db.session.commit()
+                    study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
+                    db.session.add(study_investigator)
             print("Studies loaded.  There are now %i studies in the database." % db.session.query(
                 Study).count())
             print("There are now %i links between studies and categories in the database." %
@@ -355,9 +369,11 @@ class DataLoader:
         db.session.query(StepLog).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
+        db.session.query(StudyInvestigator).delete()
         db.session.query(TrainingCategory).delete()
         db.session.query(Category).delete()
         db.session.query(EmailLog).delete()
+        db.session.query(Investigator).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()

@@ -15,3 +15,5 @@ class Organization(db.Model):
         'Study', backref=db.backref('organization', lazy=True))
     trainings = db.relationship(
         'Training', backref=db.backref('organization', lazy=True))
+    investigators = db.relationship(
+        'Investigator', backref=db.backref('organization', lazy=True))

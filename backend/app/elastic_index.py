@@ -100,9 +100,7 @@ class ElasticIndex:
 
         doc.meta.id = self._get_id(document)
 
-        if doc.type is 'study':
-            doc.website = document.pi_bio_link
-        else:
+        if doc.type is not 'study':
             doc.website = document.website
 
         if document.organization is not None:
