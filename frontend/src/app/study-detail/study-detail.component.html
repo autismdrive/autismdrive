@@ -31,6 +31,10 @@
           <p><a target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>, {{si.investigator.title}}, {{si.investigator.organization.name}}</p>
         </div>
       </div>
+      <div *ngIf="study.location">
+        <h2>Where does this study take place?</h2>
+        <p>{{study.location}}</p>
+      </div>
       <div
         fxLayout="column"
         fxLayoutGap="20px"
