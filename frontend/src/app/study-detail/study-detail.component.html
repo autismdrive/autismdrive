@@ -17,17 +17,19 @@
     >
       <h1>{{study.title}}</h1>
       <p>{{study.description}}</p>
-      <div *ngIf="study.researcher_description">
-        <h2>About the researchers</h2>
-        <p>{{study.researcher_description}}</p>
-      </div>
       <div *ngIf="study.participant_description">
         <h2>Who we're looking for</h2>
         <p>{{study.participant_description}}</p>
       </div>
-      <div *ngIf="study.outcomes">
+      <div *ngIf="study.benefit_description">
         <h2>Benefits of participating</h2>
-        <p>{{study.outcomes}}</p>
+        <p>{{study.benefit_description}}</p>
+      </div>
+      <div *ngIf="study.study_investigators">
+        <h2>About the researchers</h2>
+        <div *ngFor="let si of study.study_investigators">
+          <p><a target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>, {{si.investigator.title}}, {{si.investigator.organization.name}}</p>
+        </div>
       </div>
       <div
         fxLayout="column"
@@ -36,7 +38,7 @@
         <button
           mat-flat-button
           color="primary"
-          (click)="goEnroll($event)"
+          (click)="goLogin($event)"
         >Enroll in this study</button>
       </div>
     </div>
@@ -51,12 +53,18 @@
           <mat-card-title>Status</mat-card-title>
           <mat-card-content>
             <mat-list>
-              <mat-list-item *ngIf="study.max_num_participants">
-                {{study.current_num_participants}} / {{study.max_num_participants}} participants enrolled
+              <mat-list-item *ngIf="study.status">
+                {{ snakeToUpperCase(study.status) }}
               </mat-list-item>
-              <mat-list-item *ngIf="study.start_date && study.end_date">
-                Study runs from {{study.start_date | date:'longDate'}} to {{study.end_date | date:'longDate'}}
-              </mat-list-item>
+              <div *ngIf="study.status === 'currently_enrolling'">
+                <mat-list-item>
+                  <button
+                    mat-flat-button
+                    color="primary"
+                    (click)="goLogin($event)"
+                  >Enroll in this study</button>
+                </mat-list-item>
+              </div>
             </mat-list>
           </mat-card-content>
         </mat-card>
