@@ -382,5 +382,17 @@ class DataLoader:
         db.session.query(User).delete()
         db.session.commit()
 
+    def clear_resources(self):
+        db.session.query(ResourceCategory).delete()
+        db.session.query(StudyCategory).delete()
+        db.session.query(StudyInvestigator).delete()
+        db.session.query(TrainingCategory).delete()
+        db.session.query(Category).delete()
+        db.session.query(Investigator).delete()
+        db.session.query(StarResource).delete()
+        db.session.query(Study).delete()
+        db.session.query(Training).delete()
+        db.session.commit()
+
     def __increment_id_sequence(self, model):
         db.session.execute(Sequence(model.__tablename__ + '_id_seq'))
