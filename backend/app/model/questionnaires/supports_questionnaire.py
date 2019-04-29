@@ -33,6 +33,40 @@ class SupportsQuestionnaire(db.Model):
         cascade="all, delete-orphan",
         passive_deletes=True
     )
+    alternative_med = db.Column(
+        db.String,
+        info={
+            "display_order": 1,
+            "type": "multicheckbox",
+            "template_options": {
+                "type": "array",
+                "required": True,
+                "options": [
+                    {"value": "altMedChiropractics", "label": "Chiropractics"},
+                    {"value": "altMedB6Mag", "label": "High dosing Vitamin B6 and magnesium"},
+                    {"value": "altMedVitaminOther", "label": "Other vitamin supplements"},
+                    {"value": "altMedAminoAcids", "label": "Amino Acids"},
+                    {"value": "altMedEssFattyAcids", "label": "Essential fatty acids"},
+                    {"value": "altMedGlutenFree", "label": "Gluten-free diet"},
+                    {"value": "altMedOther", "label": "Other"},
+                ],
+                "description": "(select all that apply)",
+            },
+        }
+    )
+    alternative_med_other = db.Column(
+        db.String,
+        info={
+            "display_order": 1.2,
+            "type": "textarea",
+            "template_options": {
+                "label": "Enter alternative treatment",
+                "appearance": "standard",
+                "required": False,
+            },
+            "hide_expression": '!(model.alternative_med && (model.alternative_med.includes("altMedVitaminOther")) || (model.alternative_med.includes("altMedOther")))',
+        },
+    )
     therapies = db.relationship(
         "Therapy",
         backref=db.backref("supports_questionnaire", lazy=True),
@@ -73,9 +107,27 @@ class SupportsQuestionnaire(db.Model):
                     }
                 }
             },
+            "alternative_med_group": {
+                "fields": ["alternative_med", "alternative_med_other"],
+                "display_order": 2,
+                "wrappers": ["card"],
+                "template_options": {
+                    "label": ""
+                },
+                "expression_properties": {
+                    "template_options.label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"Are you receiving any complementary or alternative treatments?"',
+                            "self_guardian": '"Are you receiving any complementary or alternative treatments?"',
+                            "self_professional": '"Are you receiving any complementary or alternative treatments?"',
+                            "dependent": '"Is " + (formState.preferredName || "your child") + " receiving any complementary or alternative treatments?"'
+                        }
+                    }
+                },
+            },
             "therapies": {
                 "type": "repeat",
-                "display_order": 2,
+                "display_order": 3,
                 "wrappers": ["card"],
                 "repeat_class": Therapy,
                 "template_options": {
@@ -94,7 +146,7 @@ class SupportsQuestionnaire(db.Model):
             },
             "assistive_devices": {
                 "type": "repeat",
-                "display_order": 3,
+                "display_order": 4,
                 "wrappers": ["card"],
                 "repeat_class": AssistiveDevice,
                 "template_options": {
@@ -113,7 +165,7 @@ class SupportsQuestionnaire(db.Model):
             },
             "alternative_augmentative": {
                 "type": "repeat",
-                "display_order": 3,
+                "display_order": 5,
                 "wrappers": ["card"],
                 "repeat_class": AlternativeAugmentative,
                 "template_options": {
