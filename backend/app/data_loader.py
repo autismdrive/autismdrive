@@ -69,17 +69,18 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[5]) if row[5] else None
-                resource = StarResource(id=row[0], title=row[1], description=row[2], image_url=row[3], image_caption=row[4],
+                org = self.get_org_by_name(row[4]) if row[4] else None
+                resource = StarResource(title=row[0], description=row[1], image_url=row[2], image_caption=row[3],
                                         organization=org, street_address1=row[6], street_address2=row[7], city=row[8],
-                                        state=row[9], zip=row[10], county=row[11], website=row[12], phone=row[13])
+                                        state=row[9], zip=row[10], county=row[11], website=row[12], phone=row[14])
                 db.session.add(resource)
+                db.session.commit()
                 self.__increment_id_sequence(StarResource)
 
-                for i in range(14, 19):
+                for i in range(15, 22):
                     if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
-                    resource_id = eval(row[0])
+                    resource_id = resource.id
                     category_id = category.id
 
                     resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id)
