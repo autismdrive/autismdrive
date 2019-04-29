@@ -40,7 +40,6 @@ class SupportsQuestionnaire(db.Model):
             "type": "multicheckbox",
             "template_options": {
                 "type": "array",
-                "required": True,
                 "options": [
                     {"value": "altMedChiropractics", "label": "Chiropractics"},
                     {"value": "altMedB6Mag", "label": "High dosing Vitamin B6 and magnesium"},
