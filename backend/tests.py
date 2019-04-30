@@ -716,10 +716,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_pq.learning_interests, pq.learning_interests)
         return db_pq
 
-    def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
-                             notes='I feel better than ever!', supports_questionnaire=None):
+    def construct_medication(self, symptom='symptomInsomnia', name='Magic Potion', notes='I feel better than ever!', supports_questionnaire=None):
 
-        m = Medication(name=name, dosage=dosage, time_frame=time_frame, notes=notes)
+        m = Medication(symptom=symptom, name=name, notes=notes)
         if supports_questionnaire is not None:
             m.supports_questionnaire_id = supports_questionnaire.id
 
@@ -727,7 +726,7 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_m = db.session.query(Medication).filter_by(last_updated=m.last_updated).first()
-        self.assertEqual(db_m.dosage, m.dosage)
+        self.assertEqual(db_m.notes, m.notes)
         return db_m
 
     def construct_therapy(self, type='behavioral', timeframe='current', notes='Small steps',
