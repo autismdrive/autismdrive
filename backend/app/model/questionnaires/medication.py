@@ -98,7 +98,7 @@ class MedicationSchema(ModelSchema):
     class Meta:
         model = Medication
         ordered = True
-        fields = ("id", "last_updated", "supports_questionnaire_id", "name", "dosage", "time_frame", "notes",
+        fields = ("id", "last_updated", "supports_questionnaire_id", "symptom", "symptom_other", "name", "notes",
                   "participant_id", "user_id")
     participant_id = fields.Method('get_participant_id')
     user_id = fields.Method('get_user_id')
