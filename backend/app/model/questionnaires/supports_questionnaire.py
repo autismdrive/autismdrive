@@ -59,11 +59,11 @@ class SupportsQuestionnaire(db.Model):
             "display_order": 1.2,
             "type": "textarea",
             "template_options": {
-                "label": "Enter alternative treatment",
+                "label": "Enter other alternative treatment",
                 "appearance": "standard",
                 "required": False,
             },
-            "hide_expression": '!(model.alternative_med && (model.alternative_med.includes("altMedVitaminOther")) || (model.alternative_med.includes("altMedOther")))',
+            "hide_expression": '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))',
         },
     )
     therapies = db.relationship(
