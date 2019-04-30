@@ -145,6 +145,8 @@ class SupportsQuestionnaireSchema(ModelSchema):
         model = SupportsQuestionnaire
         ordered = True
         include_fk = True
+        fields = ("id", "last_updated", "time_on_task_ms", "participant_id", "user_id", "medications", "therapies",
+                  "assistive_devices", "alternative_augmentative")
     medications = fields.Nested(MedicationSchema, many=True)
     therapies = fields.Nested(TherapySchema, many=True)
     assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)
