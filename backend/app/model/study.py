@@ -1,32 +1,40 @@
 import datetime
-
+import enum
 from app import db
+
+
+class Status(enum.Enum):
+    currently_enrolling = 1
+    data_collection_complete = 2
+    results_being_analyzed = 3
+    study_results_published = 4
+
+    @classmethod
+    def has_name(cls, name):
+        return any(name == item.name for item in cls)
+
+    @classmethod
+    def options(cls):
+        return [item.name for item in cls]
 
 
 class Study(db.Model):
     __tablename__ = 'study'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
-    last_updated= db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     description = db.Column(db.String)
-    researcher_description = db.Column(db.String)
     participant_description = db.Column(db.String)
-    outcomes_description = db.Column(db.String)
+    benefit_description = db.Column(db.String)
+    investigators = db.relationship("StudyInvestigator", back_populates="study")
     organization_id = db.Column('organization_id', db.Integer,
-                               db.ForeignKey('organization.id'))
-    enrollment_start_date = db.Column(db.DateTime)
-    enrollment_end_date = db.Column(db.DateTime)
-    current_num_participants = db.Column(db.Integer)
-    max_num_participants = db.Column(db.Integer)
-    start_date = db.Column(db.DateTime)
-    end_date = db.Column(db.DateTime)
-    website = db.Column(db.String)
+                                db.ForeignKey('organization.id'))
+    location = db.Column(db.String)
+    status = db.Column(db.Enum(Status))
     categories = db.relationship("StudyCategory", back_populates="study")
-
-    # we'll change current_num_participants to a count of related participants if that's how we connect things.
 
     def indexable_content(self):
         return ' '.join(filter(None, (self.description,
-                        self.outcomes_description,
-                        self.participant_description,
-                        self.researcher_description)))
+                                      self.participant_description,
+                                      self.benefit_description,
+                                      self.location)))

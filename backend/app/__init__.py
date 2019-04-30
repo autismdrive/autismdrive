@@ -147,4 +147,19 @@ def reset():
     data_loader.build_index()
 
 
+@app.cli.command()
+def resourcereset():
+    """Remove all data about resources, studies, and trainings, and recreate it from the example data files"""
+    click.echo('Re-populating resources, studies, and trainings from the example data files')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.clear_index()
+    data_loader.clear_resources()
+    data_loader.load_categories()
+    data_loader.load_resources()
+    data_loader.load_studies()
+    data_loader.load_trainings()
+    data_loader.build_index()
+
+
 from app import views

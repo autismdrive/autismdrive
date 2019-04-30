@@ -15,6 +15,7 @@ from app.resources.FlowEndpoint import (
     FlowQuestionnaireMetaEndpoint)
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
 from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
+from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
 from app.resources.CategoryEndpoint import (
     CategoryEndpoint,
@@ -47,6 +48,12 @@ from app.resources.StudyAndCategoryEndpoint import (
     CategoryByStudyEndpoint,
     StudyByCategoryEndpoint,
     StudyCategoryListEndpoint
+)
+from app.resources.StudyAndInvestigatorEndpoint import (
+    StudyByInvestigatorEndpoint,
+    StudyInvestigatorEndpoint,
+    InvestigatorByStudyEndpoint,
+    StudyInvestigatorListEndpoint
 )
 from app.resources.UserAndParticipantEndpoint import (
     ParticipantBySessionEndpoint
@@ -122,12 +129,20 @@ endpoints = [
     (CategoryByStudyEndpoint, "/study/<study_id>/category"),
     (StudyCategoryListEndpoint, "/study_category"),
     (StudyCategoryEndpoint, "/study_category/<id>"),
+    (InvestigatorByStudyEndpoint, "/study/<study_id>/investigator"),
+    (StudyInvestigatorListEndpoint, "/study_investigator"),
+    (StudyInvestigatorEndpoint, "/study_investigator/<id>"),
     # Trainings
     (TrainingListEndpoint, "/training"),
     (TrainingEndpoint, "/training/<id>"),
     (CategoryByTrainingEndpoint, "/training/<training_id>/category"),
     (TrainingCategoryListEndpoint, "/training_category"),
     (TrainingCategoryEndpoint, "/training_category/<id>"),
+
+    # Investigators
+    (InvestigatorListEndpoint, "/investigator"),
+    (InvestigatorEndpoint, "/investigator/<id>"),
+    (StudyByInvestigatorEndpoint, "/investigator/<investigator_id>/study"),
 
     # User Sessions
     (SessionEndpoint, "/session"),

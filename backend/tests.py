@@ -13,20 +13,21 @@ import base64
 import quopri
 import random
 import string
-import datetime
 import unittest
 import openpyxl
 import io
 from app import db, app, elastic_index
 from app.model.user import User, Role
-from app.model.study import Study
+from app.model.study import Study, Status
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
 from app.model.resource import StarResource
 from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
+from app.model.investigator import Investigator
 from app.model.participant import Participant, Relationship
+from app.model.study_investigator import StudyInvestigator
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
@@ -151,17 +152,11 @@ class TestCase(unittest.TestCase):
         return db_resource
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
-                        researcher_description="Fantastic people work on this fantastic study. You should be impressed",
                         participant_description="Even your pet hamster could benefit from participating in this study",
-                        outcomes_description="You can expect to have your own rainbow following you around after participating",
-                        enrollment_start_date=datetime.date(2019, 1, 20), current_num_participants="54",
-                        max_num_participants="5000",
-                        start_date=datetime.date(2019, 2, 1), end_date=datetime.date(2019, 3, 31)):
+                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
 
-        study = Study(title=title, description=description, researcher_description=researcher_description,
-                      participant_description=participant_description, outcomes_description=outcomes_description,
-                      enrollment_start_date=enrollment_start_date, current_num_participants=current_num_participants,
-                      max_num_participants=max_num_participants, start_date=start_date, end_date=end_date)
+        study = Study(title=title, description=description, participant_description=participant_description,
+                      benefit_description=benefit_description, status=Status.currently_enrolling)
         study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()
@@ -207,6 +202,17 @@ class TestCase(unittest.TestCase):
         db_category = db.session.query(Category).filter_by(name=category.name).first()
         self.assertIsNotNone(db_category.id)
         return db_category
+
+    def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
+
+        investigator = Investigator(name=name, title=title)
+        investigator.organization_id = self.construct_organization().id
+        db.session.add(investigator)
+        db.session.commit()
+
+        db_inv = db.session.query(Investigator).filter_by(name=investigator.name).first()
+        self.assertEqual(db_inv.title, investigator.title)
+        return db_inv
 
     def construct_user(self, email="stan@staunton.com"):
 
@@ -710,10 +716,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_pq.learning_interests, pq.learning_interests)
         return db_pq
 
-    def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
-                             notes='I feel better than ever!', supports_questionnaire=None):
+    def construct_medication(self, symptom='symptomInsomnia', name='Magic Potion', notes='I feel better than ever!', supports_questionnaire=None):
 
-        m = Medication(name=name, dosage=dosage, time_frame=time_frame, notes=notes)
+        m = Medication(symptom=symptom, name=name, notes=notes)
         if supports_questionnaire is not None:
             m.supports_questionnaire_id = supports_questionnaire.id
 
@@ -721,7 +726,7 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_m = db.session.query(Medication).filter_by(last_updated=m.last_updated).first()
-        self.assertEqual(db_m.dosage, m.dosage)
+        self.assertEqual(db_m.notes, m.notes)
         return db_m
 
     def construct_therapy(self, type='behavioral', timeframe='current', notes='Small steps',
@@ -886,8 +891,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
-        response['outcomes_description'] = 'Better fluids for you and your car, Duh.'
-        response['max_num_participants'] = '2'
+        response['benefit_description'] = 'Better fluids for you and your car, Duh.'
         orig_date = response['last_updated']
         rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -897,8 +901,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
-        self.assertEqual(response['outcomes_description'], 'Better fluids for you and your car, Duh.')
-        self.assertEqual(response['max_num_participants'], 2)
+        self.assertEqual(response['benefit_description'], 'Better fluids for you and your car, Duh.')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_study(self):
@@ -914,13 +917,13 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_study(self):
-        study = {'title': "Study of Studies", 'outcomes_description': "This study will change your life."}
+        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life."}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Study of Studies')
-        self.assertEqual(response['outcomes_description'], 'This study will change your life.')
+        self.assertEqual(response['benefit_description'], 'This study will change your life.')
         self.assertIsNotNone(response['id'])
 
     def test_training_basics(self):
@@ -1522,6 +1525,113 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def test_add_investigator_to_study(self):
+        i = self.construct_investigator()
+        s = self.construct_study()
+
+        si_data = {"study_id": s.id, "investigator_id": i.id}
+
+        rv = self.app.post(
+            '/api/study_investigator',
+            data=json.dumps(si_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(i.id, response["investigator_id"])
+        self.assertEqual(s.id, response["study_id"])
+
+    def test_set_all_investigators_on_study(self):
+        i1 = self.construct_investigator(name="person1")
+        i2 = self.construct_investigator(name="person2")
+        i3 = self.construct_investigator(name="person3")
+        s = self.construct_study()
+
+        si_data = [
+            {"investigator_id": i1.id},
+            {"investigator_id": i2.id},
+            {"investigator_id": i3.id},
+        ]
+        rv = self.app.post(
+            '/api/study/%i/investigator' % s.id,
+            data=json.dumps(si_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        si_data = [{"investigator_id": i1.id}]
+        rv = self.app.post(
+            '/api/study/%i/investigator' % s.id,
+            data=json.dumps(si_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_investigator_from_study(self):
+        self.test_add_investigator_to_study()
+        rv = self.app.delete('/api/study_investigator/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/study/%i/investigator' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
+    def test_investigator_basics(self):
+        self.construct_investigator()
+        i = db.session.query(Investigator).first()
+        self.assertIsNotNone(i)
+        i_id = i.id
+        rv = self.app.get('/api/investigator/%i' % i_id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], i_id)
+        self.assertEqual(response["name"], i.name)
+
+    def test_modify_investigator_basics(self):
+        self.construct_investigator()
+        i = db.session.query(Investigator).first()
+        self.assertIsNotNone(i)
+
+        rv = self.app.get('/api/investigator/%i' % i.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'dungeon master'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/investigator/%i' % i.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'dungeon master')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_investigator(self):
+        i = self.construct_investigator()
+        i_id = i.id
+
+        rv = self.app.get('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_investigator(self):
+        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology"}
+        rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
+                           headers=self.logged_in_headers(), follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['name'], 'Tara Tarantula')
+        self.assertEqual(response['title'], 'Assistant Professor of Arachnology')
+        self.assertIsNotNone(response['id'])
 
     def search(self, query, user=None):
         """Executes a query as the given user, returning the resulting search results object."""
