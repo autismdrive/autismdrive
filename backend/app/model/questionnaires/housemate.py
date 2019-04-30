@@ -1,6 +1,7 @@
 import datetime
 
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 from app import db
 
@@ -121,3 +122,15 @@ class HousemateSchema(ModelSchema):
     class Meta:
         model = Housemate
         ordered = True
+        fields = ("id", "last_updated", "home_dependent_questionnaire_id", "home_self_questionnaire_id", "name",
+                  "relationship", "relationship_other", "age", "has_autism", "participant_id", "user_id")
+    participant_id = fields.Method('get_participant_id')
+    user_id = fields.Method('get_user_id')
+    home_dependent_questionnaire_id = fields.Integer(required=False, allow_none=True)
+    home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
+
+    def get_participant_id(self, obj):
+        return obj.supports_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        return obj.supports_questionnaire.user_id

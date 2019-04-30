@@ -34,15 +34,15 @@ source ./backend/python-env/bin/activate
 export FLASK_APP=${HOME_DIR}/backend/app/__init__.py
 eval 'cd ${HOME_DIR}/backend && pip3 install -r requirements.txt'
 
-# Load up the staging environment, not going to do this for a bitr.
-#if [ "$ENV" == "staging" ]; then
-#eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask cleardb'
-#fi
+# Load up the staging environment
+if [ "$ENV" == "staging" ]; then
+eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask resourcereset'
+fi
 
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask db upgrade'
 
 
-# clear and rebuild the index (uncomment when this is working)
+# clear and rebuild the index
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
 

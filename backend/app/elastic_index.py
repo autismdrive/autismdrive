@@ -95,11 +95,13 @@ class ElasticIndex:
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
-                           website=document.website,
                            category=[]
                            )
 
         doc.meta.id = self._get_id(document)
+
+        if doc.type is not 'study':
+            doc.website = document.website
 
         if document.organization is not None:
             doc.organization = document.organization.name

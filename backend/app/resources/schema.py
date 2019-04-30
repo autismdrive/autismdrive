@@ -8,11 +8,13 @@ from app import ma, db
 from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
+from app.model.investigator import Investigator
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search
-from app.model.study import Study
+from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
+from app.model.study_investigator import StudyInvestigator
 from app.model.training import Training
 from app.model.training_category import TrainingCategory
 from app.model.user import User, Role
@@ -46,7 +48,21 @@ import app.model.questionnaires.supports_questionnaire
 class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
-        fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies', 'trainings')
+        fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies', 'trainings', 'investigators')
+
+
+class InvestigatorSchema(ModelSchema):
+    class Meta:
+        model = Investigator
+        fields = ('id', 'last_updated', 'name', 'title', 'organization_id', 'organization', 'bio_link',
+                  '_links')
+    organization_id = fields.Integer(required=False, allow_none=True)
+    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.investigatorendpoint', id='<id>'),
+        'collection': ma.URLFor('api.investigatorlistendpoint'),
+        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>')
+    })
 
 
 class ParentCategorySchema(ModelSchema):
@@ -136,6 +152,18 @@ class CategoriesOnTrainingSchema(ModelSchema):
     })
 
 
+class InvestigatorsOnStudySchema(ModelSchema):
+    class Meta:
+        model = StudyInvestigator
+        fields = ('id', '_links', 'study_id', 'investigator_id', 'investigator')
+    investigator = fields.Nested(InvestigatorSchema, dump_only=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyinvestigatorendpoint', id='<id>'),
+        'investigator': ma.URLFor('api.investigatorendpoint', id='<investigator_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
 class StarResourceSchema(ModelSchema):
     class Meta:
         model = StarResource
@@ -191,13 +219,14 @@ class ResourceCategorySchema(ModelSchema):
 class StudySchema(ModelSchema):
     class Meta:
         model = Study
-        fields = ('id', 'title', 'last_updated', 'description', 'researcher_description', 'participant_description',
-                  'outcomes_description', 'enrollment_start_date', 'enrollment_end_date', 'current_num_participants',
-                  'max_num_participants', 'start_date', 'end_date', 'website', 'organization_id', 'organization',
-                  'study_categories', '_links')
+        fields = ('id', 'title', 'last_updated', 'description', 'participant_description', 'benefit_description',
+                  'organization_id', 'organization', 'location', 'status', 'study_categories',
+                  'study_investigators', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
+    status = EnumField(Status)
     study_categories = fields.Nested(CategoriesOnStudySchema(), many=True, dump_only=True)
+    study_investigators = fields.Nested(InvestigatorsOnStudySchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyendpoint', id='<id>'),
         'collection': ma.URLFor('api.studylistendpoint'),
@@ -237,6 +266,41 @@ class StudyCategorySchema(ModelSchema):
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studycategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class StudyInvestigatorsSchema(ModelSchema):
+    class Meta:
+        model = StudyInvestigator
+        fields = ('id', '_links', 'study_id', 'investigator_id', 'investigator')
+    investigator = fields.Nested(InvestigatorSchema, dump_only=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyinvestigatorendpoint', id='<id>'),
+        'investigator': ma.URLFor('api.investigatorendpoint', id='<investigator_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class InvestigatorStudiesSchema(ModelSchema):
+    class Meta:
+        model = StudyInvestigator
+        fields = ('id', '_links', 'study_id', 'investigator_id', 'study')
+    study = fields.Nested(StudySchema, dump_only=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyinvestigatorendpoint', id='<id>'),
+        'investigator': ma.URLFor('api.investigatorendpoint', id='<investigator_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class StudyInvestigatorSchema(ModelSchema):
+    class Meta:
+        model = StudyInvestigator
+        fields = ('id', '_links', 'study_id', 'investigator_id')
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyinvestigatorendpoint', id='<id>'),
+        'investigator': ma.URLFor('api.investigatorendpoint', id='<investigator_id>'),
         'study': ma.URLFor('api.studyendpoint', id='<study_id>')
     })
 
