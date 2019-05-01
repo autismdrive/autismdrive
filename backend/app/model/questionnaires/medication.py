@@ -20,9 +20,8 @@ class Medication(db.Model):
         db.String,
         info={
             "display_order": 1,
-            "type": "multicheckbox",
+            "type": "select",
             "template_options": {
-                "type": "array",
                 "required": True,
                 "options": [
                     {"value": "symptomAnxiety", "label": "Anxiety"},
@@ -31,7 +30,6 @@ class Medication(db.Model):
                     {"value": "symptomADHD", "label": "ADHD"},
                     {"value": "symptomOther", "label": "Other"},
                 ],
-                "description": "(select all that apply)",
             },
         }
     )
@@ -45,7 +43,7 @@ class Medication(db.Model):
                 "appearance": "standard",
                 "required": False,
             },
-            "hide_expression": '!(model.symptom && (model.symptom.includes("symptomOther")))',
+            "hide_expression": '!(model.symptom && (model.symptom === "symptomOther"))',
         },
     )
     name = db.Column(
