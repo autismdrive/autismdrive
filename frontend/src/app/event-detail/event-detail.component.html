@@ -1,7 +1,7 @@
 <div
-  *ngIf="resource"
+  *ngIf="event"
   class="container"
-  id="resource"
+  id="event"
 >
   <div
     class="row"
@@ -10,31 +10,32 @@
     fxLayoutGap="40px"
   >
     <div
-      id="resource-details"
+      id="event-details"
       fxFlex.gt-md="60%"
       fxLayout="column"
       fxLayoutGap="40px"
     >
-      <h1>{{resource.title}}</h1>
+      <h1>{{event.title}}</h1>
       <!--<img-->
-        <!--*ngIf="resource.image"-->
-        <!--[src]="resource.image"-->
+        <!--*ngIf="event.image"-->
+        <!--[src]="event.image"-->
       <!--&gt;-->
-      <!--<caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>-->
-      <h2>About this resource</h2>
-      <p>{{resource.description}}</p>
+      <!--<caption *ngIf="event.image && event.imageCaption">{{event.imageCaption}}</caption>-->
+      <h2>About this event</h2>
+      <p>{{event.description}}</p>
+      <p *ngIf="event.ticket_cost">Ticket Cost: {{event.ticket_cost}}</p>
       <div
         fxLayout="column"
         fxLayoutGap="20px"
       >
         <button
-          *ngIf="resource.phone"
+          *ngIf="event.phone"
           mat-flat-button
           color="primary"
           (click)="goPhone($event)"
-        >Call {{resource.phone}}</button>
+        >Call {{event.phone}}</button>
         <button
-          *ngIf="resource.website"
+          *ngIf="event.website"
           mat-stroked-button
           color="primary"
           (click)="goWebsite($event)"
@@ -42,42 +43,59 @@
       </div>
     </div>
     <div
-      id="resource-meta"
+      id="event-meta"
       fxFlex.gt-md="40%"
       fxLayout="column"
       fxLayoutGap="20px"
     >
-      <div id="resource-contact">
+      <div id="event-contact">
         <mat-card>
-          <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
+          <mat-card-title >Contact: {{event.organization.name}}</mat-card-title>
           <mat-card-content>
             <mat-list>
-              <mat-list-item *ngIf="resource.phone">
-                <mat-icon>phone</mat-icon>
-                <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
+              <mat-list-item *ngIf="event.date">
+                <mat-icon>access_time</mat-icon>
+                {{event.date | date:'longDate'}}: {{event.time}}
               </mat-list-item>
-              <mat-list-item *ngIf="resource.website">
+              <mat-list-item *ngIf="event.street_address1">
+                <mat-icon>location_on</mat-icon>
+                <address>
+                  {{event.location_name}},
+                  {{event.street_address1}}
+                  {{event.street_address2}},
+                  {{event.city}}, {{event.state}} {{event.zip}}
+                </address>
+              </mat-list-item>
+              <mat-list-item *ngIf="event.primary_contact">
+                <mat-icon>person_pin</mat-icon>
+                {{event.primary_contact}}
+              </mat-list-item>
+              <mat-list-item *ngIf="event.phone">
+                <mat-icon>phone</mat-icon>
+                <a href="tel://{{event.phone}}">{{event.phone}}</a>
+              </mat-list-item>
+              <mat-list-item *ngIf="event.website">
                 <mat-icon>link</mat-icon>
-                <a href="{{resource.website}}">{{resource.website}}</a>
+                <a href="{{event.website}}">{{event.website}}</a>
               </mat-list-item>
             </mat-list>
           </mat-card-content>
         </mat-card>
       </div>
-      <div id="resource-categories">
-        <app-category-chips [categories]="resource.resource_categories"></app-category-chips>
+      <div id="event-categories">
+        <app-category-chips [categories]="event.resource_categories"></app-category-chips>
       </div>
-      <div id="resource-related">
+      <div id="event-related">
         <mat-card>
           <mat-card-title>Related</mat-card-title>
           <mat-card-content>
             <mat-list>
-              <h3 mat-subheader>Resources</h3>
+              <h3 mat-subheader>Events</h3>
               <mat-list-item>
                 <a
                   mat-line
-                  href="/#/resource/1"
-                >Resource 1</a>
+                  href="/#/event/1"
+                >Event 1</a>
                 <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                   accusantium
                   doloremque laudantium, totam rem aperiam...</p>
@@ -102,6 +120,6 @@
 </div>
 
 <app-loading
-  *ngIf="!resource"
+  *ngIf="!event"
   message="Loading..."
 ></app-loading>

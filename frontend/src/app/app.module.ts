@@ -85,6 +85,8 @@ import { TrainingDetailComponent } from './training-detail/training-detail.compo
 import { HeaderComponent } from './header/header.component';
 import { NewsItemComponent } from './news-item/news-item.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
+import { EventDetailComponent } from './event-detail/event-detail.component';
+import { LocationDetailComponent } from './location-detail/location-detail.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -154,6 +156,8 @@ export class FormlyConfig {
     HeaderComponent,
     NewsItemComponent,
     CategoryChipsComponent,
+    EventDetailComponent,
+    LocationDetailComponent,
   ],
   imports: [
     BrowserAnimationsModule,
