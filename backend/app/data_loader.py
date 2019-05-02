@@ -75,9 +75,10 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[4]) if row[4] else None
-                event = Event(title=row[0], description=row[1], organization=org, street_address1=row[6],
-                              street_address2=row[7], city=row[8], state=row[9], zip=row[10], website=row[12],
+                org = self.get_org_by_name(row[5]) if row[5] else None
+                event = Event(title=row[0], description=row[1],date=row[2], time=row[3], ticket_cost=row[4],
+                              organization=org, primary_contact=row[6],location_name=row[7], street_address1=row[8],
+                              street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
                               phone=row[14])
                 db.session.add(event)
                 db.session.commit()
@@ -102,15 +103,15 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[4]) if row[4] else None
-                location = Location(title=row[0], description=row[1], organization=org, street_address1=row[6],
-                                    street_address2=row[7], city=row[8], state=row[9], zip=row[10], website=row[12],
-                                    phone=row[14])
+                org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
+                location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
+                                    street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
+                                    zip=row[11], website=row[13], phone=row[15], email=row[14])
                 db.session.add(location)
                 db.session.commit()
                 self.__increment_id_sequence(Location)
 
-                for i in range(15, 22):
+                for i in range(16, 26):
                     if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     location_id = location.id
@@ -130,9 +131,8 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
-                resource = StarResource(title=row[0], description=row[1], image_url=row[2], image_caption=row[3],
-                                        organization=org, street_address1=row[6], street_address2=row[7], city=row[8],
-                                        state=row[9], zip=row[10], county=row[11], website=row[12], phone=row[14])
+                resource = StarResource(title=row[0], description=row[1], organization=org, website=row[12],
+                                        phone=row[14])
                 db.session.add(resource)
                 db.session.commit()
                 self.__increment_id_sequence(StarResource)

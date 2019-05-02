@@ -18,6 +18,7 @@ class Location(db.Model):
     state = db.Column(db.String)
     zip = db.Column(db.String)
     phone = db.Column(db.String)
+    email = db.Column(db.String)
     website = db.Column(db.String)
     categories = db.relationship("LocationCategory", back_populates="location")
 

@@ -314,7 +314,7 @@ class LocationSchema(ModelSchema):
     class Meta:
         model = Location
         fields = ('id', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
-                  'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'website',
+                  'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'organization', 'location_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
