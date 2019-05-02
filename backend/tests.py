@@ -169,14 +169,9 @@ class TestCase(unittest.TestCase):
         return db_location
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           image_url="assets/image.svg", image_caption="An inspiring photograph of great renown",
-                           street_address1="123 Some Pl", street_address2="Apt. 45",
-                           city="Stauntonville", state="QX", zip="99775", county="Augustamarle", phone="555-555-5555",
-                           website="http://stardrive.org"):
+                           phone="555-555-5555", website="http://stardrive.org"):
 
-        resource = StarResource(title=title, description=description, image_url=image_url, image_caption=image_caption,
-                                street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip, county=county, phone=phone, website=website)
+        resource = StarResource(title=title, description=description, phone=phone, website=website)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
         db.session.commit()
@@ -981,8 +976,6 @@ class TestCase(unittest.TestCase):
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
         response['website'] = 'http://sartography.com'
-        response['county'] = 'Rockingbridge'
-        response['image_caption'] = 'Daniel GG Dog Da Funk-a-funka'
         orig_date = response['last_updated']
         rv = self.app.put('/api/resource/%i' % r_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -993,8 +986,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
         self.assertEqual(response['website'], 'http://sartography.com')
-        self.assertEqual(response['county'], 'Rockingbridge')
-        self.assertEqual(response['image_caption'], 'Daniel GG Dog Da Funk-a-funka')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_resource(self):

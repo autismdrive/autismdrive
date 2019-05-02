@@ -210,8 +210,7 @@ class InvestigatorsOnStudySchema(ModelSchema):
 class StarResourceSchema(ModelSchema):
     class Meta:
         model = StarResource
-        fields = ('id', 'title', 'last_updated', 'description', 'image_url', 'image_caption', 'organization_id',
-                  'street_address1', 'street_address2', 'city', 'state', 'zip', 'county', 'phone', 'website',
+        fields = ('id', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'organization', 'resource_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
