@@ -63,8 +63,8 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                parent = self.get_category_by_name(row[1]) if row[1] else None
-                category = Category(name=row[0], parent=parent)
+                parent = self.get_category_by_name(row[1].strip()) if row[1] else None
+                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent)
                 db.session.add(category)
             print("Categories loaded.  There are now %i categories in the database." % db.session.query(
                 Category).count())
@@ -387,10 +387,10 @@ class DataLoader:
             db.session.commit()
         return organization
 
-    def get_category_by_name(self, category_name):
+    def get_category_by_name(self, category_name, parent=None):
         category = db.session.query(Category).filter(Category.name == category_name).first()
         if category is None:
-            category = Category(name=category_name)
+            category = Category(name=category_name, parent=parent)
             db.session.add(category)
             db.session.commit()
         return category
