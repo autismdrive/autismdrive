@@ -86,10 +86,16 @@ class Housemate(db.Model):
             "display_order": 3.4,
             "type": "input",
             "template_options": {
-                "type": "number",
                 "label": "Age",
+                "type": 'number',
+                "max": 130,
                 "required": True,
             },
+            "validation": {
+                "messages": {
+                    "max": 'Please enter age in years',
+                }
+            }
         },
     )
     has_autism = db.Column(

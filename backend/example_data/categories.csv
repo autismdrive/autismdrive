@@ -1,205 +1,94 @@
-Category,Parent
+Assessment and Diagnosis,
+     Pediatrics ,Assessment and Diagnosis
+     Psychological Testing ,Assessment and Diagnosis
+     New to Diagnosis ,Assessment and Diagnosis
+Treatment and Therapies ,
+    Medication,Treatment and Therapies 
+    Early Intervention,Treatment and Therapies 
+    Applied Behavior Analysis,Treatment and Therapies 
+    Speech and Communication Supports,Treatment and Therapies 
+    Occupational Therapy ,Treatment and Therapies 
+    Counseling,Treatment and Therapies 
+          Cognitive Behavioral Therapy ,    Counseling
+          Dialectical Behavior Therapy,    Counseling
+    Social Skills Training,Treatment and Therapies 
+Physical and Mental Health ,
+     Wellness,Physical and Mental Health 
+              Dental Care,     Wellness
+              Sleep ,     Wellness
+              Toilet Training ,     Wellness
+              Gastrointestinal (GI) issues ,     Wellness
+              Feeding issues,     Wellness
+              Blood Testing ,     Wellness
+    Executive Functioning ,Physical and Mental Health 
+    Challenging Behaviors,Physical and Mental Health 
+    Developmental Delays,Physical and Mental Health 
+    Mental Health ,Physical and Mental Health 
+              ADHD,    Mental Health 
+    Genetic Conditions ,Physical and Mental Health 
+    Sexuality,Physical and Mental Health 
+    Puberty,Physical and Mental Health 
+Education and Technology ,
+     School,Education and Technology 
+     Support Plans,Education and Technology 
+          IEP ,     Support Plans
+     In School Supports,Education and Technology 
+     Communication  System ,Education and Technology 
+          Verbal,     Communication  System 
+          Non-Verbal (visual aids),     Communication  System 
+Adulthood and Transition,
+      Post Secondary Education ,Adulthood and Transition
+      Employment ,Adulthood and Transition
+      Adult Programs ,Adulthood and Transition
+             Residential Program,      Adult Programs 
+             Adult Day Program,      Adult Programs 
+Familiy Supports and Parent Training ,
+      Parent Training ,Familiy Supports and Parent Training 
+      Support Groups,Familiy Supports and Parent Training 
+      Respite ,Familiy Supports and Parent Training 
+      Autism-friendly Events,Familiy Supports and Parent Training 
+      Recreation & Camps,Familiy Supports and Parent Training 
+      Family Relationship ,Familiy Supports and Parent Training 
+              Siblings ,      Family Relationship 
+Financial Assistance and Advocacy,
+      Medicaid ,Financial Assistance and Advocacy
+            Accepts Medicaid ,      Medicaid 
+            Obtaining a Waiver,      Medicaid 
+      Advocacy,Financial Assistance and Advocacy
+            Self-Advocacy ,      Advocacy
+            Parent-Advocacy ,      Advocacy
 Locations,
-Virginia,Locations
-Winchester/Front Royal,Virginia
-Northern Virginia,Virginia
-Fredericksburg and Northern Neck,Virginia
-Culpeper/Madison,Virginia
-Harrisonburg,Virginia
-Waynesboro/Staunton/Lexington,Virginia
-Charlottesville,Virginia
-Richmond,Virginia
-Hampton Roads,Virginia
-Lynchburg,Virginia
-Roanoke/New River Valley,Virginia
-Southside Virginia,Virginia
-Southwest Virginia,Virginia
+    Virginia,Locations
+         Winchester/Front Royal ,    Virginia
+         Northern Virginia,    Virginia
+         Fredericksburg and Northern Neck         ,    Virginia
+         Culpeper/Madison ,    Virginia
+         Harrisonburg ,    Virginia
+         Waynesboro/Staunton/Lexington ,    Virginia
+         Charlottesville ,    Virginia
+         Richmond ,    Virginia
+         Hampton Roads ,    Virginia
+         Lynchburg ,    Virginia
+         Roanoke/New River Valley,    Virginia
+         Southside Virginia,    Virginia
+         Southwest Virginia ,    Virginia
 West Virginia,Locations
-Eastern Panhandle (Martinsburg/Charles Town),West Virginia
-Fairmont/Morgantown,West Virginia
-Northern Panhandle (Wheeling),West Virginia
-Huntington,West Virginia
-Charleston,West Virginia
-Lewisburg/White Sulphur Springs,West Virginia
-National, Locations
-SES,
-Low-income,SES
-Supplemental Security Income (SSI),Low-income
-Ethnicity,SES
-African/African American,Ethnicity
-Asian/Asian American,Ethnicity
-Caucasian,Ethnicity
-Native American/Alaskan Native,Ethnicity
-Pacific Islander,Ethnicity
-Medical Conditions,
-Neurodevelopmental disorders / Developmental delays,Medical Conditions
-Intellectual disability or developmental delay,Neurodevelopmental disorders / Developmental delays
-Learning disability,Neurodevelopmental disorders / Developmental delays
-Failure to thrive,Neurodevelopmental disorders / Developmental delays
-Language delay,Neurodevelopmental disorders / Developmental delays
-Motor delay,Neurodevelopmental disorders / Developmental delays
-Attention-deficit/hyperactivity disorder (ADHD),Neurodevelopmental disorders / Developmental delays
-Deaf/hard of hearing,Neurodevelopmental disorders / Developmental delays
-Visual impairment,Neurodevelopmental disorders / Developmental delays
-Fetal alcohol spectrum disorder,Neurodevelopmental disorders / Developmental delays
-Mental health disorders,Medical Conditions
-Anxiety,Mental health disorders
-Depression,Mental health disorders
-Obsessive compulsive disorder (OCD),Mental health disorders
-Schizophrenia,Mental health disorders
-Bipolar Disorder,Mental health disorders
-Tourette Syndrome,Mental health disorders
-Associated conditions,Medical Conditions
-Gastrointestinal (GI) problems,Associated conditions
-Epilepsy (seizure disorder),Associated conditions
-Feeding issues,Associated conditions
-Disrupted sleep,Associated conditions
-Problem behavior,Associated conditions
-Ear infections,Associated conditions
-Genetic conditions,Medical Conditions
-Fragile X syndrome,Genetic conditions
-Tuberous Sclerosis Complex,Genetic conditions
-Cornelia de Lange syndrome,Genetic conditions
-Down syndrome,Genetic conditions
-Angelman syndrome,Genetic conditions
-Rett syndrome,Genetic conditions
-22q11.2 Deletion syndrome,Genetic conditions
-Patient History,
-Prenatal,Patient History
-Complicated pregnancy,Prenatal
-Physical development,Patient History
-Early physical development,Physical development
-Normal physical development,Physical development
-Late physical development,Physical development
-Language development,Patient History
-Early language development,Language development
-Normal language development,Language development
-Late language development,Language development
-"Sensory difficulties (hearing, vision, sensation)",Patient History
-Patient Abilities,
-Verbal,Patient Abilities
-Non-verbal,Verbal
-Single words,Verbal
-Phrase speech,Verbal
-Fluent speech,Verbal
-Education level,Patient Abilities
-Pre-School,Education level
-Elementary school,Education level
-Middle (junior high) school,Education level
-High School Graduate/GED,Education level
-Trade/Technical/Vocational Training,Education level
-College/University,Education level
-Treatments & Therapies,
-Medication,Treatments & Therapies
-Antipsychotics/Mood stabilizers,Medication
-Antidepressants,Medication
-Naturally-occurring hormones,Medication
-Melatonin,Naturally-occurring hormones
-Oxytocin (Pitocin),Naturally-occurring hormones
-Secretin,Naturally-occurring hormones
-Tranquilizers,Medication
-Stimulants,Medication
-Other,Medication
-Support plans,Treatments & Therapies
-"Support plans: IFSP, IEP, 504 plan, ISP",Support plans
-Individualized Education Plan (IEP),Support plans
-504 Plan,Support plans
-Individualized Support Plan (ISP)    ,Support plans
-Therapies,Treatments & Therapies
-Individual counseling or therapy,Therapies
-Animal-Assisted therapy,Therapies
-Applied behavior analysis,Therapies
-Behavior therapy,Therapies
-Family therapy/counseling,Therapies
-Sensory processing,Therapies
-Speech therapy,Therapies
-Occupational therapy,Therapies
-Physical therapy,Therapies
-Developmental or relationship-based therapy,Therapies
-Behavioral parent training (non ASD specific),Therapies
-Social skills training,Therapies
-Parent education workshops,Therapies
-Complementary or alternative treatments,Therapies
-Other therapies,Therapies
-Assistive devices,Treatments & Therapies
-Mobility aids,Assistive devices
-Canes,Mobility aids
-Crutches,Mobility aids
-Orthotic devices,Mobility aids
-Prosthetic devices,Mobility aids
-Scooters,Mobility aids
-Walkers,Mobility aids
-Wheelchairs,Mobility aids
-Hearing assistance,Assistive devices
-Closed captioning,Hearing assistance
-Hearing aids,Hearing assistance
-Indicator/alarm lights,Hearing assistance
-Computer software and hardware,Assistive devices
-Cognitive aids,Computer software and hardware
-Screen enlargement applications,Computer software and hardware
-Screen readers,Computer software and hardware
-Voice recognition programs,Computer software and hardware
-Adaptive Tools,Assistive devices
-Automatic page turners,Adaptive Tools
-Book holders,Adaptive Tools
-Devices to extend reach,Adaptive Tools
-Pencil grips,Adaptive Tools
-Specialized handles and grips,Adaptive Tools
-Utensils,Adaptive Tools
-ADA Building Modifications,Assistive devices
-Adaptive switches,ADA Building Modifications
-Grab bars,ADA Building Modifications
-Ramps,ADA Building Modifications
-Wider doorways,ADA Building Modifications
-Services,
-Adult Day program,Services
-After School Program,Services
-Applied Behavioral Analysis (ABA) Therapy,Services
-"Assessment (diagnostic, other)",Services
-College Programs,Services
-Case management,Services
-Community Support Programs,Services
-Developmental Pediatricians,Services
-Early Education Centers,Services
-Education Specialists,Services
-Educational Services,Services
-Employment,Services
-Non-profit Organizations,Services
-Nursing,Services
-Occupational Therapy (OT),Services
-Inpatient Services,Services
-Psychoeducational evaluation,Services
-Psychologists,Services
-Research Labs,Services
-Residential Programs,Services
-Schools,Services
-Social Work,Services
-Speech Services,Services
-Respite,Services
-Medical home,Services
-New to Diagnosis,Services
-Summer camps,Services
-"Handouts, Books, Printed Resources",
-Parents,"Handouts, Books, Printed Resources"
-Professionals,"Handouts, Books, Printed Resources"
-Individuals with Autism,"Handouts, Books, Printed Resources"
-Gender/Sexuality,
-Boys/Men,Gender/Sexuality
-Girls/Women,Gender/Sexuality
-Puberty/Adolescence,Gender/Sexuality
-Lesbian,Gender/Sexuality
-Gay,Gender/Sexuality
-Transgender,Gender/Sexuality
-Bisexual,Gender/Sexuality
-Questioning Sexuality,Gender/Sexuality
-Sexual health/Sex Ed,Gender/Sexuality
-Foreign Language Resources,
-Spanish,Foreign Language Resources
-Health and healthcare access,
-Oral/Dental health,Health and healthcare access
-Reproductive health,Health and healthcare access
-Cancer screens,Health and healthcare access
-Check-ups,Health and healthcare access
-Working with physicians,Health and healthcare access
-Diet/Healthy eating,Health and healthcare access
-Exercise promotion,Health and healthcare access
+     Eastern Panhandle (Martinsburg/Charles Town),West Virginia
+     Fairmont/Morgantown,West Virginia
+     Northern Panhandle (Wheeling) ,West Virginia
+     Huntington,West Virginia
+     Charleston,West Virginia
+     Lewisburg/White Sulphur Springs,West Virginia
+National ,Locations
+Type of Resources ,
+Handout ,Type of Resources 
+Book ,Type of Resources 
+Event,Type of Resources 
+Life Ages,
+Pre-K (0 - 5 years),Life Ages
+Childhood (0 - 13 years),Life Ages
+School age (6 - 13 years),Life Ages
+Transition age (14 - 22 years),Life Ages
+Adulthood (23 - 64),Life Ages
+Aging (65+),Life Ages
+All Ages,Life Ages

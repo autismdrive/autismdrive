@@ -5,6 +5,8 @@ import { catchError, map } from 'rxjs/operators';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
 import { Query } from '../../_models/query';
+import { Event } from '../../_models/event';
+import { Location } from '../../_models/location';
 import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
 import { Training } from '../../_models/training';
@@ -38,6 +40,16 @@ export class ApiService {
     questionnaireNames: '/api/q',
     questionnaireExport: '/api/q/<name>/export',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
+    eventbycategory: '/api/category/<category_id>/event',
+    eventcategory: '/api/event_category/<id>',
+    eventcategorylist: '/api/event_category',
+    event: '/api/event/<id>',
+    eventlist: '/api/event',
+    locationbycategory: '/api/category/<category_id>/location',
+    locationcategory: '/api/location_category/<id>',
+    locationcategorylist: '/api/location_category',
+    location: '/api/location/<id>',
+    locationlist: '/api/location',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
     resourcecategorylist: '/api/resource_category',
@@ -174,6 +186,66 @@ export class ApiService {
   /** Get Studies */
   getStudies(): Observable<Study[]> {
     return this.httpClient.get<Study[]>(this._endpointUrl('studylist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add Event */
+  addEvent(event: Event): Observable<Event> {
+    return this.httpClient.post<Event>(this._endpointUrl('eventlist'), event)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update Event */
+  updateEvent(event: Event): Observable<Event> {
+    return this.httpClient.put<Event>(`${this._endpointUrl('event')}/${event.id}`, event)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete Event */
+  deleteEvent(event: Event): Observable<Event> {
+    return this.httpClient.delete<Event>(`${this._endpointUrl('event')}/${event.id}`)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Event */
+  getEvent(id: number): Observable<Event> {
+    return this.httpClient.get<Event>(this._endpointUrl('event').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Events */
+  getEvents(): Observable<Event[]> {
+    return this.httpClient.get<Event[]>(this._endpointUrl('eventlist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add Location */
+  addLocation(location: Location): Observable<Location> {
+    return this.httpClient.post<Location>(this._endpointUrl('locationlist'), location)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update Location */
+  updateLocation(location: Location): Observable<Location> {
+    return this.httpClient.put<Location>(`${this._endpointUrl('location')}/${location.id}`, location)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete Location */
+  deleteLocation(location: Location): Observable<Location> {
+    return this.httpClient.delete<Location>(`${this._endpointUrl('location')}/${location.id}`)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Location */
+  getLocation(id: number): Observable<Location> {
+    return this.httpClient.get<Location>(this._endpointUrl('location').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Locations */
+  getLocations(): Observable<Location[]> {
+    return this.httpClient.get<Location[]>(this._endpointUrl('locationlist'))
       .pipe(catchError(this._handleError));
   }
 

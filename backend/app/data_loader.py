@@ -8,6 +8,10 @@ from app.model.questionnaires.assistive_device import AssistiveDevice
 from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.therapy import Therapy
+from app.model.event import Event
+from app.model.event_category import EventCategory
+from app.model.location import Location
+from app.model.location_category import LocationCategory
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
@@ -44,6 +48,8 @@ class DataLoader:
 
     def __init__(self, directory="./example_data"):
         self.category_file = directory + "/categories.csv"
+        self.event_file = directory + "/events.csv"
+        self.location_file = directory + "/locations.csv"
         self.resource_file = directory + "/resources.csv"
         self.study_file = directory + "/studies.csv"
         self.training_file = directory + "/trainings.csv"
@@ -57,11 +63,66 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                parent = self.get_category_by_name(row[1]) if row[1] else None
-                category = Category(name=row[0], parent=parent)
+                parent = self.get_category_by_name(row[1].strip()) if row[1] else None
+                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent)
                 db.session.add(category)
             print("Categories loaded.  There are now %i categories in the database." % db.session.query(
                 Category).count())
+        db.session.commit()
+
+    def load_events(self):
+        with open(self.event_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                org = self.get_org_by_name(row[5]) if row[5] else None
+                event = Event(title=row[0], description=row[1],date=row[2], time=row[3], ticket_cost=row[4],
+                              organization=org, primary_contact=row[6],location_name=row[7], street_address1=row[8],
+                              street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
+                              phone=row[14])
+                db.session.add(event)
+                db.session.commit()
+                self.__increment_id_sequence(Event)
+
+                for i in range(15, 22):
+                    if not row[i]: continue
+                    category = self.get_category_by_name(row[i].strip())
+                    event_id = event.id
+                    category_id = category.id
+
+                    event_category = EventCategory(event_id=event_id, category_id=category_id)
+                    db.session.add(event_category)
+            print("Events loaded.  There are now %i events in the database." % db.session.query(
+                Event).count())
+            print("There are now %i links between events and categories in the database." %
+                  db.session.query(EventCategory).count())
+        db.session.commit()
+
+    def load_locations(self):
+        with open(self.location_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
+                location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
+                                    street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
+                                    zip=row[11], website=row[13], phone=row[15], email=row[14])
+                db.session.add(location)
+                db.session.commit()
+                self.__increment_id_sequence(Location)
+
+                for i in range(16, 26):
+                    if not row[i]: continue
+                    category = self.get_category_by_name(row[i].strip())
+                    location_id = location.id
+                    category_id = category.id
+
+                    location_category = LocationCategory(location_id=location_id, category_id=category_id)
+                    db.session.add(location_category)
+            print("Locations loaded.  There are now %i locations in the database." % db.session.query(
+                Location).count())
+            print("There are now %i links between locations and categories in the database." %
+                  db.session.query(LocationCategory).count())
         db.session.commit()
 
     def load_resources(self):
@@ -70,9 +131,8 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
-                resource = StarResource(title=row[0], description=row[1], image_url=row[2], image_caption=row[3],
-                                        organization=org, street_address1=row[6], street_address2=row[7], city=row[8],
-                                        state=row[9], zip=row[10], county=row[11], website=row[12], phone=row[14])
+                resource = StarResource(title=row[0], description=row[1], organization=org, website=row[12],
+                                        phone=row[14])
                 db.session.add(resource)
                 db.session.commit()
                 self.__increment_id_sequence(StarResource)
@@ -327,16 +387,18 @@ class DataLoader:
             db.session.commit()
         return organization
 
-    def get_category_by_name(self, category_name):
+    def get_category_by_name(self, category_name, parent=None):
         category = db.session.query(Category).filter(Category.name == category_name).first()
         if category is None:
-            category = Category(name=category_name)
+            category = Category(name=category_name, parent=parent)
             db.session.add(category)
             db.session.commit()
         return category
 
     def build_index(self):
-        elastic_index.load_documents(db.session.query(StarResource).all(),
+        elastic_index.load_documents(db.session.query(Event).all(),
+                                     db.session.query(Location).all(),
+                                     db.session.query(StarResource).all(),
                                      db.session.query(Study).all(),
                                      db.session.query(Training).all()
                                      )
@@ -368,6 +430,8 @@ class DataLoader:
         db.session.query(Therapy).delete()
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()
+        db.session.query(EventCategory).delete()
+        db.session.query(LocationCategory).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
@@ -375,6 +439,8 @@ class DataLoader:
         db.session.query(Category).delete()
         db.session.query(EmailLog).delete()
         db.session.query(Investigator).delete()
+        db.session.query(Event).delete()
+        db.session.query(Location).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()

@@ -113,8 +113,12 @@ class ElasticIndex:
         if flush:
             self.index.flush()
 
-    def load_documents(self, resources, studies, trainings):
-        print("Loading search records of resources, studies, and trainings into %s" % self.index_prefix)
+    def load_documents(self, events, locations, resources, studies, trainings):
+        print("Loading search records of events, locations, resources, studies, and trainings into %s" % self.index_prefix)
+        for e in events:
+            self.add_document(e, flush=False)
+        for l in locations:
+            self.add_document(l, flush=False)
         for r in resources:
             self.add_document(r, flush=False)
         for s in studies:

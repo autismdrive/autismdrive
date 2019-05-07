@@ -22,6 +22,14 @@ from app.resources.CategoryEndpoint import (
     CategoryListEndpoint,
     RootCategoryListEndpoint
 )
+from app.resources.EventEndpoint import (
+    EventEndpoint,
+    EventListEndpoint
+)
+from app.resources.LocationEndpoint import (
+    LocationEndpoint,
+    LocationListEndpoint
+)
 from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint
@@ -57,6 +65,18 @@ from app.resources.StudyAndInvestigatorEndpoint import (
 )
 from app.resources.UserAndParticipantEndpoint import (
     ParticipantBySessionEndpoint
+)
+from app.resources.EventAndCategoryEndpoint import (
+    EventCategoryEndpoint,
+    CategoryByEventEndpoint,
+    EventByCategoryEndpoint,
+    EventCategoryListEndpoint
+)
+from app.resources.LocationAndCategoryEndpoint import (
+    LocationCategoryEndpoint,
+    CategoryByLocationEndpoint,
+    LocationByCategoryEndpoint,
+    LocationCategoryListEndpoint
 )
 from app.resources.ResourceAndCategoryEndpoint import (
     ResourceCategoryEndpoint,
@@ -111,12 +131,26 @@ endpoints = [
     (CategoryListEndpoint, "/category"),
     (RootCategoryListEndpoint, "/category/root"),
     (CategoryEndpoint, "/category/<id>"),
+    (EventByCategoryEndpoint, "/category/<category_id>/event"),
+    (LocationByCategoryEndpoint, "/category/<category_id>/location"),
     (ResourceByCategoryEndpoint, "/category/<category_id>/resource"),
     (StudyByCategoryEndpoint, "/category/<category_id>/study"),
     (TrainingByCategoryEndpoint, "/category/<category_id>/training"),
     # Organizations
     (OrganizationListEndpoint, "/organization"),
     (OrganizationEndpoint, "/organization/<id>"),
+    # Events
+    (EventListEndpoint, "/event"),
+    (EventEndpoint, "/event/<id>"),
+    (CategoryByEventEndpoint, "/event/<event_id>/category"),
+    (EventCategoryListEndpoint, "/event_category"),
+    (EventCategoryEndpoint, "/event_category/<id>"),
+    # Locations
+    (LocationListEndpoint, "/location"),
+    (LocationEndpoint, "/location/<id>"),
+    (CategoryByLocationEndpoint, "/location/<location_id>/category"),
+    (LocationCategoryListEndpoint, "/location_category"),
+    (LocationCategoryEndpoint, "/location_category/<id>"),
     # Resources
     (ResourceListEndpoint, "/resource"),
     (ResourceEndpoint, "/resource/<id>"),

@@ -21,6 +21,8 @@ from app.model.user import User, Role
 from app.model.study import Study, Status
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
+from app.model.event import Event
+from app.model.location import Location
 from app.model.resource import StarResource
 from app.model.training import Training
 from app.model.email_log import EmailLog
@@ -29,6 +31,8 @@ from app.model.investigator import Investigator
 from app.model.participant import Participant, Relationship
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_category import StudyCategory
+from app.model.event_category import EventCategory
+from app.model.location_category import LocationCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
 from app.model.questionnaires.assistive_device import AssistiveDevice
@@ -132,16 +136,42 @@ class TestCase(unittest.TestCase):
             if field["name"] == name:
                 return field
 
-
-    def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           image_url="assets/image.svg", image_caption="An inspiring photograph of great renown",
+    def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
                            street_address1="123 Some Pl", street_address2="Apt. 45",
-                           city="Stauntonville", state="QX", zip="99775", county="Augustamarle", phone="555-555-5555",
+                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
                            website="http://stardrive.org"):
 
-        resource = StarResource(title=title, description=description, image_url=image_url, image_caption=image_caption,
-                                street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip, county=county, phone=phone, website=website)
+        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
+                                state=state, zip=zip, phone=phone, website=website)
+        event.organization_id = self.construct_organization().id
+        db.session.add(event)
+        db.session.commit()
+
+        db_event = db.session.query(Event).filter_by(title=event.title).first()
+        self.assertEqual(db_event.website, event.website)
+        elastic_index.add_document(db_event, 'Event')
+        return db_event
+
+    def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
+                           street_address1="123 Some Pl", street_address2="Apt. 45",
+                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
+                           website="http://stardrive.org"):
+
+        location = Location(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
+                                state=state, zip=zip,phone=phone, website=website)
+        location.organization_id = self.construct_organization().id
+        db.session.add(location)
+        db.session.commit()
+
+        db_location = db.session.query(Location).filter_by(title=location.title).first()
+        self.assertEqual(db_location.website, location.website)
+        elastic_index.add_document(db_location, 'Location')
+        return db_location
+
+    def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
+                           phone="555-555-5555", website="http://stardrive.org"):
+
+        resource = StarResource(title=title, description=description, phone=phone, website=website)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
         db.session.commit()
@@ -806,6 +836,122 @@ class TestCase(unittest.TestCase):
         self.construct_professional_questionnaire(user=user, participant=participant)
         self.construct_supports_questionnaire(user=user, participant=participant)
 
+    def test_event_basics(self):
+        self.construct_event()
+        r = db.session.query(Event).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/event/%i' % r_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], r_id)
+        self.assertEqual(response["title"], 'A+ Event')
+        self.assertEqual(response["description"], 'A delightful event destined to create rejoicing')
+
+    def test_modify_event_basics(self):
+        self.construct_event()
+        r = db.session.query(Event).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/event/%i' % r_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['website'] = 'http://sartography.com'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/event/%i' % r_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/event/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['website'], 'http://sartography.com')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_event(self):
+        r = self.construct_event()
+        r_id = r.id
+        rv = self.app.get('api/event/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/event/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/event/%i' % r_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_event(self):
+        event = {'title': "event of events", 'description': "You need this event in your life."}
+        rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'event of events')
+        self.assertEqual(response['description'], 'You need this event in your life.')
+        self.assertIsNotNone(response['id'])
+
+    def test_location_basics(self):
+        self.construct_location()
+        r = db.session.query(Location).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/location/%i' % r_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], r_id)
+        self.assertEqual(response["title"], 'A+ location')
+        self.assertEqual(response["description"], 'A delightful location destined to create rejoicing')
+
+    def test_modify_location_basics(self):
+        self.construct_location()
+        r = db.session.query(Location).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/location/%i' % r_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['website'] = 'http://sartography.com'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/location/%i' % r_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/location/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['website'], 'http://sartography.com')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_location(self):
+        r = self.construct_location()
+        r_id = r.id
+        rv = self.app.get('api/location/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/location/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/location/%i' % r_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_location(self):
+        location = {'title': "location of locations", 'description': "You need this location in your life."}
+        rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'location of locations')
+        self.assertEqual(response['description'], 'You need this location in your life.')
+        self.assertIsNotNone(response['id'])
+
     def test_resource_basics(self):
         self.construct_resource()
         r = db.session.query(StarResource).first()
@@ -830,8 +976,6 @@ class TestCase(unittest.TestCase):
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
         response['website'] = 'http://sartography.com'
-        response['county'] = 'Rockingbridge'
-        response['image_caption'] = 'Daniel GG Dog Da Funk-a-funka'
         orig_date = response['last_updated']
         rv = self.app.put('/api/resource/%i' % r_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -842,8 +986,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
         self.assertEqual(response['website'], 'http://sartography.com')
-        self.assertEqual(response['county'], 'Rockingbridge')
-        self.assertEqual(response['image_caption'], 'Daniel GG Dog Da Funk-a-funka')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_resource(self):
@@ -1156,6 +1298,252 @@ class TestCase(unittest.TestCase):
 
         self.assertEqual(1, len(response))
         self.assertEqual(1, len(response[0]["children"]))
+
+    def test_get_event_by_category(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+        ce = EventCategory(event=ev, category=c)
+        db.session.add(ce)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/event' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(ev.description, response[0]["event"]["description"])
+
+    def test_get_event_by_category_includes_category_details(self):
+        c = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        ev = self.construct_event()
+        ce = EventCategory(event=ev, category=c)
+        ce2 = EventCategory(event=ev, category=c2)
+        db.session.add_all([ce, ce2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/event' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(2,
+                         len(response[0]["event"]["event_categories"]))
+        self.assertEqual(
+            "c1", response[0]["event"]["event_categories"][0]["category"]
+            ["name"])
+
+    def test_category_event_count(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+        ce = EventCategory(event=ev, category=c)
+        db.session.add(ce)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i' % c.id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response["event_count"])
+
+    def test_get_category_by_event(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+        ce = EventCategory(event=ev, category=c)
+        db.session.add(ce)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/event/%i/category' % ev.id,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(c.id, response[0]["id"])
+        self.assertEqual(c.name, response[0]["category"]["name"])
+
+    def test_add_category_to_event(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+
+        ec_data = {"event_id": ev.id, "category_id": c.id}
+
+        rv = self.app.post(
+            '/api/event_category',
+            data=json.dumps(ec_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(c.id, response["category_id"])
+        self.assertEqual(ev.id, response["event_id"])
+
+    def test_set_all_categories_on_event(self):
+        c1 = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        c3 = self.construct_category(name="c3")
+        ev = self.construct_event()
+
+        ec_data = [
+            {
+                "category_id": c1.id
+            },
+            {
+                "category_id": c2.id
+            },
+            {
+                "category_id": c3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/event/%i/category' % ev.id,
+            data=json.dumps(ec_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        ec_data = [{"category_id": c1.id}]
+        rv = self.app.post(
+            '/api/event/%i/category' % ev.id,
+            data=json.dumps(ec_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_category_from_event(self):
+        self.test_add_category_to_event()
+        rv = self.app.delete('/api/event_category/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/event/%i/category' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
+    def test_get_location_by_category(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+        cl = LocationCategory(location=loc, category=c)
+        db.session.add(cl)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/location' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(loc.id, response[0]["id"])
+        self.assertEqual(loc.description, response[0]["location"]["description"])
+
+    def test_get_location_by_category_includes_category_details(self):
+        c = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        loc = self.construct_location()
+        cl = LocationCategory(location=loc, category=c)
+        cl2 = LocationCategory(location=loc, category=c2)
+        db.session.add_all([cl, cl2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/location' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(loc.id, response[0]["id"])
+        self.assertEqual(2,
+                         len(response[0]["location"]["location_categories"]))
+        self.assertEqual(
+            "c1", response[0]["location"]["location_categories"][0]["category"]
+            ["name"])
+
+    def test_category_location_count(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+        cr = LocationCategory(location=loc, category=c)
+        db.session.add(cr)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i' % c.id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response["location_count"])
+
+    def test_get_category_by_location(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+        cl = LocationCategory(location=loc, category=c)
+        db.session.add(cl)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/location/%i/category' % loc.id,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(c.id, response[0]["id"])
+        self.assertEqual(c.name, response[0]["category"]["name"])
+
+    def test_add_category_to_location(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+
+        rc_data = {"location_id": loc.id, "category_id": c.id}
+
+        rv = self.app.post(
+            '/api/location_category',
+            data=json.dumps(rc_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(c.id, response["category_id"])
+        self.assertEqual(loc.id, response["location_id"])
+
+    def test_set_all_categories_on_location(self):
+        c1 = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        c3 = self.construct_category(name="c3")
+        loc = self.construct_location()
+
+        lc_data = [
+            {
+                "category_id": c1.id
+            },
+            {
+                "category_id": c2.id
+            },
+            {
+                "category_id": c3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/location/%i/category' % loc.id,
+            data=json.dumps(lc_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        lc_data = [{"category_id": c1.id}]
+        rv = self.app.post(
+            '/api/location/%i/category' % loc.id,
+            data=json.dumps(lc_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_category_from_location(self):
+        self.test_add_category_to_location()
+        rv = self.app.delete('/api/location_category/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/location/%i/category' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
 
     def test_get_resource_by_category(self):
         c = self.construct_category()
