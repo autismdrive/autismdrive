@@ -76,8 +76,8 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[5]) if row[5] else None
-                event = Event(title=row[0], description=row[1],date=row[2], time=row[3], ticket_cost=row[4],
-                              organization=org, primary_contact=row[6],location_name=row[7], street_address1=row[8],
+                event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
+                              organization=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
                               street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
                               phone=row[14])
                 db.session.add(event)
@@ -85,7 +85,6 @@ class DataLoader:
                 self.__increment_id_sequence(Event)
 
                 for i in range(15, 22):
-                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     event_id = event.id
                     category_id = category.id
@@ -112,7 +111,6 @@ class DataLoader:
                 self.__increment_id_sequence(Location)
 
                 for i in range(16, 26):
-                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     location_id = location.id
                     category_id = category.id
@@ -138,7 +136,6 @@ class DataLoader:
                 self.__increment_id_sequence(StarResource)
 
                 for i in range(15, 22):
-                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     resource_id = resource.id
                     category_id = category.id
@@ -163,7 +160,6 @@ class DataLoader:
                 self.__increment_id_sequence(Study)
 
                 for i in range(7, 10):
-                    if not row[i]: continue
                     category = self.get_category_by_name(row[i])
                     study_id = study.id
                     category_id = category.id
@@ -202,7 +198,6 @@ class DataLoader:
                 self.__increment_id_sequence(Training)
 
                 for i in range(8, 12):
-                    if not row[i]: continue
                     category = self.get_category_by_name(row[i])
                     training_id = eval(row[0])
                     category_id = category.id
@@ -449,12 +444,16 @@ class DataLoader:
         db.session.commit()
 
     def clear_resources(self):
+        db.session.query(EventCategory).delete()
+        db.session.query(LocationCategory).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
         db.session.query(TrainingCategory).delete()
         db.session.query(Category).delete()
         db.session.query(Investigator).delete()
+        db.session.query(Event).delete()
+        db.session.query(Location).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
         db.session.query(Training).delete()

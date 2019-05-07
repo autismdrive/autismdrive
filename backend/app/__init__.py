@@ -158,6 +158,8 @@ def resourcereset():
     data_loader.clear_index()
     data_loader.clear_resources()
     data_loader.load_categories()
+    data_loader.load_events()
+    data_loader.load_locations()
     data_loader.load_resources()
     data_loader.load_studies()
     data_loader.load_trainings()
