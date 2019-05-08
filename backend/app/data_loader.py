@@ -84,8 +84,9 @@ class DataLoader:
                 db.session.commit()
                 self.__increment_id_sequence(Event)
 
-                for i in range(15, 22):
+                for i in range(15, 25):
                     category = self.get_category_by_name(row[i].strip())
+                    if not row[i]: continue
                     event_id = event.id
                     category_id = category.id
 
@@ -111,6 +112,7 @@ class DataLoader:
                 self.__increment_id_sequence(Location)
 
                 for i in range(16, 26):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     location_id = location.id
                     category_id = category.id
@@ -136,6 +138,7 @@ class DataLoader:
                 self.__increment_id_sequence(StarResource)
 
                 for i in range(15, 22):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     resource_id = resource.id
                     category_id = category.id
@@ -160,6 +163,7 @@ class DataLoader:
                 self.__increment_id_sequence(Study)
 
                 for i in range(7, 10):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i])
                     study_id = study.id
                     category_id = category.id
@@ -198,6 +202,7 @@ class DataLoader:
                 self.__increment_id_sequence(Training)
 
                 for i in range(8, 12):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i])
                     training_id = eval(row[0])
                     category_id = category.id
