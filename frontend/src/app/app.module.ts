@@ -81,7 +81,6 @@ import { StudiesComponent } from './studies/studies.component';
 import { StudyDetailComponent } from './study-detail/study-detail.component';
 import { TermsComponent } from './terms/terms.component';
 import { TimedoutComponent } from './timed-out/timed-out.component';
-import { TrainingDetailComponent } from './training-detail/training-detail.component';
 import { HeaderComponent } from './header/header.component';
 import { NewsItemComponent } from './news-item/news-item.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
@@ -152,7 +151,6 @@ export class FormlyConfig {
     StudyDetailComponent,
     TermsComponent,
     TimedoutComponent,
-    TrainingDetailComponent,
     HeaderComponent,
     NewsItemComponent,
     CategoryChipsComponent,
