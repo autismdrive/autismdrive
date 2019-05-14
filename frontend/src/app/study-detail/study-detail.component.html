@@ -25,7 +25,7 @@
         <h2>Benefits of participating</h2>
         <p>{{study.benefit_description}}</p>
       </div>
-      <div *ngIf="study.study_investigators">
+      <div *ngIf="study.study_investigators.length > 0">
         <h2>About the researchers</h2>
         <div *ngFor="let si of study.study_investigators">
           <p><a target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>, {{si.investigator.title}}, {{si.investigator.organization.name}}</p>
