@@ -153,9 +153,19 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
-                              benefit_description=row[3], organization=org, location=row[5], status=Status.currently_enrolling)
+                              benefit_description=row[3], organization=org, location=row[5])
+
+                if row[6].strip() == 'Currently Enrolling':
+                    study.status = Status.currently_enrolling
+                elif row[6].strip() == 'Study In Progress':
+                    study.status = Status.study_in_progress
+                elif row[6].strip() == 'Results Being Analyzed':
+                    study.status = Status.results_being_analyzed
+                elif row[6].strip() == 'Study Results Published':
+                    study.status = Status.study_results_published
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
+
 
                 for i in range(7, 10):
                     if not row[i]: continue
