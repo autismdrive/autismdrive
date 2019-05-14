@@ -17,8 +17,6 @@ from app.model.search import Filter, Search
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
-from app.model.training import Training
-from app.model.training_category import TrainingCategory
 from app.model.user import User, Role
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
@@ -51,7 +49,7 @@ class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
         fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies',
-                  'trainings', 'investigators')
+                  'investigators')
 
 
 class InvestigatorSchema(ModelSchema):
@@ -86,7 +84,7 @@ class CategorySchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count', 'location_count',
-                  'resource_count', 'study_count', 'training_count', '_links')
+                  'resource_count', 'study_count', '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -96,7 +94,6 @@ class CategorySchema(ModelSchema):
     location_count = fields.Method('get_location_count')
     resource_count = fields.Method('get_resource_count')
     study_count = fields.Method('get_study_count')
-    training_count = fields.Method('get_training_count')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
@@ -123,12 +120,6 @@ class CategorySchema(ModelSchema):
     def get_study_count(self, obj):
         query = db.session.query(StudyCategory).join(StudyCategory.study)\
             .filter(StudyCategory.category_id == obj.id)
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
-        return query.session.execute(count_q).scalar()
-
-    def get_training_count(self, obj):
-        query = db.session.query(TrainingCategory).join(TrainingCategory.training)\
-            .filter(TrainingCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
 
@@ -178,18 +169,6 @@ class CategoriesOnStudySchema(ModelSchema):
         'self': ma.URLFor('api.studycategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
         'study': ma.URLFor('api.studyendpoint', id='<study_id>')
-    })
-
-
-class CategoriesOnTrainingSchema(ModelSchema):
-    class Meta:
-        model = TrainingCategory
-        fields = ('id', '_links', 'training_id', 'category_id', 'category')
-    category = fields.Nested(ParentCategorySchema, dump_only=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.trainingcategoryendpoint', id='<id>'),
-        'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'training': ma.URLFor('api.trainingendpoint', id='<training_id>')
     })
 
 
@@ -445,57 +424,6 @@ class StudyInvestigatorSchema(ModelSchema):
         'self': ma.URLFor('api.studyinvestigatorendpoint', id='<id>'),
         'investigator': ma.URLFor('api.investigatorendpoint', id='<investigator_id>'),
         'study': ma.URLFor('api.studyendpoint', id='<study_id>')
-    })
-
-
-class TrainingSchema(ModelSchema):
-    class Meta:
-        model = Training
-        fields = ('id', 'title', 'last_updated', 'description', 'outcomes_description', 'image_url', 'image_caption',
-                  'website', 'organization_id', 'organization', 'training_categories', '_links')
-    organization_id = fields.Integer(required=False, allow_none=True)
-    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
-    training_categories = fields.Nested(CategoriesOnTrainingSchema(), many=True, dump_only=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.trainingendpoint', id='<id>'),
-        'collection': ma.URLFor('api.traininglistendpoint'),
-        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
-        'categories': ma.UrlFor('api.categorybytrainingendpoint', training_id='<id>')
-    })
-
-
-class TrainingCategoriesSchema(ModelSchema):
-    class Meta:
-        model = TrainingCategory
-        fields = ('id', '_links', 'training_id', 'category_id', 'category')
-    category = fields.Nested(CategorySchema, dump_only=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.trainingcategoryendpoint', id='<id>'),
-        'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'training': ma.URLFor('api.trainingendpoint', id='<training_id>')
-    })
-
-
-class CategoryTrainingsSchema(ModelSchema):
-    class Meta:
-        model = TrainingCategory
-        fields = ('id', '_links', 'training_id', 'category_id', 'training')
-    training = fields.Nested(TrainingSchema, dump_only=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.trainingcategoryendpoint', id='<id>'),
-        'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'training': ma.URLFor('api.trainingendpoint', id='<training_id>')
-    })
-
-
-class TrainingCategorySchema(ModelSchema):
-    class Meta:
-        model = TrainingCategory
-        fields = ('id', '_links', 'training_id', 'category_id')
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.trainingcategoryendpoint', id='<id>'),
-        'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'training': ma.URLFor('api.trainingendpoint', id='<training_id>')
     })
 
 
