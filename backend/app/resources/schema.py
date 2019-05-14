@@ -10,9 +10,7 @@ from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.investigator import Investigator
 from app.model.event import Event
-from app.model.event_category import EventCategory
 from app.model.location import Location
-from app.model.location_category import LocationCategory
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search
@@ -52,7 +50,7 @@ import app.model.questionnaires.supports_questionnaire
 class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
-        fields = ('id', 'name', 'last_updated', 'description', 'events', 'locations', 'resources', 'studies',
+        fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies',
                   'trainings', 'investigators')
 
 
@@ -105,19 +103,19 @@ class CategorySchema(ModelSchema):
     })
 
     def get_event_count(self, obj):
-        query = db.session.query(EventCategory).join(EventCategory.event)\
-            .filter(EventCategory.category_id == obj.id)
+        query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event')\
+            .filter(ResourceCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
 
     def get_location_count(self, obj):
-        query = db.session.query(LocationCategory).join(LocationCategory.location)\
-            .filter(LocationCategory.category_id == obj.id)
+        query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'location')\
+            .filter(ResourceCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
 
     def get_resource_count(self, obj):
-        query = db.session.query(ResourceCategory).join(ResourceCategory.resource)\
+        query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource')\
             .filter(ResourceCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
@@ -137,25 +135,25 @@ class CategorySchema(ModelSchema):
 
 class CategoriesOnEventSchema(ModelSchema):
     class Meta:
-        model = EventCategory
-        fields = ('id', '_links', 'event_id', 'category_id', 'category')
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(ParentCategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'event': ma.URLFor('api.eventendpoint', id='<event_id>')
+        'event': ma.URLFor('api.eventendpoint', id='<resource_id>')
     })
 
 
 class CategoriesOnLocationSchema(ModelSchema):
     class Meta:
-        model = LocationCategory
-        fields = ('id', '_links', 'location_id', 'category_id', 'category')
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(ParentCategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'location': ma.URLFor('api.locationendpoint', id='<location_id>')
+        'location': ma.URLFor('api.locationendpoint', id='<resource_id>')
     })
 
 
@@ -210,7 +208,7 @@ class InvestigatorsOnStudySchema(ModelSchema):
 class StarResourceSchema(ModelSchema):
     class Meta:
         model = StarResource
-        fields = ('id', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
+        fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'organization', 'resource_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -261,104 +259,103 @@ class ResourceCategorySchema(ModelSchema):
 class EventSchema(ModelSchema):
     class Meta:
         model = Event
-        fields = ('id', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
+        fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'organization', 'event_categories', '_links')
+                  'phone', 'website', 'organization', 'resource_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
-    event_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
+    resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventendpoint', id='<id>'),
         'collection': ma.URLFor('api.eventlistendpoint'),
         'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
-        'categories': ma.UrlFor('api.categorybyeventendpoint', event_id='<id>')
+        'categories': ma.UrlFor('api.categorybyeventendpoint', resource_id='<id>')
     })
 
 
 class EventCategoriesSchema(ModelSchema):
     class Meta:
-        model = EventCategory
-        fields = ('id', '_links', 'event_id', 'category_id', 'category')
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(CategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'event': ma.URLFor('api.eventendpoint', id='<event_id>')
+        'event': ma.URLFor('api.eventendpoint', id='<resource_id>')
     })
 
 
 class CategoryEventsSchema(ModelSchema):
     class Meta:
-        model = EventCategory
-        fields = ('id', '_links', 'event_id', 'category_id', 'event')
-    event = fields.Nested(EventSchema, dump_only=True)
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
+    resource = fields.Nested(EventSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'event': ma.URLFor('api.eventendpoint', id='<event_id>')
+        'event': ma.URLFor('api.eventendpoint', id='<resource_id>')
     })
 
 
 class EventCategorySchema(ModelSchema):
     class Meta:
-        model = EventCategory
-        fields = ('id', '_links', 'event_id', 'category_id')
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'event': ma.URLFor('api.eventendpoint', id='<event_id>')
+        'event': ma.URLFor('api.eventendpoint', id='<resource_id>')
     })
 
 
 class LocationSchema(ModelSchema):
     class Meta:
         model = Location
-        fields = ('id', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
+        fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'organization', 'location_categories', '_links')
+                  'organization', 'resource_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
-    location_categories = fields.Nested(CategoriesOnLocationSchema(), many=True, dump_only=True)
+    resource_categories = fields.Nested(CategoriesOnLocationSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationendpoint', id='<id>'),
         'collection': ma.URLFor('api.locationlistendpoint'),
         'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
-        'categories': ma.UrlFor('api.categorybylocationendpoint', location_id='<id>')
     })
 
 
 class LocationCategoriesSchema(ModelSchema):
     class Meta:
-        model = LocationCategory
-        fields = ('id', '_links', 'location_id', 'category_id', 'category')
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(CategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'location': ma.URLFor('api.locationendpoint', id='<location_id>')
+        'location': ma.URLFor('api.locationendpoint', id='<resource_id>')
     })
 
 
 class CategoryLocationsSchema(ModelSchema):
     class Meta:
-        model = LocationCategory
-        fields = ('id', '_links', 'location_id', 'category_id', 'location')
-    location = fields.Nested(LocationSchema, dump_only=True)
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
+    resource = fields.Nested(LocationSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'location': ma.URLFor('api.locationendpoint', id='<location_id>')
+        'location': ma.URLFor('api.locationendpoint', id='<resource_id>')
     })
 
 
 class LocationCategorySchema(ModelSchema):
     class Meta:
-        model = LocationCategory
-        fields = ('id', '_links', 'location_id', 'category_id')
+        model = ResourceCategory
+        fields = ('id', '_links', 'resource_id', 'category_id')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
-        'location': ma.URLFor('api.locationendpoint', id='<location_id>')
+        'location': ma.URLFor('api.locationendpoint', id='<resource_id>')
     })
 
 

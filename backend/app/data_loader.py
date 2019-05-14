@@ -9,9 +9,7 @@ from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.therapy import Therapy
 from app.model.event import Event
-from app.model.event_category import EventCategory
 from app.model.location import Location
-from app.model.location_category import LocationCategory
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
@@ -90,12 +88,12 @@ class DataLoader:
                     event_id = event.id
                     category_id = category.id
 
-                    event_category = EventCategory(event_id=event_id, category_id=category_id)
+                    event_category = ResourceCategory(resource_id=event_id, category_id=category_id, type='event')
                     db.session.add(event_category)
             print("Events loaded.  There are now %i events in the database." % db.session.query(
                 Event).count())
             print("There are now %i links between events and categories in the database." %
-                  db.session.query(EventCategory).count())
+                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event').count())
         db.session.commit()
 
     def load_locations(self):
@@ -117,12 +115,12 @@ class DataLoader:
                     location_id = location.id
                     category_id = category.id
 
-                    location_category = LocationCategory(location_id=location_id, category_id=category_id)
+                    location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
                     db.session.add(location_category)
             print("Locations loaded.  There are now %i locations in the database." % db.session.query(
-                Location).count())
+                Location).filter(Location.type == 'location').count())
             print("There are now %i links between locations and categories in the database." %
-                  db.session.query(LocationCategory).count())
+                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'location').count())
         db.session.commit()
 
     def load_resources(self):
@@ -143,12 +141,12 @@ class DataLoader:
                     resource_id = resource.id
                     category_id = category.id
 
-                    resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id)
+                    resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
                     db.session.add(resource_category)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
-                StarResource).count())
+                StarResource).filter(StarResource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
-                  db.session.query(ResourceCategory).count())
+                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource').count())
         db.session.commit()
 
     def load_studies(self):
@@ -430,8 +428,6 @@ class DataLoader:
         db.session.query(Therapy).delete()
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()
-        db.session.query(EventCategory).delete()
-        db.session.query(LocationCategory).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
@@ -449,8 +445,6 @@ class DataLoader:
         db.session.commit()
 
     def clear_resources(self):
-        db.session.query(EventCategory).delete()
-        db.session.query(LocationCategory).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()

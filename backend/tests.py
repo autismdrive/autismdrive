@@ -31,8 +31,6 @@ from app.model.investigator import Investigator
 from app.model.participant import Participant, Relationship
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_category import StudyCategory
-from app.model.event_category import EventCategory
-from app.model.location_category import LocationCategory
 from app.model.resource_category import ResourceCategory
 from app.model.training_category import TrainingCategory
 from app.model.questionnaires.assistive_device import AssistiveDevice
@@ -885,13 +883,16 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_event(self):
-        event = {'title': "event of events", 'description': "You need this event in your life."}
+        event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
+                 'ticket_cost': "$500 suggested donation"}
         rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'event of events')
         self.assertEqual(response['description'], 'You need this event in your life.')
+        self.assertEqual(response['time'], '4PM sharp')
+        self.assertEqual(response['ticket_cost'], '$500 suggested donation')
         self.assertIsNotNone(response['id'])
 
     def test_location_basics(self):
@@ -1302,8 +1303,8 @@ class TestCase(unittest.TestCase):
     def test_get_event_by_category(self):
         c = self.construct_category()
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        db.session.add(ce)
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
@@ -1313,15 +1314,15 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
         self.assertEqual(ev.id, response[0]["id"])
-        self.assertEqual(ev.description, response[0]["event"]["description"])
+        self.assertEqual(ev.description, response[0]["resource"]["description"])
 
     def test_get_event_by_category_includes_category_details(self):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        ce2 = EventCategory(event=ev, category=c2)
-        db.session.add_all([ce, ce2])
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=ev.id, category=c2, type='event')
+        db.session.add_all([rc, rc2])
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
@@ -1331,16 +1332,18 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(ev.id, response[0]["id"])
         self.assertEqual(2,
-                         len(response[0]["event"]["event_categories"]))
+                         len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
-            "c1", response[0]["event"]["event_categories"][0]["category"]
+            "c1", response[0]["resource"]["resource_categories"][0]["category"]
             ["name"])
 
     def test_category_event_count(self):
         c = self.construct_category()
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        db.session.add(ce)
+        rec = self.construct_resource()
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=rec.id, category=c, type='resource')
+        db.session.add_all([rc, rc2])
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
@@ -1351,8 +1354,8 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_event(self):
         c = self.construct_category()
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        db.session.add(ce)
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/event/%i/category' % ev.id,
@@ -1367,16 +1370,16 @@ class TestCase(unittest.TestCase):
         c = self.construct_category()
         ev = self.construct_event()
 
-        ec_data = {"event_id": ev.id, "category_id": c.id}
+        ec_data = {"resource_id": ev.id, "category_id": c.id}
 
         rv = self.app.post(
-            '/api/event_category',
+            '/api/resource_category',
             data=json.dumps(ec_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(ev.id, response["event_id"])
+        self.assertEqual(ev.id, response["resource_id"])
 
     def test_set_all_categories_on_event(self):
         c1 = self.construct_category(name="c1")
@@ -1414,7 +1417,7 @@ class TestCase(unittest.TestCase):
 
     def test_remove_category_from_event(self):
         self.test_add_category_to_event()
-        rv = self.app.delete('/api/event_category/%i' % 1)
+        rv = self.app.delete('/api/resource_category/%i' % 1)
         self.assertSuccess(rv)
         rv = self.app.get(
             '/api/event/%i/category' % 1, content_type="application/json")
@@ -1425,8 +1428,8 @@ class TestCase(unittest.TestCase):
     def test_get_location_by_category(self):
         c = self.construct_category()
         loc = self.construct_location()
-        cl = LocationCategory(location=loc, category=c)
-        db.session.add(cl)
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/location' % c.id,
@@ -1436,15 +1439,15 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
         self.assertEqual(loc.id, response[0]["id"])
-        self.assertEqual(loc.description, response[0]["location"]["description"])
+        self.assertEqual(loc.description, response[0]["resource"]["description"])
 
     def test_get_location_by_category_includes_category_details(self):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         loc = self.construct_location()
-        cl = LocationCategory(location=loc, category=c)
-        cl2 = LocationCategory(location=loc, category=c2)
-        db.session.add_all([cl, cl2])
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        rc2 = ResourceCategory(resource_id=loc.id, category=c2, type='location')
+        db.session.add_all([rc, rc2])
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/location' % c.id,
@@ -1454,16 +1457,16 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(loc.id, response[0]["id"])
         self.assertEqual(2,
-                         len(response[0]["location"]["location_categories"]))
+                         len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
-            "c1", response[0]["location"]["location_categories"][0]["category"]
+            "c1", response[0]["resource"]["resource_categories"][0]["category"]
             ["name"])
 
     def test_category_location_count(self):
         c = self.construct_category()
         loc = self.construct_location()
-        cr = LocationCategory(location=loc, category=c)
-        db.session.add(cr)
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
@@ -1474,8 +1477,8 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_location(self):
         c = self.construct_category()
         loc = self.construct_location()
-        cl = LocationCategory(location=loc, category=c)
-        db.session.add(cl)
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/location/%i/category' % loc.id,
@@ -1490,16 +1493,16 @@ class TestCase(unittest.TestCase):
         c = self.construct_category()
         loc = self.construct_location()
 
-        rc_data = {"location_id": loc.id, "category_id": c.id}
+        rc_data = {"resource_id": loc.id, "category_id": c.id}
 
         rv = self.app.post(
-            '/api/location_category',
+            '/api/resource_category',
             data=json.dumps(rc_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(loc.id, response["location_id"])
+        self.assertEqual(loc.id, response["resource_id"])
 
     def test_set_all_categories_on_location(self):
         c1 = self.construct_category(name="c1")
@@ -1537,7 +1540,7 @@ class TestCase(unittest.TestCase):
 
     def test_remove_category_from_location(self):
         self.test_add_category_to_location()
-        rv = self.app.delete('/api/location_category/%i' % 1)
+        rv = self.app.delete('/api/resource_category/%i' % 1)
         self.assertSuccess(rv)
         rv = self.app.get(
             '/api/location/%i/category' % 1, content_type="application/json")
@@ -1548,7 +1551,7 @@ class TestCase(unittest.TestCase):
     def test_get_resource_by_category(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1565,8 +1568,8 @@ class TestCase(unittest.TestCase):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
-        cr2 = ResourceCategory(resource=r, category=c2)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
+        cr2 = ResourceCategory(resource=r, category=c2, type='resource')
         db.session.add_all([cr, cr2])
         db.session.commit()
         rv = self.app.get(
@@ -1585,7 +1588,7 @@ class TestCase(unittest.TestCase):
     def test_category_resource_count(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1597,7 +1600,7 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_resource(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
