@@ -24,7 +24,7 @@ describe('Anonymous User', () => {
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should visit enroll page', () => globalHeaderUseCases.visitEnrollPage());
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
-  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
+  it('should visit resources search page', () => globalHeaderUseCases.visitResourcesSearchPage());
 
   // Login & Register
   it('should display terms and conditions when Create Account button is clicked', () => loginUseCases.displayTerms());
