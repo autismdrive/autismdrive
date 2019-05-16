@@ -24,17 +24,13 @@ from app.model.category import Category
 from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import StarResource
-from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
 from app.model.investigator import Investigator
 from app.model.participant import Participant, Relationship
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_category import StudyCategory
-from app.model.event_category import EventCategory
-from app.model.location_category import LocationCategory
 from app.model.resource_category import ResourceCategory
-from app.model.training_category import TrainingCategory
 from app.model.questionnaires.assistive_device import AssistiveDevice
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
@@ -98,7 +94,6 @@ class TestCase(unittest.TestCase):
         endpoints = [
             ('api.categorybyresourceendpoint', '/api/resource/<resource_id>/category'),
             ('api.categorybystudyendpoint', '/api/study/<study_id>/category'),
-            ('api.categorybytrainingendpoint', '/api/training/<training_id>/category'),
             ('api.categoryendpoint', '/api/category/<id>'),
             ('api.categorylistendpoint', '/api/category'),
             ('api.questionnaireendpoint', '/api/q/<name>/<id>'),
@@ -116,11 +111,6 @@ class TestCase(unittest.TestCase):
             ('api.studycategorylistendpoint', '/api/study_category'),
             ('api.studyendpoint', '/api/study/<id>'),
             ('api.studylistendpoint', '/api/study'),
-            ('api.trainingbycategoryendpoint', '/api/category/<category_id>/training'),
-            ('api.trainingcategoryendpoint', '/api/training_category/<id>'),
-            ('api.trainingcategorylistendpoint', '/api/training_category'),
-            ('api.trainingendpoint', '/api/training/<id>'),
-            ('api.traininglistendpoint', '/api/training'),
             ('api.userendpoint', '/api/user/<id>'),
             ('api.userlistendpoint', '/api/user'),
             ('auth.forgot_password', '/api/forgot_password'),
@@ -194,21 +184,6 @@ class TestCase(unittest.TestCase):
         db_study = db.session.query(Study).filter_by(title=study.title).first()
         self.assertEqual(db_study.description, study.description)
         return db_study
-
-    def construct_training(self, title="Best Training", description="A training to end all trainings",
-                           outcomes_description="Increased intelligence and the ability to do magic tricks.",
-                           image_url="assets/image.png", image_caption="One of the magic tricks you will learn"):
-
-        training = Training(title=title, description=description, outcomes_description=outcomes_description,
-                            image_url=image_url,
-                            image_caption=image_caption)
-        training.organization_id = self.construct_organization().id
-        db.session.add(training)
-        db.session.commit()
-
-        db_training = db.session.query(Training).filter_by(title=training.title).first()
-        self.assertEqual(db_training.outcomes_description, training.outcomes_description)
-        return db_training
 
     def construct_organization(self, name="Staunton Makerspace",
                                description="A place full of surprise, delight, and amazing people. And tools. Lots of exciting tools."):
@@ -885,13 +860,16 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_event(self):
-        event = {'title': "event of events", 'description': "You need this event in your life."}
+        event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
+                 'ticket_cost': "$500 suggested donation"}
         rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'event of events')
         self.assertEqual(response['description'], 'You need this event in your life.')
+        self.assertEqual(response['time'], '4PM sharp')
+        self.assertEqual(response['ticket_cost'], '$500 suggested donation')
         self.assertIsNotNone(response['id'])
 
     def test_location_basics(self):
@@ -1068,66 +1046,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['benefit_description'], 'This study will change your life.')
         self.assertIsNotNone(response['id'])
 
-    def test_training_basics(self):
-        self.construct_training()
-        t = db.session.query(Training).first()
-        self.assertIsNotNone(t)
-        t_id = t.id
-        rv = self.app.get('/api/training/%i' % t_id,
-                          follow_redirects=True,
-                          content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["id"], t_id)
-        self.assertEqual(response["title"], 'Best Training')
-        self.assertEqual(response["description"], 'A training to end all trainings')
-
-    def test_modify_training_basics(self):
-        self.construct_training()
-        t = db.session.query(Training).first()
-        self.assertIsNotNone(t)
-        t_id = t.id
-        rv = self.app.get('/api/training/%i' % t_id, content_type="application/json")
-        response = json.loads(rv.get_data(as_text=True))
-        response['title'] = 'Edwarardos Lemonade and Oil Change'
-        response['description'] = 'Better fluids for you and your car.'
-        response['outcomes_description'] = 'Better fluids for you and your car, Duh.'
-        response['image_caption'] = 'A nice cool glass of lemonade'
-        orig_date = response['last_updated']
-        rv = self.app.put('/api/training/%i' % t_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
-        self.assertSuccess(rv)
-        rv = self.app.get('/api/training/%i' % t_id, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
-        self.assertEqual(response['description'], 'Better fluids for you and your car.')
-        self.assertEqual(response['outcomes_description'], 'Better fluids for you and your car, Duh.')
-        self.assertEqual(response['image_caption'], 'A nice cool glass of lemonade')
-        self.assertNotEqual(orig_date, response['last_updated'])
-
-    def test_delete_training(self):
-        t = self.construct_training()
-        t_id = t.id
-        rv = self.app.get('api/training/%i' % t_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.delete('api/training/%i' % t_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.get('api/training/%i' % t_id, content_type="application/json")
-        self.assertEqual(404, rv.status_code)
-
-    def test_create_training(self):
-        training = {'title': "Training of Trainings", 'outcomes_description': "This training will change your life."}
-        rv = self.app.post('api/training', data=json.dumps(training), content_type="application/json",
-                           follow_redirects=True)
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['title'], 'Training of Trainings')
-        self.assertEqual(response['outcomes_description'], 'This training will change your life.')
-        self.assertIsNotNone(response['id'])
-
     def test_organization_basics(self):
         self.construct_organization()
         o = db.session.query(Organization).first()
@@ -1302,8 +1220,8 @@ class TestCase(unittest.TestCase):
     def test_get_event_by_category(self):
         c = self.construct_category()
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        db.session.add(ce)
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
@@ -1313,15 +1231,15 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
         self.assertEqual(ev.id, response[0]["id"])
-        self.assertEqual(ev.description, response[0]["event"]["description"])
+        self.assertEqual(ev.description, response[0]["resource"]["description"])
 
     def test_get_event_by_category_includes_category_details(self):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        ce2 = EventCategory(event=ev, category=c2)
-        db.session.add_all([ce, ce2])
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=ev.id, category=c2, type='event')
+        db.session.add_all([rc, rc2])
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
@@ -1331,16 +1249,18 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(ev.id, response[0]["id"])
         self.assertEqual(2,
-                         len(response[0]["event"]["event_categories"]))
+                         len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
-            "c1", response[0]["event"]["event_categories"][0]["category"]
+            "c1", response[0]["resource"]["resource_categories"][0]["category"]
             ["name"])
 
     def test_category_event_count(self):
         c = self.construct_category()
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        db.session.add(ce)
+        rec = self.construct_resource()
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=rec.id, category=c, type='resource')
+        db.session.add_all([rc, rc2])
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
@@ -1351,8 +1271,8 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_event(self):
         c = self.construct_category()
         ev = self.construct_event()
-        ce = EventCategory(event=ev, category=c)
-        db.session.add(ce)
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/event/%i/category' % ev.id,
@@ -1367,16 +1287,16 @@ class TestCase(unittest.TestCase):
         c = self.construct_category()
         ev = self.construct_event()
 
-        ec_data = {"event_id": ev.id, "category_id": c.id}
+        ec_data = {"resource_id": ev.id, "category_id": c.id}
 
         rv = self.app.post(
-            '/api/event_category',
+            '/api/resource_category',
             data=json.dumps(ec_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(ev.id, response["event_id"])
+        self.assertEqual(ev.id, response["resource_id"])
 
     def test_set_all_categories_on_event(self):
         c1 = self.construct_category(name="c1")
@@ -1414,7 +1334,7 @@ class TestCase(unittest.TestCase):
 
     def test_remove_category_from_event(self):
         self.test_add_category_to_event()
-        rv = self.app.delete('/api/event_category/%i' % 1)
+        rv = self.app.delete('/api/resource_category/%i' % 1)
         self.assertSuccess(rv)
         rv = self.app.get(
             '/api/event/%i/category' % 1, content_type="application/json")
@@ -1425,8 +1345,8 @@ class TestCase(unittest.TestCase):
     def test_get_location_by_category(self):
         c = self.construct_category()
         loc = self.construct_location()
-        cl = LocationCategory(location=loc, category=c)
-        db.session.add(cl)
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/location' % c.id,
@@ -1436,15 +1356,15 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
         self.assertEqual(loc.id, response[0]["id"])
-        self.assertEqual(loc.description, response[0]["location"]["description"])
+        self.assertEqual(loc.description, response[0]["resource"]["description"])
 
     def test_get_location_by_category_includes_category_details(self):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         loc = self.construct_location()
-        cl = LocationCategory(location=loc, category=c)
-        cl2 = LocationCategory(location=loc, category=c2)
-        db.session.add_all([cl, cl2])
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        rc2 = ResourceCategory(resource_id=loc.id, category=c2, type='location')
+        db.session.add_all([rc, rc2])
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i/location' % c.id,
@@ -1454,16 +1374,16 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(loc.id, response[0]["id"])
         self.assertEqual(2,
-                         len(response[0]["location"]["location_categories"]))
+                         len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
-            "c1", response[0]["location"]["location_categories"][0]["category"]
+            "c1", response[0]["resource"]["resource_categories"][0]["category"]
             ["name"])
 
     def test_category_location_count(self):
         c = self.construct_category()
         loc = self.construct_location()
-        cr = LocationCategory(location=loc, category=c)
-        db.session.add(cr)
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
@@ -1474,8 +1394,8 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_location(self):
         c = self.construct_category()
         loc = self.construct_location()
-        cl = LocationCategory(location=loc, category=c)
-        db.session.add(cl)
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
         db.session.commit()
         rv = self.app.get(
             '/api/location/%i/category' % loc.id,
@@ -1490,16 +1410,16 @@ class TestCase(unittest.TestCase):
         c = self.construct_category()
         loc = self.construct_location()
 
-        rc_data = {"location_id": loc.id, "category_id": c.id}
+        rc_data = {"resource_id": loc.id, "category_id": c.id}
 
         rv = self.app.post(
-            '/api/location_category',
+            '/api/resource_category',
             data=json.dumps(rc_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(loc.id, response["location_id"])
+        self.assertEqual(loc.id, response["resource_id"])
 
     def test_set_all_categories_on_location(self):
         c1 = self.construct_category(name="c1")
@@ -1537,7 +1457,7 @@ class TestCase(unittest.TestCase):
 
     def test_remove_category_from_location(self):
         self.test_add_category_to_location()
-        rv = self.app.delete('/api/location_category/%i' % 1)
+        rv = self.app.delete('/api/resource_category/%i' % 1)
         self.assertSuccess(rv)
         rv = self.app.get(
             '/api/location/%i/category' % 1, content_type="application/json")
@@ -1548,7 +1468,7 @@ class TestCase(unittest.TestCase):
     def test_get_resource_by_category(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1565,8 +1485,8 @@ class TestCase(unittest.TestCase):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
-        cr2 = ResourceCategory(resource=r, category=c2)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
+        cr2 = ResourceCategory(resource=r, category=c2, type='resource')
         db.session.add_all([cr, cr2])
         db.session.commit()
         rv = self.app.get(
@@ -1585,7 +1505,7 @@ class TestCase(unittest.TestCase):
     def test_category_resource_count(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1597,7 +1517,7 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_resource(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1791,129 +1711,6 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
 
-    def test_get_training_by_category(self):
-        c = self.construct_category()
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        db.session.add(ct)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/category/%i/training' % c.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(t.id, response[0]["id"])
-        self.assertEqual(t.description, response[0]["training"]["description"])
-
-    def test_get_training_by_category_includes_category_details(self):
-        c = self.construct_category(name="c1")
-        c2 = self.construct_category(name="c2")
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        ct2 = TrainingCategory(training=t, category=c2)
-        db.session.add_all([ct, ct2])
-        db.session.commit()
-        rv = self.app.get(
-            '/api/category/%i/training' % c.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(t.id, response[0]["id"])
-        self.assertEqual(2,
-                         len(response[0]["training"]["training_categories"]))
-        self.assertEqual(
-            "c1", response[0]["training"]["training_categories"][0]["category"]
-            ["name"])
-
-    def test_category_training_count(self):
-        c = self.construct_category()
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        db.session.add(ct)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/category/%i' % c.id, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, response["training_count"])
-
-    def test_get_category_by_training(self):
-        c = self.construct_category()
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        db.session.add(ct)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/training/%i/category' % t.id,
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(c.id, response[0]["id"])
-        self.assertEqual(c.name, response[0]["category"]["name"])
-
-    def test_add_category_to_training(self):
-        c = self.construct_category()
-        t = self.construct_training()
-
-        tc_data = {"training_id": t.id, "category_id": c.id}
-
-        rv = self.app.post(
-            '/api/training_category',
-            data=json.dumps(tc_data),
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(t.id, response["training_id"])
-
-    def test_set_all_categories_on_training(self):
-        c1 = self.construct_category(name="c1")
-        c2 = self.construct_category(name="c2")
-        c3 = self.construct_category(name="c3")
-        t = self.construct_training()
-
-        tc_data = [
-            {
-                "category_id": c1.id
-            },
-            {
-                "category_id": c2.id
-            },
-            {
-                "category_id": c3.id
-            },
-        ]
-        rv = self.app.post(
-            '/api/training/%i/category' % t.id,
-            data=json.dumps(tc_data),
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(3, len(response))
-
-        tc_data = [{"category_id": c1.id}]
-        rv = self.app.post(
-            '/api/training/%i/category' % t.id,
-            data=json.dumps(tc_data),
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-
-    def test_remove_category_from_training(self):
-        self.test_add_category_to_training()
-        rv = self.app.delete('/api/training_category/%i' % 1)
-        self.assertSuccess(rv)
-        rv = self.app.get(
-            '/api/training/%i/category' % 1, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(0, len(response))
-
     def test_add_investigator_to_study(self):
         i = self.construct_investigator()
         s = self.construct_study()
@@ -2070,38 +1867,16 @@ class TestCase(unittest.TestCase):
 
     def test_study_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
+        rainbow_query = {'words': 'umbrellas', 'filters': []}
+        world_query = {'words': 'universe', 'filters': []}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
-        study = {'title': "space unicorn", 'description': "delivering rainbows"}
+        study = {'title': "space platypus", 'description': "delivering umbrellas"}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
-                           follow_redirects=True)
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-
-        search_results = self.search(rainbow_query)
-        self.assertEqual(1, len(search_results["hits"]))
-        self.assertEqual(search_results['hits'][0]['id'], response['id'])
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["hits"]))
-
-    def test_training_search_basics(self):
-        elastic_index.clear()
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
-        search_results = self.search(rainbow_query)
-        self.assertEqual(0, len(search_results["hits"]))
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["hits"]))
-
-        # test that elastic resource is created with post
-        training = {'title': "space unicorn", 'description': "delivering rainbows"}
-        rv = self.app.post('api/training', data=json.dumps(training), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))

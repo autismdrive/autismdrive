@@ -5,7 +5,7 @@ from app import db
 
 class Status(enum.Enum):
     currently_enrolling = 1
-    data_collection_complete = 2
+    study_in_progress = 2
     results_being_analyzed = 3
     study_results_published = 4
 

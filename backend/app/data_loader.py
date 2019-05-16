@@ -9,17 +9,13 @@ from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.therapy import Therapy
 from app.model.event import Event
-from app.model.event_category import EventCategory
 from app.model.location import Location
-from app.model.location_category import LocationCategory
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
-from app.model.training import Training
-from app.model.training_category import TrainingCategory
 from app.model.user import User
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
@@ -52,7 +48,6 @@ class DataLoader:
         self.location_file = directory + "/locations.csv"
         self.resource_file = directory + "/resources.csv"
         self.study_file = directory + "/studies.csv"
-        self.training_file = directory + "/trainings.csv"
         self.user_file = directory + "/users.csv"
         self.participant_file = directory + "/participants.csv"
         self.user_participant_file = directory + "/user_participants.csv"
@@ -84,17 +79,18 @@ class DataLoader:
                 db.session.commit()
                 self.__increment_id_sequence(Event)
 
-                for i in range(15, 22):
+                for i in range(15, 25):
                     category = self.get_category_by_name(row[i].strip())
+                    if not row[i]: continue
                     event_id = event.id
                     category_id = category.id
 
-                    event_category = EventCategory(event_id=event_id, category_id=category_id)
+                    event_category = ResourceCategory(resource_id=event_id, category_id=category_id, type='event')
                     db.session.add(event_category)
             print("Events loaded.  There are now %i events in the database." % db.session.query(
                 Event).count())
             print("There are now %i links between events and categories in the database." %
-                  db.session.query(EventCategory).count())
+                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event').count())
         db.session.commit()
 
     def load_locations(self):
@@ -111,16 +107,17 @@ class DataLoader:
                 self.__increment_id_sequence(Location)
 
                 for i in range(16, 26):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     location_id = location.id
                     category_id = category.id
 
-                    location_category = LocationCategory(location_id=location_id, category_id=category_id)
+                    location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
                     db.session.add(location_category)
             print("Locations loaded.  There are now %i locations in the database." % db.session.query(
-                Location).count())
+                Location).filter(Location.type == 'location').count())
             print("There are now %i links between locations and categories in the database." %
-                  db.session.query(LocationCategory).count())
+                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'location').count())
         db.session.commit()
 
     def load_resources(self):
@@ -136,16 +133,17 @@ class DataLoader:
                 self.__increment_id_sequence(StarResource)
 
                 for i in range(15, 22):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i].strip())
                     resource_id = resource.id
                     category_id = category.id
 
-                    resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id)
+                    resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
                     db.session.add(resource_category)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
-                StarResource).count())
+                StarResource).filter(StarResource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
-                  db.session.query(ResourceCategory).count())
+                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource').count())
         db.session.commit()
 
     def load_studies(self):
@@ -155,11 +153,22 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
-                              benefit_description=row[3], organization=org, location=row[5], status=Status.currently_enrolling)
+                              benefit_description=row[3], organization=org, location=row[5])
+
+                if row[6].strip() == 'Currently Enrolling':
+                    study.status = Status.currently_enrolling
+                elif row[6].strip() == 'Study In Progress':
+                    study.status = Status.study_in_progress
+                elif row[6].strip() == 'Results Being Analyzed':
+                    study.status = Status.results_being_analyzed
+                elif row[6].strip() == 'Study Results Published':
+                    study.status = Status.study_results_published
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
+
                 for i in range(7, 10):
+                    if not row[i]: continue
                     category = self.get_category_by_name(row[i])
                     study_id = study.id
                     category_id = category.id
@@ -184,30 +193,6 @@ class DataLoader:
                 Study).count())
             print("There are now %i links between studies and categories in the database." %
                   db.session.query(StudyCategory).count())
-        db.session.commit()
-
-    def load_trainings(self):
-        with open(self.training_file, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
-            next(reader, None)  # skip the headers
-            for row in reader:
-                org = self.get_org_by_name(row[6]) if row[6] else None
-                training = Training(id=row[0], title=row[1], description=row[2], outcomes_description=row[3], image_url=row[4],
-                                    image_caption=row[5], organization=org, website=row[7])
-                db.session.add(training)
-                self.__increment_id_sequence(Training)
-
-                for i in range(8, 12):
-                    category = self.get_category_by_name(row[i])
-                    training_id = eval(row[0])
-                    category_id = category.id
-
-                    training_category = TrainingCategory(training_id=training_id, category_id=category_id)
-                    db.session.add(training_category)
-            print("Trainings loaded.  There are now %i trainings in the database." % db.session.query(
-                Training).count())
-            print("There are now %i links between trainings and categories in the database." %
-                  db.session.query(TrainingCategory).count())
         db.session.commit()
 
     def load_users(self):
@@ -394,8 +379,7 @@ class DataLoader:
         elastic_index.load_documents(db.session.query(Event).all(),
                                      db.session.query(Location).all(),
                                      db.session.query(StarResource).all(),
-                                     db.session.query(Study).all(),
-                                     db.session.query(Training).all()
+                                     db.session.query(Study).all()
                                      )
 
     def clear_index(self):
@@ -425,12 +409,9 @@ class DataLoader:
         db.session.query(Therapy).delete()
         db.session.query(SupportsQuestionnaire).delete()
         db.session.query(StepLog).delete()
-        db.session.query(EventCategory).delete()
-        db.session.query(LocationCategory).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
-        db.session.query(TrainingCategory).delete()
         db.session.query(Category).delete()
         db.session.query(EmailLog).delete()
         db.session.query(Investigator).delete()
@@ -438,25 +419,20 @@ class DataLoader:
         db.session.query(Location).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
-        db.session.query(Training).delete()
         db.session.query(Participant).delete()
         db.session.query(User).delete()
         db.session.commit()
 
     def clear_resources(self):
-        db.session.query(EventCategory).delete()
-        db.session.query(LocationCategory).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
-        db.session.query(TrainingCategory).delete()
         db.session.query(Category).delete()
         db.session.query(Investigator).delete()
         db.session.query(Event).delete()
         db.session.query(Location).delete()
         db.session.query(StarResource).delete()
         db.session.query(Study).delete()
-        db.session.query(Training).delete()
         db.session.commit()
 
     def __increment_id_sequence(self, model):

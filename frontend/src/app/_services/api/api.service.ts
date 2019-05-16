@@ -9,7 +9,6 @@ import { Event } from '../../_models/event';
 import { Location } from '../../_models/location';
 import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
-import { Training } from '../../_models/training';
 import { User } from '../../_models/user';
 import { environment } from '../../../environments/environment';
 
@@ -22,7 +21,6 @@ export class ApiService {
   endpoints = {
     categorybyresource: '/api/resource/<resource_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
-    categorybytraining: '/api/training/<training_id>/category',
     category: '/api/category/<id>',
     categorylist: '/api/category',
     flow: '/api/flow/<name>/<participant_id>',
@@ -65,11 +63,6 @@ export class ApiService {
     studycategorylist: '/api/study_category',
     study: '/api/study/<id>',
     studylist: '/api/study',
-    trainingbycategory: '/api/category/<category_id>/training',
-    trainingcategory: '/api/training_category/<id>',
-    trainingcategorylist: '/api/training_category',
-    training: '/api/training/<id>',
-    traininglist: '/api/training',
     user: '/api/user/<id>',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
@@ -276,36 +269,6 @@ export class ApiService {
   /** Get Resources */
   getResources(): Observable<Resource[]> {
     return this.httpClient.get<Resource[]>(this._endpointUrl('resourcelist'))
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Add Training */
-  addTraining(training: Training): Observable<Training> {
-    return this.httpClient.post<Training>(this._endpointUrl('traininglist'), training)
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Update Training */
-  updateTraining(training: Training): Observable<Training> {
-    return this.httpClient.put<Training>(`${this._endpointUrl('training')}/${training.id}`, training)
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Delete Training */
-  deleteTraining(training: Training): Observable<Training> {
-    return this.httpClient.delete<Training>(`${this._endpointUrl('training')}/${training.id}`)
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Get Training */
-  getTraining(id: number): Observable<Training> {
-    return this.httpClient.get<Training>(this._endpointUrl('training').replace('<id>', id.toString()))
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Get Trainings */
-  getTrainings(): Observable<Training[]> {
-    return this.httpClient.get<Training[]>(this._endpointUrl('traininglist'))
       .pipe(catchError(this._handleError));
   }
 

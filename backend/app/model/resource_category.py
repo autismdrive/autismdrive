@@ -9,6 +9,7 @@ Base = declarative_base()
 class ResourceCategory(db.Model):
     __tablename__ = 'resource_category'
     id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String)
     resource_id = db.Column(db.Integer, db.ForeignKey(StarResource.id), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey(Category.id), nullable=False)
     resource = db.relationship(StarResource, backref='resource_categories')

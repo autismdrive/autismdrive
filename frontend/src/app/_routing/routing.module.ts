@@ -19,7 +19,6 @@ import { StudiesComponent } from '../studies/studies.component';
 import { StudyDetailComponent } from '../study-detail/study-detail.component';
 import { TermsComponent } from '../terms/terms.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
-import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
 import { EventDetailComponent } from '../event-detail/event-detail.component';
@@ -59,7 +58,6 @@ const routes: Routes = [
   { path: 'terms', component: TermsComponent, data: { title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true } },
   { path: 'logout', component: LogoutComponent, data: { title: 'You have been logged out.', hideHeader: true } },
   { path: 'timedout', component: TimedoutComponent, data: { title: 'Your session has timed out.', hideHeader: true } },
-  { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
   { path: 'search', component: SearchComponent, data: { title: 'Search' } },
   { path: 'search/:query', component: SearchComponent, data: { title: 'Search Resources' } },
   { matcher: searchFilterMatcher, component: SearchComponent, data: { title: 'Search' } },

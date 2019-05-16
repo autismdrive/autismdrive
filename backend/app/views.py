@@ -34,10 +34,6 @@ from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint
 )
-from app.resources.TrainingEndpoint import (
-    TrainingEndpoint,
-    TrainingListEndpoint
-)
 from app.resources.ParticipantEndpoint import ParticipantEndpoint
 from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
@@ -84,13 +80,6 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
-from app.resources.TrainingAndCategoryEndpoint import (
-    TrainingCategoryEndpoint,
-    CategoryByTrainingEndpoint,
-    TrainingByCategoryEndpoint,
-    TrainingCategoryListEndpoint
-)
-
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -135,7 +124,6 @@ endpoints = [
     (LocationByCategoryEndpoint, "/category/<category_id>/location"),
     (ResourceByCategoryEndpoint, "/category/<category_id>/resource"),
     (StudyByCategoryEndpoint, "/category/<category_id>/study"),
-    (TrainingByCategoryEndpoint, "/category/<category_id>/training"),
     # Organizations
     (OrganizationListEndpoint, "/organization"),
     (OrganizationEndpoint, "/organization/<id>"),
@@ -166,12 +154,6 @@ endpoints = [
     (InvestigatorByStudyEndpoint, "/study/<study_id>/investigator"),
     (StudyInvestigatorListEndpoint, "/study_investigator"),
     (StudyInvestigatorEndpoint, "/study_investigator/<id>"),
-    # Trainings
-    (TrainingListEndpoint, "/training"),
-    (TrainingEndpoint, "/training/<id>"),
-    (CategoryByTrainingEndpoint, "/training/<training_id>/category"),
-    (TrainingCategoryListEndpoint, "/training_category"),
-    (TrainingCategoryEndpoint, "/training_category/<id>"),
 
     # Investigators
     (InvestigatorListEndpoint, "/investigator"),
