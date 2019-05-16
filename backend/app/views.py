@@ -34,7 +34,7 @@ from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint
 )
-from app.resources.ParticipantEndpoint import ParticipantEndpoint
+from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint
 from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
     OrganizationListEndpoint
