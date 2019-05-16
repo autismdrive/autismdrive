@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import {
   Component,
   OnDestroy,
@@ -7,7 +6,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { MatPaginator, MatSidenav } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params, ParamMap } from '@angular/router';
 import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 
@@ -31,8 +30,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private renderer: Renderer2,
-    private searchService: SearchService,
-    private location: Location
+    private searchService: SearchService
   ) {
     this.route.queryParamMap.subscribe(qParams => {
       let words = '';
@@ -42,7 +40,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         if (key === 'words') {
           words = qParams.get(key);
         } else {
-          filters.push({ field: key, value: qParams.get(key) });
+          filters.push({ field: key, value: qParams.getAll(key) });
         }
       }
 
@@ -53,8 +51,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
 
       this.doSearch();
-
-      this.showFilters = qParams.keys.length === 0;
+      this.updateFilters();
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -82,43 +79,45 @@ export class SearchComponent implements OnInit, OnDestroy {
   removeWords() {
     this.query.words = '';
     this.query.start = 0;
-    this.paginator.firstPage();
-    this.doSearch();
-    this.updateFilters();
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.updateUrl(this.query);
   }
 
   updateUrl(query: Query) {
-    const queryArray: string[] = [];
+    const queryParams: Params = {};
 
     if (query.hasOwnProperty('words') && query.words) {
-      queryArray.push(`words=${query.words}`);
+      queryParams.words = query.words;
+    } else {
+      queryParams.words = undefined;
     }
 
     for (const filter of query.filters) {
-      queryArray.push(`${filter.field}=${filter.value}`);
+      queryParams[filter.field] = filter.value;
     }
 
-    const url = queryArray.length > 0 ? `/search/filter?${queryArray.join('&')}` : '/search';
-    // this.location.go(url);
-    this.router.navigateByUrl(url);
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: queryParams
+      });
   }
 
   doSearch() {
     this.loading = true;
-    this.updateUrl(this.query);
     this.searchService
       .search(this.query)
-      .subscribe(query => {
-        this.query = query;
-        //
-        // this.hideResults = (
-        //   (this.query.words === '') &&
-        //   (this.query.filters.length === 0)
-        // );
-
-        this.loading = false;
-
-        this.checkWindowWidth();
+      .subscribe(queryWithResults => {
+        if (this.query.equals(queryWithResults)) {
+          this.query = queryWithResults;
+          this.checkWindowWidth();
+          this.loading = false;
+        } else {
+          this.updateUrl(this.query);
+        }
       });
     if ((<any>window).gtag) {
       (<any>window).gtag('event', this.query.words, {
@@ -131,49 +130,64 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.query.sort = '-last_updated';
     this.showFilters = false;
     this.query.start = 0;
-    this.doSearch();
+    this.updateUrl(this.query);
   }
 
   sortByRelevance() {
     this.query.sort = '_score';
     this.showFilters = false;
     this.query.start = 0;
-    this.doSearch();
+    this.updateUrl(this.query);
   }
 
-  addFilter(field: string, value: string) {
-    this.query.filters.push({ field: field, value: value });
-    this.showFilters = false;
+  addFilter(field: string, fieldValue: string) {
+    const i = this.query.filters.findIndex(f => f.field === field);
+
+    // Filter has already been set
+    if (i > -1) {
+
+      // Make sure it's not a duplicate value
+      const j = this.query.filters[i].value.findIndex(v => v === fieldValue);
+
+      if (j === -1) {
+        this.query.filters[i].value.push(fieldValue);
+      }
+    } else {
+      this.query.filters.push({ field: field, value: [fieldValue] });
+    }
+
     this.query.start = 0;
 
     if (this.paginator) {
       this.paginator.firstPage();
     }
 
-    this.doSearch();
+    this.updateUrl(this.query);
   }
 
-  removeFilter(filter: Filter) {
-    const index = this.query.filters.indexOf(filter, 0);
-    if (index > -1) {
-      this.query.filters.splice(index, 1);
-    }
+  removeFilter(field: string, fieldValue: string) {
+    const i = this.query.filters.findIndex(f => f.field === field);
 
-    this.updateFilters();
+    if (i > -1) {
+      const j = this.query.filters[i].value.findIndex(v => v === fieldValue);
+      if (j > -1) {
+        this.query.filters[i].value.splice(j, 1);
+      }
+    }
     this.query.start = 0;
-    this.doSearch();
+    this.updateUrl(this.query);
   }
 
   updatePage() {
     this.query.size = this.paginator.pageSize;
     this.query.start = (this.paginator.pageIndex * this.paginator.pageSize) + 1;
-    this.doSearch();
+    this.updateUrl(this.query);
   }
 
   // Show filters if all filters have been removed.
   updateFilters() {
     this.showFilters = this.query.filters.length === 0;
-    if (this.showFilters) {
+    if (this.showFilters && this.sideNav) {
       this.sideNav.open();
     }
   }

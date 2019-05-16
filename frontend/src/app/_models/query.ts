@@ -19,6 +19,12 @@ export class Query {
       this.hits = this.hits.map(h => new Hit(h));
     }
   }
+
+  equals(otherQuery: Query) {
+    const sameWords = this.words === otherQuery.words;
+    const sameFilters = this.filters.toString() === otherQuery.filters.toString();
+    return (sameWords && sameFilters);
+  }
 }
 
 export class Hit {
@@ -41,7 +47,7 @@ export class Hit {
 
 export interface Filter {
   field: string;
-  value: string;
+  value: string[];
 }
 
 export interface Facet {

@@ -55,7 +55,7 @@ export class SearchBoxComponent implements OnInit {
     const hasFilters = Object.keys(newParams).length > 0;
 
     if (hasFilters) {
-      this.router.navigate(['/search/filter'], { queryParams: newParams,  skipLocationChange: true });
+      this.router.navigate(['/search/filter'], { queryParams: newParams });
     } else {
       this.router.navigateByUrl('/search');
     }

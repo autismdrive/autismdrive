@@ -80,15 +80,17 @@
             Search: {{query.words}}
           </li>
 
-          <li *ngFor="let filter of query.filters">
-            <button
-              mat-icon-button
-              (click)="removeFilter(filter)"
-            >
-              <i class="material-icons">remove_circle_outline</i>
-            </button>
-            {{filter.field}} : {{filter.value}}
-          </li>
+          <ng-container *ngFor="let filter of query.filters">
+            <li *ngFor="let fieldValue of filter.value">
+              <button
+                mat-icon-button
+                (click)="removeFilter(filter.field, fieldValue)"
+              >
+                <i class="material-icons">remove_circle_outline</i>
+              </button>
+              {{filter.field}} : {{fieldValue}}
+            </li>
+          </ng-container>
         </ul>
 
         <div *ngIf="!(loading || hideResults)">
