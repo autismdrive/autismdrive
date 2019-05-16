@@ -31,10 +31,10 @@ from app.model.questionnaires.professional_profile_questionnaire import Professi
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
+from app.model.step_log import StepLog
 
 
 class TestQuestionnaire(BaseTest, unittest.TestCase):
-
 
     def randomString(self):
         char_set = string.ascii_uppercase + string.digits
@@ -716,7 +716,6 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         log = db.session.query(StepLog).all()
         self.assertIsNotNone(log)
         self.assertTrue(len(log) > 0)
-
 
     def test_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
