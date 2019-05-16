@@ -2,8 +2,7 @@
   *ngIf="hit"
   [ngClass]="{
   'result-item': true,
-  'mat-typography': true,
-  'featured-item': isFeatured
+  'mat-typography': true
 }"
 >
   <div
@@ -29,7 +28,6 @@
     class="description"
   >{{hit.content}}</p>
   <a
-    *ngIf="isFeatured"
     class="chevron-link"
     href="/#/{{hit.type}}/{{hit.id}}"
   >View {{hit.type}} Details</a>

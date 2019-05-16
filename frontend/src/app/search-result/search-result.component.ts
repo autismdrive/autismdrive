@@ -8,7 +8,6 @@ import { Hit } from '../_models/query';
 })
 export class SearchResultComponent implements OnInit {
   @Input() hit: Hit;
-  @Input() isFeatured: boolean;
 
   constructor() {
   }

@@ -8,7 +8,10 @@
     class="sidenav"
   >
     <h2>
-      <span>Filters</span>
+      <span>
+        <mat-icon>filter_list</mat-icon>
+        Filters
+      </span>
       <div class="spacer"></div>
       <button
         mat-icon-button
@@ -61,43 +64,56 @@
     <div class="container">
       <div class="row">
         <ul class="applied-filters">
+          <li *ngIf="sideNav.opened">
+            <button
+              mat-button
+              (click)="sideNav.close()"
+            >
+              <mat-icon>arrow_back</mat-icon>
+              Select a filter
+            </button>
+          </li>
           <li *ngIf="!sideNav.opened">
             <button
-              mat-icon-button
+              mat-button
               (click)="sideNav.open()"
             >
-              <i class="material-icons">add_circle_outline</i>
+              <mat-icon>filter_list</mat-icon>
+              Add a filter
             </button>
-            Add a filter
           </li>
           <li *ngIf="query.words">
             <button
-              mat-icon-button
+              mat-button
               (click)="removeWords()"
             >
-              <i class="material-icons">remove_circle_outline</i>
+              <mat-icon>remove_circle_outline</mat-icon>
+              Search: {{query.words}}
             </button>
-            Search: {{query.words}}
           </li>
 
           <ng-container *ngFor="let filter of query.filters">
             <li *ngFor="let fieldValue of filter.value">
               <button
-                mat-icon-button
+                mat-button
                 (click)="removeFilter(filter.field, fieldValue)"
               >
-                <i class="material-icons">remove_circle_outline</i>
+                <mat-icon>remove_circle_outline</mat-icon>
+                {{filter.field}} : {{fieldValue}}
               </button>
-              {{filter.field}} : {{fieldValue}}
             </li>
           </ng-container>
         </ul>
 
-        <div *ngIf="!(loading || hideResults)">
+        <div
+          id="results"
+          fxLayout="column"
+          fxLayoutGap="40px"
+          *ngIf="!(loading || hideResults)"
+        >
           <app-search-result
             *ngFor="let hit of query.hits"
             [hit]="hit"
-            [isFeatured]="false"
           >
           </app-search-result>
           <mat-paginator
