@@ -1865,13 +1865,37 @@ class TestCase(unittest.TestCase):
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["hits"]))
 
+    def test_search_facets(self):
+        elastic_index.clear()
+        type_query = {'words': '', 'facets': {"Type": "Resource"}}
+        category_query = {'words': '', 'facets': {"Category": ["Space", "Rainbows"]}}
+        search_results = self.search(type_query)
+        self.assertEqual(0, len(search_results["hits"]))
+        search_results = self.search(category_query)
+        self.assertEqual(0, len(search_results["hits"]))
+
+        # test that elastic resource is created with post
+        c = self.construct_category(name="Rainbows")
+        c2 = self.construct_category(name="Space")
+        res = self.construct_resource(title="space unicorn", description="delivering rainbows")
+        rc = ResourceCategory(resource_id=res.id, category=c, type='resource')
+        rc2 = ResourceCategory(resource_id=res.id, category=c2, type='resource')
+        rv = self.app.get('api/resource/%i' % res.id, content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+
+        search_results = self.search(type_query)
+        self.assertEqual(1, len(search_results["hits"]))
+        search_results = self.search(category_query)
+        self.assertEqual(1, len(search_results["hits"]))
+
     def test_study_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'words': 'umbrellas', 'filters': []}
-        world_query = {'words': 'universe', 'filters': []}
-        search_results = self.search(rainbow_query)
+        umbrella_query = {'words': 'umbrellas', 'filters': []}
+        universe_query = {'words': 'universe', 'filters': []}
+        search_results = self.search(umbrella_query)
         self.assertEqual(0, len(search_results["hits"]))
-        search_results = self.search(world_query)
+        search_results = self.search(universe_query)
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
@@ -1881,10 +1905,10 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
 
-        search_results = self.search(rainbow_query)
+        search_results = self.search(umbrella_query)
         self.assertEqual(1, len(search_results["hits"]))
         self.assertEqual(search_results['hits'][0]['id'], response['id'])
-        search_results = self.search(world_query)
+        search_results = self.search(universe_query)
         self.assertEqual(0, len(search_results["hits"]))
 
     def test_modify_resource_search_basics(self):
