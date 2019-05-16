@@ -81,12 +81,12 @@ class DataLoader:
 
                 for i in range(15, 25):
                     category = self.get_category_by_name(row[i].strip())
-                    if not row[i]: continue
-                    event_id = event.id
-                    category_id = category.id
+                    if row[i]:
+                        event_id = event.id
+                        category_id = category.id
 
-                    event_category = ResourceCategory(resource_id=event_id, category_id=category_id, type='event')
-                    db.session.add(event_category)
+                        event_category = ResourceCategory(resource_id=event_id, category_id=category_id, type='event')
+                        db.session.add(event_category)
             print("Events loaded.  There are now %i events in the database." % db.session.query(
                 Event).count())
             print("There are now %i links between events and categories in the database." %
@@ -107,13 +107,13 @@ class DataLoader:
                 self.__increment_id_sequence(Location)
 
                 for i in range(16, 26):
-                    if not row[i]: continue
-                    category = self.get_category_by_name(row[i].strip())
-                    location_id = location.id
-                    category_id = category.id
+                    if not row[i]:
+                        category = self.get_category_by_name(row[i].strip())
+                        location_id = location.id
+                        category_id = category.id
 
-                    location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
-                    db.session.add(location_category)
+                        location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
+                        db.session.add(location_category)
             print("Locations loaded.  There are now %i locations in the database." % db.session.query(
                 Location).filter(Location.type == 'location').count())
             print("There are now %i links between locations and categories in the database." %
@@ -132,14 +132,14 @@ class DataLoader:
                 db.session.commit()
                 self.__increment_id_sequence(StarResource)
 
-                for i in range(15, 22):
-                    if not row[i]: continue
-                    category = self.get_category_by_name(row[i].strip())
-                    resource_id = resource.id
-                    category_id = category.id
+                for i in range(15, len(row)):
+                    if row[i]:
+                        category = self.get_category_by_name(row[i].strip())
+                        resource_id = resource.id
+                        category_id = category.id
 
-                    resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
-                    db.session.add(resource_category)
+                        resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
+                        db.session.add(resource_category)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
                 StarResource).filter(StarResource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
@@ -166,15 +166,14 @@ class DataLoader:
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-
                 for i in range(7, 10):
-                    if not row[i]: continue
-                    category = self.get_category_by_name(row[i])
-                    study_id = study.id
-                    category_id = category.id
+                    if row[i]:
+                        category = self.get_category_by_name(row[i])
+                        study_id = study.id
+                        category_id = category.id
 
-                    study_category = StudyCategory(study_id=study_id, category_id=category_id)
-                    db.session.add(study_category)
+                        study_category = StudyCategory(study_id=study_id, category_id=category_id)
+                        db.session.add(study_category)
                 if row[10]:
                     investigator = Investigator(name=row[10], title=row[11],
                                                 organization_id=self.get_org_by_name(row[12]).id, bio_link=row[13])
@@ -219,7 +218,6 @@ class DataLoader:
             print("Participants loaded.  There are now %i participants in the database." % db.session.query(
                 Participant).count())
         db.session.commit()
-
 
     def load_clinical_diagnoses_questionnaire(self):
         cd_ques = ClinicalDiagnosesQuestionnaire(mental_health=['ptsd'], genetic=['angelman'])
