@@ -22,6 +22,7 @@ class StarDocument(Document):
     content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     organization = Keyword()
     website = Keyword()
+    location = Keyword()
     category = Keyword(multi=True)
 
 
@@ -95,6 +96,7 @@ class ElasticIndex:
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
+                           location=None,
                            category=[]
                            )
 
@@ -107,7 +109,13 @@ class ElasticIndex:
             doc.organization = document.organization.name
 
         for cat in document.categories:
-            doc.category.append(cat.category.name)
+            if cat.category.parent:
+                if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
+                    doc.location = cat.category.name
+                else:
+                    doc.category.append(cat.category.parent.name)
+            else:
+                doc.category.append(cat.category.name)
 
         StarDocument.save(doc, index=self.index_name)
         if flush:
@@ -145,7 +153,8 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     facets = {
         'Type': elasticsearch_dsl.TermsFacet(field='type'),
         'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
-        'Category': elasticsearch_dsl.TermsFacet(field='category')
+        'Categories': elasticsearch_dsl.TermsFacet(field='category'),
+        'Locations': elasticsearch_dsl.TermsFacet(field='location')
     }
 
     def highlight(self, search):
