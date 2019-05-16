@@ -12,12 +12,16 @@
     <a
       class="title mat-h2"
       href="/#/{{hit.type}}/{{hit.id}}"
-    >{{hit.title}}</a>
-    <a mat-button
+    >
+      {{hit.title}}
+    </a>
+    <button mat-button
         [routerLink]="[ '/search/filter' ]"
         [queryParams]="{'Type': hit.type}"
         class="type"
-      >{{hit.type}}</a>
+        [disableRipple]="true"
+        matTooltip="{{ hit.type | uppercase }}"
+      ><app-type-icon [iconType]="hit.type" [size]="1"></app-type-icon></button>
   </div>
   <markdown
     *ngIf="hit.highlights"

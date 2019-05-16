@@ -36,6 +36,13 @@
   text-transform: uppercase;
   white-space: nowrap;
   color: mat-color($stardrive-primary, 300, 1);
+  font-size: 3em;
+  background-color: transparent;
+
+  &:hover {
+    color: mat-color($stardrive-primary, default, 1);
+    background-color: transparent;
+  }
 }
 
 ::ng-deep .highlights em {
