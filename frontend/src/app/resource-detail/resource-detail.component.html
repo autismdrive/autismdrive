@@ -16,11 +16,11 @@
       fxLayoutGap="40px"
     >
       <h1>{{resource.title}}</h1>
-      <img
-        *ngIf="resource.image"
-        [src]="resource.image"
-      >
-      <caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>
+      <!--<img-->
+        <!--*ngIf="resource.image"-->
+        <!--[src]="resource.image"-->
+      <!--&gt;-->
+      <!--<caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>-->
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
       <div
@@ -52,21 +52,13 @@
           <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
           <mat-card-content>
             <mat-list>
-              <mat-list-item *ngIf="resource.streetAddress1">
-                <mat-icon>address</mat-icon>
-                <address>
-                  {{resource.streetAddress1}}
-                  {{resource.streetAddress2}}
-                  {{resource.city}}, {{resource.state}} {{resource.zip}}
-                </address>
-              </mat-list-item>
               <mat-list-item *ngIf="resource.phone">
                 <mat-icon>phone</mat-icon>
                 <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
               </mat-list-item>
               <mat-list-item *ngIf="resource.website">
                 <mat-icon>link</mat-icon>
-                <a href="{{resource.website}}">{{resource.website}}</a>
+                <a target="_blank" href="{{resource.website}}">{{resource.website}}</a>
               </mat-list-item>
             </mat-list>
           </mat-card-content>

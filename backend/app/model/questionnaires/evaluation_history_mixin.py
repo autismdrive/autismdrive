@@ -29,7 +29,6 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 1,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": True,
                     "label": "Formal Diagnosis?",
@@ -51,7 +50,6 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 2,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": False,
                     "options": [
@@ -74,11 +72,19 @@ class EvaluationHistoryMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "Age at Diagnosis",
-                    "required": True,
+                    "type": 'number',
+                    "max": 130,
                 },
                 "expression_properties": {
-                    "template_options.description": cls.years_old_at_first_diagnosis_label
+                    "template_options.description": cls.years_old_at_first_diagnosis_label,
+                    "template_options.required": 'model.has_autism_diagnosis'
                 },
+                "hide_expression": '!(model.has_autism_diagnosis)',
+                "validation": {
+                    "messages": {
+                        "max": 'Please enter age in years',
+                    }
+                }
             },
         )
 
@@ -90,7 +96,6 @@ class EvaluationHistoryMixin(object):
                 "display_order": 4,
                 "type": "select",
                 "template_options": {
-                    "required": True,
                     "label": "First Diagnosed by:",
                     "options": [
                         {
@@ -109,7 +114,9 @@ class EvaluationHistoryMixin(object):
                 },
                 "expression_properties": {
                     "template_options.description": cls.who_diagnosed_label,
+                    "template_options.required": 'model.has_autism_diagnosis'
                 },
+                "hide_expression": '!(model.has_autism_diagnosis)',
             },
         )
 
@@ -134,7 +141,6 @@ class EvaluationHistoryMixin(object):
                 "display_order": 6,
                 "type": "select",
                 "template_options": {
-                    "required": True,
                     "label": "Diagnosed At",
                     "options": [
                         {"value": "1uvaDp", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children's Rehabilitation Center, KCRC)"},
@@ -167,7 +173,9 @@ class EvaluationHistoryMixin(object):
                 },
                 "expression_properties": {
                     "template_options.description": cls.where_diagnosed_label,
+                    "template_options.required": 'model.has_autism_diagnosis'
                 },
+                "hide_expression": '!(model.has_autism_diagnosis)',
             },
         )
 
@@ -212,7 +220,6 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 9,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "label": "Permission to Link Data",
                     "appearance": "standard",
@@ -225,7 +232,7 @@ class EvaluationHistoryMixin(object):
                 "expression_properties": {
                     "template_options.description": cls.gives_permission_to_link_evaluation_data_desc,
                 },
-                "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0))',
+                "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0) && !model.partner_centers_evaluation.includes("none"))',
             },
         )
 
@@ -236,7 +243,6 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 10,
                 "type": "radio",
-                "default_value": True,
                 "template_options": {
                     "required": False,
                     "label": "Taken an IQ Test?",

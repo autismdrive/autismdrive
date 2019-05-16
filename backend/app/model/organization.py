@@ -13,5 +13,5 @@ class Organization(db.Model):
         'StarResource', backref=db.backref('organization', lazy=True))
     studies = db.relationship(
         'Study', backref=db.backref('organization', lazy=True))
-    trainings = db.relationship(
-        'Training', backref=db.backref('organization', lazy=True))
+    investigators = db.relationship(
+        'Investigator', backref=db.backref('organization', lazy=True))

@@ -58,7 +58,6 @@ class ContactQuestionnaire(db.Model):
         info={
             "display_order": 1.3,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "label": "Leave voicemail?",
                 "description": "Is it okay to leave a voicemail message at this number?",

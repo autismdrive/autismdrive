@@ -1,6 +1,7 @@
 import datetime
 
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 from app import db
 
@@ -15,46 +16,50 @@ class Medication(db.Model):
         db.Integer,
         db.ForeignKey("supports_questionnaire.id"),
     )
-    name = db.Column(
+    symptom = db.Column(
         db.String,
         info={
             "display_order": 1,
+            "type": "select",
+            "template_options": {
+                "required": True,
+                "options": [
+                    {"value": "symptomAnxiety", "label": "Anxiety"},
+                    {"value": "symptomDepression", "label": "Depression"},
+                    {"value": "symptomInsomnia", "label": "Insomnia"},
+                    {"value": "symptomADHD", "label": "ADHD"},
+                    {"value": "symptomOther", "label": "Other"},
+                ],
+            },
+        }
+    )
+    symptom_other = db.Column(
+        db.String,
+        info={
+            "display_order": 1.2,
             "type": "textarea",
             "template_options": {
-                "label": "Name of Medication or Vitamin",
-                "required": True,
+                "label": "Enter symptom",
+                "appearance": "standard",
+                "required": False,
             },
+            "hide_expression": '!(model.symptom && (model.symptom === "symptomOther"))',
         },
     )
-    dosage = db.Column(
+    name = db.Column(
         db.String,
         info={
             "display_order": 2,
             "type": "textarea",
-            "template_options": {"label": "Dosage", "required": False},
-        },
-    )
-    time_frame = db.Column(
-        db.String,
-        info={
-            "display_order": 3,
-            "type": "radio",
-            "default_value": True,
             "template_options": {
-                "label": "",
-                "required": False,
-                "options": [
-                    {"value": "current", "label": "Currently taking"},
-                    {"value": "past", "label": "Received in the past"},
-                    {"value": "futureInterest", "label": "Interested in receiving"},
-                ],
+                "label": "Name of Medication (if known)",
             },
         },
     )
     notes = db.Column(
         db.String,
         info={
-            "display_order": 4,
+            "display_order": 3,
             "type": "textarea",
             "template_options": {
                 "label": "Notes on use and/or issues with medication",
@@ -64,10 +69,40 @@ class Medication(db.Model):
     )
 
     def get_field_groups(self):
-        return {}
+        info = {
+            "symptom_group": {
+                "fields": ["symptom", "symptom_other"],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {
+                    "label": ""
+                },
+                "expression_properties": {
+                    "template_options.label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"Symptom for which you are taking medication"',
+                            "self_guardian": '"Symptom for which you are taking medication"',
+                            "self_professional": '"Symptom for which you are taking medication"',
+                            "dependent": '"Symptom for which " + (formState.preferredName || "your child") + " is taking medication"'
+                        }
+                    }
+                },
+            }
+        }
+        return info
 
 
 class MedicationSchema(ModelSchema):
     class Meta:
         model = Medication
         ordered = True
+        fields = ("id", "last_updated", "supports_questionnaire_id", "symptom", "symptom_other", "name", "notes",
+                  "participant_id", "user_id")
+    participant_id = fields.Method('get_participant_id')
+    user_id = fields.Method('get_user_id')
+
+    def get_participant_id(self, obj):
+        return obj.supports_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        return obj.supports_questionnaire.user_id

@@ -1,8 +1,10 @@
 <div
   class="studies"
-  fxLayout="column"
+  fxLayout="row"
+  fxLayoutGap="2%"
+  fxLayoutAlign="center auto"
 >
-  <div fxFlex="60%">
+  <div fxFlex="30%">
     <h1>STAR Research</h1>
     <h2>About our research</h2>
     <p>The Supporting Transformative Autism Research (STAR) project was designed to
@@ -19,15 +21,8 @@
       The ultimate goal of this work is to empower individuals with autism, their families,
       and their communities to achieve positive outcomes and quality of life.</p>
   </div>
-<div
-  fxLayout="row"
-  fxLayoutGap="2%"
->
-  <div fxFlex="20%">
-    <app-filters></app-filters>
-  </div>
   <div
-    fxFlex="50%"
+    fxFlex="60%"
     fxLayout="column"
     fxLayoutGap="40px"
     *ngIf="query && query.hits"
@@ -39,5 +34,4 @@
       [isFeatured]="true"
     ></app-search-result>
   </div>
-</div>
 </div>

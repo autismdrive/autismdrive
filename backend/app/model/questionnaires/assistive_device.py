@@ -1,6 +1,7 @@
 import datetime
 
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 from app import db
 
@@ -15,143 +16,150 @@ class AssistiveDevice(db.Model):
         db.Integer,
         db.ForeignKey("supports_questionnaire.id"),
     )
-    type = db.Column(
+    type_group = db.Column(
         db.String,
         info={
             "display_order": 1.1,
             "type": "select",
             "template_options": {
                 "required": False,
-                "label": "Select device",
+                "label": "Select category of device",
                 "options": [
+                    {
+                        "value": "mobility",
+                        "label": "Mobility aids",
+                    },
+                    {
+                        "value": "hearing",
+                        "label": "Hearing assistance",
+                    },
+                    {
+                        "value": "computer",
+                        "label": "Computer software and hardware",
+                    },
+                    {
+                        "value": "building",
+                        "label": "ADA Building Modifications",
+                    },
+                    {
+                        "value": "other",
+                        "label": "Others",
+                    }
+                ]
+            },
+        }
+    )
+    type = db.Column(
+        db.String,
+        info={
+            "display_order": 1.2,
+            "type": "select",
+            "template_options": {
+                "required": False,
+                "label": "Select device",
+                "all_options": [
                     {
                         "value": "cane",
                         "label": "Canes",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "crutches",
                         "label": "Crutches",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "orthotic",
                         "label": "Orthotic devices",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "prosthetic",
                         "label": "Prosthetic devices",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "scooter",
                         "label": "Scooters",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "walker",
                         "label": "Walkers",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "wheelchair",
                         "label": "Wheelchairs",
-                        "group": "Mobility aids",
+                        "groupValue": "mobility",
                     },
                     {
                         "value": "captioning",
                         "label": "Closed captioning",
-                        "group": "Hearing assistance",
+                        "groupValue": "hearing",
                     },
                     {
                         "value": "hearingAid",
                         "label": "Hearing aids",
-                        "group": "Hearing assistance",
+                        "groupValue": "hearing",
                     },
                     {
                         "value": "alarmLight",
                         "label": "Indicator/alarm lights",
-                        "group": "Hearing assistance",
+                        "groupValue": "hearing",
                     },
                     {
                         "value": "cognitiveAids",
                         "label": "Cognitive aids",
-                        "group": "Computer software and hardware",
+                        "groupValue": "computer",
                     },
                     {
                         "value": "screenEnlarge",
                         "label": "Screen enlargement applications",
-                        "group": "Computer software and hardware",
+                        "groupValue": "computer",
                     },
                     {
                         "value": "screenReader",
                         "label": "Screen readers",
-                        "group": "Computer software and hardware",
+                        "groupValue": "computer",
                     },
                     {
                         "value": "voiceRecognition",
                         "label": "Voice recognition programs",
-                        "group": "Computer software and hardware",
-                    },
-                    {
-                        "value": "autoPageTurn",
-                        "label": "Automatic page turners",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "bookHold",
-                        "label": "Book holders",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "reachExtend",
-                        "label": "Devices to extend reach",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "pencilGrip",
-                        "label": "Pencil grips",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "handleGrip",
-                        "label": "Specialized handles and grips",
-                        "group": "Adaptive Tools",
-                    },
-                    {
-                        "value": "utensils",
-                        "label": "Utensils",
-                        "group": "Adaptive Tools",
+                        "groupValue": "computer",
                     },
                     {
                         "value": "adaptSwitch",
                         "label": "Adaptive switches",
-                        "group": "ADA Building Modifications",
+                        "groupValue": "building",
                     },
                     {
                         "value": "grabBar",
                         "label": "Grab bars",
-                        "group": "ADA Building Modifications",
+                        "groupValue": "building",
                     },
                     {
                         "value": "ramp",
                         "label": "Ramps",
-                        "group": "ADA Building Modifications",
+                        "groupValue": "building",
                     },
                     {
                         "value": "wideDoor",
                         "label": "Wider doorways",
-                        "group": "ADA Building Modifications",
+                        "groupValue": "building",
                     },
                     {
                         "value": "other",
                         "label": "Other assistive device",
-                        "group": "Others",
-                    },
-                ],
+                        "groupValue": "other",
+                    }
+                ]
             },
-        },
+            "expression_properties": {
+                'template_options.options': 'this.field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
+                'model.type': 'model.type_group === "other" ? "other" : (this.field.templateOptions.options.find(o => o.id === model.type) ? model.type : null)',
+            },
+        }
     )
     type_other = db.Column(
         db.String,
@@ -163,15 +171,7 @@ class AssistiveDevice(db.Model):
                 "appearance": "standard",
                 "required": False,
             },
-            "hide_expression": '!(model.type && (model.type === "other"))',
-        },
-    )
-    description = db.Column(
-        db.String,
-        info={
-            "display_order": 2,
-            "type": "textarea",
-            "template_options": {"label": "Description", "required": False},
+            "hide_expression": '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))',
         },
     )
     timeframe = db.Column(
@@ -179,7 +179,6 @@ class AssistiveDevice(db.Model):
         info={
             "display_order": 3,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "label": "",
                 "required": False,
@@ -206,7 +205,7 @@ class AssistiveDevice(db.Model):
     def get_field_groups(self):
         return {
             "type": {
-                "fields": ["type", "type_other"],
+                "fields": ["type_group", "type", "type_other"],
                 "display_order": 1,
                 "wrappers": ["card"],
                 "template_options": {"label": "Type of assistive device"},
@@ -218,3 +217,13 @@ class AssistiveDeviceSchema(ModelSchema):
     class Meta:
         model = AssistiveDevice
         ordered = True
+        fields = ("id", "last_updated", "supports_questionnaire_id", "type_group", "type", "type_other", "timeframe", "notes",
+                  "participant_id", "user_id")
+    participant_id = fields.Method('get_participant_id')
+    user_id = fields.Method('get_user_id')
+
+    def get_participant_id(self, obj):
+        return obj.supports_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        return obj.supports_questionnaire.user_id

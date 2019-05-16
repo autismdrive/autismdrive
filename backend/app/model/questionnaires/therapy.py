@@ -1,6 +1,7 @@
 import datetime
 
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 from app import db
 
@@ -31,7 +32,11 @@ class Therapy(db.Model):
                     {"value": "physical", "label": "Physical Therapy"},
                     {
                         "value": "behavioral",
-                        "label": "Behavioral Therapy (ABA, Lovaas, Discrete Trial Training, Pivotal response training, early start Denver model, etc.)",
+                        "label": "Behavior Therapy (ABA, Lovaas, Discrete Trial Training)",
+                    },
+                    {
+                        "value": "natDevBehavioral",
+                        "label": "Naturalistic Developmental Behavioral (Pivotal Response Training, Early Start Denver Model, JASPER, etc)",
                     },
                     {
                         "value": "developmental",
@@ -83,20 +88,11 @@ class Therapy(db.Model):
             "hide_expression": '!(model.type && (model.type === "other"))',
         },
     )
-    description = db.Column(
-        db.String,
-        info={
-            "display_order": 2,
-            "type": "textarea",
-            "template_options": {"label": "Description", "required": False},
-        },
-    )
     timeframe = db.Column(
         db.String,
         info={
             "display_order": 3,
             "type": "radio",
-            "default_value": True,
             "template_options": {
                 "label": "",
                 "required": False,
@@ -141,3 +137,13 @@ class TherapySchema(ModelSchema):
     class Meta:
         model = Therapy
         ordered = True
+        fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other",
+                  "timeframe", "notes", "participant_id", "user_id")
+    participant_id = fields.Method('get_participant_id')
+    user_id = fields.Method('get_user_id')
+
+    def get_participant_id(self, obj):
+        return obj.supports_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        return obj.supports_questionnaire.user_id

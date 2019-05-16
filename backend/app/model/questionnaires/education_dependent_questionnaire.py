@@ -10,7 +10,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
 
     attends_school_desc = '"Does " + (formState.preferredName || "your child") + " attend school?"'
     school_type_desc = '"Is " + (formState.preferredName || "your child") + "\'s school:"'
-    school_services_desc = '"Please check the following services " + (formState.preferredName || "your child") + "currently receives in school (check all that apply):"'
+    school_services_desc = '"Please check the following services " + (formState.preferredName || "your child") + " currently receives in school (check all that apply):"'
     placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
@@ -27,8 +27,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                     {"value": "preschool", "label": "Preschool"},
                     {"value": "kindergarten", "label": "Kindergarten"},
                     {"value": "grades1to12", "label": "1st through 12th grade, please specify CURRENT GRADE below"},
-                    {"value": "homeSchool", "label": "Home schooled"},
-                    {"value": "vocational", "label": "Vocational school where I am learning job or life skills"},
+                    {"value": "vocational", "label": "Vocational school for learning job or life skills"},
                     {"value": "college", "label": "College/university"},
                     {"value": "graduate", "label": "Graduate school"},
                     {"value": "schoolOther", "label": "Other"},
@@ -38,6 +37,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
                 "template_options.label": '"What is " + (formState.preferredName || "your child") + "\'s '
                                           'current grade/school placement?"',
             },
+            "hide_expression": '!(model.attends_school)',
         },
     )
 

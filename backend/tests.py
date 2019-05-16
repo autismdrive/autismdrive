@@ -13,24 +13,26 @@ import base64
 import quopri
 import random
 import string
-import datetime
 import unittest
 import openpyxl
 import io
 from app import db, app, elastic_index
 from app.model.user import User, Role
-from app.model.study import Study
+from app.model.study import Study, Status
 from app.email_service import TEST_MESSAGES
 from app.model.category import Category
+from app.model.event import Event
+from app.model.location import Location
 from app.model.resource import StarResource
-from app.model.training import Training
 from app.model.email_log import EmailLog
 from app.model.organization import Organization
+from app.model.investigator import Investigator
 from app.model.participant import Participant, Relationship
+from app.model.study_investigator import StudyInvestigator
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
-from app.model.training_category import TrainingCategory
 from app.model.questionnaires.assistive_device import AssistiveDevice
+from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -92,7 +94,6 @@ class TestCase(unittest.TestCase):
         endpoints = [
             ('api.categorybyresourceendpoint', '/api/resource/<resource_id>/category'),
             ('api.categorybystudyendpoint', '/api/study/<study_id>/category'),
-            ('api.categorybytrainingendpoint', '/api/training/<training_id>/category'),
             ('api.categoryendpoint', '/api/category/<id>'),
             ('api.categorylistendpoint', '/api/category'),
             ('api.questionnaireendpoint', '/api/q/<name>/<id>'),
@@ -110,11 +111,6 @@ class TestCase(unittest.TestCase):
             ('api.studycategorylistendpoint', '/api/study_category'),
             ('api.studyendpoint', '/api/study/<id>'),
             ('api.studylistendpoint', '/api/study'),
-            ('api.trainingbycategoryendpoint', '/api/category/<category_id>/training'),
-            ('api.trainingcategoryendpoint', '/api/training_category/<id>'),
-            ('api.trainingcategorylistendpoint', '/api/training_category'),
-            ('api.trainingendpoint', '/api/training/<id>'),
-            ('api.traininglistendpoint', '/api/training'),
             ('api.userendpoint', '/api/user/<id>'),
             ('api.userlistendpoint', '/api/user'),
             ('auth.forgot_password', '/api/forgot_password'),
@@ -130,16 +126,42 @@ class TestCase(unittest.TestCase):
             if field["name"] == name:
                 return field
 
-
-    def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           image_url="assets/image.svg", image_caption="An inspiring photograph of great renown",
+    def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
                            street_address1="123 Some Pl", street_address2="Apt. 45",
-                           city="Stauntonville", state="QX", zip="99775", county="Augustamarle", phone="555-555-5555",
+                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
                            website="http://stardrive.org"):
 
-        resource = StarResource(title=title, description=description, image_url=image_url, image_caption=image_caption,
-                                street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip, county=county, phone=phone, website=website)
+        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
+                                state=state, zip=zip, phone=phone, website=website)
+        event.organization_id = self.construct_organization().id
+        db.session.add(event)
+        db.session.commit()
+
+        db_event = db.session.query(Event).filter_by(title=event.title).first()
+        self.assertEqual(db_event.website, event.website)
+        elastic_index.add_document(db_event, 'Event')
+        return db_event
+
+    def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
+                           street_address1="123 Some Pl", street_address2="Apt. 45",
+                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
+                           website="http://stardrive.org"):
+
+        location = Location(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
+                                state=state, zip=zip,phone=phone, website=website)
+        location.organization_id = self.construct_organization().id
+        db.session.add(location)
+        db.session.commit()
+
+        db_location = db.session.query(Location).filter_by(title=location.title).first()
+        self.assertEqual(db_location.website, location.website)
+        elastic_index.add_document(db_location, 'Location')
+        return db_location
+
+    def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
+                           phone="555-555-5555", website="http://stardrive.org"):
+
+        resource = StarResource(title=title, description=description, phone=phone, website=website)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
         db.session.commit()
@@ -150,17 +172,11 @@ class TestCase(unittest.TestCase):
         return db_resource
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
-                        researcher_description="Fantastic people work on this fantastic study. You should be impressed",
                         participant_description="Even your pet hamster could benefit from participating in this study",
-                        outcomes_description="You can expect to have your own rainbow following you around after participating",
-                        enrollment_start_date=datetime.date(2019, 1, 20), current_num_participants="54",
-                        max_num_participants="5000",
-                        start_date=datetime.date(2019, 2, 1), end_date=datetime.date(2019, 3, 31)):
+                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
 
-        study = Study(title=title, description=description, researcher_description=researcher_description,
-                      participant_description=participant_description, outcomes_description=outcomes_description,
-                      enrollment_start_date=enrollment_start_date, current_num_participants=current_num_participants,
-                      max_num_participants=max_num_participants, start_date=start_date, end_date=end_date)
+        study = Study(title=title, description=description, participant_description=participant_description,
+                      benefit_description=benefit_description, status=Status.currently_enrolling)
         study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()
@@ -168,21 +184,6 @@ class TestCase(unittest.TestCase):
         db_study = db.session.query(Study).filter_by(title=study.title).first()
         self.assertEqual(db_study.description, study.description)
         return db_study
-
-    def construct_training(self, title="Best Training", description="A training to end all trainings",
-                           outcomes_description="Increased intelligence and the ability to do magic tricks.",
-                           image_url="assets/image.png", image_caption="One of the magic tricks you will learn"):
-
-        training = Training(title=title, description=description, outcomes_description=outcomes_description,
-                            image_url=image_url,
-                            image_caption=image_caption)
-        training.organization_id = self.construct_organization().id
-        db.session.add(training)
-        db.session.commit()
-
-        db_training = db.session.query(Training).filter_by(title=training.title).first()
-        self.assertEqual(db_training.outcomes_description, training.outcomes_description)
-        return db_training
 
     def construct_organization(self, name="Staunton Makerspace",
                                description="A place full of surprise, delight, and amazing people. And tools. Lots of exciting tools."):
@@ -206,6 +207,17 @@ class TestCase(unittest.TestCase):
         db_category = db.session.query(Category).filter_by(name=category.name).first()
         self.assertIsNotNone(db_category.id)
         return db_category
+
+    def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
+
+        investigator = Investigator(name=name, title=title)
+        investigator.organization_id = self.construct_organization().id
+        db.session.add(investigator)
+        db.session.commit()
+
+        db_inv = db.session.query(Investigator).filter_by(name=investigator.name).first()
+        self.assertEqual(db_inv.title, investigator.title)
+        return db_inv
 
     def construct_user(self, email="stan@staunton.com"):
 
@@ -237,10 +249,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_participant.relationship, participant.relationship)
         return db_participant
 
-    def construct_assistive_device(self, type='prosthetic', description='leg', timeframe='current',
+    def construct_assistive_device(self, type_group='mobility', type='prosthetic', timeframe='current',
                                    notes='I love my new leg!', supports_questionnaire=None):
 
-        ad = AssistiveDevice(type=type, description=description, timeframe=timeframe, notes=notes)
+        ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             ad.supports_questionnaire_id = supports_questionnaire.id
 
@@ -248,8 +260,23 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_ad = db.session.query(AssistiveDevice).filter_by(last_updated=ad.last_updated).first()
-        self.assertEqual(db_ad.description, ad.description)
+        self.assertEqual(db_ad.notes, ad.notes)
+        self.assertEqual(db_ad.type_group, ad.type_group)
+        self.assertEqual(db_ad.type, ad.type)
         return db_ad
+
+    def construct_alternative_augmentative(self, type='lowTechAAC', timeframe='current', notes='We use pen and paper', supports_questionnaire=None):
+
+        aac = AlternativeAugmentative(type=type, timeframe=timeframe, notes=notes)
+        if supports_questionnaire is not None:
+            aac.supports_questionnaire_id = supports_questionnaire.id
+
+        db.session.add(aac)
+        db.session.commit()
+
+        db_aac = db.session.query(AlternativeAugmentative).filter_by(last_updated=aac.last_updated).first()
+        self.assertEqual(db_aac.notes, aac.notes)
+        return db_aac
 
     def construct_clinical_diagnoses_questionnaire(self, developmental=['speechLanguage'], mental_health=['ocd'],
                                                    medical=['insomnia'], genetic=['corneliaDeLange'], participant=None,
@@ -303,7 +330,7 @@ class TestCase(unittest.TestCase):
     def construct_current_behaviors_dependent_questionnaire(self, dependent_verbal_ability='fluent',
                                                             concerning_behaviors=['hoarding'],
                                                             has_academic_difficulties=True,
-                                                            academic_difficulty_areas=['math'],
+                                                            academic_difficulty_areas=['math', 'writing'],
                                                             participant=None, user=None):
 
         cb = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability=dependent_verbal_ability,
@@ -694,10 +721,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(db_pq.learning_interests, pq.learning_interests)
         return db_pq
 
-    def construct_medication(self, name='Magic Potion', dosage='3 times daily', time_frame='current',
-                             notes='I feel better than ever!', supports_questionnaire=None):
+    def construct_medication(self, symptom='symptomInsomnia', name='Magic Potion', notes='I feel better than ever!', supports_questionnaire=None):
 
-        m = Medication(name=name, dosage=dosage, time_frame=time_frame, notes=notes)
+        m = Medication(symptom=symptom, name=name, notes=notes)
         if supports_questionnaire is not None:
             m.supports_questionnaire_id = supports_questionnaire.id
 
@@ -705,13 +731,13 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_m = db.session.query(Medication).filter_by(last_updated=m.last_updated).first()
-        self.assertEqual(db_m.dosage, m.dosage)
+        self.assertEqual(db_m.notes, m.notes)
         return db_m
 
-    def construct_therapy(self, type='behavioral', description='Discrete Trial Training', timeframe='current',
-                          notes='Small steps', supports_questionnaire=None):
+    def construct_therapy(self, type='behavioral', timeframe='current', notes='Small steps',
+                          supports_questionnaire=None):
 
-        t = Therapy(type=type, description=description, timeframe=timeframe, notes=notes)
+        t = Therapy(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             t.supports_questionnaire_id = supports_questionnaire.id
 
@@ -719,11 +745,11 @@ class TestCase(unittest.TestCase):
         db.session.commit()
 
         db_t = db.session.query(Therapy).filter_by(last_updated=t.last_updated).first()
-        self.assertEqual(db_t.description, t.description)
+        self.assertEqual(db_t.notes, t.notes)
         return db_t
 
     def construct_supports_questionnaire(self, medications=None, therapies=None, assistive_devices=None,
-                                         participant=None, user=None):
+                                         alternative_augmentative=None, participant=None, user=None):
 
         sq = SupportsQuestionnaire()
         if user is None:
@@ -745,6 +771,11 @@ class TestCase(unittest.TestCase):
             self.construct_assistive_device(supports_questionnaire=sq)
         else:
             sq.assistive_devices = assistive_devices
+
+        if alternative_augmentative is None:
+            self.construct_alternative_augmentative(supports_questionnaire=sq)
+        else:
+            sq.alternative_augmentative = alternative_augmentative
 
         if medications is None:
             self.construct_medication(supports_questionnaire=sq)
@@ -780,6 +811,125 @@ class TestCase(unittest.TestCase):
         self.construct_professional_questionnaire(user=user, participant=participant)
         self.construct_supports_questionnaire(user=user, participant=participant)
 
+    def test_event_basics(self):
+        self.construct_event()
+        r = db.session.query(Event).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/event/%i' % r_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], r_id)
+        self.assertEqual(response["title"], 'A+ Event')
+        self.assertEqual(response["description"], 'A delightful event destined to create rejoicing')
+
+    def test_modify_event_basics(self):
+        self.construct_event()
+        r = db.session.query(Event).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/event/%i' % r_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['website'] = 'http://sartography.com'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/event/%i' % r_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/event/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['website'], 'http://sartography.com')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_event(self):
+        r = self.construct_event()
+        r_id = r.id
+        rv = self.app.get('api/event/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/event/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/event/%i' % r_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_event(self):
+        event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
+                 'ticket_cost': "$500 suggested donation"}
+        rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'event of events')
+        self.assertEqual(response['description'], 'You need this event in your life.')
+        self.assertEqual(response['time'], '4PM sharp')
+        self.assertEqual(response['ticket_cost'], '$500 suggested donation')
+        self.assertIsNotNone(response['id'])
+
+    def test_location_basics(self):
+        self.construct_location()
+        r = db.session.query(Location).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/location/%i' % r_id,
+                          follow_redirects=True,
+                          content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], r_id)
+        self.assertEqual(response["title"], 'A+ location')
+        self.assertEqual(response["description"], 'A delightful location destined to create rejoicing')
+
+    def test_modify_location_basics(self):
+        self.construct_location()
+        r = db.session.query(Location).first()
+        self.assertIsNotNone(r)
+        r_id = r.id
+        rv = self.app.get('/api/location/%i' % r_id, content_type="application/json")
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Edwarardos Lemonade and Oil Change'
+        response['description'] = 'Better fluids for you and your car.'
+        response['website'] = 'http://sartography.com'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/location/%i' % r_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assertSuccess(rv)
+        rv = self.app.get('/api/location/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
+        self.assertEqual(response['description'], 'Better fluids for you and your car.')
+        self.assertEqual(response['website'], 'http://sartography.com')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_location(self):
+        r = self.construct_location()
+        r_id = r.id
+        rv = self.app.get('api/location/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/location/%i' % r_id, content_type="application/json")
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/location/%i' % r_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_location(self):
+        location = {'title': "location of locations", 'description': "You need this location in your life."}
+        rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
+                           follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'location of locations')
+        self.assertEqual(response['description'], 'You need this location in your life.')
+        self.assertIsNotNone(response['id'])
+
     def test_resource_basics(self):
         self.construct_resource()
         r = db.session.query(StarResource).first()
@@ -804,8 +954,6 @@ class TestCase(unittest.TestCase):
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
         response['website'] = 'http://sartography.com'
-        response['county'] = 'Rockingbridge'
-        response['image_caption'] = 'Daniel GG Dog Da Funk-a-funka'
         orig_date = response['last_updated']
         rv = self.app.put('/api/resource/%i' % r_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -816,8 +964,6 @@ class TestCase(unittest.TestCase):
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
         self.assertEqual(response['website'], 'http://sartography.com')
-        self.assertEqual(response['county'], 'Rockingbridge')
-        self.assertEqual(response['image_caption'], 'Daniel GG Dog Da Funk-a-funka')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_resource(self):
@@ -865,8 +1011,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
-        response['outcomes_description'] = 'Better fluids for you and your car, Duh.'
-        response['max_num_participants'] = '2'
+        response['benefit_description'] = 'Better fluids for you and your car, Duh.'
         orig_date = response['last_updated']
         rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -876,8 +1021,7 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
-        self.assertEqual(response['outcomes_description'], 'Better fluids for you and your car, Duh.')
-        self.assertEqual(response['max_num_participants'], 2)
+        self.assertEqual(response['benefit_description'], 'Better fluids for you and your car, Duh.')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_study(self):
@@ -893,73 +1037,13 @@ class TestCase(unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_study(self):
-        study = {'title': "Study of Studies", 'outcomes_description': "This study will change your life."}
+        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life."}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Study of Studies')
-        self.assertEqual(response['outcomes_description'], 'This study will change your life.')
-        self.assertIsNotNone(response['id'])
-
-    def test_training_basics(self):
-        self.construct_training()
-        t = db.session.query(Training).first()
-        self.assertIsNotNone(t)
-        t_id = t.id
-        rv = self.app.get('/api/training/%i' % t_id,
-                          follow_redirects=True,
-                          content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["id"], t_id)
-        self.assertEqual(response["title"], 'Best Training')
-        self.assertEqual(response["description"], 'A training to end all trainings')
-
-    def test_modify_training_basics(self):
-        self.construct_training()
-        t = db.session.query(Training).first()
-        self.assertIsNotNone(t)
-        t_id = t.id
-        rv = self.app.get('/api/training/%i' % t_id, content_type="application/json")
-        response = json.loads(rv.get_data(as_text=True))
-        response['title'] = 'Edwarardos Lemonade and Oil Change'
-        response['description'] = 'Better fluids for you and your car.'
-        response['outcomes_description'] = 'Better fluids for you and your car, Duh.'
-        response['image_caption'] = 'A nice cool glass of lemonade'
-        orig_date = response['last_updated']
-        rv = self.app.put('/api/training/%i' % t_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
-        self.assertSuccess(rv)
-        rv = self.app.get('/api/training/%i' % t_id, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
-        self.assertEqual(response['description'], 'Better fluids for you and your car.')
-        self.assertEqual(response['outcomes_description'], 'Better fluids for you and your car, Duh.')
-        self.assertEqual(response['image_caption'], 'A nice cool glass of lemonade')
-        self.assertNotEqual(orig_date, response['last_updated'])
-
-    def test_delete_training(self):
-        t = self.construct_training()
-        t_id = t.id
-        rv = self.app.get('api/training/%i' % t_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.delete('api/training/%i' % t_id, content_type="application/json")
-        self.assertSuccess(rv)
-
-        rv = self.app.get('api/training/%i' % t_id, content_type="application/json")
-        self.assertEqual(404, rv.status_code)
-
-    def test_create_training(self):
-        training = {'title': "Training of Trainings", 'outcomes_description': "This training will change your life."}
-        rv = self.app.post('api/training', data=json.dumps(training), content_type="application/json",
-                           follow_redirects=True)
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['title'], 'Training of Trainings')
-        self.assertEqual(response['outcomes_description'], 'This training will change your life.')
+        self.assertEqual(response['benefit_description'], 'This study will change your life.')
         self.assertIsNotNone(response['id'])
 
     def test_organization_basics(self):
@@ -1133,10 +1217,258 @@ class TestCase(unittest.TestCase):
         self.assertEqual(1, len(response))
         self.assertEqual(1, len(response[0]["children"]))
 
+    def test_get_event_by_category(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        db.session.add(rc)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/event' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(ev.description, response[0]["resource"]["description"])
+
+    def test_get_event_by_category_includes_category_details(self):
+        c = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        ev = self.construct_event()
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=ev.id, category=c2, type='event')
+        db.session.add_all([rc, rc2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/event' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(2,
+                         len(response[0]["resource"]["resource_categories"]))
+        self.assertEqual(
+            "c1", response[0]["resource"]["resource_categories"][0]["category"]
+            ["name"])
+
+    def test_category_event_count(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+        rec = self.construct_resource()
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=rec.id, category=c, type='resource')
+        db.session.add_all([rc, rc2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i' % c.id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response["event_count"])
+
+    def test_get_category_by_event(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        db.session.add(rc)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/event/%i/category' % ev.id,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(c.id, response[0]["id"])
+        self.assertEqual(c.name, response[0]["category"]["name"])
+
+    def test_add_category_to_event(self):
+        c = self.construct_category()
+        ev = self.construct_event()
+
+        ec_data = {"resource_id": ev.id, "category_id": c.id}
+
+        rv = self.app.post(
+            '/api/resource_category',
+            data=json.dumps(ec_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(c.id, response["category_id"])
+        self.assertEqual(ev.id, response["resource_id"])
+
+    def test_set_all_categories_on_event(self):
+        c1 = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        c3 = self.construct_category(name="c3")
+        ev = self.construct_event()
+
+        ec_data = [
+            {
+                "category_id": c1.id
+            },
+            {
+                "category_id": c2.id
+            },
+            {
+                "category_id": c3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/event/%i/category' % ev.id,
+            data=json.dumps(ec_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        ec_data = [{"category_id": c1.id}]
+        rv = self.app.post(
+            '/api/event/%i/category' % ev.id,
+            data=json.dumps(ec_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_category_from_event(self):
+        self.test_add_category_to_event()
+        rv = self.app.delete('/api/resource_category/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/event/%i/category' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
+    def test_get_location_by_category(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/location' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(loc.id, response[0]["id"])
+        self.assertEqual(loc.description, response[0]["resource"]["description"])
+
+    def test_get_location_by_category_includes_category_details(self):
+        c = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        loc = self.construct_location()
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        rc2 = ResourceCategory(resource_id=loc.id, category=c2, type='location')
+        db.session.add_all([rc, rc2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i/location' % c.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(loc.id, response[0]["id"])
+        self.assertEqual(2,
+                         len(response[0]["resource"]["resource_categories"]))
+        self.assertEqual(
+            "c1", response[0]["resource"]["resource_categories"][0]["category"]
+            ["name"])
+
+    def test_category_location_count(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/category/%i' % c.id, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response["location_count"])
+
+    def test_get_category_by_location(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
+        db.session.add(rc)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/location/%i/category' % loc.id,
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(c.id, response[0]["id"])
+        self.assertEqual(c.name, response[0]["category"]["name"])
+
+    def test_add_category_to_location(self):
+        c = self.construct_category()
+        loc = self.construct_location()
+
+        rc_data = {"resource_id": loc.id, "category_id": c.id}
+
+        rv = self.app.post(
+            '/api/resource_category',
+            data=json.dumps(rc_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(c.id, response["category_id"])
+        self.assertEqual(loc.id, response["resource_id"])
+
+    def test_set_all_categories_on_location(self):
+        c1 = self.construct_category(name="c1")
+        c2 = self.construct_category(name="c2")
+        c3 = self.construct_category(name="c3")
+        loc = self.construct_location()
+
+        lc_data = [
+            {
+                "category_id": c1.id
+            },
+            {
+                "category_id": c2.id
+            },
+            {
+                "category_id": c3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/location/%i/category' % loc.id,
+            data=json.dumps(lc_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        lc_data = [{"category_id": c1.id}]
+        rv = self.app.post(
+            '/api/location/%i/category' % loc.id,
+            data=json.dumps(lc_data),
+            content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_category_from_location(self):
+        self.test_add_category_to_location()
+        rv = self.app.delete('/api/resource_category/%i' % 1)
+        self.assertSuccess(rv)
+        rv = self.app.get(
+            '/api/location/%i/category' % 1, content_type="application/json")
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
     def test_get_resource_by_category(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1153,8 +1485,8 @@ class TestCase(unittest.TestCase):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
-        cr2 = ResourceCategory(resource=r, category=c2)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
+        cr2 = ResourceCategory(resource=r, category=c2, type='resource')
         db.session.add_all([cr, cr2])
         db.session.commit()
         rv = self.app.get(
@@ -1173,7 +1505,7 @@ class TestCase(unittest.TestCase):
     def test_category_resource_count(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1185,7 +1517,7 @@ class TestCase(unittest.TestCase):
     def test_get_category_by_resource(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c)
+        cr = ResourceCategory(resource=r, category=c, type='resource')
         db.session.add(cr)
         db.session.commit()
         rv = self.app.get(
@@ -1379,128 +1711,112 @@ class TestCase(unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
 
-    def test_get_training_by_category(self):
-        c = self.construct_category()
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        db.session.add(ct)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/category/%i/training' % c.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(t.id, response[0]["id"])
-        self.assertEqual(t.description, response[0]["training"]["description"])
+    def test_add_investigator_to_study(self):
+        i = self.construct_investigator()
+        s = self.construct_study()
 
-    def test_get_training_by_category_includes_category_details(self):
-        c = self.construct_category(name="c1")
-        c2 = self.construct_category(name="c2")
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        ct2 = TrainingCategory(training=t, category=c2)
-        db.session.add_all([ct, ct2])
-        db.session.commit()
-        rv = self.app.get(
-            '/api/category/%i/training' % c.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(t.id, response[0]["id"])
-        self.assertEqual(2,
-                         len(response[0]["training"]["training_categories"]))
-        self.assertEqual(
-            "c1", response[0]["training"]["training_categories"][0]["category"]
-            ["name"])
-
-    def test_category_training_count(self):
-        c = self.construct_category()
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        db.session.add(ct)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/category/%i' % c.id, content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, response["training_count"])
-
-    def test_get_category_by_training(self):
-        c = self.construct_category()
-        t = self.construct_training()
-        ct = TrainingCategory(training=t, category=c)
-        db.session.add(ct)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/training/%i/category' % t.id,
-            content_type="application/json")
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(c.id, response[0]["id"])
-        self.assertEqual(c.name, response[0]["category"]["name"])
-
-    def test_add_category_to_training(self):
-        c = self.construct_category()
-        t = self.construct_training()
-
-        tc_data = {"training_id": t.id, "category_id": c.id}
+        si_data = {"study_id": s.id, "investigator_id": i.id}
 
         rv = self.app.post(
-            '/api/training_category',
-            data=json.dumps(tc_data),
+            '/api/study_investigator',
+            data=json.dumps(si_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(t.id, response["training_id"])
+        self.assertEqual(i.id, response["investigator_id"])
+        self.assertEqual(s.id, response["study_id"])
 
-    def test_set_all_categories_on_training(self):
-        c1 = self.construct_category(name="c1")
-        c2 = self.construct_category(name="c2")
-        c3 = self.construct_category(name="c3")
-        t = self.construct_training()
+    def test_set_all_investigators_on_study(self):
+        i1 = self.construct_investigator(name="person1")
+        i2 = self.construct_investigator(name="person2")
+        i3 = self.construct_investigator(name="person3")
+        s = self.construct_study()
 
-        tc_data = [
-            {
-                "category_id": c1.id
-            },
-            {
-                "category_id": c2.id
-            },
-            {
-                "category_id": c3.id
-            },
+        si_data = [
+            {"investigator_id": i1.id},
+            {"investigator_id": i2.id},
+            {"investigator_id": i3.id},
         ]
         rv = self.app.post(
-            '/api/training/%i/category' % t.id,
-            data=json.dumps(tc_data),
+            '/api/study/%i/investigator' % s.id,
+            data=json.dumps(si_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(3, len(response))
 
-        tc_data = [{"category_id": c1.id}]
+        si_data = [{"investigator_id": i1.id}]
         rv = self.app.post(
-            '/api/training/%i/category' % t.id,
-            data=json.dumps(tc_data),
+            '/api/study/%i/investigator' % s.id,
+            data=json.dumps(si_data),
             content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
 
-    def test_remove_category_from_training(self):
-        self.test_add_category_to_training()
-        rv = self.app.delete('/api/training_category/%i' % 1)
+    def test_remove_investigator_from_study(self):
+        self.test_add_investigator_to_study()
+        rv = self.app.delete('/api/study_investigator/%i' % 1)
         self.assertSuccess(rv)
         rv = self.app.get(
-            '/api/training/%i/category' % 1, content_type="application/json")
+            '/api/study/%i/investigator' % 1, content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def test_investigator_basics(self):
+        self.construct_investigator()
+        i = db.session.query(Investigator).first()
+        self.assertIsNotNone(i)
+        i_id = i.id
+        rv = self.app.get('/api/investigator/%i' % i_id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], i_id)
+        self.assertEqual(response["name"], i.name)
+
+    def test_modify_investigator_basics(self):
+        self.construct_investigator()
+        i = db.session.query(Investigator).first()
+        self.assertIsNotNone(i)
+
+        rv = self.app.get('/api/investigator/%i' % i.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'dungeon master'
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/investigator/%i' % i.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'dungeon master')
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_investigator(self):
+        i = self.construct_investigator()
+        i_id = i.id
+
+        rv = self.app.get('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        rv = self.app.delete('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertSuccess(rv)
+
+        rv = self.app.get('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_investigator(self):
+        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology"}
+        rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
+                           headers=self.logged_in_headers(), follow_redirects=True)
+        self.assertSuccess(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['name'], 'Tara Tarantula')
+        self.assertEqual(response['title'], 'Assistant Professor of Arachnology')
+        self.assertIsNotNone(response['id'])
 
     def search(self, query, user=None):
         """Executes a query as the given user, returning the resulting search results object."""
@@ -1551,38 +1867,16 @@ class TestCase(unittest.TestCase):
 
     def test_study_search_basics(self):
         elastic_index.clear()
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
+        rainbow_query = {'words': 'umbrellas', 'filters': []}
+        world_query = {'words': 'universe', 'filters': []}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
-        study = {'title': "space unicorn", 'description': "delivering rainbows"}
+        study = {'title': "space platypus", 'description': "delivering umbrellas"}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
-                           follow_redirects=True)
-        self.assertSuccess(rv)
-        response = json.loads(rv.get_data(as_text=True))
-
-        search_results = self.search(rainbow_query)
-        self.assertEqual(1, len(search_results["hits"]))
-        self.assertEqual(search_results['hits'][0]['id'], response['id'])
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["hits"]))
-
-    def test_training_search_basics(self):
-        elastic_index.clear()
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
-        search_results = self.search(rainbow_query)
-        self.assertEqual(0, len(search_results["hits"]))
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["hits"]))
-
-        # test that elastic resource is created with post
-        training = {'title': "space unicorn", 'description': "delivering rainbows"}
-        rv = self.app.post('api/training', data=json.dumps(training), content_type="application/json",
                            follow_redirects=True)
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -3111,13 +3405,15 @@ class TestCase(unittest.TestCase):
         self.assertSuccess(rv)
         self.construct_medication(name='Iocane Powder', supports_questionnaire=sq)
         self.construct_therapy(type='socialSkills', supports_questionnaire=sq)
-        self.construct_assistive_device(type='scooter', supports_questionnaire=sq)
+        self.construct_alternative_augmentative(type='highTechAAC', supports_questionnaire=sq)
+        self.construct_assistive_device(type_group='hearing', type='hearingAid', notes='Your ears you keep and I\'ll tell you why.', supports_questionnaire=sq)
         rv = self.app.get('/api/q/supports_questionnaire/%i' % sq_id, content_type="application/json",
                           headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(len(response['medications']), 2)
         self.assertEqual(len(response['therapies']), 2)
+        self.assertEqual(len(response['alternative_augmentative']), 2)
         self.assertEqual(len(response['assistive_devices']), 2)
         self.assertNotEqual(orig_date, response['last_updated'])
 
@@ -3409,11 +3705,11 @@ class TestCase(unittest.TestCase):
                           content_type="application/json")
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("assistive_device", response[0])
-        self.assertEqual("education_dependent_questionnaire", response[7])
-        self.assertEqual("home_self_questionnaire", response[13])
-        self.assertEqual("therapy", response[19])
-        self.assertEqual(20, len(response))
+        self.assertEqual("assistive_device", response[1])
+        self.assertEqual("education_dependent_questionnaire", response[8])
+        self.assertEqual("home_self_questionnaire", response[14])
+        self.assertEqual("therapy", response[20])
+        self.assertEqual(21, len(response))
 
     def test_questionnaire_list_meta_basics(self):
         self.construct_education_self_questionnaire()
@@ -3435,7 +3731,7 @@ class TestCase(unittest.TestCase):
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertSuccess(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(["math"], response[0]["academic_difficulty_areas"])
+        self.assertEqual(["math", "writing"], response[0]["academic_difficulty_areas"])
         self.assertEqual("fluent", response[0]["dependent_verbal_ability"])
         self.assertEqual(1, response[0]["id"])
 
@@ -3466,9 +3762,11 @@ class TestCase(unittest.TestCase):
         self.assertEqual('user_id', ws['D1'].value)
         self.assertEqual('dependent_verbal_ability', ws['E1'].value)
         self.assertEqual('concerning_behaviors', ws['F1'].value)
+        self.assertEqual('hoarding, ', ws['F2'].value)
         self.assertEqual('concerning_behaviors_other', ws['G1'].value)
         self.assertEqual('has_academic_difficulties', ws['H1'].value)
         self.assertEqual('academic_difficulty_areas', ws['I1'].value)
+        self.assertEqual('math, writing, ', ws['I2'].value)
         self.assertEqual('academic_difficulty_other', ws['J1'].value)
         self.assertEqual(10, ws.max_column)
         self.assertEqual(2, ws.max_row)
@@ -3483,24 +3781,25 @@ class TestCase(unittest.TestCase):
         ws = wb.get_active_sheet()
         self.assertEqual(ws, wb.active)
         self.assertEqual(2, ws.max_row)
-        self.assertEqual(20, len(wb.worksheets))
-        self.assertEqual('assistive_device', wb.worksheets[0].title)
-        self.assertEqual('clinical_diagnoses_questionnai', wb.worksheets[1].title)
-        self.assertEqual('contact_questionnaire', wb.worksheets[2].title)
-        self.assertEqual('current_behaviors_dependent_qu', wb.worksheets[3].title)
-        self.assertEqual('current_behaviors_self_questio', wb.worksheets[4].title)
-        self.assertEqual('demographics_questionnaire', wb.worksheets[5].title)
-        self.assertEqual('developmental_questionnaire', wb.worksheets[6].title)
-        self.assertEqual('education_dependent_questionna', wb.worksheets[7].title)
-        self.assertEqual('education_self_questionnaire', wb.worksheets[8].title)
-        self.assertEqual('employment_questionnaire', wb.worksheets[9].title)
-        self.assertEqual('evaluation_history_dependent_q', wb.worksheets[10].title)
-        self.assertEqual('evaluation_history_self_questi', wb.worksheets[11].title)
-        self.assertEqual('home_dependent_questionnaire', wb.worksheets[12].title)
-        self.assertEqual('home_self_questionnaire', wb.worksheets[13].title)
-        self.assertEqual('housemate', wb.worksheets[14].title)
-        self.assertEqual('identification_questionnaire', wb.worksheets[15].title)
-        self.assertEqual('medication', wb.worksheets[16].title)
-        self.assertEqual('professional_profile_questionn', wb.worksheets[17].title)
-        self.assertEqual('supports_questionnaire', wb.worksheets[18].title)
-        self.assertEqual('therapy', wb.worksheets[19].title)
+        self.assertEqual(21, len(wb.worksheets))
+        self.assertEqual('alternative_augmentative', wb.worksheets[0].title)
+        self.assertEqual('assistive_device', wb.worksheets[1].title)
+        self.assertEqual('clinical_diagnoses_questionnai', wb.worksheets[2].title)
+        self.assertEqual('contact_questionnaire', wb.worksheets[3].title)
+        self.assertEqual('current_behaviors_dependent_qu', wb.worksheets[4].title)
+        self.assertEqual('current_behaviors_self_questio', wb.worksheets[5].title)
+        self.assertEqual('demographics_questionnaire', wb.worksheets[6].title)
+        self.assertEqual('developmental_questionnaire', wb.worksheets[7].title)
+        self.assertEqual('education_dependent_questionna', wb.worksheets[8].title)
+        self.assertEqual('education_self_questionnaire', wb.worksheets[9].title)
+        self.assertEqual('employment_questionnaire', wb.worksheets[10].title)
+        self.assertEqual('evaluation_history_dependent_q', wb.worksheets[11].title)
+        self.assertEqual('evaluation_history_self_questi', wb.worksheets[12].title)
+        self.assertEqual('home_dependent_questionnaire', wb.worksheets[13].title)
+        self.assertEqual('home_self_questionnaire', wb.worksheets[14].title)
+        self.assertEqual('housemate', wb.worksheets[15].title)
+        self.assertEqual('identification_questionnaire', wb.worksheets[16].title)
+        self.assertEqual('medication', wb.worksheets[17].title)
+        self.assertEqual('professional_profile_questionn', wb.worksheets[18].title)
+        self.assertEqual('supports_questionnaire', wb.worksheets[19].title)
+        self.assertEqual('therapy', wb.worksheets[20].title)

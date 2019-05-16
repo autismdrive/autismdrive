@@ -80,9 +80,10 @@ def handle_404(error):
 
 def _load_data(data_loader):
     data_loader.load_categories()
+    data_loader.load_events()
+    data_loader.load_locations()
     data_loader.load_resources()
     data_loader.load_studies()
-    data_loader.load_trainings()
     data_loader.load_users()
     data_loader.load_participants()
     data_loader.load_clinical_diagnoses_questionnaire()
@@ -97,6 +98,7 @@ def _load_data(data_loader):
     data_loader.load_identification_questionnaire()
     data_loader.load_professional_profile_questionnaire()
     data_loader.load_supports_questionnaire()
+    data_loader.load_alternative_augmentative()
     data_loader.load_assistive_devices()
     data_loader.load_housemate()
     data_loader.load_medication()
@@ -147,6 +149,22 @@ def reset():
     data_loader.clear_index()
     data_loader.clear()
     _load_data(data_loader)
+    data_loader.build_index()
+
+
+@app.cli.command()
+def resourcereset():
+    """Remove all data about resources, studies, and trainings, and recreate it from the example data files"""
+    click.echo('Re-populating resources, studies, and trainings from the example data files')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.clear_index()
+    data_loader.clear_resources()
+    data_loader.load_categories()
+    data_loader.load_events()
+    data_loader.load_locations()
+    data_loader.load_resources()
+    data_loader.load_studies()
     data_loader.build_index()
 
 

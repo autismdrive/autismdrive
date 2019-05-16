@@ -9,11 +9,15 @@ from app import db
 from app.question_service import QuestionService
 
 
-def get_questionnaire(name):
+def get_questionnaire_data(name):
     class_ref = QuestionService.get_class(name)
     schema = QuestionService.get_schema(name, many=True)
     q = db.session.query(class_ref).all()
     return schema.dump(q)
+
+
+def get_questionnaire_fields(name):
+    return QuestionService.get_schema(name).fields
 
 
 def get_questionnaire_names():
@@ -61,14 +65,16 @@ class DataExport:
             worksheet = workbook.add_worksheet(qname[:30])
 
             # Some data we want to write to the worksheet.
-            questionnaires = get_questionnaire(name=qname)
+            # Get header fields from the schema in case the first record is missing fields
+            header_fields = get_questionnaire_fields(name=qname)
+            questionnaires = get_questionnaire_data(name=qname)
 
             # Start from the first cell. Rows and columns are zero indexed.
             row = 0
             col = 0
 
             # Write the column headers.
-            for key in questionnaires[0][0]:
+            for key in header_fields:
                 worksheet.write(row, col, key, bold)
                 col += 1
             row += 1
@@ -80,7 +86,9 @@ class DataExport:
                     if isinstance(item[key], list):
                         list_string = ''
                         for value in item[key]:
-                            list_string + str(value) + ', '
+                            list_string = list_string + str(value) + ', '
+                        worksheet.write(row, col, list_string)
+                        col += 1
                     else:
                         worksheet.write(row, col, item[key])
                         col += 1

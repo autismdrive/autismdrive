@@ -29,6 +29,7 @@
           <mat-list-item
             *ngFor="let count of facet.facetCounts"
             (click)="addFilter(facet.field, count.category)"
+            [ngClass]="{'filter-facet': true}"
           >
             {{count.category}}
             <div fxFlex></div>

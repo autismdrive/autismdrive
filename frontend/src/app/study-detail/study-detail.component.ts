@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { Study } from '../_models/study';
 import { ActivatedRoute, Router } from '@angular/router';
+import { snakeToUpperCase } from '../../util/snakeToUpper';
 
 @Component({
   selector: 'app-study-detail',
@@ -26,11 +27,12 @@ export class StudyDetailComponent implements OnInit {
   ngOnInit() {
   }
 
-  goEnroll($event: MouseEvent) {
+  goLogin($event: MouseEvent) {
     $event.preventDefault();
     if (this.study) {
-      this.router.navigateByUrl('/register');
+      this.router.navigateByUrl('/login');
     }
   }
 
+  get snakeToUpperCase() { return snakeToUpperCase; }
 }

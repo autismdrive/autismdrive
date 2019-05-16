@@ -20,7 +20,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   query: Query;
   showFilters = false;
   loading = true;
-  hideResults = true;
+  hideResults = false;
   filters: Filter[];
   pageSize = 20;
 
@@ -110,11 +110,11 @@ export class SearchComponent implements OnInit, OnDestroy {
       .search(this.query)
       .subscribe(query => {
         this.query = query;
-
-        this.hideResults = (
-          (this.query.words === '') &&
-          (this.query.filters.length === 0)
-        );
+        //
+        // this.hideResults = (
+        //   (this.query.words === '') &&
+        //   (this.query.filters.length === 0)
+        // );
 
         this.loading = false;
 

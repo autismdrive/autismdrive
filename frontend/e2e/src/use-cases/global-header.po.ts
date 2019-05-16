@@ -52,15 +52,14 @@ export class GlobalHeaderUseCases {
   visitStudiesPage() {
     this.page.clickLinkTo('/studies');
     expect(this.page.getElements('.studies').count()).toEqual(1);
-    expect(this.page.getElements('app-filters').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
   }
 
-  visitResourcesPage() {
-    this.page.clickLinkTo('/resources');
-    expect(this.page.getElements('.resources').count()).toEqual(1);
-    expect(this.page.getElements('app-filters').count()).toEqual(1);
+  visitResourcesSearchPage() {
+    this.page.clickLinkTo('/search');
+    expect(this.page.getElements('.applied-filters').count()).toEqual(1);
+    expect(this.page.getElements('.filter-facet').count()).toBeGreaterThan(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
   }

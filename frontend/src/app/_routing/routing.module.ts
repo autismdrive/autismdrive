@@ -19,9 +19,10 @@ import { StudiesComponent } from '../studies/studies.component';
 import { StudyDetailComponent } from '../study-detail/study-detail.component';
 import { TermsComponent } from '../terms/terms.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
-import { TrainingDetailComponent } from '../training-detail/training-detail.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
+import { EventDetailComponent } from '../event-detail/event-detail.component';
+import { LocationDetailComponent } from '../location-detail/location-detail.component';
 
 export function searchFilterMatcher(url: UrlSegment[]) {
   if (
@@ -48,6 +49,8 @@ const routes: Routes = [
   { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard] },
   { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
+  { path: 'event/:eventId', component: EventDetailComponent, data: { title: 'Event Details' } },
+  { path: 'location/:locationId', component: LocationDetailComponent, data: { title: 'Location Details' } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
   { path: 'studies', component: StudiesComponent, data: { title: 'Create a STAR Drive Account' } },
@@ -55,7 +58,6 @@ const routes: Routes = [
   { path: 'terms', component: TermsComponent, data: { title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true } },
   { path: 'logout', component: LogoutComponent, data: { title: 'You have been logged out.', hideHeader: true } },
   { path: 'timedout', component: TimedoutComponent, data: { title: 'Your session has timed out.', hideHeader: true } },
-  { path: 'training/:trainingId', component: TrainingDetailComponent, data: { title: 'Training Details' } },
   { path: 'search', component: SearchComponent, data: { title: 'Search' } },
   { path: 'search/:query', component: SearchComponent, data: { title: 'Search Resources' } },
   { matcher: searchFilterMatcher, component: SearchComponent, data: { title: 'Search' } },
