@@ -233,11 +233,13 @@ token, and then redirect again to the front end, passing that token along as a G
 
 ### Run backend tests
 Make sure you have set up your test database (see Database Setup above)
+You can use nose2 to execute all of tests, or you can run them individually using
+Pycharm or other IDE.
 In the `backend` directory, execute the following command:
 ```BASH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
-python tests.py
+nose2
 ```
 
 ### Run frontend tests
