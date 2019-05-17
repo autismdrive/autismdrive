@@ -686,7 +686,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
             follow_redirects=True,
             content_type="application/json",
             headers=self.logged_in_headers(user))
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         return json.loads(rv.get_data(as_text=True))
 
     def search_anonymous(self, query):
@@ -696,7 +696,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
             data=json.dumps(query),
             follow_redirects=True,
             content_type="application/json")
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         return json.loads(rv.get_data(as_text=True))
 
     def test_search_basics(self):
@@ -712,7 +712,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         resource = {'title': "space unicorn", 'description': "delivering rainbows"}
         rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
                            follow_redirects=True)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
 
         search_results = self.search(rainbow_query)
@@ -741,7 +741,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         rc = ResourceCategory(resource_id=res.id, category=c, type='resource')
         rc2 = ResourceCategory(resource_id=res.id, category=c2, type='resource')
         rv = self.app.get('api/resource/%i' % res.id, content_type="application/json", follow_redirects=True)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
 
         search_results = self.search(type_query)
         self.assertEqual(1, len(search_results["hits"]))
@@ -761,7 +761,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         study = {'title': "space platypus", 'description': "delivering umbrellas"}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
 
         search_results = self.search(umbrella_query)
@@ -780,7 +780,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         # test that it indeed exists
         rv = self.app.get('/api/resource/%i' % resource.id, content_type="application/json",
                           follow_redirects=True)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
 
         search_results = self.search(rainbow_query)
         self.assertEqual(1, len(search_results["hits"]))
@@ -790,7 +790,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         response['description'] = 'all around the world'
         rv = self.app.put('/api/resource/%i' % resource.id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
 
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results["hits"]))
@@ -818,7 +818,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         rv = self.app.get('/api/user/%i' % u_id,
                           follow_redirects=True,
                           content_type="application/json", headers=headers)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["id"], u_id)
         self.assertEqual(response["email"], 'stan@staunton.com')
@@ -832,22 +832,22 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
 
         # A user should be able to access and modify their user record, with the exception of making themselves Admin
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=user_headers)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         response['email'] = 'ed@edwardos.com'
         orig_date = response['last_updated']
         rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True, headers=user_headers)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
 
         # Only Admin users can make other admin users
         response['role'] = 'admin'
         rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True, headers=admin_headers)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
 
         rv = self.app.get('/api/user/%i' % u.id, content_type="application/json", headers=user_headers)
-        self.assertSuccess(rv)
+        self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['email'], 'ed@edwardos.com')
         self.assertEqual(response['role'], 'admin')
