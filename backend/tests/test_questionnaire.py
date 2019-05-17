@@ -31,6 +31,7 @@ from app.model.questionnaires.professional_profile_questionnaire import Professi
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
+from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
 
 
@@ -797,17 +798,6 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         search_results = self.search(world_query)
         self.assertEqual(1, len(search_results["hits"]))
         self.assertEqual(resource.id, search_results['hits'][0]['id'])
-
-    def test_delete_search_item(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
-        resource = self.construct_resource(
-            title='space unicorn', description="delivering rainbows")
-        search_results = self.search(rainbow_query)
-        self.assertEqual(1, len(search_results["hits"]))
-        elastic_index.remove_document(resource, 'Resource')
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["hits"]))
 
     def test_user_basics(self):
         self.construct_user()
