@@ -19,7 +19,6 @@ class CategoryEndpoint(flask_restful.Resource):
     def delete(self, id):
         try:
             db.session.query(Category).filter(Category.id == id).delete()
-            db.session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)
         return
@@ -31,7 +30,6 @@ class CategoryEndpoint(flask_restful.Resource):
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         db.session.add(updated)
-        db.session.commit()
         return self.schema.dump(updated)
 
 

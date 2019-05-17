@@ -3,7 +3,7 @@ import flask_restful
 import os
 from flask import request
 from sqlalchemy.exc import IntegrityError
-from app import db, RestException, auth
+from app import app, db, RestException, auth
 from app.model.user import Role
 from app.wrappers import requires_roles
 from data_export_service import DataExport
@@ -102,7 +102,7 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
 class QuestionnaireNamesEndpoint(flask_restful.Resource):
 
     def get(self):
-        all_file_names = os.listdir('./app/model/questionnaires')
+        all_file_names = os.listdir(os.path.dirname(app.instance_path) + '/app/model/questionnaires')
         non_questionnaires = ['mixin', '__']
         questionnaire_file_names = []
         for index, file_name in enumerate(all_file_names):
@@ -119,4 +119,4 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
-        return DataExport.export(name=name)
+        return DataExport.export(name=name, app=app)
