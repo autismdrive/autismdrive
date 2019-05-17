@@ -2052,10 +2052,10 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("id", response["fields"][0]["name"])
-        self.assertEqual("user_id", response["fields"][3]["name"])
-        self.assertEqual("school_type", response["fields"][7]["name"])
-        self.assertEqual("school_services_other", response["fields"][12]["name"])
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'id', response["fields"]))))
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'user_id', response["fields"]))))
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'school_type', response["fields"]))))
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'school_services_other', response["fields"]))))
         self.assertEqual(13, len(response["fields"]))
 
     def test_questionnaire_list_basics(self):
