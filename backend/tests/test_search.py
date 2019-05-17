@@ -92,13 +92,3 @@ class TestSearch(BaseTest, unittest.TestCase):
         elastic_index.remove_document(resource, 'Resource')
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["hits"]))
-    def test_delete_search_item(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
-        resource = self.construct_resource(
-            title='space unicorn', description="delivering rainbows")
-        search_results = self.search(rainbow_query)
-        self.assertEqual(1, len(search_results["hits"]))
-        elastic_index.remove_document(resource, 'Resource')
-        search_results = self.search(world_query)
-        self.assertEqual(0, len(search_results["hits"]))
