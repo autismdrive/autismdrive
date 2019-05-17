@@ -106,7 +106,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(s.id, response[0]["id"])
+        self.assertEqual(s.id, response[0]["study_id"])
         self.assertEqual(s.description, response[0]["study"]["description"])
 
     def test_get_study_by_category_includes_category_details(self):
@@ -123,7 +123,7 @@ class TestStudy(BaseTest, unittest.TestCase):
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(s.id, response[0]["id"])
+        self.assertEqual(s.id, response[0]["study_id"])
         self.assertEqual(2,
                          len(response[0]["study"]["study_categories"]))
         self.assertEqual(
