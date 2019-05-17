@@ -27,7 +27,6 @@ class ParticipantEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def delete(self, id):
         db.session.query(Participant).filter_by(id=id).delete()
-        db.session.commit()
         return None
 
     @auth.login_required
@@ -40,7 +39,6 @@ class ParticipantEndpoint(flask_restful.Resource):
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
-        db.session.commit()
         return self.schema.dump(updated)
 
 

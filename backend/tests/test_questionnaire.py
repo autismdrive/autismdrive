@@ -2053,13 +2053,13 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual("id", response["fields"][0]["name"])
-        self.assertEqual("user_id", response["fields"][4]["name"])
+        self.assertEqual("user_id", response["fields"][3]["name"])
         self.assertEqual("school_type", response["fields"][7]["name"])
         self.assertEqual("school_services_other", response["fields"][12]["name"])
         self.assertEqual(13, len(response["fields"]))
 
     def test_questionnaire_list_basics(self):
-        self.construct_current_behaviors_dependent_questionnaire()
+        q = self.construct_current_behaviors_dependent_questionnaire()
         rv = self.app.get('/api/q/current_behaviors_dependent_questionnaire',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -2067,7 +2067,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(["math", "writing"], response[0]["academic_difficulty_areas"])
         self.assertEqual("fluent", response[0]["dependent_verbal_ability"])
-        self.assertEqual(1, response[0]["id"])
+        self.assertEqual(q.id, response[0]["id"])
 
     def test_non_admin_cannot_view_questionnaire_list(self):
         user = self.construct_user(email='regularUser@user.com')

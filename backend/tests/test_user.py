@@ -212,7 +212,7 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assertIsNotNone(logs[-1].tracking_code)
 
     def test_forgot_password_sends_email(self):
-        user = self.test_create_user_with_password()
+        user = self.test_create_user_with_password(id=10101, email="forgot_password_sends_email@test.com")
         message_count = len(TEST_MESSAGES)
         data = {"email": user.email}
         rv = self.app.post(
