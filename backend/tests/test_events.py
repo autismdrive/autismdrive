@@ -18,7 +18,6 @@ class TestEvents(BaseTest, unittest.TestCase):
                                 state=state, zip=zip, phone=phone, website=website)
         event.organization_id = self.construct_organization().id
         db.session.add(event)
-        db.session.commit()
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
         self.assertEqual(db_event.website, event.website)
@@ -91,7 +90,6 @@ class TestEvents(BaseTest, unittest.TestCase):
         ev = self.construct_event()
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         db.session.add(rc)
-        db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
             content_type="application/json",
@@ -99,7 +97,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(ev.id, response[0]["resource_id"])
         self.assertEqual(ev.description, response[0]["resource"]["description"])
 
     def test_get_event_by_category_includes_category_details(self):
@@ -109,14 +107,13 @@ class TestEvents(BaseTest, unittest.TestCase):
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         rc2 = ResourceCategory(resource_id=ev.id, category=c2, type='event')
         db.session.add_all([rc, rc2])
-        db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(ev.id, response[0]["resource_id"])
         self.assertEqual(2,
                          len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
@@ -130,7 +127,6 @@ class TestEvents(BaseTest, unittest.TestCase):
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         rc2 = ResourceCategory(resource_id=rec.id, category=c, type='resource')
         db.session.add_all([rc, rc2])
-        db.session.commit()
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
         self.assert_success(rv)
@@ -142,14 +138,13 @@ class TestEvents(BaseTest, unittest.TestCase):
         ev = self.construct_event()
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         db.session.add(rc)
-        db.session.commit()
         rv = self.app.get(
             '/api/event/%i/category' % ev.id,
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(c.id, response[0]["id"])
+        self.assertEqual(c.id, response[0]["category_id"])
         self.assertEqual(c.name, response[0]["category"]["name"])
 
     def test_add_category_to_event(self):

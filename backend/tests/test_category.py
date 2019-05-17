@@ -36,6 +36,7 @@ class TestCategory(BaseTest, unittest.TestCase):
         rv = self.app.put('/api/category/%i' % c_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assert_success(rv)
+        db.session.commit()
         rv = self.app.get('/api/category/%i' % c_id, content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -64,26 +65,26 @@ class TestCategory(BaseTest, unittest.TestCase):
         self.assertIsNotNone(response['id'])
 
     def test_category_has_links(self):
-        self.construct_category()
+        c = self.construct_category()
         rv = self.app.get(
-            '/api/category/1',
+            '/api/category/' + str(c.id),
             follow_redirects=True,
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["_links"]["self"], '/api/category/1')
+        self.assertEqual(response["_links"]["self"], '/api/category/' + str(c.id))
         self.assertEqual(response["_links"]["collection"], '/api/category')
 
     def test_category_has_children(self):
         c1 = self.construct_category()
         c2 = self.construct_category(name="I'm the kid", parent=c1)
         rv = self.app.get(
-            '/api/category/1',
+            '/api/category/' + str(c1.id),
             follow_redirects=True,
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["children"][0]['id'], 2)
+        self.assertEqual(response["children"][0]['id'], c2.id)
         self.assertEqual(response["children"][0]['name'], "I'm the kid")
 
     def test_category_has_parents_and_that_parent_has_no_children(self):
@@ -91,12 +92,12 @@ class TestCategory(BaseTest, unittest.TestCase):
         c2 = self.construct_category(name="I'm the kid", parent=c1)
         c3 = self.construct_category(name="I'm the grand kid", parent=c2)
         rv = self.app.get(
-            '/api/category/3',
+            '/api/category/' + str(c3.id),
             follow_redirects=True,
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["parent"]['id'], 2)
+        self.assertEqual(response["parent"]['id'], c2.id)
         self.assertNotIn("children", response["parent"])
 
     def test_category_depth_is_limited(self):
