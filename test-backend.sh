@@ -11,7 +11,7 @@ echo -e '\n\n*** Starting tests in backend with nose2 ***\n\n'
 cd $BACKEND_PATH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
-nose2 & TESTING_PID=$!
+nose2 -v & TESTING_PID=$!
 
 wait $TESTING_PID
 

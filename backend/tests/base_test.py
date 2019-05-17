@@ -103,9 +103,11 @@ class BaseTest:
 
         organization = Organization(name=name, description=description)
         db.session.add(organization)
+        db.session.commit()
 
         db_org = db.session.query(Organization).filter_by(name=organization.name).first()
         self.assertEqual(db_org.description, organization.description)
+        self.assertIsNotNone(db_org.id)
         return db_org
 
     def construct_category(self, name="Ultimakers", parent=None):

@@ -76,7 +76,8 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_location(self):
-        location = {'title': "location of locations", 'description': "You need this location in your life."}
+        o_id = self.construct_organization().id
+        location = {'title': "location of locations", 'description': "You need this location in your life.", 'organization_id': o_id}
         rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
