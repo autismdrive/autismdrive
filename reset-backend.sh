@@ -10,5 +10,6 @@ echo -e '\n\n*** Resetting backend app... ***\n\n'
 cd $BACKEND_PATH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
+pip3 install -r requirements.txt
 flask db upgrade
 flask reset
