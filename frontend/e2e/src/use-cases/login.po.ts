@@ -31,7 +31,6 @@ export class LoginUseCases {
     expect(this.page.getElements('app-login').count()).toEqual(1);
     this.page.clickAndExpectRoute('#register', '/register');
     expect(this.page.getElements('app-register').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#cancel', '/home');
   }
 
   displayRegisterConfirmation(email: string) {
