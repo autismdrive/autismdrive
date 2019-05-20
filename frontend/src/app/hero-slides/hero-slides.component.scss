@@ -37,7 +37,7 @@ $dot_size: 8px;
       padding: $dot_size;
       height: $dot_size;
       width: $dot_size;
-      border-radius: $dot_size;
+      border-radius: 50%;
       border: 1px solid mat-color($stardrive-primary, default, 1);
       background-color: white;
       float: left;
