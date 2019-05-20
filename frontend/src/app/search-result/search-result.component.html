@@ -21,7 +21,7 @@
         class="type"
         [disableRipple]="true"
         matTooltip="{{ hit.type | uppercase }}"
-      ><app-type-icon [iconType]="hit.type" [size]="1"></app-type-icon></button>
+      ><app-type-icon [iconType]="hit.type.toLowerCase()" [size]="1"></app-type-icon></button>
   </div>
   <markdown
     *ngIf="hit.highlights"
