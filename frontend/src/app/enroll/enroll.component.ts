@@ -15,8 +15,8 @@ export class EnrollComponent implements OnInit {
   ngOnInit() {
   }
 
-  goTerms($event) {
+  goRegister($event) {
     $event.preventDefault();
-    this.router.navigate(['terms']);
+    this.router.navigate(['register']);
   }
 }
