@@ -11,7 +11,7 @@
   >
     <a
       class="title mat-h2"
-      href="/#/{{hit.type}}/{{hit.id}}"
+      href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
     >
       {{hit.title}}
     </a>
@@ -33,6 +33,6 @@
   >{{hit.content}}</p>
   <a
     class="chevron-link"
-    href="/#/{{hit.type}}/{{hit.id}}"
+    href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
   >View {{hit.type}} Details</a>
 </div>
