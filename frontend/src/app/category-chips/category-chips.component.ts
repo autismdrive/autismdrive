@@ -10,9 +10,12 @@ import { ResourceCategory } from '../_models/resource_category';
 export class CategoryChipsComponent implements OnInit {
   @Input() categories: StudyCategory[] | ResourceCategory[];
 
-  constructor() { }
+  constructor() {
+
+  }
 
   ngOnInit() {
+    console.log('this.categories', this.categories);
   }
 
 }

@@ -92,7 +92,7 @@ class ElasticIndex:
 
     def add_document(self, document, flush=True):
         doc = StarDocument(id=document.id,
-                           type=document.__tablename__,
+                           type=document.__tablename__.upper(),
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
@@ -102,7 +102,7 @@ class ElasticIndex:
 
         doc.meta.id = self._get_id(document)
 
-        if doc.type is not 'study':
+        if document.__tablename__ is not 'study':
             doc.website = document.website
 
         if document.organization is not None:
@@ -112,6 +112,8 @@ class ElasticIndex:
             if cat.category.parent:
                 if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
                     doc.location = cat.category.name
+                elif cat.category.parent.name == 'Type of Resources':
+                    continue
                 else:
                     doc.category.append(cat.category.parent.name)
             else:

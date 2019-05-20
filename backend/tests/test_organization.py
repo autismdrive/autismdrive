@@ -12,13 +12,12 @@ class TestOrganizations(BaseTest, unittest.TestCase):
         self.construct_organization()
         o = db.session.query(Organization).first()
         self.assertIsNotNone(o)
-        o_id = o.id
-        rv = self.app.get('/api/organization/%i' % o_id,
+        rv = self.app.get('/api/organization/%i' % o.id,
                           follow_redirects=True,
                           content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["id"], o_id)
+        self.assertEqual(response["id"], o.id)
         self.assertEqual(response["name"], 'Staunton Makerspace')
         self.assertEqual(response["description"],
                          'A place full of surprise, delight, and amazing people. And tools. Lots of exciting tools.')
@@ -27,16 +26,15 @@ class TestOrganizations(BaseTest, unittest.TestCase):
         self.construct_organization()
         o = db.session.query(Organization).first()
         self.assertIsNotNone(o)
-        o_id = o.id
-        rv = self.app.get('/api/organization/%i' % o_id, content_type="application/json")
+        rv = self.app.get('/api/organization/%i' % o.id, content_type="application/json")
         response = json.loads(rv.get_data(as_text=True))
         response['name'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/organization/%i' % o_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/organization/%i' % o.id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
         self.assert_success(rv)
-        rv = self.app.get('/api/organization/%i' % o_id, content_type="application/json")
+        rv = self.app.get('/api/organization/%i' % o.id, content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['name'], 'Edwarardos Lemonade and Oil Change')
@@ -64,4 +62,3 @@ class TestOrganizations(BaseTest, unittest.TestCase):
         self.assertEqual(response['name'], 'Organization of Champions')
         self.assertEqual(response['description'], 'All the best people, all the time.')
         self.assertIsNotNone(response['id'])
-

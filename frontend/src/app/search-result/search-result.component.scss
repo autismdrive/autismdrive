@@ -7,24 +7,6 @@
 
 .result-item {
   margin-top: 2em;
-}
-
-.title {
-  margin: 0px;
-}
-
-.type {
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: mat-color($stardrive-primary, 300, 1);
-}
-
-::ng-deep .highlights em {
-  font-weight: 700;
-}
-
-
-.featured-item {
   position: relative;
 
   &:after {
@@ -40,6 +22,7 @@
   }
 
   .title {
+    margin: 0px;
     color: mat-color($stardrive-primary, 500, 1);
     font-weight: 800;
     font-style: italic;
@@ -47,4 +30,21 @@
     line-height: 1;
     font-size: 1.625rem;
   }
+}
+
+.type {
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: mat-color($stardrive-primary, 300, 1);
+  font-size: 3em;
+  background-color: transparent;
+
+  &:hover {
+    color: mat-color($stardrive-primary, default, 1);
+    background-color: transparent;
+  }
+}
+
+::ng-deep .highlights em {
+  font-weight: 700;
 }

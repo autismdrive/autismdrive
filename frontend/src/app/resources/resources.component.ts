@@ -22,7 +22,7 @@ export class ResourcesComponent implements OnInit {
 
   loadResources() {
     const query = new Query({
-      filters: [{field: 'Type', value: 'resource'}]
+      filters: [{field: 'Type', value: 'RESOURCE'}]
     });
     this.api.search(query).subscribe(q => this.query = q);
   }

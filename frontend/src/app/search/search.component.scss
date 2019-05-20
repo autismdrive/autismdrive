@@ -53,7 +53,7 @@ form.search-box {
   }
 
   .applied-filters {
-    margin-left: 0px;
+    margin-left: 1em;
 
     li {
       list-style: none;
@@ -74,7 +74,18 @@ form.search-box {
     border: none;
   }
 
+  .filter-facet, .sort-order {
+    font-size: 1em;
+    line-height: 1.2;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
   .hit-count { text-align: right; white-space: nowrap; }
+
+  #results {
+    padding: 2em;
+  }
 }
 
 

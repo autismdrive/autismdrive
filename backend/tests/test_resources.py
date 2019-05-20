@@ -59,7 +59,8 @@ class TestResources(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_resource(self):
-        resource = {'title': "Resource of Resources", 'description': "You need this resource in your life."}
+        o_id = self.construct_organization().id
+        resource = {'title': "Resource of Resources", 'description': "You need this resource in your life.", 'organization_id': o_id}
         rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)

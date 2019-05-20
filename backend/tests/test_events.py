@@ -1,9 +1,11 @@
 import unittest
 
+from click import INT
 from flask import json
-from tests.base_test import BaseTest
+
 from app import db, elastic_index
 from app.model.event import Event
+from tests.base_test import BaseTest
 from app.model.resource_category import ResourceCategory
 
 
@@ -18,6 +20,7 @@ class TestEvents(BaseTest, unittest.TestCase):
                                 state=state, zip=zip, phone=phone, website=website)
         event.organization_id = self.construct_organization().id
         db.session.add(event)
+        db.session.commit()
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
         self.assertEqual(db_event.website, event.website)
@@ -73,8 +76,9 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_event(self):
+        o_id = self.construct_organization().id
         event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
-                 'ticket_cost': "$500 suggested donation"}
+                 'ticket_cost': "$500 suggested donation", 'organization_id': o_id}
         rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
