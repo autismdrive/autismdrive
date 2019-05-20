@@ -22,6 +22,7 @@ describe('Anonymous User', () => {
   it('should display logged-out state in utility navigation', () => globalHeaderUseCases.displayLoggedOutState());
   it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
   it('should visit enroll page', () => globalHeaderUseCases.visitEnrollPage());
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
   it('should visit resources search page', () => globalHeaderUseCases.visitResourcesSearchPage());
