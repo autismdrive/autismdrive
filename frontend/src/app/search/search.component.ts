@@ -3,12 +3,14 @@ import {
   OnDestroy,
   OnInit,
   Renderer2,
-  ViewChild
+  ViewChild,
+  ChangeDetectorRef
 } from '@angular/core';
 import { MatPaginator, MatSidenav } from '@angular/material';
 import { ActivatedRoute, Router, Params, ParamMap } from '@angular/router';
 import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
+import { MediaMatcher } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-search',
@@ -22,16 +24,24 @@ export class SearchComponent implements OnInit, OnDestroy {
   hideResults = false;
   filters: Filter[];
   pageSize = 20;
+  mobileQuery: MediaQueryList;
+  private _mobileQueryListener: () => void;
 
   @ViewChild('sidenav') public sideNav: MatSidenav;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
+    changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
     private renderer: Renderer2,
-    private searchService: SearchService
+    private searchService: SearchService,
+    media: MediaMatcher,
   ) {
+    this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
+
     this.route.queryParamMap.subscribe(qParams => {
       let words = '';
       const filters: Filter[] = [];
@@ -73,7 +83,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.sideNav.mode = 'over';
     }
 
-    this.sideNav.opened = this.showFilters;
+    this.sideNav.opened = this.showFilters && !this.mobileQuery.matches;
   }
 
   removeWords() {
@@ -187,7 +197,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   // Show filters if all filters have been removed.
   updateFilters() {
     this.showFilters = this.query.filters.length === 0;
-    if (this.showFilters && this.sideNav) {
+    if (!this.mobileQuery.matches && this.showFilters && this.sideNav) {
       this.sideNav.open();
     }
   }
