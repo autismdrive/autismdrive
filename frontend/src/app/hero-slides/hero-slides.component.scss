@@ -1,0 +1,79 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
+$dot_size: 8px;
+
+.hero-slides {
+  position: relative;
+  height: 60vh;
+
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) { height: 60vh; }
+
+  // Medium devices (tablets, 768px and up)
+  @media (min-width: 768px) { height: 60vh; }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) { height: 60vh; }
+
+  // Extra large devices (large desktops, 1200px and up)
+  @media (min-width: 1200px) { height: 60vh; }
+
+  .dots {
+    list-style: none;
+    z-index: 2;
+    position: absolute;
+    bottom: (-4 * $dot_size);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0px;
+    padding: 0px;
+
+    .dot {
+      padding: $dot_size;
+      height: $dot_size;
+      width: $dot_size;
+      border-radius: $dot_size;
+      border: 1px solid mat-color($stardrive-primary, default, 1);
+      background-color: white;
+      float: left;
+      margin-left: 10px;
+      margin-right: 10px;
+      cursor: pointer;
+
+      &.active, &.inactive:hover {
+        background-color: mat-color($stardrive-primary, default, 1);
+        opacity: 1;
+      }
+      &.inactive { opacity: 0.5; }
+    }
+  }
+}
+
+.hero-slides .hero-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 1s ease-in-out;
+  cursor: pointer;
+
+  &.top-left { background-position: top left; }
+  &.top-center { background-position: top center; }
+  &.top-right { background-position: top right; }
+  &.center-left { background-position: center left; }
+  &.center-center { background-position: center center; }
+  &.center-right { background-position: center right; }
+  &.bottom-left { background-position: bottom left; }
+  &.bottom-center { background-position: bottom center; }
+  &.bottom-right { background-position: bottom right; }
+
+  &.active { opacity: 1; z-index: 1; }
+  &.prev { opacity: 0; z-index: 0; }
+  &.next { opacity: 0; z-index: 0; }
+}

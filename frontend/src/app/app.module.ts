@@ -88,6 +88,7 @@ import { CategoryChipsComponent } from './category-chips/category-chips.componen
 import { EventDetailComponent } from './event-detail/event-detail.component';
 import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
+import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -159,6 +160,7 @@ export class FormlyConfig {
     EventDetailComponent,
     LocationDetailComponent,
     TypeIconComponent,
+    HeroSlidesComponent,
   ],
   imports: [
     BrowserAnimationsModule,
