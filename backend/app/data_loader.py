@@ -166,7 +166,7 @@ class DataLoader:
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(7, 10):
+                for i in range(19, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
@@ -174,24 +174,22 @@ class DataLoader:
 
                         study_category = StudyCategory(study_id=study_id, category_id=category_id)
                         db.session.add(study_category)
-                if row[10]:
-                    investigator = Investigator(name=row[10], title=row[11],
-                                                organization_id=self.get_org_by_name(row[12]).id, bio_link=row[13])
-                    db.session.add(investigator)
-                    db.session.commit()
-                    study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
-                    db.session.add(study_investigator)
-                if row[14]:
-                    investigator = Investigator(name=row[14], title=row[15],
-                                                organization_id=self.get_org_by_name(row[16]).id, bio_link=row[17])
-                    db.session.add(investigator)
-                    db.session.commit()
-                    study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
-                    db.session.add(study_investigator)
+                for i in [7, 11, 15]:
+                    if row[i]:
+                        investigator = db.session.query(Investigator).filter(Investigator.name == row[i]).first()
+                        if investigator is None:
+                            investigator = Investigator(name=row[i], title=row[i+1],
+                                                        organization_id=self.get_org_by_name(row[i+2]).id, bio_link=row[i+3])
+                        db.session.add(investigator)
+                        db.session.commit()
+                        study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
+                        db.session.add(study_investigator)
             print("Studies loaded.  There are now %i studies in the database." % db.session.query(
                 Study).count())
             print("There are now %i links between studies and categories in the database." %
                   db.session.query(StudyCategory).count())
+            print("There are now %i study investigators in the database." %
+                  db.session.query(Investigator).count())
         db.session.commit()
 
     def load_users(self):
