@@ -1,10 +1,11 @@
 <div
   class="studies"
-  fxLayout="row"
-  fxLayoutGap="2%"
+  fxLayout.lt-md="column"
+  fxLayout.gt-sm="row"
+  fxLayoutGap="40px"
   fxLayoutAlign="center auto"
 >
-  <div fxFlex="30%">
+  <div fxFlex.gt-sm="30%">
     <h1>STAR Research</h1>
     <h2>About our research</h2>
     <p>The Supporting Transformative Autism Research (STAR) project was designed to
@@ -22,7 +23,7 @@
       and their communities to achieve positive outcomes and quality of life.</p>
   </div>
   <div
-    fxFlex="60%"
+    fxFlex.gt-sm="60%"
     fxLayout="column"
     fxLayoutGap="40px"
     *ngIf="query && query.hits"
