@@ -4,14 +4,6 @@ export class LoginUseCases {
   constructor(private page: AppPage) {
   }
 
-  displayTerms() {
-    this.page.clickAndExpectRoute('#register-button', '/terms');
-    expect(this.page.getElements('app-terms').count()).toEqual(1);
-    expect(this.page.getElements('#agree').count()).toEqual(1);
-    expect(this.page.getElements('#cancel').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#cancel', '/home');
-  }
-
   displayLoginForm() {
     this.page.waitForClickable('#login-button');
     this.page.clickElement('#login-button');
@@ -37,17 +29,9 @@ export class LoginUseCases {
   displayRegisterForm() {
     this.page.clickAndExpectRoute('#login-button', '/login');
     expect(this.page.getElements('app-login').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#register', '/terms');
-    expect(this.page.getElements('app-terms').count()).toEqual(1);
+    this.page.clickAndExpectRoute('#register', '/register');
+    expect(this.page.getElements('app-register').count()).toEqual(1);
     this.page.clickAndExpectRoute('#cancel', '/home');
-  }
-
-  acceptTerms() {
-    this.page.clickAndExpectRoute('#login-button', '/login');
-    expect(this.page.getElements('app-login').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#register', '/terms');
-    expect(this.page.getElements('app-terms').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#agree', '/register');
   }
 
   displayRegisterConfirmation(email: string) {
@@ -60,9 +44,8 @@ export class LoginUseCases {
   }
 
   displayRegisterError(email: string) {
-    this.page.clickAndExpectRoute('#register-button', '/terms');
-    expect(this.page.getElements('app-terms').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#agree', '/register');
+    this.page.clickAndExpectRoute('#register-button', '/register');
+    expect(this.page.getElements('app-register').count()).toEqual(1);
     this.page.inputText('[id*="input_email"]', email);
     this.page.clickElement('#submit');
     this.page.waitForNotVisible('app-loading');

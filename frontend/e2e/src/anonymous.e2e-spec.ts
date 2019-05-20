@@ -28,11 +28,9 @@ describe('Anonymous User', () => {
   it('should visit resources search page', () => globalHeaderUseCases.visitResourcesSearchPage());
 
   // Login & Register
-  it('should display terms and conditions when Create Account button is clicked', () => loginUseCases.displayTerms());
   it('should display login form', () => loginUseCases.displayLoginForm());
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
   it('should display register form', () => loginUseCases.displayRegisterForm());
-  it('should accept terms and conditions', () => loginUseCases.acceptTerms());
   it('should display confirmation message on submit', () => loginUseCases.displayRegisterConfirmation(randomEmail));
   it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
