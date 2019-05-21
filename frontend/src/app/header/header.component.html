@@ -15,6 +15,18 @@
       target="_blank"
       href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"
     ><img src="/assets/logo/UVA_STAR-logo.svg"></a></div>
+  <span fxFlex></span>
+  <a
+    mat-button
+    *ngIf="currentUser && currentUser.role == 'admin'"
+    [routerLink]="[ '/admin' ]"
+    routerLinkActive="selected"
+    id="admin-button"
+  >
+    <mat-icon>build</mat-icon>
+    Admin
+  </a>
+
 </div>
 <div
   id="site-header"
@@ -67,9 +79,24 @@
           [routerLink]="[ '/search' ]"
           routerLinkActive="selected"
           id="resources-button"
-        >Training & Resources</a>
+        >
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Resources</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          >Training &amp; Resources</span>
+        </a>
       </div>
 
+      <span fxFlex></span>
+      <app-search-box
+        variant="dark-bg"
+        fxHide
+        fxShow.gt-sm
+      ></app-search-box>
       <span fxFlex></span>
 
       <div
@@ -77,8 +104,6 @@
         fxHide
         fxShow.gt-sm
       >
-        <app-search-box variant="dark-bg"></app-search-box>
-
         <a
           mat-button
           *ngIf="!currentUser"
@@ -87,6 +112,10 @@
           id="register-button"
         >
           <mat-icon>person_add</mat-icon>
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Register</span>
           <span
             fxHide
             fxShow.gt-md
@@ -100,20 +129,7 @@
           id="login-button"
         >
           <mat-icon>account_circle</mat-icon>
-          <span
-            fxHide
-            fxShow.gt-md
-          >Sign in</span>
-        </a>
-        <a
-          mat-button
-          *ngIf="currentUser && currentUser.role == 'admin'"
-          [routerLink]="[ '/admin' ]"
-          routerLinkActive="selected"
-          id="admin-button"
-        >
-          <mat-icon>build</mat-icon>
-          Admin
+          Sign in
         </a>
         <a
           mat-button
@@ -123,7 +139,14 @@
           id="profile-button"
         >
           <mat-icon>account_circle</mat-icon>
-          Visit Profile
+          <span
+            fxHide
+            fxShow.lt-lg
+          > Profile</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          > View Profile</span>
         </a>
         <a
           mat-button
@@ -229,5 +252,5 @@
     routerLinkActive="selected"
     id="resources-button-mobile"
     (click)="toggleMenu()"
-  >Training & Resources</a>
+  >Training &amp; Resources</a>
 </div>
