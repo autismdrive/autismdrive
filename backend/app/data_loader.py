@@ -126,13 +126,13 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
-                resource = StarResource(title=row[0], description=row[1], organization=org, website=row[12],
-                                        phone=row[14])
+                resource = StarResource(title=row[0], description=row[1], organization=org, website=row[5],
+                                        phone=row[6])
                 db.session.add(resource)
                 db.session.commit()
                 self.__increment_id_sequence(StarResource)
 
-                for i in range(15, len(row)):
+                for i in range(7, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         resource_id = resource.id

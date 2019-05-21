@@ -24,6 +24,7 @@ class StarDocument(Document):
     website = Keyword()
     location = Keyword()
     category = Keyword(multi=True)
+    child_category = Keyword(multi=True)
 
 
 class ElasticIndex:
@@ -97,7 +98,8 @@ class ElasticIndex:
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
                            location=None,
-                           category=[]
+                           category=[],
+                           child_category=[]
                            )
 
         doc.meta.id = self._get_id(document)
@@ -112,10 +114,12 @@ class ElasticIndex:
             if cat.category.parent:
                 if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
                     doc.location = cat.category.name
+                    doc.child_category.append(cat.category.name)
                 elif cat.category.parent.name == 'Type of Resources':
-                    continue
+                    doc.child_category.append(cat.category.name)
                 else:
                     doc.category.append(cat.category.parent.name)
+                    doc.child_category.append(cat.category.name)
             else:
                 doc.category.append(cat.category.name)
 
@@ -150,13 +154,13 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         super(DocumentSearch, self).__init__(*args, **kwargs)
 
     doc_types = [StarDocument]
-    fields = ['title^10', 'content^5', 'category^2', 'organization', 'website']
+    fields = ['title^10', 'content^5',  'location^3', 'category^2',  'child_category^2', 'organization', 'website']
 
     facets = {
         'Type': elasticsearch_dsl.TermsFacet(field='type'),
         'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
-        'Categories': elasticsearch_dsl.TermsFacet(field='category'),
-        'Locations': elasticsearch_dsl.TermsFacet(field='location')
+        'Category': elasticsearch_dsl.TermsFacet(field='category'),
+        'Location': elasticsearch_dsl.TermsFacet(field='location')
     }
 
     def highlight(self, search):
