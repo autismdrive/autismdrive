@@ -1,20 +1,12 @@
-<div
-  id="hero"
-  class="gradient-overlay container"
->
-  <div class="row">
-    <div class="border-box">
-      <h1>Driving discovery</h1>
-    </div>
-  </div>
-</div>
+<app-hero-slides [slides]=heroSlides></app-hero-slides>
 <div class="container mat-typography">
   <div
     class="row action"
     fxLayout="column"
     fxLayoutAlign="center center"
   >
-    <p class="intro">Improving the lives of individuals with autism and their families through ground-breaking research and innovative models for care, support, and education.</p>
+    <p class="intro">Improving the lives of individuals with autism and their families through ground-breaking research
+      and innovative models for care, support, and education.</p>
     <div id="cta">
       <button
         mat-flat-button
@@ -38,6 +30,10 @@
     class="row news"
     fxLayout="column"
   >
-    <app-news-item *ngFor="let item of newsItems" [item]="item"></app-news-item>
+    <app-news-item
+      *ngFor="let item of newsItems; let i = index"
+      [item]="item"
+      [index]="i"
+    ></app-news-item>
   </div>
 </div>

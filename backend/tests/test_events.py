@@ -1,9 +1,11 @@
 import unittest
 
+from click import INT
 from flask import json
-from tests.base_test import BaseTest
+
 from app import db, elastic_index
 from app.model.event import Event
+from tests.base_test import BaseTest
 from app.model.resource_category import ResourceCategory
 
 
@@ -74,8 +76,9 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_event(self):
+        o_id = self.construct_organization().id
         event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
-                 'ticket_cost': "$500 suggested donation"}
+                 'ticket_cost': "$500 suggested donation", 'organization_id': o_id}
         rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
@@ -91,7 +94,6 @@ class TestEvents(BaseTest, unittest.TestCase):
         ev = self.construct_event()
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         db.session.add(rc)
-        db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
             content_type="application/json",
@@ -99,7 +101,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(ev.id, response[0]["resource_id"])
         self.assertEqual(ev.description, response[0]["resource"]["description"])
 
     def test_get_event_by_category_includes_category_details(self):
@@ -109,14 +111,13 @@ class TestEvents(BaseTest, unittest.TestCase):
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         rc2 = ResourceCategory(resource_id=ev.id, category=c2, type='event')
         db.session.add_all([rc, rc2])
-        db.session.commit()
         rv = self.app.get(
             '/api/category/%i/event' % c.id,
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(ev.id, response[0]["id"])
+        self.assertEqual(ev.id, response[0]["resource_id"])
         self.assertEqual(2,
                          len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
@@ -130,7 +131,6 @@ class TestEvents(BaseTest, unittest.TestCase):
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         rc2 = ResourceCategory(resource_id=rec.id, category=c, type='resource')
         db.session.add_all([rc, rc2])
-        db.session.commit()
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
         self.assert_success(rv)
@@ -142,14 +142,13 @@ class TestEvents(BaseTest, unittest.TestCase):
         ev = self.construct_event()
         rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
         db.session.add(rc)
-        db.session.commit()
         rv = self.app.get(
             '/api/event/%i/category' % ev.id,
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(c.id, response[0]["id"])
+        self.assertEqual(c.id, response[0]["category_id"])
         self.assertEqual(c.name, response[0]["category"]["name"])
 
     def test_add_category_to_event(self):

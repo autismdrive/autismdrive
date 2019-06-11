@@ -76,7 +76,8 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_location(self):
-        location = {'title': "location of locations", 'description': "You need this location in your life."}
+        o_id = self.construct_organization().id
+        location = {'title': "location of locations", 'description': "You need this location in your life.", 'organization_id': o_id}
         rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
@@ -98,7 +99,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(loc.id, response[0]["id"])
+        self.assertEqual(loc.id, response[0]["resource_id"])
         self.assertEqual(loc.description, response[0]["resource"]["description"])
 
     def test_get_location_by_category_includes_category_details(self):
@@ -115,7 +116,7 @@ class TestLocations(BaseTest, unittest.TestCase):
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(loc.id, response[0]["id"])
+        self.assertEqual(loc.id, response[0]["resource_id"])
         self.assertEqual(2,
                          len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(

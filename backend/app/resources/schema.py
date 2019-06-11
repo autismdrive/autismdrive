@@ -249,7 +249,7 @@ class EventSchema(ModelSchema):
         'self': ma.URLFor('api.eventendpoint', id='<id>'),
         'collection': ma.URLFor('api.eventlistendpoint'),
         'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
-        'categories': ma.UrlFor('api.categorybyeventendpoint', resource_id='<id>')
+        'categories': ma.UrlFor('api.categorybyeventendpoint', event_id='<id>')
     })
 
 

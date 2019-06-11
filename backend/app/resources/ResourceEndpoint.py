@@ -19,11 +19,12 @@ class ResourceEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     def delete(self, id):
-        resource = db.session.query(StarResource).filter_by(id=id).delete()
-        try:
+        resource = db.session.query(StarResource).filter_by(id=id).first()
+
+        if resource is not None:
             elastic_index.remove_document(resource, 'Resource')
-        except:
-            print("unable to remove record from elastic index, might not exist.")
+
+        db.session.query(StarResource).filter_by(id=id).delete()
         db.session.commit()
         return None
 

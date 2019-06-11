@@ -56,11 +56,7 @@ class TestParticipant(BaseTest, unittest.TestCase):
         good_headers = self.logged_in_headers(u)
 
         p = db.session.query(Participant).first()
-        odd_user = User(
-            email="frankie@badfella.fr",
-            password="h@corleet",
-            email_verified=True,
-            role=Role.user)
+        odd_user = self.construct_user(email='frankie@badfella.rf')
         participant = {'first_name': "Lil' Johnny", 'last_name': "Tables"}
         rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
                           follow_redirects=True)
@@ -88,20 +84,21 @@ class TestParticipant(BaseTest, unittest.TestCase):
     def test_modify_participant_basics_admin(self):
         self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent)
         user2 = self.construct_user(email="theotherguy@stuff.com")
+        logged_in_headers = self.logged_in_headers()
         p = db.session.query(Participant).first()
         self.assertIsNotNone(p)
         p_id = p.id
         rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json",
-                          headers=self.logged_in_headers())
+                          headers=logged_in_headers)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         response['user_id'] = user2.id
         orig_date = response['last_updated']
         rv = self.app.put('/api/participant/%i' % p_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True, headers=self.logged_in_headers())
+                          follow_redirects=True, headers=logged_in_headers)
         self.assert_success(rv)
         rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json",
-                          headers=self.logged_in_headers())
+                          headers=logged_in_headers)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['user_id'], user2.id)

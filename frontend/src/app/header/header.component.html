@@ -12,27 +12,21 @@
     class="uva-logo"
     fxFlex
   ><a
-      href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"><img
-        src="/assets/logo/UVA_STAR-logo.svg"
-      ></a></div>
-  <span
-    fxFlex
-    fxShow.md="false"
-  ></span>
-  <div
-    id="uva-links"
-    fxFlex
-    *ngIf="!mobileQuery.matches"
+      target="_blank"
+      href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"
+    ><img src="/assets/logo/UVA_STAR-logo.svg"></a></div>
+  <span fxFlex></span>
+  <a
+    mat-button
+    *ngIf="currentUser && currentUser.role == 'admin'"
+    [routerLink]="[ '/admin' ]"
+    routerLinkActive="selected"
+    id="admin-button"
   >
-    <ul>
-      <li><a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/people">People</a></li>
-      <li><a
-          href="https://curry.virginia.edu/faculty-research/centers-labs-projects/star/research-projects">Research</a>
-      </li>
-      <li><a href="https://curry.virginia.edu/news-0">News</a></li>
-      <li><a [routerLink]="[ '/' ]" routerLinkActive="selected">Registry</a></li>
-    </ul>
-  </div>
+    <mat-icon>build</mat-icon>
+    Admin
+  </a>
+
 </div>
 <div
   id="site-header"
@@ -56,43 +50,76 @@
           routerLinkActive="selected"
           id="enroll-button"
         >
-        <span fxHide fxShow.lt-lg>Join</span>
-        <span fxHide fxShow.gt-md>Join the Autism Registry</span>
-      </a>
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Join</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          >Join the Autism Registry</span>
+        </a>
         <a
           mat-button
           [routerLink]="[ '/studies' ]"
           routerLinkActive="selected"
           id="studies-button"
         >
-        <span fxHide fxShow.lt-lg>Studies</span>
-        <span fxHide fxShow.gt-md>Current Studies</span>
-      </a>
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Studies</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          >Current Studies</span>
+        </a>
         <a
           mat-button
           [routerLink]="[ '/search' ]"
           routerLinkActive="selected"
           id="resources-button"
-        >Training & Resources</a>
+        >
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Resources</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          >Training &amp; Resources</span>
+        </a>
       </div>
 
+      <span fxFlex></span>
+      <app-search-box
+        variant="dark-bg"
+        fxHide
+        fxShow.gt-sm
+      ></app-search-box>
       <span fxFlex></span>
 
       <div
         id="utility-nav"
-        fxHide fxShow.gt-sm
+        fxHide
+        fxShow.gt-sm
       >
-        <app-search-box variant="dark-bg"></app-search-box>
-
         <a
           mat-button
           *ngIf="!currentUser"
-          [routerLink]="[ '/terms' ]"
+          [routerLink]="[ '/register' ]"
           routerLinkActive="selected"
           id="register-button"
         >
           <mat-icon>person_add</mat-icon>
-          <span fxHide fxShow.gt-md>Create Account</span>
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Register</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          >Create Account</span>
         </a>
         <a
           mat-button
@@ -102,17 +129,7 @@
           id="login-button"
         >
           <mat-icon>account_circle</mat-icon>
-          <span fxHide fxShow.gt-md>Sign in</span>
-        </a>
-        <a
-          mat-button
-          *ngIf="currentUser && currentUser.role == 'admin'"
-          [routerLink]="[ '/admin' ]"
-          routerLinkActive="selected"
-          id="admin-button"
-        >
-          <mat-icon>build</mat-icon>
-          Admin
+          Sign in
         </a>
         <a
           mat-button
@@ -122,7 +139,14 @@
           id="profile-button"
         >
           <mat-icon>account_circle</mat-icon>
-          Visit Profile
+          <span
+            fxHide
+            fxShow.lt-lg
+          > Profile</span>
+          <span
+            fxHide
+            fxShow.gt-md
+          > View Profile</span>
         </a>
         <a
           mat-button
@@ -137,7 +161,8 @@
       <button
         mat-button
         (click)="toggleMenu()"
-        fxHide fxShow.lt-md
+        fxHide
+        fxShow.lt-md
         [color]="menuVisible ? '' : 'accent'"
       >
         <mat-icon>menu</mat-icon>
@@ -147,7 +172,8 @@
 </div>
 <div
   id="mobile-menu"
-  fxHide fxShow.lt-md
+  fxHide
+  fxShow.lt-md
   [@toggleMobileMenu]="menuState"
   class="mat-typography"
 >
@@ -155,7 +181,7 @@
   <a
     mat-button
     *ngIf="!currentUser"
-    [routerLink]="[ '/terms' ]"
+    [routerLink]="[ '/register' ]"
     routerLinkActive="selected"
     id="register-button-mobile"
     (click)="toggleMenu()"
@@ -222,9 +248,9 @@
   >Current studies</a>
   <a
     mat-button
-    [routerLink]="[ '/resources' ]"
+    [routerLink]="[ '/search' ]"
     routerLinkActive="selected"
     id="resources-button-mobile"
     (click)="toggleMenu()"
-  >Training & Resources</a>
+  >Training &amp; Resources</a>
 </div>

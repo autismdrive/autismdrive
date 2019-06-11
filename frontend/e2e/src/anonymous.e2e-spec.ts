@@ -22,16 +22,15 @@ describe('Anonymous User', () => {
   it('should display logged-out state in utility navigation', () => globalHeaderUseCases.displayLoggedOutState());
   it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
   it('should visit enroll page', () => globalHeaderUseCases.visitEnrollPage());
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
   it('should visit resources search page', () => globalHeaderUseCases.visitResourcesSearchPage());
 
   // Login & Register
-  it('should display terms and conditions when Create Account button is clicked', () => loginUseCases.displayTerms());
   it('should display login form', () => loginUseCases.displayLoginForm());
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
   it('should display register form', () => loginUseCases.displayRegisterForm());
-  it('should accept terms and conditions', () => loginUseCases.acceptTerms());
   it('should display confirmation message on submit', () => loginUseCases.displayRegisterConfirmation(randomEmail));
   it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));

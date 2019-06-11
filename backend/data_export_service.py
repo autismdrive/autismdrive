@@ -20,8 +20,8 @@ def get_questionnaire_fields(name):
     return QuestionService.get_schema(name).fields
 
 
-def get_questionnaire_names():
-    all_file_names = os.listdir('./app/model/questionnaires')
+def get_questionnaire_names(app):
+    all_file_names = os.listdir(os.path.dirname(app.instance_path) + '/app/model/questionnaires')
     non_questionnaires = ['mixin', '__']
     questionnaire_file_names = []
     for index, file_name in enumerate(all_file_names):
@@ -34,14 +34,13 @@ def get_questionnaire_names():
 
 
 class DataExport:
-
     @staticmethod
     def export_json(name):
         # Some data we want to write to the worksheet.
         return get_questionnaire(name=name)
 
     @staticmethod
-    def export_xls(name):
+    def export_xls(name, app):
         # Flask response
         response = Response()
         response.status_code = 200
@@ -51,7 +50,7 @@ class DataExport:
 
         if name == 'all':
             # Get Questionnaire Names
-            questionnaire_names = get_questionnaire_names()
+            questionnaire_names = get_questionnaire_names(app)
         else:
             questionnaire_names = [name]
 

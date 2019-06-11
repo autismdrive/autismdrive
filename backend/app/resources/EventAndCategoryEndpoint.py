@@ -31,7 +31,7 @@ class CategoryByEventEndpoint(flask_restful.Resource):
             filter(ResourceCategory.resource_id == event_id).\
             order_by(Category.name).\
             all()
-        return self.schema.dump(event_categories,many=True)
+        return self.schema.dump(event_categories, many=True)
 
     def post(self, event_id):
         request_data = request.get_json()

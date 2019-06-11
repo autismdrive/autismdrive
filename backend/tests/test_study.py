@@ -1,7 +1,7 @@
 import unittest
 from flask import json
 from tests.base_test import BaseTest
-from app import db
+from app import db, elastic_index
 from app.model.investigator import Investigator
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
@@ -20,7 +20,8 @@ class TestStudy(BaseTest, unittest.TestCase):
         db.session.commit()
 
         db_study = db.session.query(Study).filter_by(title=study.title).first()
-        self.assertEqual(db_study.description, study.description)
+        self.assertEqual(db_study.description, description)
+        elastic_index.add_document(db_study, 'Study')
         return db_study
 
     def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
@@ -33,7 +34,6 @@ class TestStudy(BaseTest, unittest.TestCase):
         db_inv = db.session.query(Investigator).filter_by(name=investigator.name).first()
         self.assertEqual(db_inv.title, investigator.title)
         return db_inv
-
 
     def test_study_basics(self):
         self.construct_study()
@@ -84,7 +84,8 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_study(self):
-        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life."}
+        o_id = self.construct_organization().id
+        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life.", 'organization_id': o_id}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
@@ -106,7 +107,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(s.id, response[0]["id"])
+        self.assertEqual(s.id, response[0]["study_id"])
         self.assertEqual(s.description, response[0]["study"]["description"])
 
     def test_get_study_by_category_includes_category_details(self):
@@ -123,7 +124,7 @@ class TestStudy(BaseTest, unittest.TestCase):
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(s.id, response[0]["id"])
+        self.assertEqual(s.id, response[0]["study_id"])
         self.assertEqual(2,
                          len(response[0]["study"]["study_categories"]))
         self.assertEqual(
@@ -314,7 +315,8 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_investigator(self):
-        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology"}
+        o_id = self.construct_organization().id
+        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology", 'organization_id': o_id}
         rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
                            headers=self.logged_in_headers(), follow_redirects=True)
         self.assert_success(rv)
@@ -322,4 +324,3 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(response['name'], 'Tara Tarantula')
         self.assertEqual(response['title'], 'Assistant Professor of Arachnology')
         self.assertIsNotNone(response['id'])
-

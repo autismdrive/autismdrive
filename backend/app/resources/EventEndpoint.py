@@ -19,11 +19,12 @@ class EventEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     def delete(self, id):
-        event = db.session.query(Event).filter_by(id=id).delete()
-        try:
+        event = db.session.query(Event).filter_by(id=id).first()
+
+        if event is not None:
             elastic_index.remove_document(event, 'Event')
-        except:
-            print("unable to remove record from elastic index, might not exist.")
+
+        db.session.query(Event).filter_by(id=id).delete()
         db.session.commit()
         return None
 

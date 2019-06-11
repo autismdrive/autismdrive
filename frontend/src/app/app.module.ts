@@ -28,7 +28,8 @@ import {
   MatSlideToggleModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatTooltipModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -86,6 +87,8 @@ import { NewsItemComponent } from './news-item/news-item.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
 import { EventDetailComponent } from './event-detail/event-detail.component';
 import { LocationDetailComponent } from './location-detail/location-detail.component';
+import { TypeIconComponent } from './type-icon/type-icon.component';
+import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -156,6 +159,8 @@ export class FormlyConfig {
     CategoryChipsComponent,
     EventDetailComponent,
     LocationDetailComponent,
+    TypeIconComponent,
+    HeroSlidesComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -192,6 +197,7 @@ export class FormlyConfig {
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
+    MatTooltipModule,
     NgProgressModule,
     ReactiveFormsModule,
     RoutingModule,

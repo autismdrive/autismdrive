@@ -19,7 +19,7 @@ export class StudiesComponent implements OnInit {
 
   loadStudies() {
     const query = new Query({
-      filters: [{field: 'Type', value: 'study'}]
+      filters: [{field: 'Type', value: 'STUDY'}]
     });
     this.api.search(query).subscribe(q => this.query = q);
   }

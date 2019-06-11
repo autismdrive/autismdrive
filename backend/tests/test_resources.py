@@ -59,7 +59,8 @@ class TestResources(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_resource(self):
-        resource = {'title': "Resource of Resources", 'description': "You need this resource in your life."}
+        o_id = self.construct_organization().id
+        resource = {'title': "Resource of Resources", 'description': "You need this resource in your life.", 'organization_id': o_id}
         rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
@@ -81,7 +82,7 @@ class TestResources(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(r.id, response[0]["id"])
+        self.assertEqual(r.id, response[0]["resource_id"])
         self.assertEqual(r.description, response[0]["resource"]["description"])
 
     def test_get_resource_by_category_includes_category_details(self):
@@ -98,7 +99,7 @@ class TestResources(BaseTest, unittest.TestCase):
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(r.id, response[0]["id"])
+        self.assertEqual(r.id, response[0]["resource_id"])
         self.assertEqual(2,
                          len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(

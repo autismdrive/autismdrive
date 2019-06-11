@@ -1,0 +1,4 @@
+<i class="icofont-search-stock icofont-{{size}}x" *ngIf="iconType === 'study'"></i>
+<mat-icon *ngIf="iconType === 'resource'" [ngStyle]="{'font-size': size + 'em'}">important_devices</mat-icon>
+<mat-icon *ngIf="iconType === 'event'" [ngStyle]="{'font-size': size + 'em'}">event_available</mat-icon>
+<i class="icofont-ui-map icofont-{{size}}x" *ngIf="iconType === 'location'"></i>

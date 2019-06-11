@@ -38,7 +38,17 @@ export class GlobalHeaderUseCases {
     this.page.clickLinkTo('/home');
     expect(this.page.getElements('#cta').count()).toEqual(1);
     expect(this.page.getElements('#cta button').count()).toBeGreaterThan(1);
+    expect(this.page.getElements('.hero-slides .hero-slide').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
+  }
+
+  async displayHomeHero() {
+    const numSlides = await this.page.getElements('.hero-slides .hero-slide').count();
+
+    for (let i = 0; i < numSlides; i++) {
+      this.page.clickElement(`.hero-slides .dots .dot:nth-of-type(${i + 1})`);
+      expect(this.page.getElements(`.hero-slides .hero-slide:nth-of-type(${i + 1}).active`).count()).toEqual(1);
+    }
   }
 
   visitEnrollPage() {

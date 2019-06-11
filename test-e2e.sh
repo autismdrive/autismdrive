@@ -10,10 +10,7 @@ FRONTEND_PATH="${HOME_DIR}/frontend"
 DATABASE_PATH="/usr/local/var/postgres"
 
 echo -e '\n\n*** Clearing and re-seeding database... ***\n\n'
-cd $BACKEND_PATH
-source python-env/bin/activate
-export FLASK_APP=./app/__init__.py
-flask reset
+./reset-backend.sh
 
 echo -e '\n\n*** backend reset. Starting tests in frontend with "ng e2e --dev-server-target=" ***\n\n'
 cd $FRONTEND_PATH

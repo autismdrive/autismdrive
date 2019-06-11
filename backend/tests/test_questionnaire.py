@@ -31,10 +31,11 @@ from app.model.questionnaires.professional_profile_questionnaire import Professi
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
+from app.model.resource_category import ResourceCategory
+from app.model.step_log import StepLog
 
 
 class TestQuestionnaire(BaseTest, unittest.TestCase):
-
 
     def randomString(self):
         char_set = string.ascii_uppercase + string.digits
@@ -82,9 +83,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
             if field["name"] == name:
                 return field
 
-
     def construct_admin_user(self, email="rmond@virginia.gov"):
-
         user = User(email=email, role=Role.admin)
         db.session.add(user)
         db.session.commit()
@@ -93,10 +92,8 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         self.assertEqual(db_user.role, user.role)
         return db_user
 
-
     def construct_assistive_device(self, type_group='mobility', type='prosthetic', timeframe='current',
                                    notes='I love my new leg!', supports_questionnaire=None):
-
         ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
             ad.supports_questionnaire_id = supports_questionnaire.id
@@ -656,7 +653,6 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         self.construct_professional_questionnaire(user=user, participant=participant)
         self.construct_supports_questionnaire(user=user, participant=participant)
 
-
     def test_questionnare_post_fails_if_flow_does_not_exist(self):
         evaluation_history_self_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
         rv = self.app.post('api/flow/noSuchFlow/evaluation_history_self_questionnaire',
@@ -716,7 +712,6 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         log = db.session.query(StepLog).all()
         self.assertIsNotNone(log)
         self.assertTrue(len(log) > 0)
-
 
     def test_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
@@ -897,7 +892,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/q/current_behaviors_dependent_questionnaire/%i' % cbdq_id,
-                          content_type="application/json",headers=self.logged_in_headers())
+                          content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['dependent_verbal_ability'], 'nonVerbal')
@@ -956,8 +951,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         cbsq = db.session.query(CurrentBehaviorsSelfQuestionnaire).first()
         self.assertIsNotNone(cbsq)
         cbsq_id = cbsq.id
-        rv = self.app.get('/api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json",
-                           headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json", headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         response['self_verbal_ability'] = ['nonVerbal']
         response['academic_difficulty_areas'] = ['math']
@@ -967,8 +961,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
-        rv = self.app.get('/api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['self_verbal_ability'], ['nonVerbal'])
@@ -979,16 +972,13 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
     def test_delete_current_behaviors_self_questionnaire(self):
         cbsq = self.construct_current_behaviors_self_questionnaire()
         cbsq_id = cbsq.id
-        rv = self.app.get('api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
-        rv = self.app.delete('api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json"
-                             , headers=self.logged_in_headers())
+        rv = self.app.delete('api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
-        rv = self.app.get('api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertEqual(404, rv.status_code)
 
     def test_create_current_behaviors_self_questionnaire(self):
@@ -1028,8 +1018,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         dq = db.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
         dq_id = dq.id
-        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json", headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         response['gender_identity'] = 'genderOther'
         response['race_ethnicity'] = ['raceOther']
@@ -1040,8 +1029,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
-        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/demographics_questionnaire/%i' % dq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['gender_identity'], 'genderOther')
@@ -1097,8 +1085,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         dq = db.session.query(DevelopmentalQuestionnaire).first()
         self.assertIsNotNone(dq)
         dq_id = dq.id
-        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json", headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         response['when_motor_milestones'] = 'notYet'
         response['when_language_milestones'] = 'notYet'
@@ -1110,8 +1097,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
-        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/developmental_questionnaire/%i' % dq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['when_motor_milestones'], 'notYet')
@@ -1169,8 +1155,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         eq = db.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
         eq_id = eq.id
-        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json", headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         response['school_name'] = 'Sesame School'
         response['school_type'] = 'public'
@@ -1182,8 +1167,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
-        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['school_name'], 'Sesame School')
@@ -1195,16 +1179,13 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
     def test_delete_education_dependent_questionnaire(self):
         eq = self.construct_education_dependent_questionnaire()
         eq_id = eq.id
-        rv = self.app.get('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
-        rv = self.app.delete('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json"
-                             , headers=self.logged_in_headers())
+        rv = self.app.delete('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
-        rv = self.app.get('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('api/q/education_dependent_questionnaire/%i' % eq_id, content_type="application/json", headers=self.logged_in_headers())
         self.assertEqual(404, rv.status_code)
 
     def test_create_education_dependent_questionnaire(self):
@@ -1244,8 +1225,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         eq = db.session.query(EducationSelfQuestionnaire).first()
         self.assertIsNotNone(eq)
         eq_id = eq.id
-        rv = self.app.get('/api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json"
-                          , headers=self.logged_in_headers())
+        rv = self.app.get('/api/q/education_self_questionnaire/%i' % eq_id, content_type="application/json", headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         response['school_name'] = 'Sesame School'
         response['school_type'] = 'public'
@@ -1841,7 +1821,6 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         self.assertEqual(response['participant_id'], p.id)
         self.assertIsNotNone(response['id'])
 
-
     def test_flow_endpoint(self):
         # It should be possible to get a list of available flows
         rv = self.app.get('api/flow', content_type="application/json", headers=self.logged_in_headers())
@@ -2053,14 +2032,14 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
                           content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("id", response["fields"][0]["name"])
-        self.assertEqual("user_id", response["fields"][4]["name"])
-        self.assertEqual("school_type", response["fields"][7]["name"])
-        self.assertEqual("school_services_other", response["fields"][12]["name"])
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'id', response["fields"]))))
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'user_id', response["fields"]))))
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'school_type', response["fields"]))))
+        self.assertEqual(1, len(list(filter(lambda field: field['name'] == 'school_services_other', response["fields"]))))
         self.assertEqual(13, len(response["fields"]))
 
     def test_questionnaire_list_basics(self):
-        self.construct_current_behaviors_dependent_questionnaire()
+        q = self.construct_current_behaviors_dependent_questionnaire()
         rv = self.app.get('/api/q/current_behaviors_dependent_questionnaire',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -2068,7 +2047,7 @@ class TestQuestionnaire(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(["math", "writing"], response[0]["academic_difficulty_areas"])
         self.assertEqual("fluent", response[0]["dependent_verbal_ability"])
-        self.assertEqual(1, response[0]["id"])
+        self.assertEqual(q.id, response[0]["id"])
 
     def test_non_admin_cannot_view_questionnaire_list(self):
         user = self.construct_user(email='regularUser@user.com')

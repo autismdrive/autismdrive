@@ -2,8 +2,7 @@
   *ngIf="hit"
   [ngClass]="{
   'result-item': true,
-  'mat-typography': true,
-  'featured-item': isFeatured
+  'mat-typography': true
 }"
 >
   <div
@@ -12,13 +11,17 @@
   >
     <a
       class="title mat-h2"
-      href="/#/{{hit.type}}/{{hit.id}}"
-    >{{hit.title}}</a>
-    <a mat-button
+      href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+    >
+      {{hit.title}}
+    </a>
+    <button mat-button
         [routerLink]="[ '/search/filter' ]"
         [queryParams]="{'Type': hit.type}"
         class="type"
-      >{{hit.type}}</a>
+        [disableRipple]="true"
+        matTooltip="{{ hit.type | uppercase }}"
+      ><app-type-icon [iconType]="hit.type.toLowerCase()" [size]="1"></app-type-icon></button>
   </div>
   <markdown
     *ngIf="hit.highlights"
@@ -29,8 +32,7 @@
     class="description"
   >{{hit.content}}</p>
   <a
-    *ngIf="isFeatured"
     class="chevron-link"
-    href="/#/{{hit.type}}/{{hit.id}}"
+    href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
   >View {{hit.type}} Details</a>
 </div>

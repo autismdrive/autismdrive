@@ -8,6 +8,7 @@ import { NewsItem } from '../_models/news-item';
 })
 export class NewsItemComponent implements OnInit {
   @Input() item: NewsItem;
+  @Input() index: number;
 
   constructor() { }
 
