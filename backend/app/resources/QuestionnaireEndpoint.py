@@ -69,7 +69,7 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
 
 
 class QuestionnaireListMetaEndpoint(flask_restful.Resource):
-
+    # Used for data export to get meta without specifying flow and relationship
     def get(self, name):
         class_ref = QuestionService.get_class(name)
         questionnaire = db.session.query(class_ref).first()
