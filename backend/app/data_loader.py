@@ -10,7 +10,7 @@ from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.therapy import Therapy
 from app.model.event import Event
 from app.model.location import Location
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
@@ -126,11 +126,11 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
-                resource = StarResource(title=row[0], description=row[1], organization=org, website=row[5],
+                resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
                                         phone=row[6])
                 db.session.add(resource)
                 db.session.commit()
-                self.__increment_id_sequence(StarResource)
+                self.__increment_id_sequence(Resource)
 
                 for i in range(7, len(row)):
                     if row[i] and row[i] is not '':
@@ -141,7 +141,7 @@ class DataLoader:
                         resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
                         db.session.add(resource_category)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
-                StarResource).filter(StarResource.type == 'resource').count())
+                Resource).filter(Resource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
                   db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource').count())
         db.session.commit()
@@ -374,7 +374,7 @@ class DataLoader:
     def build_index(self):
         elastic_index.load_documents(db.session.query(Event).all(),
                                      db.session.query(Location).all(),
-                                     db.session.query(StarResource).all(),
+                                     db.session.query(Resource).all(),
                                      db.session.query(Study).all()
                                      )
 
@@ -413,7 +413,7 @@ class DataLoader:
         db.session.query(Investigator).delete()
         db.session.query(Event).delete()
         db.session.query(Location).delete()
-        db.session.query(StarResource).delete()
+        db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.query(Participant).delete()
         db.session.query(User).delete()
@@ -427,7 +427,7 @@ class DataLoader:
         db.session.query(Investigator).delete()
         db.session.query(Event).delete()
         db.session.query(Location).delete()
-        db.session.query(StarResource).delete()
+        db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.commit()
 

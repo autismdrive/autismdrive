@@ -11,7 +11,7 @@ from app.model.participant import Participant, Relationship
 from app.model.investigator import Investigator
 from app.model.event import Event
 from app.model.location import Location
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search
 from app.model.study import Study, Status
@@ -184,9 +184,9 @@ class InvestigatorsOnStudySchema(ModelSchema):
     })
 
 
-class StarResourceSchema(ModelSchema):
+class ResourceSchema(ModelSchema):
     class Meta:
-        model = StarResource
+        model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'organization', 'resource_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
@@ -216,7 +216,7 @@ class CategoryResourcesSchema(ModelSchema):
     class Meta:
         model = ResourceCategory
         fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
-    resource = fields.Nested(StarResourceSchema, dump_only=True)
+    resource = fields.Nested(ResourceSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourcecategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),

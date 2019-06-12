@@ -9,7 +9,7 @@ from app import app, db, elastic_index
 from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.user import User, Role
 
 
@@ -42,6 +42,7 @@ class BaseTest:
         db.session.rollback()
         self.ctx.pop()
 
+
     def logged_in_headers(self, user=None):
 
         # If no user is provided, generate a dummy Admin user
@@ -68,15 +69,15 @@ class BaseTest:
 
         return self.auths[existing_user.id]
 
-    def assert_success(self, rv):
+    def assert_success(self, rv, msg=""):
         try:
             data = json.loads(rv.get_data(as_text=True))
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
                             "BAD Response: %i. \n %s" %
-                            (rv.status_code, json.dumps(data)))
+                            (rv.status_code, json.dumps(data)) + ". " + msg)
         except:
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
-                            "BAD Response: %i." % rv.status_code)
+                            "BAD Response: %i." % rv.status_code + ". " + msg)
 
     def construct_user(self, email="stan@staunton.com", role=Role.user):
 
@@ -103,7 +104,6 @@ class BaseTest:
 
         organization = Organization(name=name, description=description)
         db.session.add(organization)
-        db.session.commit()
 
         db_org = db.session.query(Organization).filter_by(name=organization.name).first()
         self.assertEqual(db_org.description, organization.description)
@@ -124,11 +124,11 @@ class BaseTest:
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            phone="555-555-5555", website="http://stardrive.org"):
 
-        resource = StarResource(title=title, description=description, phone=phone, website=website)
+        resource = Resource(title=title, description=description, phone=phone, website=website)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
 
-        db_resource = db.session.query(StarResource).filter_by(title=resource.title).first()
+        db_resource = db.session.query(Resource).filter_by(title=resource.title).first()
         self.assertEqual(db_resource.website, resource.website)
         elastic_index.add_document(db_resource, 'Resource')
         return db_resource

@@ -1,5 +1,6 @@
 import copy
 import importlib
+import re
 
 
 class QuestionService:
@@ -27,6 +28,10 @@ class QuestionService:
         first, *rest = name.split('_')
         return first.capitalize() + ''.join(word.capitalize() for word in rest)
 
+    @staticmethod
+    def snake_case_it(name):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
     # Given a string, creates an instance of that class
     @staticmethod
     def str_to_class(module_name, class_name):

@@ -1,8 +1,8 @@
 from app import db
-from app.model.resource import StarResource
+from app.model.resource import Resource
 
 
-class Location(StarResource):
+class Location(Resource):
     __tablename__ = 'location'
     id = db.Column(db.Integer, db.ForeignKey('resource.id'), primary_key=True)
     primary_contact = db.Column(db.String)

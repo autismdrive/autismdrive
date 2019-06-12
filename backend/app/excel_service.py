@@ -2,10 +2,13 @@
 import os
 import io
 import xlsxwriter
-from flask import Response
+from flask import Response, url_for
 from datetime import datetime
+
+from sqlalchemy import func
 from werkzeug.datastructures import Headers
 from app import db
+from app.model.export_info import ExportInfo
 from app.question_service import QuestionService
 
 
@@ -32,12 +35,10 @@ def get_questionnaire_names(app):
             questionnaire_file_names.append(f)
     return sorted(questionnaire_file_names)
 
-
-class DataExport:
+class ExcelExport:
     @staticmethod
-    def export_json(name):
-        # Some data we want to write to the worksheet.
-        return get_questionnaire(name=name)
+    def export_json(name, app):
+        return get_questionnaire_data(name=name)
 
     @staticmethod
     def export_xls(name, app):

@@ -4,9 +4,10 @@ import os
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import app, db, RestException, auth
+from app.excel_service import ExcelExport
 from app.model.user import Role
 from app.wrappers import requires_roles
-from data_export_service import DataExport
+from app.export_service import DataExport
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -130,4 +131,4 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
         if self.request_wants_json():
             return DataExport.export_json(name=name, app=app)
         else:
-            return DataExport.export_xls(name=name, app=app)
+            return ExcelExport.export_xls(name=name, app=app)

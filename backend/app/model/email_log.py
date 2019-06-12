@@ -1,3 +1,5 @@
+from marshmallow_sqlalchemy import ModelSchema
+
 from app import db
 
 
@@ -9,3 +11,8 @@ class EmailLog(db.Model):
     tracking_code = db.Column(db.String)
     viewed = db.Column(db.Boolean)
     date_viewed = db.Column(db.DateTime)
+
+
+class EmailLogSchema(ModelSchema):
+    class Meta:
+        model = EmailLog

@@ -10,7 +10,7 @@ class Organization(db.Model):
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
     description = db.Column(db.String)
     resources = db.relationship(
-        'StarResource', backref=db.backref('organization', lazy=True))
+        'Resource', backref=db.backref('organization', lazy=True))
     studies = db.relationship(
         'Study', backref=db.backref('organization', lazy=True))
     investigators = db.relationship(

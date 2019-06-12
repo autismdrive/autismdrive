@@ -50,5 +50,5 @@ class ParticipantListEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def get(self):
         participants = db.session.query(Participant).all()
-        return self.usersSchema.dump(participants)
+        return self.schema.dump(participants)
 

@@ -6,7 +6,9 @@ from flask_restful import reqparse
 
 from app import app
 from app.resources.Auth import auth_blueprint
+from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
+from app.resources.StepLogEndpoint import StepLogListEndpoint
 from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
     FlowEndpoint,
@@ -80,6 +82,8 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
+from app.resources.ExportEndpoint import ExportEndpoint, ExportListEndpoint
+
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -184,6 +188,10 @@ endpoints = [
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
     # Search Endpoint
     (SearchEndpoint, "/search"),
+    (ExportListEndpoint, "/export"),
+    (ExportEndpoint, "/export/<string:name>"),
+    (EmailLogListEndpoint, "/email_log"),
+    (StepLogListEndpoint, "/step_log"),
 
 ]
 

@@ -20,7 +20,6 @@ class TestEvents(BaseTest, unittest.TestCase):
                                 state=state, zip=zip, phone=phone, website=website)
         event.organization_id = self.construct_organization().id
         db.session.add(event)
-        db.session.commit()
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
         self.assertEqual(db_event.website, event.website)
