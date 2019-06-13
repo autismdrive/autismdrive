@@ -94,7 +94,7 @@ class ElasticIndex:
 
     def add_document(self, document, flush=True):
         doc = StarDocument(id=document.id,
-                           type=document.__tablename__.upper(),
+                           type=document.__label__,
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
