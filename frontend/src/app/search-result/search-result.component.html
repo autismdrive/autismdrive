@@ -17,10 +17,10 @@
     </a>
     <button mat-button
         [routerLink]="[ '/search/filter' ]"
-        [queryParams]="{'Type': hit.type}"
+        [queryParams]="{'Type': hit.label}"
         class="type"
         [disableRipple]="true"
-        matTooltip="{{ hit.type | uppercase }}"
+        matTooltip="{{ hit.label }}"
       ><app-type-icon [iconType]="hit.type.toLowerCase()" [size]="1"></app-type-icon></button>
   </div>
   <markdown

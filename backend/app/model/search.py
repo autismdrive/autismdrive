@@ -52,11 +52,12 @@ class Filter:
 
 class Hit:
 
-    def __init__(self, result_id, content, description, title, doc_type, last_updated, highlights):
+    def __init__(self, result_id, content, description, title, doc_type, label, last_updated, highlights):
         self.id = result_id
         self.content = content
         self.description = description
         self.title = title
         self.type = doc_type
+        self.label = label
         self.last_updated = last_updated
         self.highlights = highlights

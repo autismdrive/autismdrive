@@ -451,6 +451,7 @@ class SearchSchema(ma.Schema):
         description = fields.Str()
         title = fields.Str()
         type = fields.Str()
+        label = fields.Str()
         last_updated = fields.Date()
         highlights = fields.Str()
 

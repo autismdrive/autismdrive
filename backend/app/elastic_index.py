@@ -16,6 +16,7 @@ autocomplete_search = analyzer('autocomplete_search',
 # Star Documents are ElastciSearch documents and can be used to index an Event, Location, Resource, or Study
 class StarDocument(Document):
     type = Keyword()
+    label = Keyword()
     id = Integer()
     title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     last_updated = Date()
@@ -95,7 +96,8 @@ class ElasticIndex:
 
     def add_document(self, document, flush=True):
         doc = StarDocument(id=document.id,
-                           type=document.__label__,
+                           type=document.__tablename__,
+                           label=document.__label__,
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
@@ -168,7 +170,7 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
 
     facets = {
         'Location': elasticsearch_dsl.TermsFacet(field='location'),
-        'Type': elasticsearch_dsl.TermsFacet(field='type'),
+        'Type': elasticsearch_dsl.TermsFacet(field='label'),
         'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
         'Category': elasticsearch_dsl.TermsFacet(field='category'),
         'Organization': elasticsearch_dsl.TermsFacet(field='organization'),

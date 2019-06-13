@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
-import { Query, HitType } from '../_models/query';
+import { Query, HitLabel } from '../_models/query';
 
 @Component({
   selector: 'app-resources',
@@ -21,7 +21,7 @@ export class ResourcesComponent implements OnInit {
 
   loadResources() {
     const query = new Query({
-      filters: [{field: 'Type', value: HitType.RESOURCE}]
+      filters: [{field: 'Type', value: HitLabel.RESOURCE}]
     });
     this.api.search(query).subscribe(q => this.query = q);
   }
