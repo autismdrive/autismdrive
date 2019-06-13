@@ -23,6 +23,7 @@ class StarDocument(Document):
     organization = Keyword()
     website = Keyword()
     location = Keyword()
+    life_age = Keyword()
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
 
@@ -93,11 +94,12 @@ class ElasticIndex:
 
     def add_document(self, document, flush=True):
         doc = StarDocument(id=document.id,
-                           type=document.__tablename__.upper(),
+                           type=document.__label__,
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
                            location=None,
+                           life_age=None,
                            category=[],
                            child_category=[]
                            )
@@ -115,7 +117,13 @@ class ElasticIndex:
                 if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
                     doc.location = cat.category.name
                     doc.child_category.append(cat.category.name)
+                elif cat.category.parent.name == 'Life Ages':
+                    doc.life_age = cat.category.name
+                    doc.child_category.append(cat.category.name)
                 elif cat.category.parent.name == 'Type of Resources':
+                    doc.child_category.append(cat.category.name)
+                elif cat.category.parent.parent_id:
+                    doc.category.append(cat.category.parent.parent.name)
                     doc.child_category.append(cat.category.name)
                 else:
                     doc.category.append(cat.category.parent.name)
@@ -157,10 +165,11 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     fields = ['title^10', 'content^5',  'location^3', 'category^2',  'child_category^2', 'organization', 'website']
 
     facets = {
+        'Location': elasticsearch_dsl.TermsFacet(field='location'),
         'Type': elasticsearch_dsl.TermsFacet(field='type'),
-        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
+        'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
         'Category': elasticsearch_dsl.TermsFacet(field='category'),
-        'Location': elasticsearch_dsl.TermsFacet(field='location')
+        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
     }
 
     def highlight(self, search):

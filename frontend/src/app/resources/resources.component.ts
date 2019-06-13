@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
-import { Resource } from '../_models/resource';
-import { Query, Hit, HitType } from '../_models/query';
 import { LatLngLiteral } from '@agm/core';
+import { Query, HitType } from '../_models/query';
 
 @Component({
   selector: 'app-resources',
