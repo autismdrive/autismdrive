@@ -31,6 +31,7 @@ import {
   MatToolbarModule,
   MatTooltipModule
 } from '@angular/material';
+import { AgmCoreModule } from '@agm/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CovalentTextEditorModule } from '@covalent/text-editor';
@@ -89,6 +90,7 @@ import { EventDetailComponent } from './event-detail/event-detail.component';
 import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class FormlyConfig {
@@ -163,6 +165,9 @@ export class FormlyConfig {
     HeroSlidesComponent,
   ],
   imports: [
+    AgmCoreModule.forRoot({
+      apiKey: environment.gcp_api_key
+    }),
     BrowserAnimationsModule,
     BrowserModule,
     ColorPickerModule,

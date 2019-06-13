@@ -1,10 +1,96 @@
 <div
-  class="resources"
-  fxLayout="row"
-  fxLayoutGap="2%"
+  id="hero"
+  class="gradient-overlay container"
 >
-  <div fxFlex="20%">
-    <app-filters></app-filters>
+  <h1>Training &amp; Resources</h1>
+  <div class="row">
+    <div class="border-box">
+      <h1>Resource Type</h1>
+    </div>
+    <div>or</div>
+    <div class="border-box">
+      <h1>Category</h1>
+    </div>
+  </div>
+</div>
+<div
+  class="resources"
+  fxLayout.lt-md="column"
+  fxLayout.gt-sm="row"
+  fxLayoutGap="40px"
+  fxLayoutAlign="center auto"
+>
+  <div fxFlex.gt-sm="30%">
+    <h1>STAR Resources</h1>
+    <mat-card>
+      <mat-card-title>
+        Near you
+      </mat-card-title>
+      <mat-card-content>
+        <agm-map
+          [latitude]="mapLoc.lat"
+          [longitude]="mapLoc.lng"
+          mapTypeId="roadmap"
+          [zoom]="7"
+        >
+          <agm-marker
+            [latitude]="mapLoc.lat"
+            [longitude]="mapLoc.lng"
+          ></agm-marker>
+        </agm-map>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-title>
+        Title
+      </mat-card-title>
+      <mat-card-content>
+        Description
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-title>
+        Title
+      </mat-card-title>
+      <mat-card-content>
+        Description
+      </mat-card-content>
+    </mat-card>
+    <h2>Partner Organization</h2>
+    <li>Autism Speaks</li>
+    <li>University of Virginia</li>
+    <li>Civitas Health Services, Inc.</li>
+    <li>Next Steps Behavioral Centers</li>
+    <li>Vanderbilt Kennedy Center</li>
+    <li>Virginia Institute of Autism</li>
+    <li>ABC Behavior</li>
+    <li>Blue Ridge Autism and Achievement Center</li>
+    <li>A.C.E.S Aligned Clinical and Educational Services</li>
+    <li>ABA Behavioral Group</li>
+    <mat-card>
+      <mat-card-title>
+        Autism Speaks
+      </mat-card-title>
+      <mat-card-content>
+        Description
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-title>
+        Title
+      </mat-card-title>
+      <mat-card-content>
+        Description
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-title>
+        Title
+      </mat-card-title>
+      <mat-card-content>
+        Description
+      </mat-card-content>
+    </mat-card>
   </div>
   <div
     fxFlex="50%"
