@@ -20,6 +20,7 @@ class StarDocument(Document):
     title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     last_updated = Date()
     content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    description = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     organization = Keyword()
     website = Keyword()
     location = Keyword()
@@ -98,6 +99,7 @@ class ElasticIndex:
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
+                           description=document.description,
                            location=None,
                            life_age=None,
                            category=[],
@@ -162,7 +164,7 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         super(DocumentSearch, self).__init__(*args, **kwargs)
 
     doc_types = [StarDocument]
-    fields = ['title^10', 'content^5',  'location^3', 'category^2',  'child_category^2', 'organization', 'website']
+    fields = ['title^10', 'content^5', 'description^5', 'location^3', 'category^2',  'child_category^2', 'organization', 'website']
 
     facets = {
         'Location': elasticsearch_dsl.TermsFacet(field='location'),

@@ -448,6 +448,7 @@ class SearchSchema(ma.Schema):
     class HitSchema(ma.Schema):
         id = fields.Integer()
         content = fields.Str()
+        description = fields.Str()
         title = fields.Str()
         type = fields.Str()
         last_updated = fields.Date()

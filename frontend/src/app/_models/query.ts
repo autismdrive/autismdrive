@@ -39,6 +39,7 @@ export class Hit {
   type: HitType;
   title: string;
   content: string;
+  description: string;
   last_updated: Date;
   highlights: string;
   url?: string;
