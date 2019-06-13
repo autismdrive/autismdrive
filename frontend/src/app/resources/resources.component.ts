@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
-import { Query, Hit } from '../_models/query';
+import { Query, Hit, HitType } from '../_models/query';
 import { LatLngLiteral } from '@agm/core';
 
 @Component({
@@ -31,13 +31,18 @@ export class ResourcesComponent implements OnInit {
       navigator.geolocation.getCurrentPosition(p => {
         this.mapLoc.lat = p.coords.latitude;
         this.mapLoc.lng = p.coords.longitude;
+
+        const query = new Query({
+          filters: [{field: 'Type', value: HitType.RESOURCE}]
+        });
+        this.api.search(query).subscribe(q => this.query = q);
       });
     }
   }
 
   loadResources() {
     const query = new Query({
-      filters: [{field: 'Type', value: 'RESOURCE'}]
+      filters: [{field: 'Type', value: HitType.RESOURCE}]
     });
     this.api.search(query).subscribe(q => this.query = q);
   }

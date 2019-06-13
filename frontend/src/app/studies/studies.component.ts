@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
-import { Query } from '../_models/query';
+import { Query, HitType } from '../_models/query';
 
 @Component({
   selector: 'app-studies',
@@ -19,7 +19,7 @@ export class StudiesComponent implements OnInit {
 
   loadStudies() {
     const query = new Query({
-      filters: [{field: 'Type', value: 'STUDY'}]
+      filters: [{field: 'Type', value: HitType.STUDY}]
     });
     this.api.search(query).subscribe(q => this.query = q);
   }

@@ -27,9 +27,16 @@ export class Query {
   }
 }
 
+export enum HitType {
+  LOCATION = 'Local Services',
+  RESOURCE = 'Online Information',
+  STUDY = 'Research Studies',
+  EVENT = 'Events and Training'
+}
+
 export class Hit {
   id: number;
-  type: string;
+  type: HitType;
   title: string;
   content: string;
   last_updated: Date;
