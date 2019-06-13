@@ -96,7 +96,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(1, len(search_results["hits"]))
         self.assertEqual(search_results['hits'][0]['id'], response['id'])
         self.assertEqual(search_results['hits'][0]['title'], response['title'])
-        self.assertEqual(search_results['hits'][0]['type'], "RESOURCE")
+        self.assertEqual(search_results['hits'][0]['type'], "Online Information")
         self.assertEqual(search_results['hits'][0]['highlights'], "delivering <em>rainbows</em>")
         self.assertIsNotNone(search_results['hits'][0]['last_updated'])
         search_results = self.search(world_query)
