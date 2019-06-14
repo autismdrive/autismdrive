@@ -27,7 +27,7 @@ export class Query {
   }
 }
 
-export enum HitType {
+export enum HitLabel {
   LOCATION = 'Local Services',
   RESOURCE = 'Online Information',
   STUDY = 'Research Studies',
@@ -36,9 +36,11 @@ export enum HitType {
 
 export class Hit {
   id: number;
-  type: HitType;
+  type: string;
+  label: string;
   title: string;
   content: string;
+  description: string;
   last_updated: Date;
   highlights: string;
   url?: string;

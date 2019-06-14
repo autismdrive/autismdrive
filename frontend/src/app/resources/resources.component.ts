@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
 import { LatLngLiteral } from '@agm/core';
-import { Query, HitType } from '../_models/query';
+import { Component, OnInit } from '@angular/core';
+import { HitLabel, Query } from '../_models/query';
+import { ApiService } from '../_services/api/api.service';
 
 @Component({
   selector: 'app-resources',
@@ -41,7 +41,7 @@ export class ResourcesComponent implements OnInit {
 
   loadResources() {
     const query = new Query({
-      filters: [{field: 'Type', value: HitType.RESOURCE}]
+      filters: [{field: 'Type', value: HitLabel.RESOURCE}]
     });
     this.api.search(query).subscribe(q => this.query = q);
   }

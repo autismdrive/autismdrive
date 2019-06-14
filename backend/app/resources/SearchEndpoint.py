@@ -1,6 +1,7 @@
 import elasticsearch
 import flask_restful
 from flask import request
+import logging
 
 from app import elastic_index, RestException
 from app.model.search import Facet, FacetCount, Hit
@@ -34,8 +35,8 @@ class SearchEndpoint(flask_restful.Resource):
         for hit in results:
             highlights = ""
             if "highlight" in hit.meta:
-                highlights = "...".join(hit.meta.highlight.content)
-            hit = Hit(hit.id, hit.content, hit.title, hit.type, hit.last_updated, highlights)
+                highlights = "... ".join(hit.meta.highlight.content)
+            hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.last_updated, highlights)
             search.hits.append(hit)
 
         return SearchSchema().jsonify(search)
