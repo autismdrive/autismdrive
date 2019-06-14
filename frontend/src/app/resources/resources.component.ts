@@ -32,7 +32,7 @@ export class ResourcesComponent implements OnInit {
         this.mapLoc.lng = p.coords.longitude;
 
         const query = new Query({
-          filters: [{field: 'Type', value: HitType.RESOURCE}]
+          filters: [{field: 'Type', value: HitLabel.RESOURCE}]
         });
         this.api.search(query).subscribe(q => this.query = q);
       });
