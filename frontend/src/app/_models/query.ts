@@ -27,11 +27,20 @@ export class Query {
   }
 }
 
+export enum HitLabel {
+  LOCATION = 'Local Services',
+  RESOURCE = 'Online Information',
+  STUDY = 'Research Studies',
+  EVENT = 'Events and Training'
+}
+
 export class Hit {
   id: number;
   type: string;
+  label: string;
   title: string;
   content: string;
+  description: string;
   last_updated: Date;
   highlights: string;
   url?: string;

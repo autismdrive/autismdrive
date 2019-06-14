@@ -7,6 +7,7 @@ Base = declarative_base()
 
 class StarResource(db.Model):
     __tablename__ = 'resource'
+    __label__ = "Online Information"
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String)
     title = db.Column(db.String)
