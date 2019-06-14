@@ -16,7 +16,7 @@
 <div
   class="resources"
   fxLayout.lt-md="column"
-  fxLayout.gt-sm="row"
+  fxLayout.gt-sm="column"
   fxLayoutGap="40px"
   fxLayoutAlign="center auto"
 >
@@ -30,70 +30,46 @@
         <agm-map
           [latitude]="mapLoc.lat"
           [longitude]="mapLoc.lng"
+          [streetViewControl]="false"
           mapTypeId="roadmap"
           [zoom]="7"
+          (mapReady)="mapLoad($event)"
         >
           <agm-marker
             [latitude]="mapLoc.lat"
             [longitude]="mapLoc.lng"
+            iconUrl="/assets/map/your-location.svg"
           ></agm-marker>
         </agm-map>
       </mat-card-content>
     </mat-card>
+    <h2>Type</h2>
+    <mat-card *ngFor="let resourceType of resourceTypes">
+      <mat-card-title>
+        <app-type-icon [iconType]="resourceType.name" [size]="2"></app-type-icon>
+        {{resourceType.label}}
+      </mat-card-title>
+    </mat-card>
+
+    <h2>Gathered by</h2>
     <mat-card>
       <mat-card-title>
-        Title
+        Charlottesville Region Autism Action Group (CRAAG)
       </mat-card-title>
       <mat-card-content>
-        Description
+        Logo?
       </mat-card-content>
     </mat-card>
     <mat-card>
       <mat-card-title>
-        Title
+        UVA Supporting Transformative Autism Research (STAR)
       </mat-card-title>
       <mat-card-content>
-        Description
-      </mat-card-content>
-    </mat-card>
-    <h2>Partner Organization</h2>
-    <li>Autism Speaks</li>
-    <li>University of Virginia</li>
-    <li>Civitas Health Services, Inc.</li>
-    <li>Next Steps Behavioral Centers</li>
-    <li>Vanderbilt Kennedy Center</li>
-    <li>Virginia Institute of Autism</li>
-    <li>ABC Behavior</li>
-    <li>Blue Ridge Autism and Achievement Center</li>
-    <li>A.C.E.S Aligned Clinical and Educational Services</li>
-    <li>ABA Behavioral Group</li>
-    <mat-card>
-      <mat-card-title>
-        Autism Speaks
-      </mat-card-title>
-      <mat-card-content>
-        Description
-      </mat-card-content>
-    </mat-card>
-    <mat-card>
-      <mat-card-title>
-        Title
-      </mat-card-title>
-      <mat-card-content>
-        Description
-      </mat-card-content>
-    </mat-card>
-    <mat-card>
-      <mat-card-title>
-        Title
-      </mat-card-title>
-      <mat-card-content>
-        Description
+        Logo?
       </mat-card-content>
     </mat-card>
   </div>
   <div
-    fxFlex="50%"
     fxLayout="column"
     fxLayoutGap="40px"
     *ngIf="query && query.hits"

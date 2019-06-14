@@ -27,6 +27,13 @@ export class Query {
   }
 }
 
+export enum HitType {
+  LOCATION = 'LOCATION',
+  RESOURCE = 'RESOURCE',
+  STUDY = 'STUDY',
+  EVENT = 'EVENT'
+}
+
 export enum HitLabel {
   LOCATION = 'Local Services',
   RESOURCE = 'Online Information',
