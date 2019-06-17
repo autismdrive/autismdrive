@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Flow} from '../_models/flow';
-import {Step} from '../_models/step';
 
 @Component({
   selector: 'app-flow-intro',
