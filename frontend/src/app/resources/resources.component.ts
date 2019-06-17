@@ -18,8 +18,8 @@ class MapControlDiv extends HTMLDivElement {
   styleUrls: ['./resources.component.scss']
 })
 export class ResourcesComponent implements OnInit {
-  resourceTypes: ResourceType[] = Object.values(HitType).map((t, i) => {
-    return {name: t, label: Object.values(HitLabel)[i]};
+  resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
+    return {name: HitType[t], label: HitLabel[t] };
   });
   query: Query;
   mapLoc: LatLngLiteral = {

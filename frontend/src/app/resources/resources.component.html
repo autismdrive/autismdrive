@@ -3,13 +3,31 @@
   class="gradient-overlay container"
 >
   <h1>Training &amp; Resources</h1>
-  <div class="row">
-    <div class="border-box">
-      <h1>Resource Type</h1>
-    </div>
-    <div>or</div>
-    <div class="border-box">
-      <h1>Category</h1>
+  <div
+    class="row"
+    fxLayout.lt-sm="column"
+    fxLayout.gt-xs="row wrap"
+    fxLayoutGap="40px"
+    fxLayoutAlign="center auto"
+  >
+    <div
+      class="border-box-tile"
+      *ngFor="let resourceType of resourceTypes"
+      fxFlex.gt-sm="calc(33% - 160px)"
+      fxFlex.sm="calc(50% - 120px)"
+    >
+      <div
+        class="border-box-tile-inner"
+        [routerLink]="[ '/search' ]"
+        [queryParams]="{Type: resourceType.label}"
+      >
+        <app-type-icon
+          [iconType]="resourceType.name"
+          [size]="2"
+        ></app-type-icon>
+        <div class="resource-type-label">{{resourceType.label}}</div>
+        <i class="icofont-circled-right icofont-1x"></i>
+      </div>
     </div>
   </div>
 </div>
@@ -21,35 +39,21 @@
   fxLayoutAlign="center auto"
 >
   <div fxFlex.gt-sm="30%">
-    <h1>STAR Resources</h1>
-    <mat-card>
-      <mat-card-title>
-        Near you
-      </mat-card-title>
-      <mat-card-content>
-        <agm-map
-          [latitude]="mapLoc.lat"
-          [longitude]="mapLoc.lng"
-          [streetViewControl]="false"
-          mapTypeId="roadmap"
-          [zoom]="7"
-          (mapReady)="mapLoad($event)"
-        >
-          <agm-marker
-            [latitude]="mapLoc.lat"
-            [longitude]="mapLoc.lng"
-            iconUrl="/assets/map/your-location.svg"
-          ></agm-marker>
-        </agm-map>
-      </mat-card-content>
-    </mat-card>
-    <h2>Type</h2>
-    <mat-card *ngFor="let resourceType of resourceTypes">
-      <mat-card-title>
-        <app-type-icon [iconType]="resourceType.name" [size]="2"></app-type-icon>
-        {{resourceType.label}}
-      </mat-card-title>
-    </mat-card>
+    <h1>Resources Near You</h1>
+    <agm-map
+      [latitude]="mapLoc.lat"
+      [longitude]="mapLoc.lng"
+      [streetViewControl]="false"
+      mapTypeId="roadmap"
+      [zoom]="7"
+      (mapReady)="mapLoad($event)"
+    >
+      <agm-marker
+        [latitude]="mapLoc.lat"
+        [longitude]="mapLoc.lng"
+        iconUrl="/assets/map/your-location.svg"
+      ></agm-marker>
+    </agm-map>
 
     <h2>Gathered by</h2>
     <mat-card>

@@ -1,3 +1,9 @@
+#hero {
+  background-image: url('/assets/home/hero-parent-child.jpg');
+
+  h1 { color: white; }
+}
+
 .resources {
   margin: 2%;
 
@@ -15,3 +21,18 @@
 }
 
 agm-map { height: 300px; }
+.border-box-tile {
+  .icofont-1x {
+    color: #e57200;
+    transition: margin-left 0.5s;
+  }
+
+  &:hover .icofont-1x {
+    margin-left: 10px;
+  }
+
+  .resource-type-label {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+}
