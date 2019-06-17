@@ -33,9 +33,11 @@ from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnai
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
-from app import db, elastic_index
+from app import app, db, elastic_index
 from sqlalchemy import Sequence
 import csv
+import googlemaps
+from string import Template
 
 
 class DataLoader:
@@ -97,16 +99,33 @@ class DataLoader:
         with open(self.location_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
+            api_key = app.config.get('GOOGLE_MAPS_API_KEY')
+            gmaps = googlemaps.Client(key=api_key)
+
             for row in reader:
                 org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
+                lat = row[16]
+                lng = row[17]
+                address = '{s1} {s2}, {c}, {st} {z}'.format(s1=row[7], s2=row[8], c=row[9], st=row[10], z=row[11])
+
+                if lat is '' and lng is '':
+                    geocode_result = gmaps.geocode(address)
+
+                    if geocode_result is not None:
+                        if geocode_result[0] is not None:
+                            loc = geocode_result[0]['geometry']['location']
+                            lat = loc['lat']
+                            lng = loc['lng']
+
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
-                                    zip=row[11], website=row[13], phone=row[15], email=row[14])
+                                    zip=row[11], website=row[13], phone=row[15], email=row[14],
+                                    latitude=lat, longitude=lng)
                 db.session.add(location)
                 db.session.commit()
                 self.__increment_id_sequence(Location)
 
-                for i in range(16, len(row)):
+                for i in range(18, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id

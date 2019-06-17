@@ -31,3 +31,5 @@ SSO_ATTRIBUTE_MAP = {
     'HTTP_GIVENNAME': (False, 'givenName'), # Daniel
     'HTTP_MAIL': (False, 'email')  # dhf8r@Virginia.EDU
 }
+
+GOOGLE_MAPS_API_KEY = "KEY_GOES_HERE"
