@@ -41,6 +41,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
+import { PdfJsViewerModule } from 'ng2-pdfjs-viewer';
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
@@ -199,6 +200,7 @@ export class FormlyConfig {
     MatToolbarModule,
     MatTooltipModule,
     NgProgressModule,
+    PdfJsViewerModule,
     ReactiveFormsModule,
     RoutingModule,
   ],
