@@ -1,5 +1,5 @@
 <div
-  class="container mat-typography"
+  class="container mat-typography terms"
   fxLayoutAlign="center center"
 >
   <div fxFlex="80%">
@@ -27,10 +27,10 @@
     >
       <button
         mat-flat-button
-        (click)="goHome($event)"
+        (click)="goProfile($event)"
         color="accent"
         class="btn-lg"
-        id="cancel"
+        id="cancel-button"
       >
         Cancel
       </button>
@@ -39,7 +39,7 @@
         (click)="continue()"
         color="primary"
         class="btn-lg"
-        id="agree"
+        id="agree-button"
       >
         I agree
       </button>

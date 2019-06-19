@@ -22,9 +22,9 @@ export class TermsComponent implements OnInit {
   ngOnInit() {
   }
 
-  goHome($event) {
+  goProfile($event) {
     $event.preventDefault();
-    this.router.navigate(['home']);
+    this.router.navigate(['profile']);
   }
 
   continue() {
