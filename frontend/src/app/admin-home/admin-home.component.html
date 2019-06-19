@@ -1,1 +1,25 @@
-<app-questionnaire-data-view></app-questionnaire-data-view>
+<div
+  class="admin"
+  fxLayout="column"
+  fxLayoutAlign="start start"
+>
+  <h1>Administrative Options</h1>
+  <button
+    mat-flat-button
+    (click)="goDataAdmin($event)"
+    color="primary"
+    class="btn-lg"
+    id="data-button"
+  >
+    Visit Data Admin
+  </button>
+  <button
+    mat-flat-button
+    (click)="goUserAdmin($event)"
+    color="primary"
+    class="btn-lg"
+    id="user-button"
+  >
+    Visit User Admin
+  </button>
+</div>

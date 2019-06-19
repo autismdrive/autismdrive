@@ -89,6 +89,7 @@ import { EventDetailComponent } from './event-detail/event-detail.component';
 import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
+import { UserAdminComponent } from './user-admin/user-admin.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -161,6 +162,7 @@ export class FormlyConfig {
     LocationDetailComponent,
     TypeIconComponent,
     HeroSlidesComponent,
+    UserAdminComponent,
   ],
   imports: [
     BrowserAnimationsModule,

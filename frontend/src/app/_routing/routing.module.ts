@@ -10,7 +10,7 @@ import { LoginComponent } from '../login/login.component';
 import { LogoutComponent } from '../logout/logout.component';
 import { PasswordResetComponent } from '../password-reset/password-reset.component';
 import { ProfileComponent } from '../profile/profile.component';
-import { QuestionnaireStepComponent } from '../questionnaire-step/questionnaire-step.component';
+import { QuestionnaireDataViewComponent } from '../questionnaire-data-view/questionnaire-data-view.component';
 import { RegisterComponent } from '../register/register.component';
 import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
 import { ResourcesComponent } from '../resources/resources.component';
@@ -18,6 +18,7 @@ import { SearchComponent } from '../search/search.component';
 import { StudiesComponent } from '../studies/studies.component';
 import { StudyDetailComponent } from '../study-detail/study-detail.component';
 import { TermsComponent } from '../terms/terms.component';
+import { UserAdminComponent } from '../user-admin/user-admin.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
@@ -61,7 +62,9 @@ const routes: Routes = [
   { path: 'search', component: SearchComponent, data: { title: 'Search' } },
   { path: 'search/:query', component: SearchComponent, data: { title: 'Search Resources' } },
   { matcher: searchFilterMatcher, component: SearchComponent, data: { title: 'Search' } },
-  { path: 'admin', component: AdminHomeComponent, data: { title: 'Admin' }, canActivate: [AdminGuard] },
+  { path: 'admin', component: AdminHomeComponent, data: { title: 'Admin Home' }, canActivate: [AdminGuard] },
+  { path: 'admin/data', component: QuestionnaireDataViewComponent, data: { title: 'Data Admin' }, canActivate: [AdminGuard] },
+  { path: 'admin/user', component: UserAdminComponent, data: { title: 'User Admin' }, canActivate: [AdminGuard] },
 ];
 
 @NgModule({
