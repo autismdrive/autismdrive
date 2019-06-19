@@ -135,7 +135,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   markConsentAndGoToFlow(participant: Participant) {
     participant.has_consented = true;
     this.api.updateParticipant(participant).subscribe(participant => {
-      this.goToNextAvailableStep();
+      this.loadFlow(this.flow.name);
     });
   }
 
