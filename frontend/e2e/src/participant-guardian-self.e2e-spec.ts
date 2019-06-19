@@ -58,7 +58,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
   // Enrollment Flow
-  it('should display the terms of consent to the study', () => enrollUseCases.displayTerms());
+  it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
   it('should cancel out of the terms consent page', () => enrollUseCases.cancelEditing());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
   it('should accept the terms', () => enrollUseCases.acceptTerms());

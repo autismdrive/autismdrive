@@ -40,8 +40,9 @@ export class EnrollUseCases {
     this.page.clickAndExpectRoute('#cancel-button', '/profile');
   }
 
-  displayTerms() {
+  displayGuardianTerms() {
     expect(this.page.getElements('app-terms').count()).toEqual(1);
+    expect(this.page.getElements('#guardian-terms').count()).toEqual(1);
     expect(this.page.getElements('#agree-button').count()).toEqual(1);
     expect(this.page.getElements('#cancel-button').count()).toEqual(1);
   }
