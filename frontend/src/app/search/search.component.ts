@@ -11,6 +11,7 @@ import { ActivatedRoute, Router, Params, ParamMap } from '@angular/router';
 import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 import { MediaMatcher } from '@angular/cdk/layout';
+import { LatLngLiteral } from '@agm/core';
 
 @Component({
   selector: 'app-search',
@@ -24,6 +25,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   hideResults = false;
   filters: Filter[];
   pageSize = 20;
+  mapLoc: LatLngLiteral = {
+    lat: 37.9864031,
+    lng: -81.6645856
+  };
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
 
@@ -143,24 +148,34 @@ export class SearchComponent implements OnInit, OnDestroy {
     };
     this.showFilters = false;
     this.query.start = 0;
-    this.updateUrl(this.query);
+    // this.updateUrl(this.query);
+    this.doSearch();
   }
 
   sortByRelevance() {
-    this.query.sort = { field: '_score'};
+    this.query.sort = { field: '_score' };
     this.showFilters = false;
     this.query.start = 0;
-    this.updateUrl(this.query);
+    // this.updateUrl(this.query);
+    this.doSearch();
   }
 
   sortByDistance() {
-    this.query.sort = {
-      field: 'geo_point',
-      latitude: 38.065229,
-      longitude: -79.079076,
-      order: 'asc',
-      unit: 'mi'
-    };
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p => {
+        this.mapLoc.lat = p.coords.latitude;
+        this.mapLoc.lng = p.coords.longitude;
+        this.query.sort = {
+          field: 'geo_point',
+          latitude: this.mapLoc.lat,
+          longitude: this.mapLoc.lng,
+          order: 'asc',
+          unit: 'mi'
+        };
+        // this.updateUrl(this.query);
+        this.doSearch();
+      });
+    }
   }
 
   addFilter(field: string, fieldValue: string) {

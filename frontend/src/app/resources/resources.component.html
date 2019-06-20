@@ -41,18 +41,30 @@
   <div fxFlex.gt-sm="30%">
     <h1>Resources Near You</h1>
     <agm-map
-      [latitude]="mapLoc.lat"
-      [longitude]="mapLoc.lng"
+      *ngIf="!loading"
+      [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
+      [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
       [streetViewControl]="false"
       mapTypeId="roadmap"
       [zoom]="7"
       (mapReady)="mapLoad($event)"
     >
       <agm-marker
+        *ngIf="mapLoc"
         [latitude]="mapLoc.lat"
         [longitude]="mapLoc.lng"
         iconUrl="/assets/map/your-location.svg"
       ></agm-marker>
+
+      <ng-container *ngIf="query && query.hits">
+        <ng-container *ngFor="let hit of query.hits">
+          <agm-marker
+            *ngIf="hit.latitude && hit.longitude"
+            [latitude]="hit.latitude"
+            [longitude]="hit.longitude"
+          ></agm-marker>
+        </ng-container>
+      </ng-container>
     </agm-map>
 
     <h2>Gathered by</h2>

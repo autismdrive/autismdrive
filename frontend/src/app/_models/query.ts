@@ -54,6 +54,8 @@ export class Hit {
   last_updated: Date;
   highlights: string;
   url?: string;
+  latitude?: number;
+  longitude?: number;
 
   constructor(private _props) {
     for (const propName in this._props) {
