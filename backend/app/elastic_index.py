@@ -163,7 +163,8 @@ class ElasticIndex:
         self.index.flush()
 
     def search(self, search):
-        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=search.sort.translate())
+        sort = None if search.sort is None else search.sort.translate()
+        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=sort)
         document_search = document_search[search.start:search.start + search.size]
         return document_search.execute()
 
