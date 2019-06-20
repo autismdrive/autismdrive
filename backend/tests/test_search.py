@@ -108,32 +108,44 @@ class TestSearch(BaseTest, unittest.TestCase):
         # geo_query = {'words': 'rainbows', 'filters': []}
         geo_query = {
             'words': 'rainbows',
-            'filters': [{
-                'field':'geo_distance',
-                'value': {
-                    'distance': '20mi',
-                    'geo_point': {
-                        'lat': 38.065229,
-                        'lon': -79.079076
-                    }
-                }
-            }]
+            # 'filters': [{
+            #     'field':'geo_distance',
+            #     'value': {
+            #         'distance': '20mi',
+            #         'geo_point': {
+            #             'lat': 38.065229,
+            #             'lon': -79.079076
+            #         }
+            #     }
+            # }],
+            'sort': {
+                'field': 'geo_point',
+                'latitude': 38.065229,
+                'longitude': -79.079076,
+                'order': 'asc',
+                'unit': 'mi'
+            }
         }
 
 
         # Add a location within the distance filter
-        location_near = TestLocations.construct_location(self, title='local unicorn', description="delivering rainbows within the orbit of Uranus", state="VA", latitude=38.149595, longitude=-79.072557)
+        location_near = TestLocations.construct_location(self, title='local unicorn', description="delivering rainbows within the orbit of Uranus", latitude=38.149595, longitude=-79.072557)
 
         # Add a location beyond the distance filter
-        location_far = TestLocations.construct_location(self, title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", state="VA", latitude=-38.149595, longitude=100.927443)
+        location_far = TestLocations.construct_location(self, title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", latitude=-38.149595, longitude=100.927443)
+
+        # Add a location somewhere in between
+        location_mid = TestLocations.construct_location(self, title='middle unicorn', description="delivering rainbows somewhere in between", latitude=37.5246403, longitude=-77.5633015)
 
         c1 = TestLocations.construct_location_category(self, location_near.id, "c1")
         c2 = TestLocations.construct_location_category(self, location_far.id, "c2")
+        c2 = TestLocations.construct_location_category(self, location_mid.id, "c3")
 
         search_results = self.search(geo_query)
-        self.assertEqual(1, len(search_results["hits"]))
-        self.assertEqual(search_results['hits'][0]['type'], "location")
+        self.assertEqual(3, len(search_results["hits"]))
         self.assertEqual(search_results['hits'][0]['title'], location_near['title'])
+        self.assertEqual(search_results['hits'][1]['title'], location_mid['title'])
+        self.assertEqual(search_results['hits'][2]['title'], location_far['title'])
 
     def test_modify_resource_search_basics(self):
         elastic_index.clear()

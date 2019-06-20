@@ -137,17 +137,30 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   sortByDate() {
-    this.query.sort = '-last_updated';
+    this.query.sort = {
+      field: 'last_updated',
+      order: 'desc'
+    };
     this.showFilters = false;
     this.query.start = 0;
     this.updateUrl(this.query);
   }
 
   sortByRelevance() {
-    this.query.sort = '_score';
+    this.query.sort = { field: '_score'};
     this.showFilters = false;
     this.query.start = 0;
     this.updateUrl(this.query);
+  }
+
+  sortByDistance() {
+    this.query.sort = {
+      field: 'geo_point',
+      latitude: 38.065229,
+      longitude: -79.079076,
+      order: 'asc',
+      unit: 'mi'
+    };
   }
 
   addFilter(field: string, fieldValue: string) {

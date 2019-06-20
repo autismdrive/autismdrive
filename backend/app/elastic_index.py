@@ -13,7 +13,7 @@ autocomplete_search = analyzer('autocomplete_search',
                                )
 
 
-# Star Documents are ElastciSearch documents and can be used to index an Event, Location, Resource, or Study
+# Star Documents are ElasticSearch documents and can be used to index an Event, Location, Resource, or Study
 class StarDocument(Document):
     type = Keyword()
     label = Keyword()
@@ -163,7 +163,7 @@ class ElasticIndex:
         self.index.flush()
 
     def search(self, search):
-        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name)
+        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=search.sort.translate())
         document_search = document_search[search.start:search.start + search.size]
         return document_search.execute()
 
@@ -171,9 +171,11 @@ class ElasticIndex:
 class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     def __init__(self, *args, **kwargs):
         self.index = kwargs["index"]
-#        self.date_restriction = kwargs["date_restriction"]
         kwargs.pop("index")
-#        kwargs.pop("date_restriction")
+
+        # self.sort = kwargs["sort"]
+        # kwargs.pop("sort")
+
         super(DocumentSearch, self).__init__(*args, **kwargs)
 
     doc_types = [StarDocument]
@@ -184,8 +186,7 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         'Type': elasticsearch_dsl.TermsFacet(field='label'),
         'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
         'Category': elasticsearch_dsl.TermsFacet(field='category'),
-        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
-        'Geolocation': elasticsearch_dsl.TermsFacet(field='geo_point')
+        'Organization': elasticsearch_dsl.TermsFacet(field='organization')
     }
 
     def highlight(self, search):

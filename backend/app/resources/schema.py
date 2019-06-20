@@ -13,7 +13,7 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
-from app.model.search import Filter, Search
+from app.model.search import Filter, Search, Sort
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -457,6 +457,17 @@ class SearchSchema(ma.Schema):
         latitude = fields.Float()
         longitude = fields.Float()
 
+    class SortSchema(ma.Schema):
+        field = fields.Str()
+        latitude = fields.Float()
+        longitude = fields.Float()
+        order = fields.Str()
+        unit = fields.Str()
+
+        @post_load
+        def make_sort(self, data):
+            return Sort(**data)
+
     class FilterSchema(ma.Schema):
         field = fields.Str()
         value = fields.Raw()
@@ -478,7 +489,7 @@ class SearchSchema(ma.Schema):
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
-    sort = fields.Str()
+    sort = ma.Nested(SortSchema)
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)

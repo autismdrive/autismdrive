@@ -5,7 +5,10 @@ export class Query {
   total?: number;
   size = 20;
   start = 0;
-  sort = '_score';
+  sort: Sort = {
+    field: '_score',
+    order: 'asc'
+  };
   hits?: Array<Hit>;
 
   constructor(private _props) {
@@ -64,6 +67,14 @@ export class Hit {
 export interface Filter {
   field: string;
   value: string[];
+}
+
+export interface Sort {
+  field: string;
+  order?: string;
+  unit?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Facet {
