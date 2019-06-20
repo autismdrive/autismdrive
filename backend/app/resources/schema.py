@@ -459,10 +459,10 @@ class SearchSchema(ma.Schema):
 
     class SortSchema(ma.Schema):
         field = fields.Str()
-        latitude = fields.Float()
-        longitude = fields.Float()
-        order = fields.Str()
-        unit = fields.Str()
+        latitude = fields.Float(missing=None)
+        longitude = fields.Float(missing=None)
+        order = fields.Str(missing='asc')
+        unit = fields.Str(missing='mi')
 
         @post_load
         def make_sort(self, data):

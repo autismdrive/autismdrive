@@ -20,6 +20,8 @@ class SearchEndpoint(flask_restful.Resource):
         except elasticsearch.ElasticsearchException as e:
             raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e.info))
 
+        print(results.to_dict())
+
         search.total = results.hits.total
         search.facets = []
         for facet_name in results.facets:

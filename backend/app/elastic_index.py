@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Float, GeoPoint
+from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
@@ -28,8 +28,8 @@ class StarDocument(Document):
     life_age = Keyword()
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
-    latitude = Float()
-    longitude = Float()
+    latitude = Double()
+    longitude = Double()
     geo_point = GeoPoint()
 
 
@@ -77,7 +77,7 @@ class ElasticIndex:
             self.index.delete(ignore=404)
             self.index.create()
         except:
-            self.logger.error("Failed to delete the indices.  They night not exist.")
+            self.logger.error("Failed to delete the indices. They might not exist.")
 
     def remove_document(self, document, flush=True):
         obj = self.get_document(document)
@@ -142,6 +142,7 @@ class ElasticIndex:
                 doc.category.append(cat.category.name)
 
         if (doc.type is 'location') and None not in (latitude, longitude):
+            print("{}: {}, {}".format(document.id, latitude, longitude))
             doc.latitude = latitude
             doc.longitude = longitude
             doc.geo_point = dict(lat=latitude, lon=longitude)
@@ -151,22 +152,24 @@ class ElasticIndex:
             self.index.flush()
 
     def load_documents(self, events, locations, resources, studies):
-        print("Loading search records of events, locations, resources, and studies into %s" % self.index_prefix)
+
+        print("\n\n======= load_documents ======")
+        print("Loading search records of events, locations, resources, and studies into Elasticsearch index: %s" % self.index_prefix)
         for e in events:
             self.add_document(e, flush=False)
         for l in locations:
-            self.add_document(l, flush=False)
+            self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
         for r in resources:
             self.add_document(r, flush=False)
         for s in studies:
             self.add_document(s, flush=False)
         self.index.flush()
+        print("======= /load_documents ======\n\n")
 
     def search(self, search):
         sort = None if search.sort is None else search.sort.translate()
         document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=sort)
         document_search = document_search[search.start:search.start + search.size]
-        print(document_search._s.to_dict())
         return document_search.execute()
 
 

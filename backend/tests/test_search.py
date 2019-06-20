@@ -125,12 +125,10 @@ class TestSearch(BaseTest, unittest.TestCase):
         # Add a location somewhere in between
         location_mid = TestLocations.construct_location(self, title='middle unicorn', description="delivering rainbows somewhere in between", latitude=37.5246403, longitude=-77.5633015)
 
-        c1 = TestLocations.construct_location_category(self, location_near.id, "c1")
-        c2 = TestLocations.construct_location_category(self, location_far.id, "c2")
-        c2 = TestLocations.construct_location_category(self, location_mid.id, "c3")
-
         search_results = self.search(geo_query)
         self.assertEqual(3, len(search_results["hits"]))
+        self.assertIsNotNone(search_results['hits'][0]['latitude'])
+        self.assertIsNotNone(search_results['hits'][0]['longitude'])
         self.assertEqual(search_results['hits'][0]['title'], location_near.title)
         self.assertEqual(search_results['hits'][1]['title'], location_mid.title)
         self.assertEqual(search_results['hits'][2]['title'], location_far.title)
@@ -139,9 +137,11 @@ class TestSearch(BaseTest, unittest.TestCase):
         geo_query['sort']['order'] = 'desc'
         search_results = self.search(geo_query)
         self.assertEqual(3, len(search_results["hits"]))
-        self.assertEqual(search_results['hits'][2]['title'], location_near.title)
-        self.assertEqual(search_results['hits'][1]['title'], location_mid.title)
+        self.assertIsNotNone(search_results['hits'][0]['latitude'])
+        self.assertIsNotNone(search_results['hits'][0]['longitude'])
         self.assertEqual(search_results['hits'][0]['title'], location_far.title)
+        self.assertEqual(search_results['hits'][1]['title'], location_mid.title)
+        self.assertEqual(search_results['hits'][2]['title'], location_near.title)
 
         # Change which point is closest
         geo_query['sort']['latitude'] = location_mid.latitude
@@ -149,6 +149,8 @@ class TestSearch(BaseTest, unittest.TestCase):
         geo_query['sort']['order'] = 'asc'
         search_results = self.search(geo_query)
         self.assertEqual(3, len(search_results["hits"]))
+        self.assertIsNotNone(search_results['hits'][0]['latitude'])
+        self.assertIsNotNone(search_results['hits'][0]['longitude'])
         self.assertEqual(search_results['hits'][0]['title'], location_mid.title)
         self.assertEqual(search_results['hits'][1]['title'], location_near.title)
         self.assertEqual(search_results['hits'][2]['title'], location_far.title)

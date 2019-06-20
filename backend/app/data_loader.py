@@ -391,11 +391,12 @@ class DataLoader:
         return category
 
     def build_index(self):
-        elastic_index.load_documents(db.session.query(Event).all(),
-                                     db.session.query(Location).all(),
-                                     db.session.query(StarResource).all(),
-                                     db.session.query(Study).all()
-                                     )
+        elastic_index.load_documents(
+            events=db.session.query(Event).all(),
+            locations=db.session.query(Location).all(),
+            resources=db.session.query(StarResource).all(),
+            studies=db.session.query(Study).all()
+        )
 
     def clear_index(self):
         print("Clearing the index")
