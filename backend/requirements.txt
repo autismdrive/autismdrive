@@ -10,8 +10,8 @@ flask-cors==3.0.3
 flask-httpauth==3.2.4
 PyJWT==1.6.3
 marshmallow-enum==1.4.1
-elasticsearch==6.3.1
-elasticsearch-dsl==6.3.1
+elasticsearch>=6.0.0,<7.0.0
+elasticsearch-dsl>=6.0.0,<7.0.0
 XlsxWriter==1.1.5
 openpyxl==2.6.2
 apscheduler==3.6.0

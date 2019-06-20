@@ -104,11 +104,11 @@ class DataLoader:
 
             for row in reader:
                 org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
-                lat = row[16]
-                lng = row[17]
+                lat = None if row[16] is '' else float(row[16])
+                lng = None if row[17] is '' else float(row[17])
                 address = '{s1} {s2}, {c}, {st} {z}'.format(s1=row[7], s2=row[8], c=row[9], st=row[10], z=row[11])
 
-                if lat is '' and lng is '':
+                if lat is None and lng is None:
                     geocode_result = gmaps.geocode(address)
 
                     if geocode_result is not None:

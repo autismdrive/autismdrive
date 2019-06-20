@@ -142,10 +142,10 @@ class ElasticIndex:
                 doc.category.append(cat.category.name)
 
         if (doc.type is 'location') and None not in (latitude, longitude):
-            print("{}: {}, {}".format(document.id, latitude, longitude))
             doc.latitude = latitude
             doc.longitude = longitude
             doc.geo_point = dict(lat=latitude, lon=longitude)
+            print("{}: {}, {}".format(doc.id, doc.latitude, doc.longitude))
 
         StarDocument.save(doc, index=self.index_name)
         if flush:
