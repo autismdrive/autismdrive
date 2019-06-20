@@ -73,8 +73,7 @@ class Sort:
                         'lon': self.longitude
                     },
                     'order': self.order,
-                    'unit': self.unit,
-                    'ignore_unmapped': True
+                    'unit': self.unit
                 }
             }
         else:
