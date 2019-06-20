@@ -82,8 +82,10 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
-from app.resources.ExportEndpoint import ExportEndpoint, ExportListEndpoint
-
+from app.resources.ExportEndpoint import (
+    ExportEndpoint,
+    ExportListEndpoint
+)
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that

@@ -9,18 +9,18 @@ from sqlalchemy import func
 from werkzeug.datastructures import Headers
 from app import db
 from app.model.export_info import ExportInfo
-from app.question_service import QuestionService
+from app.export_service import ExportService
 
 
 def get_questionnaire_data(name):
-    class_ref = QuestionService.get_class(name)
-    schema = QuestionService.get_schema(name, many=True)
+    class_ref = ExportService.get_class(name)
+    schema = ExportService.get_questionnaire_schema(name, many=True)
     q = db.session.query(class_ref).all()
     return schema.dump(q)
 
 
 def get_questionnaire_fields(name):
-    return QuestionService.get_schema(name).fields
+    return ExportService.get_questionnaire_schema(name).fields
 
 
 def get_questionnaire_names(app):

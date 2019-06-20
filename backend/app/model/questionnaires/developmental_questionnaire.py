@@ -1,19 +1,20 @@
 import datetime
 
+from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
-from app.question_service import QuestionService
+from app.export_service import ExportService
 
 
 class DevelopmentalQuestionnaire(db.Model):
     __tablename__ = "developmental_questionnaire"
     __label__ = "Birth and Developmental History"
-    __question_type__ = QuestionService.TYPE_UNRESTRICTED
+    __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
     participant_id = db.Column(

@@ -1,5 +1,6 @@
 import datetime
 
+from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
@@ -10,7 +11,7 @@ class Medication(db.Model):
     __tablename__ = "medication"
     __label__ = "Medication"
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     supports_questionnaire_id = db.Column(
         "supports_questionnaire_id",
         db.Integer,

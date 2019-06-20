@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # data, store it locally, and remove it from the master when necessary.
 from sqlalchemy import exc
 
-from app.question_service import QuestionService
+from app.export_service import ExportService
 from app.resources.schema import UserSchema
 
 
@@ -80,8 +80,8 @@ class DataImporter:
 
     def pull_data_for_question(self, question_name, meta_data):
         data = self.__get_json(self.QUESTION_ENDPOINT + "/" + question_name + "/export")
-        class_ref = QuestionService.get_class(question_name)
-        schema = QuestionService.get_schema(question_name, session=self.db.session)
+        class_ref = ExportService.get_class(question_name)
+        schema = ExportService.get_questionnaire_schema(question_name, session=self.db.session)
         for record in data:
             self.save_data(question_name, record)
 
