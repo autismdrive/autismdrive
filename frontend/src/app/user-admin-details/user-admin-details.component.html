@@ -1,0 +1,25 @@
+<div
+  class="user-admin-details"
+  fxLayout="column"
+>
+  <h1>User:</h1>
+  <p>User Email: {{user.email}}</p>
+  <p>User Role: {{user.role}}</p>
+  <p>User ID: {{user.id}}</p>
+
+  <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>
+  <div
+    id="participants"
+   *ngFor="let p of user.participants"
+    id="participant-detail"
+    fxFlex="40%"
+    fxLayoutGap="2em"
+  >
+    <mat-card>
+      <p><b>Name: {{p.name}}</b></p>
+      <p>Relationship: {{p.relationship}}</p>
+      <p>Last Updated: {{p.last_updated}}</p>
+      <p>Percent Complete: {{p.percent_complete}}</p>
+    </mat-card>
+  </div>
+</div>
