@@ -19,6 +19,7 @@ import { StudiesComponent } from '../studies/studies.component';
 import { StudyDetailComponent } from '../study-detail/study-detail.component';
 import { TermsComponent } from '../terms/terms.component';
 import { UserAdminComponent } from '../user-admin/user-admin.component';
+import { UserAdminDetailsComponent } from '../user-admin-details/user-admin-details.component';
 import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
@@ -65,6 +66,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminHomeComponent, data: { title: 'Admin Home' }, canActivate: [AdminGuard] },
   { path: 'admin/data', component: QuestionnaireDataViewComponent, data: { title: 'Data Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user', component: UserAdminComponent, data: { title: 'User Admin' }, canActivate: [AdminGuard] },
+  { path: 'admin/user/:userId', component: UserAdminDetailsComponent, data: { title: 'User Admin Details' }, canActivate: [AdminGuard] },
 ];
 
 @NgModule({

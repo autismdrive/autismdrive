@@ -26,6 +26,7 @@ import {
   MatSelectModule,
   MatSidenavModule,
   MatSlideToggleModule,
+  MatSortModule,
   MatStepperModule,
   MatTableModule,
   MatToolbarModule,
@@ -90,6 +91,7 @@ import { LocationDetailComponent } from './location-detail/location-detail.compo
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
 import { UserAdminComponent } from './user-admin/user-admin.component';
+import { UserAdminDetailsComponent } from './user-admin-details/user-admin-details.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -163,6 +165,7 @@ export class FormlyConfig {
     TypeIconComponent,
     HeroSlidesComponent,
     UserAdminComponent,
+    UserAdminDetailsComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -196,6 +199,7 @@ export class FormlyConfig {
     MatSelectModule,
     MatSidenavModule,
     MatSlideToggleModule,
+    MatSortModule,
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
