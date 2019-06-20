@@ -4,6 +4,7 @@ from app.model.resource import Resource
 
 class Location(Resource):
     __tablename__ = 'location'
+    __label__ = "Local Services"
     id = db.Column(db.Integer, db.ForeignKey('resource.id'), primary_key=True)
     primary_contact = db.Column(db.String)
     street_address1 = db.Column(db.String)

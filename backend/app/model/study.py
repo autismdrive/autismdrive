@@ -23,6 +23,7 @@ class Status(enum.Enum):
 
 class Study(db.Model):
     __tablename__ = 'study'
+    __label__ = "Research Studies"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))

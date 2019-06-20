@@ -4,6 +4,7 @@ from app.model.location import Location
 
 class Event(Location):
     __tablename__ = 'event'
+    __label__ = "Events and Training"
     id = db.Column(db.Integer, db.ForeignKey('location.id'), primary_key=True)
     date = db.Column(db.DateTime)
     time = db.Column(db.String)
