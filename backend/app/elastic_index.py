@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document
+from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Float, GeoPoint
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
@@ -28,6 +28,9 @@ class StarDocument(Document):
     life_age = Keyword()
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
+    latitude = Float()
+    longitude = Float()
+    geo_point = GeoPoint()
 
 
 class ElasticIndex:
@@ -90,11 +93,11 @@ class ElasticIndex:
         uid = self._get_id(document)
         return StarDocument.get(id=uid, index=self.index_name)
 
-    def update_document(self, document, flush=True):
+    def update_document(self, document, flush=True, latitude=None, longitude=None):
         # update is the same as add, as it will overwrite.  Better to have code in one place.
-        self.add_document(document, flush)
+        self.add_document(document, flush, latitude, longitude)
 
-    def add_document(self, document, flush=True):
+    def add_document(self, document, flush=True, latitude=None, longitude=None):
         doc = StarDocument(id=document.id,
                            type=document.__tablename__,
                            label=document.__label__,
@@ -105,7 +108,10 @@ class ElasticIndex:
                            location=None,
                            life_age=None,
                            category=[],
-                           child_category=[]
+                           child_category=[],
+                           latitude=None,
+                           longitude=None,
+                           geo_point=None
                            )
 
         doc.meta.id = self._get_id(document)
@@ -134,6 +140,11 @@ class ElasticIndex:
                     doc.child_category.append(cat.category.name)
             else:
                 doc.category.append(cat.category.name)
+
+        if (doc.type is 'location') and None not in (latitude, longitude):
+            doc.latitude = latitude
+            doc.longitude = longitude
+            doc.geo_point = dict(lat=latitude, lon=longitude)
 
         StarDocument.save(doc, index=self.index_name)
         if flush:
@@ -166,7 +177,7 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         super(DocumentSearch, self).__init__(*args, **kwargs)
 
     doc_types = [StarDocument]
-    fields = ['title^10', 'content^5', 'description^5', 'location^3', 'category^2',  'child_category^2', 'organization', 'website']
+    fields = ['title^10', 'content^5', 'description^5', 'location^3', 'category^2', 'child_category^2', 'organization', 'website']
 
     facets = {
         'Location': elasticsearch_dsl.TermsFacet(field='location'),
@@ -174,6 +185,7 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
         'Category': elasticsearch_dsl.TermsFacet(field='category'),
         'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
+        'Geolocation': elasticsearch_dsl.TermsFacet(field='geo_point')
     }
 
     def highlight(self, search):

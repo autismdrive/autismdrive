@@ -4,6 +4,7 @@ from flask import json
 from tests.base_test import BaseTest
 from app import elastic_index
 from app.model.resource_category import ResourceCategory
+from tests.test_locations import TestLocations
 
 
 class TestSearch(BaseTest, unittest.TestCase):
@@ -101,6 +102,38 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertIsNotNone(search_results['hits'][0]['last_updated'])
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["hits"]))
+
+    def test_search_location_by_geo_point(self):
+        elastic_index.clear()
+        # geo_query = {'words': 'rainbows', 'filters': []}
+        geo_query = {
+            'words': 'rainbows',
+            'filters': [{
+                'field':'geo_distance',
+                'value': {
+                    'distance': '20mi',
+                    'geo_point': {
+                        'lat': 38.065229,
+                        'lon': -79.079076
+                    }
+                }
+            }]
+        }
+
+
+        # Add a location within the distance filter
+        location_near = TestLocations.construct_location(self, title='local unicorn', description="delivering rainbows within the orbit of Uranus", state="VA", latitude=38.149595, longitude=-79.072557)
+
+        # Add a location beyond the distance filter
+        location_far = TestLocations.construct_location(self, title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", state="VA", latitude=-38.149595, longitude=100.927443)
+
+        c1 = TestLocations.construct_location_category(self, location_near.id, "c1")
+        c2 = TestLocations.construct_location_category(self, location_far.id, "c2")
+
+        search_results = self.search(geo_query)
+        self.assertEqual(1, len(search_results["hits"]))
+        self.assertEqual(search_results['hits'][0]['type'], "location")
+        self.assertEqual(search_results['hits'][0]['title'], location_near['title'])
 
     def test_modify_resource_search_basics(self):
         elastic_index.clear()

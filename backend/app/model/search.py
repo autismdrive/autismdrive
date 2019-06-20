@@ -52,7 +52,7 @@ class Filter:
 
 class Hit:
 
-    def __init__(self, result_id, content, description, title, doc_type, label, last_updated, highlights):
+    def __init__(self, result_id, content, description, title, doc_type, label, last_updated, highlights, latitude, longitude):
         self.id = result_id
         self.content = content
         self.description = description
@@ -61,3 +61,5 @@ class Hit:
         self.label = label
         self.last_updated = last_updated
         self.highlights = highlights
+        self.latitude = latitude
+        self.longitude = longitude

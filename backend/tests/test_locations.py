@@ -13,19 +13,25 @@ class TestLocations(BaseTest, unittest.TestCase):
     def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
                            street_address1="123 Some Pl", street_address2="Apt. 45",
                            city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org"):
+                           website="http://stardrive.org", latitude=38.98765, longitude=-93.12345):
 
         location = Location(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip,phone=phone, website=website)
+                                state=state, zip=zip,phone=phone, website=website, latitude=latitude, longitude=longitude)
         location.organization_id = self.construct_organization().id
         db.session.add(location)
         db.session.commit()
 
         db_location = db.session.query(Location).filter_by(title=location.title).first()
         self.assertEqual(db_location.website, location.website)
-        elastic_index.add_document(db_location, 'Location')
+        elastic_index.add_document(db_location, 'Location', latitude=latitude, longitude=longitude)
         return db_location
 
+    def construct_location_category(self, location_id, category_name):
+        c = self.construct_category(name=category_name)
+        rc = ResourceCategory(resource_id=location_id, category=c, type='location')
+        db.session.add(rc)
+        db.session.commit()
+        return c
 
     def test_location_basics(self):
         self.construct_location()
@@ -40,6 +46,8 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(response["id"], r_id)
         self.assertEqual(response["title"], 'A+ location')
         self.assertEqual(response["description"], 'A delightful location destined to create rejoicing')
+        self.assertEqual(response["latitude"], 38.98765)
+        self.assertEqual(response["longitude"], -93.12345)
 
     def test_modify_location_basics(self):
         self.construct_location()
@@ -51,6 +59,8 @@ class TestLocations(BaseTest, unittest.TestCase):
         response['title'] = 'Edwarardos Lemonade and Oil Change'
         response['description'] = 'Better fluids for you and your car.'
         response['website'] = 'http://sartography.com'
+        response['latitude'] = 34.5678
+        response['longitude'] = -98.7654
         orig_date = response['last_updated']
         rv = self.app.put('/api/location/%i' % r_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -61,6 +71,8 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(response['title'], 'Edwarardos Lemonade and Oil Change')
         self.assertEqual(response['description'], 'Better fluids for you and your car.')
         self.assertEqual(response['website'], 'http://sartography.com')
+        self.assertEqual(response['latitude'], 34.5678)
+        self.assertEqual(response['longitude'], -98.7654)
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_location(self):
@@ -87,11 +99,9 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertIsNotNone(response['id'])
 
     def test_get_location_by_category(self):
-        c = self.construct_category()
         loc = self.construct_location()
-        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
-        db.session.add(rc)
-        db.session.commit()
+        c = self.construct_location_category(loc.id, "c1")
+
         rv = self.app.get(
             '/api/category/%i/location' % c.id,
             content_type="application/json",
@@ -103,32 +113,23 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(loc.description, response[0]["resource"]["description"])
 
     def test_get_location_by_category_includes_category_details(self):
-        c = self.construct_category(name="c1")
-        c2 = self.construct_category(name="c2")
         loc = self.construct_location()
-        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
-        rc2 = ResourceCategory(resource_id=loc.id, category=c2, type='location')
-        db.session.add_all([rc, rc2])
-        db.session.commit()
+        c1 = self.construct_location_category(loc.id, "c1")
+        c2 = self.construct_location_category(loc.id, "c2")
+
         rv = self.app.get(
-            '/api/category/%i/location' % c.id,
+            '/api/category/%i/location' % c1.id,
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(loc.id, response[0]["resource_id"])
-        self.assertEqual(2,
-                         len(response[0]["resource"]["resource_categories"]))
-        self.assertEqual(
-            "c1", response[0]["resource"]["resource_categories"][0]["category"]
-            ["name"])
+        self.assertEqual(2, len(response[0]["resource"]["resource_categories"]))
+        self.assertEqual("c1", response[0]["resource"]["resource_categories"][0]["category"]["name"])
 
     def test_category_location_count(self):
-        c = self.construct_category()
         loc = self.construct_location()
-        rc = ResourceCategory(resource_id=loc.id, category=c, type='location')
-        db.session.add(rc)
-        db.session.commit()
+        c = self.construct_location_category(loc.id, "c1")
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
         self.assert_success(rv)

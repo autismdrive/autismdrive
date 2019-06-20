@@ -293,7 +293,7 @@ class LocationSchema(ModelSchema):
         model = Location
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'organization', 'resource_categories', '_links')
+                  'organization', 'resource_categories', 'latitude', 'longitude', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -454,6 +454,8 @@ class SearchSchema(ma.Schema):
         label = fields.Str()
         last_updated = fields.Date()
         highlights = fields.Str()
+        latitude = fields.Float()
+        longitude = fields.Float()
 
     class FilterSchema(ma.Schema):
         field = fields.Str()
