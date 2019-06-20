@@ -1,4 +1,5 @@
 <div
+  *ngIf="user"
   class="user-admin-details"
   fxLayout="column"
 >
@@ -6,6 +7,7 @@
   <p>User Email: {{user.email}}</p>
   <p>User Role: {{user.role}}</p>
   <p>User ID: {{user.id}}</p>
+  <p>Last Updated: {{user.last_updated | date:'long'}}</p>
 
   <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>
   <div
@@ -16,10 +18,10 @@
     fxLayoutGap="2em"
   >
     <mat-card>
-      <p><b>Name: {{p.name}}</b></p>
+      <p><b>Name: {{p.name || '(None given)'}}</b></p>
       <p>Relationship: {{p.relationship}}</p>
-      <p>Last Updated: {{p.last_updated}}</p>
-      <p>Percent Complete: {{p.percent_complete}}</p>
+      <p>Last Updated: {{p.last_updated | date:'long'}}</p>
+      <p>Percent Complete: {{p.percent_complete || '0'}}%</p>
     </mat-card>
   </div>
 </div>
