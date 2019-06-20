@@ -143,9 +143,9 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         search_results = self.search(geo_query)
         self.assertEqual(3, len(search_results["hits"]))
-        self.assertEqual(search_results['hits'][0]['title'], location_near['title'])
-        self.assertEqual(search_results['hits'][1]['title'], location_mid['title'])
-        self.assertEqual(search_results['hits'][2]['title'], location_far['title'])
+        self.assertEqual(search_results['hits'][0]['title'], location_near.title)
+        self.assertEqual(search_results['hits'][1]['title'], location_mid.title)
+        self.assertEqual(search_results['hits'][2]['title'], location_far.title)
 
     def test_modify_resource_search_basics(self):
         elastic_index.clear()

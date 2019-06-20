@@ -166,6 +166,7 @@ class ElasticIndex:
         sort = None if search.sort is None else search.sort.translate()
         document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=sort)
         document_search = document_search[search.start:search.start + search.size]
+        print(document_search._s.to_dict())
         return document_search.execute()
 
 
@@ -173,7 +174,8 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     def __init__(self, *args, **kwargs):
         self.index = kwargs["index"]
         kwargs.pop("index")
-
+        self.my_sort = kwargs['sort']
+        kwargs.pop("sort")
         # self.sort = kwargs["sort"]
         # kwargs.pop("sort")
 
@@ -195,4 +197,5 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
 
     def search(self):
         s = super(DocumentSearch, self).search()
+        s = s.sort(self.my_sort)
         return s

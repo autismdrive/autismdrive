@@ -1,6 +1,6 @@
 import elasticsearch
 import flask_restful
-from flask import request
+from flask import request, json
 import logging
 
 from app import elastic_index, RestException
@@ -18,7 +18,7 @@ class SearchEndpoint(flask_restful.Resource):
         try:
             results = elastic_index.search(search)
         except elasticsearch.ElasticsearchException as e:
-            raise RestException(RestException.ELASTIC_ERROR)
+            raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e.info))
 
         search.total = results.hits.total
         search.facets = []
