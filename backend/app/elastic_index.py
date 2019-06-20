@@ -151,16 +151,16 @@ class ElasticIndex:
         if flush:
             self.index.flush()
 
-    def load_documents(self, events, locations, resources, studies):
+    def load_documents(self, resources, events, locations, studies):
 
         print("\n\n======= load_documents ======")
         print("Loading search records of events, locations, resources, and studies into Elasticsearch index: %s" % self.index_prefix)
+        for r in resources:
+            self.add_document(r, flush=False)
         for e in events:
             self.add_document(e, flush=False)
         for l in locations:
             self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
-        for r in resources:
-            self.add_document(r, flush=False)
         for s in studies:
             self.add_document(s, flush=False)
         self.index.flush()

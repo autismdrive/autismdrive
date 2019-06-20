@@ -392,9 +392,9 @@ class DataLoader:
 
     def build_index(self):
         elastic_index.load_documents(
+            resources=db.session.query(StarResource).all(),
             events=db.session.query(Event).all(),
             locations=db.session.query(Location).all(),
-            resources=db.session.query(StarResource).all(),
             studies=db.session.query(Study).all()
         )
 
