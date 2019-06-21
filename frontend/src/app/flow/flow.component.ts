@@ -72,7 +72,6 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-     this.startTime = performance.now();
   }
 
   ngOnDestroy(): void {
@@ -172,6 +171,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
 
   private renderForm(step: Step, q_meta) {
+    this.startTime = performance.now();
     this.fields = this.infoToForm(q_meta);
     console.log('Model: ', this.model);
     console.log('Fields: ', this.fields);
