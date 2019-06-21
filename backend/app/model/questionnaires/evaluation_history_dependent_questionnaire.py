@@ -33,6 +33,7 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
             "last_updated",
             "participant_id",
             "user_id",
+            "time_on_task_ms",
             "self_identifies_autistic",
             "has_autism_diagnosis",
             "years_old_at_first_diagnosis",
