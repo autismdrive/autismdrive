@@ -145,15 +145,12 @@ class ElasticIndex:
             doc.latitude = latitude
             doc.longitude = longitude
             doc.geo_point = dict(lat=latitude, lon=longitude)
-            print("{}: {}, {}".format(doc.id, doc.latitude, doc.longitude))
 
         StarDocument.save(doc, index=self.index_name)
         if flush:
             self.index.flush()
 
     def load_documents(self, resources, events, locations, studies):
-
-        print("\n\n======= load_documents ======")
         print("Loading search records of events, locations, resources, and studies into Elasticsearch index: %s" % self.index_prefix)
         for r in resources:
             self.add_document(r, flush=False)
@@ -164,7 +161,6 @@ class ElasticIndex:
         for s in studies:
             self.add_document(s, flush=False)
         self.index.flush()
-        print("======= /load_documents ======\n\n")
 
     def search(self, search):
         sort = None if search.sort is None else search.sort.translate()
@@ -200,5 +196,8 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
 
     def search(self):
         s = super(DocumentSearch, self).search()
-        s = s.sort(self.my_sort)
+
+        if self.my_sort is not None:
+            s = s.sort(self.my_sort)
+
         return s

@@ -10,29 +10,6 @@ from app.model.resource_category import ResourceCategory
 
 class TestLocations(BaseTest, unittest.TestCase):
 
-    def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
-                           street_address1="123 Some Pl", street_address2="Apt. 45",
-                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org", latitude=38.98765, longitude=-93.12345):
-
-        location = Location(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip,phone=phone, website=website, latitude=latitude, longitude=longitude)
-        location.organization_id = self.construct_organization().id
-        db.session.add(location)
-        db.session.commit()
-
-        db_location = db.session.query(Location).filter_by(title=location.title).first()
-        self.assertEqual(db_location.website, location.website)
-        elastic_index.add_document(db_location, True, latitude=latitude, longitude=longitude)
-        return db_location
-
-    def construct_location_category(self, location_id, category_name):
-        c = self.construct_category(name=category_name)
-        rc = ResourceCategory(resource_id=location_id, category=c, type='location')
-        db.session.add(rc)
-        db.session.commit()
-        return c
-
     def test_location_basics(self):
         self.construct_location()
         r = db.session.query(Location).first()

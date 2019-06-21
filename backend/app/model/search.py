@@ -93,5 +93,3 @@ class Hit:
         self.highlights = highlights
         self.latitude = latitude
         self.longitude = longitude
-
-        print("Hit {}: {}, {}".format(result_id, latitude, longitude))

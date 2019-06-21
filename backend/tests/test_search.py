@@ -117,13 +117,13 @@ class TestSearch(BaseTest, unittest.TestCase):
         }
 
         # Add a location within the distance filter
-        location_near = TestLocations.construct_location(self, title='local unicorn', description="delivering rainbows within the orbit of Uranus", latitude=38.149595, longitude=-79.072557)
+        location_near = self.construct_location(title='local unicorn', description="delivering rainbows within the orbit of Uranus", latitude=38.149595, longitude=-79.072557)
 
         # Add a location beyond the distance filter
-        location_far = TestLocations.construct_location(self, title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", latitude=-38.149595, longitude=100.927443)
+        location_far = self.construct_location(title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", latitude=-38.149595, longitude=100.927443)
 
         # Add a location somewhere in between
-        location_mid = TestLocations.construct_location(self, title='middle unicorn', description="delivering rainbows somewhere in between", latitude=37.5246403, longitude=-77.5633015)
+        location_mid = self.construct_location(title='middle unicorn', description="delivering rainbows somewhere in between", latitude=37.5246403, longitude=-77.5633015)
 
         search_results = self.search(geo_query)
         self.assertEqual(3, len(search_results["hits"]))
