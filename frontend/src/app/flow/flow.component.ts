@@ -35,6 +35,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   activeStep = 0;
   flowState = FlowState;
   state = FlowState.LOADING;
+  startTime: number;
 
   sidebarOpen = true;
 
@@ -71,6 +72,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+     this.startTime = performance.now();
   }
 
   ngOnDestroy(): void {
@@ -201,6 +203,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   submit() {
     // force the correct participant id.
     this.model['participant_id'] = this.participant.id;
+    this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
     if (this.currentStep().questionnaire_id > 0) {
