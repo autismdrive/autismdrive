@@ -35,16 +35,20 @@ from app.model.questionnaires.professional_profile_questionnaire import Professi
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app import app, db, elastic_index
 from sqlalchemy import Sequence
+import os
 import csv
 import googlemaps
-from string import Template
 
 
 class DataLoader:
+    backend_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    default_dir = backend_path + "/example_data"
+
     "Loads CSV files into the database"
     file = "example_data/resources.csv"
 
-    def __init__(self, directory="./example_data"):
+    def __init__(self, directory=default_dir):
+
         self.category_file = directory + "/categories.csv"
         self.event_file = directory + "/events.csv"
         self.location_file = directory + "/locations.csv"
@@ -79,7 +83,7 @@ class DataLoader:
                               phone=row[14])
                 db.session.add(event)
                 db.session.commit()
-                self.__increment_id_sequence(Event)
+                self.__increment_id_sequence(StarResource)
 
                 for i in range(15, len(row)):
                     if row[i] and row[i] is not '':
@@ -123,7 +127,7 @@ class DataLoader:
                                     latitude=lat, longitude=lng)
                 db.session.add(location)
                 db.session.commit()
-                self.__increment_id_sequence(Location)
+                self.__increment_id_sequence(StarResource)
 
                 for i in range(18, len(row)):
                     if row[i] and row[i] is not '':

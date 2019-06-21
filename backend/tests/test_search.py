@@ -4,7 +4,6 @@ from flask import json
 from tests.base_test import BaseTest
 from app import elastic_index
 from app.model.resource_category import ResourceCategory
-from tests.test_locations import TestLocations
 
 
 class TestSearch(BaseTest, unittest.TestCase):
