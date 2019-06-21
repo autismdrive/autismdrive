@@ -28,14 +28,7 @@ mat-row:hover {
   background: mat-color($stardrive-accent, 100, 1.0);
 }
 
-.mat-column-id {
+.mat-column-id, .mat-column-role {
   flex: 0 0 100px;
 }
 
-.mat-column-role {
-  flex: 0 0 100px;
-}
-
-.mat-column-participants {
-  flex: 0 0 100px;
-}

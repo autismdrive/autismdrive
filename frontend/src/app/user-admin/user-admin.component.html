@@ -31,7 +31,7 @@
         mat-sort-header
       >ID</mat-header-cell>
       <mat-cell
-        class="name-cell"
+        class="id-cell"
         *matCellDef="let user"
       >{{user.id}}
       </mat-cell>
@@ -64,10 +64,9 @@
     <ng-container matColumnDef="participants">
       <mat-header-cell
         *matHeaderCellDef
-        mat-sort-header
       >Number of Participants</mat-header-cell>
       <mat-cell
-        class="email-cell"
+        class="participants-cell"
         *matCellDef="let user"
       >
         {{user.participants.length}}
