@@ -1,0 +1,93 @@
+<div class="userList">
+
+  <mat-form-field>
+    <input
+      matInput
+      placeholder="Search Users"
+      #input
+    >
+  </mat-form-field>
+
+  <div
+    class="spinner-container"
+    *ngIf="dataSource.loading$ | async"
+  >
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <mat-table
+    class="users-table mat-elevation-z8"
+    [dataSource]="dataSource"
+    matSort
+    matSortActive="email"
+    matSortDirection="asc"
+    matSortDisableClear
+  >
+
+
+    <ng-container matColumnDef="id">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >ID</mat-header-cell>
+      <mat-cell
+        class="id-cell"
+        *matCellDef="let user"
+      >{{user.id}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="role">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Role</mat-header-cell>
+      <mat-cell
+        class="role-cell"
+        *matCellDef="let user"
+      >{{user.role}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Email</mat-header-cell>
+      <mat-cell
+        class="email-cell"
+        *matCellDef="let user"
+      >{{user.email}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="participants">
+      <mat-header-cell
+        *matHeaderCellDef
+      >Number of Participants</mat-header-cell>
+      <mat-cell
+        class="participants-cell"
+        *matCellDef="let user"
+      >
+        {{user.participants.length}}
+      </mat-cell>
+    </ng-container>
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+    <mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      (click)="onRowClicked(row)"
+      id="user_row_{{row.id}}"
+    >
+    </mat-row>
+
+  </mat-table>
+
+  <mat-paginator
+    [length]="dataSource.count$ | async"
+    [pageSize]="default_page_size"
+    [pageSizeOptions]="[5, 10, 20]"
+  ></mat-paginator>
+</div>

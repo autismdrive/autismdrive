@@ -500,6 +500,12 @@ class UserSchema(ModelSchema):
     role = EnumField(Role)
 
 
+class UserSearchSchema(ma.Schema):
+    pages = fields.Integer()
+    total = fields.Integer()
+    items = ma.List(ma.Nested(UserSchema))
+
+
 class StepSchema(Schema):
     name = fields.Str()
     type = fields.Str()
