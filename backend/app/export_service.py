@@ -91,7 +91,7 @@ class ExportService:
                 continue
             export_info = ExportInfo(table_name=table.name, class_name= db_model.__name__)
             export_info.size=db.session.execute(db.select([func.count()]).select_from(table)).scalar(),
-            export_info.url=url_for("api.exportendpoint", name=db_model.__name__)
+            export_info.url=url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
             if hasattr(db_model, '__question_type__'):
                 export_info.type = db_model.__question_type__
             export_infos.append(export_info)

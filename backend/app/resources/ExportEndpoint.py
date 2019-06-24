@@ -13,6 +13,7 @@ class ExportEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
+        name = ExportService.camel_case_it(name)
         schema = ExportService.get_schema(name, many=True)
         return schema.dump(ExportService().get_data(name))
 
