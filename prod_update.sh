@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # Run the basic operations to update a production setup after a code change.
-# This script should be executed by a post_recieve git hook after completing
+# This script should be executed by a post_receive git hook after completing
 # a checkout.
 # --------------------------------------------------------------------------
 
 # Move the configuration file into place.
 mkdir -p ./backend/instance
 cp /home/ubuntu/star_config.py ./backend/instance/config.py
+cp /home/ubuntu/api-keys.ts ./frontend/src/api-keys.ts
 
 if [ "$1" == "prod" ]; then
     echo "Building for production."
