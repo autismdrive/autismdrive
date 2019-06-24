@@ -6,8 +6,8 @@ from dateutil.tz import tzutc
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import app, db, RestException, auth
-from app.excel_service import ExcelExport
 from app.export_service import ExportService
+from app.export_xls_service import ExportXlsService
 from app.model.user import Role
 from app.wrappers import requires_roles
 
@@ -23,16 +23,18 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, name, id):
+        name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
         if instance is None:
             raise RestException(RestException.NOT_FOUND)
-        schema = ExportService.get_questionnaire_schema(name)
+        schema = ExportService.get_schema(name)
         return schema.dump(instance)
 
     @auth.login_required
     def delete(self, name, id):
         try:
+            name = ExportService.camel_case_it(name)
             class_ref = ExportService.get_class(name)
             instance = db.session.query(class_ref).filter(class_ref.id == id).first()
             db.session.delete(instance)
@@ -44,9 +46,10 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def put(self, name, id):
+        name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
-        schema = ExportService.get_questionnaire_schema(name, session=db.session)
+        schema = ExportService.get_schema(name, session=db.session)
         request_data = request.get_json()
         updated, errors = schema.load(request_data, instance=instance)
 
@@ -63,8 +66,9 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
+        name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
-        schema = ExportService.get_questionnaire_schema(name, many=True)
+        schema = ExportService.get_schema(name, many=True)
         questionnaires = db.session.query(class_ref).all()
         return schema.dump(questionnaires)
 
@@ -72,6 +76,7 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
 class QuestionnaireListMetaEndpoint(flask_restful.Resource):
 
     def get(self, name):
+        name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         questionnaire = db.session.query(class_ref).first()
         meta = {"table": {}}
@@ -128,7 +133,9 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
+        name = ExportService.camel_case_it(name)
         if self.request_wants_json():
-            return ExportService.export_json(name=name, app=app)
+            schema = ExportService.get_schema(name, many=True)
+            return schema.dump(ExportService().get_data(name))
         else:
-            return ExcelExport.export_xls(name=name, app=app)
+            return ExportXlsService.export_xls(name=name, app=app)

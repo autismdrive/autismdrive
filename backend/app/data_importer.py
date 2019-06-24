@@ -81,7 +81,7 @@ class DataImporter:
     def pull_data_for_question(self, question_name, meta_data):
         data = self.__get_json(self.QUESTION_ENDPOINT + "/" + question_name + "/export")
         class_ref = ExportService.get_class(question_name)
-        schema = ExportService.get_questionnaire_schema(question_name, session=self.db.session)
+        schema = ExportService.get_schema(question_name, session=self.db.session)
         for record in data:
             self.save_data(question_name, record)
 

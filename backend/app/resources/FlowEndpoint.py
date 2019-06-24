@@ -110,6 +110,7 @@ class FlowListEndpoint(flask_restful.Resource):
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
 
     def get(self, flow, questionnaire_name):
+        questionnaire_name = ExportService.camel_case_it(questionnaire_name)
         flow = Flows.get_flow_by_name(flow)
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
@@ -130,7 +131,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.NOT_IN_THE_FLOW)
         request_data = request.get_json()
         request_data["user_id"] = g.user.id
-        schema = ExportService.get_questionnaire_schema(questionnaire_name)
+        schema = ExportService.get_schema(ExportService.camel_case_it(questionnaire_name))
         new_quest, errors = schema.load(request_data, session=db.session)
 
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)

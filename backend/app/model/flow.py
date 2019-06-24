@@ -37,6 +37,6 @@ class Flow:
 
     def add_step(self, questionnaireName):
         if not self.has_step(questionnaireName):
-            q = ExportService.get_class(questionnaireName)()
+            q = ExportService.get_class(ExportService.camel_case_it(questionnaireName))()
             step = Step(questionnaireName, q.__question_type__, q.__label__)
             self.steps.append(step)

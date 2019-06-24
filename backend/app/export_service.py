@@ -33,12 +33,6 @@ class ExportService:
                 return c
 
     @staticmethod
-    def get_questionnaire_schema(name, many=False, session=None):
-        module_name = ExportService.QUESTION_PACKAGE + "." + name
-        schema_name = ExportService.camel_case_it(name) + "Schema"
-        return ExportService.str_to_class(module_name, schema_name)(many=many, session=session)
-
-    @staticmethod
     def get_schema(name, many=False, session=None):
         model = ExportService.get_class(name)
         class_name = model.__name__
