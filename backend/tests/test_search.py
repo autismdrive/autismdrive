@@ -102,6 +102,58 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results["hits"]))
 
+    def test_search_location_by_geo_point(self):
+        elastic_index.clear()
+        geo_query = {
+            'words': 'rainbows',
+            'sort': {
+                'field': 'geo_point',
+                'latitude': 38.065229,
+                'longitude': -79.079076,
+                'order': 'asc',
+                'unit': 'mi'
+            }
+        }
+
+        # Add a location within the distance filter
+        location_near = self.construct_location(title='local unicorn', description="delivering rainbows within the orbit of Uranus", latitude=38.149595, longitude=-79.072557)
+
+        # Add a location beyond the distance filter
+        location_far = self.construct_location(title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", latitude=-38.149595, longitude=100.927443)
+
+        # Add a location somewhere in between
+        location_mid = self.construct_location(title='middle unicorn', description="delivering rainbows somewhere in between", latitude=37.5246403, longitude=-77.5633015)
+
+        search_results = self.search(geo_query)
+        self.assertEqual(3, len(search_results["hits"]))
+        self.assertIsNotNone(search_results['hits'][0]['latitude'])
+        self.assertIsNotNone(search_results['hits'][0]['longitude'])
+        self.assertEqual(search_results['hits'][0]['title'], location_near.title)
+        self.assertEqual(search_results['hits'][1]['title'], location_mid.title)
+        self.assertEqual(search_results['hits'][2]['title'], location_far.title)
+
+        # Reverse the sort order
+        geo_query['sort']['order'] = 'desc'
+        search_results = self.search(geo_query)
+        self.assertEqual(3, len(search_results["hits"]))
+        self.assertIsNotNone(search_results['hits'][0]['latitude'])
+        self.assertIsNotNone(search_results['hits'][0]['longitude'])
+        self.assertEqual(search_results['hits'][0]['title'], location_far.title)
+        self.assertEqual(search_results['hits'][1]['title'], location_mid.title)
+        self.assertEqual(search_results['hits'][2]['title'], location_near.title)
+
+        # Change which point is closest
+        geo_query['sort']['latitude'] = location_mid.latitude
+        geo_query['sort']['longitude'] = location_mid.longitude
+        geo_query['sort']['order'] = 'asc'
+        search_results = self.search(geo_query)
+        self.assertEqual(3, len(search_results["hits"]))
+        self.assertIsNotNone(search_results['hits'][0]['latitude'])
+        self.assertIsNotNone(search_results['hits'][0]['longitude'])
+        self.assertEqual(search_results['hits'][0]['title'], location_mid.title)
+        self.assertEqual(search_results['hits'][1]['title'], location_near.title)
+        self.assertEqual(search_results['hits'][2]['title'], location_far.title)
+
     def test_modify_resource_search_basics(self):
         elastic_index.clear()
         rainbow_query = {'words': 'rainbows', 'filters': []}

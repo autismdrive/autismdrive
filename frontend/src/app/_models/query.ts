@@ -5,7 +5,10 @@ export class Query {
   total?: number;
   size = 20;
   start = 0;
-  sort = '_score';
+  sort: Sort = {
+    field: '_score',
+    order: 'asc'
+  };
   hits?: Array<Hit>;
 
   constructor(private _props) {
@@ -27,6 +30,13 @@ export class Query {
   }
 }
 
+export enum HitType {
+  LOCATION = 'LOCATION',
+  RESOURCE = 'RESOURCE',
+  STUDY = 'STUDY',
+  EVENT = 'EVENT'
+}
+
 export enum HitLabel {
   LOCATION = 'Local Services',
   RESOURCE = 'Online Information',
@@ -44,6 +54,8 @@ export class Hit {
   last_updated: Date;
   highlights: string;
   url?: string;
+  latitude?: number;
+  longitude?: number;
 
   constructor(private _props) {
     for (const propName in this._props) {
@@ -57,6 +69,14 @@ export class Hit {
 export interface Filter {
   field: string;
   value: string[];
+}
+
+export interface Sort {
+  field: string;
+  order?: string;
+  unit?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Facet {
