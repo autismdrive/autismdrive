@@ -38,6 +38,7 @@ class Participant(db.Model):
     relationship = db.Column(db.Enum(Relationship))
     avatar_icon = db.Column(db.String)
     avatar_color = db.Column(db.String)
+    has_consented = db.Column(db.Boolean)
 
     def get_name(self):
         if self.identification:

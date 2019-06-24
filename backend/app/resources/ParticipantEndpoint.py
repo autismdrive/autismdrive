@@ -39,6 +39,7 @@ class ParticipantEndpoint(flask_restful.Resource):
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
+        db.session.commit()
         return self.schema.dump(updated)
 
 

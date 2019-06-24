@@ -12,6 +12,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {AuthenticationService} from '../_services/api/authentication-service';
 
 enum FlowState {
+  NO_CONSENT = 'no_consent',
   INTRO = 'intro',
   LOADING = 'loading',
   COMPLETE = 'complete',
@@ -83,7 +84,9 @@ export class FlowComponent implements OnInit, OnDestroy {
       .subscribe(f => {
         this.flow = new Flow(f);
         console.log('Flow Loaded:' + this.flow.name);
-        if (this.flow.percentComplete() === 0) {
+        if (!this.participant.has_consented) {
+          this.state = this.flowState.NO_CONSENT;
+        } else if (this.participant.has_consented && this.flow.percentComplete() === 0) {
           this.state = this.flowState.INTRO;
         } else {
           this.goToNextAvailableStep();
@@ -127,6 +130,13 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.state = FlowState.COMPLETE;
       this.scrollToTop();
     }
+  }
+
+  markConsentAndGoToFlow(participant: Participant) {
+    participant.has_consented = true;
+    this.api.updateParticipant(participant).subscribe(participant => {
+      this.loadFlow(this.flow.name);
+    });
   }
 
   goToStep(step: Step) {
