@@ -82,6 +82,7 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "last_updated",
             "participant_id",
             "user_id",
+            "time_on_task_ms",
             "dependent_living_situation",
             "dependent_living_other",
             "housemates",

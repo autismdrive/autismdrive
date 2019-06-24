@@ -52,6 +52,7 @@ class EducationSelfQuestionnaireSchema(ModelSchema):
             "last_updated",
             "participant_id",
             "user_id",
+            "time_on_task_ms",
             "attends_school",
             "school_name",
             "school_type",

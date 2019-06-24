@@ -95,6 +95,7 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "last_updated",
             "participant_id",
             "user_id",
+            "time_on_task_ms",
             "dependent_verbal_ability",
             "concerning_behaviors",
             "concerning_behaviors_other",

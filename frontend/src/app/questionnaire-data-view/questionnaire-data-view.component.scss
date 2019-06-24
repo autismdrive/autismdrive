@@ -1,3 +1,9 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
 
 mat-drawer-container {
   min-height: 100vh;
@@ -11,3 +17,8 @@ mat-drawer-content {
 .pad-2 {
   padding: 2em;
 }
+
+button {
+  margin: 2em;
+}
+

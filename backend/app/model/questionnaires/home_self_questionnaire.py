@@ -69,6 +69,7 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "last_updated",
             "participant_id",
             "user_id",
+            "time_on_task_ms",
             "self_living_situation",
             "self_living_other",
             "housemates",

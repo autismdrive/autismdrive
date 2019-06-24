@@ -36,6 +36,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   activeStep = 0;
   flowState = FlowState;
   state = FlowState.LOADING;
+  startTime: number;
 
   sidebarOpen = true;
 
@@ -180,6 +181,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
 
   private renderForm(step: Step, q_meta) {
+    this.startTime = performance.now();
     this.fields = this.infoToForm(q_meta);
     console.log('Model: ', this.model);
     console.log('Fields: ', this.fields);
@@ -211,6 +213,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   submit() {
     // force the correct participant id.
     this.model['participant_id'] = this.participant.id;
+    this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
     if (this.currentStep().questionnaire_id > 0) {
