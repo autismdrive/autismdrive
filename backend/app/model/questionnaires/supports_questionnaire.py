@@ -4,7 +4,7 @@ from dateutil.tz import tzutc
 from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
-from app import db
+from app import db, ma
 from app.export_service import ExportService
 from app.model.questionnaires.therapy import Therapy, TherapySchema
 from app.model.questionnaires.medication import Medication, MedicationSchema
@@ -198,8 +198,11 @@ class SupportsQuestionnaireSchema(ModelSchema):
         ordered = True
         include_fk = True
         fields = ("id", "last_updated", "time_on_task_ms", "participant_id", "user_id", "medications", "therapies",
-                  "assistive_devices", "alternative_augmentative")
+                  "assistive_devices", "alternative_augmentative", "_links")
     medications = fields.Nested(MedicationSchema, many=True)
     therapies = fields.Nested(TherapySchema, many=True)
     assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)
     alternative_augmentative = fields.Nested(AlternativeAugmentativeSchema, many=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.questionnaireendpoint', name='supports_questionnaire', id='<id>'),
+    })

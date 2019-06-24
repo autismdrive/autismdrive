@@ -169,5 +169,27 @@ class TestImportExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(0, len(db.session.query(IdentificationQuestionnaire).all()),
                          msg="Identifying Questionnaires should not import.")
 
-    def test_sensitive_questionnaires_are_removed(self):
-        self.assertFalse(True, msg="Please Implement me.")
+    def test_all_exports_have_links_to_self(self):
+        self.construct_all_questionnaires()
+        exports = ExportService.get_export_info()
+        for export in exports:
+            rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+            data = json.loads(rv.get_data(as_text=True))
+            for d in data:
+                self.assertTrue('_links' in d, msg="%s should have links in json." % export.class_name)
+                self.assertTrue('self' in d['_links'])
+                self.assert_success(self.app.get(d['_links']['self'], headers=self.logged_in_headers()))
+
+    def test_sensitive_records_returned_can_be_deleted(self):
+        self.construct_all_questionnaires()
+        exports = ExportService.get_export_info()
+        exports.reverse()  # Reverse the records
+        for export in exports:
+            rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+            data = json.loads(rv.get_data(as_text=True))
+            for d in data:
+                if export.question_type == ExportService.TYPE_SENSITIVE:
+                    del_rv = self.app.delete(d['_links']['self'], headers=self.logged_in_headers())
+                    self.assert_success(del_rv)

@@ -2,6 +2,7 @@ from marshmallow import fields
 from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelSchema
 
+from app import ma
 from app.model.participant import Participant, Relationship
 from app.model.user import User, Role
 
@@ -19,11 +20,14 @@ class UserExportSchema(ModelSchema):
     """ Used exclusively for data export, removes identifying information"""
     class Meta:
         model = User
-        fields = ('id', 'last_updated', 'role', 'email_verified', 'email')
+        fields = ('id', 'last_updated', 'role', 'email_verified', 'email', '_links')
         ordered = True
         include_fk = True
     role = EnumField(Role)
     email = fields.Method("obfuscate_email")
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.userendpoint', id='<id>'),
+    })
 
     def obfuscate_email(self, obj):
         return obj.id
@@ -33,7 +37,10 @@ class ParticipantExportSchema(ModelSchema):
     """ Used exclusively for data export, removes identifying information"""
     class Meta:
         model = Participant
-        fields = ('id', 'last_updated', 'user_id', 'relationship', 'avatar_icon', 'avatar_color')
+        fields = ('id', 'last_updated', 'user_id', 'relationship', 'avatar_icon', 'avatar_color', '_links')
         ordered = True
         include_fk = True
     relationship = EnumField(Relationship)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.participantendpoint', id='<id>'),
+    })

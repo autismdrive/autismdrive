@@ -18,6 +18,7 @@ class ExportService:
     TYPE_SENSITIVE = 'sensitive'
     TYPE_IDENTIFYING = 'identifying'
     TYPE_UNRESTRICTED = 'unrestricted'
+    TYPE_SUB_TABLE = 'sub-table'
 
     @staticmethod
     def get_class_for_table(table):
@@ -86,9 +87,15 @@ class ExportService:
         export_infos = []
         for table in db.metadata.sorted_tables:
             db_model = ExportService.get_class_for_table(table)
+
             # Never export Identifying information.
             if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_IDENTIFYING:
                 continue
+            # Do not include sub-tables that will fall through from quiestionnaire schemas
+            if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_SUB_TABLE:
+                continue
+
+
             export_info = ExportInfo(table_name=table.name, class_name= db_model.__name__)
             export_info.size=db.session.execute(db.select([func.count()]).select_from(table)).scalar(),
             export_info.url=url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))

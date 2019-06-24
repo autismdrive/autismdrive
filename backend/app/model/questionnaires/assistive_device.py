@@ -5,11 +5,13 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
+from app.export_service import ExportService
 
 
 class AssistiveDevice(db.Model):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
+    __question_type__ = ExportService.TYPE_SUB_TABLE
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     supports_questionnaire_id = db.Column(

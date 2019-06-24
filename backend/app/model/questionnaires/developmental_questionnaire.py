@@ -3,7 +3,7 @@ import datetime
 from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 
-from app import db
+from app import db, ma
 from app.export_service import ExportService
 
 
@@ -129,3 +129,6 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
         model = DevelopmentalQuestionnaire
         ordered = True
         include_fk = True
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.questionnaireendpoint', name='developmental_questionnaire', id='<id>'),
+    })
