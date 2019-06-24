@@ -8,7 +8,9 @@
 #hero {
   background-image: url('/assets/home/hero-parent-child.jpg');
 
-  h1 { color: white; }
+  h1 {
+    color: white;
+  }
 }
 
 .resources {
@@ -27,14 +29,11 @@
   }
 }
 
-agm-map { height: 400px; width: 100%; }
+agm-map {
+  height: 400px;
+  width: 100%;
+}
 
 .text-align-left {
   text-align: left;
-}
-
-agm-info-window {
-  a {
-    @include more-details-link;
-  }
 }

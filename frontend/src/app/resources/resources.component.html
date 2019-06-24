@@ -64,7 +64,8 @@
               <h4>{{hit.title}}</h4>
               <p>{{hit.description}}</p>
               <a
-                [routerLink]="['/' + hit.type + '/' + hit.id]"
+                class="chevron-link"
+                [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
                 routerLinkActive="router-link-active"
               >{{hit.type}} Details</a>
             </agm-info-window>

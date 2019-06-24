@@ -55,11 +55,6 @@
       color: mat-color($stardrive-primary, 500);
     }
   }
-
-  .mat-expansion-panel-body>a {
-    @include more-details-link;
-  }
-
 }
 
 mat-expansion-panel.accordion-link:hover mat-expansion-panel-header .accordion-icon mat-icon {
