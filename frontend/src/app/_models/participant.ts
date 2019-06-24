@@ -10,6 +10,7 @@ export class Participant {
   name?: string;
   avatar_color?: string;
   avatar_icon?: string;
+  has_consented: boolean;
 
   constructor(private _props) {
     for (const propName in this._props) {

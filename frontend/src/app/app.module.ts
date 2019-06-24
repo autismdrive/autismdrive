@@ -26,6 +26,7 @@ import {
   MatSelectModule,
   MatSidenavModule,
   MatSlideToggleModule,
+  MatSortModule,
   MatStepperModule,
   MatTableModule,
   MatToolbarModule,
@@ -42,6 +43,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
+import { PdfJsViewerModule } from 'ng2-pdfjs-viewer';
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
@@ -91,6 +93,8 @@ import { LocationDetailComponent } from './location-detail/location-detail.compo
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
 import { environment } from 'src/environments/environment';
+import { UserAdminComponent } from './user-admin/user-admin.component';
+import { UserAdminDetailsComponent } from './user-admin-details/user-admin-details.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -163,6 +167,8 @@ export class FormlyConfig {
     LocationDetailComponent,
     TypeIconComponent,
     HeroSlidesComponent,
+    UserAdminComponent,
+    UserAdminDetailsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({
@@ -199,11 +205,13 @@ export class FormlyConfig {
     MatSelectModule,
     MatSidenavModule,
     MatSlideToggleModule,
+    MatSortModule,
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,
     NgProgressModule,
+    PdfJsViewerModule,
     ReactiveFormsModule,
     RoutingModule,
   ],

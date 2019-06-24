@@ -10,6 +10,7 @@ import { Location } from '../../_models/location';
 import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
 import { User } from '../../_models/user';
+import { UserSearchResults } from '../../_models/user_search_results';
 import { environment } from '../../../environments/environment';
 
 @Injectable()
@@ -116,21 +117,14 @@ export class ApiService {
 
   /** updateParticipant */
   updateParticipant(participant: Participant): Observable<Participant> {
-    const url = this
-      ._endpointUrl('participantbysession');
-    return this.httpClient.post<Participant>(url, participant)
-      .pipe(
-        map(participantJson => new Participant(participantJson)),
-        catchError(this._handleError));
+    return this.httpClient.put<Participant>(this._endpointUrl('participant').replace('<id>', participant.id.toString()), participant)
+      .pipe(catchError(this._handleError));
   }
-
 
   /** Get Participant */
   getParticipant(id: number): Observable<Participant> {
     return this.httpClient.get<Participant>(this._endpointUrl('participant').replace('<id>', id.toString()))
-      .pipe(
-        map(participantJson => new Participant(participantJson)),
-        catchError(this._handleError));
+      .pipe(catchError(this._handleError));
   }
 
   /** getFlow */
@@ -272,13 +266,26 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  // addUser
+  /** Get User */
+  getUser(id: number): Observable<User> {
+    return this.httpClient.get<User>(this._endpointUrl('user').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** addUser */
   addUser(user: User): Observable<User> {
     return this.httpClient.post<User>(this._endpointUrl('userlist'), user)
       .pipe(
         map(json => new User(json)),
         catchError(this._handleError));
   }
+
+  /** findUsers */
+  findUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0, pageSize = 3): Observable<UserSearchResults> {
+    const search_data = { filter: filter, sort: sort, sortOrder: sortOrder, pageNumber: String(pageNumber), pageSize: String(pageSize) };
+    return this.httpClient.get<UserSearchResults>(this._endpointUrl('userlist'), { params: search_data })
+      .pipe(catchError(this._handleError));
+}
 
   /** getQuestionnaireNames */
   getQuestionnaireNames() {

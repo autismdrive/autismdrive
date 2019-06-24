@@ -45,6 +45,7 @@ class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
             "last_updated",
             "participant_id",
             "user_id",
+            "time_on_task_ms",
             "self_verbal_ability",
             "has_academic_difficulties",
             "academic_difficulty_areas",

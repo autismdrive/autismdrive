@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { ParticipantRelationship } from '../_models/participantRelationship';
 
 @Component({
   selector: 'app-terms',
@@ -8,6 +9,12 @@ import { Router } from '@angular/router';
 })
 export class TermsComponent implements OnInit {
 
+  @Input()
+  relationship: ParticipantRelationship;
+
+  @Output()
+  next: EventEmitter<any> = new EventEmitter();
+
   constructor(
     private router: Router
   ) { }
@@ -15,13 +22,12 @@ export class TermsComponent implements OnInit {
   ngOnInit() {
   }
 
-  goHome($event) {
+  goProfile($event) {
     $event.preventDefault();
-    this.router.navigate(['home']);
+    this.router.navigate(['profile']);
   }
 
-  goRegister($event) {
-    $event.preventDefault();
-    this.router.navigate(['register']);
+  continue() {
+    this.next.emit();
   }
 }
