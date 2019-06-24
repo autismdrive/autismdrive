@@ -1,8 +1,8 @@
 import { LatLngLiteral } from '@agm/core';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HitLabel, HitType, Query } from '../_models/query';
-import { ApiService } from '../_services/api/api.service';
 import { SearchService } from '../_services/api/search.service';
+import { AccordionItem } from '../_models/accordion-item';
 
 interface ResourceType {
   name: string;
@@ -22,7 +22,31 @@ export class ResourcesComponent implements OnInit, OnDestroy {
   resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
     return {name: HitType[t], label: HitLabel[t] };
   });
-  query: Query;
+
+  resourceGatherers: AccordionItem[] = [
+    {
+      name: 'Charlottesville Region Autism Action Group',
+      shortName: 'CRAAG',
+      description: `
+        CRAAG is a parent-run advocacy group, one of three active all-volunteer regional Autism Action Groups
+        initiated by Commonwealth Autism. Established in 2010, it serves Charlottesville, Albemarle, Greene,
+        Fluvanna, Louisa, and Nelson counties.
+      `,
+      url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
+    },
+    {
+      name: 'UVA Supporting Transformative Autism Research',
+      shortName: 'UVA STAR',
+      description: `
+        The STAR initiative, led by the Curry School in partnership with colleagues across the University,
+        aims to improve the lives of individuals with autism through groundbreaking research and innovative
+        models for intervention and training.
+      `,
+      url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star',
+    }
+  ];
+  locQuery: Query;
+  recentQuery: Query;
   mapLoc: LatLngLiteral;
   loading = true;
 
@@ -32,17 +56,19 @@ export class ResourcesComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    private api: ApiService,
-    private searchService: SearchService
+    private locSearchService: SearchService,
+    private recentSearchService: SearchService
   ) {
-    this.loadMapLocation(() => this.loadResources());
+    this.loadMapLocation(() => this.loadLocResources());
+    this.loadRecentResources();
   }
 
   ngOnInit() {
   }
 
   ngOnDestroy(): void {
-    this.searchService.reset();
+    this.locSearchService.reset();
+    this.recentSearchService.reset();
   }
 
   loadMapLocation(callback: Function) {
@@ -59,12 +85,30 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadResources() {
+  loadRecentResources() {
     this.loading = true;
 
-    this.query = new Query({filters: [{field: 'Type', value: HitLabel.LOCATION}]});
+    this.recentQuery = new Query({sort: {
+      field: 'last_updated',
+      order: 'desc'
+    }});
+
+    this.recentSearchService
+      .search(this.recentQuery)
+      .subscribe(queryWithResults => {
+        if (this.recentQuery.equals(queryWithResults)) {
+          this.recentQuery = queryWithResults;
+          this.loading = false;
+        }
+      });
+  }
+
+  loadLocResources() {
+    this.loading = true;
+
+    this.locQuery = new Query({filters: [{field: 'Type', value: HitLabel.LOCATION}]});
     if (this.mapLoc) {
-      this.query.sort = {
+      this.locQuery.sort = {
         field: 'geo_point',
         latitude: this.mapLoc.lat,
         longitude: this.mapLoc.lng,
@@ -73,11 +117,11 @@ export class ResourcesComponent implements OnInit, OnDestroy {
       };
     }
 
-    this.searchService
-      .search(this.query)
+    this.locSearchService
+      .search(this.locQuery)
       .subscribe(queryWithResults => {
-        if (this.query.equals(queryWithResults)) {
-          this.query = queryWithResults;
+        if (this.locQuery.equals(queryWithResults)) {
+          this.locQuery = queryWithResults;
           this.loading = false;
         }
       });
@@ -126,8 +170,8 @@ export class ResourcesComponent implements OnInit, OnDestroy {
   }
 
   addMapResources(map: google.maps.Map) {
-    if (this.query) {
-      console.log(this.query.hits);
+    if (this.locQuery) {
+      console.log(this.locQuery.hits);
     }
   }
 }

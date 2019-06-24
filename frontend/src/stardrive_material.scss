@@ -98,6 +98,7 @@ $header-height: ($uva-header-height + $site-header-height);
     justify-content: center;
     justify-items: center;
     grid-template-columns: 1fr;
+
     .row {
       margin-top: 4em;
       margin-bottom: 4em;
@@ -254,7 +255,8 @@ $header-height: ($uva-header-height + $site-header-height);
     pointer-events: none;
   }
 
-  #hero, .hero-slide {
+  #hero,
+  .hero-slide {
     background-size: cover;
     height: 400px;
 
@@ -278,63 +280,136 @@ $header-height: ($uva-header-height + $site-header-height);
       }
     }
 
-    .border-box-tile {
-      display: grid;
+    &.container {
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
+      justify-content: start;
+    }
+  }
+
+  .border-box-tile {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    color: mat-color($stardrive-primary, 500);
+
+    .border-box-tile-inner {
       padding: 2.4375rem;
-      margin: 0;
-      background-color: rgba(255, 255, 255, 0.8);
-      text-align: center;
-      color: mat-color($stardrive-primary, 500);
+
+      &:hover {
+        &:before {
+          opacity: 0;
+        }
+
+        &:after {
+          opacity: 1;
+        }
+      }
+
+      &:before,
+      &:after {
+        content: '';
+        pointer-events: none;
+        transition: opacity 0.5s;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+      }
+
+      &:before {
+        border: 11px solid #dadada;
+        border-image: linear-gradient(to bottom, #dadada 0%, #f1f1ef 100%);
+        border-image-slice: 1;
+        opacity: 1;
+      }
+
+      &:after {
+        border: 11px solid #002f6c;
+        border-image: linear-gradient(#002f6c 0%, #e57200 100%);
+        border-image-slice: 1;
+        opacity: 0;
+      }
+    }
+
+    .icofont-1x {
+      color: #e57200;
+      transition: margin-left 0.5s;
+    }
+
+    &:hover .icofont-1x {
+      margin-left: 10px;
+    }
+
+    .border-box-tile-label {
+      @include mat-typography-level-to-styles($custom-typography, title);
+      margin-top: 1em;
+      margin-bottom: 1em;
       font-weight: 700;
       font-size: 1.25rem;
       font-style: italic;
       text-transform: uppercase;
       letter-spacing: 1.8px;
-
-      .border-box-tile-inner {
-        &:hover {
-          &:before { opacity: 0; }
-          &:after { opacity: 1; }
-        }
-
-        &:before, &:after {
-          content: '';
-          pointer-events: none;
-          transition: opacity 0.5s;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          margin: 0;
-        }
-
-        &:before {
-          border: 11px solid #dadada;
-          border-image: linear-gradient(to bottom,#dadada 0%,#f1f1ef 100%);
-          border-image-slice: 1;
-          opacity: 1;
-        }
-
-        &:after {
-          border: 11px solid #002f6c;
-          border-image: linear-gradient(#002f6c 0%,#e57200 100%);
-          border-image-slice: 1;
-          opacity: 0;
-        }
-      }
     }
 
-    &.container {
-      align-items: center;
-      justify-content: start;
+    .border-box-tile-description {
+      margin-top: 1em;
+      margin-bottom: 1em;
     }
+
+  }
+}
+
+@mixin border-dots {
+  background-image: url('/assets/theme/orange-dotted-border-x.png');
+  background-repeat: repeat-x;
+  width: 100%;
+  height: 4px;
+  display: block;
+  position: absolute;
+  left: 0;
+}
+
+@mixin bottom-border-dots {
+  &:after {
+    @include border-dots;
+    content: '';
+    bottom: -2em;
+  }
+}
+
+@mixin top-border-dots {
+  &:before {
+    @include border-dots;
+    content: '';
+    top: -2em;
+  }
+}
+
+@mixin more-details-link {
+  @include mat-typography-level-to-styles($custom-typography, title);
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: mat-color($stardrive-primary, 500);
+  transition: all 0.5s ease-in-out;
+
+  &:hover {
+    text-decoration: none;
+    text-indent: 1em;
   }
 }
 

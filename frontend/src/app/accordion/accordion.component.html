@@ -1,0 +1,23 @@
+<mat-expansion-panel
+  *ngIf="item"
+  hideToggle
+  (opened)="item.expanded = true"
+  (closed)="item.expanded = false"
+  [class.mat-elevation-z0]="true"
+  [ngClass]="{'accordion-link': true}"
+>
+  <mat-expansion-panel-header>
+    <div class="accordion-icon">
+        <mat-icon *ngIf="!item.expanded">add</mat-icon>
+        <mat-icon *ngIf="item.expanded">remove</mat-icon>
+    </div>
+    <mat-panel-title [ngClass]="{'mat-title': true}">
+      {{item.name}}
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <p>{{item.description}}</p>
+  <a [routerLink]="[ item.url ]">
+    <i class="icofont-circled-right icofont-1x"></i>
+    Visit {{item.shortName }} website
+  </a>
+</mat-expansion-panel>

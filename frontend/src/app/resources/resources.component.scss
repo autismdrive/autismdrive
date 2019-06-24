@@ -1,3 +1,10 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
 #hero {
   background-image: url('/assets/home/hero-parent-child.jpg');
 
@@ -12,7 +19,7 @@
 
     &:after {
       content: '';
-      background-color: #e57200;
+      background-color: mat-color($stardrive-accent, 500);
       width: 6.25rem;
       height: .125rem;
       display: block;
@@ -20,19 +27,14 @@
   }
 }
 
-agm-map { height: 300px; }
-.border-box-tile {
-  .icofont-1x {
-    color: #e57200;
-    transition: margin-left 0.5s;
-  }
+agm-map { height: 400px; width: 100%; }
 
-  &:hover .icofont-1x {
-    margin-left: 10px;
-  }
+.text-align-left {
+  text-align: left;
+}
 
-  .resource-type-label {
-    margin-top: 1em;
-    margin-bottom: 1em;
+agm-info-window {
+  a {
+    @include more-details-link;
   }
 }

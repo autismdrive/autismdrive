@@ -9,11 +9,9 @@ import { ParticipantRelationship } from '../_models/participantRelationship';
 })
 export class TermsComponent implements OnInit {
 
-  @Input()
-  relationship: ParticipantRelationship;
+  @Input() relationship: ParticipantRelationship;
 
-  @Output()
-  next: EventEmitter<any> = new EventEmitter();
+  @Output() next: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private router: Router

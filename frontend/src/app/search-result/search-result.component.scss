@@ -9,17 +9,7 @@
   margin-top: 2em;
   position: relative;
 
-  &:after {
-    content: '';
-    background-image: url('/assets/theme/orange-dotted-border-x.png');
-    background-repeat: repeat-x;
-    width: 100%;
-    height: 4px;
-    display: block;
-    position: absolute;
-    top: -2em;
-    left: 0;
-  }
+  @include top-border-dots;
 
   .title {
     margin: 0px;
