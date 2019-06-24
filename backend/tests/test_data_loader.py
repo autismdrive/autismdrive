@@ -1,27 +1,13 @@
+import math
 import unittest
 
-from tests.base_test import BaseTest
-from app import app, db, data_loader, elastic_index
+from app import db, data_loader, elastic_index
 from app.model.category import Category
-from app.model.search import Search, Filter
-from app.model.email_log import EmailLog
-from app.model.investigator import Investigator
-from app.model.organization import Organization
+from app.model.event import Event
+from app.model.location import Location
 from app.model.participant import Participant
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.assistive_device import AssistiveDevice
-from app.model.questionnaires.housemate import Housemate
-from app.model.questionnaires.medication import Medication
-from app.model.questionnaires.therapy import Therapy
-from app.model.event import Event
-from app.model.location import Location
-from app.model.resource import StarResource
-from app.model.resource_category import ResourceCategory
-from app.model.step_log import StepLog
-from app.model.study import Study, Status
-from app.model.study_category import StudyCategory
-from app.model.study_investigator import StudyInvestigator
-from app.model.user import User
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -35,11 +21,19 @@ from app.model.questionnaires.evaluation_history_dependent_questionnaire import 
 from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
 from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
 from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
+from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
-import os
-import math
+from app.model.questionnaires.therapy import Therapy
+from app.model.resource import StarResource
+from app.model.resource_category import ResourceCategory
+from app.model.search import Search, Filter
+from app.model.study import Study
+from app.model.study_category import StudyCategory
+from app.model.user import User
+from tests.base_test import BaseTest
 
 
 class TestDataLoader(BaseTest, unittest.TestCase):
@@ -96,7 +90,8 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(ContactQuestionnaire, 'load_contact_questionnaire')
 
     def test_load_current_behaviors_questionnaires(self):
-        self._load_and_assert_success(CurrentBehaviorsDependentQuestionnaire, 'load_current_behaviors_questionnaires', CurrentBehaviorsSelfQuestionnaire)
+        self._load_and_assert_success(CurrentBehaviorsDependentQuestionnaire, 'load_current_behaviors_questionnaires',
+                                      CurrentBehaviorsSelfQuestionnaire)
 
     # DemographicsQuestionnaire depends on Users
     def test_load_demographics_questionnaire(self):
@@ -107,13 +102,15 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(DevelopmentalQuestionnaire, 'load_developmental_questionnaire')
 
     def test_load_education_questionnaires(self):
-        self._load_and_assert_success(EducationDependentQuestionnaire, 'load_education_questionnaires', EducationSelfQuestionnaire)
+        self._load_and_assert_success(EducationDependentQuestionnaire, 'load_education_questionnaires',
+                                      EducationSelfQuestionnaire)
 
     def test_load_employment_questionnaire(self):
         self._load_and_assert_success(EmploymentQuestionnaire, 'load_employment_questionnaire')
 
     def test_load_evaluation_history_questionnaires(self):
-        self._load_and_assert_success(EvaluationHistoryDependentQuestionnaire, 'load_evaluation_history_questionnaires', EvaluationHistorySelfQuestionnaire)
+        self._load_and_assert_success(EvaluationHistoryDependentQuestionnaire, 'load_evaluation_history_questionnaires',
+                                      EvaluationHistorySelfQuestionnaire)
 
     def test_load_home_questionnaires(self):
         self._load_and_assert_success(HomeDependentQuestionnaire, 'load_home_questionnaires', HomeSelfQuestionnaire)
@@ -185,5 +182,3 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self.assertEqual(num_db_events, es_events.hits.total)
         self.assertEqual(num_db_locations, es_locations.hits.total)
         self.assertEqual(num_db_studies, es_studies.hits.total)
-
-
