@@ -4,14 +4,21 @@
   <div>
     <div
       fxLayout="row"
+      fxLayoutAlign="auto center"
     >
       <h1>
-        <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+        <button
+          mat-fab
+          color="primary"
+          (click)="sidenav.toggle()"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
       </h1>
       <button
-        fxLayoutAlign="center end"
-        mat-button
+        mat-flat-button
         (click)="exportAll()"
+        color="accent"
       >
         Export All
       </button>
