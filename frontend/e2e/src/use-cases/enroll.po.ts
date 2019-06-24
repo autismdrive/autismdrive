@@ -40,6 +40,19 @@ export class EnrollUseCases {
     this.page.clickAndExpectRoute('#cancel-button', '/profile');
   }
 
+  displayGuardianTerms() {
+    expect(this.page.getElements('app-terms').count()).toEqual(1);
+    expect(this.page.getElements('#guardian-terms').count()).toEqual(1);
+    expect(this.page.getElements('#agree-button').count()).toEqual(1);
+    expect(this.page.getElements('#cancel-button').count()).toEqual(1);
+  }
+
+  acceptTerms() {
+    expect(this.page.getElements('#agree-button').count()).toEqual(1);
+    this.page.clickElement('#agree-button');
+    expect(this.page.getElements('app-flow-intro').count()).toEqual(1);
+  }
+
   displayInstructions() {
     expect(this.page.getElements('app-flow-intro').count()).toEqual(1);
     expect(this.page.getElements('#instructions').count()).toEqual(1);

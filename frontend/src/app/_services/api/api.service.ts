@@ -117,21 +117,14 @@ export class ApiService {
 
   /** updateParticipant */
   updateParticipant(participant: Participant): Observable<Participant> {
-    const url = this
-      ._endpointUrl('participantbysession');
-    return this.httpClient.post<Participant>(url, participant)
-      .pipe(
-        map(participantJson => new Participant(participantJson)),
-        catchError(this._handleError));
+    return this.httpClient.put<Participant>(this._endpointUrl('participant').replace('<id>', participant.id.toString()), participant)
+      .pipe(catchError(this._handleError));
   }
-
 
   /** Get Participant */
   getParticipant(id: number): Observable<Participant> {
     return this.httpClient.get<Participant>(this._endpointUrl('participant').replace('<id>', id.toString()))
-      .pipe(
-        map(participantJson => new Participant(participantJson)),
-        catchError(this._handleError));
+      .pipe(catchError(this._handleError));
   }
 
   /** getFlow */
