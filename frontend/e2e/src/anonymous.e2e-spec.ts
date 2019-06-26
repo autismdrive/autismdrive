@@ -31,12 +31,14 @@ describe('Anonymous User', () => {
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Search
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location');
   it('should sort by last date updated');
 
   // Login & Register
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should display login form', () => loginUseCases.displayLoginForm());
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
   it('should display register form', () => loginUseCases.displayRegisterForm());

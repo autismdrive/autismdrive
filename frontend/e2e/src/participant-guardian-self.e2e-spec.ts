@@ -50,12 +50,14 @@ describe('Participant (Guardian - Self)', () => {
   it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
 
   // Search
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location');
   it('should sort by last date updated');
 
   // Profile
+  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
   it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
