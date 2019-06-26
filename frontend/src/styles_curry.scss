@@ -2048,6 +2048,11 @@ div.more {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  transition: margin-left 0.5s;
+
+  &:hover {
+    margin-left: 0.5em;
+  }
 
   &:before {
     content: '';

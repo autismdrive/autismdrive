@@ -50,9 +50,39 @@ class Filter:
         self.value = value
 
 
+class Sort:
+    field = ""
+    latitude = None
+    longitude = None
+    order = "asc"
+    unit = "mi"
+
+    def __init__(self, field, latitude, longitude, order, unit):
+        self.field = field
+        self.latitude = latitude
+        self.longitude = longitude
+        self.order = order
+        self.unit = unit
+
+    def translate(self):
+        if None not in (self.latitude, self.latitude):
+            return {
+                '_geo_distance': {
+                    self.field: {
+                        'lat': self.latitude,
+                        'lon': self.longitude
+                    },
+                    'order': self.order,
+                    'unit': self.unit
+                }
+            }
+        else:
+            return {self.field: {'order': self.order}}
+
+
 class Hit:
 
-    def __init__(self, result_id, content, description, title, doc_type, label, last_updated, highlights):
+    def __init__(self, result_id, content, description, title, doc_type, label, last_updated, highlights, latitude, longitude):
         self.id = result_id
         self.content = content
         self.description = description
@@ -61,3 +91,5 @@ class Hit:
         self.label = label
         self.last_updated = last_updated
         self.highlights = highlights
+        self.latitude = latitude
+        self.longitude = longitude

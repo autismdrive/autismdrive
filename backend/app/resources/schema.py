@@ -13,7 +13,7 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
-from app.model.search import Filter, Search
+from app.model.search import Filter, Search, Sort
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -293,7 +293,7 @@ class LocationSchema(ModelSchema):
         model = Location
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'organization', 'resource_categories', '_links')
+                  'organization', 'resource_categories', 'latitude', 'longitude', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -455,6 +455,19 @@ class SearchSchema(ma.Schema):
         label = fields.Str()
         last_updated = fields.Date()
         highlights = fields.Str()
+        latitude = fields.Float()
+        longitude = fields.Float()
+
+    class SortSchema(ma.Schema):
+        field = fields.Str()
+        latitude = fields.Float(missing=None)
+        longitude = fields.Float(missing=None)
+        order = fields.Str(missing='asc')
+        unit = fields.Str(missing='mi')
+
+        @post_load
+        def make_sort(self, data):
+            return Sort(**data)
 
     class FilterSchema(ma.Schema):
         field = fields.Str()
@@ -477,7 +490,7 @@ class SearchSchema(ma.Schema):
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
-    sort = fields.Str()
+    sort = ma.Nested(SortSchema)
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)

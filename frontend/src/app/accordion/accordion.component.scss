@@ -1,0 +1,64 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
+::ng-deep mat-expansion-panel.accordion-link {
+
+  mat-expansion-panel-header .mat-content {
+    display: grid;
+    grid-template-areas: "icon title";
+    grid-template-columns: 2rem auto;
+    align-items: center;
+    position: relative;
+
+    &:after {
+      @include border-dots;
+      content: '';
+      bottom: 0;
+      left: 42px;
+    }
+
+    &>.accordion-icon {
+      grid-area: icon;
+      width: 2rem;
+      height: 2rem;
+      align-self: center;
+      justify-self: center;
+      display: grid;
+      align-items: center;
+      justify-items: center;
+
+      mat-icon {
+        color: white;
+        background-color: mat-color($stardrive-accent, 500);
+        transition: all 0.3s ease-in-out;
+        border-width: 0px;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: mat-color($stardrive-accent, 500);
+        align-self: center;
+      }
+    }
+
+    &>mat-panel-title.mat-title {
+      grid-area: title;
+      align-self: center;
+      justify-self: start;
+      display: grid;
+      align-items: center;
+      justify-items: start;
+      padding: 0.5rem;
+      margin: 0 0 0 0;
+      color: mat-color($stardrive-primary, 500);
+    }
+  }
+}
+
+mat-expansion-panel.accordion-link:hover mat-expansion-panel-header .accordion-icon mat-icon {
+  background-color: mat-color($stardrive-primary, 500);
+  border-color: mat-color($stardrive-primary, 500);
+  border-width: 4px;
+}
