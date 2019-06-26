@@ -16,6 +16,7 @@ class StepLog(db.Model):
     user_id = db.Column('user_id', db.Integer, db.ForeignKey('stardrive_user.id'))
     date_completed = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     time_on_task_ms = db.Column(db.BigInteger)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
 
 
 class StepLogSchema(ModelSchema):

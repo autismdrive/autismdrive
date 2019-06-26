@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from flask import json
@@ -12,7 +13,7 @@ from tests.base_test import clean_db
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
-class TestImportExportCase(BaseTestQuestionnaire, unittest.TestCase):
+class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_get_list_of_exportables_requires_admin(self):
         rv = self.app.get('/api/export')
@@ -184,7 +185,6 @@ class TestImportExportCase(BaseTestQuestionnaire, unittest.TestCase):
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
         exports = ExportService.get_export_info()
-        exports.reverse()  # Reverse the records
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -193,3 +193,22 @@ class TestImportExportCase(BaseTestQuestionnaire, unittest.TestCase):
                 if export.question_type == ExportService.TYPE_SENSITIVE:
                     del_rv = self.app.delete(d['_links']['self'], headers=self.logged_in_headers())
                     self.assert_success(del_rv)
+
+    def toDate(dateString):
+        return datetime.datetime.strptime(dateString, "%Y-%m-%d").date()
+
+    def test_retrieve_records_later_than(self):
+        self.construct_all_questionnaires()
+#        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
+
+        date = datetime.datetime.now()
+        exports = ExportService.get_export_info()
+        params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
+        for export in exports:
+            rv = self.app.get(export.url + params, follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+            data = json.loads(rv.get_data(as_text=True))
+            self.assertEquals(0, len(data), msg=export.url + " does not respect 'after' param in get request.")
+
+
+

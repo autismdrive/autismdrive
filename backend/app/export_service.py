@@ -1,4 +1,4 @@
-
+import datetime
 import importlib
 import re
 
@@ -19,6 +19,8 @@ class ExportService:
     TYPE_IDENTIFYING = 'identifying'
     TYPE_UNRESTRICTED = 'unrestricted'
     TYPE_SUB_TABLE = 'sub-table'
+
+    DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
     @staticmethod
     def get_class_for_table(table):
@@ -65,11 +67,10 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name):
+    def get_data(name, last_modifed_after):
         print("Exporting " + name)
         model = ExportService.get_class(name)
-        # Query on the table, don't pass this through the model class at all.
-        query = db.session.query(model)
+        query = db.session.query(model).filter(model.last_updated > last_modifed_after)
         return query.all()
 
     @staticmethod
@@ -94,7 +95,6 @@ class ExportService:
             # Do not include sub-tables that will fall through from quiestionnaire schemas
             if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_SUB_TABLE:
                 continue
-
 
             export_info = ExportInfo(table_name=table.name, class_name= db_model.__name__)
             export_info.size=db.session.execute(db.select([func.count()]).select_from(table)).scalar(),
