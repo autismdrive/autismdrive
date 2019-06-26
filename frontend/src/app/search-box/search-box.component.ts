@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { MatInput } from '@angular/material';
+import { MatInput } from '@angular/material/input';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SearchService } from '../_services/api/search.service';
 import { debounce } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { timer } from 'rxjs';
   styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit {
-  @ViewChild('searchInput', { read: MatInput }) public searchInput: MatInput;
+  @ViewChild('searchInput', { read: MatInput, static: false }) public searchInput: MatInput;
   words = '';
   queryParams: Params;
   @Input() variant: string;

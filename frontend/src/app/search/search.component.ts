@@ -1,17 +1,18 @@
+import { LatLngLiteral } from '@agm/core';
+import { MediaMatcher } from '@angular/cdk/layout';
 import {
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
   Renderer2,
-  ViewChild,
-  ChangeDetectorRef
+  ViewChild
 } from '@angular/core';
-import { MatPaginator, MatSidenav } from '@angular/material';
-import { ActivatedRoute, Router, Params, ParamMap } from '@angular/router';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSidenav } from '@angular/material/sidenav';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
-import { MediaMatcher } from '@angular/cdk/layout';
-import { LatLngLiteral } from '@agm/core';
 
 @Component({
   selector: 'app-search',
@@ -32,8 +33,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
 
-  @ViewChild('sidenav') public sideNav: MatSidenav;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild('sidenav', {static: false}) public sideNav: MatSidenav;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
 
   constructor(
     changeDetectorRef: ChangeDetectorRef,

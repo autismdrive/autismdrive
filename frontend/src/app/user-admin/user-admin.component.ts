@@ -1,7 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { UserDataSource } from '../_models/user_data_source';
 import { ApiService } from '../_services/api/api.service';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { merge } from 'rxjs/internal/observable/merge';
 import { fromEvent } from 'rxjs/internal/observable/fromEvent';
@@ -19,9 +20,9 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
   displayedColumns = ['id', 'role', 'email', 'participants'];
   default_page_size = 10;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild('input') input: ElementRef;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild('input', {static: false}) input: ElementRef;
 
   constructor(
     private api: ApiService,
