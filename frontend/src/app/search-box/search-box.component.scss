@@ -1,5 +1,4 @@
-#search-bar,
-#search-button {
+.search-bar {
   display: inline-flex;
 
   &.hidden {
@@ -10,7 +9,7 @@
   }
 }
 
-::ng-deep #search-bar {
+::ng-deep .search-bar {
   &.dark-bg {
     .mat-form-field-appearance-outline .mat-form-field-outline {
       color: white;

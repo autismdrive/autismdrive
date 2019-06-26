@@ -1,17 +1,20 @@
 import { AppPage } from './app-page.po';
 import { GlobalHeaderUseCases } from './use-cases/global-header.po';
 import { LoginUseCases } from './use-cases/login.po';
+import { SearchUseCases } from './use-cases/search.po';
 
 describe('Anonymous User', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
+  let searchUseCases: SearchUseCases;
   let randomEmail;
 
   beforeAll(() => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
+    searchUseCases = new SearchUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
     page.navigateToHome();
   });
@@ -25,7 +28,13 @@ describe('Anonymous User', () => {
   it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
   it('should visit enroll page', () => globalHeaderUseCases.visitEnrollPage());
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
-  it('should visit resources search page', () => globalHeaderUseCases.visitResourcesSearchPage());
+  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
+
+  // Search
+  it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should display selected filters', () => searchUseCases.displaySelectedFilters());
+  it('should sort results by distance from user location');
+  it('should sort by last date updated');
 
   // Login & Register
   it('should display login form', () => loginUseCases.displayLoginForm());

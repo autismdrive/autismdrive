@@ -8,5 +8,5 @@ import { FieldWrapper, FormlyTemplateOptions } from '@ngx-formly/core';
 })
 export class CardWrapperComponent extends FieldWrapper {
   @Input() to: FormlyTemplateOptions;
-  @ViewChild('fieldComponent', { read: ViewContainerRef, static: false }) fieldComponent: ViewContainerRef;
+  @ViewChild('fieldComponent', { read: ViewContainerRef, static: true }) fieldComponent: ViewContainerRef;
 }

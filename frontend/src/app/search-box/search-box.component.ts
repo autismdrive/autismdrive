@@ -49,10 +49,15 @@ export class SearchBoxComponent implements OnInit {
       this.words = '';
     }
 
+    console.log('this.searchInput', this.searchInput);
+
+
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
     const words: string = this.searchInput && this.searchInput.value || '';
     newParams.words = removeWords ? undefined : words;
     const hasFilters = Object.keys(newParams).length > 0;
+
+    console.log('newParams.words', newParams.words);
 
     if (hasFilters) {
       this.router.navigate(['/search/filter'], { queryParams: newParams });

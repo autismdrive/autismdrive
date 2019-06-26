@@ -33,8 +33,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
 
-  @ViewChild('sidenav', {static: false}) public sideNav: MatSidenav;
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(
     changeDetectorRef: ChangeDetectorRef,

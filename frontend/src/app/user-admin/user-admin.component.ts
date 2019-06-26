@@ -20,9 +20,9 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
   displayedColumns = ['id', 'role', 'email', 'participants'];
   default_page_size = 10;
 
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
-  @ViewChild('input', {static: false}) input: ElementRef;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild('input', {static: true}) input: ElementRef;
 
   constructor(
     private api: ApiService,
