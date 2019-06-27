@@ -47,10 +47,11 @@ eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
 
 # Copy the frontend config file into the proper place.
-eval 'cp /home/ubuntu/environment.${ENV}.ts ./frontend/src/environments/environment.${ENV}.ts'
+eval 'cp /home/ubuntu/environment.${ENV}.ts ${HOME_DIR}/frontend/src/environments/environment.${ENV}.ts'
 
 # Rebuild the front end.
 eval 'cd ${HOME_DIR}/frontend && npm install'
+
 if [ "$1" == "prod" ]; then
     eval 'cd ${HOME_DIR}/frontend && ng build --prod -c production'
 else
