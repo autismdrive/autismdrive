@@ -21,6 +21,7 @@
         <!--[src]="resource.image"-->
       <!--&gt;-->
       <!--<caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>-->
+      <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
       <div

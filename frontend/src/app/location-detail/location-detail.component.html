@@ -21,6 +21,7 @@
         <!--[src]="location.image"-->
       <!--&gt;-->
       <!--<caption *ngIf="location.image && location.imageCaption">{{location.imageCaption}}</caption>-->
+      <p>Last Updated: {{location.last_updated | date:'longDate'}}</p>
       <h2>About this location</h2>
       <p>{{location.description}}</p>
       <div

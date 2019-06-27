@@ -19,6 +19,7 @@ export interface Event {
   phone: string;
   website: string;
   categories: string[];
+  last_updated: string;
   status?: string;
   resource_categories?: ResourceCategory[];
 }

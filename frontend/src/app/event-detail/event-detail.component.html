@@ -21,6 +21,7 @@
         <!--[src]="event.image"-->
       <!--&gt;-->
       <!--<caption *ngIf="event.image && event.imageCaption">{{event.imageCaption}}</caption>-->
+      <p>Last Updated: {{event.last_updated | date:'longDate'}}</p>
       <h2>About this event</h2>
       <p>{{event.description}}</p>
       <p *ngIf="event.ticket_cost">Ticket Cost: {{event.ticket_cost}}</p>
