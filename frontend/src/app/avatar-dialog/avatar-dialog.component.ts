@@ -1,13 +1,9 @@
-import { Component, OnInit, Input, Inject, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Participant } from '../_models/participant';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ParticipantProfileComponent } from '../participant-profile/participant-profile.component';
 import { ApiService } from '../_services/api/api.service';
 import { ParticipantRelationship } from '../_models/participantRelationship';
-
-export interface DialogData {
-  participant: Participant;
-}
 
 @Component({
   selector: 'app-avatar-dialog',
@@ -23,7 +19,7 @@ export class AvatarDialogComponent implements OnInit {
   constructor(
     private api: ApiService,
     public dialogRef: MatDialogRef<ParticipantProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    @Inject(MAT_DIALOG_DATA) public data: {participant: Participant}
   ) {
     for (let i = 0; i < 104; i++) {
       this.avatarImages[i] = (i + 1).toLocaleString('en', { minimumIntegerDigits: 3 });

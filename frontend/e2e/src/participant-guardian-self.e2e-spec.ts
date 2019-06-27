@@ -3,11 +3,13 @@ import { GlobalHeaderUseCases } from './use-cases/global-header.po';
 import { LoginUseCases } from './use-cases/login.po';
 import { ProfileUseCases } from './use-cases/profile.po';
 import { EnrollUseCases } from './use-cases/enroll.po';
+import { SearchUseCases } from './use-cases/search.po';
 
 describe('Participant (Guardian - Self)', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
+  let searchUseCases: SearchUseCases;
   let profileUseCases: ProfileUseCases;
   let enrollUseCases: EnrollUseCases;
   let randomEmail;
@@ -18,6 +20,7 @@ describe('Participant (Guardian - Self)', () => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
+    searchUseCases = new SearchUseCases(page);
     profileUseCases = new ProfileUseCases(page);
     enrollUseCases = new EnrollUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
@@ -33,7 +36,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
   it('should visit enroll page', () => globalHeaderUseCases.visitEnrollPage());
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
-  it('should visit resources search page', () => globalHeaderUseCases.visitResourcesSearchPage());
+  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Login & Register
   it('should display login form', () => loginUseCases.displayLoginForm());
@@ -46,7 +49,15 @@ describe('Participant (Guardian - Self)', () => {
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
   it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
 
+  // Search
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should display selected filters', () => searchUseCases.displaySelectedFilters());
+  it('should sort results by distance from user location');
+  it('should sort by last date updated');
+
   // Profile
+  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
   it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
