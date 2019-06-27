@@ -33,16 +33,22 @@ from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnai
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
-from app import db, elastic_index
+from app import app, db, elastic_index
 from sqlalchemy import Sequence
+import os
 import csv
+import googlemaps
 
 
 class DataLoader:
+    backend_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    default_dir = backend_path + "/example_data"
+
     "Loads CSV files into the database"
     file = "example_data/resources.csv"
 
-    def __init__(self, directory="./example_data"):
+    def __init__(self, directory=default_dir):
+
         self.category_file = directory + "/categories.csv"
         self.event_file = directory + "/events.csv"
         self.location_file = directory + "/locations.csv"
@@ -77,7 +83,7 @@ class DataLoader:
                               phone=row[14])
                 db.session.add(event)
                 db.session.commit()
-                self.__increment_id_sequence(Event)
+                self.__increment_id_sequence(Resource)
 
                 for i in range(15, len(row)):
                     if row[i] and row[i] is not '':
@@ -97,16 +103,33 @@ class DataLoader:
         with open(self.location_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
+            api_key = app.config.get('GOOGLE_MAPS_API_KEY')
+            gmaps = googlemaps.Client(key=api_key)
+
             for row in reader:
                 org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
+                lat = None if row[16] is '' else float(row[16])
+                lng = None if row[17] is '' else float(row[17])
+                address = '{s1} {s2}, {c}, {st} {z}'.format(s1=row[7], s2=row[8], c=row[9], st=row[10], z=row[11])
+
+                if lat is None and lng is None:
+                    geocode_result = gmaps.geocode(address)
+
+                    if geocode_result is not None:
+                        if geocode_result[0] is not None:
+                            loc = geocode_result[0]['geometry']['location']
+                            lat = loc['lat']
+                            lng = loc['lng']
+
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
-                                    zip=row[11], website=row[13], phone=row[15], email=row[14])
+                                    zip=row[11], website=row[13], phone=row[15], email=row[14],
+                                    latitude=lat, longitude=lng)
                 db.session.add(location)
                 db.session.commit()
-                self.__increment_id_sequence(Location)
+                self.__increment_id_sequence(Resource)
 
-                for i in range(16, len(row)):
+                for i in range(18, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
@@ -372,11 +395,12 @@ class DataLoader:
         return category
 
     def build_index(self):
-        elastic_index.load_documents(db.session.query(Event).all(),
-                                     db.session.query(Location).all(),
-                                     db.session.query(Resource).all(),
-                                     db.session.query(Study).all()
-                                     )
+        elastic_index.load_documents(
+            resources=db.session.query(Resource).filter(Resource.type == 'resource').all(),
+            events=db.session.query(Resource).filter(Resource.type == 'event').all(),
+            locations=db.session.query(Resource).filter(Resource.type == 'location').all(),
+            studies=db.session.query(Study).all()
+        )
 
     def clear_index(self):
         print("Clearing the index")

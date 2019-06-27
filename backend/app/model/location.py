@@ -13,6 +13,8 @@ class Location(Resource):
     state = db.Column(db.String)
     zip = db.Column(db.String)
     email = db.Column(db.String)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'location',
