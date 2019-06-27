@@ -28,13 +28,25 @@
         >
           Enrolled in {{numStudies}} studies
         </div>
-        <a
-          mat-flat-button
-          color="primary"
-          (click)="goEditEnroll($event)"
-          id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
-        >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</a>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          fxLayoutGap="1em"
+        >
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="goEditEnroll($event)"
+            id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
+          >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</button>
 
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="goTerms($event)"
+            id="view_terms_{{participant.relationship}}_{{participant.id}}"
+          >View Terms and Conditions</button>
+        </div>
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>

@@ -4,7 +4,7 @@
 >
   <div fxFlex="80%">
     <app-logo variant="dark-lg" (click)="goProfile($event)"></app-logo>
-    <h3 class="alert alert-warn">You must read and accept the following Terms & Conditions in order to continue
+    <h3 *ngIf="!preview" class="alert alert-warn">You must read and accept the following Terms & Conditions in order to continue
       creating a STAR DRIVE account.</h3>
     <h1>Terms and Conditions</h1>
     <div
@@ -32,6 +32,7 @@
       fxLayoutAlign="center center"
     >
       <button
+        *ngIf="!preview"
         mat-flat-button
         (click)="goProfile($event)"
         color="accent"
@@ -41,6 +42,7 @@
         Cancel
       </button>
       <button
+        *ngIf="!preview"
         mat-flat-button
         (click)="continue()"
         color="primary"
@@ -48,6 +50,16 @@
         id="agree-button"
       >
         I agree
+      </button>
+      <button
+        *ngIf="preview"
+        mat-flat-button
+        (click)="goProfile($event)"
+        color="primary"
+        class="btn-lg"
+        id="profile-button"
+      >
+        Back to Profile
       </button>
     </div>
   </div>
