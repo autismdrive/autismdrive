@@ -47,7 +47,11 @@ eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
 
 # Copy the frontend config file into the proper place.
-eval 'cp /home/ubuntu/environment.${ENV}.ts ${HOME_DIR}/frontend/src/environments/environment.${ENV}.ts'
+declare -a arr=("" ".staging" ".prod")
+for NAME in "${arr[@]}"
+do
+    eval 'cp /home/ubuntu/environment${NAME}.ts ${HOME_DIR}/frontend/src/environments/environment${NAME}.ts'
+done
 
 # Rebuild the front end.
 eval 'cd ${HOME_DIR}/frontend && npm install'
