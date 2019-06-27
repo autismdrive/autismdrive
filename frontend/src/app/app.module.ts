@@ -167,7 +167,7 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
   ],
   imports: [
-    AgmCoreModule.forRoot({apiKey: environment.gcp_api_key}),
+    AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),
     BrowserAnimationsModule,
     BrowserModule,
     ColorPickerModule,
