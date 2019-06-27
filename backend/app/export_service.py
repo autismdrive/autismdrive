@@ -67,19 +67,35 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name, last_modifed_after):
+    def get_data(name, last_modifed_after = None):
         print("Exporting " + name)
         model = ExportService.get_class(name)
-        query = db.session.query(model).filter(model.last_updated > last_modifed_after)
+        query = db.session.query(model)
+        if last_modifed_after:
+            query = query.filter(model.last_updated > last_modifed_after)
         return query.all()
 
     @staticmethod
     def load_data(exportInfo, data):
         if len(data) < 1:
-            return # Nothing to do here.
+            return  # Nothing to do here.
         print("Loading " + exportInfo.class_name)
-        schema = ExportService.get_schema(exportInfo.class_name, many=True)
-        models = schema.load(data, session=db.session).data
+        schema = ExportService.get_schema(exportInfo.class_name, many=False)
+        for item in data:
+            item_copy = dict(item)
+            links = item_copy.pop("_links")
+            model, errors = schema.load(item_copy, session=db.session)
+            if not errors:
+                try:
+                    db.session.add(model)
+                    db.session.commit()
+                    if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
+                        print("WE SHOULD CALL A DELETE ON THE MAIN SERVER HERE.")
+                except Exception as e:
+                    print("THERE WAS AN ERROR" + str(e))
+            else:
+                raise Exception("Failed!" + errors)
+        models, errors = schema.load(data, session=db.session)
         db.session.add_all(models)
 
     # Returns a list of classes that can be exported from the system.

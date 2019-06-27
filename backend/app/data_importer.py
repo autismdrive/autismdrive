@@ -9,16 +9,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import exc
 
 from app.export_service import ExportService
+from app.model.export_info import ExportInfoSchema
 from app.resources.schema import UserSchema
 
 
 class DataImporter:
 
-    QUESTION_ENDPOINT = "/api/q"
     LOGIN_ENDPOINT = "/api/login_password"
-    USER_ENDPOINT = "/api/user"
-    participant_ENDPOINT = "/api/user"
-
+    EXPORT_ENDPOINT = "/api/export"
     token = "invalid"
 
     def __init__(self, app, db):
@@ -50,6 +48,22 @@ class DataImporter:
             self.login()
             headers = {'Authorization': 'Bearer {}'.format(self.token)}
         return headers
+
+    def load_data(self):
+        response = requests.get(self.master_url + self.EXPORT_ENDPOINT, headers=self.get_headers())
+        exportables = ExportInfoSchema().load(response.json())
+        return exportables
+
+    def
+
+    def load_data(self):
+        all_data = {}
+        exports = ExportService.get_export_info()
+        for export in exports:
+            rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+            all_data[export.class_name] = json.loads(rv.get_data(as_text=True))
+        return all_data
 
     # Takes the partial path of an endpoint, and returns json.  Logging any errors.
     def __get_json(self, path):

@@ -34,7 +34,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Category', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Participant', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'User', response))))
-        self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'AssistiveDevice', response))))
+        self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'EvaluationHistorySelfQuestionnaire', response))))
 
     def test_get_list_of_exportables_has_basic_attributes(self):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
@@ -106,7 +106,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
     def test_insert_user_with_participant(self):
         u = self.construct_user()
         u._password = b"xxxxx"
+        u.email_verified = True
+
+        role = u.role
+        email_verified = u.email_verified
         orig_u_date = u.last_updated
+
         orig_user_dict = UserSchema().dump(u).data  # Use standard schema
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         orig_p_dict = ParticipantSchema().dump(p).data  # Use standard schema
@@ -122,9 +127,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(db_user, msg="User is recreated.")
         self.assertNotEqual(orig_user_dict["email"], db_user.email, msg="Email should be obfuscated")
         self.assertEqual(db_user.last_updated, orig_u_date, msg="Dates are kept in tact")
-        self.assertEqual(db_user.role, u.role)
-        self.assertEqual(db_user.email_verified, u.email_verified)
-        self.assertEqual(db_user._password, u._password)
+        self.assertEqual(db_user.role, role)
+        self.assertEqual(db_user.email_verified, email_verified)
+        self.assertEqual(None, db_user._password, msg="Passwords should not be exported.")
 
         db_par = db.session.query(Participant).filter_by(id=orig_p_dict["id"]).first()
         self.assertIsNotNone(db_par, msg="Participant is recreated.")
@@ -210,5 +215,5 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             data = json.loads(rv.get_data(as_text=True))
             self.assertEquals(0, len(data), msg=export.url + " does not respect 'after' param in get request.")
 
-
-
+    def admin_accounts_should_transfer_completely(self):
+        self.assertFalse(False, msg="Admin accounts should be replicated so folks can log into the private systems.")

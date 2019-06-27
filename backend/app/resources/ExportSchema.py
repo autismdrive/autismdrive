@@ -32,7 +32,6 @@ class UserExportSchema(ModelSchema):
     def obfuscate_email(self, obj):
         return obj.id
 
-
 class ParticipantExportSchema(ModelSchema):
     """ Used exclusively for data export, removes identifying information"""
     class Meta:

@@ -16,12 +16,12 @@ class ExportEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def get(self, name):
         date_arg = request.args.get('after')
-        after_date = datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT)
-
         name = ExportService.camel_case_it(name)
         schema = ExportService.get_schema(name, many=True)
+        after_date = None
+        if date_arg:
+            after_date = datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT)
         return schema.dump(ExportService().get_data(name, after_date))
-
 
 class ExportListEndpoint(flask_restful.Resource):
 
