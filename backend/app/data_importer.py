@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # Fire of the scheduler
 # The Data Importer should run on the SLAVE, and will make calls to the master to download
 # data, store it locally, and remove it from the master when necessary.
+from flask import json
 from sqlalchemy import exc
 
 from app.export_service import ExportService
@@ -53,8 +54,6 @@ class DataImporter:
         response = requests.get(self.master_url + self.EXPORT_ENDPOINT, headers=self.get_headers())
         exportables = ExportInfoSchema().load(response.json())
         return exportables
-
-    def
 
     def load_data(self):
         all_data = {}

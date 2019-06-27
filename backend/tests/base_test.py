@@ -1,7 +1,7 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
-os.environ["APP_CONFIG_FILE"] = '../instance/testing.py'
+os.environ["TESTING"] = "true"
 
 from flask import json
 

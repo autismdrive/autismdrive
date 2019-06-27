@@ -1666,7 +1666,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual('academic_difficulty_areas', ws['J1'].value)
         self.assertEqual('math, writing, ', ws['J2'].value)
         self.assertEqual('academic_difficulty_other', ws['K1'].value)
-        self.assertEqual(11, ws.max_column)
+        self.assertEqual(12, ws.max_column)
         self.assertEqual(2, ws.max_row)
 
     def test_export_all_questionnaires(self):

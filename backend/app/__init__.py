@@ -21,8 +21,9 @@ app.config.from_object('config.default')
 app.config.from_pyfile('config.py')
 # Load the file specified by the APP_CONFIG_FILE environment variable
 # Variables defined here will override those in the default configuration
-if "APP_CONFIG_FILE" in os.environ:
-    app.config.from_envvar('APP_CONFIG_FILE')
+if "TESTING" in os.environ and os.environ["TESTING"] == "true":
+    app.config.from_object('config.testing')
+    app.config.from_pyfile('testing.py')
 
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

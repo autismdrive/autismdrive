@@ -73,17 +73,19 @@ class ExportXlsService:
 
             # Iterate over the data and write it out row by row.
             for item in questionnaires[0]:
-                col = 0
+                col = -1
                 for key in item:
+                    if key == "_links":
+                        continue
                     if isinstance(item[key], list):
                         list_string = ''
                         for value in item[key]:
                             list_string = list_string + str(value) + ', '
+                        col += 1
                         worksheet.write(row, col, list_string)
-                        col += 1
                     else:
-                        worksheet.write(row, col, item[key])
                         col += 1
+                        worksheet.write(row, col, item[key])
                 row += 1
 
         # Close the workbook before streaming the data.
