@@ -8,7 +8,6 @@
 # Move the configuration file into place.
 mkdir -p ./backend/instance
 cp /home/ubuntu/star_config.py ./backend/instance/config.py
-cp /home/ubuntu/api-keys.ts ./frontend/src/api-keys.ts
 
 if [ "$1" == "prod" ]; then
     echo "Building for production."
@@ -46,6 +45,9 @@ eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask db upgrade'
 # clear and rebuild the index
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
 eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
+
+# Copy the frontend config file into the proper place.
+eval 'cp /home/ubuntu/environment.${ENV}.ts ./frontend/src/environments/environment.${ENV}.ts'
 
 # Rebuild the front end.
 eval 'cd ${HOME_DIR}/frontend && npm install'
