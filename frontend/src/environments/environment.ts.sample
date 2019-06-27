@@ -1,0 +1,7 @@
+const localhost = navigator.platform.includes('Win') ? '10.0.2.2' : 'localhost';
+
+export const environment = {
+  production: false,
+  api: `http://${localhost}:5000`,
+  gc_api_key: 'API_KEY_GOES_HERE'
+};
