@@ -5,13 +5,12 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
-from app.export_service import ExportService
 
 
 class Therapy(db.Model):
     __tablename__ = "therapy"
     __label__ = "Therapy or Service"
-    __question_type__ = ExportService.TYPE_SUB_TABLE
+    __no_export__ = True  # This will be transferred as a part of a parent class
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))

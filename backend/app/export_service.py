@@ -65,8 +65,6 @@ class ExportService:
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-
-
     @staticmethod
     def get_data(name, last_modifed_after = None):
         print("Exporting " + name)
@@ -79,33 +77,6 @@ class ExportService:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
         return query.all()
 
-    @staticmethod
-    def load_data(exportInfo, data):
-        if len(data) < 1:
-            return  # Nothing to do here.
-        print("Loading " + str(len(data)) + " records into " + exportInfo.class_name + "")
-        schema = ExportService.get_schema(exportInfo.class_name, many=False)
-        model_class = ExportService.get_class(exportInfo.class_name)
-        for item in data:
-            item_copy = dict(item)
-            if "_links" in item_copy:
-                links = item_copy.pop("_links")
-            existing_model = db.session.query(model_class).filter_by(id=item['id']).first()
-            model, errors = schema.load(item_copy, session=db.session, instance=existing_model)
-            if not errors:
-                try:
-                    db.session.add(model)
-                    db.session.commit()
-                    if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
-                        print("WE SHOULD CALL A DELETE ON THE MAIN SERVER HERE.")
-                except Exception as e:
-                    db.session.rollback()
-                    print("THERE WAS AN ERROR" + str(e))
-            else:
-                raise Exception("Failed!" + errors)
-        models, errors = schema.load(data, session=db.session)
-        db.session.add_all(models)
-
     # Returns a list of classes that can be exported from the system.
     @staticmethod
     def get_export_info(last_modifed_after=None):
@@ -117,8 +88,9 @@ class ExportService:
             # Never export Identifying information.
             if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_IDENTIFYING:
                 continue
-            # Do not include sub-tables that will fall through from quiestionnaire schemas
-            if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_SUB_TABLE:
+            # Do not include sub-tables that will fall through from quiestionnaire schemas,
+            # or logs that don't make sense to export.
+            if hasattr(db_model, '__no_export__') and db_model.__no_export__:
                 continue
 
             export_info = ExportInfo(table_name=table.name, class_name= db_model.__name__)

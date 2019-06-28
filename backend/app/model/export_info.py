@@ -8,6 +8,7 @@ class ExportInfo:
     size = 0
     url = ""
     question_type = ""
+    json_data = {}
 
     def __init__(self, table_name, class_name, size=0, url="", question_type=""):
         self.table_name = table_name

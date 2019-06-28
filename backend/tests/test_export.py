@@ -3,7 +3,8 @@ import unittest
 
 from flask import json
 
-from app import db
+from app import db, app
+from app.data_importer import DataImporter
 from app.export_service import ExportService
 from app.model.participant import Relationship, Participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
@@ -101,8 +102,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def load_database(self, all_data):
         exports = ExportService.get_export_info()
+        importer = DataImporter(app, db)
         for export in exports:
-            ExportService.load_data(export, all_data[export.class_name])
+            export.json_data = all_data[export.class_name]
+            importer.load_data(export)
 
     def test_insert_user_with_participant(self):
         u = self.construct_user()
@@ -201,9 +204,6 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                 if export.question_type == ExportService.TYPE_SENSITIVE:
                     del_rv = self.app.delete(d['_links']['self'], headers=self.logged_in_headers())
                     self.assert_success(del_rv)
-
-    def toDate(dateString):
-        return datetime.datetime.strptime(dateString, "%Y-%m-%d").date()
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()

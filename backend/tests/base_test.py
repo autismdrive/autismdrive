@@ -35,6 +35,9 @@ class BaseTest:
 
     @classmethod
     def setUpClass(cls):
+        app.config.from_object('config.testing')
+        app.config.from_pyfile('testing.py')
+
         cls.ctx = app.test_request_context()
         cls.app = app.test_client()
         db.create_all()

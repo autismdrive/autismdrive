@@ -11,7 +11,8 @@ from app.export_service import ExportService
 class AssistiveDevice(db.Model):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
-    __question_type__ = ExportService.TYPE_SUB_TABLE
+    __no_export__ = True  # This will be transferred as a part of a parent class
+
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     supports_questionnaire_id = db.Column(
