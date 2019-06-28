@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Hit } from '../_models/query';
+import { Hit, HitType } from '../_models/query';
+import { LatLngLiteral } from '@agm/core';
 
 @Component({
   selector: 'app-search-result',
@@ -8,6 +9,7 @@ import { Hit } from '../_models/query';
 })
 export class SearchResultComponent implements OnInit {
   @Input() hit: Hit;
+  @Input() mapLoc: LatLngLiteral;
 
   constructor() {
   }

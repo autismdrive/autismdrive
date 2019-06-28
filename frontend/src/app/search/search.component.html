@@ -128,6 +128,7 @@
           <app-search-result
             *ngFor="let hit of query.hits"
             [hit]="hit"
+            [mapLoc]="mapLoc"
           >
           </app-search-result>
           <mat-paginator

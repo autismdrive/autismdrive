@@ -1,3 +1,6 @@
+import { getDistance, convertDistance } from 'geolib';
+import { UserInputCoordinates } from 'geolib/es/types';
+
 export class Query {
   words = '';
   filters: Array<Filter> = [];
@@ -64,6 +67,19 @@ export class Hit {
       }
     }
   }
+
+  hasCoords(): boolean {
+    return (isFinite(this.latitude) && isFinite(this.latitude));
+  }
+
+  milesFrom(there: UserInputCoordinates) {
+    if (there && this.hasCoords()) {
+      const here: UserInputCoordinates = {lat: this.latitude, lng: this.longitude};
+      const dist = getDistance(here, there);
+      return convertDistance(dist, 'mi').toFixed(1);
+    }
+  }
+
 }
 
 export interface Filter {
