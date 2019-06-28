@@ -65,11 +65,13 @@
                 [longitude]="resource.longitude"
               >
                 <agm-info-window *ngIf="mapLoc">
+                  <h5>{{resource.title}}</h5>
+                  <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
                   <a
                     class="chevron-link"
                     href="{{getGoogleMapsUrl()}}"
                     target="_blank"
-                  >Driving directions - {{resource.milesFrom(mapLoc)}}mi</a>
+                  >Driving directions</a>
                 </agm-info-window>
               </agm-marker>
             </agm-map>
