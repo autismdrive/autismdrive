@@ -69,7 +69,8 @@ export class Hit {
   }
 
   hasCoords(): boolean {
-    return (isFinite(this.latitude) && isFinite(this.latitude));
+    const _isSet = n => (typeof n === 'number') && isFinite(n);
+    return (_isSet(this.latitude) && _isSet(this.longitude));
   }
 
   milesFrom(there: UserInputCoordinates) {
