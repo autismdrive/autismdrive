@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
 import { ActivatedRoute } from '@angular/router';
+import { LatLngLiteral } from '@agm/core';
 
 @Component({
   selector: 'app-resource-detail',
@@ -10,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ResourceDetailComponent implements OnInit {
   resource: Resource;
+  mapLoc: LatLngLiteral;
 
   constructor(
     private api: ApiService,
@@ -17,29 +19,30 @@ export class ResourceDetailComponent implements OnInit {
   ) {
     this.route.params.subscribe(params => {
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
-      if (this.route.snapshot.data['title'] == 'Event Details') {
-        if (isFinite(resourceId)) {
-          this.api.getEvent(resourceId).subscribe(resource => {
-            this.resource = resource;
-          });
-        }
-      } else if (this.route.snapshot.data['title'] == 'Location Details') {
-        if (isFinite(resourceId)) {
-          this.api.getLocation(resourceId).subscribe(resource => {
-            this.resource = resource;
-          });
-        }
-      } else if (this.route.snapshot.data['title'] == 'Resource Details') {
-        if (isFinite(resourceId)) {
-          this.api.getResource(resourceId).subscribe(resource => {
-            this.resource = resource;
-          });
-        }
+
+      if (typeof resourceId === 'number' && isFinite(resourceId)) {
+        const path = this.route.snapshot.url[0].path;
+        const resourceType = path.charAt(0).toUpperCase() + path.slice(1);
+        this.api[`get${resourceType}`](resourceId).subscribe(resource => {
+          this.resource = new Resource(resource);
+          this.loadMapLocation();
+        });
       }
     });
   }
 
   ngOnInit() {
+  }
+
+  loadMapLocation() {
+    if (this.resource && this.resource.hasCoords() && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p => {
+        this.mapLoc = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude
+        };
+      });
+    }
   }
 
   goPhone($event: MouseEvent) {

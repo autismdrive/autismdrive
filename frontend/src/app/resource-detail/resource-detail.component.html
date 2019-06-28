@@ -50,6 +50,23 @@
       fxLayoutGap="20px"
     >
       <div id="resource-contact">
+        <mat-card *ngIf="resource && resource.hasCoords()">
+          <mat-card-content>
+            <agm-map
+              [latitude]="resource.latitude"
+              [longitude]="resource.longitude"
+              [streetViewControl]="false"
+              mapTypeId="roadmap"
+              [zoom]="7"
+            >
+              <agm-marker
+                *ngIf="resource.hasCoords()"
+                [latitude]="resource.latitude"
+                [longitude]="resource.longitude"
+                ></agm-marker>
+            </agm-map>
+          </mat-card-content>
+        </mat-card>
         <mat-card>
           <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
           <mat-card-content>

@@ -56,7 +56,7 @@
       <ng-container *ngIf="locQuery && locQuery.hits">
         <ng-container *ngFor="let hit of locQuery.hits">
           <agm-marker
-            *ngIf="hit.latitude && hit.longitude"
+            *ngIf="hit.hasCoords()"
             [latitude]="hit.latitude"
             [longitude]="hit.longitude"
           >
