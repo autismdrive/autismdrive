@@ -55,7 +55,6 @@ import { AppComponent } from './app.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
 import { EnrollComponent } from './enroll/enroll.component';
-import { EventDetailComponent } from './event-detail/event-detail.component';
 import { FiltersComponent } from './filters/filters.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
@@ -65,7 +64,6 @@ import { HeaderComponent } from './header/header.component';
 import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
 import { HomeComponent } from './home/home.component';
 import { LoadingComponent } from './loading/loading.component';
-import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
 import { LogoutComponent } from './logout/logout.component';
@@ -123,7 +121,6 @@ export class FormlyConfig {
     CardWrapperComponent,
     CategoryChipsComponent,
     EnrollComponent,
-    EventDetailComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,
@@ -137,7 +134,6 @@ export class FormlyConfig {
     HeroSlidesComponent,
     HomeComponent,
     LoadingComponent,
-    LocationDetailComponent,
     LoginComponent,
     LogoComponent,
     LogoutComponent,

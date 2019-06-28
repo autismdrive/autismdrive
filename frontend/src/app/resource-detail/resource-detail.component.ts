@@ -11,14 +11,30 @@ import { ActivatedRoute } from '@angular/router';
 export class ResourceDetailComponent implements OnInit {
   resource: Resource;
 
-  constructor(private api: ApiService, private route: ActivatedRoute) {
+  constructor(
+    private api: ApiService,
+    private route: ActivatedRoute
+  ) {
     this.route.params.subscribe(params => {
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
-
-      if (isFinite(resourceId)) {
-        this.api.getResource(resourceId).subscribe(resource => {
-          this.resource = resource;
-        });
+      if (this.route.snapshot.data['title'] == 'Event Details') {
+        if (isFinite(resourceId)) {
+          this.api.getEvent(resourceId).subscribe(resource => {
+            this.resource = resource;
+          });
+        }
+      } else if (this.route.snapshot.data['title'] == 'Location Details') {
+        if (isFinite(resourceId)) {
+          this.api.getLocation(resourceId).subscribe(resource => {
+            this.resource = resource;
+          });
+        }
+      } else if (this.route.snapshot.data['title'] == 'Resource Details') {
+        if (isFinite(resourceId)) {
+          this.api.getResource(resourceId).subscribe(resource => {
+            this.resource = resource;
+          });
+        }
       }
     });
   }
