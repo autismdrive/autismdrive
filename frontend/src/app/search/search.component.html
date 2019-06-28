@@ -22,7 +22,7 @@
       </button>
     </h2>
     <div class="spacer"></div>
-    <mat-accordion>
+    <mat-accordion *ngIf="!loading">
       <mat-expansion-panel
         *ngFor="let facet of query.facets"
         [ngClass]="{'filter-facet': true}"
@@ -51,6 +51,7 @@
       class="container"
       fxLayout="column"
       fxLayoutAlign="start center"
+      *ngIf="!loading"
     >
       <div class="row search-tools">
         <ul class="applied-filters">

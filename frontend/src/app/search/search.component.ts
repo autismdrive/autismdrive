@@ -83,27 +83,28 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
+    this.loadMapLocation(() => {
+      this.route.queryParamMap.subscribe(qParams => {
+        let words = '';
+        const filters: Filter[] = [];
 
-    this.route.queryParamMap.subscribe(qParams => {
-      let words = '';
-      const filters: Filter[] = [];
-
-      for (const key of qParams.keys) {
-        if (key === 'words') {
-          words = qParams.get(key);
-        } else {
-          filters.push({ field: key, value: qParams.getAll(key) });
+        for (const key of qParams.keys) {
+          if (key === 'words') {
+            words = qParams.get(key);
+          } else {
+            filters.push({ field: key, value: qParams.getAll(key) });
+          }
         }
-      }
 
-      this.query = new Query({
-        words: words,
-        filters: filters,
-        size: this.pageSize,
+        this.query = new Query({
+          words: words,
+          filters: filters,
+          size: this.pageSize,
+        });
+
+        this.doSearch();
+        this.updateFilters();
       });
-
-      this.doSearch();
-      this.updateFilters();
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -178,20 +179,33 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  loadMapLocation(callback: Function) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p => {
+        this.mapLoc = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude
+        };
+        callback();
+      });
+    } else {
+      callback();
+    }
+  }
+
   sortBy(selectedSort: SortMethod) {
     this.loading = true;
     this.selectedSort = selectedSort;
     this.query.start = 0;
     this.query.sort = selectedSort.sortQuery;
 
-    if ((selectedSort.name === 'Distance') && (navigator.geolocation)) {
-        navigator.geolocation.getCurrentPosition(p => {
-          this.mapLoc.lat = p.coords.latitude;
-          this.mapLoc.lng = p.coords.longitude;
-          this.query.sort.latitude = this.mapLoc.lat;
-          this.query.sort.longitude = this.mapLoc.lng;
-          this.doSearch();
-        });
+
+    if (selectedSort.name === 'Distance') {
+      this.loadMapLocation(() => {
+        this.query.sort.latitude = this.mapLoc.lat;
+        this.query.sort.longitude = this.mapLoc.lng;
+        this.doSearch();
+      });
     } else {
       this.doSearch();
     }

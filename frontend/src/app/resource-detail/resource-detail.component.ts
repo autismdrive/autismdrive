@@ -59,4 +59,18 @@ export class ResourceDetailComponent implements OnInit {
     }
   }
 
+  getGoogleMapsUrl(): string {
+    if (this.mapLoc && this.resource.hasCoords()) {
+      const address = `
+        ${this.resource.street_address1},
+        ${this.resource.street_address2},
+        ${this.resource.city},
+        ${this.resource.state}
+        ${this.resource.zip}
+      `;
+
+      return `https://www.google.com/maps/dir/${this.mapLoc.lat},${this.mapLoc.lng}/${encodeURIComponent(address)}`;
+    }
+  }
+
 }

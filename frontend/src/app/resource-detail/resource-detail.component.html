@@ -17,8 +17,8 @@
     >
       <h1>{{resource.title}}</h1>
       <!--<img-->
-        <!--*ngIf="resource.image"-->
-        <!--[src]="resource.image"-->
+      <!--*ngIf="resource.image"-->
+      <!--[src]="resource.image"-->
       <!--&gt;-->
       <!--<caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>-->
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
@@ -63,7 +63,15 @@
                 *ngIf="resource.hasCoords()"
                 [latitude]="resource.latitude"
                 [longitude]="resource.longitude"
-                ></agm-marker>
+              >
+                <agm-info-window *ngIf="mapLoc">
+                  <a
+                    class="chevron-link"
+                    href="{{getGoogleMapsUrl()}}"
+                    target="_blank"
+                  >Driving directions - {{resource.milesFrom(mapLoc)}}mi</a>
+                </agm-info-window>
+              </agm-marker>
             </agm-map>
           </mat-card-content>
         </mat-card>
@@ -94,7 +102,10 @@
               </mat-list-item>
               <mat-list-item *ngIf="resource.website">
                 <mat-icon>link</mat-icon>
-                <a target="_blank" href="{{resource.website}}">{{resource.website}}</a>
+                <a
+                  target="_blank"
+                  href="{{resource.website}}"
+                >{{resource.website}}</a>
               </mat-list-item>
             </mat-list>
           </mat-card-content>
