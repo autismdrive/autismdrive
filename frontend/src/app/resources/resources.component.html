@@ -67,7 +67,7 @@
                 class="chevron-link"
                 [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
                 routerLinkActive="router-link-active"
-              >{{hit.type}} Details</a>
+              >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
             </agm-info-window>
           </agm-marker>
         </ng-container>

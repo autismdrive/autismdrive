@@ -1,5 +1,4 @@
-import { getDistance, convertDistance } from 'geolib';
-import { UserInputCoordinates } from 'geolib/es/types';
+import { GeoLocation } from './geolocation';
 
 export class Query {
   words = '';
@@ -47,7 +46,7 @@ export enum HitLabel {
   EVENT = 'Events and Training'
 }
 
-export class Hit {
+export class Hit extends GeoLocation {
   id: number;
   type: string;
   label: string;
@@ -57,30 +56,16 @@ export class Hit {
   last_updated: Date;
   highlights: string;
   url?: string;
-  latitude?: number;
-  longitude?: number;
 
   constructor(private _props) {
+    super(_props);
+
     for (const propName in this._props) {
       if (this._props.hasOwnProperty(propName)) {
         this[propName] = this._props[propName];
       }
     }
   }
-
-  hasCoords(): boolean {
-    const _isSet = n => (typeof n === 'number') && isFinite(n);
-    return (_isSet(this.latitude) && _isSet(this.longitude));
-  }
-
-  milesFrom(there: UserInputCoordinates) {
-    if (there && this.hasCoords()) {
-      const here: UserInputCoordinates = {lat: this.latitude, lng: this.longitude};
-      const dist = getDistance(here, there);
-      return convertDistance(dist, 'mi').toFixed(1);
-    }
-  }
-
 }
 
 export interface Filter {
