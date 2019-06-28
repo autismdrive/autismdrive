@@ -11,8 +11,8 @@
     fxLayoutAlign="center auto"
   >
     <div
-      class="border-box-tile"
       *ngFor="let resourceType of resourceTypes"
+      class="border-box-tile {{resourceType.name.toLowerCase()}}"
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
     >
@@ -94,6 +94,7 @@
     <app-accordion
       *ngFor="let rg of resourceGatherers"
       [item]="rg"
+      [ngClass]="{'resource-gatherer': true}"
     ></app-accordion>
   </div>
 
