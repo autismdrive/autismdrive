@@ -5,7 +5,7 @@
 >
   <mat-sidenav
     #sidenav
-    class="sidenav"
+    class="sidenav filters"
   >
     <h2>
       <span>
@@ -22,7 +22,10 @@
     </h2>
     <div class="spacer"></div>
     <mat-accordion>
-      <mat-expansion-panel *ngFor="let facet of query.facets">
+      <mat-expansion-panel
+        *ngFor="let facet of query.facets"
+        [ngClass]="{'filter-facet': true}"
+      >
         <mat-expansion-panel-header>
           <mat-panel-title>
             {{facet.field}}
@@ -32,7 +35,7 @@
           <mat-list-item
             *ngFor="let count of facet.facetCounts"
             (click)="addFilter(facet.field, count.category)"
-            [ngClass]="{'filter-facet': true}"
+            [ngClass]="{'filter-facet-item': true}"
           >
             {{count.category}}
             <div fxFlex></div>
@@ -47,15 +50,24 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-list>
-          <mat-list-item (click)="sortByDistance()" class="sort-order">
+          <mat-list-item
+            (click)="sortByDistance()"
+            class="sort-order"
+          >
             Near me
             <div class="spacer"></div>
           </mat-list-item>
-          <mat-list-item (click)="sortByRelevance()" class="sort-order">
+          <mat-list-item
+            (click)="sortByRelevance()"
+            class="sort-order"
+          >
             Search Relevance
             <div class="spacer"></div>
           </mat-list-item>
-          <mat-list-item (click)="sortByDate()" class="sort-order">
+          <mat-list-item
+            (click)="sortByDate()"
+            class="sort-order"
+          >
             Recently Updated
             <div class="spacer"></div>
           </mat-list-item>
@@ -86,7 +98,7 @@
               Add a filter
             </button>
           </li>
-          <li *ngIf="query.words">
+          <li *ngIf="query.words" class="applied-filter">
             <button
               mat-button
               (click)="removeWords()"
@@ -97,7 +109,7 @@
           </li>
 
           <ng-container *ngFor="let filter of query.filters">
-            <li *ngFor="let fieldValue of filter.value">
+            <li *ngFor="let fieldValue of filter.value" class="applied-filter">
               <button
                 mat-button
                 (click)="removeFilter(filter.field, fieldValue)"

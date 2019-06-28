@@ -4,7 +4,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {User} from '../../_models/user';
 import {environment} from '../../../environments/environment';
-import {load} from '@angular/core/src/render3';
 
 
 @Injectable({ providedIn: 'root' })

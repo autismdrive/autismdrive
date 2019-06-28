@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef, Input } from '@angular/core';
+import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
 import { FieldWrapper, FormlyTemplateOptions } from '@ngx-formly/core';
 
 @Component({
@@ -8,5 +8,5 @@ import { FieldWrapper, FormlyTemplateOptions } from '@ngx-formly/core';
 })
 export class CardWrapperComponent extends FieldWrapper {
   @Input() to: FormlyTemplateOptions;
-  @ViewChild('fieldComponent', { read: ViewContainerRef }) fieldComponent: ViewContainerRef;
+  @ViewChild('fieldComponent', { read: ViewContainerRef, static: true }) fieldComponent: ViewContainerRef;
 }

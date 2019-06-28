@@ -6,7 +6,7 @@ import { ParticipantRelationship } from '../_models/participantRelationship';
 import { Flow } from '../_models/flow';
 import { ApiService } from '../_services/api/api.service';
 import { AvatarDialogComponent } from '../avatar-dialog/avatar-dialog.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-participant-profile',
