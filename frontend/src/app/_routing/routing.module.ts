@@ -23,8 +23,6 @@ import { UserAdminDetailsComponent } from '../user-admin-details/user-admin-deta
 import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
-import { EventDetailComponent } from '../event-detail/event-detail.component';
-import { LocationDetailComponent } from '../location-detail/location-detail.component';
 
 export function searchFilterMatcher(url: UrlSegment[]) {
   if (
@@ -51,8 +49,8 @@ const routes: Routes = [
   { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard] },
   { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
-  { path: 'event/:eventId', component: EventDetailComponent, data: { title: 'Event Details' } },
-  { path: 'location/:locationId', component: LocationDetailComponent, data: { title: 'Location Details' } },
+  { path: 'event/:resourceId', component: ResourceDetailComponent, data: { title: 'Event Details' } },
+  { path: 'location/:resourceId', component: ResourceDetailComponent, data: { title: 'Location Details' } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
   { path: 'studies', component: StudiesComponent, data: { title: 'Create a STAR Drive Account' } },
