@@ -24,6 +24,7 @@
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
+      <p *ngIf="resource.ticket_cost">Ticket Cost: {{resource.ticket_cost}}</p>
       <div
         fxLayout="column"
         fxLayoutGap="20px"
@@ -53,6 +54,23 @@
           <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
           <mat-card-content>
             <mat-list>
+              <mat-list-item *ngIf="resource.date">
+                <mat-icon>access_time</mat-icon>
+                {{resource.date | date:'longDate'}}: {{resource.time}}
+              </mat-list-item>
+              <mat-list-item *ngIf="resource.street_address1">
+                <mat-icon>location_on</mat-icon>
+                <address>
+                  <p *ngIf="resource.location_name">{{resource.location_name}},</p>
+                  <p *ngIf="resource.street_address1">{{resource.street_address1}}</p>
+                  <p *ngIf="resource.street_address2">{{resource.street_address2}}</p>
+                  <p>{{resource.city}}, {{resource.state}} {{resource.zip}}</p>
+                </address>
+              </mat-list-item>
+              <mat-list-item *ngIf="resource.primary_contact">
+                <mat-icon>person_pin</mat-icon>
+                {{resource.primary_contact}}
+              </mat-list-item>
               <mat-list-item *ngIf="resource.phone">
                 <mat-icon>phone</mat-icon>
                 <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
