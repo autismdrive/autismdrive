@@ -11,12 +11,13 @@ import {
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Filter, Query } from '../_models/query';
+import { Filter, Query, Sort } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 
 interface SortMethod {
   name: string;
   label: string;
+  sortQuery: Sort;
 }
 
 @Component({
@@ -37,22 +38,36 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
-  selectedSortIndex = 0;
-  sorts: SortMethod[] = [
+  sortMethods: SortMethod[] = [
     {
       name: 'Relevance',
-      label: 'Relevance'
+      label: 'Relevance',
+      sortQuery: {
+        field: '_score',
+        order: 'asc',
+      }
     },
     {
       name: 'Distance',
-      label: 'Near me'
+      label: 'Near me',
+      sortQuery: {
+        field: 'geo_point',
+        latitude: this.mapLoc.lat,
+        longitude: this.mapLoc.lng,
+        order: 'asc',
+        unit: 'mi'
+      }
     },
     {
       name: 'Date',
-      label: 'Recently Updated'
+      label: 'Recently Updated',
+      sortQuery: {
+        field: 'last_updated',
+        order: 'desc'
+      }
     },
   ];
-
+  selectedSort: SortMethod;
   @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -64,6 +79,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     media: MediaMatcher,
   ) {
+    this.selectedSort = this.sortMethods[0];
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -162,51 +178,22 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  sortBy(index: number) {
-    console.log('index', index);
+  sortBy(selectedSort: SortMethod) {
     this.loading = true;
-    this.selectedSortIndex = index;
-    const selectedSort = this.sorts[this.selectedSortIndex];
-    this[`sortBy${selectedSort.name}`]();
-  }
-
-  sortByDate() {
-    console.log('=== sortByDate ===');
-    this.query.sort = {
-      field: 'last_updated',
-      order: 'desc'
-    };
-    this.showFilters = false;
+    this.selectedSort = selectedSort;
     this.query.start = 0;
-    // this.updateUrl(this.query);
-    this.doSearch();
-  }
+    this.query.sort = selectedSort.sortQuery;
 
-  sortByRelevance() {
-    console.log('=== sortByRelevance ===');
-    this.query.sort = { field: '_score' };
-    this.showFilters = false;
-    this.query.start = 0;
-    // this.updateUrl(this.query);
-    this.doSearch();
-  }
-
-  sortByDistance() {
-    console.log('=== sortByDistance ===');
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(p => {
-        this.mapLoc.lat = p.coords.latitude;
-        this.mapLoc.lng = p.coords.longitude;
-        this.query.sort = {
-          field: 'geo_point',
-          latitude: this.mapLoc.lat,
-          longitude: this.mapLoc.lng,
-          order: 'asc',
-          unit: 'mi'
-        };
-        // this.updateUrl(this.query);
-        this.doSearch();
-      });
+    if ((selectedSort.name === 'Distance') && (navigator.geolocation)) {
+        navigator.geolocation.getCurrentPosition(p => {
+          this.mapLoc.lat = p.coords.latitude;
+          this.mapLoc.lng = p.coords.longitude;
+          this.query.sort.latitude = this.mapLoc.lat;
+          this.query.sort.longitude = this.mapLoc.lng;
+          this.doSearch();
+        });
+    } else {
+      this.doSearch();
     }
   }
 

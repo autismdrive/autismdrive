@@ -1,3 +1,4 @@
+<app-loading *ngIf="loading"></app-loading>
 <mat-sidenav-container
   [id]="'sidenavContainer'"
   class="mat-typography"
@@ -49,83 +50,75 @@
     <div
       class="container"
       fxLayout="column"
+      fxLayoutAlign="start center"
     >
-      <div
-        class="row"
-        fxLayout="row"
-        fxLayoutGap="40px"
-      >
-        <div fxFlex="50%">
-          <ul class="applied-filters">
-            <li *ngIf="sideNav.opened">
-              <button
-                mat-button
-                (click)="sideNav.close()"
-              >
-                <i class="icofont-hand-left icofont-2x"></i>
-                Select a filter
-              </button>
-            </li>
-            <li *ngIf="!sideNav.opened">
-              <button
-                mat-button
-                (click)="sideNav.open()"
-              >
-                <mat-icon>filter_list</mat-icon>
-                Add a filter
-              </button>
-            </li>
+      <div class="row search-tools">
+        <ul class="applied-filters">
+          <li *ngIf="sideNav.opened">
+            <button
+              mat-button
+              (click)="sideNav.close()"
+            >
+              <i class="icofont-hand-left icofont-2x"></i>
+              Select a filter
+            </button>
+          </li>
+          <li *ngIf="!sideNav.opened">
+            <button
+              mat-button
+              (click)="sideNav.open()"
+            >
+              <mat-icon>filter_list</mat-icon>
+              Add a filter
+            </button>
+          </li>
+          <li
+            *ngIf="query.words"
+            class="applied-filter"
+          >
+            <button
+              mat-button
+              (click)="removeWords()"
+            >
+              <mat-icon>remove_circle_outline</mat-icon>
+              Search: {{query.words}}
+            </button>
+          </li>
+
+          <ng-container *ngFor="let filter of query.filters">
             <li
-              *ngIf="query.words"
+              *ngFor="let fieldValue of filter.value"
               class="applied-filter"
             >
               <button
                 mat-button
-                (click)="removeWords()"
+                (click)="removeFilter(filter.field, fieldValue)"
               >
                 <mat-icon>remove_circle_outline</mat-icon>
-                Search: {{query.words}}
+                {{filter.field}} : {{fieldValue}}
               </button>
             </li>
-
-            <ng-container *ngFor="let filter of query.filters">
-              <li
-                *ngFor="let fieldValue of filter.value"
-                class="applied-filter"
-              >
-                <button
-                  mat-button
-                  (click)="removeFilter(filter.field, fieldValue)"
-                >
-                  <mat-icon>remove_circle_outline</mat-icon>
-                  {{filter.field}} : {{fieldValue}}
-                </button>
-              </li>
-            </ng-container>
-          </ul>
-
-        </div>
-
-        <div
-          class="sort-results"
-          fxFlex="50%"
-        >
+          </ng-container>
+        </ul>
+        <div class="sort-order">
           <mat-form-field>
             <mat-label>
               Sort Results By:
             </mat-label>
-            <mat-select [(value)]="sorts[selectedSortIndex].name">
+            <mat-select value="{{selectedSort.name}}">
               <mat-option
-                *ngFor="let sort of sorts; let i = index"
-                (click)="sortBy(i)"
-                class="sort-order"
-                [value]="sort.name"
-              >{{sort.label}}</mat-option>
+                *ngFor="let s of sortMethods"
+                (click)="sortBy(s)"
+                value="{{s.name}}"
+              >{{s.label}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
       </div>
-      <div class="row">
+      <div
+        class="row search-results"
+        style="margin-top: 0"
+      >
         <div
           id="results"
           fxLayout="column"
@@ -145,7 +138,6 @@
           >
           </mat-paginator>
         </div>
-
       </div>
 
     </div>

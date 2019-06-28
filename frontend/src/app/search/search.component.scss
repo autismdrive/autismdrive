@@ -52,15 +52,6 @@ form.search-box {
     }
   }
 
-  .applied-filters {
-    margin-left: 1em;
-
-    li {
-      list-style: none;
-      margin-left: 0px;
-    }
-  }
-
   mat-list-item {
     cursor: pointer;
   }
@@ -82,6 +73,33 @@ form.search-box {
   }
 
   .hit-count { text-align: right; white-space: nowrap; }
+
+  .search-tools {
+    display: grid;
+    grid-template-areas: "filters sort";
+    grid-template-columns: 1fr 1fr;
+    justify-items: stretch;
+    width: 100%;
+    padding-right: 2em;
+    margin-bottom: 0;
+    margin-left: 1em;
+  }
+
+  .applied-filters {
+    grid-area: filters;
+    margin-left: 1em;
+    justify-self: start;
+
+    li {
+      list-style: none;
+      margin-left: 0px;
+    }
+  }
+
+  .sort-order {
+    grid-area: sort;
+    justify-self: end;
+  }
 
   #results {
     padding: 2em;
