@@ -14,6 +14,11 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Filter, Query } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 
+interface SortMethod {
+  name: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -32,6 +37,21 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
+  selectedSortIndex = 0;
+  sorts: SortMethod[] = [
+    {
+      name: 'Relevance',
+      label: 'Relevance'
+    },
+    {
+      name: 'Distance',
+      label: 'Near me'
+    },
+    {
+      name: 'Date',
+      label: 'Recently Updated'
+    },
+  ];
 
   @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -142,7 +162,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  sortBy(index: number) {
+    console.log('index', index);
+    this.loading = true;
+    this.selectedSortIndex = index;
+    const selectedSort = this.sorts[this.selectedSortIndex];
+    this[`sortBy${selectedSort.name}`]();
+  }
+
   sortByDate() {
+    console.log('=== sortByDate ===');
     this.query.sort = {
       field: 'last_updated',
       order: 'desc'
@@ -154,6 +183,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   sortByRelevance() {
+    console.log('=== sortByRelevance ===');
     this.query.sort = { field: '_score' };
     this.showFilters = false;
     this.query.start = 0;
@@ -162,6 +192,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   sortByDistance() {
+    console.log('=== sortByDistance ===');
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         this.mapLoc.lat = p.coords.latitude;

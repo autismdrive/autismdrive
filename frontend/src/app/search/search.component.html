@@ -10,7 +10,7 @@
     <h2>
       <span>
         <mat-icon>filter_list</mat-icon>
-        Filters
+        Filter Resources By:
       </span>
       <div class="spacer"></div>
       <button
@@ -43,84 +43,89 @@
           </mat-list-item>
         </mat-list>
       </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Sort Results
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          <mat-list-item
-            (click)="sortByDistance()"
-            class="sort-order"
-          >
-            Near me
-            <div class="spacer"></div>
-          </mat-list-item>
-          <mat-list-item
-            (click)="sortByRelevance()"
-            class="sort-order"
-          >
-            Search Relevance
-            <div class="spacer"></div>
-          </mat-list-item>
-          <mat-list-item
-            (click)="sortByDate()"
-            class="sort-order"
-          >
-            Recently Updated
-            <div class="spacer"></div>
-          </mat-list-item>
-        </mat-list>
-      </mat-expansion-panel>
-
     </mat-accordion>
   </mat-sidenav>
   <mat-sidenav-content>
-    <div class="container">
-      <div class="row">
-        <ul class="applied-filters">
-          <li *ngIf="sideNav.opened">
-            <button
-              mat-button
-              (click)="sideNav.close()"
-            >
-              <i class="icofont-hand-left icofont-2x"></i>
-              Select a filter
-            </button>
-          </li>
-          <li *ngIf="!sideNav.opened">
-            <button
-              mat-button
-              (click)="sideNav.open()"
-            >
-              <mat-icon>filter_list</mat-icon>
-              Add a filter
-            </button>
-          </li>
-          <li *ngIf="query.words" class="applied-filter">
-            <button
-              mat-button
-              (click)="removeWords()"
-            >
-              <mat-icon>remove_circle_outline</mat-icon>
-              Search: {{query.words}}
-            </button>
-          </li>
-
-          <ng-container *ngFor="let filter of query.filters">
-            <li *ngFor="let fieldValue of filter.value" class="applied-filter">
+    <div
+      class="container"
+      fxLayout="column"
+    >
+      <div
+        class="row"
+        fxLayout="row"
+        fxLayoutGap="40px"
+      >
+        <div fxFlex="50%">
+          <ul class="applied-filters">
+            <li *ngIf="sideNav.opened">
               <button
                 mat-button
-                (click)="removeFilter(filter.field, fieldValue)"
+                (click)="sideNav.close()"
               >
-                <mat-icon>remove_circle_outline</mat-icon>
-                {{filter.field}} : {{fieldValue}}
+                <i class="icofont-hand-left icofont-2x"></i>
+                Select a filter
               </button>
             </li>
-          </ng-container>
-        </ul>
+            <li *ngIf="!sideNav.opened">
+              <button
+                mat-button
+                (click)="sideNav.open()"
+              >
+                <mat-icon>filter_list</mat-icon>
+                Add a filter
+              </button>
+            </li>
+            <li
+              *ngIf="query.words"
+              class="applied-filter"
+            >
+              <button
+                mat-button
+                (click)="removeWords()"
+              >
+                <mat-icon>remove_circle_outline</mat-icon>
+                Search: {{query.words}}
+              </button>
+            </li>
 
+            <ng-container *ngFor="let filter of query.filters">
+              <li
+                *ngFor="let fieldValue of filter.value"
+                class="applied-filter"
+              >
+                <button
+                  mat-button
+                  (click)="removeFilter(filter.field, fieldValue)"
+                >
+                  <mat-icon>remove_circle_outline</mat-icon>
+                  {{filter.field}} : {{fieldValue}}
+                </button>
+              </li>
+            </ng-container>
+          </ul>
+
+        </div>
+
+        <div
+          class="sort-results"
+          fxFlex="50%"
+        >
+          <mat-form-field>
+            <mat-label>
+              Sort Results By:
+            </mat-label>
+            <mat-select [(value)]="sorts[selectedSortIndex].name">
+              <mat-option
+                *ngFor="let sort of sorts; let i = index"
+                (click)="sortBy(i)"
+                class="sort-order"
+                [value]="sort.name"
+              >{{sort.label}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
         <div
           id="results"
           fxLayout="column"
