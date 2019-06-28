@@ -1,4 +1,3 @@
-import datetime
 import importlib
 import re
 
@@ -66,6 +65,8 @@ class ExportService:
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
+
+
     @staticmethod
     def get_data(name, last_modifed_after = None):
         print("Exporting " + name)
@@ -73,18 +74,24 @@ class ExportService:
         query = db.session.query(model)
         if last_modifed_after:
             query = query.filter(model.last_updated > last_modifed_after)
+        if hasattr(model, '__mapper_args__') \
+                and 'polymorphic_identity' in model.__mapper_args__:
+            query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
         return query.all()
 
     @staticmethod
     def load_data(exportInfo, data):
         if len(data) < 1:
             return  # Nothing to do here.
-        print("Loading " + exportInfo.class_name)
+        print("Loading " + str(len(data)) + " records into " + exportInfo.class_name + "")
         schema = ExportService.get_schema(exportInfo.class_name, many=False)
+        model_class = ExportService.get_class(exportInfo.class_name)
         for item in data:
             item_copy = dict(item)
-            links = item_copy.pop("_links")
-            model, errors = schema.load(item_copy, session=db.session)
+            if "_links" in item_copy:
+                links = item_copy.pop("_links")
+            existing_model = db.session.query(model_class).filter_by(id=item['id']).first()
+            model, errors = schema.load(item_copy, session=db.session, instance=existing_model)
             if not errors:
                 try:
                     db.session.add(model)
@@ -92,6 +99,7 @@ class ExportService:
                     if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
                         print("WE SHOULD CALL A DELETE ON THE MAIN SERVER HERE.")
                 except Exception as e:
+                    db.session.rollback()
                     print("THERE WAS AN ERROR" + str(e))
             else:
                 raise Exception("Failed!" + errors)
@@ -100,9 +108,10 @@ class ExportService:
 
     # Returns a list of classes that can be exported from the system.
     @staticmethod
-    def get_export_info():
+    def get_export_info(last_modifed_after=None):
         export_infos = []
-        for table in db.metadata.sorted_tables:
+        sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
+        for table in sorted_tables:
             db_model = ExportService.get_class_for_table(table)
 
             # Never export Identifying information.
@@ -113,7 +122,11 @@ class ExportService:
                 continue
 
             export_info = ExportInfo(table_name=table.name, class_name= db_model.__name__)
-            export_info.size=db.session.execute(db.select([func.count()]).select_from(table)).scalar(),
+
+            query = (db.session.query(func.count(db_model.id)))
+            if last_modifed_after:
+                query = query.filter(db_model.last_updated > last_modifed_after)
+            export_info.size = query.all()[0][0]
             export_info.url=url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
             if hasattr(db_model, '__question_type__'):
                 export_info.type = db_model.__question_type__

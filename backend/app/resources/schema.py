@@ -49,8 +49,10 @@ class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
         fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies',
-                  'investigators')
-
+                  'investigators', '_links')
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.organizationendpoint', id='<id>'),
+    })
 
 class InvestigatorSchema(ModelSchema):
     class Meta:
@@ -90,10 +92,10 @@ class CategorySchema(ModelSchema):
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
     parent = fields.Nested(ParentCategorySchema, dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
-    event_count = fields.Method('get_event_count')
-    location_count = fields.Method('get_location_count')
-    resource_count = fields.Method('get_resource_count')
-    study_count = fields.Method('get_study_count')
+    event_count = fields.Method('get_event_count', dump_only=True)
+    location_count = fields.Method('get_location_count', dump_only=True)
+    resource_count = fields.Method('get_resource_count', dump_only=True)
+    study_count = fields.Method('get_study_count', dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')

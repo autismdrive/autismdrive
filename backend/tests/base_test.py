@@ -1,6 +1,15 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
+
+from app.model.email_log import EmailLog
+from app.model.event import Event
+from app.model.investigator import Investigator
+from app.model.step_log import StepLog
+from app.model.study import Study, Status
+from app.model.study_category import StudyCategory
+from app.model.study_investigator import StudyInvestigator
+
 os.environ["TESTING"] = "true"
 
 from flask import json
@@ -157,3 +166,68 @@ class BaseTest:
         db.session.add(rc)
         db.session.commit()
         return c
+
+    def construct_study_category(self, study_id, category_name):
+        c = self.construct_category(name=category_name)
+        sc = StudyCategory(study_id=study_id, category=c)
+        db.session.add(sc)
+        db.session.commit()
+        return c
+
+    def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
+                        participant_description="Even your pet hamster could benefit from participating in this study",
+                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
+
+        study = Study(title=title, description=description, participant_description=participant_description,
+                      benefit_description=benefit_description, status=Status.currently_enrolling)
+        study.organization_id = self.construct_organization().id
+        db.session.add(study)
+        db.session.commit()
+
+        db_study = db.session.query(Study).filter_by(title=study.title).first()
+        self.assertEqual(db_study.description, description)
+        elastic_index.add_document(db_study, 'Study')
+        return db_study
+
+    def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
+
+        investigator = Investigator(name=name, title=title)
+        investigator.organization_id = self.construct_organization().id
+        db.session.add(investigator)
+        db.session.commit()
+
+        db_inv = db.session.query(Investigator).filter_by(name=investigator.name).first()
+        self.assertEqual(db_inv.title, investigator.title)
+        return db_inv
+
+    def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
+                           street_address1="123 Some Pl", street_address2="Apt. 45",
+                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
+                           website="http://stardrive.org"):
+
+        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
+                                state=state, zip=zip, phone=phone, website=website)
+        event.organization_id = self.construct_organization().id
+        db.session.add(event)
+
+        db_event = db.session.query(Event).filter_by(title=event.title).first()
+        self.assertEqual(db_event.website, event.website)
+        elastic_index.add_document(db_event, 'Event')
+        return db_event
+
+    def construct_everything(self):
+        self.construct_all_questionnaires()
+        cat = self.construct_category()
+        org = self.construct_organization()
+        self.construct_resource()
+        study = self.construct_study()
+        location = self.construct_location()
+        event = self.construct_event()
+        self.construct_location_category(location.id, cat.name)
+        self.construct_study_category(study.id, cat.name)
+        investigator = Investigator(name="Sam I am", organization_id=org.id)
+        db.session.add(StudyInvestigator(study = study, investigator = investigator))
+        db.session.add(investigator)
+        db.session.add(EmailLog())
+        db.session.add(StepLog())
+        db.session.commit()

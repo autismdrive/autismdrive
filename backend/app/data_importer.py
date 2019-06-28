@@ -18,17 +18,21 @@ class DataImporter:
 
     LOGIN_ENDPOINT = "/api/login_password"
     EXPORT_ENDPOINT = "/api/export"
+    USER_ENDPOINT = "/api/session"
     token = "invalid"
 
     def __init__(self, app, db):
-        scheduler = BackgroundScheduler()
-        scheduler.start()
-        job2 = scheduler.add_job(self.get_questionnaires, 'interval', seconds=5)
         self.master_url = app.config["MASTER_URL"]
+        self.app = app
         self.db = db
         self.logger = app.logger
         self.email = app.config["MASTER_EMAIL"]
         self.password = app.config["MASTER_PASS"]
+
+    def start(self):
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        job2 = scheduler.add_job(self.get_questionnaires, 'interval', seconds=5)
 
     def login(self):
         creds = {'email': self.email, 'password': self.password}
@@ -50,18 +54,19 @@ class DataImporter:
             headers = {'Authorization': 'Bearer {}'.format(self.token)}
         return headers
 
-    def load_data(self):
+    def get_export_list(self):
         response = requests.get(self.master_url + self.EXPORT_ENDPOINT, headers=self.get_headers())
-        exportables = ExportInfoSchema().load(response.json())
+        exportables = ExportInfoSchema(many=True).load(response.json()).data
         return exportables
 
-    def load_data(self):
+    def request_data(self):
         all_data = {}
-        exports = ExportService.get_export_info()
+        exports = self.get_export_list()
         for export in exports:
-            rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
-                              headers=self.logged_in_headers())
-            all_data[export.class_name] = json.loads(rv.get_data(as_text=True))
+            if export.size == 0:
+                continue
+            response = requests.get(export.url, headers=self.get_headers())
+            all_data[export.class_name] = response.json()
         return all_data
 
     # Takes the partial path of an endpoint, and returns json.  Logging any errors.
@@ -72,41 +77,3 @@ class DataImporter:
             return response.json()
         except requests.exceptions.ConnectionError as err:
             self.logger.error("Uable to contact the master instance at " + url)
-
-    def get_users(self):
-        data = self.__get_json(self.USER_ENDPOINT)
-        schema = UserSchema()
-        for record in data:
-            updated, errors = schema.load(data)
-            self.db.session.merge(updated)
-        self.db.session.commit
-
-    # Now get a list of the questionnaires to pull back.
-    def get_questionnaires(self):
-        data = self.__get_json(self.QUESTION_ENDPOINT)
-        for q in data:
-            meta_data = self.get_metadata(question_name=q)
-            self.pull_data_for_question(question_name=q, meta_data=meta_data)
-
-    def get_metadata(self, question_name):
-        return self.__get_json(self.QUESTION_ENDPOINT + "/" + question_name + "/meta")
-
-    def pull_data_for_question(self, question_name, meta_data):
-        data = self.__get_json(self.QUESTION_ENDPOINT + "/" + question_name + "/export")
-        class_ref = ExportService.get_class(question_name)
-        schema = ExportService.get_schema(question_name, session=self.db.session)
-        for record in data:
-            self.save_data(question_name, record)
-
-    def save_data(self, name, data):
-        try: # Attempt to update existing data record
-            instance = self.db.session.query(class_ref).filter(class_ref.id == data['id']).first()
-            updated, errors = schema.load(data, instance=instance)
-        except exc.IntegrityError as ie: # If this fails, create a new record
-            self.db.session.rollback()
-            updated, errors = schema.load(data)
-        if errors:
-            raise Exception("Failed to save record.", details=errors)
-        self.db.session.merge(updated)
-        self.db.session.commit()
-

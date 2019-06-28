@@ -11,20 +11,6 @@ from app.model.resource_category import ResourceCategory
 
 class TestEvents(BaseTest, unittest.TestCase):
 
-    def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
-                           street_address1="123 Some Pl", street_address2="Apt. 45",
-                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org"):
-
-        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip, phone=phone, website=website)
-        event.organization_id = self.construct_organization().id
-        db.session.add(event)
-
-        db_event = db.session.query(Event).filter_by(title=event.title).first()
-        self.assertEqual(db_event.website, event.website)
-        elastic_index.add_document(db_event, 'Event')
-        return db_event
 
     def test_event_basics(self):
         self.construct_event()

@@ -7,6 +7,7 @@ from app import db
 from app.export_service import ExportService
 from app.model.participant import Relationship, Participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+
 from app.model.user import Role, User
 from app.resources.schema import UserSchema, ParticipantSchema
 from tests.base_test import clean_db
@@ -175,10 +176,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(0, len(db.session.query(IdentificationQuestionnaire).all()),
                          msg="Identifying Questionnaires should not import.")
 
-    def test_all_exports_have_links_to_self(self):
-        self.construct_all_questionnaires()
+    def test_all_sensitive_exports_have_links_to_self(self):
+        self.construct_everything()
         exports = ExportService.get_export_info()
         for export in exports:
+            if export.question_type != ExportService.TYPE_SENSITIVE:
+                continue
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
             data = json.loads(rv.get_data(as_text=True))
@@ -203,7 +206,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         return datetime.datetime.strptime(dateString, "%Y-%m-%d").date()
 
     def test_retrieve_records_later_than(self):
-        self.construct_all_questionnaires()
+        self.construct_everything()
 #        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
 
         date = datetime.datetime.now()
@@ -215,5 +218,19 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             data = json.loads(rv.get_data(as_text=True))
             self.assertEquals(0, len(data), msg=export.url + " does not respect 'after' param in get request.")
 
-    def admin_accounts_should_transfer_completely(self):
-        self.assertFalse(False, msg="Admin accounts should be replicated so folks can log into the private systems.")
+    def test_export_list_count_is_date_based(self):
+        self.construct_everything()
+        date = datetime.datetime.now()
+        exports = ExportService.get_export_info()
+        for export in exports:
+            self.assertTrue(export.size > 0, msg=export.class_name + " should have a count > 0")
+        exports = ExportService.get_export_info(date)
+        for export in exports:
+            self.assertEqual(0, export.size)
+
+    def test_it_all_crazy_madness_wohoo(self):
+        self.construct_everything()
+        data = self.get_export()
+        clean_db(db)
+        db.session.commit()
+        self.load_database(data)

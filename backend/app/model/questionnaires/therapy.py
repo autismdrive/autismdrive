@@ -143,8 +143,8 @@ class TherapySchema(ModelSchema):
         ordered = True
         fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other",
                   "timeframe", "notes", "participant_id", "user_id")
-    participant_id = fields.Method('get_participant_id')
-    user_id = fields.Method('get_user_id')
+    participant_id = fields.Method('get_participant_id', dump_only=True)
+    user_id = fields.Method('get_user_id', dump_only=True)
 
     def get_participant_id(self, obj):
         return obj.supports_questionnaire.participant_id
