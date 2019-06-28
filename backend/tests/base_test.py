@@ -1,6 +1,7 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
+os.environ["TESTING"] = "true"
 
 from app.model.email_log import EmailLog
 from app.model.event import Event
@@ -10,7 +11,6 @@ from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 
-os.environ["TESTING"] = "true"
 
 from flask import json
 
