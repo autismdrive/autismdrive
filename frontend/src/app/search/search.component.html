@@ -23,27 +23,29 @@
     </h2>
     <div class="spacer"></div>
     <mat-accordion *ngIf="!loading">
-      <mat-expansion-panel
-        *ngFor="let facet of query.facets"
-        [ngClass]="{'filter-facet': true}"
-      >
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{facet.field}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          <mat-list-item
-            *ngFor="let count of facet.facetCounts"
-            (click)="addFilter(facet.field, count.category)"
-            [ngClass]="{'filter-facet-item': true}"
-          >
-            {{count.category}}
-            <div fxFlex></div>
-            <span class="hit-count">{{count.hit_count}}</span>
-          </mat-list-item>
-        </mat-list>
-      </mat-expansion-panel>
+      <ng-container *ngFor="let facet of query.facets">
+        <mat-expansion-panel
+          *ngIf="facet.facetCounts.length > 0"
+          [ngClass]="{'filter-facet': true}"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{facet.field}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            <mat-list-item
+              *ngFor="let count of facet.facetCounts"
+              (click)="addFilter(facet.field, count.category)"
+              [ngClass]="{'filter-facet-item': true}"
+            >
+              {{count.category}}
+              <div fxFlex></div>
+              <span class="hit-count">{{count.hit_count}}</span>
+            </mat-list-item>
+          </mat-list>
+        </mat-expansion-panel>
+      </ng-container>
     </mat-accordion>
   </mat-sidenav>
   <mat-sidenav-content>

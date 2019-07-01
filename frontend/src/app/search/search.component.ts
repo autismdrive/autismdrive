@@ -11,8 +11,9 @@ import {
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Filter, Query, Sort } from '../_models/query';
+import { Filter, Query, Sort, Hit, HitLabel } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
+import { StudyStatus } from '../_models/study';
 
 interface SortMethod {
   name: string;
@@ -70,6 +71,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectedSort: SortMethod;
   @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  featuredStudies: Hit[];
 
   constructor(
     changeDetectorRef: ChangeDetectorRef,
@@ -77,6 +79,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private router: Router,
     private renderer: Renderer2,
     private searchService: SearchService,
+    private featuredSearchService: SearchService,
     media: MediaMatcher,
   ) {
     this.selectedSort = this.sortMethods[0];
@@ -167,6 +170,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         if (this.query.equals(queryWithResults)) {
           this.query = queryWithResults;
           this.checkWindowWidth();
+          this.searchFeaturedStudies();
           this.loading = false;
         } else {
           this.updateUrl(this.query);
@@ -177,6 +181,15 @@ export class SearchComponent implements OnInit, OnDestroy {
         'event_category': 'search'
       });
     }
+  }
+
+  searchFeaturedStudies() {
+    const query = new Query(this.query);
+    query.replaceFilter('Type', HitLabel.STUDY);
+    query.filters.push({field: 'Status', value: [StudyStatus.currently_enrolling]});
+    this.featuredSearchService.search(query).subscribe(queryWithResults => {
+      console.log('Featured studies queryWithResults', queryWithResults);
+    });
   }
 
   loadMapLocation(callback: Function) {
@@ -212,21 +225,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   addFilter(field: string, fieldValue: string) {
-    const i = this.query.filters.findIndex(f => f.field === field);
-
-    // Filter has already been set
-    if (i > -1) {
-
-      // Make sure it's not a duplicate value
-      const j = this.query.filters[i].value.findIndex(v => v === fieldValue);
-
-      if (j === -1) {
-        this.query.filters[i].value.push(fieldValue);
-      }
-    } else {
-      this.query.filters.push({ field: field, value: [fieldValue] });
-    }
-
+    this.query.addFilter(field, fieldValue);
     this.query.start = 0;
 
     if (this.paginator) {
@@ -237,14 +236,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   removeFilter(field: string, fieldValue: string) {
-    const i = this.query.filters.findIndex(f => f.field === field);
-
-    if (i > -1) {
-      const j = this.query.filters[i].value.findIndex(v => v === fieldValue);
-      if (j > -1) {
-        this.query.filters[i].value.splice(j, 1);
-      }
-    }
+    this.query.removeFilter(field, fieldValue);
     this.query.start = 0;
     this.updateUrl(this.query);
   }
