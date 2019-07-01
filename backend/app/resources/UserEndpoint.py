@@ -3,7 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists, or_
+from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 
 from app import RestException, db, email_service, auth

@@ -37,6 +37,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Participant', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'User', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'EvaluationHistorySelfQuestionnaire', response))))
+        self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Category', response))))
 
     def test_get_list_of_exportables_has_basic_attributes(self):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
@@ -229,8 +230,25 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             self.assertEqual(0, export.size)
 
     def test_it_all_crazy_madness_wohoo(self):
+        # Sanity check, can we load everything, export it, delete, and reload it all without error.
         self.construct_everything()
         data = self.get_export()
         clean_db(db)
         db.session.commit()
         self.load_database(data)
+
+    def test_export_admin_details(self):
+        user = self.construct_user(email="testadmin@test.com", role=Role.admin)
+        user.password = "this_is_my_password!"
+        db.session.add(user)
+        db.session.commit()
+
+        rv = self.app.get('/api/export/admin',
+                          follow_redirects=True,
+                          content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertTrue(len(response) > 1)
+        self.assertEqual(1, len(list(filter(lambda field: field['email'] == 'testadmin@test.com', response))))
+        self.assertEqual(1, len(list(filter(lambda field: field['_password'] is not None, response))))

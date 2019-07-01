@@ -7,19 +7,19 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # Fire of the scheduler
 # The Data Importer should run on the SLAVE, and will make calls to the master to download
 # data, store it locally, and remove it from the master when necessary.
-from flask import json
-from sqlalchemy import exc, desc
+from sqlalchemy import desc
 
 from app.export_service import ExportService
 from app.model.export_info import ExportInfoSchema
 from app.model.import_log import ImportLog
-from app.resources.schema import UserSchema
+from app.resources.ExportSchema import AdminExportSchema
 
 
 class DataImporter:
 
     LOGIN_ENDPOINT = "/api/login_password"
     EXPORT_ENDPOINT = "/api/export"
+    EXPORT_ADMIN_ENDPOINT = "/api/export/admin"
     USER_ENDPOINT = "/api/session"
     token = "invalid"
 
@@ -121,3 +121,13 @@ class DataImporter:
             return response.json()
         except requests.exceptions.ConnectionError as err:
             self.logger.error("Uable to contact the master instance at " + url)
+
+    def load_admin(self):
+        url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
+        response = requests.get(url).json()
+        schema = AdminExportSchema(many=True)
+        admin_users, errors = schema.load(response, session=self.db.session)
+        for user in admin_users:
+            user._password = str.encode(user._password)
+            self.db.session.add(user)
+        self.db.session.commit()

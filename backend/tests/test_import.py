@@ -10,7 +10,7 @@ from app.data_importer import DataImporter
 from app.model.export_info import ExportInfo, ExportInfoSchema
 from app.model.import_log import ImportLog
 from app.model.user import User, Role
-from app.resources.ExportSchema import UserExportSchema
+from app.resources.ExportSchema import UserExportSchema, AdminExportSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
@@ -117,7 +117,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         )
         export_list = data_importer.get_export_list()
         data_importer.request_data(export_list)
-        self.assertEqual(2, len(httpretty.httpretty.latest_requests)) # Assumes one request for auth check.
+        self.assertEqual(2, len(httpretty.httpretty.latest_requests))  # Assumes one request for auth check.
         self.assertEqual("/api/export", httpretty.last_request().path)
 
     def request_user_setup(self):
@@ -204,7 +204,6 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEquals(0, log.success_count)
         self.assertEquals(1, log.failure_count)
 
-
     @httpretty.activate
     def test_request_includes_date_param_if_log_exists(self):
         # log a previous success
@@ -220,5 +219,27 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         self.assertTrue("after" in httpretty.last_request().querystring)
 
+    @httpretty.activate
     def test_admin_accounts_should_be_requested_in_full(self):
-        self.assertTrue(False, msg="Admin accounts should be replicated so folks can log into the private systems.")
+        data_importer = self.get_data_importer_setup_auth()
+        user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
+                    role=Role.admin, email_verified=True)
+        user.password = "tacos are good"
+        user_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://na.edu/api/export/admin",
+            body=user_json,
+            status=200
+        )
+        data_importer.load_admin()
+
+#        encoded = base64.encodestring(user._password)
+#        data = {'email': 'dan@test.com', 'password': encoded.decode()}
+        data = {'email': 'dan@test.com', 'password': 'tacos are good'}
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assertEqual(200, rv.status_code)
+

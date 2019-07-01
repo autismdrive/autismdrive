@@ -33,6 +33,17 @@ class UserExportSchema(ModelSchema):
     def obfuscate_email(self, obj):
         return obj.id
 
+
+class AdminExportSchema(ModelSchema):
+    """Allows the full details of an admin account to be exported, so that administrators
+    can continue to log into the secondary private server with their normal credentials."""
+    class Meta:
+        model = User
+        fields = ('id', 'last_updated', 'email', '_password', 'role',
+                  'participants', 'token', 'email_verified')
+    role = EnumField(Role)
+
+
 class ParticipantExportSchema(ModelSchema):
     """ Used exclusively for data export, removes identifying information"""
     class Meta:
@@ -44,6 +55,7 @@ class ParticipantExportSchema(ModelSchema):
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.participantendpoint', id='<id>'),
     })
+
 
 class OrganizationExportSchema(ModelSchema):
     """Don't include sub relationships for Organization when dumping."""
