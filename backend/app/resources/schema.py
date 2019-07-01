@@ -9,11 +9,13 @@ from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.investigator import Investigator
+from app.model.email_log import EmailLog
 from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search, Sort
+from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -531,3 +533,32 @@ class StepSchema(Schema):
 class FlowSchema(Schema):
     name = fields.Str()
     steps = fields.Nested(StepSchema(), many=True)
+
+
+class EmailLogSchema(Schema):
+    class Meta:
+        model = EmailLog
+        fields = ('id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed')
+        ordered = True
+    id = fields.Integer(required=False, allow_none=True)
+    user_id = fields.Integer()
+    type = fields.Str()
+    tracking_code = fields.Str()
+    viewed = fields.Boolean()
+    date_viewed = fields.Date()
+
+
+class StepLogSchema(Schema):
+    class Meta:
+        model = StepLog
+        fields = ('id', 'questionnaire_name', 'questionnaire_id', 'flow', 'participant_id', 'user_id', 'date_completed',
+                  'time_on_task_ms')
+        ordered = True
+    id = fields.Integer(required=False, allow_none=True)
+    questionnaire_name = fields.Str()
+    questionnaire_id = fields.Integer()
+    flow = fields.Str()
+    participant_id = fields.Integer()
+    user_id = fields.Integer()
+    date_completed = fields.Date()
+    time_on_task_ms = fields.Integer()
