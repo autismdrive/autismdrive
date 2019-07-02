@@ -77,15 +77,19 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[5]) if row[5] else None
+                geocode = self.get_geocode(
+                    address_dict={'street': row[8], 'city': row[10], 'state': row[11], 'zip': row[12]},
+                    lat_long_dict={'lat': row[15], 'lng': row[16]}
+                )
                 event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
                               organization=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
                               street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
-                              phone=row[14])
+                              phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'])
                 db.session.add(event)
                 db.session.commit()
                 self.__increment_id_sequence(StarResource)
 
-                for i in range(15, len(row)):
+                for i in range(17, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         event_id = event.id
@@ -103,28 +107,19 @@ class DataLoader:
         with open(self.location_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
-            api_key = app.config.get('GOOGLE_MAPS_API_KEY')
-            gmaps = googlemaps.Client(key=api_key)
 
             for row in reader:
                 org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
-                lat = None if row[16] is '' else float(row[16])
-                lng = None if row[17] is '' else float(row[17])
-                address = '{s1} {s2}, {c}, {st} {z}'.format(s1=row[7], s2=row[8], c=row[9], st=row[10], z=row[11])
 
-                if lat is None and lng is None:
-                    geocode_result = gmaps.geocode(address)
-
-                    if geocode_result is not None:
-                        if geocode_result[0] is not None:
-                            loc = geocode_result[0]['geometry']['location']
-                            lat = loc['lat']
-                            lng = loc['lng']
+                geocode = self.get_geocode(
+                    address_dict={'street': row[7], 'city': row[9], 'state': row[10], 'zip': row[11]},
+                    lat_long_dict={'lat': row[16], 'lng': row[17]}
+                )
 
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
                                     zip=row[11], website=row[13], phone=row[15], email=row[14],
-                                    latitude=lat, longitude=lng)
+                                    latitude=geocode['lat'], longitude=geocode['lng'])
                 db.session.add(location)
                 db.session.commit()
                 self.__increment_id_sequence(StarResource)
@@ -393,6 +388,33 @@ class DataLoader:
             db.session.add(category)
             db.session.commit()
         return category
+
+    def get_geocode(self, address_dict, lat_long_dict):
+        api_key = app.config.get('GOOGLE_MAPS_API_KEY')
+        gmaps = googlemaps.Client(key=api_key)
+        lat = None
+        lng = None
+
+        # Check that location has a street address
+        if '' not in address_dict.values():
+
+            # Use stored latitude & longitude, if available
+            if '' not in lat_long_dict.values():
+                lat = lat_long_dict['lat']
+                lng = lat_long_dict['lng']
+
+            # Otherwise, look it up using Google Maps API
+            else:
+                address = ' '.join(address_dict.values())
+                geocode_result = gmaps.geocode(address)
+
+                if geocode_result is not None:
+                    if geocode_result[0] is not None:
+                        loc = geocode_result[0]['geometry']['location']
+                        lat = loc['lat']
+                        lng = loc['lng']
+
+        return {'lat': lat, 'lng': lng}
 
     def build_index(self):
         elastic_index.load_documents(

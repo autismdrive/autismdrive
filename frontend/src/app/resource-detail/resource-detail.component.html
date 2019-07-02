@@ -17,8 +17,8 @@
     >
       <h1>{{resource.title}}</h1>
       <!--<img-->
-        <!--*ngIf="resource.image"-->
-        <!--[src]="resource.image"-->
+      <!--*ngIf="resource.image"-->
+      <!--[src]="resource.image"-->
       <!--&gt;-->
       <!--<caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>-->
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
@@ -50,6 +50,33 @@
       fxLayoutGap="20px"
     >
       <div id="resource-contact">
+        <mat-card *ngIf="resource && resource.hasCoords()">
+          <mat-card-content>
+            <agm-map
+              [latitude]="resource.latitude"
+              [longitude]="resource.longitude"
+              [streetViewControl]="false"
+              mapTypeId="roadmap"
+              [zoom]="7"
+            >
+              <agm-marker
+                *ngIf="resource.hasCoords()"
+                [latitude]="resource.latitude"
+                [longitude]="resource.longitude"
+              >
+                <agm-info-window *ngIf="mapLoc">
+                  <h5>{{resource.title}}</h5>
+                  <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
+                  <a
+                    class="chevron-link"
+                    href="{{getGoogleMapsUrl()}}"
+                    target="_blank"
+                  >Driving directions</a>
+                </agm-info-window>
+              </agm-marker>
+            </agm-map>
+          </mat-card-content>
+        </mat-card>
         <mat-card>
           <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
           <mat-card-content>
@@ -77,7 +104,10 @@
               </mat-list-item>
               <mat-list-item *ngIf="resource.website">
                 <mat-icon>link</mat-icon>
-                <a target="_blank" href="{{resource.website}}">{{resource.website}}</a>
+                <a
+                  target="_blank"
+                  href="{{resource.website}}"
+                >{{resource.website}}</a>
               </mat-list-item>
             </mat-list>
           </mat-card-content>

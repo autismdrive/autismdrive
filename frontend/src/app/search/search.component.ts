@@ -11,8 +11,15 @@ import {
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Filter, Query } from '../_models/query';
+import { Filter, Query, Sort, Hit, HitLabel } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
+import { StudyStatus } from '../_models/study';
+
+interface SortMethod {
+  name: string;
+  label: string;
+  sortQuery: Sort;
+}
 
 @Component({
   selector: 'app-search',
@@ -32,9 +39,39 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
-
+  sortMethods: SortMethod[] = [
+    {
+      name: 'Relevance',
+      label: 'Relevance',
+      sortQuery: {
+        field: '_score',
+        order: 'asc',
+      }
+    },
+    {
+      name: 'Distance',
+      label: 'Near me',
+      sortQuery: {
+        field: 'geo_point',
+        latitude: this.mapLoc.lat,
+        longitude: this.mapLoc.lng,
+        order: 'asc',
+        unit: 'mi'
+      }
+    },
+    {
+      name: 'Date',
+      label: 'Recently Updated',
+      sortQuery: {
+        field: 'last_updated',
+        order: 'desc'
+      }
+    },
+  ];
+  selectedSort: SortMethod;
   @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  featuredStudies: Hit[];
 
   constructor(
     changeDetectorRef: ChangeDetectorRef,
@@ -42,32 +79,35 @@ export class SearchComponent implements OnInit, OnDestroy {
     private router: Router,
     private renderer: Renderer2,
     private searchService: SearchService,
+    private featuredSearchService: SearchService,
     media: MediaMatcher,
   ) {
+    this.selectedSort = this.sortMethods[0];
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
+    this.loadMapLocation(() => {
+      this.route.queryParamMap.subscribe(qParams => {
+        let words = '';
+        const filters: Filter[] = [];
 
-    this.route.queryParamMap.subscribe(qParams => {
-      let words = '';
-      const filters: Filter[] = [];
-
-      for (const key of qParams.keys) {
-        if (key === 'words') {
-          words = qParams.get(key);
-        } else {
-          filters.push({ field: key, value: qParams.getAll(key) });
+        for (const key of qParams.keys) {
+          if (key === 'words') {
+            words = qParams.get(key);
+          } else {
+            filters.push({ field: key, value: qParams.getAll(key) });
+          }
         }
-      }
 
-      this.query = new Query({
-        words: words,
-        filters: filters,
-        size: this.pageSize,
+        this.query = new Query({
+          words: words,
+          filters: filters,
+          size: this.pageSize,
+        });
+
+        this.doSearch();
+        this.updateFilters();
       });
-
-      this.doSearch();
-      this.updateFilters();
     });
 
     this.renderer.listen(window, 'resize', (event) => {
@@ -130,6 +170,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         if (this.query.equals(queryWithResults)) {
           this.query = queryWithResults;
           this.checkWindowWidth();
+          this.searchFeaturedStudies();
           this.loading = false;
         } else {
           this.updateUrl(this.query);
@@ -142,59 +183,49 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  sortByDate() {
-    this.query.sort = {
-      field: 'last_updated',
-      order: 'desc'
-    };
-    this.showFilters = false;
-    this.query.start = 0;
-    // this.updateUrl(this.query);
-    this.doSearch();
+  searchFeaturedStudies() {
+    const query = new Query(this.query);
+    query.replaceFilter('Type', HitLabel.STUDY);
+    query.filters.push({field: 'Status', value: [StudyStatus.currently_enrolling]});
+    this.featuredSearchService.search(query).subscribe(queryWithResults => {
+      console.log('Featured studies queryWithResults', queryWithResults);
+    });
   }
 
-  sortByRelevance() {
-    this.query.sort = { field: '_score' };
-    this.showFilters = false;
-    this.query.start = 0;
-    // this.updateUrl(this.query);
-    this.doSearch();
-  }
-
-  sortByDistance() {
+  loadMapLocation(callback: Function) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
-        this.mapLoc.lat = p.coords.latitude;
-        this.mapLoc.lng = p.coords.longitude;
-        this.query.sort = {
-          field: 'geo_point',
-          latitude: this.mapLoc.lat,
-          longitude: this.mapLoc.lng,
-          order: 'asc',
-          unit: 'mi'
+        this.mapLoc = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude
         };
-        // this.updateUrl(this.query);
+        callback();
+      });
+    } else {
+      callback();
+    }
+  }
+
+  sortBy(selectedSort: SortMethod) {
+    this.loading = true;
+    this.selectedSort = selectedSort;
+    this.query.start = 0;
+    this.query.sort = selectedSort.sortQuery;
+
+
+    if (selectedSort.name === 'Distance') {
+      this.loadMapLocation(() => {
+        this.query.sort.latitude = this.mapLoc.lat;
+        this.query.sort.longitude = this.mapLoc.lng;
         this.doSearch();
       });
+    } else {
+      this.doSearch();
     }
   }
 
   addFilter(field: string, fieldValue: string) {
-    const i = this.query.filters.findIndex(f => f.field === field);
-
-    // Filter has already been set
-    if (i > -1) {
-
-      // Make sure it's not a duplicate value
-      const j = this.query.filters[i].value.findIndex(v => v === fieldValue);
-
-      if (j === -1) {
-        this.query.filters[i].value.push(fieldValue);
-      }
-    } else {
-      this.query.filters.push({ field: field, value: [fieldValue] });
-    }
-
+    this.query.addFilter(field, fieldValue);
     this.query.start = 0;
 
     if (this.paginator) {
@@ -205,14 +236,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   removeFilter(field: string, fieldValue: string) {
-    const i = this.query.filters.findIndex(f => f.field === field);
-
-    if (i > -1) {
-      const j = this.query.filters[i].value.findIndex(v => v === fieldValue);
-      if (j > -1) {
-        this.query.filters[i].value.splice(j, 1);
-      }
-    }
+    this.query.removeFilter(field, fieldValue);
     this.query.start = 0;
     this.updateUrl(this.query);
   }

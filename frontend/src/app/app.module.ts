@@ -1,4 +1,5 @@
 import { AgmCoreModule } from '@agm/core';
+import { AgmJsMarkerClustererModule } from '@agm/js-marker-clusterer';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -166,6 +167,7 @@ export class FormlyConfig {
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),
+    AgmJsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
     ColorPickerModule,
