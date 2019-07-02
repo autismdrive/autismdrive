@@ -8,14 +8,14 @@
     fxLayout="row"
   >
     <div>
-      <p>User ID: {{user.id}}</p>
+      <p><b>User ID: {{user.id}}</b></p>
       <p>User Email: {{user.email}}</p>
       <p>User Role: {{user.role}}</p>
       <p>Last Updated: {{user.last_updated | date:'long'}}</p>
     </div>
     <div
       class="email-log"
-      *ngIf="user.email_log.length > 0"
+      *ngIf="user.email_log && user.email_log.length > 0"
     >
       <h5>User Email Log:</h5>
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
@@ -65,11 +65,7 @@
     fxLayoutGap="2em"
   >
     <mat-card>
-      <p><b>Participant ID: {{p.id}}</b></p>
-      <p>Name: {{p.name || '(None given)'}}</p>
-      <p>Relationship: {{p.relationship}}</p>
-      <p>Last Updated: {{p.last_updated | date:'long'}}</p>
-      <p>Percent Complete: {{p.percent_complete || '0'}}%</p>
+      <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>
   </div>
 </div>

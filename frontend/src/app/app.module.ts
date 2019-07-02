@@ -68,6 +68,7 @@ import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
 import { LogoutComponent } from './logout/logout.component';
 import { NewsItemComponent } from './news-item/news-item.component';
+import { ParticipantDetailComponent } from './participant-detail/participant-detail.component';
 import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -139,6 +140,7 @@ export class FormlyConfig {
     LogoutComponent,
     LogoutComponent,
     NewsItemComponent,
+    ParticipantDetailComponent,
     ParticipantProfileComponent,
     PasswordResetComponent,
     ProfileComponent,
