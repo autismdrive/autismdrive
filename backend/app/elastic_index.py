@@ -26,6 +26,7 @@ class StarDocument(Document):
     website = Keyword()
     location = Keyword()
     life_age = Keyword()
+    status = Keyword()
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
     latitude = Double()
@@ -107,6 +108,7 @@ class ElasticIndex:
                            description=document.description,
                            location=None,
                            life_age=None,
+                           status=None,
                            category=[],
                            child_category=[],
                            latitude=None,
@@ -118,6 +120,8 @@ class ElasticIndex:
 
         if document.__tablename__ is not 'study':
             doc.website = document.website
+        elif document.status is not None:
+                doc.status = document.status.value
 
         if document.organization is not None:
             doc.organization = document.organization.name
@@ -188,7 +192,8 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
         'Type': elasticsearch_dsl.TermsFacet(field='label'),
         'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
         'Category': elasticsearch_dsl.TermsFacet(field='category'),
-        'Organization': elasticsearch_dsl.TermsFacet(field='organization')
+        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
+        'Status': elasticsearch_dsl.TermsFacet(field='status')
     }
 
     def highlight(self, search):

@@ -21,7 +21,7 @@ export class StudiesComponent implements OnInit {
     const query = new Query({
       filters: [{field: 'Type', value: HitLabel.STUDY}]
     });
-    this.api.search(query).subscribe(q => this.query = q);
+    this.api.search(query).subscribe(q => this.query = new Query(q));
   }
 
 }
