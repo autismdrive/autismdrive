@@ -4,11 +4,58 @@
   fxLayout="column"
 >
   <h1>User:</h1>
-  <p>User ID: {{user.id}}</p>
-  <p>User Email: {{user.email}}</p>
-  <p>User Role: {{user.role}}</p>
-  <p>Last Updated: {{user.last_updated | date:'long'}}</p>
+  <div
+    fxLayout="row"
+  >
+    <div>
+      <p>User ID: {{user.id}}</p>
+      <p>User Email: {{user.email}}</p>
+      <p>User Role: {{user.role}}</p>
+      <p>Last Updated: {{user.last_updated | date:'long'}}</p>
+    </div>
+    <div
+      class="email-log"
+      *ngIf="user.email_log.length > 0"
+    >
+      <h5>User Email Log:</h5>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="user_id">
+        <th mat-header-cell *matHeaderCellDef> User ID </th>
+        <td mat-cell *matCellDef="let element"> {{element.user_id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tracking_code">
+        <th mat-header-cell *matHeaderCellDef> Tracking Code </th>
+        <td mat-cell *matCellDef="let element"> {{element.tracking_code}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="viewed">
+        <th mat-header-cell *matHeaderCellDef> Viewed </th>
+        <td mat-cell *matCellDef="let element"> {{element.viewed}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date_viewed">
+        <th mat-header-cell *matHeaderCellDef> Date Viewed </th>
+        <td mat-cell *matCellDef="let element"> {{element.date_viewed | date:'longDate'}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    </div>
+  </div>
   <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>
   <div
     id="participants"

@@ -55,8 +55,8 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   }
 
   exportQ(questionnaire_name) {
-    console.log('clicking the button for export all');
-    this.api.exportQuestionnaire( questionnaire_name).subscribe( response => {
+    console.log('clicking the button for export ', questionnaire_name);
+    this.api.exportQuestionnaire(questionnaire_name).subscribe( response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});

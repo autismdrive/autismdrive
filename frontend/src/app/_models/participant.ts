@@ -1,4 +1,5 @@
 import { ParticipantRelationship } from './participantRelationship';
+import { StepLog } from './step_log';
 
 export class Participant {
   id?: number;
@@ -11,6 +12,7 @@ export class Participant {
   avatar_color?: string;
   avatar_icon?: string;
   has_consented: boolean;
+  step_log?: StepLog[];
 
   constructor(private _props) {
     for (const propName in this._props) {
