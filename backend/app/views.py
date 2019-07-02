@@ -14,6 +14,8 @@ from app.resources.FlowEndpoint import (
     FlowQuestionnaireEndpoint,
     FlowQuestionnaireMetaEndpoint)
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
+from app.resources.EmailLogEndpoint import EmailLogEndpoint
+from app.resources.StepLogEndpoint import StepLogEndpoint
 from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
 from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
@@ -39,6 +41,7 @@ from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
     OrganizationListEndpoint
 )
+from app.resources.QuestionnaireAndParticipantEndpoint import QuestionnaireByParticipantEndpoint
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
     QuestionnaireListEndpoint,
@@ -80,6 +83,7 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
+
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -168,11 +172,14 @@ endpoints = [
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
+    (EmailLogEndpoint, "/user/email_log/<user_id>"),
     # Participants
     (ParticipantEndpoint, "/participant/<id>"),
+    (StepLogEndpoint, "/participant/step_log/<participant_id>"),
     # Questionnaires
     (QuestionnaireNamesEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
+    (QuestionnaireByParticipantEndpoint, "/q/<string:name>/participant/<string:participant_id>"),
     (QuestionnaireListMetaEndpoint, "/q/<string:name>/meta"),
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireDataExportEndpoint, "/q/<string:name>/export"),
