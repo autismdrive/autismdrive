@@ -33,3 +33,32 @@ ng e2e --dev-server-target=
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
+## API keys
+
+Place any API keys in a file called `api-keys.ts` in the `frontend/src` directory. Note that it will be ignored by the `.gitignore` file and will not be committed to the repository. The file must be in the following format:
+
+```ts
+const keys = {
+  gcp: {
+    dev: 'PASTE_DEV_API_KEY_HERE',
+    staging: 'PASTE_STAGING_API_KEY_HERE',
+    production: 'PASTE_PRODUCTION_API_KEY_HERE'
+  }
+};
+
+export default keys;
+```
+
+In the app, When you need an API key, just import the `keys` object from `api-keys.ts`. For instance, in `frontend/src/environments/environment.prod.ts`:
+
+```ts
+import keys from '../api-keys';
+
+export const environment = {
+  production: true ,
+  api: 'http://http://34.224.58.224/api',
+  gcp_api_key: keys.gcp.production
+};
+```

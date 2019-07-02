@@ -1,24 +1,30 @@
 <div
-  class="container mat-typography"
+  class="container mat-typography terms"
   fxLayoutAlign="center center"
 >
   <div fxFlex="80%">
-    <app-logo variant="dark-lg" (click)="goHome($event)"></app-logo>
-    <h3 class="alert alert-warn">You must read and accept the following Terms & Conditions in order to continue
+    <app-logo variant="dark-lg" (click)="goProfile($event)"></app-logo>
+    <h3 *ngIf="!preview" class="alert alert-warn">You must read and accept the following Terms & Conditions in order to continue
       creating a STAR DRIVE account.</h3>
     <h1>Terms and Conditions</h1>
-    <p>Summarize, as simply as possible, which rights the participant is entitled to, and which right they are giving
-      up by
-      agreeing to these terms. Lorem ipsum habitasse adipiscing donec nunc curabitur rutrum nibh, felis curae tristique
-      nullam aliquam magna tincidunt lectus, dapibus auctor habitasse pretium euismod libero cras nec commodo iaculis
-      pharetra varius nibh.</p>
-    <p>Vulputate iaculis habitant at vulputate sollicitudin justo adipiscing, nisi potenti adipiscing mollis diam
-      facilisis, sit quis
-      pharetra dictum dictumst euismod. Odio mattis morbi ligula fusce hendrerit sodales gravida nostra hendrerit,
-      pretium
-      habitasse malesuada vitae eget dapibus sit curabitur quisque nulla, dui maecenas integer pellentesque est
-      dictumst dui
-      lacus.</p>
+    <div
+      *ngIf="relationship == 'self_guardian'"
+      id="guardian-terms"
+    >
+      <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/guardian_information_sheet.pdf"></ng2-pdfjs-viewer>
+    </div>
+    <div
+      *ngIf="relationship == 'self_participant' || relationship == 'self_professional'"
+      id="self-terms"
+    >
+      <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/adult_information_sheet.pdf"></ng2-pdfjs-viewer>
+    </div>
+    <div
+      *ngIf="relationship == 'dependent'"
+      id="dependent-terms"
+    >
+      <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/child_information_sheet.pdf"></ng2-pdfjs-viewer>
+    </div>
     <div
       fxLayout="row"
       fxLayout.xs="column"
@@ -26,22 +32,34 @@
       fxLayoutAlign="center center"
     >
       <button
+        *ngIf="!preview"
         mat-flat-button
-        (click)="goHome($event)"
+        (click)="goProfile($event)"
         color="accent"
         class="btn-lg"
-        id="cancel"
+        id="cancel-button"
       >
         Cancel
       </button>
       <button
+        *ngIf="!preview"
         mat-flat-button
-        (click)="goRegister($event)"
+        (click)="continue()"
         color="primary"
         class="btn-lg"
-        id="agree"
+        id="agree-button"
       >
         I agree
+      </button>
+      <button
+        *ngIf="preview"
+        mat-flat-button
+        (click)="goProfile($event)"
+        color="primary"
+        class="btn-lg"
+        id="profile-button"
+      >
+        Back to Profile
       </button>
     </div>
   </div>

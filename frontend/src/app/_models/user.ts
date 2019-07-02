@@ -1,5 +1,6 @@
 import { Participant } from './participant';
 import { ParticipantRelationship } from './participantRelationship';
+import { EmailLog } from './email_log';
 
 export class User {
 
@@ -9,6 +10,7 @@ export class User {
   last_updated?: Date;
   token?: string;
   role?: string;
+  email_log?: EmailLog[];
 
   constructor(private _props) {
     for (const propName in this._props) {

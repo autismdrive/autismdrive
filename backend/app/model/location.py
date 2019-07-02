@@ -4,6 +4,7 @@ from app.model.resource import StarResource
 
 class Location(StarResource):
     __tablename__ = 'location'
+    __label__ = "Local Services"
     id = db.Column(db.Integer, db.ForeignKey('resource.id'), primary_key=True)
     primary_contact = db.Column(db.String)
     street_address1 = db.Column(db.String)
@@ -12,6 +13,8 @@ class Location(StarResource):
     state = db.Column(db.String)
     zip = db.Column(db.String)
     email = db.Column(db.String)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'location',

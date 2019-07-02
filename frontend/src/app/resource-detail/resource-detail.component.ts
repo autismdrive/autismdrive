@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
 import { ActivatedRoute } from '@angular/router';
+import { LatLngLiteral } from '@agm/core';
 
 @Component({
   selector: 'app-resource-detail',
@@ -10,20 +11,38 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ResourceDetailComponent implements OnInit {
   resource: Resource;
+  mapLoc: LatLngLiteral;
 
-  constructor(private api: ApiService, private route: ActivatedRoute) {
+  constructor(
+    private api: ApiService,
+    private route: ActivatedRoute
+  ) {
     this.route.params.subscribe(params => {
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
-      if (isFinite(resourceId)) {
-        this.api.getResource(resourceId).subscribe(resource => {
-          this.resource = resource;
+      if (typeof resourceId === 'number' && isFinite(resourceId)) {
+        const path = this.route.snapshot.url[0].path;
+        const resourceType = path.charAt(0).toUpperCase() + path.slice(1);
+        this.api[`get${resourceType}`](resourceId).subscribe(resource => {
+          this.resource = new Resource(resource);
+          this.loadMapLocation();
         });
       }
     });
   }
 
   ngOnInit() {
+  }
+
+  loadMapLocation() {
+    if (this.resource && this.resource.hasCoords() && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p => {
+        this.mapLoc = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude
+        };
+      });
+    }
   }
 
   goPhone($event: MouseEvent) {
@@ -37,6 +56,20 @@ export class ResourceDetailComponent implements OnInit {
     $event.preventDefault();
     if (this.resource && this.resource.website) {
       location.href = this.resource.website;
+    }
+  }
+
+  getGoogleMapsUrl(): string {
+    if (this.mapLoc && this.resource.hasCoords()) {
+      const address = `
+        ${this.resource.street_address1},
+        ${this.resource.street_address2},
+        ${this.resource.city},
+        ${this.resource.state}
+        ${this.resource.zip}
+      `;
+
+      return `https://www.google.com/maps/dir/${this.mapLoc.lat},${this.mapLoc.lng}/${encodeURIComponent(address)}`;
     }
   }
 

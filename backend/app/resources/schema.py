@@ -9,11 +9,13 @@ from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.investigator import Investigator
+from app.model.email_log import EmailLog
 from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import StarResource
 from app.model.resource_category import ResourceCategory
-from app.model.search import Filter, Search
+from app.model.search import Filter, Search, Sort
+from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -293,7 +295,7 @@ class LocationSchema(ModelSchema):
         model = Location
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'organization', 'resource_categories', '_links')
+                  'organization', 'resource_categories', 'latitude', 'longitude', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -432,7 +434,8 @@ class StudyInvestigatorSchema(ModelSchema):
 class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
-        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color')
+        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
+                  'has_consented')
     id = fields.Integer(required=False, allow_none=True)
     name = fields.Function(lambda obj: obj.get_name())
     relationship = EnumField(Relationship)
@@ -448,10 +451,25 @@ class SearchSchema(ma.Schema):
     class HitSchema(ma.Schema):
         id = fields.Integer()
         content = fields.Str()
+        description = fields.Str()
         title = fields.Str()
         type = fields.Str()
+        label = fields.Str()
         last_updated = fields.Date()
         highlights = fields.Str()
+        latitude = fields.Float()
+        longitude = fields.Float()
+
+    class SortSchema(ma.Schema):
+        field = fields.Str()
+        latitude = fields.Float(missing=None)
+        longitude = fields.Float(missing=None)
+        order = fields.Str(missing='asc')
+        unit = fields.Str(missing='mi')
+
+        @post_load
+        def make_sort(self, data):
+            return Sort(**data)
 
     class FilterSchema(ma.Schema):
         field = fields.Str()
@@ -474,7 +492,7 @@ class SearchSchema(ma.Schema):
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
-    sort = fields.Str()
+    sort = ma.Nested(SortSchema)
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)
@@ -497,6 +515,12 @@ class UserSchema(ModelSchema):
     role = EnumField(Role)
 
 
+class UserSearchSchema(ma.Schema):
+    pages = fields.Integer()
+    total = fields.Integer()
+    items = ma.List(ma.Nested(UserSchema))
+
+
 class StepSchema(Schema):
     name = fields.Str()
     type = fields.Str()
@@ -509,3 +533,32 @@ class StepSchema(Schema):
 class FlowSchema(Schema):
     name = fields.Str()
     steps = fields.Nested(StepSchema(), many=True)
+
+
+class EmailLogSchema(Schema):
+    class Meta:
+        model = EmailLog
+        fields = ('id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed')
+        ordered = True
+    id = fields.Integer(required=False, allow_none=True)
+    user_id = fields.Integer()
+    type = fields.Str()
+    tracking_code = fields.Str()
+    viewed = fields.Boolean()
+    date_viewed = fields.Date()
+
+
+class StepLogSchema(Schema):
+    class Meta:
+        model = StepLog
+        fields = ('id', 'questionnaire_name', 'questionnaire_id', 'flow', 'participant_id', 'user_id', 'date_completed',
+                  'time_on_task_ms')
+        ordered = True
+    id = fields.Integer(required=False, allow_none=True)
+    questionnaire_name = fields.Str()
+    questionnaire_id = fields.Integer()
+    flow = fields.Str()
+    participant_id = fields.Integer()
+    user_id = fields.Integer()
+    date_completed = fields.Date()
+    time_on_task_ms = fields.Integer()

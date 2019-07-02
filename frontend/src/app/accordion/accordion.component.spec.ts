@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EventDetailComponent } from './event-detail.component';
+import { AccordionComponent } from './accordion.component';
 
-describe('EventDetailComponent', () => {
-  let component: EventDetailComponent;
-  let fixture: ComponentFixture<EventDetailComponent>;
+describe('AccordionComponent', () => {
+  let component: AccordionComponent;
+  let fixture: ComponentFixture<AccordionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventDetailComponent ]
+      declarations: [ AccordionComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EventDetailComponent);
+    fixture = TestBed.createComponent(AccordionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

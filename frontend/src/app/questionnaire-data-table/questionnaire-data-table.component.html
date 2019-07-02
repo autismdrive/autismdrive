@@ -1,14 +1,11 @@
-<div
-  fxLayout="row"
+<h2>{{ snakeToUpperCase(questionnaire_name) }}</h2>
+<button
+  mat-flat-button
+  (click)="exportQ(questionnaire_name)"
+  color="accent"
 >
-  <h2>{{ snakeToUpperCase(questionnaire_name) }}</h2>
-  <button
-    mat-button
-    (click)="exportQ(questionnaire_name)"
-  >
-    Export {{ snakeToUpperCase(questionnaire_name) }} Data
-  </button>
-</div>
+  Export {{ snakeToUpperCase(questionnaire_name) }} Data
+</button>
 <mat-table
   [dataSource]="dataSource"
 >

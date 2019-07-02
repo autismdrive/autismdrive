@@ -12,6 +12,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {AuthenticationService} from '../_services/api/authentication-service';
 
 enum FlowState {
+  NO_CONSENT = 'no_consent',
   INTRO = 'intro',
   LOADING = 'loading',
   COMPLETE = 'complete',
@@ -35,6 +36,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   activeStep = 0;
   flowState = FlowState;
   state = FlowState.LOADING;
+  startTime: number;
 
   sidebarOpen = true;
 
@@ -83,7 +85,9 @@ export class FlowComponent implements OnInit, OnDestroy {
       .subscribe(f => {
         this.flow = new Flow(f);
         console.log('Flow Loaded:' + this.flow.name);
-        if (this.flow.percentComplete() === 0) {
+        if (!this.participant.has_consented) {
+          this.state = this.flowState.NO_CONSENT;
+        } else if (this.participant.has_consented && this.flow.percentComplete() === 0) {
           this.state = this.flowState.INTRO;
         } else {
           this.goToNextAvailableStep();
@@ -129,6 +133,13 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
   }
 
+  markConsentAndGoToFlow(participant: Participant) {
+    participant.has_consented = true;
+    this.api.updateParticipant(participant).subscribe(participant => {
+      this.loadFlow(this.flow.name);
+    });
+  }
+
   goToStep(step: Step) {
     // get the participant back first to catch any changes to the preferred name
     this.updateParticipant(this.participant.id);
@@ -170,6 +181,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
 
   private renderForm(step: Step, q_meta) {
+    this.startTime = performance.now();
     this.fields = this.infoToForm(q_meta);
     console.log('Model: ', this.model);
     console.log('Fields: ', this.fields);
@@ -201,6 +213,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   submit() {
     // force the correct participant id.
     this.model['participant_id'] = this.participant.id;
+    this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
     if (this.currentStep().questionnaire_id > 0) {

@@ -4,10 +4,10 @@ from app import db
 
 
 class Status(enum.Enum):
-    currently_enrolling = 1
-    study_in_progress = 2
-    results_being_analyzed = 3
-    study_results_published = 4
+    currently_enrolling = "Currently enrolling"
+    study_in_progress = "Study in progress"
+    results_being_analyzed = "Results being analyzed"
+    study_results_published = "Study results published"
 
     @classmethod
     def has_name(cls, name):
@@ -20,6 +20,7 @@ class Status(enum.Enum):
 
 class Study(db.Model):
     __tablename__ = 'study'
+    __label__ = "Research Studies"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     last_updated = db.Column(db.DateTime, default=datetime.datetime.now)

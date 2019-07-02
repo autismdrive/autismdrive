@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document
+from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
@@ -13,18 +13,25 @@ autocomplete_search = analyzer('autocomplete_search',
                                )
 
 
-# Star Documents are ElastciSearch documents and can be used to index an Event, Location, Resource, or Study
+# Star Documents are ElasticSearch documents and can be used to index an Event, Location, Resource, or Study
 class StarDocument(Document):
     type = Keyword()
+    label = Keyword()
     id = Integer()
     title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     last_updated = Date()
     content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    description = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     organization = Keyword()
     website = Keyword()
     location = Keyword()
+    life_age = Keyword()
+    status = Keyword()
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
+    latitude = Double()
+    longitude = Double()
+    geo_point = GeoPoint()
 
 
 class ElasticIndex:
@@ -71,7 +78,7 @@ class ElasticIndex:
             self.index.delete(ignore=404)
             self.index.create()
         except:
-            self.logger.error("Failed to delete the indices.  They night not exist.")
+            self.logger.error("Failed to delete the indices. They might not exist.")
 
     def remove_document(self, document, flush=True):
         obj = self.get_document(document)
@@ -87,25 +94,34 @@ class ElasticIndex:
         uid = self._get_id(document)
         return StarDocument.get(id=uid, index=self.index_name)
 
-    def update_document(self, document, flush=True):
+    def update_document(self, document, flush=True, latitude=None, longitude=None):
         # update is the same as add, as it will overwrite.  Better to have code in one place.
-        self.add_document(document, flush)
+        self.add_document(document, flush, latitude, longitude)
 
-    def add_document(self, document, flush=True):
+    def add_document(self, document, flush=True, latitude=None, longitude=None):
         doc = StarDocument(id=document.id,
-                           type=document.__tablename__.upper(),
+                           type=document.__tablename__,
+                           label=document.__label__,
                            title=document.title,
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
+                           description=document.description,
                            location=None,
+                           life_age=None,
+                           status=None,
                            category=[],
-                           child_category=[]
+                           child_category=[],
+                           latitude=None,
+                           longitude=None,
+                           geo_point=None
                            )
 
         doc.meta.id = self._get_id(document)
 
         if document.__tablename__ is not 'study':
             doc.website = document.website
+        elif document.status is not None:
+                doc.status = document.status.value
 
         if document.organization is not None:
             doc.organization = document.organization.name
@@ -115,7 +131,13 @@ class ElasticIndex:
                 if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
                     doc.location = cat.category.name
                     doc.child_category.append(cat.category.name)
+                elif cat.category.parent.name == 'Life Ages':
+                    doc.life_age = cat.category.name
+                    doc.child_category.append(cat.category.name)
                 elif cat.category.parent.name == 'Type of Resources':
+                    doc.child_category.append(cat.category.name)
+                elif cat.category.parent.parent_id:
+                    doc.category.append(cat.category.parent.parent.name)
                     doc.child_category.append(cat.category.name)
                 else:
                     doc.category.append(cat.category.parent.name)
@@ -123,24 +145,30 @@ class ElasticIndex:
             else:
                 doc.category.append(cat.category.name)
 
+        if (doc.type is 'location') and None not in (latitude, longitude):
+            doc.latitude = latitude
+            doc.longitude = longitude
+            doc.geo_point = dict(lat=latitude, lon=longitude)
+
         StarDocument.save(doc, index=self.index_name)
         if flush:
             self.index.flush()
 
-    def load_documents(self, events, locations, resources, studies):
-        print("Loading search records of events, locations, resources, and studies into %s" % self.index_prefix)
+    def load_documents(self, resources, events, locations, studies):
+        print("Loading search records of events, locations, resources, and studies into Elasticsearch index: %s" % self.index_prefix)
+        for r in resources:
+            self.add_document(r, flush=False)
         for e in events:
             self.add_document(e, flush=False)
         for l in locations:
-            self.add_document(l, flush=False)
-        for r in resources:
-            self.add_document(r, flush=False)
+            self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
         for s in studies:
             self.add_document(s, flush=False)
         self.index.flush()
 
     def search(self, search):
-        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name)
+        sort = None if search.sort is None else search.sort.translate()
+        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=sort)
         document_search = document_search[search.start:search.start + search.size]
         return document_search.execute()
 
@@ -148,19 +176,24 @@ class ElasticIndex:
 class DocumentSearch(elasticsearch_dsl.FacetedSearch):
     def __init__(self, *args, **kwargs):
         self.index = kwargs["index"]
-#        self.date_restriction = kwargs["date_restriction"]
         kwargs.pop("index")
-#        kwargs.pop("date_restriction")
+        self.my_sort = kwargs['sort']
+        kwargs.pop("sort")
+        # self.sort = kwargs["sort"]
+        # kwargs.pop("sort")
+
         super(DocumentSearch, self).__init__(*args, **kwargs)
 
     doc_types = [StarDocument]
-    fields = ['title^10', 'content^5',  'location^3', 'category^2',  'child_category^2', 'organization', 'website']
+    fields = ['title^10', 'content^5', 'description^5', 'location^3', 'category^2', 'child_category^2', 'organization', 'website']
 
     facets = {
-        'Type': elasticsearch_dsl.TermsFacet(field='type'),
-        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
+        'Location': elasticsearch_dsl.TermsFacet(field='location'),
+        'Type': elasticsearch_dsl.TermsFacet(field='label'),
+        'Life Ages': elasticsearch_dsl.TermsFacet(field='life_age'),
         'Category': elasticsearch_dsl.TermsFacet(field='category'),
-        'Location': elasticsearch_dsl.TermsFacet(field='location')
+        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
+        'Status': elasticsearch_dsl.TermsFacet(field='status')
     }
 
     def highlight(self, search):
@@ -168,4 +201,8 @@ class DocumentSearch(elasticsearch_dsl.FacetedSearch):
 
     def search(self):
         s = super(DocumentSearch, self).search()
+
+        if self.my_sort is not None:
+            s = s.sort(self.my_sort)
+
         return s
