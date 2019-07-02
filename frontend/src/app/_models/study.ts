@@ -1,12 +1,19 @@
 import { StudyCategory } from './study_category';
 import { StudyInvestigator } from './study_investigator';
 
+export enum StudyStatus {
+  currently_enrolling = 'Currently enrolling',
+  study_in_progress = 'Study in progress',
+  results_being_analyzed = 'Results being analyzed',
+  study_results_published = 'Study results published',
+}
+
 export interface Study {
   id: number;
   title: string;
   description: string;
   participant_description: string;
-  benefit_description
+  benefit_description: string;
   investigators: string[];
   organization_id: number;
   location: string;

@@ -1,8 +1,14 @@
 import { LatLngLiteral } from '@agm/core';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HitLabel, HitType, Query } from '../_models/query';
+import { HitLabel, HitType, Query, Hit } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 import { AccordionItem } from '../_models/accordion-item';
+
+interface MostRecents {
+  resource: Hit;
+  location: Hit;
+  event: Hit;
+}
 
 interface ResourceType {
   name: string;
@@ -20,7 +26,7 @@ class MapControlDiv extends HTMLDivElement {
 })
 export class ResourcesComponent implements OnInit, OnDestroy {
   resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
-    return {name: HitType[t], label: HitLabel[t] };
+    return { name: HitType[t], label: HitLabel[t] };
   });
 
   resourceGatherers: AccordionItem[] = [
@@ -53,6 +59,12 @@ export class ResourcesComponent implements OnInit, OnDestroy {
   defaultLoc: LatLngLiteral = {
     lat: 37.9864031,
     lng: -81.6645856
+  };
+
+  mostRecents: MostRecents = {
+    resource: null,
+    location: null,
+    event: null,
   };
 
   constructor(
@@ -88,25 +100,42 @@ export class ResourcesComponent implements OnInit, OnDestroy {
   loadRecentResources() {
     this.loading = true;
 
-    this.recentQuery = new Query({sort: {
-      field: 'last_updated',
-      order: 'desc'
-    }});
-
-    this.recentSearchService
-      .search(this.recentQuery)
-      .subscribe(queryWithResults => {
-        if (this.recentQuery.equals(queryWithResults)) {
-          this.recentQuery = queryWithResults;
-          this.loading = false;
-        }
+    this.resourceTypes.forEach(resourceType => {
+      this.recentQuery = new Query({
+        sort: { field: 'last_updated', order: 'desc' },
+        filters: [{ field: 'Type', value: resourceType.label }],
+        size: 1,
+        start: 0,
       });
+
+      this.recentSearchService
+        .search(this.recentQuery)
+        .subscribe(queryWithResults => {
+          if (this.recentQuery.equals(queryWithResults)) {
+            const result = (queryWithResults.hits.length > 0) ? queryWithResults.hits[0] : null;
+            this.mostRecents[resourceType.name.toLowerCase()] = result;
+            this.loading = !this.mostRecentsLoaded();
+          }
+        });
+    });
+  }
+
+  mostRecentsList(): Hit[] {
+    return Object.values(this.mostRecents);
+  }
+
+  mostRecentsLoaded() {
+    return this.mostRecentsList().length === this.resourceTypes.length;
   }
 
   loadLocResources() {
     this.loading = true;
 
-    this.locQuery = new Query({filters: [{field: 'Type', value: HitLabel.LOCATION}]});
+    this.locQuery = new Query({
+      filters: [{ field: 'Type', value: HitLabel.LOCATION }],
+      start: 0,
+      size: 999
+    });
     if (this.mapLoc) {
       this.locQuery.sort = {
         field: 'geo_point',

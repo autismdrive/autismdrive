@@ -1,7 +1,8 @@
 import { ResourceCategory } from './resource_category';
 import { Organization } from './organization';
+import { GeoLocation } from './geolocation';
 
-export interface Resource {
+export class Resource extends GeoLocation {
   id: number;
   title: string;
   description: string;
@@ -22,4 +23,14 @@ export interface Resource {
   last_updated: string;
   status?: string;
   resource_categories?: ResourceCategory[];
+
+  constructor(private _props) {
+    super(_props);
+
+    for (const propName in this._props) {
+      if (this._props.hasOwnProperty(propName)) {
+        this[propName] = this._props[propName];
+      }
+    }
+  }
 }
