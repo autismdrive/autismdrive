@@ -179,7 +179,7 @@ endpoints = [
     # Questionnaires
     (QuestionnaireNamesEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
-    (QuestionnaireByParticipantEndpoint, "/q/<string:name>/<string:participant_id>"),
+    (QuestionnaireByParticipantEndpoint, "/q/<string:name>/participant/<string:participant_id>"),
     (QuestionnaireListMetaEndpoint, "/q/<string:name>/meta"),
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireDataExportEndpoint, "/q/<string:name>/export"),
