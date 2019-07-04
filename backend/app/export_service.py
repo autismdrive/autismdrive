@@ -1,15 +1,17 @@
+import datetime
 import importlib
 import re
 
+from dateutil.tz import UTC
 from flask import url_for
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
-from app import db
+from app import db, EmailService, app
 from app.model.export_info import ExportInfo
+from app.model.export_log import ExportLog
 
 
 class ExportService:
-
     QUESTION_PACKAGE = "app.model.questionnaires"
     SCHEMA_PACKAGE = "app.resources.schema"
     EXPORT_SCHEMA_PACKAGE = "app.resources.ExportSchema"
@@ -66,7 +68,7 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name, last_modifed_after = None):
+    def get_data(name, last_modifed_after=None):
         print("Exporting " + name)
         model = ExportService.get_class(name)
         query = db.session.query(model)
@@ -82,6 +84,7 @@ class ExportService:
     def get_export_info(last_modifed_after=None):
         export_infos = []
         sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
+        total_records_for_export = 0
         for table in sorted_tables:
             db_model = ExportService.get_class_for_table(table)
 
@@ -93,17 +96,20 @@ class ExportService:
             if hasattr(db_model, '__no_export__') and db_model.__no_export__:
                 continue
 
-            export_info = ExportInfo(table_name=table.name, class_name= db_model.__name__)
+            export_info = ExportInfo(table_name=table.name, class_name=db_model.__name__)
 
             query = (db.session.query(func.count(db_model.id)))
             if last_modifed_after:
                 query = query.filter(db_model.last_updated > last_modifed_after)
             export_info.size = query.all()[0][0]
-            export_info.url=url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
+            total_records_for_export += query.all()[0][0]
+            export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
             if hasattr(db_model, '__question_type__'):
                 export_info.type = db_model.__question_type__
             export_infos.append(export_info)
 
+        log = ExportLog(available_records=total_records_for_export)
+        db.session.add(log)
         return export_infos
 
     @staticmethod
@@ -146,7 +152,7 @@ class ExportService:
                     if "fields" in values:
                         if c.name in values['fields']:
                             values['fields'].remove(c.name)
-                            if'fieldGroup' not in values: values['fieldGroup'] = []
+                            if 'fieldGroup' not in values: values['fieldGroup'] = []
                             values['fieldGroup'].append(c.info)
                             values['fieldGroup'] = sorted(values['fieldGroup'],
                                                           key=lambda field: field['display_order'])
@@ -158,8 +164,8 @@ class ExportService:
 
         for group, values in groups.items():
             values['name'] = group
-#            if value['type'] == 'repeat':
-#                value['fieldArray'] = value.pop('fields')
+            #            if value['type'] == 'repeat':
+            #                value['fieldArray'] = value.pop('fields')
             if "repeat_class" in values:
                 values['key'] = group  # Only include the key on the group if an actual sub-class exists.
                 values['fields'] = ExportService.get_meta(values["repeat_class"](), relationship)['fields']
@@ -183,7 +189,7 @@ class ExportService:
     # possible type of relationship.
     def _recursive_relationship_changes(meta, relationship):
         meta_copy = {}
-        for k,v in meta.items():
+        for k, v in meta.items():
             if type(v) is dict:
                 if "RELATIONSHIP_SPECIFIC" in v:
                     if relationship.name in meta[k]['RELATIONSHIP_SPECIFIC']:
@@ -209,3 +215,48 @@ class ExportService:
                 meta_copy[k] = v
         return meta_copy
 
+    @staticmethod
+    def send_alert_if_exports_not_running():
+        """If more than 30 minutes pass without an export from the Public Mirror to the
+        Private Mirror, an email will be sent to an administrative email address.
+         Emails to this address will occur every two (2) hours for the first 24 hours
+          and every four hours after that until the fault is corrected or the system taken down.
+            After 24 hours, the PI will also be emailed notifications every 8 hours until
+             the fault is corrected or the system taken down."""
+        last_log = db.session.query(ExportLog) \
+            .order_by(desc(ExportLog.last_updated)).limit(1).first()
+        if not last_log:
+            # If the export logs are empty, create one with the current date.
+            seed_log = ExportLog(available_records=0)
+            db.session.add(seed_log)
+            db.session.commit()
+        else:
+            msg = None
+            subject = "Star Drive: Error - "
+            time_difference = datetime.datetime.now(tz=UTC) - last_log.last_updated
+            hours = int(time_difference.total_seconds()/3600)
+            minutes = int(time_difference.total_seconds()/60)
+            if hours >= 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
+                subject = subject + str(hours) + " hours since last successful export"
+                msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
+                    " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \
+                    " email about this issue.  You will receive an email every 2 hours for the first " + \
+                    "24 hours, and every 4 hours there-after."
+
+            elif hours >= 2 and hours % 2 == 0 and hours / 2 >= last_log.alerts_sent:
+                subject = subject + str(hours) + " hours since last successful export"
+                msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
+                    " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \
+                    " email about this issue.  You will receive an email every 2 hours for the first " \
+                    "24 hours, and every 4 hours there-after."
+
+            elif minutes >= 30 and last_log.alerts_sent == 0:
+                subject = subject + str(minutes) + " minutes since last successful export"
+                msg = "Exports should occur every 5 minutes.  It has been " + str(minutes) + \
+                    " minutes since the last export was requested."
+            if msg:
+                email_server = EmailService(app)
+                email_server.admin_alert_email(subject, msg)
+                last_log.alerts_sent = last_log.alerts_sent + 1
+                db.session.add(last_log)
+                db.session.commit()

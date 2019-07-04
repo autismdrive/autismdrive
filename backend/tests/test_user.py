@@ -185,21 +185,6 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assert_success(response)
         return json.loads(response.data.decode())
 
-    def decode(self, encoded_words):
-        """
-        Useful for checking the content of email messages
-        (which we store in an array for testing)
-        """
-        encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
-        charset, encoding, encoded_text = re.match(encoded_word_regex,
-                                                   encoded_words).groups()
-        if encoding is 'b':
-            byte_string = base64.b64decode(encoded_text)
-        elif encoding is 'q':
-            byte_string = quopri.decodestring(encoded_text)
-        text = byte_string.decode(charset)
-        text = text.replace("_", " ")
-        return text
 
     def test_register_sends_email(self):
         message_count = len(TEST_MESSAGES)

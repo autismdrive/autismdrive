@@ -220,7 +220,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertTrue("after" in httpretty.last_request().querystring)
 
     @httpretty.activate
-    def test_admin_accounts_should_be_requested_in_full(self):
+    def test_admin_accounts_should_be_requested_in_full_and_import_with_working_password(self):
         data_importer = self.get_data_importer_setup_auth()
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
                     role=Role.admin, email_verified=True)

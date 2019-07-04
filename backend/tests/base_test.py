@@ -1,6 +1,10 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
+import base64
 import os
+import quopri
+import re
+
 os.environ["TESTING"] = "true"
 
 from app.model.email_log import EmailLog
@@ -82,6 +86,22 @@ class BaseTest:
             Authorization='Bearer ' + existing_user.encode_auth_token().decode())
 
         return self.auths[existing_user.id]
+
+    def decode(self, encoded_words):
+        """
+        Useful for checking the content of email messages
+        (which we store in an array for testing)
+        """
+        encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
+        charset, encoding, encoded_text = re.match(encoded_word_regex,
+                                                   encoded_words).groups()
+        if encoding is 'b':
+            byte_string = base64.b64decode(encoded_text)
+        elif encoding is 'q':
+            byte_string = quopri.decodestring(encoded_text)
+        text = byte_string.decode(charset)
+        text = text.replace("_", " ")
+        return text
 
     def assert_success(self, rv, msg=""):
         try:

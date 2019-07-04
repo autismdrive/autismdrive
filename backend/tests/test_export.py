@@ -1,18 +1,22 @@
 import datetime
 import unittest
+import os
+os.environ["TESTING"] = "true"
 
 from flask import json
+from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 from app import db, app
 from app.data_importer import DataImporter
+from app.email_service import TEST_MESSAGES
 from app.export_service import ExportService
+from app.model.export_log import ExportLog
 from app.model.participant import Relationship, Participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 
 from app.model.user import Role, User
 from app.resources.schema import UserSchema, ParticipantSchema
 from tests.base_test import clean_db
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
@@ -252,3 +256,81 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertTrue(len(response) > 1)
         self.assertEqual(1, len(list(filter(lambda field: field['email'] == 'testadmin@test.com', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['_password'] is not None, response))))
+
+    def test_exporter_logs_export_calls(self):
+        rv = self.app.get('/api/export',
+                          follow_redirects=True,
+                          content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        export_logs = db.session.query(ExportLog).all()
+        self.assertEqual(1, len(export_logs))
+        self.assertIsNotNone(export_logs[0].last_updated)
+        self.assertTrue(export_logs[0].available_records > 0, msg="The act of setting up this test harness should mean "
+                                                                  "at least one user record is avialable for export")
+
+    def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
+
+        message_count = len(TEST_MESSAGES)
+
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=28), available_records=2)
+        db.session.add(log)
+        db.session.commit()
+        ExportService.send_alert_if_exports_not_running()
+        self.assertEqual(len(TEST_MESSAGES), message_count)
+
+    def test_exporter_sends_email_alert_if_30_minutes_pass_without_export(self):
+
+        message_count = len(TEST_MESSAGES)
+
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=45), available_records=2)
+        db.session.add(log)
+        db.session.commit()
+
+        ExportService.send_alert_if_exports_not_running()
+        self.assertGreater(len(TEST_MESSAGES), message_count)
+        self.assertEqual("Star Drive: Error - 45 minutes since last successful export",
+                         self.decode(TEST_MESSAGES[-1]['subject']))
+
+        ExportService.send_alert_if_exports_not_running()
+        ExportService.send_alert_if_exports_not_running()
+        ExportService.send_alert_if_exports_not_running()
+        self.assertEqual(message_count+1, len(TEST_MESSAGES), msg="No more messages should be sent.")
+
+    def test_exporter_sends_second_email_after_2_hours(self):
+
+        message_count = len(TEST_MESSAGES)
+
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=30), available_records=2)
+        db.session.add(log)
+        db.session.commit()
+        ExportService.send_alert_if_exports_not_running()
+        self.assertGreater(len(TEST_MESSAGES), message_count)
+        self.assertEqual("Star Drive: Error - 30 minutes since last successful export",
+                         self.decode(TEST_MESSAGES[-1]['subject']))
+
+        log.last_updated = datetime.datetime.now() - datetime.timedelta(minutes=120)
+        db.session.add(log)
+        db.session.commit()
+        ExportService.send_alert_if_exports_not_running()
+        self.assertGreater(len(TEST_MESSAGES), message_count + 1, "another email should have gone out")
+        self.assertEqual("Star Drive: Error - 2 hours since last successful export",
+                         self.decode(TEST_MESSAGES[-1]['subject']))
+
+    def test_exporter_sends_12_emails_over_first_24_hours(self):
+        message_count = len(TEST_MESSAGES)
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=1), available_records=2)
+        db.session.add(log)
+        db.session.commit()
+        for i in range(20):
+            ExportService.send_alert_if_exports_not_running()
+        self.assertEqual(message_count + 13, len(TEST_MESSAGES), msg="12 emails should have gone out.")
+
+    def test_exporter_sends_20_emails_over_first_48_hours(self):
+        message_count = len(TEST_MESSAGES)
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=2), available_records=2)
+        db.session.add(log)
+        db.session.commit()
+        for i in range(20):
+            ExportService.send_alert_if_exports_not_running()
+        self.assertEqual(message_count + 20, len(TEST_MESSAGES), msg="20 emails should have gone out.")
