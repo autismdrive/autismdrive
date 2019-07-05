@@ -5,32 +5,32 @@ from flask import request
 from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index
-from app.model.resource import StarResource
-from app.resources.schema import StarResourceSchema
+from app.model.resource import Resource
+from app.resources.schema import ResourceSchema
 
 
 class ResourceEndpoint(flask_restful.Resource):
 
-    schema = StarResourceSchema()
+    schema = ResourceSchema()
 
     def get(self, id):
-        model = db.session.query(StarResource).filter_by(id=id).first()
+        model = db.session.query(Resource).filter_by(id=id).first()
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        resource = db.session.query(StarResource).filter_by(id=id).first()
+        resource = db.session.query(Resource).filter_by(id=id).first()
 
         if resource is not None:
             elastic_index.remove_document(resource, 'Resource')
 
-        db.session.query(StarResource).filter_by(id=id).delete()
+        db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
         return None
 
     def put(self, id):
         request_data = request.get_json()
-        instance = db.session.query(StarResource).filter_by(id=id).first()
+        instance = db.session.query(Resource).filter_by(id=id).first()
         updated, errors = self.schema.load(request_data, instance=instance)
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.now()
@@ -42,11 +42,11 @@ class ResourceEndpoint(flask_restful.Resource):
 
 class ResourceListEndpoint(flask_restful.Resource):
 
-    resourcesSchema = StarResourceSchema(many=True)
-    resourceSchema = StarResourceSchema()
+    resourcesSchema = ResourceSchema(many=True)
+    resourceSchema = ResourceSchema()
 
     def get(self):
-        resources = db.session.query(StarResource).all()
+        resources = db.session.query(Resource).all()
         return self.resourcesSchema.dump(resources)
 
     def post(self):

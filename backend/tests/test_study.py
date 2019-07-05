@@ -9,31 +9,7 @@ from app.model.study_category import StudyCategory
 
 class TestStudy(BaseTest, unittest.TestCase):
 
-    def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
-                        participant_description="Even your pet hamster could benefit from participating in this study",
-                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
 
-        study = Study(title=title, description=description, participant_description=participant_description,
-                      benefit_description=benefit_description, status=Status.currently_enrolling)
-        study.organization_id = self.construct_organization().id
-        db.session.add(study)
-        db.session.commit()
-
-        db_study = db.session.query(Study).filter_by(title=study.title).first()
-        self.assertEqual(db_study.description, description)
-        elastic_index.add_document(db_study, 'Study')
-        return db_study
-
-    def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
-
-        investigator = Investigator(name=name, title=title)
-        investigator.organization_id = self.construct_organization().id
-        db.session.add(investigator)
-        db.session.commit()
-
-        db_inv = db.session.query(Investigator).filter_by(name=investigator.name).first()
-        self.assertEqual(db_inv.title, investigator.title)
-        return db_inv
 
     def test_study_basics(self):
         self.construct_study()

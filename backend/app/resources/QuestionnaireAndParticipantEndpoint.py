@@ -1,6 +1,7 @@
 import flask_restful
 
 from app import db, auth
+from app.export_service import ExportService
 from app.model.user import Role
 from app.wrappers import requires_roles
 
@@ -11,7 +12,6 @@ from app.wrappers import requires_roles
 #   * it has an id field called "id"
 #   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
-from app.question_service import QuestionService
 
 
 class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
@@ -19,8 +19,8 @@ class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name, participant_id):
-        class_ref = QuestionService.get_class(name)
-        schema = QuestionService.get_schema(name, many=True)
+        class_ref = ExportService.get_class(name)
+        schema = ExportService.get_schema(name, many=True)
         questionnaires = db.session.query(class_ref)\
             .filter(class_ref.participant_id == participant_id)\
             .all()

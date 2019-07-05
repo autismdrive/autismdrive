@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -20,8 +21,9 @@ app.config.from_object('config.default')
 app.config.from_pyfile('config.py')
 # Load the file specified by the APP_CONFIG_FILE environment variable
 # Variables defined here will override those in the default configuration
-if "APP_CONFIG_FILE" in os.environ:
-    app.config.from_envvar('APP_CONFIG_FILE')
+if "TESTING" in os.environ and os.environ["TESTING"] == "true":
+    app.config.from_object('config.testing')
+    app.config.from_pyfile('testing.py')
 
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -49,6 +51,7 @@ bcrypt = Bcrypt(app)
 # Search System
 elastic_index = ElasticIndex(app)
 
+#
 # Constructing for a problem when building urls when the id is null.
 # there is a fix in the works for this, see
 # https://github.com/kids-first/kf-api-dathanaservice/pull/219
@@ -58,6 +61,8 @@ elastic_index = ElasticIndex(app)
 def handler(error, endpoint, values=''):
     print("URL Build error:" + str(error))
     return ''
+
+
 app.url_build_error_handlers.append(handler)
 
 
@@ -165,3 +170,8 @@ def resourcereset():
 
 
 from app import views
+
+# Cron scheduler
+if app.config["SLAVE"]:
+    from app import data_importer
+    importer = data_importer.ImportService(app, db)

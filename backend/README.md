@@ -253,3 +253,39 @@ Alternatively, to run the e2e tests without reseeding first, execute the followi
 ```BASH
 ng e2e --dev-server-target=
 ```
+
+### Master/Slave Configuration
+For the most part, you don't need to run slave configuration in development unless you are specifically
+working on the handoff of data.  The slave instance will pull data from the primary instance and then potentially
+remove it. 
+
+#### To run the slave instance, you'll need a second database:
+Run the following command (as postgres) from a bash prompt.
+```BASH
+createdb stardrive_slave -O ed_user ed_platform
+```
+
+### Configuration
+You will need to specify a different configuration file for the slave
+instance.   A set of reasonable defaults for development is available
+under the "slave.py" in the config directory.  You can set an environment
+variable to specify this when you fire up the slave instance.
+
+```bash
+APP_CONFIG_FILE=/full/path/to/config/slave.py
+```
+  
+Note that it should be the full path.  You'll be running both instances, 
+so don't set this environment variable for all commands, just for running the instance.
+For me, I have it set as an environement variable under the Run Configuration within
+PyCharm.  I copied by existing run command and added this environment variable
+there.
+
+You will need to build the basic data structures in the database in order to
+load data for this you will need to run the init_db flask command, but
+you will need to make that specific to the slave instance.  You'll need to provide
+ALL the environment settings with the flask command for it to work correctly.
+
+```bash
+FLASK_APP=app/__init__.py APP_CONFIG_FILE=/path/to/config/slave.py flask db upgrade
+```

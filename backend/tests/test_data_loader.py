@@ -27,7 +27,7 @@ from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Search, Filter
 from app.model.study import Study
@@ -70,7 +70,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(Location, 'load_locations', ResourceCategory, 'location')
 
     def test_load_resources(self):
-        self._load_and_assert_success(StarResource, 'load_resources', ResourceCategory, 'resource')
+        self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
 
     def test_load_studies(self):
         self._load_and_assert_success(Study, 'load_studies', StudyCategory)
@@ -157,7 +157,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         elastic_index.clear()
 
         # Populate the database
-        self._load_and_assert_success(StarResource, 'load_resources', ResourceCategory, 'resource')
+        self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
         self._load_and_assert_success(Event, 'load_events', ResourceCategory, 'event')
         self._load_and_assert_success(Location, 'load_locations', ResourceCategory, 'location')
         self._load_and_assert_success(Study, 'load_studies', StudyCategory)
@@ -166,13 +166,13 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         data_loader.DataLoader().build_index()
 
         # Get the number of items in the database
-        num_db_resources = db.session.query(StarResource).filter(StarResource.type == 'resource').count()
-        num_db_events = db.session.query(StarResource).filter(StarResource.type == 'event').count()
-        num_db_locations = db.session.query(StarResource).filter(StarResource.type == 'location').count()
+        num_db_resources = db.session.query(Resource).filter(Resource.type == 'resource').count()
+        num_db_events = db.session.query(Resource).filter(Resource.type == 'event').count()
+        num_db_locations = db.session.query(Resource).filter(Resource.type == 'location').count()
         num_db_studies = db.session.query(Study).count()
 
         # Get the number of items in the search index
-        es_resources = elastic_index.search(Search(filters=[Filter('Type', StarResource.__label__)]))
+        es_resources = elastic_index.search(Search(filters=[Filter('Type', Resource.__label__)]))
         es_events = elastic_index.search(Search(filters=[Filter('Type', Event.__label__)]))
         es_locations = elastic_index.search(Search(filters=[Filter('Type', Location.__label__)]))
         es_studies = elastic_index.search(Search(filters=[Filter('Type', Study.__label__)]))

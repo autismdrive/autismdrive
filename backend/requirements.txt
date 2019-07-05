@@ -18,3 +18,4 @@ apscheduler==3.6.0
 requests==2.21.0
 nose2==0.6.0
 googlemaps==3.0.2
+HTTPretty==0.9.6
