@@ -1,7 +1,6 @@
 <div
-  id="search-bar"
   *ngIf="queryParams"
-  [class]="variant"
+  [class]="'search-bar ' + variant"
 >
   <mat-form-field id="search-field">
     <input

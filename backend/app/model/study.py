@@ -7,10 +7,10 @@ from app import db
 
 
 class Status(enum.Enum):
-    currently_enrolling = 1
-    study_in_progress = 2
-    results_being_analyzed = 3
-    study_results_published = 4
+    currently_enrolling = "Currently enrolling"
+    study_in_progress = "Study in progress"
+    results_being_analyzed = "Results being analyzed"
+    study_results_published = "Study results published"
 
     @classmethod
     def has_name(cls, name):

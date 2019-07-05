@@ -6,7 +6,7 @@ import requests
 from flask import json
 
 from app import app, db
-from app.data_importer import DataImporter
+from app.import_service import ImportService
 from app.model.export_info import ExportInfo, ExportInfoSchema
 from app.model.import_log import ImportLog
 from app.model.user import User, Role
@@ -50,7 +50,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             "http://na.edu/api/login_password",
             body='{"token": "my_token"}'
         )
-        data_importer = DataImporter(app, db)
+        data_importer = ImportService(app, db)
         data_importer.login()
         self.assertIsNotNone(httpretty.last_request())
 
@@ -72,7 +72,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         app.config["MASTER_URL"] = "http://na.edu"
         app.config["MASTER_EMAIL"] = "dan@test.com"
         app.config["MASTER_PASS"] = "12345"
-        data_importer = DataImporter(app, db)
+        data_importer = ImportService(app, db)
         headers = data_importer.get_headers()
         self.assertIsNotNone(httpretty.last_request())
         self.assertIsNotNone(headers)
@@ -86,7 +86,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             body='{"email": "dan@test.com"}',
             status=200
         )
-        data_importer = DataImporter(app, db)
+        data_importer = ImportService(app, db)
         data_importer.token = "my_token"
         return data_importer
 

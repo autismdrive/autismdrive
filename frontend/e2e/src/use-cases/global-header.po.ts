@@ -66,11 +66,15 @@ export class GlobalHeaderUseCases {
     this.page.clickLinkTo('/home');
   }
 
-  visitResourcesSearchPage() {
-    this.page.clickLinkTo('/search');
-    expect(this.page.getElements('.applied-filters').count()).toEqual(1);
-    expect(this.page.getElements('.filter-facet').count()).toBeGreaterThan(1);
+  visitResourcesPage() {
+    this.page.clickLinkTo('/resources');
+
+    ['resource', 'location', 'event'].forEach(t => {
+      expect(this.page.getElements(`.border-box-tile.${t}`).count()).toEqual(1);
+    });
+    expect(this.page.getElements('agm-map').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
+    expect(this.page.getElements('.resource-gatherer').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
   }
 }

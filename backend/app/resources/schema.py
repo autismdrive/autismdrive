@@ -9,11 +9,13 @@ from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.investigator import Investigator
+from app.model.email_log import EmailLog
 from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search, Sort
+from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -533,3 +535,15 @@ class StepSchema(Schema):
 class FlowSchema(Schema):
     name = fields.Str()
     steps = fields.Nested(StepSchema(), many=True)
+
+
+class EmailLogSchema(ModelSchema):
+    class Meta:
+        model = EmailLog
+
+
+class StepLogSchema(ModelSchema):
+    class Meta:
+        model = StepLog
+
+

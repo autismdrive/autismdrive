@@ -1,13 +1,15 @@
 import datetime
 import unittest
 import os
+
+from app.import_service import ImportService
+
 os.environ["TESTING"] = "true"
 
 from flask import json
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 from app import db, app
-from app.data_importer import DataImporter
 from app.email_service import TEST_MESSAGES
 from app.export_service import ExportService
 from app.model.export_log import ExportLog
@@ -107,7 +109,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def load_database(self, all_data):
         exports = ExportService.get_export_info()
-        importer = DataImporter(app, db)
+        importer = ImportService(app, db)
         for export in exports:
             export.json_data = all_data[export.class_name]
             importer.load_data(export)
@@ -324,7 +326,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         db.session.commit()
         for i in range(20):
             ExportService.send_alert_if_exports_not_running()
-        self.assertEqual(message_count + 13, len(TEST_MESSAGES), msg="12 emails should have gone out.")
+        self.assertEqual(message_count + 13, len(TEST_MESSAGES), msg="13 emails should have gone out.")
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(TEST_MESSAGES)

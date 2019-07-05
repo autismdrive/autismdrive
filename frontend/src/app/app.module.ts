@@ -1,4 +1,5 @@
 import { AgmCoreModule } from '@agm/core';
+import { AgmJsMarkerClustererModule } from '@agm/js-marker-clusterer';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -6,42 +7,36 @@ import { HttpClientModule } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {
-  MAT_FORM_FIELD_DEFAULT_OPTIONS,
-  MAT_LABEL_GLOBAL_OPTIONS,
-  MatButtonModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatChipsModule,
-  MatDatepickerModule,
-  MatExpansionModule,
-  MatFormFieldModule,
-  MatGridListModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatNativeDateModule,
-  MatPaginatorModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSlideToggleModule,
-  MatSortModule,
-  MatStepperModule,
-  MatTableModule,
-  MatToolbarModule,
-  MatTooltipModule
-  } from '@angular/material';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSortModule } from '@angular/material/sort';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatTableModule } from '@angular/material/table';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CovalentTextEditorModule } from '@covalent/text-editor';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { PdfJsViewerModule } from 'ng2-pdfjs-viewer';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { FileDropModule } from 'ngx-file-drop';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
 import { environment } from 'src/environments/environment';
@@ -61,7 +56,6 @@ import { AppComponent } from './app.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
 import { EnrollComponent } from './enroll/enroll.component';
-import { EventDetailComponent } from './event-detail/event-detail.component';
 import { FiltersComponent } from './filters/filters.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
@@ -71,11 +65,11 @@ import { HeaderComponent } from './header/header.component';
 import { HeroSlidesComponent } from './hero-slides/hero-slides.component';
 import { HomeComponent } from './home/home.component';
 import { LoadingComponent } from './loading/loading.component';
-import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { LoginComponent } from './login/login.component';
 import { LogoComponent } from './logo/logo.component';
 import { LogoutComponent } from './logout/logout.component';
 import { NewsItemComponent } from './news-item/news-item.component';
+import { ParticipantDetailComponent } from './participant-detail/participant-detail.component';
 import { ParticipantProfileComponent } from './participant-profile/participant-profile.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -129,7 +123,6 @@ export class FormlyConfig {
     CardWrapperComponent,
     CategoryChipsComponent,
     EnrollComponent,
-    EventDetailComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,
@@ -143,12 +136,12 @@ export class FormlyConfig {
     HeroSlidesComponent,
     HomeComponent,
     LoadingComponent,
-    LocationDetailComponent,
     LoginComponent,
     LogoComponent,
     LogoutComponent,
     LogoutComponent,
     NewsItemComponent,
+    ParticipantDetailComponent,
     ParticipantProfileComponent,
     PasswordResetComponent,
     ProfileComponent,
@@ -173,13 +166,12 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
   ],
   imports: [
-    AgmCoreModule.forRoot({apiKey: environment.gcp_api_key}),
+    AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),
+    AgmJsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
     ColorPickerModule,
     CommonModule,
-    CovalentTextEditorModule,
-    FileDropModule,
     FlexLayoutModule,
     FormlyMatDatepickerModule,
     FormlyMaterialModule,

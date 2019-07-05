@@ -3,7 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists
+from sqlalchemy import exists, desc
 from sqlalchemy.exc import IntegrityError
 
 from app import RestException, db, email_service, auth
@@ -62,13 +62,19 @@ class UserListEndpoint(flask_restful.Resource):
         args = request.args
         pageNumber = eval(args["pageNumber"]) if ("pageNumber" in args) else 0
         per_page = eval(args["pageSize"]) if ("pageSize" in args) else 20
-        sort_column = args["sort"] if ("sort" in args) else "email"
-        sort_order = args["sortOrder"] if ("sortOrder" in args) else "asc"
         query = db.session.query(User)
         if "filter" in args:
             f = '%' + args["filter"] + '%'
             query = query.filter(User.email.ilike(f))
-        query = query.order_by("%s %s" % (sort_column, sort_order))
+
+        sort_column = args["sort"] if ("sort" in args) else "email"
+        col = getattr(User, sort_column)
+
+        if args["sortOrder"] is "desc":
+            query = query.order_by(desc(col))
+        else:
+            query = query.order_by(col)
+
         page = query.paginate(page=pageNumber + 1, per_page=per_page, error_out=False)
         return self.searchSchema.dump(page)
 

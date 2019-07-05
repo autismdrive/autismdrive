@@ -174,4 +174,4 @@ from app import views
 # Cron scheduler
 if app.config["SLAVE"]:
     from app import data_importer
-    importer = data_importer.DataImporter(app,db)
+    importer = data_importer.ImportService(app, db)

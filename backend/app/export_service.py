@@ -54,7 +54,7 @@ class ExportService:
         if not schema_class:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(model.__module__, schema_name)
-
+        print("Schema for " + name)
         return schema_class(many=many, session=session)
 
     @staticmethod
@@ -236,7 +236,7 @@ class ExportService:
             time_difference = datetime.datetime.now(tz=UTC) - last_log.last_updated
             hours = int(time_difference.total_seconds()/3600)
             minutes = int(time_difference.total_seconds()/60)
-            if hours >= 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
+            if hours > 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
                 subject = subject + str(hours) + " hours since last successful export"
                 msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
                     " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \
@@ -244,6 +244,7 @@ class ExportService:
                     "24 hours, and every 4 hours there-after."
 
             elif hours >= 2 and hours % 2 == 0 and hours / 2 >= last_log.alerts_sent:
+                print("Alerts Sent / formula result:" + str(last_log.alerts_sent))
                 subject = subject + str(hours) + " hours since last successful export"
                 msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
                     " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \

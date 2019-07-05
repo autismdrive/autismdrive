@@ -28,6 +28,7 @@
 
       <app-terms *ngIf="state === flowState.NO_CONSENT"
                  [relationship]="participant.relationship"
+                 [preview]="false"
                  (next)="markConsentAndGoToFlow(participant)">
       </app-terms>
       <div *ngIf="state !== flowState.NO_CONSENT">

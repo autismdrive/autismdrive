@@ -15,7 +15,7 @@ from app.model.import_log import ImportLog
 from app.resources.ExportSchema import AdminExportSchema
 
 
-class DataImporter:
+class ImportService:
 
     LOGIN_ENDPOINT = "/api/login_password"
     EXPORT_ENDPOINT = "/api/export"

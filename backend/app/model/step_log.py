@@ -19,6 +19,3 @@ class StepLog(db.Model):
     last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
 
 
-class StepLogSchema(ModelSchema):
-    class Meta:
-        model = StepLog
