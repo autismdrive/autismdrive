@@ -68,12 +68,12 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name, last_modifed_after=None):
+    def get_data(name, last_updated=None):
         print("Exporting " + name)
         model = ExportService.get_class(name)
         query = db.session.query(model)
-        if last_modifed_after:
-            query = query.filter(model.last_updated > last_modifed_after)
+        if last_updated:
+            query = query.filter(model.last_updated > last_updated)
         if hasattr(model, '__mapper_args__') \
                 and 'polymorphic_identity' in model.__mapper_args__:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
@@ -81,7 +81,7 @@ class ExportService:
 
     # Returns a list of classes that can be exported from the system.
     @staticmethod
-    def get_export_info(last_modifed_after=None):
+    def get_export_info(last_updated=None):
         export_infos = []
         sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
         total_records_for_export = 0
@@ -99,8 +99,8 @@ class ExportService:
             export_info = ExportInfo(table_name=table.name, class_name=db_model.__name__)
 
             query = (db.session.query(func.count(db_model.id)))
-            if last_modifed_after:
-                query = query.filter(db_model.last_updated > last_modifed_after)
+            if last_updated:
+                query = query.filter(db_model.last_updated > last_updated)
             export_info.size = query.all()[0][0]
             total_records_for_export += query.all()[0][0]
             export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
