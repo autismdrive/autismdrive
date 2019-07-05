@@ -1,2 +1,9 @@
+import sys
+if len(sys.argv) > 1:
+    port = int(sys.argv[1])
+else:
+    port = 5000
+
 from app import app
-app.run(threaded=True)
+print("Running on port " + str(port))
+app.run(threaded=True, port=port)
