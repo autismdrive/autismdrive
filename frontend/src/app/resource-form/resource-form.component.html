@@ -1,0 +1,43 @@
+<div
+  class="resource-detail mat-typography"
+>
+  <app-loading
+    *ngIf="state === pageState.LOADING"
+    message="Loading..."
+  ></app-loading>
+
+  <form
+    *ngIf="state === pageState.SHOW_FORM"
+    [formGroup]="form"
+    class="pad-2"
+  >
+    <h1>Resource Details</h1>
+
+    <formly-form
+      [form]="form"
+      [model]="model"
+      [fields]="fields"
+      [options]="options"
+    >
+    </formly-form>
+
+    <div class="button-row">
+      <button
+        *ngIf="form"
+        mat-flat-button
+        type="button"
+        (click)="submit()"
+        color="primary"
+        [disabled]="!form.valid"
+        id="save-next-button"
+      >Save</button>
+      <button
+        *ngIf="form"
+        mat-flat-button
+        type="button"
+        (click)="onCancel()"
+        id="cancel-button"
+      >Cancel</button>
+    </div>
+  </form>
+</div>
