@@ -42,3 +42,4 @@ MAIL_TIMEOUT = 10
 GOOGLE_MAPS_API_KEY = "PRODUCTION_API_KEY_GOES_HERE"
 
 ADMIN_EMAIL = "admin@tester.com"
+PRINCIPAL_INVESTIGATOR_EMAIL = "pi@tester.com"  # Receives some high levl alerts per agreement with InfoSec.
