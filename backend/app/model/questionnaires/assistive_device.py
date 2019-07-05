@@ -1,16 +1,20 @@
 import datetime
 
+from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
+from app.export_service import ExportService
 
 
 class AssistiveDevice(db.Model):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
+    __no_export__ = True  # This will be transferred as a part of a parent class
+
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     supports_questionnaire_id = db.Column(
         "supports_questionnaire_id",
         db.Integer,
@@ -219,8 +223,8 @@ class AssistiveDeviceSchema(ModelSchema):
         ordered = True
         fields = ("id", "last_updated", "supports_questionnaire_id", "type_group", "type", "type_other", "timeframe", "notes",
                   "participant_id", "user_id")
-    participant_id = fields.Method('get_participant_id')
-    user_id = fields.Method('get_user_id')
+    participant_id = fields.Method('get_participant_id', dump_only=True)
+    user_id = fields.Method('get_user_id', dump_only=True)
 
     def get_participant_id(self, obj):
         return obj.supports_questionnaire.participant_id

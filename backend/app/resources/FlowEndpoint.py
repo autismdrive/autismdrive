@@ -8,7 +8,7 @@ from app.model.flow import Flow
 from app.model.participant import Participant, Relationship
 from app.model.step_log import StepLog
 from app.resources.schema import FlowSchema
-from app.question_service import QuestionService
+from app.export_service import ExportService
 
 
 class Flows:
@@ -110,12 +110,13 @@ class FlowListEndpoint(flask_restful.Resource):
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
 
     def get(self, flow, questionnaire_name):
+        questionnaire_name = ExportService.camel_case_it(questionnaire_name)
         flow = Flows.get_flow_by_name(flow)
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
-        class_ref = QuestionService.get_class(questionnaire_name)
+        class_ref = ExportService.get_class(questionnaire_name)
         questionnaire = db.session.query(class_ref).first()
-        return QuestionService.get_meta(questionnaire, flow.relationship)
+        return ExportService.get_meta(questionnaire, flow.relationship)
     #        return schema.dump(questionnaire)
 
 
@@ -130,7 +131,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.NOT_IN_THE_FLOW)
         request_data = request.get_json()
         request_data["user_id"] = g.user.id
-        schema = QuestionService.get_schema(questionnaire_name)
+        schema = ExportService.get_schema(ExportService.camel_case_it(questionnaire_name))
         new_quest, errors = schema.load(request_data, session=db.session)
 
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)

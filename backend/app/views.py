@@ -6,7 +6,9 @@ from flask_restful import reqparse
 
 from app import app
 from app.resources.Auth import auth_blueprint
+from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
+from app.resources.StepLogEndpoint import StepLogListEndpoint
 from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
     FlowEndpoint,
@@ -36,7 +38,7 @@ from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint
 )
-from app.resources.ParticipantEndpoint import ParticipantEndpoint
+from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint
 from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
     OrganizationListEndpoint
@@ -82,6 +84,10 @@ from app.resources.ResourceAndCategoryEndpoint import (
     CategoryByResourceEndpoint,
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
+)
+from app.resources.ExportEndpoint import (
+    ExportEndpoint,
+    ExportListEndpoint
 )
 
 
@@ -174,6 +180,7 @@ endpoints = [
     (UserEndpoint, "/user/<id>"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     # Participants
+    (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
     # Questionnaires
@@ -190,6 +197,10 @@ endpoints = [
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
     # Search Endpoint
     (SearchEndpoint, "/search"),
+    (ExportListEndpoint, "/export"),
+    (ExportEndpoint, "/export/<string:name>"),
+    (EmailLogListEndpoint, "/email_log"),
+    (StepLogListEndpoint, "/step_log"),
 
 ]
 

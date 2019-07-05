@@ -43,4 +43,13 @@ class ParticipantEndpoint(flask_restful.Resource):
         return self.schema.dump(updated)
 
 
+class ParticipantListEndpoint(flask_restful.Resource):
+
+    schema = ParticipantSchema(many=True)
+
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self):
+        participants = db.session.query(Participant).all()
+        return self.schema.dump(participants)
 

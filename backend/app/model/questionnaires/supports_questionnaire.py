@@ -1,10 +1,11 @@
 import datetime
 
+from dateutil.tz import tzutc
 from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
-from app import db
-from app.question_service import QuestionService
+from app import db, ma
+from app.export_service import ExportService
 from app.model.questionnaires.therapy import Therapy, TherapySchema
 from app.model.questionnaires.medication import Medication, MedicationSchema
 from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
@@ -14,11 +15,11 @@ from app.model.questionnaires.alternative_augmentative import AlternativeAugment
 class SupportsQuestionnaire(db.Model):
     __tablename__ = "supports_questionnaire"
     __label__ = "Supports"
-    __question_type__ = QuestionService.TYPE_UNRESTRICTED
+    __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
     participant_id = db.Column(
@@ -197,8 +198,11 @@ class SupportsQuestionnaireSchema(ModelSchema):
         ordered = True
         include_fk = True
         fields = ("id", "last_updated", "time_on_task_ms", "participant_id", "user_id", "medications", "therapies",
-                  "assistive_devices", "alternative_augmentative")
+                  "assistive_devices", "alternative_augmentative", "_links")
     medications = fields.Nested(MedicationSchema, many=True)
     therapies = fields.Nested(TherapySchema, many=True)
     assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)
     alternative_augmentative = fields.Nested(AlternativeAugmentativeSchema, many=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.questionnaireendpoint', name='supports_questionnaire', id='<id>'),
+    })

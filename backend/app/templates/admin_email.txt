@@ -1,0 +1,8 @@
+Dear Administrator,
+
+This address is configured to receive errors and alerts from STAR Drive.
+The following error occurred:
+
+{{ msg }}
+
+This message was sent by a site currently running at: {{ site_url }}
