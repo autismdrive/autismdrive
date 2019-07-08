@@ -277,9 +277,13 @@ APP_CONFIG_FILE=/full/path/to/config/slave.py
   
 Note that it should be the full path.  You'll be running both instances, 
 so don't set this environment variable for all commands, just for running the instance.
-For me, I have it set as an environement variable under the Run Configuration within
+For me, I have it set as an environment variable under the Run Configuration within
 PyCharm.  I copied by existing run command and added this environment variable
-there.
+there.  You will also need to add a port (5001) argument so you aren't running on the 
+same port as the master server.  Below are the settings in my Run configuration:
+
+Parameters: 5001
+Environment Variable: PYTHONUNBUFFERED=1;APP_CONFIG_FILE=/home/dan/code/star-drive/backend/config/slave.py
 
 You will need to build the basic data structures in the database in order to
 load data for this you will need to run the init_db flask command, but

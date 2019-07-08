@@ -78,7 +78,7 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
     def get(self, name):
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
-        questionnaire = db.session.query(class_ref).first()
+        questionnaire = class_ref()
         meta = {"table": {}}
         try:
             meta["table"]['question_type'] = questionnaire.__question_type__

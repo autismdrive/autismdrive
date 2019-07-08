@@ -293,11 +293,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertGreater(len(TEST_MESSAGES), message_count)
         self.assertEqual("Star Drive: Error - 45 minutes since last successful export",
                          self.decode(TEST_MESSAGES[-1]['subject']))
-
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
         self.assertEqual(message_count+1, len(TEST_MESSAGES), msg="No more messages should be sent.")
+        self.assertEqual("admin@tester.com", TEST_MESSAGES[-1]['To'])
 
     def test_exporter_sends_second_email_after_2_hours(self):
 
@@ -321,12 +321,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_sends_12_emails_over_first_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=1), available_records=2)
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=22), available_records=2)
         db.session.add(log)
         db.session.commit()
         for i in range(20):
             ExportService.send_alert_if_exports_not_running()
-        self.assertEqual(message_count + 13, len(TEST_MESSAGES), msg="13 emails should have gone out.")
+        self.assertEqual(message_count + 12, len(TEST_MESSAGES), msg="12 emails should have gone out.")
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(TEST_MESSAGES)
@@ -336,3 +336,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         for i in range(20):
             ExportService.send_alert_if_exports_not_running()
         self.assertEqual(message_count + 20, len(TEST_MESSAGES), msg="20 emails should have gone out.")
+
+    def test_exporter_notifies_PI_after_24_hours(self):
+        message_count = len(TEST_MESSAGES)
+        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=24), available_records=2)
+        db.session.add(log)
+        db.session.commit()
+        ExportService.send_alert_if_exports_not_running()
+        self.assertTrue("pi@tester.com" in TEST_MESSAGES[-1]['To'])
+

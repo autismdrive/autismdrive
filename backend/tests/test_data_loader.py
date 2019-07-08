@@ -83,62 +83,6 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(User, 'load_users')
         self._load_and_assert_success(Participant, 'load_participants')
 
-    def test_load_clinical_diagnoses_questionnaire(self):
-        self._load_and_assert_success(ClinicalDiagnosesQuestionnaire, 'load_clinical_diagnoses_questionnaire')
-
-    def test_load_contact_questionnaire(self):
-        self._load_and_assert_success(ContactQuestionnaire, 'load_contact_questionnaire')
-
-    def test_load_current_behaviors_questionnaires(self):
-        self._load_and_assert_success(CurrentBehaviorsDependentQuestionnaire, 'load_current_behaviors_questionnaires',
-                                      CurrentBehaviorsSelfQuestionnaire)
-
-    # DemographicsQuestionnaire depends on Users
-    def test_load_demographics_questionnaire(self):
-        self._load_and_assert_success(User, 'load_users')
-        self._load_and_assert_success(DemographicsQuestionnaire, 'load_demographics_questionnaire')
-
-    def test_load_developmental_questionnaire(self):
-        self._load_and_assert_success(DevelopmentalQuestionnaire, 'load_developmental_questionnaire')
-
-    def test_load_education_questionnaires(self):
-        self._load_and_assert_success(EducationDependentQuestionnaire, 'load_education_questionnaires',
-                                      EducationSelfQuestionnaire)
-
-    def test_load_employment_questionnaire(self):
-        self._load_and_assert_success(EmploymentQuestionnaire, 'load_employment_questionnaire')
-
-    def test_load_evaluation_history_questionnaires(self):
-        self._load_and_assert_success(EvaluationHistoryDependentQuestionnaire, 'load_evaluation_history_questionnaires',
-                                      EvaluationHistorySelfQuestionnaire)
-
-    def test_load_home_questionnaires(self):
-        self._load_and_assert_success(HomeDependentQuestionnaire, 'load_home_questionnaires', HomeSelfQuestionnaire)
-
-    def test_load_identification_questionnaire(self):
-        self._load_and_assert_success(IdentificationQuestionnaire, 'load_identification_questionnaire')
-
-    def test_load_professional_profile_questionnaire(self):
-        self._load_and_assert_success(ProfessionalProfileQuestionnaire, 'load_professional_profile_questionnaire')
-
-    def test_load_supports_questionnaire(self):
-        self._load_and_assert_success(SupportsQuestionnaire, 'load_supports_questionnaire')
-
-    def test_load_alternative_augmentative(self):
-        self._load_and_assert_success(AlternativeAugmentative, 'load_alternative_augmentative')
-
-    def test_load_assistive_devices(self):
-        self._load_and_assert_success(AssistiveDevice, 'load_assistive_devices')
-
-    def test_load_housemate(self):
-        self._load_and_assert_success(Housemate, 'load_housemate')
-
-    def test_load_medication(self):
-        self._load_and_assert_success(Medication, 'load_medication')
-
-    def test_load_therapy(self):
-        self._load_and_assert_success(Therapy, 'load_therapy')
-
     def test_get_org_by_name(self):
         expected_name = 'The Graham Institute for Magical Misfits'
         loader = data_loader.DataLoader()

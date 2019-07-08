@@ -115,7 +115,7 @@ class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
         class_ref = ExportService.get_class(questionnaire_name)
-        questionnaire = db.session.query(class_ref).first()
+        questionnaire = class_ref()
         return ExportService.get_meta(questionnaire, flow.relationship)
     #        return schema.dump(questionnaire)
 

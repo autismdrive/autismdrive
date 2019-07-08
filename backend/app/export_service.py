@@ -68,12 +68,12 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name, last_modifed_after=None):
+    def get_data(name, last_updated=None):
         print("Exporting " + name)
         model = ExportService.get_class(name)
         query = db.session.query(model)
-        if last_modifed_after:
-            query = query.filter(model.last_updated > last_modifed_after)
+        if last_updated:
+            query = query.filter(model.last_updated > last_updated)
         if hasattr(model, '__mapper_args__') \
                 and 'polymorphic_identity' in model.__mapper_args__:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
@@ -81,7 +81,7 @@ class ExportService:
 
     # Returns a list of classes that can be exported from the system.
     @staticmethod
-    def get_export_info(last_modifed_after=None):
+    def get_export_info(last_updated=None):
         export_infos = []
         sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
         total_records_for_export = 0
@@ -99,8 +99,8 @@ class ExportService:
             export_info = ExportInfo(table_name=table.name, class_name=db_model.__name__)
 
             query = (db.session.query(func.count(db_model.id)))
-            if last_modifed_after:
-                query = query.filter(db_model.last_updated > last_modifed_after)
+            if last_updated:
+                query = query.filter(db_model.last_updated > last_updated)
             export_info.size = query.all()[0][0]
             total_records_for_export += query.all()[0][0]
             export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
@@ -223,6 +223,7 @@ class ExportService:
           and every four hours after that until the fault is corrected or the system taken down.
             After 24 hours, the PI will also be emailed notifications every 8 hours until
              the fault is corrected or the system taken down."""
+        alert_principal_investigator = False
         last_log = db.session.query(ExportLog) \
             .order_by(desc(ExportLog.last_updated)).limit(1).first()
         if not last_log:
@@ -236,7 +237,8 @@ class ExportService:
             time_difference = datetime.datetime.now(tz=UTC) - last_log.last_updated
             hours = int(time_difference.total_seconds()/3600)
             minutes = int(time_difference.total_seconds()/60)
-            if hours > 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
+            if hours >= 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
+                alert_principal_investigator = hours % 8 == 0
                 subject = subject + str(hours) + " hours since last successful export"
                 msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
                     " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \
@@ -257,7 +259,10 @@ class ExportService:
                     " minutes since the last export was requested."
             if msg:
                 email_server = EmailService(app)
-                email_server.admin_alert_email(subject, msg)
+                email_server.admin_alert_email(subject, msg,
+                                               alert_principal_investigator=alert_principal_investigator)
                 last_log.alerts_sent = last_log.alerts_sent + 1
                 db.session.add(last_log)
                 db.session.commit()
+
+
