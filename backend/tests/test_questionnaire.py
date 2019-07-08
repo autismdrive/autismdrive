@@ -1290,7 +1290,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(response['steps'][0]['date_completed'])
 
     def test_questionnaire_meta_is_relation_specific(self):
-        self.construct_identification_questionnaire()
         rv = self.app.get('/api/flow/self_intake/identification_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1319,7 +1318,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                          "Your child's city/municipality of birth")
 
     def test_questionnaire_meta_has_relation_required_fields(self):
-        self.construct_identification_questionnaire()
         rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1338,7 +1336,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNone(relationship)
 
     def test_meta_contains_table_details(self):
-        self.construct_identification_questionnaire()
         rv = self.app.get('/api/flow/dependent_intake/identification_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1348,7 +1345,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("Identification", response["table"]["label"])
 
     def test_meta_field_groups_contain_their_fields(self):
-        self.construct_home_self_questionnaire()
         rv = self.app.get('/api/flow/self_intake/home_self_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1358,7 +1354,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("self_living_situation", self_living["fieldGroup"][0]["name"])
 
     def test_support_meta_contain_their_fields(self):
-        self.construct_supports_questionnaire()
         rv = self.app.get('/api/flow/self_intake/supports_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1369,7 +1364,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("type", assistive_devices["fieldArray"]["fieldGroup"][0]["name"])
 
     def test_evaluation_history_dependent_meta_contain_their_fields(self):
-        self.construct_evaluation_history_dependent_questionnaire()
         rv = self.app.get('/api/flow/dependent_intake/evaluation_history_dependent_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1378,7 +1372,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(len(response["fields"]), 10)
 
     def test_evaluation_history_self_meta_contain_their_fields(self):
-        self.construct_evaluation_history_self_questionnaire()
         rv = self.app.get('/api/flow/self_intake/evaluation_history_self_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1387,7 +1380,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(len(response["fields"]), 10)
 
     def test_education_dependent_meta_contain_their_fields(self):
-        self.construct_education_dependent_questionnaire()
         rv = self.app.get('/api/flow/dependent_intake/education_dependent_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1396,7 +1388,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(len(response["fields"]), 5)
 
     def test_education_self_meta_contain_their_fields(self):
-        self.construct_education_self_questionnaire()
         rv = self.app.get('/api/flow/self_intake/education_self_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1405,7 +1396,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(len(response["fields"]), 5)
 
     def test_meta_fields_are_ordered(self):
-        self.construct_education_self_questionnaire()
         rv = self.app.get('/api/flow/self_intake/education_self_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
@@ -1431,7 +1421,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(21, len(response))
 
     def test_questionnaire_list_meta_basics(self):
-        self.construct_education_self_questionnaire()
         rv = self.app.get('/api/q/education_self_questionnaire/meta',
                           follow_redirects=True,
                           content_type="application/json")
