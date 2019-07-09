@@ -79,6 +79,7 @@ import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-s
 import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
 import { RegisterComponent } from './register/register.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
+import { ResourceEditButtonComponent } from './resource-edit-button/resource-edit-button.component';
 import { ResourceFormComponent } from './resource-form/resource-form.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { SearchBoxComponent } from './search-box/search-box.component';
@@ -153,6 +154,7 @@ export class FormlyConfig {
     RegisterComponent,
     RepeatSectionComponent,
     ResourceDetailComponent,
+    ResourceEditButtonComponent,
     ResourceFormComponent,
     ResourcesComponent,
     SearchBoxComponent,
