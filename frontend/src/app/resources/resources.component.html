@@ -36,6 +36,7 @@
     class="row"
     style="width: 100%"
   >
+    <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
     <h1>Resources Near You</h1>
     <agm-map
       *ngIf="!loading"

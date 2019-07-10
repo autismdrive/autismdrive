@@ -78,6 +78,7 @@ import { QuestionnaireDataViewComponent } from './questionnaire-data-view/questi
 import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
 import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
 import { RegisterComponent } from './register/register.component';
+import { ResourceAddButtonComponent } from './resource-add-button/resource-add-button.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
 import { ResourceEditButtonComponent } from './resource-edit-button/resource-edit-button.component';
 import { ResourceFormComponent } from './resource-form/resource-form.component';
@@ -153,6 +154,7 @@ export class FormlyConfig {
     QuestionnaireStepsListComponent,
     RegisterComponent,
     RepeatSectionComponent,
+    ResourceAddButtonComponent,
     ResourceDetailComponent,
     ResourceEditButtonComponent,
     ResourceFormComponent,
