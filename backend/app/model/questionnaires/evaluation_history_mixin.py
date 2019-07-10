@@ -1,17 +1,18 @@
 import datetime
 
+from dateutil.tz import tzutc
 from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
-from app.question_service import QuestionService
+from app.export_service import ExportService
 
 
 class EvaluationHistoryMixin(object):
-    __question_type__ = QuestionService.TYPE_SENSITIVE
+    __question_type__ = ExportService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
     @declared_attr

@@ -1,12 +1,15 @@
 import datetime
 import flask_restful
 import os
+
+from dateutil.tz import tzutc
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import app, db, RestException, auth
+from app.export_service import ExportService
+from app.export_xls_service import ExportXlsService
 from app.model.user import Role
 from app.wrappers import requires_roles
-from data_export_service import DataExport
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -15,24 +18,24 @@ from data_export_service import DataExport
 #   * it has an id field called "id"
 #   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
-from app.question_service import QuestionService
-
 
 class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, name, id):
-        class_ref = QuestionService.get_class(name)
+        name = ExportService.camel_case_it(name)
+        class_ref = ExportService.get_class(name)
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
         if instance is None:
             raise RestException(RestException.NOT_FOUND)
-        schema = QuestionService.get_schema(name)
+        schema = ExportService.get_schema(name)
         return schema.dump(instance)
 
     @auth.login_required
     def delete(self, name, id):
         try:
-            class_ref = QuestionService.get_class(name)
+            name = ExportService.camel_case_it(name)
+            class_ref = ExportService.get_class(name)
             instance = db.session.query(class_ref).filter(class_ref.id == id).first()
             db.session.delete(instance)
 #            db.session.query(class_ref).filter(class_ref.id == id).delete()
@@ -43,15 +46,16 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def put(self, name, id):
-        class_ref = QuestionService.get_class(name)
+        name = ExportService.camel_case_it(name)
+        class_ref = ExportService.get_class(name)
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
-        schema = QuestionService.get_schema(name, session=db.session)
+        schema = ExportService.get_schema(name, session=db.session)
         request_data = request.get_json()
         updated, errors = schema.load(request_data, instance=instance)
 
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
+        updated.last_updated = datetime.datetime.now(tz=tzutc())
         db.session.add(updated)
         db.session.commit()
         return schema.dump(updated)
@@ -62,8 +66,9 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
-        class_ref = QuestionService.get_class(name)
-        schema = QuestionService.get_schema(name, many=True)
+        name = ExportService.camel_case_it(name)
+        class_ref = ExportService.get_class(name)
+        schema = ExportService.get_schema(name, many=True)
         questionnaires = db.session.query(class_ref).all()
         return schema.dump(questionnaires)
 
@@ -71,8 +76,9 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
 class QuestionnaireListMetaEndpoint(flask_restful.Resource):
 
     def get(self, name):
-        class_ref = QuestionService.get_class(name)
-        questionnaire = db.session.query(class_ref).first()
+        name = ExportService.camel_case_it(name)
+        class_ref = ExportService.get_class(name)
+        questionnaire = class_ref()
         meta = {"table": {}}
         try:
             meta["table"]['question_type'] = questionnaire.__question_type__
@@ -116,7 +122,20 @@ class QuestionnaireNamesEndpoint(flask_restful.Resource):
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):
 
+    @staticmethod
+    def request_wants_json():
+        best = request.accept_mimetypes \
+            .best_match(['application/json', 'text/html'])
+        return best == 'application/json' and \
+               request.accept_mimetypes[best] > \
+               request.accept_mimetypes['text/html']
+
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
-        return DataExport.export(name=name, app=app)
+        name = ExportService.camel_case_it(name)
+        if self.request_wants_json():
+            schema = ExportService.get_schema(name, many=True)
+            return schema.dump(ExportService().get_data(name))
+        else:
+            return ExportXlsService.export_xls(name=name, app=app)

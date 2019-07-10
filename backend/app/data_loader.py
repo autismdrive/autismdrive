@@ -10,7 +10,7 @@ from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.therapy import Therapy
 from app.model.event import Event
 from app.model.location import Location
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
@@ -87,7 +87,7 @@ class DataLoader:
                               phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'])
                 db.session.add(event)
                 db.session.commit()
-                self.__increment_id_sequence(StarResource)
+                self.__increment_id_sequence(Resource)
 
                 for i in range(17, len(row)):
                     if row[i] and row[i] is not '':
@@ -122,7 +122,7 @@ class DataLoader:
                                     latitude=geocode['lat'], longitude=geocode['lng'])
                 db.session.add(location)
                 db.session.commit()
-                self.__increment_id_sequence(StarResource)
+                self.__increment_id_sequence(Resource)
 
                 for i in range(18, len(row)):
                     if row[i] and row[i] is not '':
@@ -144,11 +144,11 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
-                resource = StarResource(title=row[0], description=row[1], organization=org, website=row[5],
+                resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
                                         phone=row[6])
                 db.session.add(resource)
                 db.session.commit()
-                self.__increment_id_sequence(StarResource)
+                self.__increment_id_sequence(Resource)
 
                 for i in range(7, len(row)):
                     if row[i] and row[i] is not '':
@@ -159,7 +159,7 @@ class DataLoader:
                         resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
                         db.session.add(resource_category)
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
-                StarResource).filter(StarResource.type == 'resource').count())
+                Resource).filter(Resource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
                   db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource').count())
         db.session.commit()
@@ -235,144 +235,6 @@ class DataLoader:
                 Participant).count())
         db.session.commit()
 
-    def load_clinical_diagnoses_questionnaire(self):
-        cd_ques = ClinicalDiagnosesQuestionnaire(mental_health=['ptsd'], genetic=['angelman'])
-        db.session.add(cd_ques)
-        print("Clinical Diagnoses loaded. There is now %i clinical diagnoses record in the database." % db.session.query(
-            ClinicalDiagnosesQuestionnaire).count())
-        db.session.commit()
-
-    def load_contact_questionnaire(self):
-        c_ques = ContactQuestionnaire(phone='555-555-1234', contact_times='Weekdays at 5AM', email='charlie@brown.com')
-        db.session.add(c_ques)
-        print("Contact loaded.  There is now %i contact record in the database." % db.session.query(
-            ContactQuestionnaire).count())
-        db.session.commit()
-
-    def load_current_behaviors_questionnaires(self):
-        cb_dques = CurrentBehaviorsDependentQuestionnaire(dependent_verbal_ability='nonVerbal', has_academic_difficulties=True)
-        db.session.add(cb_dques)
-        print("Current Behaviors for Dependents loaded.  There is now %i dependent current behavior record in the database." % db.session.query(
-            CurrentBehaviorsDependentQuestionnaire).count())
-        cb_sques = CurrentBehaviorsSelfQuestionnaire(self_verbal_ability=["nonVerbal"], has_academic_difficulties=True)
-        db.session.add(cb_sques)
-        print("Current Behaviors for Self participants loaded.  There is now %i self current behavior record in the database." % db.session.query(
-            CurrentBehaviorsSelfQuestionnaire).count())
-        db.session.commit()
-
-    def load_demographics_questionnaire(self):
-        d_ques = DemographicsQuestionnaire(user_id=1, birth_sex='male', gender_identity='intersex',
-                                           race_ethnicity=["raceAsian"])
-        db.session.add(d_ques)
-        print("Demographics loaded.  There is now %i demographics record in the database." % db.session.query(
-            DemographicsQuestionnaire).count())
-        db.session.commit()
-
-    def load_developmental_questionnaire(self):
-        d_ques = DevelopmentalQuestionnaire(had_birth_complications=True, when_language_milestones="early")
-        db.session.add(d_ques)
-        print("Developmental History loaded.  There is now %i developmental record in the database." % db.session.query(
-            DevelopmentalQuestionnaire).count())
-        db.session.commit()
-
-    def load_education_questionnaires(self):
-        e_dques = EducationDependentQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
-        db.session.add(e_dques)
-        print("Education for Dependents loaded.  There is now %i dependent education record in the database." % db.session.query(
-            EducationDependentQuestionnaire).count())
-        e_sques = EducationSelfQuestionnaire(attends_school=True, school_name="Staunton Montessori School")
-        db.session.add(e_sques)
-        print("Education for Self participants loaded.  There is now %i self education record in the database." % db.session.query(
-            EducationSelfQuestionnaire).count())
-        db.session.commit()
-
-    def load_employment_questionnaire(self):
-        em_ques = EmploymentQuestionnaire(is_currently_employed=True, employment_capacity='fullTime', has_employment_support=False)
-        db.session.add(em_ques)
-        print("Employment loaded.  There is now %i employment record in the database." % db.session.query(
-            EmploymentQuestionnaire).count())
-        db.session.commit()
-
-    def load_evaluation_history_questionnaires(self):
-        eh_dques = EvaluationHistoryDependentQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
-        db.session.add(eh_dques)
-        print("Evaluation History for Dependents loaded.  There is now %i dependent evaluation history record in the database." % db.session.query(
-            EvaluationHistoryDependentQuestionnaire).count())
-        eh_sques = EvaluationHistorySelfQuestionnaire(self_identifies_autistic=True, years_old_at_first_diagnosis=10, where_diagnosed="uva")
-        db.session.add(eh_sques)
-        print("Evaluation History for Self participants loaded.  There is now %i self evaluation history record in the database." % db.session.query(
-            EvaluationHistorySelfQuestionnaire).count())
-        db.session.commit()
-
-    def load_home_questionnaires(self):
-        h_ques = HomeDependentQuestionnaire(dependent_living_situation=["fullTimeGuardian"], struggle_to_afford=True)
-        db.session.add(h_ques)
-        print("Home for Dependents loaded.  There is now %i dependent home record in the database." % db.session.query(
-            HomeDependentQuestionnaire).count())
-        h_ques = HomeSelfQuestionnaire(self_living_situation=["spouse"], struggle_to_afford=True)
-        db.session.add(h_ques)
-        print("Home for Self participants loaded.  There is now %i self home record in the database." % db.session.query(
-            HomeSelfQuestionnaire).count())
-        db.session.commit()
-
-    def load_identification_questionnaire(self):
-        i_ques = IdentificationQuestionnaire(first_name="Charles", middle_name="Monroe", last_name="Brown",
-                                             is_first_name_preferred=False, nickname="Charlie", birthdate="1979-1-5",
-                                             birth_city="Staunton", birth_state="VA", is_english_primary=True)
-        db.session.add(i_ques)
-        print("Identification loaded.  There is now %i home record in the database." % db.session.query(
-            IdentificationQuestionnaire).count())
-        db.session.commit()
-
-    def load_professional_profile_questionnaire(self):
-        pp_ques = ProfessionalProfileQuestionnaire()
-        db.session.add(pp_ques)
-        print("Professional Profile loaded.  There is now %i professional profile record in the database." % db.session.query(
-            ProfessionalProfileQuestionnaire).count())
-        db.session.commit()
-
-    def load_supports_questionnaire(self):
-        s_ques = SupportsQuestionnaire()
-        db.session.add(s_ques)
-        print("Supports loaded.  There is now %i supports record in the database." % db.session.query(
-            SupportsQuestionnaire).count())
-        db.session.commit()
-
-    def load_alternative_augmentative(self):
-        aac = AlternativeAugmentative()
-        db.session.add(aac)
-        print("AAC loaded.  There is now %i AAC record in the database." % db.session.query(
-            AlternativeAugmentative).count())
-        db.session.commit()
-
-    def load_assistive_devices(self):
-        ad = AssistiveDevice()
-        db.session.add(ad)
-        print("Assistive Device loaded.  There is now %i assistive device record in the database." % db.session.query(
-            AssistiveDevice).count())
-        db.session.commit()
-
-    def load_housemate(self):
-        hm = Housemate()
-        db.session.add(hm)
-        print("Housemate loaded.  There is now %i housemate record in the database." % db.session.query(
-            Housemate).count())
-        db.session.commit()
-
-    def load_medication(self):
-        m = Medication()
-        db.session.add(m)
-        print("Medication loaded.  There is now %i medication record in the database." % db.session.query(
-            Medication).count())
-        db.session.commit()
-
-    def load_therapy(self):
-        t = Therapy()
-        db.session.add(t)
-        print("Therapy loaded.  There is now %i therapy record in the database." % db.session.query(
-            Therapy).count())
-        db.session.commit()
-
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
         if organization is None:
@@ -418,9 +280,9 @@ class DataLoader:
 
     def build_index(self):
         elastic_index.load_documents(
-            resources=db.session.query(StarResource).filter(StarResource.type == 'resource').all(),
-            events=db.session.query(StarResource).filter(StarResource.type == 'event').all(),
-            locations=db.session.query(StarResource).filter(StarResource.type == 'location').all(),
+            resources=db.session.query(Resource).filter(Resource.type == 'resource').all(),
+            events=db.session.query(Resource).filter(Resource.type == 'event').all(),
+            locations=db.session.query(Resource).filter(Resource.type == 'location').all(),
             studies=db.session.query(Study).all()
         )
 
@@ -459,7 +321,7 @@ class DataLoader:
         db.session.query(Investigator).delete()
         db.session.query(Event).delete()
         db.session.query(Location).delete()
-        db.session.query(StarResource).delete()
+        db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.query(Participant).delete()
         db.session.query(User).delete()
@@ -473,7 +335,7 @@ class DataLoader:
         db.session.query(Investigator).delete()
         db.session.query(Event).delete()
         db.session.query(Location).delete()
-        db.session.query(StarResource).delete()
+        db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.commit()
 

@@ -9,12 +9,14 @@ from itsdangerous import URLSafeTimedSerializer
 TEST_MESSAGES = []
 
 
-class EmailService():
+class EmailService:
 
     def __init__(self, app):
         self.app = app
         self.api_url = app.config['API_URL']
         self.site_url = app.config['SITE_URL']
+        self.admin_email = app.config['ADMIN_EMAIL']
+        self.principal_investigator_email = app.config['PRINCIPAL_INVESTIGATOR_EMAIL']
 
     def tracking_code(self):
         return str(uuid.uuid4())[:16]
@@ -110,3 +112,14 @@ class EmailService():
                         recipients=[user.email], text_body=text_body, html_body=html_body)
 
         return tracking_code
+
+    def admin_alert_email(self, subject, message, alert_principal_investigator=False):
+        text_body = render_template("admin_email.txt", msg=message, site_url=self.site_url)
+
+        html_body = render_template("admin_email.html", msg=message, site_url=self.site_url)
+        recipients = [self.admin_email]
+        if alert_principal_investigator:
+            recipients.append(self.principal_investigator_email)
+
+        self.send_email(subject,
+                        recipients=recipients, text_body=text_body, html_body=html_body)

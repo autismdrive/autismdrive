@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -20,8 +21,13 @@ app.config.from_object('config.default')
 app.config.from_pyfile('config.py')
 # Load the file specified by the APP_CONFIG_FILE environment variable
 # Variables defined here will override those in the default configuration
-if "APP_CONFIG_FILE" in os.environ:
-    app.config.from_envvar('APP_CONFIG_FILE')
+if "TESTING" in os.environ and os.environ["TESTING"] == "true":
+    app.config.from_object('config.testing')
+    app.config.from_pyfile('testing.py')
+
+if "SLAVE" in os.environ and os.environ["SLAVE"] == "true":
+    app.config.from_object('config.slave')
+
 
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -49,6 +55,7 @@ bcrypt = Bcrypt(app)
 # Search System
 elastic_index = ElasticIndex(app)
 
+#
 # Constructing for a problem when building urls when the id is null.
 # there is a fix in the works for this, see
 # https://github.com/kids-first/kf-api-dathanaservice/pull/219
@@ -58,6 +65,8 @@ elastic_index = ElasticIndex(app)
 def handler(error, endpoint, values=''):
     print("URL Build error:" + str(error))
     return ''
+
+
 app.url_build_error_handlers.append(handler)
 
 
@@ -82,23 +91,6 @@ def _load_data(data_loader):
     data_loader.load_studies()
     data_loader.load_users()
     data_loader.load_participants()
-    data_loader.load_clinical_diagnoses_questionnaire()
-    data_loader.load_contact_questionnaire()
-    data_loader.load_current_behaviors_questionnaires()
-    data_loader.load_demographics_questionnaire()
-    data_loader.load_developmental_questionnaire()
-    data_loader.load_education_questionnaires()
-    data_loader.load_employment_questionnaire()
-    data_loader.load_evaluation_history_questionnaires()
-    data_loader.load_home_questionnaires()
-    data_loader.load_identification_questionnaire()
-    data_loader.load_professional_profile_questionnaire()
-    data_loader.load_supports_questionnaire()
-    data_loader.load_alternative_augmentative()
-    data_loader.load_assistive_devices()
-    data_loader.load_housemate()
-    data_loader.load_medication()
-    data_loader.load_therapy()
 
 
 @app.cli.command()
@@ -165,3 +157,9 @@ def resourcereset():
 
 
 from app import views
+
+# Cron scheduler
+if app.config["SLAVE"]:
+    from app.import_service import ImportService
+    importer = ImportService(app, db)
+    importer.start()

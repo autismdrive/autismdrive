@@ -1,7 +1,20 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
+import base64
 import os
-os.environ["APP_CONFIG_FILE"] = '../instance/testing.py'
+import quopri
+import re
+
+os.environ["TESTING"] = "true"
+
+from app.model.email_log import EmailLog
+from app.model.event import Event
+from app.model.investigator import Investigator
+from app.model.step_log import StepLog
+from app.model.study import Study, Status
+from app.model.study_category import StudyCategory
+from app.model.study_investigator import StudyInvestigator
+
 
 from flask import json
 
@@ -11,7 +24,7 @@ from app.model.resource_category import ResourceCategory
 from app.model.location import Location
 from app.model.organization import Organization
 from app.model.participant import Participant
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.user import User, Role
 
 
@@ -26,6 +39,9 @@ class BaseTest:
 
     @classmethod
     def setUpClass(cls):
+        app.config.from_object('config.testing')
+        app.config.from_pyfile('testing.py')
+
         cls.ctx = app.test_request_context()
         cls.app = app.test_client()
         db.create_all()
@@ -43,6 +59,7 @@ class BaseTest:
     def tearDown(self):
         db.session.rollback()
         self.ctx.pop()
+
 
     def logged_in_headers(self, user=None):
 
@@ -70,15 +87,31 @@ class BaseTest:
 
         return self.auths[existing_user.id]
 
-    def assert_success(self, rv):
+    def decode(self, encoded_words):
+        """
+        Useful for checking the content of email messages
+        (which we store in an array for testing)
+        """
+        encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
+        charset, encoding, encoded_text = re.match(encoded_word_regex,
+                                                   encoded_words).groups()
+        if encoding is 'b':
+            byte_string = base64.b64decode(encoded_text)
+        elif encoding is 'q':
+            byte_string = quopri.decodestring(encoded_text)
+        text = byte_string.decode(charset)
+        text = text.replace("_", " ")
+        return text
+
+    def assert_success(self, rv, msg=""):
         try:
             data = json.loads(rv.get_data(as_text=True))
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
                             "BAD Response: %i. \n %s" %
-                            (rv.status_code, json.dumps(data)))
+                            (rv.status_code, json.dumps(data)) + ". " + msg)
         except:
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
-                            "BAD Response: %i." % rv.status_code)
+                            "BAD Response: %i." % rv.status_code + ". " + msg)
 
     def construct_user(self, email="stan@staunton.com", role=Role.user):
 
@@ -105,7 +138,6 @@ class BaseTest:
 
         organization = Organization(name=name, description=description)
         db.session.add(organization)
-        db.session.commit()
 
         db_org = db.session.query(Organization).filter_by(name=organization.name).first()
         self.assertEqual(db_org.description, organization.description)
@@ -126,11 +158,11 @@ class BaseTest:
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            phone="555-555-5555", website="http://stardrive.org"):
 
-        resource = StarResource(title=title, description=description, phone=phone, website=website)
+        resource = Resource(title=title, description=description, phone=phone, website=website)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
 
-        db_resource = db.session.query(StarResource).filter_by(title=resource.title).first()
+        db_resource = db.session.query(Resource).filter_by(title=resource.title).first()
         self.assertEqual(db_resource.website, resource.website)
         elastic_index.add_document(db_resource, 'Resource')
         return db_resource
@@ -157,3 +189,68 @@ class BaseTest:
         db.session.add(rc)
         db.session.commit()
         return c
+
+    def construct_study_category(self, study_id, category_name):
+        c = self.construct_category(name=category_name)
+        sc = StudyCategory(study_id=study_id, category=c)
+        db.session.add(sc)
+        db.session.commit()
+        return c
+
+    def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
+                        participant_description="Even your pet hamster could benefit from participating in this study",
+                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
+
+        study = Study(title=title, description=description, participant_description=participant_description,
+                      benefit_description=benefit_description, status=Status.currently_enrolling)
+        study.organization_id = self.construct_organization().id
+        db.session.add(study)
+        db.session.commit()
+
+        db_study = db.session.query(Study).filter_by(title=study.title).first()
+        self.assertEqual(db_study.description, description)
+        elastic_index.add_document(db_study, 'Study')
+        return db_study
+
+    def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
+
+        investigator = Investigator(name=name, title=title)
+        investigator.organization_id = self.construct_organization().id
+        db.session.add(investigator)
+        db.session.commit()
+
+        db_inv = db.session.query(Investigator).filter_by(name=investigator.name).first()
+        self.assertEqual(db_inv.title, investigator.title)
+        return db_inv
+
+    def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
+                           street_address1="123 Some Pl", street_address2="Apt. 45",
+                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
+                           website="http://stardrive.org"):
+
+        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
+                                state=state, zip=zip, phone=phone, website=website)
+        event.organization_id = self.construct_organization().id
+        db.session.add(event)
+
+        db_event = db.session.query(Event).filter_by(title=event.title).first()
+        self.assertEqual(db_event.website, event.website)
+        elastic_index.add_document(db_event, 'Event')
+        return db_event
+
+    def construct_everything(self):
+        self.construct_all_questionnaires()
+        cat = self.construct_category()
+        org = self.construct_organization()
+        self.construct_resource()
+        study = self.construct_study()
+        location = self.construct_location()
+        event = self.construct_event()
+        self.construct_location_category(location.id, cat.name)
+        self.construct_study_category(study.id, cat.name)
+        investigator = Investigator(name="Sam I am", organization_id=org.id)
+        db.session.add(StudyInvestigator(study = study, investigator = investigator))
+        db.session.add(investigator)
+        db.session.add(EmailLog())
+        db.session.add(StepLog())
+        db.session.commit()

@@ -12,7 +12,7 @@ from app.model.investigator import Investigator
 from app.model.email_log import EmailLog
 from app.model.event import Event
 from app.model.location import Location
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Filter, Search, Sort
 from app.model.step_log import StepLog
@@ -51,8 +51,10 @@ class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
         fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies',
-                  'investigators')
-
+                  'investigators', '_links')
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.organizationendpoint', id='<id>'),
+    })
 
 class InvestigatorSchema(ModelSchema):
     class Meta:
@@ -92,10 +94,10 @@ class CategorySchema(ModelSchema):
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
     parent = fields.Nested(ParentCategorySchema, dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
-    event_count = fields.Method('get_event_count')
-    location_count = fields.Method('get_location_count')
-    resource_count = fields.Method('get_resource_count')
-    study_count = fields.Method('get_study_count')
+    event_count = fields.Method('get_event_count', dump_only=True)
+    location_count = fields.Method('get_location_count', dump_only=True)
+    resource_count = fields.Method('get_resource_count', dump_only=True)
+    study_count = fields.Method('get_study_count', dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
@@ -186,9 +188,9 @@ class InvestigatorsOnStudySchema(ModelSchema):
     })
 
 
-class StarResourceSchema(ModelSchema):
+class ResourceSchema(ModelSchema):
     class Meta:
-        model = StarResource
+        model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'organization', 'resource_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
@@ -218,7 +220,7 @@ class CategoryResourcesSchema(ModelSchema):
     class Meta:
         model = ResourceCategory
         fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
-    resource = fields.Nested(StarResourceSchema, dump_only=True)
+    resource = fields.Nested(ResourceSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourcecategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
@@ -535,30 +537,13 @@ class FlowSchema(Schema):
     steps = fields.Nested(StepSchema(), many=True)
 
 
-class EmailLogSchema(Schema):
+class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
-        fields = ('id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed')
-        ordered = True
-    id = fields.Integer(required=False, allow_none=True)
-    user_id = fields.Integer()
-    type = fields.Str()
-    tracking_code = fields.Str()
-    viewed = fields.Boolean()
-    date_viewed = fields.Date()
 
 
-class StepLogSchema(Schema):
+class StepLogSchema(ModelSchema):
     class Meta:
         model = StepLog
-        fields = ('id', 'questionnaire_name', 'questionnaire_id', 'flow', 'participant_id', 'user_id', 'date_completed',
-                  'time_on_task_ms')
-        ordered = True
-    id = fields.Integer(required=False, allow_none=True)
-    questionnaire_name = fields.Str()
-    questionnaire_id = fields.Integer()
-    flow = fields.Str()
-    participant_id = fields.Integer()
-    user_id = fields.Integer()
-    date_completed = fields.Date()
-    time_on_task_ms = fields.Integer()
+
+

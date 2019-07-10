@@ -1,6 +1,6 @@
 from marshmallow_sqlalchemy import ModelSchema
 
-from app import db
+from app import db, ma
 from app.model.questionnaires.evaluation_history_mixin import EvaluationHistoryMixin
 
 
@@ -45,5 +45,9 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
             "gives_permission_to_link_evaluation_data",
             "has_iq_test",
             "recent_iq_score",
+            "_links"
         )
         ordered = True
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.questionnaireendpoint', name='evaluation_history_dependent_questionnaire', id='<id>'),
+    })

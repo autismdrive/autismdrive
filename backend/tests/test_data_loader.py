@@ -27,7 +27,7 @@ from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Search, Filter
 from app.model.study import Study
@@ -70,7 +70,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(Location, 'load_locations', ResourceCategory, 'location')
 
     def test_load_resources(self):
-        self._load_and_assert_success(StarResource, 'load_resources', ResourceCategory, 'resource')
+        self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
 
     def test_load_studies(self):
         self._load_and_assert_success(Study, 'load_studies', StudyCategory)
@@ -82,62 +82,6 @@ class TestDataLoader(BaseTest, unittest.TestCase):
     def test_load_participants(self):
         self._load_and_assert_success(User, 'load_users')
         self._load_and_assert_success(Participant, 'load_participants')
-
-    def test_load_clinical_diagnoses_questionnaire(self):
-        self._load_and_assert_success(ClinicalDiagnosesQuestionnaire, 'load_clinical_diagnoses_questionnaire')
-
-    def test_load_contact_questionnaire(self):
-        self._load_and_assert_success(ContactQuestionnaire, 'load_contact_questionnaire')
-
-    def test_load_current_behaviors_questionnaires(self):
-        self._load_and_assert_success(CurrentBehaviorsDependentQuestionnaire, 'load_current_behaviors_questionnaires',
-                                      CurrentBehaviorsSelfQuestionnaire)
-
-    # DemographicsQuestionnaire depends on Users
-    def test_load_demographics_questionnaire(self):
-        self._load_and_assert_success(User, 'load_users')
-        self._load_and_assert_success(DemographicsQuestionnaire, 'load_demographics_questionnaire')
-
-    def test_load_developmental_questionnaire(self):
-        self._load_and_assert_success(DevelopmentalQuestionnaire, 'load_developmental_questionnaire')
-
-    def test_load_education_questionnaires(self):
-        self._load_and_assert_success(EducationDependentQuestionnaire, 'load_education_questionnaires',
-                                      EducationSelfQuestionnaire)
-
-    def test_load_employment_questionnaire(self):
-        self._load_and_assert_success(EmploymentQuestionnaire, 'load_employment_questionnaire')
-
-    def test_load_evaluation_history_questionnaires(self):
-        self._load_and_assert_success(EvaluationHistoryDependentQuestionnaire, 'load_evaluation_history_questionnaires',
-                                      EvaluationHistorySelfQuestionnaire)
-
-    def test_load_home_questionnaires(self):
-        self._load_and_assert_success(HomeDependentQuestionnaire, 'load_home_questionnaires', HomeSelfQuestionnaire)
-
-    def test_load_identification_questionnaire(self):
-        self._load_and_assert_success(IdentificationQuestionnaire, 'load_identification_questionnaire')
-
-    def test_load_professional_profile_questionnaire(self):
-        self._load_and_assert_success(ProfessionalProfileQuestionnaire, 'load_professional_profile_questionnaire')
-
-    def test_load_supports_questionnaire(self):
-        self._load_and_assert_success(SupportsQuestionnaire, 'load_supports_questionnaire')
-
-    def test_load_alternative_augmentative(self):
-        self._load_and_assert_success(AlternativeAugmentative, 'load_alternative_augmentative')
-
-    def test_load_assistive_devices(self):
-        self._load_and_assert_success(AssistiveDevice, 'load_assistive_devices')
-
-    def test_load_housemate(self):
-        self._load_and_assert_success(Housemate, 'load_housemate')
-
-    def test_load_medication(self):
-        self._load_and_assert_success(Medication, 'load_medication')
-
-    def test_load_therapy(self):
-        self._load_and_assert_success(Therapy, 'load_therapy')
 
     def test_get_org_by_name(self):
         expected_name = 'The Graham Institute for Magical Misfits'
@@ -157,7 +101,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         elastic_index.clear()
 
         # Populate the database
-        self._load_and_assert_success(StarResource, 'load_resources', ResourceCategory, 'resource')
+        self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
         self._load_and_assert_success(Event, 'load_events', ResourceCategory, 'event')
         self._load_and_assert_success(Location, 'load_locations', ResourceCategory, 'location')
         self._load_and_assert_success(Study, 'load_studies', StudyCategory)
@@ -166,13 +110,13 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         data_loader.DataLoader().build_index()
 
         # Get the number of items in the database
-        num_db_resources = db.session.query(StarResource).filter(StarResource.type == 'resource').count()
-        num_db_events = db.session.query(StarResource).filter(StarResource.type == 'event').count()
-        num_db_locations = db.session.query(StarResource).filter(StarResource.type == 'location').count()
+        num_db_resources = db.session.query(Resource).filter(Resource.type == 'resource').count()
+        num_db_events = db.session.query(Resource).filter(Resource.type == 'event').count()
+        num_db_locations = db.session.query(Resource).filter(Resource.type == 'location').count()
         num_db_studies = db.session.query(Study).count()
 
         # Get the number of items in the search index
-        es_resources = elastic_index.search(Search(filters=[Filter('Type', StarResource.__label__)]))
+        es_resources = elastic_index.search(Search(filters=[Filter('Type', Resource.__label__)]))
         es_events = elastic_index.search(Search(filters=[Filter('Type', Event.__label__)]))
         es_locations = elastic_index.search(Search(filters=[Filter('Type', Location.__label__)]))
         es_studies = elastic_index.search(Search(filters=[Filter('Type', Study.__label__)]))

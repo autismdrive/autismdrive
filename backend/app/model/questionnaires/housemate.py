@@ -1,17 +1,20 @@
 import datetime
 
+from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
+from app.export_service import ExportService
 
 
 class Housemate(db.Model):
     __tablename__ = "housemate"
     __label__ = "Housemate"
+    __no_export__ = True  # This will be transferred as a part of a parent class
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     home_dependent_questionnaire_id = db.Column(
         "home_dependent_questionnaire_id",
         db.Integer,

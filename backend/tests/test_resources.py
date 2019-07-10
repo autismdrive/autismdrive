@@ -4,7 +4,7 @@ from flask import json
 
 from tests.base_test import BaseTest
 from app import db
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 
 
@@ -12,7 +12,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
     def test_resource_basics(self):
         self.construct_resource()
-        r = db.session.query(StarResource).first()
+        r = db.session.query(Resource).first()
         self.assertIsNotNone(r)
         r_id = r.id
         rv = self.app.get('/api/resource/%i' % r_id,
@@ -26,7 +26,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
     def test_modify_resource_basics(self):
         self.construct_resource()
-        r = db.session.query(StarResource).first()
+        r = db.session.query(Resource).first()
         self.assertIsNotNone(r)
         r_id = r.id
         rv = self.app.get('/api/resource/%i' % r_id, content_type="application/json")

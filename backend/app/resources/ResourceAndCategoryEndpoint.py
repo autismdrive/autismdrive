@@ -3,7 +3,7 @@ from flask import request
 
 from app import db, RestException
 from app.model.category import Category
-from app.model.resource import StarResource
+from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.resources.schema import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
 
@@ -16,7 +16,7 @@ class ResourceByCategoryEndpoint(flask_restful.Resource):
         resource_categories = db.session.query(ResourceCategory)\
             .join(ResourceCategory.resource)\
             .filter(ResourceCategory.category_id == category_id)\
-            .order_by(StarResource.title)\
+            .order_by(Resource.title)\
             .all()
         return self.schema.dump(resource_categories, many=True)
 

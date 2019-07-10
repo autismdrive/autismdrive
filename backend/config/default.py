@@ -4,6 +4,7 @@ VERSION = "0.1"
 CORS_ENABLED = False
 DEVELOPMENT = True
 TESTING = True
+SLAVE = False
 
 SQLALCHEMY_DATABASE_URI = "postgresql://ed_user:ed_pass@localhost/stardrive"
 
@@ -39,3 +40,6 @@ MAIL_DEFAULT_USER='someaddress@fake.com'
 MAIL_TIMEOUT = 10
 
 GOOGLE_MAPS_API_KEY = "PRODUCTION_API_KEY_GOES_HERE"
+
+ADMIN_EMAIL = "admin@tester.com"
+PRINCIPAL_INVESTIGATOR_EMAIL = "pi@tester.com"  # Receives some high levl alerts per agreement with InfoSec.

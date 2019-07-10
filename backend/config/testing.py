@@ -7,6 +7,9 @@ TESTING = True
 CORS_ENABLED = True
 DEBUG = False
 DEVELOPMENT = False
+MASTER_URL = "http://localhost:5000"
+MASTER_EMAIL = "daniel.h.funk@gmail.com"
+MASTER_PASS = "dfunk7"
 
 ELASTIC_SEARCH = {
     "index_prefix": "stardrive_test",

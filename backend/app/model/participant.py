@@ -1,6 +1,9 @@
 import datetime
 import enum
 
+from dateutil.tz import tzutc
+from marshmallow_enum import EnumField
+from marshmallow_sqlalchemy import ModelSchema
 from app import db
 
 
@@ -28,7 +31,7 @@ class Participant(db.Model):
     # with a user account; sometimes that of themselves and sometimes that of their guardian.
     __tablename__ = 'stardrive_participant'
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
     user_id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'))
     user = db.relationship("User", back_populates="participants")
     identification = db.relationship(IdentificationQuestionnaire, uselist=False)
@@ -42,4 +45,3 @@ class Participant(db.Model):
             return self.identification.get_name()
         else:
             return ""
-
