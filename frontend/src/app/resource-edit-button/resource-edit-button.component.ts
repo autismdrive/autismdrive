@@ -20,6 +20,6 @@ export class ResourceEditButtonComponent implements OnInit {
   }
 
   openEdit() {
-    this.router.navigateByUrl(`resource/${this.resource.id}/edit`);
+    this.router.navigateByUrl(`${this.resource.type}/${this.resource.id}/edit`);
   }
 }

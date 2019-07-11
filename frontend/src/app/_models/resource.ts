@@ -4,6 +4,7 @@ import { GeoLocation } from './geolocation';
 
 export class Resource extends GeoLocation {
   id: number;
+  type: string;
   title: string;
   description: string;
   date?: string;
