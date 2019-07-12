@@ -40,7 +40,7 @@ class OrganizationListEndpoint(flask_restful.Resource):
     organizationSchema = OrganizationSchema()
 
     def get(self):
-        organizations = db.session.query(Organization).all()
+        organizations = db.session.query(Organization).order_by(Organization.name).all()
         return self.organizationsSchema.dump(organizations)
 
     def post(self):
