@@ -21,7 +21,10 @@
     >
     </formly-form>
 
-    <div class="button-row">
+    <div
+      class="button-row"
+      fxLayoutGap="2em"
+    >
       <button
         *ngIf="form"
         mat-flat-button
@@ -31,13 +34,35 @@
         [disabled]="!form.valid"
         id="save-next-button"
       >Save</button>
+
       <button
         *ngIf="form"
         mat-flat-button
         type="button"
         (click)="onCancel()"
+        color="accent"
         id="cancel-button"
       >Cancel</button>
+
+      <button
+        type="button"
+        mat-flat-button
+        *ngIf="!showConfirmDelete && !createNew"
+        (click)="showDelete()"
+        color="warn"
+        id="delete-button"
+      >Delete</button>
+
+      <button
+        *ngIf="showConfirmDelete"
+        id="confirm_delete"
+        type="button"
+        mat-flat-button
+        (click)="onDelete()"
+        color="warn"
+        id="permanently-delete-button"
+      >Permanently Delete This Resource!!!
+      </button>
     </div>
   </form>
 </div>

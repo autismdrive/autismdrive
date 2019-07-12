@@ -20,6 +20,7 @@ export class ResourceFormComponent implements OnInit {
   resource: Resource;
   pageState = PageState;
   state = PageState.LOADING;
+  showConfirmDelete = false;
 
   model: any = {};
   form: FormGroup;
@@ -323,6 +324,16 @@ export class ResourceFormComponent implements OnInit {
         this.close();
       }
     }
+  }
+
+  showDelete() {
+    this.showConfirmDelete = true;
+  }
+
+  onDelete() {
+    this.api.deleteResource(this.resource).subscribe(r => {
+      this.router.navigate(['resources']);
+    })
   }
 
   // Go to resource screen
