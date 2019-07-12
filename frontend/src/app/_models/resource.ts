@@ -1,16 +1,18 @@
 import { ResourceCategory } from './resource_category';
 import { Organization } from './organization';
 import { GeoLocation } from './geolocation';
+import { Category } from './category';
 
 export class Resource extends GeoLocation {
-  id: number;
+  id?: number;
   type: string;
   title: string;
   description: string;
   date?: string;
   time?: string;
   ticket_cost?: string;
-  organization: Organization;
+  organization?: Organization;
+  organization_id?: number;
   primary_contact?: string;
   location_name?: string;
   street_address1?: string;
@@ -20,10 +22,10 @@ export class Resource extends GeoLocation {
   zip?: string;
   phone: string;
   website: string;
-  categories: string[];
-  last_updated: string;
+  last_updated?: string;
   status?: string;
   resource_categories?: ResourceCategory[];
+  categories?: Category[];
 
   constructor(private _props) {
     super(_props);

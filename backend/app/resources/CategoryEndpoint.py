@@ -40,7 +40,6 @@ class CategoryListEndpoint(flask_restful.Resource):
     def get(self):
         categories = db.session.query(Category)\
             .options(joinedload(Category.children))\
-            .filter(Category.parent_id == None)\
             .order_by(Category.name)\
             .all()
         return self.categories_schema.dump(categories)

@@ -89,16 +89,15 @@ export class ResourceFormComponent implements OnInit {
         hideExpression: 'model.type != "event"',
       },
       {
-        key: 'organization',
+        key: 'organization_id',
         type: 'select',
         templateOptions: {
           label: 'Organization',
-          options: []
+          options: this.api.getOrganizations(),
+          valueProp: 'id',
+          labelProp: 'name',
         },
         hideExpression: '!model.type',
-        expressionProperties: {
-          'templateOptions.options': this.api.getOrganizations()
-        },
       },
       {
         key: 'primary_contact',
@@ -182,16 +181,15 @@ export class ResourceFormComponent implements OnInit {
         hideExpression: '!model.type',
       },
       {
-        key: 'resource_categories',
+        key: 'categories',
         type: 'multicheckbox',
         templateOptions: {
           label: 'Topics',
-          options: [],
+          options: this.api.getCategories(),
+          valueProp: 'id',
+          labelProp: 'name',
         },
         hideExpression: '!model.type',
-        expressionProperties: {
-          'templateOptions.options': this.api.getCategories()
-        }
       },
     ];
 
@@ -243,24 +241,21 @@ export class ResourceFormComponent implements OnInit {
           }
       } else {
         this.createNew = true;
+        this.resource = new Resource({'type': '', 'title': '', 'description': '', 'phone': '', 'website': '' }) ;
         this.loadForm();
       }
     });
   }
 
   loadResourceCategories(resource: Resource, callback: Function) {
-    this.api
-      .getResourceCategories(resource)
-      .subscribe(rcs => {
-        this.model.resource_categories = rcs;
-        callback();
-      });
-}
+    this.model.categories = [];
+    for (const cat in resource.resource_categories) {
+      this.model.categories[resource.resource_categories[cat].category.id] = true;
+      callback();
+    }
+  }
 
   loadForm() {
-    console.log('Model: ', this.model);
-    console.log('Fields: ', this.fields);
-
     this.form = new FormGroup({});
     this.options = {
       formState: {
@@ -270,19 +265,54 @@ export class ResourceFormComponent implements OnInit {
     this.state = this.pageState.SHOW_FORM;
   }
 
+  updateResourceCategories() {
+    const rcIds = this.resource.resource_categories.map(rc => rc.category.id);
+    // Add the new categories
+    for (const cat in this.model.categories) {
+      if (!rcIds.includes(Number(cat))) {
+        this.api.addResourceCategory({resource_id: this.resource.id, category_id: Number(cat), type: this.resource.type}).subscribe();
+      }
+    }
+    // Remove any deleted categories
+    for (const rc in this.resource.resource_categories) {
+      if (!this.model.categories[this.resource.resource_categories[rc].category_id]) {
+        this.api.deleteResourceCategory(this.resource.resource_categories[rc]).subscribe();
+      }
+    }
+  }
+
+  addResourceCategories(resource_id) {
+    for (const cat in this.model.categories) {
+      this.api.addResourceCategory({resource_id: resource_id, category_id: Number(cat), type: this.resource.type}).subscribe();
+    }
+  }
+
   submit() {
     // Post to the resource endpoint, and then close
     if (this.form.valid) {
       if (this.createNew) {
         if (this.model.type == 'resource') {
-          this.api.addResource(this.model).subscribe();
+          this.api.addResource(this.model).subscribe(r =>
+            {
+              this.resource = r;
+              this.addResourceCategories(r.id);
+            });
         } else if (this.model.type == 'location') {
-          this.api.addLocation(this.model).subscribe();
+          this.api.addLocation(this.model).subscribe(r =>
+            {
+              this.resource = r;
+              this.addResourceCategories(r.id);
+            });
         } else if (this.model.type == 'event') {
-          this.api.addEvent(this.model).subscribe();
+          this.api.addEvent(this.model).subscribe(r =>
+            {
+              this.resource = r;
+              this.addResourceCategories(r.id);
+            });
         }
         this.close();
       } else {
+        this.updateResourceCategories();
         if (this.model.type == 'resource') {
           this.api.updateResource(this.model).subscribe();
         } else if (this.model.type == 'location') {
@@ -290,7 +320,6 @@ export class ResourceFormComponent implements OnInit {
         } else if (this.model.type == 'event') {
           this.api.updateEvent(this.model).subscribe();
         }
-
         this.close();
       }
     }

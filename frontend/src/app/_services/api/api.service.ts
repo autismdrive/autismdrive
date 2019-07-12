@@ -278,6 +278,18 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Add ResourceCategory */
+  addResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
+    return this.httpClient.post<ResourceCategory>(this._endpointUrl('resourcecategorylist'), resourceCategory)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete ResourceCategory */
+  deleteResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
+    return this.httpClient.delete<ResourceCategory>(this._endpointUrl('resourcecategory').replace('<id>', resourceCategory.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
   /** getCategories */
   getCategories(): Observable<Category[]> {
     return this.httpClient.get<Category[]>(this._endpointUrl('categorylist'))

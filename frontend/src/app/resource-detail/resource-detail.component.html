@@ -79,9 +79,12 @@
           </mat-card-content>
         </mat-card>
         <mat-card>
-          <mat-card-title>Contact: {{resource.organization.name}}</mat-card-title>
+          <mat-card-title>Contact:</mat-card-title>
           <mat-card-content>
             <mat-list>
+              <mat-list-item *ngIf="resource.organization">
+                <h4>{{resource.organization.name}}</h4>
+              </mat-list-item>
               <mat-list-item *ngIf="resource.date">
                 <mat-icon>access_time</mat-icon>
                 {{resource.date | date:'longDate'}}: {{resource.time}}
