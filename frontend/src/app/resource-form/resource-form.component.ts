@@ -171,6 +171,7 @@ export class ResourceFormComponent implements OnInit {
           placeholder: 'Please enter the phone number',
         },
         hideExpression: '!model.type',
+        validators: {"validation": ["phone"]},
       },
       {
         key: 'website',
