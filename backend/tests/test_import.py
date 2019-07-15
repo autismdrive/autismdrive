@@ -10,7 +10,7 @@ from app.import_service import ImportService
 from app.model.export_info import ExportInfo, ExportInfoSchema
 from app.model.import_log import ImportLog
 from app.model.user import User, Role
-from app.schema.ExportSchema import UserExportSchema, AdminExportSchema
+from app.schema.export_schema import UserExportSchema, AdminExportSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
@@ -121,7 +121,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("/api/export", httpretty.last_request().path)
 
     def request_user_setup(self):
-        info = [ExportInfo('star_user', 'User', size=1, url="http://na.edu/api/export/user")]
+        info = [ExportInfo('star_user', 'User', size=1, url="/api/export/user")]
         info_json = ExportInfoSchema(many=True).jsonify(info).data
 
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
@@ -170,7 +170,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     @httpretty.activate
     def test_import_logs_schema_error(self):
-        info = [ExportInfo('star_user', 'User', size=1, url="http://na.edu/api/export/user")]
+        info = [ExportInfo('star_user', 'User', size=1, url="/api/export/user")]
         info_json = ExportInfoSchema(many=True).jsonify(info).data
         user_json = json.dumps([{"id": "55", "pickes": "42"}])
 
@@ -243,3 +243,11 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             content_type="application/json")
         self.assertEqual(200, rv.status_code)
 
+    @httpretty.activate
+    def test_import_calls_delete_on_sensitive_data(self):
+        info = [ExportInfo('identification_questionnaire', 'IdentificationQuestionnaire', size=1,
+                           url="http://na.edu/api/export/identification_questionnaire")]
+        info_json = ExportInfoSchema(many=True).jsonify(info).data
+
+        user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
+                    role=Role.user, email_verified=True)
