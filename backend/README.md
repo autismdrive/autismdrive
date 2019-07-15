@@ -254,25 +254,25 @@ Alternatively, to run the e2e tests without reseeding first, execute the followi
 ng e2e --dev-server-target=
 ```
 
-### Master/Slave Configuration
-For the most part, you don't need to run slave configuration in development unless you are specifically
-working on the handoff of data.  The slave instance will pull data from the primary instance and then potentially
+### Public/Private Configuration
+For the most part, you don't need to run the second configuration in development unless you are specifically
+working on the handoff of data.  The private mirror will pull data from the public instance and then potentially
 remove it. 
 
-#### To run the slave instance, you'll need a second database:
+#### To run the private mirror instance, you'll need a second database:
 Run the following command (as postgres) from a bash prompt.
 ```BASH
-createdb stardrive_slave -O ed_user ed_platform
+createdb stardrive_mirror -O ed_user ed_platform
 ```
 
 ### Configuration
-You will need to specify a different configuration file for the slave
+You will need to specify a different configuration file for the private mirror
 instance.   A set of reasonable defaults for development is available
-under the "slave.py" in the config directory.  You can set an environment
-variable to specify this when you fire up the slave instance.
+under the "mirror.py" in the config directory.  You can set an environment
+variable to specify this when you fire up the mirroring instance.
 
 ```bash
-APP_CONFIG_FILE=/full/path/to/config/slave.py
+APP_CONFIG_FILE=/full/path/to/config/mirror.py
 ```
   
 Note that it should be the full path.  You'll be running both instances, 
@@ -280,16 +280,16 @@ so don't set this environment variable for all commands, just for running the in
 For me, I have it set as an environment variable under the Run Configuration within
 PyCharm.  I copied by existing run command and added this environment variable
 there.  You will also need to add a port (5001) argument so you aren't running on the 
-same port as the master server.  Below are the settings in my Run configuration:
+same port as the primary server.  Below are the settings in my Run configuration:
 
 Parameters: 5001
-Environment Variable: PYTHONUNBUFFERED=1;SLAVE=true
+Environment Variable: PYTHONUNBUFFERED=1;MIRRORING=true
 
 You will need to build the basic data structures in the database in order to
 load data for this you will need to run the init_db flask command, but
-you will need to make that specific to the slave instance.  You'll need to provide
+you will need to make that specific to the mirror instance.  You'll need to provide
 ALL the environment settings with the flask command for it to work correctly.
 
 ```bash
-FLASK_APP=app/__init__.py SLAVE=true flask db upgrade
+FLASK_APP=app/__init__.py MIRRORING=true flask db upgrade
 ```

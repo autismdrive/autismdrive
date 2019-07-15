@@ -25,8 +25,8 @@ if "TESTING" in os.environ and os.environ["TESTING"] == "true":
     app.config.from_object('config.testing')
     app.config.from_pyfile('testing.py')
 
-if "SLAVE" in os.environ and os.environ["SLAVE"] == "true":
-    app.config.from_object('config.slave')
+if "MIRRORING" in os.environ and os.environ["MIRRORING"] == "true":
+    app.config.from_object('config.mirror')
 
 
 # Database Configuration
@@ -159,7 +159,7 @@ def resourcereset():
 from app import views
 
 # Cron scheduler
-if app.config["SLAVE"]:
+if app.config["MIRRORING"]:
     from app.import_service import ImportService
     importer = ImportService(app, db)
     importer.start()

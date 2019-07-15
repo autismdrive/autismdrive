@@ -3,7 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 # Fire of the scheduler
-# The Data Importer should run on the SLAVE, and will make calls to the master to download
+# The Data Importer should run on the MIRROR, and will make calls to the primary server to download
 # data, store it locally, and remove it from the master when necessary.
 from flask import logging
 from sqlalchemy import desc
