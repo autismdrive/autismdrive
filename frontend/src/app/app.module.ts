@@ -43,7 +43,7 @@ import { environment } from 'src/environments/environment';
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
-import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './_forms/validators/formly.validator';
+import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage, UrlValidator, UrlValidatorMessage } from './_forms/validators/formly.validator';
 import { ErrorInterceptor } from './_routing/error-interceptor';
 import { JwtInterceptor } from './_routing/jwt-interceptor';
 import { RoutingModule } from './_routing/routing.module';
@@ -103,10 +103,12 @@ export class FormlyConfig {
     validators: [
       { name: 'phone', validation: PhoneValidator },
       { name: 'email', validation: EmailValidator },
+      { name: 'url', validation: UrlValidator },
     ],
     validationMessages: [
       { name: 'phone', message: PhoneValidatorMessage },
       { name: 'email', message: EmailValidatorMessage },
+      { name: 'url', message: UrlValidatorMessage },
       { name: 'required', message: 'This field is required.' },
     ],
     wrappers: [

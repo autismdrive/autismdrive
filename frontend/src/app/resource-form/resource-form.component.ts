@@ -181,6 +181,7 @@ export class ResourceFormComponent implements OnInit {
           placeholder: 'Please enter the website',
         },
         hideExpression: '!model.type',
+        validators: {"validation": ["url"]},
       },
       {
         key: 'categories',
