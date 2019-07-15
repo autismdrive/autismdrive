@@ -3,7 +3,7 @@ import flask_restful
 
 from app import db, auth
 from app.model.step_log import StepLog
-from app.resources.schema import StepLogSchema
+from app.schema.schema import StepLogSchema
 from app.model.user import Role
 from app.wrappers import requires_roles
 

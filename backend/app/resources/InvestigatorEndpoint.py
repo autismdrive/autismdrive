@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db
 from app.model.investigator import Investigator
-from app.resources.schema import InvestigatorSchema
+from app.schema.schema import InvestigatorSchema
 
 
 class InvestigatorEndpoint(flask_restful.Resource):

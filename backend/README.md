@@ -283,7 +283,7 @@ there.  You will also need to add a port (5001) argument so you aren't running o
 same port as the master server.  Below are the settings in my Run confguration:
 
 Parameters: 5001
-Environment Variable: PYTHONUNBUFFERED=1;APP_CONFIG_FILE=/home/dan/code/star-drive/backend/config/slave.py
+Environment Variable: PYTHONUNBUFFERED=1;SLAVE=true
 
 You will need to build the basic data structures in the database in order to
 load data for this you will need to run the init_db flask command, but
@@ -291,5 +291,5 @@ you will need to make that specific to the slave instance.  You'll need to provi
 ALL the environment settings with the flask command for it to work correctly.
 
 ```bash
-FLASK_APP=app/__init__.py APP_CONFIG_FILE=/path/to/config/slave.py flask db upgrade
+FLASK_APP=app/__init__.py SLAVE=true flask db upgrade
 ```

@@ -1,5 +1,3 @@
-import datetime
-
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -7,15 +5,18 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # Fire of the scheduler
 # The Data Importer should run on the SLAVE, and will make calls to the master to download
 # data, store it locally, and remove it from the master when necessary.
+from flask import logging
 from sqlalchemy import desc
 
 from app.export_service import ExportService
 from app.model.export_info import ExportInfoSchema
 from app.model.import_log import ImportLog
-from app.resources.ExportSchema import AdminExportSchema
+from app.schema.export_schema import AdminExportSchema
 
 
 class ImportService:
+
+    logger = logging.getLogger("ImportService")
 
     LOGIN_ENDPOINT = "/api/login_password"
     EXPORT_ENDPOINT = "/api/export"
@@ -27,14 +28,19 @@ class ImportService:
         self.master_url = app.config["MASTER_URL"]
         self.app = app
         self.db = db
-        self.logger = app.logger
         self.email = app.config["MASTER_EMAIL"]
         self.password = app.config["MASTER_PASS"]
 
     def start(self):
         scheduler = BackgroundScheduler()
         scheduler.start()
-        job2 = scheduler.add_job(self.get_questionnaires, 'interval', seconds=5)
+        scheduler.add_job(self.run_backup, 'interval', seconds=5)
+
+    def run_backup(self):
+        exportables = self.get_export_list()
+        data = self.request_data(exportables)
+        self.load_all_data(data)
+        self.load_admin()
 
     def login(self):
         creds = {'email': self.email, 'password': self.password}
@@ -72,6 +78,7 @@ class ImportService:
                 url = export.url + "?after=" + date_string
             else:
                 url = export.url
+            url = self.master_url + url
             response = requests.get(url, headers=self.get_headers())
             export.json_data = response.json()
         return export_list
@@ -83,7 +90,6 @@ class ImportService:
     def load_data(self, export_info):
         if len(export_info.json_data) < 1:
             return  # Nothing to do here.
-        print("Loading " + str(len(export_info.json_data)) + " records into " + export_info.class_name + "")
         schema = ExportService.get_schema(export_info.class_name, many=False)
         model_class = ExportService.get_class(export_info.class_name)
         log = ImportLog(class_name=export_info.class_name, successful=True, success_count=0, failure_count=0)
@@ -106,7 +112,7 @@ class ImportService:
                     self.db.session.add(log)
                     raise e
             else:
-                e = Exception(msg="Failed to parse model " + export_info.class_name)
+                e = Exception("Failed to parse model " + export_info.class_name + ". " + str(errors))
                 log.handle_failure(e)
                 self.db.session.add(log)
                 raise e
@@ -124,10 +130,12 @@ class ImportService:
 
     def load_admin(self):
         url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
-        response = requests.get(url).json()
-        schema = AdminExportSchema(many=True)
-        admin_users, errors = schema.load(response, session=self.db.session)
-        for user in admin_users:
-            user._password = str.encode(user._password)
-            self.db.session.add(user)
+        response = requests.get(url, headers=self.get_headers())
+        schema = AdminExportSchema()
+        json_response = response.json()
+        for json_admin in json_response:
+            password = str.encode(json_admin.pop('_password'))
+            admin, errors = schema.load(json_admin, session=self.db.session)
+            admin._password = password
+            self.db.session.add(admin)
         self.db.session.commit()

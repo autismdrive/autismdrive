@@ -6,7 +6,7 @@ from sqlalchemy import exc
 from app import db, RestException, auth
 from app.model.participant import Participant, Relationship
 from app.model.user import User
-from app.resources.schema import ParticipantSchema
+from app.schema.schema import ParticipantSchema
 
 
 class ParticipantBySessionEndpoint(flask_restful.Resource):

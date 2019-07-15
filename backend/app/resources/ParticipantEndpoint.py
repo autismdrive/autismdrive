@@ -6,7 +6,7 @@ from flask import request, g
 from app import RestException, db, auth
 from app.model.participant import Participant
 from app.model.user import Role
-from app.resources.schema import ParticipantSchema
+from app.schema.schema import ParticipantSchema
 from app.wrappers import requires_roles
 
 

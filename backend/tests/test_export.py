@@ -17,7 +17,7 @@ from app.model.participant import Relationship, Participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 
 from app.model.user import Role, User
-from app.resources.schema import UserSchema, ParticipantSchema
+from app.schema.schema import UserSchema, ParticipantSchema
 from tests.base_test import clean_db
 
 

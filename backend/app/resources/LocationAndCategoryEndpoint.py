@@ -5,7 +5,7 @@ from app import db, RestException
 from app.model.category import Category
 from app.model.location import Location
 from app.model.resource_category import ResourceCategory
-from app.resources.schema import LocationCategorySchema, CategoryLocationsSchema, LocationCategoriesSchema
+from app.schema.schema import LocationCategorySchema, CategoryLocationsSchema, LocationCategoriesSchema
 
 
 class LocationByCategoryEndpoint(flask_restful.Resource):

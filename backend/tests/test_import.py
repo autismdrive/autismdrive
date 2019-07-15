@@ -10,7 +10,7 @@ from app.import_service import ImportService
 from app.model.export_info import ExportInfo, ExportInfoSchema
 from app.model.import_log import ImportLog
 from app.model.user import User, Role
-from app.resources.ExportSchema import UserExportSchema, AdminExportSchema
+from app.schema.ExportSchema import UserExportSchema, AdminExportSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 

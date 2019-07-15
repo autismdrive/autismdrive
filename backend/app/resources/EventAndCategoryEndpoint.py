@@ -5,7 +5,7 @@ from app import db, RestException
 from app.model.category import Category
 from app.model.event import Event
 from app.model.resource_category import ResourceCategory
-from app.resources.schema import EventCategorySchema, CategoryEventsSchema, EventCategoriesSchema
+from app.schema.schema import EventCategorySchema, CategoryEventsSchema, EventCategoriesSchema
 
 
 class EventByCategoryEndpoint(flask_restful.Resource):

@@ -1,12 +1,12 @@
 import datetime
 
 import flask_restful
-from flask import json, request
+from flask import request
 
 from app import auth, db
 from app.model.export_info import ExportInfoSchema
 from app.model.user import Role, User
-from app.resources.ExportSchema import AdminExportSchema
+from app.schema.export_schema import AdminExportSchema
 from app.wrappers import requires_roles
 from app.export_service import ExportService
 

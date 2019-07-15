@@ -3,7 +3,7 @@ import importlib
 import re
 
 from dateutil.tz import UTC
-from flask import url_for
+from flask import url_for, logging
 from sqlalchemy import func, desc
 
 from app import db, EmailService, app
@@ -12,9 +12,12 @@ from app.model.export_log import ExportLog
 
 
 class ExportService:
+
+    logger = logging.getLogger("ExportService")
+
     QUESTION_PACKAGE = "app.model.questionnaires"
-    SCHEMA_PACKAGE = "app.resources.schema"
-    EXPORT_SCHEMA_PACKAGE = "app.resources.ExportSchema"
+    SCHEMA_PACKAGE = "app.schema.schema"
+    EXPORT_SCHEMA_PACKAGE = "app.schema.export_schema"
 
     TYPE_SENSITIVE = 'sensitive'
     TYPE_IDENTIFYING = 'identifying'
@@ -54,7 +57,6 @@ class ExportService:
         if not schema_class:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(model.__module__, schema_name)
-        print("Schema for " + name)
         return schema_class(many=many, session=session)
 
     @staticmethod
@@ -69,7 +71,6 @@ class ExportService:
 
     @staticmethod
     def get_data(name, last_updated=None):
-        print("Exporting " + name)
         model = ExportService.get_class(name)
         query = db.session.query(model)
         if last_updated:
@@ -77,6 +78,7 @@ class ExportService:
         if hasattr(model, '__mapper_args__') \
                 and 'polymorphic_identity' in model.__mapper_args__:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
+        query = query.order_by(model.id)
         return query.all()
 
     # Returns a list of classes that can be exported from the system.
@@ -84,6 +86,11 @@ class ExportService:
     def get_export_info(last_updated=None):
         export_infos = []
         sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
+
+        # This moves the resource_categories table to the end of the list.
+        rc = next((t for t in sorted_tables if t.fullname == "resource_category"), None)
+        sorted_tables.append(sorted_tables.pop(sorted_tables.index(rc)))
+
         total_records_for_export = 0
         for table in sorted_tables:
             db_model = ExportService.get_class_for_table(table)
@@ -101,6 +108,10 @@ class ExportService:
             query = (db.session.query(func.count(db_model.id)))
             if last_updated:
                 query = query.filter(db_model.last_updated > last_updated)
+            if hasattr(db_model, '__mapper_args__') \
+                    and 'polymorphic_identity' in db_model.__mapper_args__:
+                query = query.filter(db_model.type == db_model.__mapper_args__['polymorphic_identity'])
+
             export_info.size = query.all()[0][0]
             total_records_for_export += query.all()[0][0]
             export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
@@ -246,7 +257,6 @@ class ExportService:
                     "24 hours, and every 4 hours there-after."
 
             elif hours >= 2 and hours % 2 == 0 and hours / 2 >= last_log.alerts_sent:
-                print("Alerts Sent / formula result:" + str(last_log.alerts_sent))
                 subject = subject + str(hours) + " hours since last successful export"
                 msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
                     " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \

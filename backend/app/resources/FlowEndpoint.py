@@ -7,7 +7,7 @@ from app import RestException, db, auth
 from app.model.flow import Flow
 from app.model.participant import Participant, Relationship
 from app.model.step_log import StepLog
-from app.resources.schema import FlowSchema
+from app.schema.schema import FlowSchema
 from app.export_service import ExportService
 
 
