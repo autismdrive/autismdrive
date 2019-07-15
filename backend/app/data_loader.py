@@ -463,6 +463,7 @@ class DataLoader:
         db.session.query(Study).delete()
         db.session.query(Participant).delete()
         db.session.query(User).delete()
+        db.session.query(Organization).delete()
         db.session.commit()
 
     def clear_resources(self):
