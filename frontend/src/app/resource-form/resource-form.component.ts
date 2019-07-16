@@ -218,7 +218,7 @@ export class ResourceFormComponent implements OnInit {
 
   filterOrganizations(name: string): Organization[] {
     return this.orgOptions.filter(org =>
-      org.name.toLowerCase().indexOf(name.toLowerCase()) === 0
+      org.name.toLowerCase().includes(name.toLowerCase())
     )
   }
 
