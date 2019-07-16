@@ -5,7 +5,6 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
-from app.export_service import ExportService
 
 
 class Medication(db.Model):

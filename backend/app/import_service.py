@@ -79,6 +79,7 @@ class ImportService:
             else:
                 url = export.url
             url = self.master_url + url
+            print("Calling: " + url)
             response = requests.get(url, headers=self.get_headers())
             export.json_data = response.json()
         return export_list
@@ -105,9 +106,10 @@ class ImportService:
                     self.db.session.commit()
                     log.handle_success()
                     if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
-                        print("WE SHOULD CALL A DELETE ON THE MAIN SERVER HERE.")
+                        self.delete_record(item)
                 except Exception as e:
                     self.db.session.rollback()
+                    self.logger.error("Error processing " + model_class + " with id of " + item["id"], e)
                     log.handle_failure(e)
                     self.db.session.add(log)
                     raise e
@@ -119,10 +121,18 @@ class ImportService:
         self.db.session.add(log)
         self.db.session.commit()
 
+    def delete_record(self, item):
+        if not '_links' in item or not 'self' in item['_links']:
+            raise Exception('No link available to delete ' + item.__class__.__name__)
+        url = self.master_url + item['_links']['self']
+        print ("Calling delete on url:" + url)
+        response = requests.delete(url, headers=self.get_headers())
+        assert(response.status_code == 200)
+
     # Takes the partial path of an endpoint, and returns json.  Logging any errors.
     def __get_json(self, path):
         try:
-            url = self.master_url + path;
+            url = self.master_url + path
             response = requests.get(url)
             return response.json()
         except requests.exceptions.ConnectionError as err:

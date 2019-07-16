@@ -9,7 +9,7 @@ from app.export_service import ExportService
 
 
 class HomeMixin(object):
-    __question_type__ = ExportService.TYPE_IDENTIFYING
+    __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)

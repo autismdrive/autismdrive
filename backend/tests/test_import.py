@@ -9,6 +9,9 @@ from app import app, db
 from app.import_service import ImportService
 from app.model.export_info import ExportInfo, ExportInfoSchema
 from app.model.import_log import ImportLog
+from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaireSchema
+from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaireSchema
+from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaireSchema
 from app.model.user import User, Role
 from app.schema.export_schema import UserExportSchema, AdminExportSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
@@ -245,9 +248,50 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     @httpretty.activate
     def test_import_calls_delete_on_sensitive_data(self):
-        info = [ExportInfo('identification_questionnaire', 'IdentificationQuestionnaire', size=1,
-                           url="http://na.edu/api/export/identification_questionnaire")]
-        info_json = ExportInfoSchema(many=True).jsonify(info).data
+        export_list = [ExportInfo('clinical_diagnoses_questionnaire', 'ClinicalDiagnosesQuestionnaire', size=1,
+                           url="/api/export/clinical_diagnoses_questionnaire")]
 
-        user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
-                    role=Role.user, email_verified=True)
+        q = self.construct_clinical_diagnoses_questionnaire()
+        id = q.id
+        json_q = json.dumps(ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q]).data)
+        db.session.delete(q)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://na.edu/api/export/clinical_diagnoses_questionnaire",
+            body=json_q,
+            status=200
+        )
+        expected_delete_url = "http://na.edu/api/q/clinical_diagnoses_questionnaire/" + str(id)
+        httpretty.register_uri(
+            httpretty.DELETE,
+            expected_delete_url,
+            body=json_q,
+            status=200
+        )
+        data_importer = self.get_data_importer_setup_auth()
+        data = data_importer.request_data(export_list)
+        data_importer.load_all_data(data)
+        self.assertEqual("/api/q/clinical_diagnoses_questionnaire/" + str(id), httpretty.last_request().path)
+        self.assertEqual("DELETE", httpretty.last_request().method)
+
+    @httpretty.activate
+    def test_import_does_not_call_delete_on_non_sensitive_data(self):
+        export_list = [ExportInfo('employment_questionnaire', 'EmploymentQuestionnaire', size=1,
+                           url="/api/export/employment_questionnaire")]
+
+        q = self.construct_employment_questionnaire()
+        id = q.id
+        json_q = json.dumps(EmploymentQuestionnaireSchema(many=True).dump([q]).data)
+        db.session.delete(q)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://na.edu/api/export/employment_questionnaire",
+            body=json_q,
+            status=200
+        )
+        data_importer = self.get_data_importer_setup_auth()
+        data = data_importer.request_data(export_list)
+        data_importer.load_all_data(data)
+        self.assertEqual("GET", httpretty.last_request().method)  # Last call should not be a delete call.
