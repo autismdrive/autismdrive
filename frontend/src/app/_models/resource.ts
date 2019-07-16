@@ -20,8 +20,8 @@ export class Resource extends GeoLocation {
   city?: string;
   state?: string;
   zip?: string;
-  phone: string;
-  website: string;
+  phone?: string;
+  website?: string;
   last_updated?: string;
   status?: string;
   resource_categories?: ResourceCategory[];

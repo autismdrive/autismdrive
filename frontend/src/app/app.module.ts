@@ -8,6 +8,7 @@ import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule } from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -40,6 +41,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
 import { environment } from 'src/environments/environment';
+import { AutocompleteSectionComponent } from './_forms/autocomplete-section/autocomplete-section.component';
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
@@ -99,6 +101,11 @@ export class FormlyConfig {
   public static config = {
     types: [
       { name: 'repeat', component: RepeatSectionComponent },
+      {
+        name: 'autocomplete',
+        component: AutocompleteSectionComponent,
+        wrappers: ['form-field'],
+      }
     ],
     validators: [
       { name: 'phone', validation: PhoneValidator },
@@ -123,6 +130,7 @@ export class FormlyConfig {
     AccordionComponent,
     AdminHomeComponent,
     AppComponent,
+    AutocompleteSectionComponent,
     AvatarDialogComponent,
     AvatarDialogComponent,
     CardWrapperComponent,
@@ -187,6 +195,7 @@ export class FormlyConfig {
     FormsModule,
     HttpClientModule,
     MarkdownModule.forRoot(),
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,

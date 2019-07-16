@@ -4,6 +4,7 @@ import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { FormGroup } from '@angular/forms';
+import { Organization } from '../_models/organization';
 
 
 enum PageState {
@@ -57,6 +58,7 @@ export class ResourceFormComponent implements OnInit {
         templateOptions: {
           label: 'Description',
           placeholder: 'Please enter a description',
+          required: true,
         },
         expressionProperties: {
           "templateOptions.placeholder": '"Please enter a description of your " + (model.type || "resource")',
@@ -90,13 +92,11 @@ export class ResourceFormComponent implements OnInit {
         hideExpression: 'model.type != "event"',
       },
       {
-        key: 'organization_id',
-        type: 'select',
+        key: 'organization',
+        type: 'autocomplete',
         templateOptions: {
           label: 'Organization',
-          options: this.api.getOrganizations(),
-          valueProp: 'id',
-          labelProp: 'name',
+          filter: (term) => term ? this.filterOrganizations(term) : this.api.getOrganizations(),
         },
         hideExpression: '!model.type',
       },
@@ -197,6 +197,7 @@ export class ResourceFormComponent implements OnInit {
     ];
 
   options: FormlyFormOptions;
+  orgOptions: Organization[];
 
   createNew = false;
 
@@ -204,10 +205,21 @@ export class ResourceFormComponent implements OnInit {
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {
+    this.api.getOrganizations().subscribe( orgs => {
+      this.orgOptions = orgs;
+      }
+    )
+  }
 
   ngOnInit() {
     this.loadData();
+  }
+
+  filterOrganizations(name: string): Organization[] {
+    return this.orgOptions.filter(org =>
+      org.name.toLowerCase().indexOf(name.toLowerCase()) === 0
+    )
   }
 
   loadData() {
@@ -293,6 +305,7 @@ export class ResourceFormComponent implements OnInit {
   submit() {
     // Post to the resource endpoint, and then close
     if (this.form.valid) {
+      this.model.organization_id = this.model.organization.id;
       if (this.createNew) {
         if (this.model.type == 'resource') {
           this.api.addResource(this.model).subscribe(r =>
