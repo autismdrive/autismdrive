@@ -8,7 +8,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 In some circumstances you may want to run the server in "mirror" mode to debug the system running in this configuration.  You can do this with
 ```
-ng serve -c mirror --port 4201
+ng serve -c mirror --port 4201 --no-config --optimization=false
 ```
 IMPORTANT:  This is purely for deployment/configuration settings.  The system will actually change behavior based on the responses from the backend system,
 and should not look at this setting to determine if it is providing a UI for the private mirror vs the public interface.
@@ -22,8 +22,9 @@ Run `ng generate component component-name` to generate a new component. You can 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
 ## Running unit tests
-
+If we had unit tests, you would run
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+But we just have e2e tests on the front end at this time.
 
 ## Running end-to-end tests
 Make sure you have the database, backend, and frontend all running.

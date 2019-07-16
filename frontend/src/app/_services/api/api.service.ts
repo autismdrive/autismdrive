@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of as observableOf, throwError } from 'rxjs';
+import {BehaviorSubject, Observable, of as observableOf, throwError} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { EmailLog } from '../../_models/email_log'
 import { Flow } from '../../_models/flow';
@@ -12,11 +12,14 @@ import { StepLog } from '../../_models/step_log'
 import { User } from '../../_models/user';
 import { UserSearchResults } from '../../_models/user_search_results';
 import { environment } from '../../../environments/environment';
+import {Status} from '../../_models/status';
 
 @Injectable()
 export class ApiService {
 
   apiRoot = environment.api;
+  private statusSubject: BehaviorSubject<Status>;
+  public serverStatus: Observable<Status>;
 
   // REST endpoints
   endpoints = {
@@ -70,9 +73,13 @@ export class ApiService {
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
+    status: '/api/status'
   };
 
   constructor(private httpClient: HttpClient) {
+    this.statusSubject = new BehaviorSubject<Status>(null);
+    this.serverStatus = this.statusSubject.asObservable();
+    this.setServerStatus();
   }
 
   private _handleError(error: HttpErrorResponse) {
@@ -97,6 +104,13 @@ export class ApiService {
     // return an observable with a user-facing error message
     // FIXME: Log all error messages to Google Analytics
     return throwError(message);
+  }
+
+  private setServerStatus() {
+    this.httpClient.get<Status>(this._endpointUrl('status')).subscribe
+      (status => {
+        this.statusSubject.next(status);
+      });
   }
 
   /** sendResetPasswordEmail

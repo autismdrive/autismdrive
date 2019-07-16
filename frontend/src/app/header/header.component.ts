@@ -11,7 +11,7 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  OnDestroy
+  OnDestroy, OnInit
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
@@ -25,6 +25,8 @@ import {
 } from 'rxjs/operators';
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
+import {ApiService} from '../_services/api/api.service';
+import {Status} from '../_models/status';
 
 export enum VisibilityState {
   Visible = 'visible',
@@ -90,6 +92,7 @@ export enum Direction {
 export class HeaderComponent implements AfterViewInit, OnDestroy {
   private headerVisible = true;
   @Input() currentUser: User;
+  @Input() status: Status;
   menuVisible = false;
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
@@ -106,6 +109,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     changeDetectorRef: ChangeDetectorRef,
     private authenticationService: AuthenticationService,
     private router: Router,
+    private api: ApiService,
     media: MediaMatcher,
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
@@ -118,7 +122,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     this.watchScrollEvents();
   }
 
-  ngOnDestroy(): void {
+    ngOnDestroy(): void {
     this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 

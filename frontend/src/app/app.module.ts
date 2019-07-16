@@ -90,6 +90,8 @@ import { TimedoutComponent } from './timed-out/timed-out.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { UserAdminDetailsComponent } from './user-admin-details/user-admin-details.component';
 import { UserAdminComponent } from './user-admin/user-admin.component';
+import { FooterComponent } from './footer/footer.component';
+import { MirrorComponent } from './mirror/mirror.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -164,6 +166,8 @@ export class FormlyConfig {
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
+    FooterComponent,
+    MirrorComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),

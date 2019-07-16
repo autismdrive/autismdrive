@@ -141,6 +141,16 @@
   }
 }
 
+#site-header.mirroring, #site-header mat-toolbar.mirroring, #mobile-menu.mirroring {
+  background-color: mat-color($stardrive-warn, 500);
+}
+
+div.mirror-message {
+  padding: 20px;
+  font-weight: bold;
+  color: white;
+}
+
 #mobile-menu {
   position: fixed;
   top: -100vh;
