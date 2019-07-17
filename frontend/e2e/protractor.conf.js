@@ -10,7 +10,7 @@ exports.config = {
   ],
   capabilities: {
     chromeOptions: {
-      // args: ['--headless']
+      args: [ "--window-size=1024x768" ]
     },
     'browserName': 'chrome'
   },
