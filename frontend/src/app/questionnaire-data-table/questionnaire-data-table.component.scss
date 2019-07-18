@@ -1,3 +1,10 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
 th.mat-header-cell {
   padding-right: 1em;
 }
@@ -6,4 +13,9 @@ td.mat-cell {
 }
 button {
   margin-bottom: 2em;
+  margin-left: 2em;
+}
+
+button.mat-flat-button.mat-accent.selected {
+  background: mat-color($stardrive-primary, default, 1);
 }
