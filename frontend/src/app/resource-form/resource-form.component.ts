@@ -238,29 +238,11 @@ export class ResourceFormComponent implements OnInit {
       if (resourceId) {
         this.createNew = false;
           if (resourceType == 'resource') {
-            this.api
-              .getResource(resourceId)
-              .subscribe(resource => {
-                this.resource = resource;
-                this.model = resource;
-                this.loadResourceCategories(resource, () => this.loadForm());
-              });
+            this.loadResource(this.api.getResource(resourceId));
           } else if (resourceType == 'location') {
-            this.api
-              .getLocation(resourceId)
-              .subscribe(resource => {
-                this.resource = resource;
-                this.model = resource;
-                this.loadResourceCategories(resource, () => this.loadForm());
-              });
+            this.loadResource(this.api.getLocation(resourceId));
           } else if (resourceType == 'event') {
-            this.api
-              .getEvent(resourceId)
-              .subscribe(resource => {
-                this.resource = resource;
-                this.model = resource;
-                this.loadResourceCategories(resource, () => this.loadForm());
-              });
+            this.loadResource(this.api.getEvent(resourceId));
           }
       } else {
         this.createNew = true;
@@ -268,6 +250,15 @@ export class ResourceFormComponent implements OnInit {
         this.loadForm();
       }
     });
+  }
+
+  loadResource(apiCall) {
+    apiCall.subscribe(
+      resource => {
+        this.resource = resource;
+        this.model = resource;
+        this.loadResourceCategories(resource, () => this.loadForm());
+      });
   }
 
   loadResourceCategories(resource: Resource, callback: Function) {
@@ -333,50 +324,40 @@ export class ResourceFormComponent implements OnInit {
     if (this.form.valid) {
       if (this.createNew) {
         if (this.model.type == 'resource') {
-          this.api.addResource(this.model).subscribe(r =>
-            {
-              this.updatedResource = r;
-              this.addResourceCategories(r.id);
-              this.close();
-            });
+          this.addAndClose(this.api.addResource(this.model));
         } else if (this.model.type == 'location') {
-          this.api.addLocation(this.model).subscribe(r =>
-            {
-              this.updatedResource = r;
-              this.addResourceCategories(r.id);
-              this.close();
-            });
+          this.addAndClose(this.api.addLocation(this.model));
         } else if (this.model.type == 'event') {
-          this.api.addEvent(this.model).subscribe(r =>
-            {
-              this.updatedResource = r;
-              this.addResourceCategories(r.id);
-              this.close();
-            });
+          this.addAndClose(this.api.addEvent(this.model));
         }
       } else {
         this.updateResourceCategories();
         if (this.model.type == 'resource') {
-          this.api.updateResource(this.updatedModel).subscribe( r =>
-          {
-            this.updatedResource = r;
-            this.close();
-          });
+          this.updateAndClose(this.api.updateResource(this.updatedModel));
         } else if (this.model.type == 'location') {
-          this.api.updateLocation(this.updatedModel).subscribe( r =>
-          {
-            this.updatedResource = r;
-            this.close();
-          });
+          this.updateAndClose(this.api.updateLocation(this.updatedModel));
         } else if (this.model.type == 'event') {
-          this.api.updateEvent(this.updatedModel).subscribe( r =>
-          {
-            this.updatedResource = r;
-            this.close();
-          });
+          this.updateAndClose(this.api.updateEvent(this.updatedModel));
         }
       }
     }
+  }
+
+  addAndClose(apiCall) {
+    apiCall.subscribe(r =>
+      {
+        this.updatedResource = r;
+        this.addResourceCategories(r.id);
+        this.close();
+      });
+  }
+
+  updateAndClose(apiCall) {
+    apiCall.subscribe( r =>
+      {
+        this.updatedResource = r;
+        this.close();
+      });
   }
 
   showDelete() {
