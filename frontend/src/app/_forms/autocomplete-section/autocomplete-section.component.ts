@@ -1,9 +1,7 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FieldType } from '@ngx-formly/material';
-import { MatInput } from '@angular/material/input';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { Observable } from 'rxjs';
-import { startWith, switchMap, map } from 'rxjs/operators';
+import { startWith, map } from 'rxjs/operators';
 import { Organization } from '../../_models/organization';
 
 @Component({
@@ -11,15 +9,12 @@ import { Organization } from '../../_models/organization';
   templateUrl: './autocomplete-section.component.html',
   styleUrls: ['./autocomplete-section.component.scss']
 })
-export class AutocompleteSectionComponent extends FieldType implements OnInit, AfterViewInit {
-  @ViewChild(MatInput, { read: MatInput, static: false }) formFieldControl: MatInput;
-  @ViewChild(MatAutocompleteTrigger, { read: MatAutocompleteTrigger, static: false }) autocomplete: MatAutocompleteTrigger;
+export class AutocompleteSectionComponent extends FieldType implements OnInit {
 
-  filter: Observable<Organization[]>;
+  filteredOptions: Observable<Organization[]>;
 
   ngOnInit() {
-    super.ngOnInit();
-    this.filter = this.formControl.valueChanges
+    this.filteredOptions = this.formControl.valueChanges
       .pipe(
         startWith(''),
         map(value => typeof value === 'string' ? value : value.name),
@@ -29,11 +24,5 @@ export class AutocompleteSectionComponent extends FieldType implements OnInit, A
 
   displayFn(organization?: Organization): string | undefined {
     return organization ? organization.name : undefined;
-  }
-
-  ngAfterViewInit() {
-    super.ngAfterViewInit();
-    // temporary fix for https://github.com/angular/material2/issues/6728
-    (<any> this.autocomplete)._formField = this.formField;
   }
 }

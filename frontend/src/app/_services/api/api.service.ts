@@ -302,6 +302,12 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Add Organization */
+  addOrganization(organization: Organization): Observable<Organization> {
+    return this.httpClient.post<Organization>(this._endpointUrl('organizationlist'), organization)
+      .pipe(catchError(this._handleError));
+  }
+
   /** Get User */
   getUser(id: number): Observable<User> {
     return this.httpClient.get<User>(this._endpointUrl('user').replace('<id>', id.toString()))

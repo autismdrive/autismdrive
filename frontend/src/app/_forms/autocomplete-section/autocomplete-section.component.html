@@ -6,7 +6,7 @@
   [placeholder]="to.placeholder"
   [errorStateMatcher]="errorStateMatcher">
 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-  <mat-option *ngFor="let value of filter | async" [value]="value">
-    {{ value.name }}
+  <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+    {{ option.name }}
   </mat-option>
 </mat-autocomplete>

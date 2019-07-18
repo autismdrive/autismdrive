@@ -19,11 +19,13 @@ enum PageState {
 })
 export class ResourceFormComponent implements OnInit {
   resource: Resource;
+  updatedResource: Resource;
   pageState = PageState;
   state = PageState.LOADING;
   showConfirmDelete = false;
 
   model: any = {};
+  updatedModel: any = {};
   form: FormGroup;
   fields: FormlyFieldConfig[] = [
       {
@@ -96,7 +98,7 @@ export class ResourceFormComponent implements OnInit {
         type: 'autocomplete',
         templateOptions: {
           label: 'Organization',
-          filter: (term) => term ? this.filterOrganizations(term) : this.api.getOrganizations(),
+          filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
         },
         hideExpression: '!model.type',
       },
@@ -169,6 +171,7 @@ export class ResourceFormComponent implements OnInit {
         templateOptions: {
           label: 'Phone Number',
           placeholder: 'Please enter the phone number',
+          required: true,
         },
         hideExpression: '!model.type',
         validators: {"validation": ["phone"]},
@@ -179,6 +182,7 @@ export class ResourceFormComponent implements OnInit {
         templateOptions: {
           label: 'Website',
           placeholder: 'Please enter the website',
+          required: true,
         },
         hideExpression: '!model.type',
         validators: {"validation": ["url"]},
@@ -206,14 +210,18 @@ export class ResourceFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.api.getOrganizations().subscribe( orgs => {
-      this.orgOptions = orgs;
-      }
-    )
+    this.getOrganizations();
   }
 
   ngOnInit() {
     this.loadData();
+  }
+
+  getOrganizations() {
+    this.api.getOrganizations().subscribe( orgs => {
+       return this.orgOptions = orgs;
+      }
+    )
   }
 
   filterOrganizations(name: string): Organization[] {
@@ -302,41 +310,71 @@ export class ResourceFormComponent implements OnInit {
     }
   }
 
+  updateOrganization() {
+    // If the user selects an existing Organization name from the list, it will be saved as an Organization object. If they write in their
+    // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
+    // updated model so that we don't accidentally save the old version before it's updated.
+    if (this.model.organization.constructor.name == "String") {
+      this.api.addOrganization({name: this.model.organization}).subscribe( org => {
+        this.model.organization_id = org.id;
+        this.model.organization = org;
+        this.updatedModel = this.model;
+        this.submit();
+      })
+    } else {
+      this.model.organization_id = this.model.organization.id;
+      this.updatedModel = this.model;
+    }
+  }
+
   submit() {
     // Post to the resource endpoint, and then close
+    this.updateOrganization();
     if (this.form.valid) {
-      this.model.organization_id = this.model.organization.id;
       if (this.createNew) {
         if (this.model.type == 'resource') {
           this.api.addResource(this.model).subscribe(r =>
             {
-              this.resource = r;
+              this.updatedResource = r;
               this.addResourceCategories(r.id);
+              this.close();
             });
         } else if (this.model.type == 'location') {
           this.api.addLocation(this.model).subscribe(r =>
             {
-              this.resource = r;
+              this.updatedResource = r;
               this.addResourceCategories(r.id);
+              this.close();
             });
         } else if (this.model.type == 'event') {
           this.api.addEvent(this.model).subscribe(r =>
             {
-              this.resource = r;
+              this.updatedResource = r;
               this.addResourceCategories(r.id);
+              this.close();
             });
         }
-        this.close();
       } else {
         this.updateResourceCategories();
         if (this.model.type == 'resource') {
-          this.api.updateResource(this.model).subscribe();
+          this.api.updateResource(this.updatedModel).subscribe( r =>
+          {
+            this.updatedResource = r;
+            this.close();
+          });
         } else if (this.model.type == 'location') {
-          this.api.updateLocation(this.model).subscribe();
+          this.api.updateLocation(this.updatedModel).subscribe( r =>
+          {
+            this.updatedResource = r;
+            this.close();
+          });
         } else if (this.model.type == 'event') {
-          this.api.updateEvent(this.model).subscribe();
+          this.api.updateEvent(this.updatedModel).subscribe( r =>
+          {
+            this.updatedResource = r;
+            this.close();
+          });
         }
-        this.close();
       }
     }
   }
@@ -353,8 +391,8 @@ export class ResourceFormComponent implements OnInit {
 
   // Go to resource screen
   close() {
-    if (this.resource && this.resource.id) {
-      this.router.navigate([this.resource.type, this.resource.id]);
+    if (this.updatedResource && this.updatedResource.id) {
+      this.router.navigate([this.updatedResource.type, this.updatedResource.id]);
     } else {
       this.router.navigate(['resources']);
     }
