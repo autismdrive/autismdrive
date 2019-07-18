@@ -57,6 +57,10 @@ class ExportService:
         if not schema_class:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(model.__module__, schema_name)
+
+        if not schema_class:
+            raise Exception("Unable to locate schema for class " + class_name)
+
         return schema_class(many=many, session=session)
 
     @staticmethod
@@ -81,9 +85,9 @@ class ExportService:
         query = query.order_by(model.id)
         return query.all()
 
-    # Returns a list of classes that can be exported from the system.
+    # Returns a list of classes/tables with information about how they should be exported.
     @staticmethod
-    def get_export_info(last_updated=None):
+    def get_table_info(last_updated=None):
         export_infos = []
         sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
 
@@ -91,37 +95,39 @@ class ExportService:
         rc = next((t for t in sorted_tables if t.fullname == "resource_category"), None)
         sorted_tables.append(sorted_tables.pop(sorted_tables.index(rc)))
 
-        total_records_for_export = 0
         for table in sorted_tables:
             db_model = ExportService.get_class_for_table(table)
-
-            # Never export Identifying information.
-            if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_IDENTIFYING:
-                continue
-            # Do not include sub-tables that will fall through from quiestionnaire schemas,
-            # or logs that don't make sense to export.
-            if hasattr(db_model, '__no_export__') and db_model.__no_export__:
-                continue
-
-            export_info = ExportInfo(table_name=table.name, class_name=db_model.__name__)
-
-            query = (db.session.query(func.count(db_model.id)))
-            if last_updated:
-                query = query.filter(db_model.last_updated > last_updated)
-            if hasattr(db_model, '__mapper_args__') \
-                    and 'polymorphic_identity' in db_model.__mapper_args__:
-                query = query.filter(db_model.type == db_model.__mapper_args__['polymorphic_identity'])
-
-            export_info.size = query.all()[0][0]
-            total_records_for_export += query.all()[0][0]
-            export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
-            if hasattr(db_model, '__question_type__'):
-                export_info.type = db_model.__question_type__
-            export_infos.append(export_info)
-
-        log = ExportLog(available_records=total_records_for_export)
-        db.session.add(log)
+            export_infos.append(ExportService.get_single_table_info(db_model, last_updated))
         return export_infos
+
+    @staticmethod
+    def get_single_table_info(db_model, last_updated):
+        export_info = ExportInfo(table_name=db_model.__tablename__, class_name=db_model.__name__)
+        query = (db.session.query(func.count(db_model.id)))
+        if last_updated:
+            query = query.filter(db_model.last_updated > last_updated)
+        if hasattr(db_model, '__mapper_args__') \
+                and 'polymorphic_identity' in db_model.__mapper_args__:
+            query = query.filter(db_model.type == db_model.__mapper_args__['polymorphic_identity'])
+
+        export_info.size = query.all()[0][0]
+        export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
+        if hasattr(db_model, '__question_type__'):
+            export_info.question_type = db_model.__question_type__
+        # Do not include sub-tables that will fall through from quiestionnaire schemas,
+        # or logs that don't make sense to export.
+        if hasattr(db_model, '__no_export__') and db_model.__no_export__:
+            export_info.exportable = False
+
+        if hasattr(db_model, "get_field_groups"):
+            groups = db_model().get_field_groups()
+            for name, settings in groups.items():
+                if "repeat_class" in settings:
+                    # RECURSE!
+                    c = settings["repeat_class"]
+                    export_info.sub_tables.append(ExportService.get_single_table_info(c, last_updated))
+
+        return export_info
 
     @staticmethod
     def class_exists(module_name, class_name):

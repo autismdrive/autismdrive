@@ -13,6 +13,7 @@ import { User } from '../../_models/user';
 import { UserSearchResults } from '../../_models/user_search_results';
 import { environment } from '../../../environments/environment';
 import {Status} from '../../_models/status';
+import {TableInfo} from '../../_models/table_info';
 
 @Injectable()
 export class ApiService {
@@ -40,7 +41,7 @@ export class ApiService {
     questionnaire: '/api/q/<name>/<id>',
     questionnaireList: '/api/q/<name>',
     questionnaireListMeta: '/api/q/<name>/meta',
-    questionnaireNames: '/api/q',
+    questionnaireInfo: '/api/q',
     questionnaireExport: '/api/q/<name>/export',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     eventbycategory: '/api/category/<category_id>/event',
@@ -316,11 +317,13 @@ export class ApiService {
   }
 
   /** getQuestionnaireNames */
-  getQuestionnaireNames() {
+  getQuestionnaireInfoList() {
     const url = this
-      ._endpointUrl('questionnaireNames');
-    return this.httpClient.get<any>(url)
-      .pipe(catchError(this._handleError));
+      ._endpointUrl('questionnaireInfo');
+    return this.httpClient.get<TableInfo[]>(url)
+      .pipe(
+        map(infoJson => infoJson.map(ij => new TableInfo(ij))),
+        catchError(this._handleError));
   }
 
   /** getQuestionnaireList */

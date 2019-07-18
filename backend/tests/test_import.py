@@ -11,7 +11,6 @@ from app.model.export_info import ExportInfo, ExportInfoSchema
 from app.model.import_log import ImportLog
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaireSchema
 from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaireSchema
-from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaireSchema
 from app.model.user import User, Role
 from app.schema.export_schema import UserExportSchema, AdminExportSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
@@ -199,7 +198,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("/api/export/user", httpretty.last_request().path)
         logs = db.session.query(ImportLog).all()
         self.assertTrue(len(logs) > 0)
-        log = logs[0]
+        log = logs[-1]
         self.assertIsNotNone(log.date_started)
         self.assertIsNotNone(log.last_updated)
         self.assertEquals("User", log.class_name)
@@ -269,6 +268,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             body=json_q,
             status=200
         )
+        app.config['DELETE_RECORDS'] = True
         data_importer = self.get_data_importer_setup_auth()
         data = data_importer.request_data(export_list)
         data_importer.load_all_data(data)

@@ -109,7 +109,7 @@ class ImportService:
                         self.delete_record(item)
                 except Exception as e:
                     self.db.session.rollback()
-                    self.logger.error("Error processing " + model_class + " with id of " + item["id"], e)
+                    self.logger.error("Error processing " + export_info.class_name + " with id of " + str(item["id"]) + ".  Error: " + str(e))
                     log.handle_failure(e)
                     self.db.session.add(log)
                     raise e
@@ -124,8 +124,10 @@ class ImportService:
     def delete_record(self, item):
         if not '_links' in item or not 'self' in item['_links']:
             raise Exception('No link available to delete ' + item.__class__.__name__)
+        if not self.app.config['DELETE_RECORDS']:
+            self.logger.info("DELETE is off in the configuration.  So not deleting.")
+            return
         url = self.master_url + item['_links']['self']
-        print ("Calling delete on url:" + url)
         response = requests.delete(url, headers=self.get_headers())
         assert(response.status_code == 200)
 

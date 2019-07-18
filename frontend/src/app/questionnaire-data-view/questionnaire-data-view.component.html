@@ -27,11 +27,12 @@
       <mat-drawer #sidenav
         [mode]='"over"'
         [(opened)]="sidebarOpen">
-          <mat-nav-list *ngFor="let qn of questionnaire_names">
+          <mat-nav-list *ngFor="let info of questionnaire_info">
             <mat-list-item
-              (click)="selectQuestionnaire(qn)"
+              (click)="selectQuestionnaire(info)"
             >
-              {{ snakeToUpperCase(qn)}}
+              <i class="material-icons">{{ info.getIcon() }}</i>
+              {{ info.display_name }}
               <span fxFlex></span>
             </mat-list-item>
           </mat-nav-list>
@@ -40,7 +41,7 @@
         *ngIf="currentQuestionnaire"
         class="pad-2"
       >
-        <app-questionnaire-data-table [questionnaire_name]="currentQuestionnaire"></app-questionnaire-data-table>
+        <app-questionnaire-data-table [questionnaire_info]="currentQuestionnaire"></app-questionnaire-data-table>
       </mat-drawer-content>
     </mat-drawer-container>
   </div>

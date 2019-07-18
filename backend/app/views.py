@@ -49,9 +49,8 @@ from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
     QuestionnaireListEndpoint,
     QuestionnaireListMetaEndpoint,
-    QuestionnaireNamesEndpoint,
-    QuestionnaireDataExportEndpoint
-)
+    QuestionnaireDataExportEndpoint,
+    QuestionnaireInfoEndpoint)
 from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
     StudyCategoryEndpoint,
@@ -185,7 +184,7 @@ endpoints = [
     (ParticipantEndpoint, "/participant/<id>"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
     # Questionnaires
-    (QuestionnaireNamesEndpoint, "/q"),
+    (QuestionnaireInfoEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
     (QuestionnaireByParticipantEndpoint, "/q/<string:name>/participant/<string:participant_id>"),
     (QuestionnaireListMetaEndpoint, "/q/<string:name>/meta"),

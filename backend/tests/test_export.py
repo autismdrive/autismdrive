@@ -3,6 +3,7 @@ import unittest
 import os
 
 from app.import_service import ImportService
+from app.model.export_info import ExportInfoSchema
 
 os.environ["TESTING"] = "true"
 
@@ -97,10 +98,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(u.id, response[0]["user_id"])
 
     def get_export(self):
-        """Grabs everything form the export, clears everything from the database, and imports
-        all the information again, running it all through the API endpoints so it is fully serilaized """
+        """Grabs everything exportable via the API, and returns it fully serialized ss json"""
         all_data = {}
-        exports = ExportService.get_export_info()
+
+        rv = self.app.get('/api/export', headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        exports = ExportInfoSchema(many=True).load(response).data
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -108,7 +111,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         return all_data
 
     def load_database(self, all_data):
-        exports = ExportService.get_export_info()
+        rv = self.app.get('/api/export', headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        exports = ExportInfoSchema(many=True).load(response).data
         importer = ImportService(app, db)
         for export in exports:
             export.json_data = all_data[export.class_name]
@@ -188,7 +193,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_all_sensitive_exports_have_links_to_self(self):
         self.construct_everything()
-        exports = ExportService.get_export_info()
+        exports = ExportService.get_table_info()
         for export in exports:
             if export.question_type != ExportService.TYPE_SENSITIVE:
                 continue
@@ -202,7 +207,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
-        exports = ExportService.get_export_info()
+        exports = ExportService.get_table_info()
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -217,7 +222,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 #        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
 
         date = datetime.datetime.now()
-        exports = ExportService.get_export_info()
+        exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         for export in exports:
             rv = self.app.get(export.url + params, follow_redirects=True, content_type="application/json",
@@ -228,12 +233,17 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
         date = datetime.datetime.now()
-        exports = ExportService.get_export_info()
-        for export in exports:
-            self.assertTrue(export.size > 0, msg=export.class_name + " should have a count > 0")
-        exports = ExportService.get_export_info(date)
-        for export in exports:
-            self.assertEqual(0, export.size)
+        params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
+
+        rv = self.app.get('/api/export', headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        for export in response:
+            self.assertTrue(export['size'] > 0, msg=export['class_name'] + " should have a count > 0")
+
+        rv = self.app.get('/api/export' + params, headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        for export in response:
+            self.assertTrue(export['size'] == 0, msg=export['class_name'] + " should have a count of 0")
 
     def test_it_all_crazy_madness_wohoo(self):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.

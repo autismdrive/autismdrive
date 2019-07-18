@@ -3,7 +3,7 @@ import datetime
 from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 
-from app import db
+from app import db, ma
 
 
 class ImportLog(db.Model):
@@ -27,3 +27,13 @@ class ImportLog(db.Model):
 
     def handle_success(self):
         self.success_count += 1
+
+
+class ImportLogSchema(ModelSchema):
+    class Meta:
+        model = ImportLog
+        ordered = True
+        include_fk = True
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.importlogendpoint', id='<id>')
+    })

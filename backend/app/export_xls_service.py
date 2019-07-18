@@ -45,7 +45,11 @@ class ExportXlsService:
             # Get Questionnaire Names
             questionnaire_names = ExportXlsService.get_questionnaire_names(app)
         else:
+            cl = ExportService.get_class(name)
+            info = ExportService.get_single_table_info(cl, None)
             questionnaire_names = [name]
+            for sub_table in info.sub_tables:
+                questionnaire_names.append(sub_table.class_name)
 
         # Create workbook
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -77,6 +81,10 @@ class ExportXlsService:
                 for key in item:
                     if key == "_links":
                         continue
+                    if isinstance(item[key], dict):
+                        continue
+                    if isinstance(item[key], list) and isinstance(item[key][0], dict):
+                        continue # Don't try to represent sub-table data.
                     if isinstance(item[key], list):
                         list_string = ''
                         for value in item[key]:

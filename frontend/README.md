@@ -8,7 +8,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 In some circumstances you may want to run the server in "mirror" mode to debug the system running in this configuration.  You can do this with
 ```
-ng serve -c mirror --port 4201 --no-config --optimization=false
+ng serve -c mirror --port 4201 --optimization=false
 ```
 IMPORTANT:  This is purely for deployment/configuration settings.  The system will actually change behavior based on the responses from the backend system,
 and should not look at this setting to determine if it is providing a UI for the private mirror vs the public interface.
