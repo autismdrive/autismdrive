@@ -2,6 +2,7 @@ import datetime
 import enum
 
 from dateutil.tz import tzutc
+from sqlalchemy import func
 
 from app import db
 
@@ -26,7 +27,7 @@ class Study(db.Model):
     __label__ = "Research Studies"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     description = db.Column(db.String)
     participant_description = db.Column(db.String)
     benefit_description = db.Column(db.String)

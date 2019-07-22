@@ -92,6 +92,7 @@ import { UserAdminDetailsComponent } from './user-admin-details/user-admin-detai
 import { UserAdminComponent } from './user-admin/user-admin.component';
 import { FooterComponent } from './footer/footer.component';
 import { MirrorComponent } from './mirror/mirror.component';
+import { AdminExportComponent } from './admin-export/admin-export.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -168,6 +169,7 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
     FooterComponent,
     MirrorComponent,
+    AdminExportComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),

@@ -221,7 +221,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.construct_everything()
 #        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
 
-        date = datetime.datetime.now()
+        date = datetime.datetime.utcnow()
         exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         for export in exports:
@@ -232,7 +232,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        date = datetime.datetime.now()
+        date = datetime.datetime.utcnow()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
 
         rv = self.app.get('/api/export', headers=self.logged_in_headers())

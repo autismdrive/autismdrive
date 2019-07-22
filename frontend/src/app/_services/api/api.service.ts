@@ -2,18 +2,20 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable, of as observableOf, throwError} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { EmailLog } from '../../_models/email_log'
+import { EmailLog } from '../../_models/email_log';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
 import { Query } from '../../_models/query';
 import { Resource } from '../../_models/resource';
 import { Study } from '../../_models/study';
-import { StepLog } from '../../_models/step_log'
+import { StepLog } from '../../_models/step_log';
 import { User } from '../../_models/user';
 import { UserSearchResults } from '../../_models/user_search_results';
 import { environment } from '../../../environments/environment';
 import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
+import {ImportLogPageResults} from '../../_models/import_log';
+import {ExportLogPageResults} from '../../_models/export_log';
 
 @Injectable()
 export class ApiService {
@@ -74,7 +76,9 @@ export class ApiService {
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
-    status: '/api/status'
+    status: '/api/status',
+    import_log: '/api/import_log',
+    export_log: '/api/export_log',
   };
 
   constructor(private httpClient: HttpClient) {
@@ -396,6 +400,21 @@ export class ApiService {
     return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }
+
+  /** findUsers */
+  getImportLogs(pageNumber = 0, pageSize = 10): Observable<ImportLogPageResults> {
+    const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
+    return this.httpClient.get<ImportLogPageResults>(this._endpointUrl('import_log'), { params: search_data })
+      .pipe(catchError(this._handleError));
+  }
+
+  /** findUsers */
+  getExportLogs(pageNumber = 0, pageSize = 10): Observable<ExportLogPageResults> {
+    const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
+    return this.httpClient.get<ExportLogPageResults>(this._endpointUrl('export_log'), { params: search_data })
+      .pipe(catchError(this._handleError));
+  }
+
 
   private _endpointUrl(endpointName: string): string {
     const path = this.endpoints[endpointName];

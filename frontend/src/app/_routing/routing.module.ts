@@ -25,6 +25,7 @@ import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
 import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
+import {AdminExportComponent} from '../admin-export/admin-export.component';
 
 export function searchFilterMatcher(url: UrlSegment[]) {
   if (
@@ -67,6 +68,7 @@ const routes: Routes = [
   { path: 'admin/data', component: QuestionnaireDataViewComponent, data: { title: 'Data Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user', component: UserAdminComponent, data: { title: 'User Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user/:userId', component: UserAdminDetailsComponent, data: { title: 'User Admin Details' }, canActivate: [AdminGuard] },
+  { path: 'admin/export', component: AdminExportComponent, data: { title: 'Export/Import Status' }, canActivate: [AdminGuard] },
   { path: 'mirrored', component: MirrorComponent, data: { title: 'Mirrored Server Details' }},
 ];
 

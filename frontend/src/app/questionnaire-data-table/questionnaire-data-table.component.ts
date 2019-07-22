@@ -82,5 +82,5 @@ export class QuestionnaireDataTableComponent implements OnChanges {
     });
   }
 
-  get snakeToUpperCase(){ return snakeToUpperCase }
+  get snakeToUpperCase() { return snakeToUpperCase; }
 }

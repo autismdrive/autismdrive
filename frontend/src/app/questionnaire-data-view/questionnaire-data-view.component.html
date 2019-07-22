@@ -27,15 +27,13 @@
       <mat-drawer #sidenav
         [mode]='"over"'
         [(opened)]="sidebarOpen">
-          <mat-nav-list *ngFor="let info of questionnaire_info">
-            <mat-list-item
-              (click)="selectQuestionnaire(info)"
-            >
-              <i class="material-icons">{{ info.getIcon() }}</i>
-              {{ info.display_name }}
-              <span fxFlex></span>
+          <mat-list *ngFor="let info of questionnaire_info" dense>
+            <mat-list-item>
+              <mat-icon matListIcon>{{info.getIcon()}}</mat-icon>
+              ({{ info.size }})
+              <button mat-button  [disabled]="info.size == 0" (click)="selectQuestionnaire(info)">{{ info.display_name }}</button>
             </mat-list-item>
-          </mat-nav-list>
+          </mat-list>
       </mat-drawer>
       <mat-drawer-content
         *ngIf="currentQuestionnaire"

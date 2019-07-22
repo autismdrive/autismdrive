@@ -1,5 +1,4 @@
 from flask_marshmallow import Schema
-from marshmallow import post_load
 
 from app import app
 
@@ -16,4 +15,3 @@ class StatusSchema(Schema):
     class Meta:
         ordered = True
         fields = ["development", "testing", "mirroring"]
-
