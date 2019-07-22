@@ -306,16 +306,21 @@ export class ResourceFormComponent implements OnInit {
   updateOrganization() {
     // If the user selects an existing Organization name from the list, it will be saved as an Organization object. If they write in their
     // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
-    // updated model so that we don't accidentally save the old version before it's updated.
-    if (this.model.organization.constructor.name == "String") {
-      this.api.addOrganization({name: this.model.organization}).subscribe( org => {
-        this.model.organization_id = org.id;
-        this.model.organization = org;
+    // updated model so that we don't accidentally save the old version before it's updated. When there is no Organization being saved, all
+    // we do is create the updated model.
+    if (this.model.organization){
+      if (this.model.organization.constructor.name == "String") {
+        this.api.addOrganization({name: this.model.organization}).subscribe( org => {
+          this.model.organization_id = org.id;
+          this.model.organization = org;
+          this.updatedModel = this.model;
+          this.submit();
+        })
+      } else {
+        this.model.organization_id = this.model.organization.id;
         this.updatedModel = this.model;
-        this.submit();
-      })
+      }
     } else {
-      this.model.organization_id = this.model.organization.id;
       this.updatedModel = this.model;
     }
   }
