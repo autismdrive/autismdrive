@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
+import { User } from '../_models/user';
 import { ActivatedRoute } from '@angular/router';
 import { LatLngLiteral } from '@agm/core';
+import { AuthenticationService } from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-resource-detail',
@@ -12,10 +14,12 @@ import { LatLngLiteral } from '@agm/core';
 export class ResourceDetailComponent implements OnInit {
   resource: Resource;
   mapLoc: LatLngLiteral;
+  currentUser: User;
 
   constructor(
     private api: ApiService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authenticationService: AuthenticationService,
   ) {
     this.route.params.subscribe(params => {
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
@@ -29,9 +33,12 @@ export class ResourceDetailComponent implements OnInit {
         });
       }
     });
+
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
   ngOnInit() {
+
   }
 
   loadMapLocation() {

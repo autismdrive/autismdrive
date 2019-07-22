@@ -3,6 +3,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HitLabel, HitType, Query, Hit } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 import { AccordionItem } from '../_models/accordion-item';
+import { AuthenticationService } from '../_services/api/authentication-service';
+import { User } from '../_models/user';
 
 interface MostRecents {
   resource: Hit;
@@ -67,12 +69,17 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     event: null,
   };
 
+  currentUser: User;
+
   constructor(
     private locSearchService: SearchService,
-    private recentSearchService: SearchService
+    private recentSearchService: SearchService,
+    private authenticationService: AuthenticationService,
   ) {
     this.loadMapLocation(() => this.loadLocResources());
     this.loadRecentResources();
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+
   }
 
   ngOnInit() {
