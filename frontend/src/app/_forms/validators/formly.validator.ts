@@ -13,7 +13,7 @@ export function EmailValidatorMessage(err, field: FormlyFieldConfig) {
 }
 
 export function UrlValidator(control: FormControl): ValidationErrors {
-  return URL_REGEX.test(control.value) ? null : { 'url': true };
+  return  !control.value || URL_REGEX.test(control.value) ? null : { 'url': true };
 }
 
 export function UrlValidatorMessage(err, field: FormlyFieldConfig) {
@@ -21,7 +21,7 @@ export function UrlValidatorMessage(err, field: FormlyFieldConfig) {
 }
 
 export function PhoneValidator(control: FormControl): ValidationErrors {
-  return PHONE_REGEX.test(control.value) ? null : { 'phone': true };
+  return  !control.value || PHONE_REGEX.test(control.value) ? null : { 'phone': true };
 }
 
 export function PhoneValidatorMessage(err, field: FormlyFieldConfig) {

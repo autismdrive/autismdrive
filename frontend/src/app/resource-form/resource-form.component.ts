@@ -171,7 +171,6 @@ export class ResourceFormComponent implements OnInit {
         templateOptions: {
           label: 'Phone Number',
           placeholder: 'Please enter the phone number',
-          required: true,
         },
         hideExpression: '!model.type',
         validators: {"validation": ["phone"]},
@@ -182,7 +181,6 @@ export class ResourceFormComponent implements OnInit {
         templateOptions: {
           label: 'Website',
           placeholder: 'Please enter the website',
-          required: true,
         },
         hideExpression: '!model.type',
         validators: {"validation": ["url"]},
