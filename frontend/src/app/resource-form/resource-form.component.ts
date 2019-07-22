@@ -263,8 +263,12 @@ export class ResourceFormComponent implements OnInit {
 
   loadResourceCategories(resource: Resource, callback: Function) {
     this.model.categories = [];
-    for (const cat in resource.resource_categories) {
-      this.model.categories[resource.resource_categories[cat].category.id] = true;
+    if (resource.resource_categories.length > 0) {
+      for (const cat in resource.resource_categories) {
+        this.model.categories[resource.resource_categories[cat].category.id] = true;
+        callback();
+      }
+    } else {
       callback();
     }
   }
