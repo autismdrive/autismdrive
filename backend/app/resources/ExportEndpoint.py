@@ -19,6 +19,7 @@ def get_date_arg():
         after_date = datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT)
     return after_date
 
+
 class ExportEndpoint(flask_restful.Resource):
 
     @auth.login_required
@@ -57,7 +58,8 @@ class ExportListEndpoint(flask_restful.Resource):
             total_records_for_export += item.size
         log = ExportLog(available_records=total_records_for_export)
         db.session.add(log)
-
+        db.session.commit()
+        print("Created Export Log")
         return self.schema.dump(info_list)
 
 
