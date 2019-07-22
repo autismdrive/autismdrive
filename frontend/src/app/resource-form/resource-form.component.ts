@@ -40,6 +40,7 @@ export class ResourceFormComponent implements OnInit {
           ],
           required: true,
         },
+        hideExpression: '!model.createNew',
       },
       {
         key: 'title',
@@ -212,6 +213,7 @@ export class ResourceFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.model.createNew = false;
     this.loadData();
   }
 
@@ -235,6 +237,7 @@ export class ResourceFormComponent implements OnInit {
 
       if (resourceId) {
         this.createNew = false;
+        this.model.createNew = false;
           if (resourceType == 'resource') {
             this.loadResource(this.api.getResource(resourceId));
           } else if (resourceType == 'location') {
@@ -244,6 +247,7 @@ export class ResourceFormComponent implements OnInit {
           }
       } else {
         this.createNew = true;
+        this.model.createNew = true;
         this.resource = new Resource({'type': '', 'title': '', 'description': '', 'phone': '', 'website': '' }) ;
         this.loadForm();
       }
