@@ -134,16 +134,16 @@
             [mapLoc]="mapLoc"
           >
           </app-search-result>
-          <mat-paginator
-            [length]="query.total"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
-            (page)="updatePage()"
-          >
-          </mat-paginator>
         </div>
       </div>
-
     </div>
+    <mat-paginator
+      #paginator
+      [length]="query.total"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+      (page)="updatePage()"
+    >
+    </mat-paginator>
   </mat-sidenav-content>
 </mat-sidenav-container>

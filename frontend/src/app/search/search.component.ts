@@ -1,6 +1,7 @@
 import { LatLngLiteral } from '@agm/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   OnDestroy,
@@ -14,6 +15,8 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Filter, Query, Sort, Hit, HitLabel } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 import { StudyStatus } from '../_models/study';
+import {merge} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 interface SortMethod {
   name: string;
@@ -26,8 +29,12 @@ interface SortMethod {
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit, OnDestroy {
-  query: Query;
+export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
+  query =  new Query({
+    words: '',
+    filters: [],
+    size: 20,
+  });
   showFilters = false;
   loading = true;
   hideResults = false;
@@ -45,7 +52,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       label: 'Relevance',
       sortQuery: {
         field: '_score',
-        order: 'asc',
+        order: 'desc',
       }
     },
     {
@@ -70,7 +77,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   ];
   selectedSort: SortMethod;
   @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild('paginator', {static: true}) paginator: MatPaginator;
   featuredStudies: Hit[];
 
   constructor(
@@ -82,7 +89,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     private featuredSearchService: SearchService,
     media: MediaMatcher,
   ) {
-    this.selectedSort = this.sortMethods[0];
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -105,7 +111,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           size: this.pageSize,
         });
 
-        this.doSearch();
+        this.sortBy(this.sortMethods[0]);
         this.updateFilters();
       });
     });
@@ -116,6 +122,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+  }
+
+  ngAfterViewInit() {
+    merge(this.paginator.page).pipe(
+      tap(() => this.doSearch())
+    ).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -137,6 +149,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.query.start = 0;
     if (this.paginator) {
       this.paginator.firstPage();
+    } else {
+      console.log('NO PAGINATOR?', this.paginator);
     }
     this.updateUrl(this.query);
   }
@@ -155,11 +169,17 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: queryParams
+    [],
+    {
+      relativeTo: this.route,
+      queryParams: queryParams
+    }).then(() => {
+      window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
       });
+    });
   }
 
   doSearch() {
@@ -242,9 +262,11 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   updatePage() {
-    this.query.size = this.paginator.pageSize;
-    this.query.start = (this.paginator.pageIndex * this.paginator.pageSize) + 1;
-    this.updateUrl(this.query);
+    if (this.paginator) {
+      this.query.size = this.paginator.pageSize;
+      this.query.start = (this.paginator.pageIndex * this.paginator.pageSize) + 1;
+      this.updateUrl(this.query);
+    }
   }
 
   // Show filters if all filters have been removed.
