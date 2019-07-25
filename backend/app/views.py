@@ -89,8 +89,7 @@ from app.resources.ExportEndpoint import (
     ExportEndpoint,
     ExportListEndpoint
 )
-from app.resources.ExportLogEndpoint import ExportLogEndpoint
-from app.resources.ImportLogEndpoint import ImportLogEndpoint
+from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -203,8 +202,7 @@ endpoints = [
     (EmailLogListEndpoint, "/email_log"),
     (StepLogListEndpoint, "/step_log"),
     (StatusEndpoint, "/status"),
-    (ExportLogEndpoint, "/export_log"),
-    (ImportLogEndpoint, "/import_log"),
+    (DataTransferLogEndpoint, "/data_transfer_log"),
 
 ]
 

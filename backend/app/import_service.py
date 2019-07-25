@@ -1,6 +1,7 @@
+import datetime
+
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-
 
 # Fire of the scheduler
 # The Data Importer should run on the MIRROR, and will make calls to the primary server to download
@@ -9,13 +10,12 @@ from flask import logging
 from sqlalchemy import desc
 
 from app.export_service import ExportService
+from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
 from app.model.export_info import ExportInfoSchema
-from app.model.import_log import ImportLog
 from app.schema.export_schema import AdminExportSchema
 
 
 class ImportService:
-
     logger = logging.getLogger("ImportService")
 
     LOGIN_ENDPOINT = "/api/login_password"
@@ -36,11 +36,30 @@ class ImportService:
         scheduler.start()
         scheduler.add_job(self.run_backup, 'interval', seconds=5)
 
-    def run_backup(self):
+    def run_backup(self, load_admin=True):
+        date_started = datetime.datetime.now()
         exportables = self.get_export_list()
+        # Note:  We request data THEN create the next log.  We depend on this order to get data since
+        # the last log was recorded, but besure and set the start date from the moment this was called.
         data = self.request_data(exportables)
-        self.load_all_data(data)
-        self.load_admin()
+        log = self.log_for_export(exportables, date_started)
+        self.db.session.add(log)
+        self.load_all_data(data, log)
+        if load_admin:
+            self.load_admin()
+        self.db.session.commit()
+
+    def log_for_export(self, exportables, date_started):
+        total = 0
+        for e in exportables:
+            total += e.size
+        if total > 0:
+            log = DataTransferLog(type="import", total_records=total)
+        else:
+            log = self.db.session.query(DataTransferLog).filter(DataTransferLog.type == 'import') \
+                .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
+            log.last_updated = date_started
+        return log
 
     def login(self):
         creds = {'email': self.email, 'password': self.password}
@@ -65,16 +84,18 @@ class ImportService:
     def get_export_list(self):
         response = requests.get(self.master_url + self.EXPORT_ENDPOINT, headers=self.get_headers())
         exportables = ExportInfoSchema(many=True).load(response.json()).data
+
         return exportables
 
     def request_data(self, export_list):
         for export in export_list:
             if export.size == 0:
                 continue
-            last_log = self.db.session.query(ImportLog).filter(ImportLog.class_name == export.class_name)\
-                .order_by(desc(ImportLog.date_started)).limit(1).first()
-            if last_log:
-                date_string = last_log.date_started.strftime(ExportService.DATE_FORMAT)
+            last_detail_log = self.db.session.query(DataTransferLogDetail)\
+                .filter(DataTransferLogDetail.class_name == export.class_name) \
+                .order_by(desc(DataTransferLogDetail.date_started)).limit(1).first()
+            if last_detail_log:
+                date_string = last_detail_log.date_started.strftime(ExportService.DATE_FORMAT)
                 url = export.url + "?after=" + date_string
             else:
                 url = export.url
@@ -84,16 +105,17 @@ class ImportService:
             export.json_data = response.json()
         return export_list
 
-    def load_all_data(self, export_list):
+    def load_all_data(self, export_list, log):
         for export_info in export_list:
-            self.load_data(export_info)
+            self.load_data(export_info, log)
 
-    def load_data(self, export_info):
+    def load_data(self, export_info, log):
         if len(export_info.json_data) < 1:
             return  # Nothing to do here.
         schema = ExportService.get_schema(export_info.class_name, many=False)
         model_class = ExportService.get_class(export_info.class_name)
-        log = ImportLog(class_name=export_info.class_name, successful=True, success_count=0, failure_count=0)
+        log_detail = DataTransferLogDetail(class_name=export_info.class_name, date_started=log.date_started, successful=True, success_count=0, failure_count=0)
+        log.details.append(log_detail)
         for item in export_info.json_data:
             item_copy = dict(item)
             if "_links" in item_copy:
@@ -104,21 +126,24 @@ class ImportService:
                 try:
                     self.db.session.add(model)
                     self.db.session.commit()
-                    log.handle_success()
+                    log_detail.handle_success()
+                    self.db.session.add(log_detail)
                     if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
                         self.delete_record(item)
                 except Exception as e:
                     self.db.session.rollback()
-                    self.logger.error("Error processing " + export_info.class_name + " with id of " + str(item["id"]) + ".  Error: " + str(e))
-                    log.handle_failure(e)
+                    self.logger.error("Error processing " + export_info.class_name + " with id of " + str(
+                        item["id"]) + ".  Error: " + str(e))
+                    log_detail.handle_failure(e)
                     self.db.session.add(log)
+                    self.db.session.add(log_detail)
                     raise e
             else:
                 e = Exception("Failed to parse model " + export_info.class_name + ". " + str(errors))
-                log.handle_failure(e)
+                log_detail.handle_failure(e)
                 self.db.session.add(log)
+                self.db.session.add(log_detail)
                 raise e
-        self.db.session.add(log)
         self.db.session.commit()
 
     def delete_record(self, item):
@@ -129,7 +154,7 @@ class ImportService:
             return
         url = self.master_url + item['_links']['self']
         response = requests.delete(url, headers=self.get_headers())
-        assert(response.status_code == 200)
+        assert (response.status_code == 200)
 
     # Takes the partial path of an endpoint, and returns json.  Logging any errors.
     def __get_json(self, path):

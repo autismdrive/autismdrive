@@ -2,10 +2,11 @@ import datetime
 
 import flask_restful
 from flask import request
+from sqlalchemy import desc
 
 from app import auth, db
+from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
 from app.model.export_info import ExportInfoSchema
-from app.model.export_log import ExportLog
 from app.model.user import Role, User
 from app.schema.export_schema import AdminExportSchema
 from app.wrappers import requires_roles
@@ -46,6 +47,7 @@ class ExportListEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def get(self):
 
+        date_started = datetime.datetime.now()
         info_list = ExportService.get_table_info(get_date_arg())
 
         # Remove items that are not exportable, or that are identifying
@@ -53,13 +55,24 @@ class ExportListEndpoint(flask_restful.Resource):
         info_list = [item for item in info_list if item.question_type != ExportService.TYPE_IDENTIFYING]
 
         # Get a count of the records, and log it.
+        log = DataTransferLog(type="export")
         total_records_for_export = 0
         for item in info_list:
             total_records_for_export += item.size
-        log = ExportLog(available_records=total_records_for_export)
+            if item.size > 0:
+                log_detail = DataTransferLogDetail(date_started=date_started, class_name=item.class_name, successful=True)
+                log.details.append(log_detail)
+        log.total_records = total_records_for_export;
+
+        # If we find we aren't exporting anything, don't create a new log, just update the last one.
+        if total_records_for_export == 0:
+            log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
+                .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
+            if log is None: log = DataTransferLog(type="export", total_records=0)
+            log.last_updated = datetime.datetime.now()
         db.session.add(log)
         db.session.commit()
-        print("Created Export Log")
+
         return self.schema.dump(info_list)
 
 

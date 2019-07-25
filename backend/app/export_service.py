@@ -7,8 +7,8 @@ from flask import url_for, logging
 from sqlalchemy import func, desc
 
 from app import db, EmailService, app
+from app.model.data_transfer_log import DataTransferLog
 from app.model.export_info import ExportInfo
-from app.model.export_log import ExportLog
 
 
 class ExportService:
@@ -241,11 +241,11 @@ class ExportService:
             After 24 hours, the PI will also be emailed notifications every 8 hours until
              the fault is corrected or the system taken down."""
         alert_principal_investigator = False
-        last_log = db.session.query(ExportLog) \
-            .order_by(desc(ExportLog.last_updated)).limit(1).first()
+        last_log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
+            .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
         if not last_log:
             # If the export logs are empty, create one with the current date.
-            seed_log = ExportLog(available_records=0)
+            seed_log = DataTransferLog(total_records=0)
             db.session.add(seed_log)
             db.session.commit()
         else:

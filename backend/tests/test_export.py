@@ -3,6 +3,7 @@ import unittest
 import os
 
 from app.import_service import ImportService
+from app.model.data_transfer_log import DataTransferLog
 from app.model.export_info import ExportInfoSchema
 
 os.environ["TESTING"] = "true"
@@ -13,7 +14,6 @@ from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, app
 from app.email_service import TEST_MESSAGES
 from app.export_service import ExportService
-from app.model.export_log import ExportLog
 from app.model.participant import Relationship, Participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 
@@ -43,7 +43,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Category', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Participant', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'User', response))))
-        self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'EvaluationHistorySelfQuestionnaire', response))))
+        self.assertEqual(1, len(
+            list(filter(lambda field: field['class_name'] == 'EvaluationHistorySelfQuestionnaire', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Category', response))))
 
     def test_get_list_of_exportables_has_basic_attributes(self):
@@ -115,9 +116,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         exports = ExportInfoSchema(many=True).load(response).data
         importer = ImportService(app, db)
+        log = importer.log_for_export(exports, datetime.datetime.now())
         for export in exports:
             export.json_data = all_data[export.class_name]
-            importer.load_data(export)
+            importer.load_data(export,log)
 
     def test_insert_user_with_participant(self):
         u = self.construct_user()
@@ -219,7 +221,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-#        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        #        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
 
         date = datetime.datetime.utcnow()
         exports = ExportService.get_table_info()
@@ -275,17 +277,18 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                           content_type="application/json",
                           headers=self.logged_in_headers())
         self.assert_success(rv)
-        export_logs = db.session.query(ExportLog).all()
+        export_logs = db.session.query(DataTransferLog).filter(DataTransferLog.type == "export").all()
         self.assertEqual(1, len(export_logs))
         self.assertIsNotNone(export_logs[0].last_updated)
-        self.assertTrue(export_logs[0].available_records > 0, msg="The act of setting up this test harness should mean "
+        self.assertTrue(export_logs[0].total_records > 0, msg="The act of setting up this test harness should mean "
                                                                   "at least one user record is avialable for export")
 
     def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
 
         message_count = len(TEST_MESSAGES)
 
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=28), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=28), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -295,7 +298,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=45), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=45), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
 
@@ -306,14 +310,15 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
-        self.assertEqual(message_count+1, len(TEST_MESSAGES), msg="No more messages should be sent.")
+        self.assertEqual(message_count + 1, len(TEST_MESSAGES), msg="No more messages should be sent.")
         self.assertEqual("admin@tester.com", TEST_MESSAGES[-1]['To'])
 
     def test_exporter_sends_second_email_after_2_hours(self):
 
         message_count = len(TEST_MESSAGES)
 
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=30), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=30), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -331,7 +336,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_sends_12_emails_over_first_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=22), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=22),
+                              total_records=2, type="export")
         db.session.add(log)
         db.session.commit()
         for i in range(20):
@@ -340,7 +346,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=2), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=2), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         for i in range(20):
@@ -349,9 +356,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=24), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=24), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
         self.assertTrue("pi@tester.com" in TEST_MESSAGES[-1]['To'])
-
