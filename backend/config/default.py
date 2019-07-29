@@ -4,7 +4,9 @@ VERSION = "0.1"
 CORS_ENABLED = False
 DEVELOPMENT = True
 TESTING = True
-SLAVE = False
+
+MIRRORING = False
+DELETE_RECORDS = True
 
 SQLALCHEMY_DATABASE_URI = "postgresql://ed_user:ed_pass@localhost/stardrive"
 

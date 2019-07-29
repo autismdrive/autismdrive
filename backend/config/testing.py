@@ -11,6 +11,9 @@ MASTER_URL = "http://localhost:5000"
 MASTER_EMAIL = "daniel.h.funk@gmail.com"
 MASTER_PASS = "dfunk7"
 
+MIRRORING = False
+DELETE_RECORDS = False
+
 ELASTIC_SEARCH = {
     "index_prefix": "stardrive_test",
     "hosts": ["localhost"],

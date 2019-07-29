@@ -1,7 +1,7 @@
 import datetime
 
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
+from sqlalchemy import func
 
 from app import db
 
@@ -14,7 +14,7 @@ class EmailLog(db.Model):
     tracking_code = db.Column(db.String)
     viewed = db.Column(db.Boolean)
     date_viewed = db.Column(db.DateTime)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
 
 
 

@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db
 from app.model.organization import Organization
-from app.resources.schema import OrganizationSchema
+from app.schema.schema import OrganizationSchema
 
 
 class OrganizationEndpoint(flask_restful.Resource):

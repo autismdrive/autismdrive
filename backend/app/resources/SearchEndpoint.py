@@ -1,11 +1,10 @@
 import elasticsearch
 import flask_restful
 from flask import request, json
-import logging
 
 from app import elastic_index, RestException
 from app.model.search import Facet, FacetCount, Hit
-from app.resources.schema import SearchSchema
+from app.schema.schema import SearchSchema
 
 
 class SearchEndpoint(flask_restful.Resource):

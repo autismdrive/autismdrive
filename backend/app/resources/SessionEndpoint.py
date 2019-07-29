@@ -1,8 +1,8 @@
 import flask_restful
 from flask import g, jsonify
 
-from app import RestException, auth
-from app.resources.schema import UserSchema
+from app import auth
+from app.schema.schema import UserSchema
 
 
 class SessionEndpoint(flask_restful.Resource):

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivationEnd, ActivationStart, Router } from '@angular/router';
 import { User } from './_models/user';
 import { AuthenticationService } from './_services/api/authentication-service';
+import {ApiService} from './_services/api/api.service';
+import {Status} from './_models/status';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +14,11 @@ export class AppComponent implements OnInit {
   title = 'star-drive';
   hideHeader = false;
   currentUser: User;
+  systemStatus: Status;
 
   public constructor(
     private authenticationService: AuthenticationService,
+    private api: ApiService,
     private router: Router,
   ) {
     this.router.events.subscribe((e) => {
@@ -26,6 +30,7 @@ export class AppComponent implements OnInit {
       }
     });
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.api.serverStatus.subscribe(s => this.systemStatus = s);
   }
 
   ngOnInit() {

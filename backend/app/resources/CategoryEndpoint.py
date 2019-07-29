@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 
 from app import db, RestException
 from app.model.category import Category
-from app.resources.schema import CategorySchema, ParentCategorySchema
+from app.schema.schema import CategorySchema, ParentCategorySchema
 
 
 class CategoryEndpoint(flask_restful.Resource):

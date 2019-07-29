@@ -7,7 +7,7 @@ from marshmallow import ValidationError
 from app import RestException, db, elastic_index
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
-from app.resources.schema import ResourceSchema
+from app.schema.schema import ResourceSchema
 
 
 class ResourceEndpoint(flask_restful.Resource):

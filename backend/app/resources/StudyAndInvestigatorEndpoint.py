@@ -5,7 +5,7 @@ from app import db, RestException
 from app.model.investigator import Investigator
 from app.model.study import Study
 from app.model.study_investigator import StudyInvestigator
-from app.resources.schema import StudyInvestigatorSchema, InvestigatorStudiesSchema, StudyInvestigatorsSchema
+from app.schema.schema import StudyInvestigatorSchema, InvestigatorStudiesSchema, StudyInvestigatorsSchema
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):

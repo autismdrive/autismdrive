@@ -1,28 +1,33 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of as observableOf, throwError } from 'rxjs';
+import {BehaviorSubject, Observable, of as observableOf, throwError} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Category } from '../../_models/category'
-import { EmailLog } from '../../_models/email_log'
+import { Category } from '../../_models/category';
+import { EmailLog } from '../../_models/email_log';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
 import { Query } from '../../_models/query';
 import { Resource } from '../../_models/resource';
 import { ResourceCategory } from '../../_models/resource_category';
 import { Study } from '../../_models/study';
-import { StepLog } from '../../_models/step_log'
+import { StepLog } from '../../_models/step_log';
 import { User } from '../../_models/user';
 import { UserSearchResults } from '../../_models/user_search_results';
 import { environment } from '../../../environments/environment';
+import {Status} from '../../_models/status';
+import {TableInfo} from '../../_models/table_info';
+import {DataTransferPageResults} from '../../_models/data_transfer_log';
 import {Organization} from '../../_models/organization';
 
 @Injectable()
 export class ApiService {
 
   apiRoot = environment.api;
+  private statusSubject: BehaviorSubject<Status>;
+  public serverStatus: Observable<Status>;
 
   // REST endpoints
-  endpoints = {
+  public endpoints = {
     categorybyresource: '/api/resource/<resource_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
     category: '/api/category/<id>',
@@ -40,7 +45,7 @@ export class ApiService {
     questionnaire: '/api/q/<name>/<id>',
     questionnaireList: '/api/q/<name>',
     questionnaireListMeta: '/api/q/<name>/meta',
-    questionnaireNames: '/api/q',
+    questionnaireInfo: '/api/q',
     questionnaireExport: '/api/q/<name>/export',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     eventbycategory: '/api/category/<category_id>/event',
@@ -73,9 +78,14 @@ export class ApiService {
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
+    status: '/api/status',
+    data_transfer_log: '/api/data_transfer_log',
   };
 
   constructor(private httpClient: HttpClient) {
+    this.statusSubject = new BehaviorSubject<Status>(null);
+    this.serverStatus = this.statusSubject.asObservable();
+    this.setServerStatus();
   }
 
   private _handleError(error: HttpErrorResponse) {
@@ -100,6 +110,13 @@ export class ApiService {
     // return an observable with a user-facing error message
     // FIXME: Log all error messages to Google Analytics
     return throwError(message);
+  }
+
+  private setServerStatus() {
+    this.httpClient.get<Status>(this._endpointUrl('status')).subscribe
+      (status => {
+        this.statusSubject.next(status);
+      });
   }
 
   /** sendResetPasswordEmail
@@ -342,11 +359,13 @@ export class ApiService {
   }
 
   /** getQuestionnaireNames */
-  getQuestionnaireNames() {
+  getQuestionnaireInfoList() {
     const url = this
-      ._endpointUrl('questionnaireNames');
-    return this.httpClient.get<any>(url)
-      .pipe(catchError(this._handleError));
+      ._endpointUrl('questionnaireInfo');
+    return this.httpClient.get<TableInfo[]>(url)
+      .pipe(
+        map(infoJson => infoJson.map(ij => new TableInfo(ij))),
+        catchError(this._handleError));
   }
 
   /** getQuestionnaireList */
@@ -419,6 +438,14 @@ export class ApiService {
     return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }
+
+  /** findUsers */
+  getDataTransferLogs(pageNumber = 0, pageSize = 10): Observable<DataTransferPageResults> {
+    const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
+    return this.httpClient.get<DataTransferPageResults>(this._endpointUrl('data_transfer_log'), { params: search_data })
+      .pipe(catchError(this._handleError));
+  }
+
 
   private _endpointUrl(endpointName: string): string {
     const path = this.endpoints[endpointName];

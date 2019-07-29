@@ -24,6 +24,9 @@ import { UserAdminDetailsComponent } from '../user-admin-details/user-admin-deta
 import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
+import {MirrorComponent} from '../mirror/mirror.component';
+import {NotMirroredGuard} from './not-mirrored-guard';
+import {AdminExportComponent} from '../admin-export/admin-export.component';
 
 export function searchFilterMatcher(url: UrlSegment[]) {
   if (
@@ -37,18 +40,18 @@ export function searchFilterMatcher(url: UrlSegment[]) {
 }
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent, data: { title: 'Welcome STAR Drive' } },
-  { path: 'enroll', component: EnrollComponent, data: { title: 'Enroll in a STAR Drive Study' } },
+  { path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]  },
+  { path: 'home', component: HomeComponent, data: { title: 'Welcome STAR Drive' } , canActivate: [NotMirroredGuard]  },
+  { path: 'enroll', component: EnrollComponent, data: { title: 'Enroll in a STAR Drive Study' } , canActivate: [NotMirroredGuard]  },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Log in to STAR Drive', hideHeader: true } },
   { path: 'login', component: LoginComponent, data: { title: 'Log in to STAR Drive', hideHeader: true } },
   {
     path: 'reset_password/:email_token', component: PasswordResetComponent,
     data: { title: 'Reset your STAR Drive password', hideHeader: true }
   },
-  { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
-  { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard] },
-  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard, NotMirroredGuard] },
+  { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard, NotMirroredGuard] },
+  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard, NotMirroredGuard] },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
   { path: 'event/:resourceId', component: ResourceDetailComponent, data: { title: 'Event Details' } },
   { path: 'location/:resourceId', component: ResourceDetailComponent, data: { title: 'Location Details' } },
@@ -68,6 +71,8 @@ const routes: Routes = [
   { path: 'admin/data', component: QuestionnaireDataViewComponent, data: { title: 'Data Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user', component: UserAdminComponent, data: { title: 'User Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user/:userId', component: UserAdminDetailsComponent, data: { title: 'User Admin Details' }, canActivate: [AdminGuard] },
+  { path: 'admin/export', component: AdminExportComponent, data: { title: 'Export/Import Status' }, canActivate: [AdminGuard] },
+  { path: 'mirrored', component: MirrorComponent, data: { title: 'Mirrored Server Details' }},
 ];
 
 @NgModule({

@@ -2,6 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { QuestionnaireDataSource } from '../_models/questionnaire_data_source';
 import { snakeToUpperCase } from '../../util/snakeToUpper';
+import {TableInfo} from '../_models/table_info';
 
 @Component({
   selector: 'app-questionnaire-data-table',
@@ -10,7 +11,8 @@ import { snakeToUpperCase } from '../../util/snakeToUpper';
 })
 export class QuestionnaireDataTableComponent implements OnChanges {
   @Input()
-  questionnaire_name: string;
+  questionnaire_info: TableInfo;
+  selected_info: TableInfo;
 
   dataSource: QuestionnaireDataSource;
   displayedColumns = [];
@@ -22,15 +24,22 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   ) {}
 
   ngOnChanges() {
+    if (this.selected_info == null) {this.selected_info = this.questionnaire_info; }
+    this.changeTable(this.selected_info);
+  }
+
+  changeTable(table_info) {
+    console.log('SEtting table to ', table_info);
+    this.selected_info = table_info;
     this.dataSource = new QuestionnaireDataSource(this.api);
-    this.dataSource.loadQuestionnaires(this.questionnaire_name);
+    this.dataSource.loadQuestionnaires(this.selected_info.table_name);
     this.load_columns();
   }
 
   load_columns() {
     this.displayedColumns = [];
     this.columnNames = [];
-    this.api.getQuestionnaireListMeta(this.questionnaire_name).subscribe(
+    this.api.getQuestionnaireListMeta(this.selected_info.table_name).subscribe(
       result => {
         for (let fieldIndex in result['fields']) {
           let column = result['fields'][fieldIndex];
@@ -54,9 +63,9 @@ export class QuestionnaireDataTableComponent implements OnChanges {
     }
   }
 
-  exportQ(questionnaire_name) {
-    console.log('clicking the button for export ', questionnaire_name);
-    this.api.exportQuestionnaire(questionnaire_name).subscribe( response => {
+  exportQ(info) {
+    console.log('clicking the button for export ', info.display_name);
+    this.api.exportQuestionnaire(info.table_name).subscribe( response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -73,5 +82,5 @@ export class QuestionnaireDataTableComponent implements OnChanges {
     });
   }
 
-  get snakeToUpperCase(){ return snakeToUpperCase }
+  get snakeToUpperCase() { return snakeToUpperCase; }
 }

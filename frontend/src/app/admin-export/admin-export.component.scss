@@ -1,0 +1,20 @@
+div.logs {
+  padding: 50px 0;
+  margin: 50px;
+}
+
+table {
+  width: 100%;
+}
+
+mat-card {
+  margin-bottom: 1em;
+}
+
+mat-row.warn {
+  background: #ffffe0;
+}
+
+mat-row.error {
+  background: #ffa07a;
+}

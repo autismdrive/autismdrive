@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index
 from app.model.location import Location
-from app.resources.schema import LocationSchema
+from app.schema.schema import LocationSchema
 
 
 class LocationEndpoint(flask_restful.Resource):

@@ -5,7 +5,7 @@ from app import db, RestException
 from app.model.category import Category
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
-from app.resources.schema import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
+from app.schema.schema import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
 
 
 class ResourceByCategoryEndpoint(flask_restful.Resource):

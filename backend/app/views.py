@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, url_for
 from flask_restful import reqparse
 
 from app import app
+from app.resources.StatusEndpoint import StatusEndpoint
 from app.resources.Auth import auth_blueprint
 from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
@@ -48,9 +49,8 @@ from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
     QuestionnaireListEndpoint,
     QuestionnaireListMetaEndpoint,
-    QuestionnaireNamesEndpoint,
-    QuestionnaireDataExportEndpoint
-)
+    QuestionnaireDataExportEndpoint,
+    QuestionnaireInfoEndpoint)
 from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
     StudyCategoryEndpoint,
@@ -89,7 +89,7 @@ from app.resources.ExportEndpoint import (
     ExportEndpoint,
     ExportListEndpoint
 )
-
+from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -184,7 +184,7 @@ endpoints = [
     (ParticipantEndpoint, "/participant/<id>"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
     # Questionnaires
-    (QuestionnaireNamesEndpoint, "/q"),
+    (QuestionnaireInfoEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
     (QuestionnaireByParticipantEndpoint, "/q/<string:name>/participant/<string:participant_id>"),
     (QuestionnaireListMetaEndpoint, "/q/<string:name>/meta"),
@@ -201,6 +201,8 @@ endpoints = [
     (ExportEndpoint, "/export/<string:name>"),
     (EmailLogListEndpoint, "/email_log"),
     (StepLogListEndpoint, "/step_log"),
+    (StatusEndpoint, "/status"),
+    (DataTransferLogEndpoint, "/data_transfer_log"),
 
 ]
 

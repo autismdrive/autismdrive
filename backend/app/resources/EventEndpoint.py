@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index
 from app.model.event import Event
-from app.resources.schema import EventSchema
+from app.schema.schema import EventSchema
 
 
 class EventEndpoint(flask_restful.Resource):

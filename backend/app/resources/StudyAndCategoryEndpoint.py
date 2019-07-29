@@ -5,7 +5,7 @@ from app import db, RestException
 from app.model.category import Category
 from app.model.study import Study
 from app.model.study_category import StudyCategory
-from app.resources.schema import StudyCategorySchema, CategoryStudiesSchema, StudyCategoriesSchema
+from app.schema.schema import StudyCategorySchema, CategoryStudiesSchema, StudyCategoriesSchema
 
 
 class StudyByCategoryEndpoint(flask_restful.Resource):

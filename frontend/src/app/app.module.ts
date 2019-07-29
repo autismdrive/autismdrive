@@ -95,6 +95,10 @@ import { TimedoutComponent } from './timed-out/timed-out.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { UserAdminDetailsComponent } from './user-admin-details/user-admin-details.component';
 import { UserAdminComponent } from './user-admin/user-admin.component';
+import { FooterComponent } from './footer/footer.component';
+import { MirrorComponent } from './mirror/mirror.component';
+import { AdminExportComponent } from './admin-export/admin-export.component';
+import { AdminExportDetailsComponent } from './admin-export-details/admin-export-details.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -180,6 +184,10 @@ export class FormlyConfig {
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
+    FooterComponent,
+    MirrorComponent,
+    AdminExportComponent,
+    AdminExportDetailsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),
@@ -233,7 +241,7 @@ export class FormlyConfig {
     SearchService,
   ],
   bootstrap: [AppComponent],
-  entryComponents: [AvatarDialogComponent]
+  entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent]
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {

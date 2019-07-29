@@ -1,11 +1,28 @@
-<h2>{{ snakeToUpperCase(questionnaire_name) }}</h2>
+<h2>{{ questionnaire_info.display_name }}</h2>
 <button
   mat-flat-button
-  (click)="exportQ(questionnaire_name)"
+  (click)="exportQ(questionnaire_info)"
   color="accent"
 >
-  Export {{ snakeToUpperCase(questionnaire_name) }} Data
+  Export {{ questionnaire_info.display_name }} Data
 </button>
+
+<div *ngIf="questionnaire_info.sub_tables.length > 0">
+  <h3>Related Tables</h3>
+  <p>This questionnaire contains some related tables that contain additional details.  Use these buttons to change the view and look at sub-tables.</p>
+  <button mat-flat-button (click)="changeTable(questionnaire_info)" color="accent"
+          [ngClass]="{'selected': selected_info == questionnaire_info}">
+    {{questionnaire_info.display_name}}
+  </button>
+  <span *ngFor="let table of questionnaire_info.sub_tables">
+  <button mat-flat-button (click)="changeTable(table)" color="accent"
+          [ngClass]="{'selected': selected_info == table}">
+    {{table.display_name}}
+
+  </button>
+</span>
+</div>
+
 <mat-table
   [dataSource]="dataSource"
 >

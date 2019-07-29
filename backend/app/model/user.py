@@ -3,6 +3,7 @@ import jwt
 import enum
 
 from dateutil.tz import tzutc
+from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import app, db, RestException, bcrypt
@@ -30,7 +31,7 @@ class User(db.Model):
     # studies.
     __tablename__ = 'stardrive_user'
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.Enum(Role))
     participants = db.relationship(Participant, back_populates="user")

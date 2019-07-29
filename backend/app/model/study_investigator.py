@@ -1,6 +1,7 @@
 import datetime
 
 from dateutil.tz import tzutc
+from sqlalchemy import func
 
 from app import db
 
@@ -15,4 +16,4 @@ class StudyInvestigator(db.Model):
     investigator_id = db.Column(db.Integer, db.ForeignKey(Investigator.id), nullable=False)
     study = db.relationship(Study, backref='study_investigators')
     investigator = db.relationship(Investigator, backref='investigator_studiess')
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())

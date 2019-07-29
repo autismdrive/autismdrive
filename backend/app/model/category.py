@@ -1,6 +1,7 @@
 import datetime
 
 from dateutil.tz import tzutc
+from sqlalchemy import func
 
 from app import db
 
@@ -10,7 +11,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     parent_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     children = db.relationship("Category",
                                backref=db.backref('parent', remote_side=[id]),
                                lazy="joined",

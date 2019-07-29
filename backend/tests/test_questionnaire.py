@@ -1408,17 +1408,18 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(6.1, response['fields'][4]["fieldGroup"][0]["display_order"])
         self.assertEqual(6.2, response['fields'][4]["fieldGroup"][1]["display_order"])
 
-    def test_questionnaire_names_list_basics(self):
+    def test_questionnaire_info_list_basics(self):
         rv = self.app.get('/api/q',
                           follow_redirects=True,
                           content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("assistive_device", response[1])
-        self.assertEqual("education_dependent_questionnaire", response[8])
-        self.assertEqual("home_self_questionnaire", response[14])
-        self.assertEqual("therapy", response[20])
-        self.assertEqual(21, len(response))
+        self.assertEqual("Contact", response[1]["display_name"])
+        self.assertEqual("Employment", response[8]["display_name"])
+        self.assertEqual("Professional Profile", response[14]["display_name"])
+        self.assertEqual("Supports", response[15]["display_name"])
+        self.assertEquals(4, len(response[15]["sub_tables"]))
+        self.assertEqual(16, len(response))
 
     def test_questionnaire_list_meta_basics(self):
         rv = self.app.get('/api/q/education_self_questionnaire/meta',

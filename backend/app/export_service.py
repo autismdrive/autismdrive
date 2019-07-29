@@ -2,19 +2,23 @@ import datetime
 import importlib
 import re
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.tz import UTC
-from flask import url_for
+from flask import url_for, logging
 from sqlalchemy import func, desc
 
 from app import db, EmailService, app
+from app.model.data_transfer_log import DataTransferLog
 from app.model.export_info import ExportInfo
-from app.model.export_log import ExportLog
 
 
 class ExportService:
+
+    logger = logging.getLogger("ExportService")
+
     QUESTION_PACKAGE = "app.model.questionnaires"
-    SCHEMA_PACKAGE = "app.resources.schema"
-    EXPORT_SCHEMA_PACKAGE = "app.resources.ExportSchema"
+    SCHEMA_PACKAGE = "app.schema.schema"
+    EXPORT_SCHEMA_PACKAGE = "app.schema.export_schema"
 
     TYPE_SENSITIVE = 'sensitive'
     TYPE_IDENTIFYING = 'identifying'
@@ -22,6 +26,12 @@ class ExportService:
     TYPE_SUB_TABLE = 'sub-table'
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+    @staticmethod
+    def start():
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval', minutes=5)
 
     @staticmethod
     def get_class_for_table(table):
@@ -54,7 +64,10 @@ class ExportService:
         if not schema_class:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(model.__module__, schema_name)
-        print("Schema for " + name)
+
+        if not schema_class:
+            raise Exception("Unable to locate schema for class " + class_name)
+
         return schema_class(many=many, session=session)
 
     @staticmethod
@@ -69,7 +82,6 @@ class ExportService:
 
     @staticmethod
     def get_data(name, last_updated=None):
-        print("Exporting " + name)
         model = ExportService.get_class(name)
         query = db.session.query(model)
         if last_updated:
@@ -77,40 +89,52 @@ class ExportService:
         if hasattr(model, '__mapper_args__') \
                 and 'polymorphic_identity' in model.__mapper_args__:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
+        query = query.order_by(model.id)
         return query.all()
 
-    # Returns a list of classes that can be exported from the system.
+    # Returns a list of classes/tables with information about how they should be exported.
     @staticmethod
-    def get_export_info(last_updated=None):
+    def get_table_info(last_updated=None):
         export_infos = []
         sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
-        total_records_for_export = 0
+
+        # This moves the resource_categories table to the end of the list.
+        rc = next((t for t in sorted_tables if t.fullname == "resource_category"), None)
+        sorted_tables.append(sorted_tables.pop(sorted_tables.index(rc)))
+
         for table in sorted_tables:
             db_model = ExportService.get_class_for_table(table)
-
-            # Never export Identifying information.
-            if hasattr(db_model, '__question_type__') and db_model.__question_type__ == ExportService.TYPE_IDENTIFYING:
-                continue
-            # Do not include sub-tables that will fall through from quiestionnaire schemas,
-            # or logs that don't make sense to export.
-            if hasattr(db_model, '__no_export__') and db_model.__no_export__:
-                continue
-
-            export_info = ExportInfo(table_name=table.name, class_name=db_model.__name__)
-
-            query = (db.session.query(func.count(db_model.id)))
-            if last_updated:
-                query = query.filter(db_model.last_updated > last_updated)
-            export_info.size = query.all()[0][0]
-            total_records_for_export += query.all()[0][0]
-            export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
-            if hasattr(db_model, '__question_type__'):
-                export_info.type = db_model.__question_type__
-            export_infos.append(export_info)
-
-        log = ExportLog(available_records=total_records_for_export)
-        db.session.add(log)
+            export_infos.append(ExportService.get_single_table_info(db_model, last_updated))
         return export_infos
+
+    @staticmethod
+    def get_single_table_info(db_model, last_updated):
+        export_info = ExportInfo(table_name=db_model.__tablename__, class_name=db_model.__name__)
+        query = (db.session.query(func.count(db_model.id)))
+        if last_updated:
+            query = query.filter(db_model.last_updated > last_updated)
+        if hasattr(db_model, '__mapper_args__') \
+                and 'polymorphic_identity' in db_model.__mapper_args__:
+            query = query.filter(db_model.type == db_model.__mapper_args__['polymorphic_identity'])
+
+        export_info.size = query.all()[0][0]
+        export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
+        if hasattr(db_model, '__question_type__'):
+            export_info.question_type = db_model.__question_type__
+        # Do not include sub-tables that will fall through from quiestionnaire schemas,
+        # or logs that don't make sense to export.
+        if hasattr(db_model, '__no_export__') and db_model.__no_export__:
+            export_info.exportable = False
+
+        if hasattr(db_model, "get_field_groups"):
+            groups = db_model().get_field_groups()
+            for name, settings in groups.items():
+                if "repeat_class" in settings:
+                    # RECURSE!
+                    c = settings["repeat_class"]
+                    export_info.sub_tables.append(ExportService.get_single_table_info(c, last_updated))
+
+        return export_info
 
     @staticmethod
     def class_exists(module_name, class_name):
@@ -224,11 +248,11 @@ class ExportService:
             After 24 hours, the PI will also be emailed notifications every 8 hours until
              the fault is corrected or the system taken down."""
         alert_principal_investigator = False
-        last_log = db.session.query(ExportLog) \
-            .order_by(desc(ExportLog.last_updated)).limit(1).first()
+        last_log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
+            .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
         if not last_log:
             # If the export logs are empty, create one with the current date.
-            seed_log = ExportLog(available_records=0)
+            seed_log = DataTransferLog(total_records=0)
             db.session.add(seed_log)
             db.session.commit()
         else:
@@ -246,7 +270,6 @@ class ExportService:
                     "24 hours, and every 4 hours there-after."
 
             elif hours >= 2 and hours % 2 == 0 and hours / 2 >= last_log.alerts_sent:
-                print("Alerts Sent / formula result:" + str(last_log.alerts_sent))
                 subject = subject + str(hours) + " hours since last successful export"
                 msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
                     " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \

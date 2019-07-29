@@ -1,6 +1,7 @@
 import datetime
 
 from dateutil.tz import tzutc
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
@@ -12,7 +13,7 @@ class EvaluationHistoryMixin(object):
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
     @declared_attr

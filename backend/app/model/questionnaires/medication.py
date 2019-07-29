@@ -3,9 +3,9 @@ import datetime
 from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
+from sqlalchemy import func
 
 from app import db
-from app.export_service import ExportService
 
 
 class Medication(db.Model):
@@ -14,7 +14,7 @@ class Medication(db.Model):
     __no_export__ = True  # This will be transferred as a part of a parent class
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     supports_questionnaire_id = db.Column(
         "supports_questionnaire_id",
         db.Integer,

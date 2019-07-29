@@ -114,12 +114,13 @@ class EmailService:
         return tracking_code
 
     def admin_alert_email(self, subject, message, alert_principal_investigator=False):
-        text_body = render_template("admin_email.txt", msg=message, site_url=self.site_url)
+        with self.app.app_context():
+            context = {'name': 'bob', 'age': 22}
+            text_body = render_template("admin_email.txt", msg=message, site_url=self.site_url, **context)
+            html_body = render_template("admin_email.html", msg=message, site_url=self.site_url, **context)
+            recipients = [self.admin_email]
+            if alert_principal_investigator:
+                recipients.append(self.principal_investigator_email)
 
-        html_body = render_template("admin_email.html", msg=message, site_url=self.site_url)
-        recipients = [self.admin_email]
-        if alert_principal_investigator:
-            recipients.append(self.principal_investigator_email)
-
-        self.send_email(subject,
-                        recipients=recipients, text_body=text_body, html_body=html_body)
+            self.send_email(subject,
+                            recipients=recipients, text_body=text_body, html_body=html_body)
