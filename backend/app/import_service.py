@@ -34,7 +34,7 @@ class ImportService:
     def start(self):
         scheduler = BackgroundScheduler()
         scheduler.start()
-        scheduler.add_job(self.run_backup, 'interval', seconds=5)
+        scheduler.add_job(self.run_backup, 'interval', minutes=5)
 
     def run_backup(self, load_admin=True):
         date_started = datetime.datetime.now()

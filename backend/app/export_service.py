@@ -31,7 +31,7 @@ class ExportService:
     def start():
         scheduler = BackgroundScheduler()
         scheduler.start()
-        scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval', seconds=5)
+        scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval', minutes=5)
 
     @staticmethod
     def get_class_for_table(table):
@@ -276,7 +276,7 @@ class ExportService:
                     " email about this issue.  You will receive an email every 2 hours for the first " \
                     "24 hours, and every 4 hours there-after."
 
-            elif minutes >= 1 and last_log.alerts_sent == 0:
+            elif minutes >= 30 and last_log.alerts_sent == 0:
                 subject = subject + str(minutes) + " minutes since last successful export"
                 msg = "Exports should occur every 5 minutes.  It has been " + str(minutes) + \
                     " minutes since the last export was requested."
