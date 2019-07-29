@@ -60,7 +60,8 @@ class ExportListEndpoint(flask_restful.Resource):
         for item in info_list:
             total_records_for_export += item.size
             if item.size > 0:
-                log_detail = DataTransferLogDetail(date_started=date_started, class_name=item.class_name, successful=True)
+                log_detail = DataTransferLogDetail(date_started=date_started, class_name=item.class_name,
+                                                   successful=True, success_count=item.size)
                 log.details.append(log_detail)
         log.total_records = total_records_for_export;
 

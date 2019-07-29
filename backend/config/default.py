@@ -6,7 +6,7 @@ DEVELOPMENT = True
 TESTING = True
 
 MIRRORING = False
-DELETE_RECORDS = False
+DELETE_RECORDS = True
 
 SQLALCHEMY_DATABASE_URI = "postgresql://ed_user:ed_pass@localhost/stardrive"
 

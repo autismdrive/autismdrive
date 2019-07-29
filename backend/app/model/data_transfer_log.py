@@ -18,6 +18,9 @@ class DataTransferLog(db.Model):
     alerts_sent = db.Column(db.Integer, default=0)
     details = db.relationship('DataTransferLogDetail')
 
+    def successful(self):
+        return next((x for x in self.details if not x.successful), None) is None
+
 
 class DataTransferLogDetail(db.Model):
     '''When data is successfully transfered it is recorded in the detail log which contains
@@ -55,9 +58,11 @@ class DataTransferLogDetailSchema(ModelSchema):
 class DataTransferLogSchema(ModelSchema):
     class Meta:
         model = DataTransferLog
+        fields = ('id', 'type', 'date_started', 'last_updated', 'total_records',
+                  'alerts_sent', 'details', '_links')
         ordered = True
         include_fk = True
-        details = fields.Nested(DataTransferLogDetailSchema, dump_only=True, many=True)
+    details = fields.Nested(DataTransferLogDetailSchema, dump_only=True, many=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.datatransferlogendpoint', id='<id>')
     })

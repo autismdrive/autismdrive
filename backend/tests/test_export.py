@@ -282,6 +282,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(export_logs[0].last_updated)
         self.assertTrue(export_logs[0].total_records > 0, msg="The act of setting up this test harness should mean "
                                                                   "at least one user record is avialable for export")
+        self.assertEquals(1, len(export_logs[0].details))
+        detail = export_logs[0].details[0]
+        self.assertEquals("User", detail.class_name)
+        self.assertEquals(True, detail.successful)
+        self.assertEquals(1, detail.success_count)
 
     def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
 

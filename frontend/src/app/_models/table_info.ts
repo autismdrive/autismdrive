@@ -6,7 +6,7 @@ export class TableInfo {
   url: string;
   question_type: string;
   exportable: boolean;
-  sub_tables: TableInfo;
+  sub_tables: TableInfo[];
 
   constructor(private _props) {
     for (const propName in this._props) {

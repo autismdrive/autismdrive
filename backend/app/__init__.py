@@ -163,3 +163,6 @@ if app.config["MIRRORING"]:
     from app.import_service import ImportService
     importer = ImportService(app, db)
     importer.start()
+else:
+    from app.export_service import ExportService
+    ExportService.start()

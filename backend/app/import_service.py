@@ -82,9 +82,15 @@ class ImportService:
         return headers
 
     def get_export_list(self):
-        response = requests.get(self.master_url + self.EXPORT_ENDPOINT, headers=self.get_headers())
-        exportables = ExportInfoSchema(many=True).load(response.json()).data
 
+        url = self.master_url + self.EXPORT_ENDPOINT;
+        last_log = self.db.session.query(DataTransferLog).filter(DataTransferLog.type == 'import')\
+            .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
+        if last_log and last_log.successful():
+            date_string = last_log.date_started.strftime(ExportService.DATE_FORMAT)
+            url += "?after=" + date_string
+        response = requests.get(url, headers=self.get_headers())
+        exportables = ExportInfoSchema(many=True).load(response.json()).data
         return exportables
 
     def request_data(self, export_list):
@@ -129,6 +135,7 @@ class ImportService:
                     log_detail.handle_success()
                     self.db.session.add(log_detail)
                     if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
+                        print("Sensitive Data.  Calling Delete.")
                         self.delete_record(item)
                 except Exception as e:
                     self.db.session.rollback()

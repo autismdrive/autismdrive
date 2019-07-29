@@ -14,8 +14,7 @@ import { UserSearchResults } from '../../_models/user_search_results';
 import { environment } from '../../../environments/environment';
 import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
-import {ImportLogPageResults} from '../../_models/import_log';
-import {ExportLogPageResults} from '../../_models/export_log';
+import {DataTransferPageResults} from '../../_models/data_transfer_log';
 
 @Injectable()
 export class ApiService {
@@ -25,7 +24,7 @@ export class ApiService {
   public serverStatus: Observable<Status>;
 
   // REST endpoints
-  endpoints = {
+  public endpoints = {
     categorybyresource: '/api/resource/<resource_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
     category: '/api/category/<id>',
@@ -77,8 +76,7 @@ export class ApiService {
     userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
     status: '/api/status',
-    import_log: '/api/import_log',
-    export_log: '/api/export_log',
+    data_transfer_log: '/api/data_transfer_log',
   };
 
   constructor(private httpClient: HttpClient) {
@@ -402,16 +400,9 @@ export class ApiService {
   }
 
   /** findUsers */
-  getImportLogs(pageNumber = 0, pageSize = 10): Observable<ImportLogPageResults> {
+  getDataTransferLogs(pageNumber = 0, pageSize = 10): Observable<DataTransferPageResults> {
     const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
-    return this.httpClient.get<ImportLogPageResults>(this._endpointUrl('import_log'), { params: search_data })
-      .pipe(catchError(this._handleError));
-  }
-
-  /** findUsers */
-  getExportLogs(pageNumber = 0, pageSize = 10): Observable<ExportLogPageResults> {
-    const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
-    return this.httpClient.get<ExportLogPageResults>(this._endpointUrl('export_log'), { params: search_data })
+    return this.httpClient.get<DataTransferPageResults>(this._endpointUrl('data_transfer_log'), { params: search_data })
       .pipe(catchError(this._handleError));
   }
 

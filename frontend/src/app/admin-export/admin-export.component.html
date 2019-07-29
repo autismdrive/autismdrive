@@ -1,0 +1,57 @@
+<div class="logs">
+  <h1>Transfer Logs</h1>
+  <p *ngIf="mirroring">
+    The following is log of IMPORTS coming into this system.
+  </p>
+  <p *ngIf="!mirroring">
+    The following is log of EXPORTS going out of this system.
+  </p>
+  <p>Click on a row for additional details.</p>
+
+  <p class="mat-error" *ngIf="latestLog && latestLog.alerts_sent > 0">
+    WARNING:  The latest log is showing alerts.  This means that the exporter
+    may be having issues and is not removing sensitive data from the server in
+    a timely manor.  An email should have been sent to an administrator to
+    alert them of this issue.
+  </p>
+
+  <mat-table
+         class="mat-elevation-z8"
+        [dataSource]="dataTransferDataSource">
+    <!-- Export Log Fields -->
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef>Id</mat-header-cell>
+      <mat-cell *matCellDef="let log"> {{log.id}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+      <mat-cell *matCellDef="let log"> {{log.type}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="date_started">
+      <mat-header-cell *matHeaderCellDef>Date Started</mat-header-cell>
+      <mat-cell *matCellDef="let log"> {{log.date_started | date:'medium'}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="last_updated">
+      <mat-header-cell *matHeaderCellDef>Last Updated</mat-header-cell>
+      <mat-cell *matCellDef="let log"> {{log.last_updated | date:'medium'}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="total_records">
+      <mat-header-cell *matHeaderCellDef># Records</mat-header-cell>
+      <mat-cell *matCellDef="let log"> {{log.total_records}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="alerts_sent">
+      <mat-header-cell *matHeaderCellDef>alerts_sent</mat-header-cell>
+      <mat-cell *matCellDef="let log"> {{log.alerts_sent}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="columns;"></mat-header-row>
+    <mat-row class="{{getRowClass(row)}}" *matRowDef="let row; columns: columns; let index=index" (click)="selectRow(index)" #tableRow  matRipple></mat-row>
+
+  </mat-table>
+</div>
+
+<mat-paginator
+  [length]="count"
+  [pageSize]="default_page_size"
+  [pageSizeOptions]="[5, 10, 20]"
+></mat-paginator>
+
