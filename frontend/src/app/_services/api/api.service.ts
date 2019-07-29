@@ -2,11 +2,13 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable, of as observableOf, throwError} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { Category } from '../../_models/category';
 import { EmailLog } from '../../_models/email_log';
 import { Flow } from '../../_models/flow';
 import { Participant } from '../../_models/participant';
 import { Query } from '../../_models/query';
 import { Resource } from '../../_models/resource';
+import { ResourceCategory } from '../../_models/resource_category';
 import { Study } from '../../_models/study';
 import { StepLog } from '../../_models/step_log';
 import { User } from '../../_models/user';
@@ -15,6 +17,7 @@ import { environment } from '../../../environments/environment';
 import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
+import {Organization} from '../../_models/organization';
 
 @Injectable()
 export class ApiService {
@@ -173,13 +176,13 @@ export class ApiService {
 
   /** Update Study */
   updateStudy(study: Study): Observable<Study> {
-    return this.httpClient.put<Study>(`${this._endpointUrl('study')}/${study.id}`, study)
+    return this.httpClient.put<Study>(this._endpointUrl('study').replace('<id>', study.id.toString()), study)
       .pipe(catchError(this._handleError));
   }
 
   /** Delete Study */
   deleteStudy(study: Study): Observable<Study> {
-    return this.httpClient.delete<Study>(`${this._endpointUrl('study')}/${study.id}`)
+    return this.httpClient.delete<Study>(this._endpointUrl('study').replace('<id>', study.id.toString()))
       .pipe(catchError(this._handleError));
   }
 
@@ -203,13 +206,13 @@ export class ApiService {
 
   /** Update Event */
   updateEvent(event: Resource): Observable<Resource> {
-    return this.httpClient.put<Resource>(`${this._endpointUrl('event')}/${event.id}`, event)
+    return this.httpClient.put<Resource>(this._endpointUrl('event').replace('<id>', event.id.toString()), event)
       .pipe(catchError(this._handleError));
   }
 
   /** Delete Event */
   deleteEvent(event: Resource): Observable<Resource> {
-    return this.httpClient.delete<Resource>(`${this._endpointUrl('event')}/${event.id}`)
+    return this.httpClient.delete<Resource>(this._endpointUrl('event').replace('<id>', event.id.toString()))
       .pipe(catchError(this._handleError));
   }
 
@@ -233,13 +236,13 @@ export class ApiService {
 
   /** Update Location */
   updateLocation(location: Resource): Observable<Resource> {
-    return this.httpClient.put<Resource>(`${this._endpointUrl('location')}/${location.id}`, location)
+    return this.httpClient.put<Resource>(this._endpointUrl('location').replace('<id>', location.id.toString()), location)
       .pipe(catchError(this._handleError));
   }
 
   /** Delete Location */
   deleteLocation(location: Resource): Observable<Resource> {
-    return this.httpClient.delete<Resource>(`${this._endpointUrl('location')}/${location.id}`)
+    return this.httpClient.delete<Resource>(this._endpointUrl('location').replace('<id>', location.id.toString()))
       .pipe(catchError(this._handleError));
   }
 
@@ -263,13 +266,13 @@ export class ApiService {
 
   /** Update resource */
   updateResource(resource: Resource): Observable<Resource> {
-    return this.httpClient.put<Resource>(`${this._endpointUrl('resource')}/${resource.id}`, resource)
+    return this.httpClient.put<Resource>(this._endpointUrl('resource').replace('<id>', resource.id.toString()), resource)
       .pipe(catchError(this._handleError));
   }
 
   /** Delete Resource */
   deleteResource(resource: Resource): Observable<Resource> {
-    return this.httpClient.delete<Resource>(`${this._endpointUrl('resource')}/${resource.id}`)
+    return this.httpClient.delete<Resource>(this._endpointUrl('resource').replace('<id>', resource.id.toString()))
       .pipe(catchError(this._handleError));
   }
 
@@ -282,6 +285,43 @@ export class ApiService {
   /** Get Resources */
   getResources(): Observable<Resource[]> {
     return this.httpClient.get<Resource[]>(this._endpointUrl('resourcelist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getResourceCategories */
+  getResourceCategories(resource: Resource): Observable<ResourceCategory[]> {
+    const url = this._endpointUrl('categorybyresource').replace('<resource_id>', resource.id.toString());
+    return this.httpClient.get<ResourceCategory[]>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add ResourceCategory */
+  addResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
+    return this.httpClient.post<ResourceCategory>(this._endpointUrl('resourcecategorylist'), resourceCategory)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete ResourceCategory */
+  deleteResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
+    return this.httpClient.delete<ResourceCategory>(this._endpointUrl('resourcecategory').replace('<id>', resourceCategory.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getCategories */
+  getCategories(): Observable<Category[]> {
+    return this.httpClient.get<Category[]>(this._endpointUrl('categorylist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getOrganizations */
+  getOrganizations(): Observable<Organization[]> {
+    return this.httpClient.get<Organization[]>(this._endpointUrl('organizationlist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add Organization */
+  addOrganization(organization: Organization): Observable<Organization> {
+    return this.httpClient.post<Organization>(this._endpointUrl('organizationlist'), organization)
       .pipe(catchError(this._handleError));
   }
 

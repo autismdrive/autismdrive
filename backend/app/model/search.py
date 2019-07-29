@@ -54,7 +54,7 @@ class Sort:
     field = ""
     latitude = None
     longitude = None
-    order = "asc"
+    order = "desc"
     unit = "mi"
 
     def __init__(self, field, latitude, longitude, order, unit):

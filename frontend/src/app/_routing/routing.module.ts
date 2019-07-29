@@ -13,6 +13,7 @@ import { ProfileComponent } from '../profile/profile.component';
 import { QuestionnaireDataViewComponent } from '../questionnaire-data-view/questionnaire-data-view.component';
 import { RegisterComponent } from '../register/register.component';
 import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
+import { ResourceFormComponent } from '../resource-form/resource-form.component';
 import { ResourcesComponent } from '../resources/resources.component';
 import { SearchComponent } from '../search/search.component';
 import { StudiesComponent } from '../studies/studies.component';
@@ -56,6 +57,8 @@ const routes: Routes = [
   { path: 'location/:resourceId', component: ResourceDetailComponent, data: { title: 'Location Details' } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
+  { path: ':resourceType/:resourceId/edit', component: ResourceFormComponent, data: { title: 'Edit Resource' }, canActivate: [AdminGuard] },
+  { path: 'resources/add', component: ResourceFormComponent, data: { title: 'Add Resource' }, canActivate: [AdminGuard] },
   { path: 'studies', component: StudiesComponent, data: { title: 'Create a STAR Drive Account' } },
   { path: 'study/:studyId', component: StudyDetailComponent, data: { title: 'Study Details' } },
   { path: 'terms', component: TermsComponent, data: { title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true } },

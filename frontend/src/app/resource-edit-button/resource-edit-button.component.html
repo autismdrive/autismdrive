@@ -1,0 +1,11 @@
+<div *ngIf="currentUser && currentUser.role == 'admin'">
+  <button
+    mat-mini-fab
+    color="accent"
+    matTooltip="Edit Resource"
+    (click)="openEdit()"
+    aria-label="Edit Resource"
+  >
+    <mat-icon>edit</mat-icon>
+  </button>
+</div>

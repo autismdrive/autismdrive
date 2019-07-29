@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index
 from app.model.resource import Resource
+from app.model.resource_category import ResourceCategory
 from app.schema.schema import ResourceSchema
 
 
@@ -24,6 +25,7 @@ class ResourceEndpoint(flask_restful.Resource):
         if resource is not None:
             elastic_index.remove_document(resource, 'Resource')
 
+        db.session.query(ResourceCategory).filter_by(resource_id=id).delete()
         db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
         return None
