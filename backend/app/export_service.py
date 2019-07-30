@@ -31,7 +31,9 @@ class ExportService:
     def start():
         scheduler = BackgroundScheduler()
         scheduler.start()
-        scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval', minutes=5)
+        scheduler.add_job(ExportService.send_alert_if_exports_not_running,
+                          'interval',
+                          minutes=app.config['EXPORT_CHECK_INTERNAL_MINUTES'])
 
     @staticmethod
     def get_class_for_table(table):

@@ -7,6 +7,8 @@ TESTING = True
 
 MIRRORING = False
 DELETE_RECORDS = True
+EXPORT_CHECK_INTERNAL_MINUTES = 1
+IMPORT_INTERVAL_MINUTES = 1
 
 SQLALCHEMY_DATABASE_URI = "postgresql://ed_user:ed_pass@localhost/stardrive"
 

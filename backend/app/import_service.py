@@ -30,11 +30,12 @@ class ImportService:
         self.db = db
         self.email = app.config["MASTER_EMAIL"]
         self.password = app.config["MASTER_PASS"]
+        self.import_interval_minutes = app.conflig['IMPORT_INTERVAL_MINUTES']
 
     def start(self):
         scheduler = BackgroundScheduler()
         scheduler.start()
-        scheduler.add_job(self.run_backup, 'interval', minutes=5)
+        scheduler.add_job(self.run_backup, 'interval', minutes=self.import_interval_minutes)
 
     def run_backup(self, load_admin=True):
         date_started = datetime.datetime.now()
