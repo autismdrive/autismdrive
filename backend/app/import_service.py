@@ -30,7 +30,7 @@ class ImportService:
         self.db = db
         self.email = app.config["MASTER_EMAIL"]
         self.password = app.config["MASTER_PASS"]
-        self.import_interval_minutes = app.conflig['IMPORT_INTERVAL_MINUTES']
+        self.import_interval_minutes = app.config['IMPORT_INTERVAL_MINUTES']
 
     def start(self):
         scheduler = BackgroundScheduler()
