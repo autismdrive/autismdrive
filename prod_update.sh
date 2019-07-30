@@ -58,7 +58,7 @@ eval 'cd ${HOME_DIR}/frontend && npm install'
 if [ "$1" == "prod" ]; then
     eval 'cd ${HOME_DIR}/frontend && ng build --prod -c production'
 elif [ "$1" == "mirror" ]; then
-    eval 'cd ${HOME_DIR}/frontend && ng build --prod -c production'
+    eval 'cd ${HOME_DIR}/frontend && ng build -c staging'
 else
     eval 'cd ${HOME_DIR}/frontend && ng build -c ${ENV}'
 fi

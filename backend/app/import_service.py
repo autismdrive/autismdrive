@@ -179,8 +179,11 @@ class ImportService:
         schema = AdminExportSchema()
         json_response = response.json()
         for json_admin in json_response:
-            password = str.encode(json_admin.pop('_password'))
-            admin, errors = schema.load(json_admin, session=self.db.session)
-            admin._password = password
-            self.db.session.add(admin)
+            try:
+                password = str.encode(json_admin.pop('_password'))
+                admin, errors = schema.load(json_admin, session=self.db.session)
+                admin._password = password
+                self.db.session.add(admin)
+            except:
+                print("Failed to import admin user :" + json_admin['id'])
         self.db.session.commit()
