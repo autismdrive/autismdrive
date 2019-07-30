@@ -36,14 +36,14 @@ eval 'cd ${HOME_DIR}/backend && pip3 install -r requirements.txt'
 
 # Load up the staging environment
 if [ "$ENV" == "staging" ]; then
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask resourcereset'
+eval 'cd ${HOME_DIR}/backend && flask resourcereset'
 fi
 
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask db upgrade'
+eval 'cd ${HOME_DIR}/backend && flask db upgrade'
 
 # clear and rebuild the index
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
+eval 'cd ${HOME_DIR}/backend && flask clearindex'
+eval 'cd ${HOME_DIR}/backend && flask initindex'
 
 # Copy the frontend config file into the proper place.
 declare -a arr=("" ".staging" ".prod")
