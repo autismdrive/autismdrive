@@ -36,19 +36,23 @@ class ImportService:
         scheduler = BackgroundScheduler()
         scheduler.start()
         scheduler.add_job(self.run_backup, 'interval', minutes=self.import_interval_minutes)
+        scheduler.add_job(self.run_full_backup, 'interval', days=1)
 
-    def run_backup(self, load_admin=True):
+    def run_backup(self, load_admin=True, full_backup=False):
         date_started = datetime.datetime.now()
-        exportables = self.get_export_list()
+        exportables = self.get_export_list(full_backup)
         # Note:  We request data THEN create the next log.  We depend on this order to get data since
         # the last log was recorded, but besure and set the start date from the moment this was called.
-        data = self.request_data(exportables)
+        data = self.request_data(exportables, full_backup=full_backup)
         log = self.log_for_export(exportables, date_started)
         self.db.session.add(log)
         self.load_all_data(data, log)
         if load_admin:
             self.load_admin()
         self.db.session.commit()
+
+    def run_full_backup(self, load_admin=True):
+        self.run_backup(load_admin=load_admin, full_backup=True)
 
     def log_for_export(self, exportables, date_started):
         total = 0
@@ -82,26 +86,26 @@ class ImportService:
             headers = {'Authorization': 'Bearer {}'.format(self.token)}
         return headers
 
-    def get_export_list(self):
+    def get_export_list(self, full_backup=False):
 
         url = self.master_url + self.EXPORT_ENDPOINT;
         last_log = self.db.session.query(DataTransferLog).filter(DataTransferLog.type == 'import')\
             .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
-        if last_log and last_log.successful():
+        if last_log and last_log.successful() and not full_backup:
             date_string = last_log.date_started.strftime(ExportService.DATE_FORMAT)
             url += "?after=" + date_string
         response = requests.get(url, headers=self.get_headers())
         exportables = ExportInfoSchema(many=True).load(response.json()).data
         return exportables
 
-    def request_data(self, export_list):
+    def request_data(self, export_list, full_backup=False):
         for export in export_list:
             if export.size == 0:
                 continue
             last_detail_log = self.db.session.query(DataTransferLogDetail)\
                 .filter(DataTransferLogDetail.class_name == export.class_name) \
                 .order_by(desc(DataTransferLogDetail.date_started)).limit(1).first()
-            if last_detail_log:
+            if last_detail_log and not full_backup:
                 date_string = last_detail_log.date_started.strftime(ExportService.DATE_FORMAT)
                 url = export.url + "?after=" + date_string
             else:

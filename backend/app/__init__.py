@@ -156,6 +156,19 @@ def resourcereset():
     data_loader.build_index()
 
 
+@app.cli.command()
+def run_full_export():
+    """Remove all data and recreate it from the example data files"""
+    if app.config["MIRRORING"]:
+        click.echo('Exporting all data.')
+        from app.import_service import ImportService
+        importer = ImportService(app, db)
+        importer.run_full_backup()
+    else:
+        click.echo('This system is not configured to run exports. Ingoring.')
+
+
+
 from app import views
 
 # Cron scheduler
