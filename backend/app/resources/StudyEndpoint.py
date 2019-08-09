@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index
 from app.model.study import Study
-from app.resources.schema import StudySchema
+from app.schema.schema import StudySchema
 
 
 class StudyEndpoint(flask_restful.Resource):

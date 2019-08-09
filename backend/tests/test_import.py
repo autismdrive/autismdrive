@@ -7,10 +7,12 @@ from flask import json
 
 from app import app, db
 from app.import_service import ImportService
+from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
 from app.model.export_info import ExportInfo, ExportInfoSchema
-from app.model.import_log import ImportLog
+from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaireSchema
+from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaireSchema
 from app.model.user import User, Role
-from app.resources.ExportSchema import UserExportSchema, AdminExportSchema
+from app.schema.export_schema import UserExportSchema, AdminExportSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
@@ -121,12 +123,13 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("/api/export", httpretty.last_request().path)
 
     def request_user_setup(self):
-        info = [ExportInfo('star_user', 'User', size=1, url="http://na.edu/api/export/user")]
+        info = [ExportInfo('star_user', 'User', size=1, url="/api/export/user")]
         info_json = ExportInfoSchema(many=True).jsonify(info).data
 
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
-                    role=Role.user, email_verified=True)
+                    role=Role.user, email_verified=True, _password="m@kerspace")
         user_json = json.dumps(UserExportSchema(many=True).dump([user]).data)
+        admin_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
 
         httpretty.register_uri(
             httpretty.GET,
@@ -138,6 +141,12 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             httpretty.GET,
             "http://na.edu/api/export/user",
             body=user_json,
+            status=200
+        )
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://na.edu/api/export/admin",
+            body=admin_json,
             status=200
         )
 
@@ -153,24 +162,24 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
     def test_import_logs_success(self):
         data_importer = self.get_data_importer_setup_auth()
         self.request_user_setup()
-        export_list = data_importer.get_export_list()
-        data = data_importer.request_data(export_list)
-        data_importer.load_all_data(data)
+        data_importer.run_backup()
 
-        self.assertEqual("/api/export/user", httpretty.last_request().path)
-        logs = db.session.query(ImportLog).all()
+        self.assertEqual("/api/export/admin", httpretty.last_request().path)
+        logs = db.session.query(DataTransferLog).all()
         self.assertTrue(len(logs) > 0)
         log = logs[0]
         self.assertIsNotNone(log.date_started)
         self.assertIsNotNone(log.last_updated)
-        self.assertEquals("User", log.class_name)
-        self.assertTrue(log.successful)
-        self.assertEquals(1, log.success_count)
-        self.assertEquals(0, log.failure_count)
+        self.assertEquals(1, len(logs[0].details))
+        detail = logs[0].details[0]
+        self.assertEquals("User", detail.class_name)
+        self.assertTrue(detail.successful)
+        self.assertEquals(1, detail.success_count)
+        self.assertEquals(0, detail.failure_count)
 
     @httpretty.activate
     def test_import_logs_schema_error(self):
-        info = [ExportInfo('star_user', 'User', size=1, url="http://na.edu/api/export/user")]
+        info = [ExportInfo('star_user', 'User', size=1, url="/api/export/user")]
         info_json = ExportInfoSchema(many=True).jsonify(info).data
         user_json = json.dumps([{"id": "55", "pickes": "42"}])
 
@@ -187,35 +196,36 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             status=200
         )
         data_importer = self.get_data_importer_setup_auth()
+        date = datetime.datetime.now()
         export_list = data_importer.get_export_list()
+        log = data_importer.log_for_export(export_list, date)
         data = data_importer.request_data(export_list)
         try:
-            data_importer.load_all_data(data)
+            data_importer.load_all_data(data, log)
         except:
             pass  # Totally should happen.
         self.assertEqual("/api/export/user", httpretty.last_request().path)
-        logs = db.session.query(ImportLog).all()
+        logs = db.session.query(DataTransferLog).all()
         self.assertTrue(len(logs) > 0)
-        log = logs[0]
+        log = logs[-1]
         self.assertIsNotNone(log.date_started)
         self.assertIsNotNone(log.last_updated)
-        self.assertEquals("User", log.class_name)
-        self.assertFalse(log.successful)
-        self.assertEquals(0, log.success_count)
-        self.assertEquals(1, log.failure_count)
+        details = log.details
+        self.assertEquals("User", log.details[0].class_name)
+        self.assertFalse(log.details[0].successful)
+        self.assertEquals(0, log.details[0].success_count)
+        self.assertEquals(1, log.details[0].failure_count)
 
     @httpretty.activate
     def test_request_includes_date_param_if_log_exists(self):
         # log a previous success
         last_date = datetime.datetime.now() - datetime.timedelta(days=1)
-        log = ImportLog(date_started=last_date, class_name="User")
+        log = DataTransferLogDetail(date_started=last_date, class_name="User")
         db.session.add(log)
 
         data_importer = self.get_data_importer_setup_auth()
         self.request_user_setup()
-        export_list = data_importer.get_export_list()
-        data = data_importer.request_data(export_list)
-        data_importer.load_all_data(data)
+        data_importer.run_backup(load_admin=False)
 
         self.assertTrue("after" in httpretty.last_request().querystring)
 
@@ -243,3 +253,57 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
             content_type="application/json")
         self.assertEqual(200, rv.status_code)
 
+    @httpretty.activate
+    def test_import_calls_delete_on_sensitive_data(self):
+        export_list = [ExportInfo('clinical_diagnoses_questionnaire', 'ClinicalDiagnosesQuestionnaire', size=1,
+                           url="/api/export/clinical_diagnoses_questionnaire")]
+
+        q = self.construct_clinical_diagnoses_questionnaire()
+        id = q.id
+        json_q = json.dumps(ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q]).data)
+        db.session.delete(q)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://na.edu/api/export/clinical_diagnoses_questionnaire",
+            body=json_q,
+            status=200
+        )
+        expected_delete_url = "http://na.edu/api/q/clinical_diagnoses_questionnaire/" + str(id)
+        httpretty.register_uri(
+            httpretty.DELETE,
+            expected_delete_url,
+            body=json_q,
+            status=200
+        )
+        app.config['DELETE_RECORDS'] = True
+        data_importer = self.get_data_importer_setup_auth()
+        date = datetime.datetime.now()
+        data = data_importer.request_data(export_list)
+        log = data_importer.log_for_export(data, date)
+        data_importer.load_all_data(data, log)
+        self.assertEqual("/api/q/clinical_diagnoses_questionnaire/" + str(id), httpretty.last_request().path)
+        self.assertEqual("DELETE", httpretty.last_request().method)
+
+    @httpretty.activate
+    def test_import_does_not_call_delete_on_non_sensitive_data(self):
+        export_list = [ExportInfo('employment_questionnaire', 'EmploymentQuestionnaire', size=1,
+                           url="/api/export/employment_questionnaire")]
+
+        q = self.construct_employment_questionnaire()
+        id = q.id
+        json_q = json.dumps(EmploymentQuestionnaireSchema(many=True).dump([q]).data)
+        db.session.delete(q)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://na.edu/api/export/employment_questionnaire",
+            body=json_q,
+            status=200
+        )
+        data_importer = self.get_data_importer_setup_auth()
+        date = datetime.datetime.now()
+        data = data_importer.request_data(export_list)
+        log = data_importer.log_for_export(data, date)
+        data_importer.load_all_data(data, log)
+        self.assertEqual("GET", httpretty.last_request().method)  # Last call should not be a delete call.

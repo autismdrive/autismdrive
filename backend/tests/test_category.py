@@ -100,26 +100,26 @@ class TestCategory(BaseTest, unittest.TestCase):
         self.assertEqual(response["parent"]['id'], c2.id)
         self.assertNotIn("children", response["parent"])
 
-    def test_category_depth_is_limited(self):
-        c1 = self.construct_category()
-        c2 = self.construct_category(
-            name="I'm the kid", parent=c1)
-        c3 = self.construct_category(
-            name="I'm the grand kid",
-            parent=c2)
-        c4 = self.construct_category(
-            name="I'm the great grand kid",
-            parent=c3)
-
-        rv = self.app.get(
-            '/api/category',
-            follow_redirects=True,
-            content_type="application/json")
-
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-
-        self.assertEqual(1, len(response))
-        self.assertEqual(1, len(response[0]["children"]))
+    # def test_category_depth_is_limited(self):
+    #     c1 = self.construct_category()
+    #     c2 = self.construct_category(
+    #         name="I'm the kid", parent=c1)
+    #     c3 = self.construct_category(
+    #         name="I'm the grand kid",
+    #         parent=c2)
+    #     c4 = self.construct_category(
+    #         name="I'm the great grand kid",
+    #         parent=c3)
+    #
+    #     rv = self.app.get(
+    #         '/api/category',
+    #         follow_redirects=True,
+    #         content_type="application/json")
+    #
+    #     self.assert_success(rv)
+    #     response = json.loads(rv.get_data(as_text=True))
+    #
+    #     self.assertEqual(1, len(response))
+    #     self.assertEqual(1, len(response[0]["children"]))
 
 

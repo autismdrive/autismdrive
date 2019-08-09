@@ -3,6 +3,8 @@ import unittest
 import os
 
 from app.import_service import ImportService
+from app.model.data_transfer_log import DataTransferLog
+from app.model.export_info import ExportInfoSchema
 
 os.environ["TESTING"] = "true"
 
@@ -12,12 +14,11 @@ from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, app
 from app.email_service import TEST_MESSAGES
 from app.export_service import ExportService
-from app.model.export_log import ExportLog
 from app.model.participant import Relationship, Participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
 
 from app.model.user import Role, User
-from app.resources.schema import UserSchema, ParticipantSchema
+from app.schema.schema import UserSchema, ParticipantSchema
 from tests.base_test import clean_db
 
 
@@ -42,7 +43,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Category', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Participant', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'User', response))))
-        self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'EvaluationHistorySelfQuestionnaire', response))))
+        self.assertEqual(1, len(
+            list(filter(lambda field: field['class_name'] == 'EvaluationHistorySelfQuestionnaire', response))))
         self.assertEqual(1, len(list(filter(lambda field: field['class_name'] == 'Category', response))))
 
     def test_get_list_of_exportables_has_basic_attributes(self):
@@ -97,10 +99,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(u.id, response[0]["user_id"])
 
     def get_export(self):
-        """Grabs everything form the export, clears everything from the database, and imports
-        all the information again, running it all through the API endpoints so it is fully serilaized """
+        """Grabs everything exportable via the API, and returns it fully serialized ss json"""
         all_data = {}
-        exports = ExportService.get_export_info()
+
+        rv = self.app.get('/api/export', headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        exports = ExportInfoSchema(many=True).load(response).data
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -108,11 +112,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         return all_data
 
     def load_database(self, all_data):
-        exports = ExportService.get_export_info()
+        rv = self.app.get('/api/export', headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        exports = ExportInfoSchema(many=True).load(response).data
         importer = ImportService(app, db)
+        log = importer.log_for_export(exports, datetime.datetime.now())
         for export in exports:
             export.json_data = all_data[export.class_name]
-            importer.load_data(export)
+            importer.load_data(export,log)
 
     def test_insert_user_with_participant(self):
         u = self.construct_user()
@@ -188,7 +195,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_all_sensitive_exports_have_links_to_self(self):
         self.construct_everything()
-        exports = ExportService.get_export_info()
+        exports = ExportService.get_table_info()
         for export in exports:
             if export.question_type != ExportService.TYPE_SENSITIVE:
                 continue
@@ -202,7 +209,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
-        exports = ExportService.get_export_info()
+        exports = ExportService.get_table_info()
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -214,10 +221,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-#        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        #        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
 
-        date = datetime.datetime.now()
-        exports = ExportService.get_export_info()
+        date = datetime.datetime.utcnow()
+        exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         for export in exports:
             rv = self.app.get(export.url + params, follow_redirects=True, content_type="application/json",
@@ -227,13 +234,18 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        date = datetime.datetime.now()
-        exports = ExportService.get_export_info()
-        for export in exports:
-            self.assertTrue(export.size > 0, msg=export.class_name + " should have a count > 0")
-        exports = ExportService.get_export_info(date)
-        for export in exports:
-            self.assertEqual(0, export.size)
+        date = datetime.datetime.utcnow()
+        params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
+
+        rv = self.app.get('/api/export', headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        for export in response:
+            self.assertTrue(export['size'] > 0, msg=export['class_name'] + " should have a count > 0")
+
+        rv = self.app.get('/api/export' + params, headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        for export in response:
+            self.assertTrue(export['size'] == 0, msg=export['class_name'] + " should have a count of 0")
 
     def test_it_all_crazy_madness_wohoo(self):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.
@@ -265,17 +277,23 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                           content_type="application/json",
                           headers=self.logged_in_headers())
         self.assert_success(rv)
-        export_logs = db.session.query(ExportLog).all()
+        export_logs = db.session.query(DataTransferLog).filter(DataTransferLog.type == "export").all()
         self.assertEqual(1, len(export_logs))
         self.assertIsNotNone(export_logs[0].last_updated)
-        self.assertTrue(export_logs[0].available_records > 0, msg="The act of setting up this test harness should mean "
+        self.assertTrue(export_logs[0].total_records > 0, msg="The act of setting up this test harness should mean "
                                                                   "at least one user record is avialable for export")
+        self.assertEquals(1, len(export_logs[0].details))
+        detail = export_logs[0].details[0]
+        self.assertEquals("User", detail.class_name)
+        self.assertEquals(True, detail.successful)
+        self.assertEquals(1, detail.success_count)
 
     def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
 
         message_count = len(TEST_MESSAGES)
 
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=28), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=28), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -285,7 +303,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=45), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=45), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
 
@@ -296,14 +315,15 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
-        self.assertEqual(message_count+1, len(TEST_MESSAGES), msg="No more messages should be sent.")
+        self.assertEqual(message_count + 1, len(TEST_MESSAGES), msg="No more messages should be sent.")
         self.assertEqual("admin@tester.com", TEST_MESSAGES[-1]['To'])
 
     def test_exporter_sends_second_email_after_2_hours(self):
 
         message_count = len(TEST_MESSAGES)
 
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=30), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=30), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -321,7 +341,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_sends_12_emails_over_first_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=22), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=22),
+                              total_records=2, type="export")
         db.session.add(log)
         db.session.commit()
         for i in range(20):
@@ -330,7 +351,8 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=2), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=2), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         for i in range(20):
@@ -339,9 +361,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = ExportLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=24), available_records=2)
+        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=24), total_records=2,
+                              type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
         self.assertTrue("pi@tester.com" in TEST_MESSAGES[-1]['To'])
-

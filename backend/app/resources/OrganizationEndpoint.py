@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db
 from app.model.organization import Organization
-from app.resources.schema import OrganizationSchema
+from app.schema.schema import OrganizationSchema
 
 
 class OrganizationEndpoint(flask_restful.Resource):
@@ -40,7 +40,7 @@ class OrganizationListEndpoint(flask_restful.Resource):
     organizationSchema = OrganizationSchema()
 
     def get(self):
-        organizations = db.session.query(Organization).all()
+        organizations = db.session.query(Organization).order_by(Organization.name).all()
         return self.organizationsSchema.dump(organizations)
 
     def post(self):

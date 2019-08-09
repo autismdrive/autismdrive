@@ -13,6 +13,7 @@ import { ProfileComponent } from '../profile/profile.component';
 import { QuestionnaireDataViewComponent } from '../questionnaire-data-view/questionnaire-data-view.component';
 import { RegisterComponent } from '../register/register.component';
 import { ResourceDetailComponent } from '../resource-detail/resource-detail.component';
+import { ResourceFormComponent } from '../resource-form/resource-form.component';
 import { ResourcesComponent } from '../resources/resources.component';
 import { SearchComponent } from '../search/search.component';
 import { StudiesComponent } from '../studies/studies.component';
@@ -23,6 +24,9 @@ import { UserAdminDetailsComponent } from '../user-admin-details/user-admin-deta
 import { TimedoutComponent } from '../timed-out/timed-out.component';
 import { AdminGuard } from './admin-guard';
 import { AuthGuard } from './auth-guard';
+import {MirrorComponent} from '../mirror/mirror.component';
+import {NotMirroredGuard} from './not-mirrored-guard';
+import {AdminExportComponent} from '../admin-export/admin-export.component';
 
 export function searchFilterMatcher(url: UrlSegment[]) {
   if (
@@ -36,23 +40,25 @@ export function searchFilterMatcher(url: UrlSegment[]) {
 }
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent, data: { title: 'Welcome STAR Drive' } },
-  { path: 'enroll', component: EnrollComponent, data: { title: 'Enroll in a STAR Drive Study' } },
+  { path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]  },
+  { path: 'home', component: HomeComponent, data: { title: 'Welcome STAR Drive' } , canActivate: [NotMirroredGuard]  },
+  { path: 'enroll', component: EnrollComponent, data: { title: 'Enroll in a STAR Drive Study' } , canActivate: [NotMirroredGuard]  },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Log in to STAR Drive', hideHeader: true } },
   { path: 'login', component: LoginComponent, data: { title: 'Log in to STAR Drive', hideHeader: true } },
   {
     path: 'reset_password/:email_token', component: PasswordResetComponent,
     data: { title: 'Reset your STAR Drive password', hideHeader: true }
   },
-  { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
-  { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard] },
-  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard, NotMirroredGuard] },
+  { path: 'flow/complete', component: FlowCompleteComponent, data: { title: 'Enrollment application complete' }, canActivate: [AuthGuard, NotMirroredGuard] },
+  { path: 'flow/:flowName/:participantId', component: FlowComponent, data: { title: 'Your STAR Drive Account' }, canActivate: [AuthGuard, NotMirroredGuard] },
   { path: 'register', component: RegisterComponent, data: { title: 'Create a STAR Drive Account', hideHeader: true } },
   { path: 'event/:resourceId', component: ResourceDetailComponent, data: { title: 'Event Details' } },
   { path: 'location/:resourceId', component: ResourceDetailComponent, data: { title: 'Location Details' } },
   { path: 'resources', component: ResourcesComponent, data: { title: 'View STAR Drive Trainings & Resources' } },
   { path: 'resource/:resourceId', component: ResourceDetailComponent, data: { title: 'Resource Details' } },
+  { path: ':resourceType/:resourceId/edit', component: ResourceFormComponent, data: { title: 'Edit Resource' }, canActivate: [AdminGuard] },
+  { path: 'resources/add', component: ResourceFormComponent, data: { title: 'Add Resource' }, canActivate: [AdminGuard] },
   { path: 'studies', component: StudiesComponent, data: { title: 'Create a STAR Drive Account' } },
   { path: 'study/:studyId', component: StudyDetailComponent, data: { title: 'Study Details' } },
   { path: 'terms', component: TermsComponent, data: { title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true } },
@@ -65,6 +71,8 @@ const routes: Routes = [
   { path: 'admin/data', component: QuestionnaireDataViewComponent, data: { title: 'Data Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user', component: UserAdminComponent, data: { title: 'User Admin' }, canActivate: [AdminGuard] },
   { path: 'admin/user/:userId', component: UserAdminDetailsComponent, data: { title: 'User Admin Details' }, canActivate: [AdminGuard] },
+  { path: 'admin/export', component: AdminExportComponent, data: { title: 'Export/Import Status' }, canActivate: [AdminGuard] },
+  { path: 'mirrored', component: MirrorComponent, data: { title: 'Mirrored Server Details' }},
 ];
 
 @NgModule({

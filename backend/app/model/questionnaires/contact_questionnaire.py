@@ -2,8 +2,9 @@ import datetime
 
 from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
+from sqlalchemy import func
 
-from app import db
+from app import db, ma
 from app.export_service import ExportService
 
 
@@ -14,7 +15,7 @@ class ContactQuestionnaire(db.Model):
     __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
     participant_id = db.Column(
@@ -213,3 +214,6 @@ class ContactQuestionnaireSchema(ModelSchema):
         model = ContactQuestionnaire
         ordered = True
         include_fk = True
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.questionnaireendpoint', name="contact_questionnaire", id='<id>')
+    })

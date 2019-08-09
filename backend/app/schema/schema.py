@@ -231,7 +231,7 @@ class CategoryResourcesSchema(ModelSchema):
 class ResourceCategorySchema(ModelSchema):
     class Meta:
         model = ResourceCategory
-        fields = ('id', '_links', 'resource_id', 'category_id')
+        fields = ('id', '_links', 'resource_id', 'category_id', 'type')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourcecategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),

@@ -11,12 +11,12 @@ cp /home/ubuntu/star_config.py ./backend/instance/config.py
 
 if [ "$1" == "prod" ]; then
     echo "Building for production."
-elif [ "$1" == "private" ]; then
-    echo "Building for private staging server."
+elif [ "$1" == "mirror" ]; then
+    echo "Building for mirroring server."
 elif [ "$1" == "staging" ]; then
     echo "Building for staging."
 else
-    echo "Please specify environment (prod/private/staging)"
+    echo "Please specify environment (prod/mirror/staging)"
     exit
 fi
 
@@ -36,15 +36,14 @@ eval 'cd ${HOME_DIR}/backend && pip3 install -r requirements.txt'
 
 # Load up the staging environment
 if [ "$ENV" == "staging" ]; then
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask resourcereset'
+eval 'cd ${HOME_DIR}/backend && flask resourcereset'
 fi
 
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask db upgrade'
-
+eval 'cd ${HOME_DIR}/backend && flask db upgrade'
 
 # clear and rebuild the index
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask clearindex'
-eval 'cd ${HOME_DIR}/backend && /home/ubuntu/.local/bin/flask initindex'
+eval 'cd ${HOME_DIR}/backend && flask clearindex'
+eval 'cd ${HOME_DIR}/backend && flask initindex'
 
 # Copy the frontend config file into the proper place.
 declare -a arr=("" ".staging" ".prod")
@@ -58,10 +57,11 @@ eval 'cd ${HOME_DIR}/frontend && npm install'
 
 if [ "$1" == "prod" ]; then
     eval 'cd ${HOME_DIR}/frontend && ng build --prod -c production'
+elif [ "$1" == "mirror" ]; then
+    eval 'cd ${HOME_DIR}/frontend && ng build -c staging'
 else
     eval 'cd ${HOME_DIR}/frontend && ng build -c ${ENV}'
 fi
 # Reload apache
 echo "Reloading Apache"
 sudo service apache2 reload
-

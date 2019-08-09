@@ -24,4 +24,11 @@ export class AdminHomeComponent implements OnInit {
     $event.preventDefault();
     this.router.navigate(['admin/user']);
   }
+
+  goExportAdmin($event) {
+    $event.preventDefault();
+    this.router.navigate(['admin/export']);
+  }
+
+
 }

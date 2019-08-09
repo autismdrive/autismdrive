@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { ApiService } from '../_services/api/api.service';
 import { snakeToUpperCase } from '../../util/snakeToUpper';
+import {TableInfo} from '../_models/table_info';
 
 @Component({
   selector: 'app-questionnaire-data-view',
@@ -9,8 +10,8 @@ import { snakeToUpperCase } from '../../util/snakeToUpper';
   styleUrls: ['./questionnaire-data-view.component.scss']
 })
 export class QuestionnaireDataViewComponent implements OnInit {
-  questionnaire_names: any;
-  currentQuestionnaire: string;
+  questionnaire_info: TableInfo[];
+  currentQuestionnaire: TableInfo;
 
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
@@ -28,15 +29,15 @@ export class QuestionnaireDataViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.api.getQuestionnaireNames().subscribe(
-      file_names => {
-        this.questionnaire_names = file_names;
+    this.api.getQuestionnaireInfoList().subscribe(
+      info => {
+        this.questionnaire_info = info;
       }
     );
   }
 
-  selectQuestionnaire(qn: string) {
-    this.currentQuestionnaire = qn;
+  selectQuestionnaire(info: TableInfo) {
+    this.currentQuestionnaire = info;
     this.sidebarOpen = false;
     return this.currentQuestionnaire;
   }

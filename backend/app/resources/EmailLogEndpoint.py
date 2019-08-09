@@ -2,7 +2,7 @@ from app.model.email_log import EmailLogSchema
 import flask_restful
 from app import db, auth
 from app.model.email_log import EmailLog
-from app.resources.schema import EmailLogSchema
+from app.schema.schema import EmailLogSchema
 from app.model.user import Role
 from app.wrappers import requires_roles
 

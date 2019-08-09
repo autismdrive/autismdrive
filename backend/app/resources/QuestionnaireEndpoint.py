@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app import app, db, RestException, auth
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
+from app.model.export_info import ExportInfoSchema
 from app.model.user import Role
 from app.wrappers import requires_roles
 
@@ -74,7 +75,7 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
 
 
 class QuestionnaireListMetaEndpoint(flask_restful.Resource):
-
+    # Used for data export to get meta without specifying flow and relationship
     def get(self, name):
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
@@ -105,19 +106,25 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
         return meta
 
 
-class QuestionnaireNamesEndpoint(flask_restful.Resource):
+class QuestionnaireInfoEndpoint(flask_restful.Resource):
 
     def get(self):
-        all_file_names = os.listdir(os.path.dirname(app.instance_path) + '/app/model/questionnaires')
-        non_questionnaires = ['mixin', '__']
-        questionnaire_file_names = []
-        for index, file_name in enumerate(all_file_names):
-            if any(string in file_name for string in non_questionnaires):
-                pass
-            else:
-                f = file_name.replace(".py", "")
-                questionnaire_file_names.append(f)
-        return sorted(questionnaire_file_names)
+
+        info_list = ExportService.get_table_info()
+        info_list = [item for item in info_list if item.question_type]
+        info_list = sorted(info_list, key=lambda item: item.table_name)
+        return ExportInfoSchema(many=True).dump(info_list)
+
+        # all_file_names = os.listdir(os.path.dirname(app.instance_path) + '/app/model/questionnaires')
+        # non_questionnaires = ['mixin', '__']
+        # questionnaire_file_names = []
+        # for index, file_name in enumerate(all_file_names):
+        #     if any(string in file_name for string in non_questionnaires):
+        #         pass
+        #     else:
+        #         f = file_name.replace(".py", "")
+        #         questionnaire_file_names.append(f)
+        # return sorted(questionnaire_file_names)
 
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):

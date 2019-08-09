@@ -8,9 +8,9 @@ from sqlalchemy import func
 from app import app, RestException, db, auth, email_service
 from app.model.email_log import EmailLog
 from app.model.user import User
-from flask import jsonify, g, request, Blueprint
+from flask import g, request, Blueprint
 
-from app.resources.schema import UserSchema
+from app.schema.schema import UserSchema
 
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/api')
 

@@ -8,6 +8,7 @@ import { Injectable, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule } from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -40,10 +41,11 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
 import { environment } from 'src/environments/environment';
+import { AutocompleteSectionComponent } from './_forms/autocomplete-section/autocomplete-section.component';
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
-import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage } from './_forms/validators/formly.validator';
+import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage, UrlValidator, UrlValidatorMessage } from './_forms/validators/formly.validator';
 import { ErrorInterceptor } from './_routing/error-interceptor';
 import { JwtInterceptor } from './_routing/jwt-interceptor';
 import { RoutingModule } from './_routing/routing.module';
@@ -78,7 +80,10 @@ import { QuestionnaireDataViewComponent } from './questionnaire-data-view/questi
 import { QuestionnaireStepComponent } from './questionnaire-step/questionnaire-step.component';
 import { QuestionnaireStepsListComponent } from './questionnaire-steps-list/questionnaire-steps-list.component';
 import { RegisterComponent } from './register/register.component';
+import { ResourceAddButtonComponent } from './resource-add-button/resource-add-button.component';
 import { ResourceDetailComponent } from './resource-detail/resource-detail.component';
+import { ResourceEditButtonComponent } from './resource-edit-button/resource-edit-button.component';
+import { ResourceFormComponent } from './resource-form/resource-form.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { SearchBoxComponent } from './search-box/search-box.component';
 import { SearchResultComponent } from './search-result/search-result.component';
@@ -90,20 +95,31 @@ import { TimedoutComponent } from './timed-out/timed-out.component';
 import { TypeIconComponent } from './type-icon/type-icon.component';
 import { UserAdminDetailsComponent } from './user-admin-details/user-admin-details.component';
 import { UserAdminComponent } from './user-admin/user-admin.component';
+import { FooterComponent } from './footer/footer.component';
+import { MirrorComponent } from './mirror/mirror.component';
+import { AdminExportComponent } from './admin-export/admin-export.component';
+import { AdminExportDetailsComponent } from './admin-export-details/admin-export-details.component';
 
 @Injectable()
 export class FormlyConfig {
   public static config = {
     types: [
       { name: 'repeat', component: RepeatSectionComponent },
+      {
+        name: 'autocomplete',
+        component: AutocompleteSectionComponent,
+        wrappers: ['form-field'],
+      }
     ],
     validators: [
       { name: 'phone', validation: PhoneValidator },
       { name: 'email', validation: EmailValidator },
+      { name: 'url', validation: UrlValidator },
     ],
     validationMessages: [
       { name: 'phone', message: PhoneValidatorMessage },
       { name: 'email', message: EmailValidatorMessage },
+      { name: 'url', message: UrlValidatorMessage },
       { name: 'required', message: 'This field is required.' },
     ],
     wrappers: [
@@ -118,6 +134,7 @@ export class FormlyConfig {
     AccordionComponent,
     AdminHomeComponent,
     AppComponent,
+    AutocompleteSectionComponent,
     AvatarDialogComponent,
     AvatarDialogComponent,
     CardWrapperComponent,
@@ -151,7 +168,10 @@ export class FormlyConfig {
     QuestionnaireStepsListComponent,
     RegisterComponent,
     RepeatSectionComponent,
+    ResourceAddButtonComponent,
     ResourceDetailComponent,
+    ResourceEditButtonComponent,
+    ResourceFormComponent,
     ResourcesComponent,
     SearchBoxComponent,
     SearchComponent,
@@ -164,6 +184,10 @@ export class FormlyConfig {
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
+    FooterComponent,
+    MirrorComponent,
+    AdminExportComponent,
+    AdminExportDetailsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),
@@ -179,6 +203,7 @@ export class FormlyConfig {
     FormsModule,
     HttpClientModule,
     MarkdownModule.forRoot(),
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -216,7 +241,7 @@ export class FormlyConfig {
     SearchService,
   ],
   bootstrap: [AppComponent],
-  entryComponents: [AvatarDialogComponent]
+  entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent]
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {

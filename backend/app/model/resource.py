@@ -1,6 +1,7 @@
 import datetime
 
 from dateutil.tz import tzutc
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 
 from app import db
@@ -13,7 +14,7 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String)
     title = db.Column(db.String)
-    last_updated = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now(tz=tzutc()))
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     description = db.Column(db.String)
     organization_id = db.Column('organization_id', db.Integer,
                                db.ForeignKey('organization.id'))

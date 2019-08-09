@@ -25,8 +25,8 @@ if "TESTING" in os.environ and os.environ["TESTING"] == "true":
     app.config.from_object('config.testing')
     app.config.from_pyfile('testing.py')
 
-if "SLAVE" in os.environ and os.environ["SLAVE"] == "true":
-    app.config.from_object('config.slave')
+if "MIRRORING" in os.environ and os.environ["MIRRORING"] == "true":
+    app.config.from_object('config.mirror')
 
 
 # Database Configuration
@@ -156,10 +156,26 @@ def resourcereset():
     data_loader.build_index()
 
 
+@app.cli.command()
+def run_full_export():
+    """Remove all data and recreate it from the example data files"""
+    if app.config["MIRRORING"]:
+        click.echo('Exporting all data.')
+        from app.import_service import ImportService
+        importer = ImportService(app, db)
+        importer.run_full_backup()
+    else:
+        click.echo('This system is not configured to run exports. Ingoring.')
+
+
+
 from app import views
 
 # Cron scheduler
-if app.config["SLAVE"]:
+if app.config["MIRRORING"]:
     from app.import_service import ImportService
     importer = ImportService(app, db)
     importer.start()
+else:
+    from app.export_service import ExportService
+    ExportService.start()

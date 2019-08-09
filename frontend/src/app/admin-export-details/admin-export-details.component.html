@@ -1,0 +1,40 @@
+
+<div class="details">
+
+  <h2>Details:</h2>
+
+
+  <mat-table [dataSource]="exportDetails" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="class_name">
+      <mat-header-cell *matHeaderCellDef style="flex: 2"> Table Name </mat-header-cell>
+      <mat-cell style="flex: 2" *matCellDef="let element"> {{element.class_name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="successful">
+      <mat-header-cell *matHeaderCellDef> Successful </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.successful}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="success_count">
+      <mat-header-cell *matHeaderCellDef> Records Processed </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.success_count}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="failure_count">
+      <mat-header-cell *matHeaderCellDef> Failures </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.failure_count}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="errors">
+      <mat-header-cell *matHeaderCellDef> Error Messages</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.errors}} </mat-cell>
+    </ng-container>
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+
+</div>
