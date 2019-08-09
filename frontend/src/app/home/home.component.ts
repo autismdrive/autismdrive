@@ -11,11 +11,11 @@ import { HitLabel } from '../_models/query';
 export class HomeComponent implements OnInit {
   heroSlides: NewsItem[] = [
     {
-      title: 'Driving discovery',
-      description: 'Current studies in autism research',
+      title: 'Transform outcomes. Together.',
+      description: '',
       url: '/studies',
       type: HitLabel.STUDY,
-      img: '/assets/home/hero-research.jpg',
+      img: '/assets/home/hero-family.jpg',
       imgClass: 'center-center'
     },
     {
