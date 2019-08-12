@@ -1,4 +1,49 @@
-.footer {
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
+footer {
   margin: 50px 10px 10px 10px;
   text-align: center;
+  position: relative;
+
+  &:before {
+    @include border-dots;
+    content: '';
+    top: -2em;
+  }
+}
+
+.footer-logo {
+  min-height: 6rem;
+  max-height: 10rem;
+}
+
+.footer-contact {}
+
+
+.footer-contact {
+  margin: 0 auto 1.25rem;
+  max-width: 15.625rem;
+
+  .address, .tel, .email {
+      color: #4e4e4e;
+      line-height: 1.5;
+      font-style: italic;
+      display: inline;
+  }
+
+  .address:after, .tel:after {
+      content: '|';
+      display: inline-block;
+      margin: 0 0.325em 0 0.5em
+  }
+
+  @media screen and (min-width: 45em) {
+    max-width:none;
+    margin:0 auto .625rem;
+  }
 }
