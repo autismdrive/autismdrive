@@ -1,6 +1,6 @@
 <div
   id="hero"
-  class="gradient-overlay container"
+  class="gradient-overlay container with-escaping-tiles"
 >
   <div class="hero-content">
     <h1>Transform Autism Outcomes. Together.</h1>
@@ -13,7 +13,7 @@
   </div>
 
   <div
-    class="row"
+    class="row escaping-tiles"
     fxLayout.lt-sm="column"
     fxLayout.gt-xs="row wrap"
     fxLayoutGap="40px"
@@ -49,7 +49,7 @@
 </div>
 <div class="container mat-typography">
   <div
-    class="row action"
+    class="row"
     fxLayout="column"
     fxLayoutAlign="center center"
   >
@@ -67,13 +67,13 @@
   </header>
 </div>
 
-<div class="container mat-typography">
+<div class="container mat-typography" *ngIf="currentStudies">
   <div
     class="row news"
     fxLayout="column"
   >
     <app-news-item
-      *ngFor="let item of newsItems; let i = index"
+      *ngFor="let item of studiesToNewsItems(currentStudies); let i = index"
       [item]="item"
       [index]="i"
     ></app-news-item>

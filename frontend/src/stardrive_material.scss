@@ -372,6 +372,19 @@ $header-height: ($uva-header-height + $site-header-height);
   }
 }
 
+#hero.with-escaping-tiles {
+  margin-bottom: 12rem;
+}
+
+#hero .escaping-tiles {
+  margin-bottom: -12rem;
+
+  .border-box-tile .border-box-tile-inner {
+    &:before { opacity: 0; }
+    &:after { opacity: 1; }
+  }
+}
+
 #hero .border-box-tile {
     .border-box-tile-label {
       @include mat-typography-level-to-styles($custom-typography, display-1);
