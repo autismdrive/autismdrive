@@ -72,14 +72,14 @@ export enum Direction {
       ),
       state(
         VisibilityState.Visible,
-        style({ top: '88px' })
+        style({ top: '40px' })
       ),
       transition('* => *', animate('500ms ease-in'))
     ]),
     trigger('toggleBackground', [
       state(
         VisibilityState.Hidden,
-        style({ top: '-88px' })
+        style({ top: '-40px' })
       ),
       state(
         VisibilityState.Visible,
