@@ -27,18 +27,24 @@
       .mat-form-field-label {
         color: white;
       }
+
+      .mat-icon {
+        margin-top: 6px;
+        margin-bottom: -6px;
+      }
+
+      .mat-form-field-wrapper {
+        padding: 10px 0px 0px 0px;
+      }
+
+      .mat-form-field-infix {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-top-width: 0px;
+      }
     }
   }
 
-  .mat-form-field-wrapper {
-    padding: 6px 0px 0px 0px;
-  }
-
-  .mat-form-field-infix {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    border-top-width: 0px;
-  }
 }
 
 

@@ -37,17 +37,19 @@ export class HomeComponent implements OnInit {
   }
 
   studiesToNewsItems(studies: Study[]): NewsItem[] {
-    return studies.map(s => {
-      const n: NewsItem = {
-        title: s.title,
-        description: s.description,
-        url: `/study/${s.id}`,
-        type: HitLabel.STUDY,
-        img: '/assets/home/news0.jpg',
-        imgClass: 'center-center',
-      };
+    return studies
+      .sort((a, b) => (a.id > b.id) ? 1 : -1)
+      .map((s, i) => {
+        const n: NewsItem = {
+          title: s.title,
+          description: s.description,
+          url: `/study/${s.id}`,
+          type: HitLabel.STUDY,
+          img: `/assets/home/study${i}.jpg`,
+          imgClass: 'center-center',
+        };
 
-      return n;
-    });
+        return n;
+      });
   }
 }

@@ -12,6 +12,11 @@
       [(ngModel)]="words"
     >
     <mat-icon
+      *ngIf="!hasWords()"
+      matSuffix
+      (click)="updateSearch(true)"
+    >search</mat-icon>
+    <mat-icon
       [ngClass]="{'ghost': !hasWords()}"
       matSuffix
       (click)="updateSearch(true)"
