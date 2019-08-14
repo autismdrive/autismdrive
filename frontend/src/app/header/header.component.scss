@@ -34,10 +34,20 @@
 #header-bg {
   background-color: mat-color($stardrive-primary, 500);
   position: fixed;
-  top: ($header-height * -1);
   width: 100%;
-  height: $header-height;
   z-index: 98;
+
+  // MD
+  @media (min-width: 768px) {
+    top: (($site-header-height + $search-bar-height-md) * -1);
+    height: ($site-header-height + $search-bar-height-md);
+  }
+
+  // XL
+  @media (min-width: 1280px) {
+    top: (($site-header-height + $search-bar-height-lg) * -1);
+    height: ($site-header-height + $search-bar-height-lg);
+  }
 }
 
 #uva-header {
@@ -74,8 +84,35 @@
   mat-toolbar-row.search {
     background-color: mat-color($stardrive-primary, 500);
     color: white;
+    display: grid;
+
+    // MD
+    @media (min-width: 768px) {
+      grid-template-rows: 1fr 1fr;
+      align-content: center;
+      height: $search-bar-height-md;
+    }
+
+    // XL
+    @media (min-width: 1280px) {
+      grid-template-columns: 1fr 1fr;
+      height: $search-bar-height-lg;
+    }
+
     p {
-      margin: 4px 20px 4px 0px;
+
+      // MD
+      @media (min-width: 768px) {
+        justify-self: center;
+        margin-top: 16px;
+        margin-bottom: 0px;
+      }
+
+      // XL
+      @media (min-width: 1280px) {
+        margin: 4px 20px 4px 0px;
+        justify-self: start;
+      }
     }
   }
 

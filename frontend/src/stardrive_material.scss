@@ -81,8 +81,11 @@ $stardrive-theme: mat-light-theme($stardrive-primary, $stardrive-accent, $stardr
 $easeDuration: 300ms;
 $animationDuration: 500ms;
 $uva-header-height: 40px;
-$site-header-height: 128px;
-$header-height: ($uva-header-height + $site-header-height);
+$site-header-height: 64px;
+$search-bar-height-md: 128px;
+$search-bar-height-lg: 64px;
+$header-height-md: ($uva-header-height + $site-header-height + $search-bar-height-md);
+$header-height-lg: ($uva-header-height + $site-header-height + $search-bar-height-lg);
 
 @include angular-material-theme($stardrive-theme);
 
@@ -91,7 +94,15 @@ $header-height: ($uva-header-height + $site-header-height);
   $accent: map-get($theme, accent); // Global style overrides
 
   body {
-    padding-top: $header-height;
+    // MD
+    @media (min-width: 768px) {
+      padding-top: $header-height-md;
+    }
+
+    // XL
+    @media (min-width: 1280px) {
+      padding-top: $header-height-lg;
+    }
   }
 
   .container {

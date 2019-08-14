@@ -1,5 +1,6 @@
 .search-bar {
   display: inline-flex;
+  width: 100%;
 
   &.hidden {
     display: block;
@@ -16,7 +17,7 @@
     }
 
     mat-form-field {
-      width: 320px;
+      min-width: 320px;
 
       ::placeholder {
         color: rgba(255,255,255,0.7);

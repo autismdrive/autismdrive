@@ -50,7 +50,7 @@ export enum Direction {
       ),
       state(
         VisibilityState.Visible,
-        style({ top: '152px' })
+        style({ top: '128px' })
       ),
       transition('* => *', animate('500ms ease-in'))
     ]),
@@ -68,11 +68,11 @@ export enum Direction {
     trigger('toggleDock', [
       state(
         VisibilityState.Hidden,
-        style({ top: '0px' })
+        style({ top: '64px' })
       ),
       state(
         VisibilityState.Visible,
-        style({ top: '40px' })
+        style({ top: '104px' })
       ),
       transition('* => *', animate('500ms ease-in'))
     ]),
@@ -110,7 +110,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     private authenticationService: AuthenticationService,
     private router: Router,
     private api: ApiService,
-    media: MediaMatcher,
+    media: MediaMatcher
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
