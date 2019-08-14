@@ -62,7 +62,7 @@ export class ResourceDetailComponent implements OnInit {
   goWebsite($event: MouseEvent) {
     $event.preventDefault();
     if (this.resource && this.resource.website) {
-      location.href = this.resource.website;
+      window.open(this.resource.website, '_blank')
     }
   }
 
