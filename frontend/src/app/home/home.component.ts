@@ -41,11 +41,11 @@ export class HomeComponent implements OnInit {
       .sort((a, b) => (a.id > b.id) ? 1 : -1)
       .map((s, i) => {
         const n: NewsItem = {
-          title: s.title,
-          description: s.description,
+          title: s.short_title || s.title,
+          description: s.short_description || s.description,
           url: `/study/${s.id}`,
           type: HitLabel.STUDY,
-          img: `/assets/home/study${i}.jpg`,
+          img: s.image_url,
           imgClass: 'center-center',
         };
 

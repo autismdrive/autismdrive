@@ -11,7 +11,9 @@ export enum StudyStatus {
 export interface Study {
   id: number;
   title: string;
+  short_title?: string;
   description: string;
+  short_description?: string;
   participant_description: string;
   benefit_description: string;
   investigators: string[];
@@ -21,4 +23,5 @@ export interface Study {
   status: string;
   study_categories?: StudyCategory[];
   study_investigators?: StudyInvestigator[];
+  image_url?: string;
 }

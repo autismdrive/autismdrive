@@ -344,15 +344,6 @@ $header-height: ($uva-header-height + $site-header-height);
 
     }
 
-    .icofont-1x, .icofont-2x {
-      color: #e57200;
-      transition: margin-left 0.5s;
-    }
-
-    &:hover .icofont-1x, &:hover .icofont-2x {
-      margin-left: 10px;
-    }
-
     .border-box-tile-label {
       @include mat-typography-level-to-styles($custom-typography, title);
       margin-top: 1em;
@@ -368,8 +359,29 @@ $header-height: ($uva-header-height + $site-header-height);
       margin-top: 1em;
       margin-bottom: 1em;
     }
-
   }
+}
+
+.border-box-tile, a.details-link {
+ .icofont-1x, .icofont-2x {
+    color: #e57200;
+    transition: margin-left 0.5s;
+  }
+
+  &:hover .icofont-1x, &:hover .icofont-2x {
+    margin-left: 10px;
+  }
+}
+
+a.details-link {
+  font-family: 'franklin-gothic-urw', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 18px;
+  color: mat-color($stardrive-primary, 500);
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.1em;
 }
 
 #hero.with-escaping-tiles {
