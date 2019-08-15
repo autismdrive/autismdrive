@@ -26,10 +26,11 @@
     >
       <div
         class="border-box-tile-inner"
+        routerLink="/register"
       >
-        <div class="border-box-tile-label">Join Autism Drive</div>
+        <div class="border-box-tile-label">Join Autism DRIVE</div>
         <p class="intro">Connect to upcoming studies at UVA and resources across the state relevant to you.</p>
-        <i class="icofont-circled-right icofont-2x"></i>
+        <app-details-link [url]="'/register'" label="" size="2"></app-details-link>
       </div>
     </div>
     <div
@@ -39,10 +40,11 @@
     >
       <div
         class="border-box-tile-inner"
+        routerLink="/resources"
       >
         <div class="border-box-tile-label">Find Support</div>
         <p class="intro">Access autism-focused resources available in Virginia and online.</p>
-        <i class="icofont-circled-right icofont-2x"></i>
+        <app-details-link [url]="'/resources'" label="" size="2"></app-details-link>
       </div>
     </div>
   </div>
@@ -77,5 +79,8 @@
       [item]="item"
       [index]="i"
     ></app-news-item>
+    <div class="more-studies">
+      <app-details-link [url]="'/studies'" label="View more studies" size="2"></app-details-link>
+    </div>
   </div>
 </div>

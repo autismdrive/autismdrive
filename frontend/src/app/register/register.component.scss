@@ -1,8 +1,10 @@
-.container {
-  min-height: 100vh;
-}
+#hero {
+  background-image: url('/assets/enroll/hero.jpg');
+  padding-top: 8rem;
+  padding-bottom: 8rem;
 
-.form {
-  border: #cccccc solid 2px;
-  padding: 2%;
+  .form.border-box {
+    background-color: #FFFFFF;
+    padding: 2em;
+  }
 }

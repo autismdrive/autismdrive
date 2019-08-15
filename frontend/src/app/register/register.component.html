@@ -1,4 +1,66 @@
 <div
+  id="hero"
+  class="gradient-overlay container"
+>
+  <div class="hero-content">
+    <div class="form border-box">
+      <h1>Join the registry</h1>
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+      >
+        <formly-form
+          [form]="form"
+          [fields]="fields"
+          [model]="model"
+          *ngIf="registerState != 'wait_for_email'"
+        >
+          <div
+            id="error_message"
+            class="display mat-error"
+            *ngIf="errorMessage"
+          >{{errorMessage}}</div>
+          <footer
+            fxLayout="column"
+            fxLayoutGap="2%"
+            fxLayoutAlign="center"
+            *ngIf="registerState === 'form'"
+          >
+            <button
+              mat-flat-button
+              type="submit"
+              color="primary"
+              id="submit"
+            >Next</button>
+            <button
+              mat-flat-button
+              (click)="goHome($event)"
+              color="accent"
+              id="cancel"
+            >Cancel</button>
+          </footer>
+          <footer *ngIf="registerState === 'submitting'">
+            <app-loading></app-loading>
+          </footer>
+        </formly-form>
+        <footer *ngIf="registerState === 'wait_for_email'" id="confirmation_message">
+          <h2>Account Created!</h2>
+          <p>Please check your email to complete the signin process.</p>
+          <button
+            color="primary"
+            (click)="goHome($event)"
+            mat-flat-button
+            id="continue"
+          >
+            Continue to browse
+          </button>
+        </footer>
+      </form>
+    </div>
+
+  </div>
+</div>
+<div
   class="container mat-typography"
   fxLayout="row"
   fxLayout.xs="column"
@@ -6,64 +68,6 @@
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
 >
-  <div
-    class="form"
-    fxFlex="60%"
-  >
-    <app-logo variant="dark-lg" (click)="goHome($event)"></app-logo>
-    <h1>Join the registry</h1>
-    <form
-      [formGroup]="form"
-      (ngSubmit)="submit()"
-    >
-      <formly-form
-        [form]="form"
-        [fields]="fields"
-        [model]="model"
-        *ngIf="registerState != 'wait_for_email'"
-      >
-        <div
-          id="error_message"
-          class="display mat-error"
-          *ngIf="errorMessage"
-        >{{errorMessage}}</div>
-        <footer
-          fxLayout="column"
-          fxLayoutGap="2%"
-          fxLayoutAlign="center"
-          *ngIf="registerState === 'form'"
-        >
-          <button
-            mat-flat-button
-            type="submit"
-            color="primary"
-            id="submit"
-          >Next</button>
-          <button
-            mat-flat-button
-            (click)="goHome($event)"
-            color="accent"
-            id="cancel"
-          >Cancel</button>
-        </footer>
-        <footer *ngIf="registerState === 'submitting'">
-          <app-loading></app-loading>
-        </footer>
-      </formly-form>
-      <footer *ngIf="registerState === 'wait_for_email'" id="confirmation_message">
-        <h2>Account Created!</h2>
-        <p>Please check your email to complete the signin process.</p>
-        <button
-          color="primary"
-          (click)="goHome($event)"
-          mat-flat-button
-          id="continue"
-        >
-          Continue to browse
-        </button>
-      </footer>
-    </form>
-  </div>
   <div fxFlex="30%">
     <h3>Why should I join?</h3>
     <p>By joining the Registry, we will be able to let you know about resources and upcoming events in your community.
