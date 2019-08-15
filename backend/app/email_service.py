@@ -115,7 +115,7 @@ class EmailService:
 
     def admin_alert_email(self, subject, message, alert_principal_investigator=False):
         with self.app.app_context():
-            context = {'name': 'bob', 'age': 22}
+            context = {}
             text_body = render_template("admin_email.txt", msg=message, site_url=self.site_url, **context)
             html_body = render_template("admin_email.html", msg=message, site_url=self.site_url, **context)
             recipients = [self.admin_email]
