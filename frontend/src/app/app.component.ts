@@ -4,6 +4,7 @@ import { User } from './_models/user';
 import { AuthenticationService } from './_services/api/authentication-service';
 import {ApiService} from './_services/api/api.service';
 import {Status} from './_models/status';
+import {GoogleAnalyticsService} from './google-analytics.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,9 @@ export class AppComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private api: ApiService,
     private router: Router,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {
+    this.googleAnalyticsService.init();
     this.router.events.subscribe((e) => {
       if (e instanceof ActivationStart || e instanceof ActivationEnd) {
         if (e.snapshot && e.snapshot.data) {

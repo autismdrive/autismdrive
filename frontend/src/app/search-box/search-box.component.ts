@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { MatInput } from '@angular/material/input';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SearchService } from '../_services/api/search.service';
-import { debounce } from 'rxjs/operators';
-import { timer } from 'rxjs';
+import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {Subject, timer} from 'rxjs';
 
 @Component({
   selector: 'app-search-box',
@@ -15,6 +15,7 @@ export class SearchBoxComponent implements OnInit {
   words = '';
   queryParams: Params;
   @Input() variant: string;
+  searchUpdate = new Subject<String>();
 
   constructor(
     private route: ActivatedRoute,
@@ -25,10 +26,13 @@ export class SearchBoxComponent implements OnInit {
       .queryParams
       .pipe(debounce(() => timer(1000)))
       .subscribe(qp => this.queryParams = qp);
-    this.searchService
-      .currentQuery
-      .pipe(debounce(() => timer(1000)))
-      .subscribe(q => this.words = (q && q.words) ? q.words : '');
+    this.searchUpdate.pipe(
+      debounceTime(400),
+      distinctUntilChanged())
+      .subscribe(value => {
+        console.log(value);
+        this.updateSearch(false);
+      });
   }
 
   ngOnInit() {

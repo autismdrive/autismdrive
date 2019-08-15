@@ -8,8 +8,9 @@
       matInput
       type="text"
       placeholder="Search"
-      (keyup)="updateSearch(false)"
       [(ngModel)]="words"
+      (ngModelChange)="this.searchUpdate.next($event)"
+      (keydown.enter)="this.updateSearch(false)"
     >
     <mat-icon
       [ngClass]="{'ghost': !hasWords()}"

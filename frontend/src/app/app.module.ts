@@ -99,6 +99,7 @@ import { FooterComponent } from './footer/footer.component';
 import { MirrorComponent } from './mirror/mirror.component';
 import { AdminExportComponent } from './admin-export/admin-export.component';
 import { AdminExportDetailsComponent } from './admin-export-details/admin-export-details.component';
+import { GoogleAnalyticsService } from './google-analytics.service';
 
 @Injectable()
 export class FormlyConfig {
@@ -230,7 +231,7 @@ export class FormlyConfig {
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,
-    RoutingModule,
+    RoutingModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
@@ -239,6 +240,8 @@ export class FormlyConfig {
     ApiService,
     IntervalService,
     SearchService,
+    GoogleAnalyticsService
+
   ],
   bootstrap: [AppComponent],
   entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent]
