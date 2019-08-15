@@ -82,8 +82,10 @@ $easeDuration: 300ms;
 $animationDuration: 500ms;
 $uva-header-height: 40px;
 $site-header-height: 64px;
+$search-bar-height-sm: 64px;
 $search-bar-height-md: 128px;
 $search-bar-height-lg: 64px;
+$header-height-sm: ($uva-header-height + $site-header-height + $search-bar-height-sm);
 $header-height-md: ($uva-header-height + $site-header-height + $search-bar-height-md);
 $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-height-lg);
 
@@ -94,8 +96,13 @@ $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-heigh
   $accent: map-get($theme, accent); // Global style overrides
 
   body {
+    // SM
+    @media (max-width: 959px) {
+      padding-top: $header-height-sm;
+    }
+
     // MD
-    @media (min-width: 768px) {
+    @media (min-width: 960px) {
       padding-top: $header-height-md;
     }
 

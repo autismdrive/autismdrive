@@ -1,6 +1,6 @@
 <div
   id="header-bg"
-  [@toggleBackground]="headerState"
+  [@toggleBackground]="menuState"
 ></div>
 <div
   id="uva-header"
@@ -178,6 +178,27 @@
   <app-search-box variant="dark-bg"></app-search-box>
   <a
     mat-button
+    [routerLink]="[ '/enroll' ]"
+    routerLinkActive="selected"
+    id="enroll-button-mobile"
+    (click)="toggleMenu()"
+  >About Autism DRIVE</a>
+  <a
+    mat-button
+    [routerLink]="[ '/studies' ]"
+    routerLinkActive="selected"
+    id="studies-button-mobile"
+    (click)="toggleMenu()"
+  >Current studies</a>
+  <a
+    mat-button
+    [routerLink]="[ '/resources' ]"
+    routerLinkActive="selected"
+    id="resources-button-mobile"
+    (click)="toggleMenu()"
+  >Find Support</a>
+  <a
+    mat-button
     *ngIf="!currentUser"
     [routerLink]="[ '/register' ]"
     routerLinkActive="selected"
@@ -185,7 +206,7 @@
     (click)="toggleMenu()"
   >
     <mat-icon>person_add</mat-icon>
-    Create Account
+    Join Us
   </a>
   <a
     mat-button
@@ -230,25 +251,4 @@
     <mat-icon>exit_to_app</mat-icon>
     Logout
   </a>
-  <a
-    mat-button
-    [routerLink]="[ '/enroll' ]"
-    routerLinkActive="selected"
-    id="enroll-button-mobile"
-    (click)="toggleMenu()"
-  >Join the Autism Registry</a>
-  <a
-    mat-button
-    [routerLink]="[ '/studies' ]"
-    routerLinkActive="selected"
-    id="studies-button-mobile"
-    (click)="toggleMenu()"
-  >Current studies</a>
-  <a
-    mat-button
-    [routerLink]="[ '/resources' ]"
-    routerLinkActive="selected"
-    id="resources-button-mobile"
-    (click)="toggleMenu()"
-  >Training &amp; Resources</a>
 </div>
