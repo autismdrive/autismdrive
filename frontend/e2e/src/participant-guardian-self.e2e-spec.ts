@@ -29,12 +29,11 @@ describe('Participant (Guardian - Self)', () => {
 
   // Global Header
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
-  it('should display utility navigation', () => globalHeaderUseCases.displayUtilityNav());
-  it('should display logged-out state in utility navigation', () => globalHeaderUseCases.displayLoggedOutState());
+  it('should display logged-out state in navigation', () => globalHeaderUseCases.displayLoggedOutState());
   it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
-  it('should visit enroll page', () => globalHeaderUseCases.visitEnrollPage());
+  it('should visit about page', () => globalHeaderUseCases.visitAboutPage());
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
