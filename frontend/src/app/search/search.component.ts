@@ -17,6 +17,7 @@ import { SearchService } from '../_services/api/search.service';
 import { StudyStatus } from '../_models/study';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 interface SortMethod {
   name: string;
@@ -87,6 +88,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     private renderer: Renderer2,
     private searchService: SearchService,
     private featuredSearchService: SearchService,
+    private googleAnalyticsService: GoogleAnalyticsService,
     media: MediaMatcher,
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
@@ -196,11 +198,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
           this.updateUrl(this.query);
         }
       });
-    if ((<any>window).gtag) {
-      (<any>window).gtag('event', this.query.words, {
-        'event_category': 'search'
+    this.googleAnalyticsService.event(this.query.words,
+      {
+        'event_category': 'search',
       });
-    }
   }
 
   searchFeaturedStudies() {

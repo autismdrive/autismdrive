@@ -10,6 +10,8 @@
       placeholder="Search for Autism Support Resources"
       (keyup)="updateSearch(false)"
       [(ngModel)]="words"
+      (ngModelChange)="this.searchUpdate.next($event)"
+      (keydown.enter)="this.updateSearch(false)"
     >
     <mat-icon
       *ngIf="!hasWords()"
