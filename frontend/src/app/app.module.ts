@@ -58,7 +58,7 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { AppComponent } from './app.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
-import { EnrollComponent } from './enroll/enroll.component';
+import { AboutComponent } from './about/about.component';
 import { FiltersComponent } from './filters/filters.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
@@ -142,7 +142,7 @@ export class FormlyConfig {
     AvatarDialogComponent,
     CardWrapperComponent,
     CategoryChipsComponent,
-    EnrollComponent,
+    AboutComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,

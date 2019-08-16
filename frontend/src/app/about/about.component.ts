@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-enroll',
-  templateUrl: './enroll.component.html',
-  styleUrls: ['./enroll.component.scss']
+  selector: 'app-about',
+  templateUrl: './about.component.html',
+  styleUrls: ['./about.component.scss']
 })
-export class EnrollComponent implements OnInit {
+export class AboutComponent implements OnInit {
 
   constructor(
     private router: Router
