@@ -25,7 +25,6 @@
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
-      <p *ngIf="resource.ticket_cost">Ticket Cost: {{resource.ticket_cost}}</p>
       <div
         fxLayout="column"
         fxLayoutGap="20px"
@@ -89,7 +88,12 @@
                 <mat-icon>access_time</mat-icon>
                 {{resource.date | date:'longDate'}}: {{resource.time}}
               </mat-list-item>
-              <mat-list-item *ngIf="resource.street_address1">
+              <mat-list-item *ngIf="resource.location_name ||
+              resource.street_address1 ||
+              resource.street_address2 ||
+              resource.city ||
+              resource.state ||
+              resource.zip">
                 <mat-icon>location_on</mat-icon>
                 <address>
                   <p *ngIf="resource.location_name">{{resource.location_name}},</p>
@@ -101,6 +105,10 @@
               <mat-list-item *ngIf="resource.primary_contact">
                 <mat-icon>person_pin</mat-icon>
                 {{resource.primary_contact}}
+              </mat-list-item>
+              <mat-list-item *ngIf="resource.ticket_cost">
+                <mat-icon>monetization_on</mat-icon>
+                {{resource.ticket_cost}}
               </mat-list-item>
               <mat-list-item *ngIf="resource.phone">
                 <mat-icon>phone</mat-icon>
