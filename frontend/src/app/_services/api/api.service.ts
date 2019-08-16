@@ -439,7 +439,6 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** findUsers */
   getDataTransferLogs(pageNumber = 0, pageSize = 10): Observable<DataTransferPageResults> {
     const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
     return this.httpClient.get<DataTransferPageResults>(this._endpointUrl('data_transfer_log'), { params: search_data })

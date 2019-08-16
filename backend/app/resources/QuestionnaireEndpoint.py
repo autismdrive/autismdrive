@@ -115,17 +115,6 @@ class QuestionnaireInfoEndpoint(flask_restful.Resource):
         info_list = sorted(info_list, key=lambda item: item.table_name)
         return ExportInfoSchema(many=True).dump(info_list)
 
-        # all_file_names = os.listdir(os.path.dirname(app.instance_path) + '/app/model/questionnaires')
-        # non_questionnaires = ['mixin', '__']
-        # questionnaire_file_names = []
-        # for index, file_name in enumerate(all_file_names):
-        #     if any(string in file_name for string in non_questionnaires):
-        #         pass
-        #     else:
-        #         f = file_name.replace(".py", "")
-        #         questionnaire_file_names.append(f)
-        # return sorted(questionnaire_file_names)
-
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):
 
