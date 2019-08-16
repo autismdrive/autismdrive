@@ -50,23 +50,8 @@ p.intro {
   font-weight: bold;
 }
 
-.news {
-  mat-card {
-    margin: 1em;
-    color: white;
-    background-color: #777777;
-    height: 300px;
-  }
-}
-
-#news1 {
-  background-image: url('/assets/home/news1.jpg');
-}
-
-#news2 {
-  background-image: url('/assets/home/news2.jpg');
-}
-
-#news3 {
-  background-image: url('/assets/home/news3.jpg');
+.more-studies {
+  //@include border-dots;
+  text-align: center;
+  padding-top: 2em;
 }

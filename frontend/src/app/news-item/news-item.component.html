@@ -10,9 +10,6 @@
     <span class="item-type">{{item.label}}</span>
     <h3 [routerLink]="[ item.url ]">{{item.title}}</h3>
     <p>{{item.description}}</p>
-    <a [routerLink]="[ item.url ]" class="details-link">
-      <i class="icofont-circled-right icofont-1x"></i>
-      Details
-    </a>
+    <app-details-link [url]="item.url"></app-details-link>
   </div>
 </div>

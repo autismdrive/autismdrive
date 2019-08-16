@@ -17,13 +17,27 @@ footer {
   }
 }
 
-.footer-logo {
-  min-height: 6rem;
-  max-height: 10rem;
+.funded-by {
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-bottom: -1em;
+
+  // SM
+  @media (max-width: 959px) { width: 290px; }
+
+  // MD - XL
+  @media (min-width: 960px) { width: 417px; }
 }
 
-.footer-contact {}
+.footer-logo {
+  // SM
+  @media (max-width: 959px) { width: 320px; }
 
+  // MD - XL
+  @media (min-width: 960px) { width: 457px; }
+}
 
 .footer-contact {
   margin: 0 auto 1.25rem;

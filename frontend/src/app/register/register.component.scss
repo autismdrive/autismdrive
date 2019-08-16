@@ -1,8 +1,18 @@
-.container {
-  min-height: 100vh;
-}
+#hero {
+  background-image: url('/assets/enroll/hero.jpg');
+  padding-top: 8rem;
+  padding-bottom: 8rem;
 
-.form {
-  border: #cccccc solid 2px;
-  padding: 2%;
+  .hero-content {
+    display: grid;
+    @media (min-width: 768px) { grid-template-columns: 1fr; }
+    @media (min-width: 992px) { grid-template-columns: 2fr 1fr; }
+    @media (min-width: 1200px) { grid-template-columns: 1fr 1fr; }
+  }
+
+  .form.border-box {
+    max-width: 100%;
+    background-color: #FFFFFF;
+    padding: 2em;
+  }
 }

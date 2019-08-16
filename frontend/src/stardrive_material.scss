@@ -82,8 +82,10 @@ $easeDuration: 300ms;
 $animationDuration: 500ms;
 $uva-header-height: 40px;
 $site-header-height: 64px;
+$search-bar-height-sm: 64px;
 $search-bar-height-md: 128px;
 $search-bar-height-lg: 64px;
+$header-height-sm: ($uva-header-height + $site-header-height + $search-bar-height-sm);
 $header-height-md: ($uva-header-height + $site-header-height + $search-bar-height-md);
 $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-height-lg);
 
@@ -94,8 +96,13 @@ $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-heigh
   $accent: map-get($theme, accent); // Global style overrides
 
   body {
+    // SM
+    @media (max-width: 959px) {
+      padding-top: $header-height-sm;
+    }
+
     // MD
-    @media (min-width: 768px) {
+    @media (min-width: 960px) {
       padding-top: $header-height-md;
     }
 
@@ -273,6 +280,14 @@ $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-heigh
   .hero-slide {
     background-size: cover;
 
+    .hero-content {
+      max-width: 320px;
+      @media (min-width: 576px) { max-width: 476px; }
+      @media (min-width: 768px) { max-width: 668px; }
+      @media (min-width: 992px) { max-width: 892px; }
+      @media (min-width: 1200px) { max-width: 1100px; }
+    }
+
     .border-box {
       max-width: 31.25rem;
       text-align: left;
@@ -352,7 +367,12 @@ $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-heigh
         border-image-slice: 1;
         opacity: 0;
       }
+    }
 
+    .border-box-tile-inner {
+      &:hover [class*="icofont-"] {
+        margin-left: 10px;
+      }
     }
 
     .border-box-tile-label {
@@ -371,28 +391,6 @@ $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-heigh
       margin-bottom: 1em;
     }
   }
-}
-
-.border-box-tile, a.details-link {
- .icofont-1x, .icofont-2x {
-    color: #e57200;
-    transition: margin-left 0.5s;
-  }
-
-  &:hover .icofont-1x, &:hover .icofont-2x {
-    margin-left: 10px;
-  }
-}
-
-a.details-link {
-  font-family: 'franklin-gothic-urw', sans-serif;
-  font-weight: 700;
-  font-style: italic;
-  font-size: 18px;
-  color: mat-color($stardrive-primary, 500);
-  text-transform: uppercase;
-  text-decoration: none;
-  letter-spacing: 0.1em;
 }
 
 #hero.with-escaping-tiles {
