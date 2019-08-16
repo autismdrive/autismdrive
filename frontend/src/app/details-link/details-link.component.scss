@@ -1,0 +1,39 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
+a {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+
+  [class*="details-link-"] {
+    @include mat-typography-level-to-styles($custom-typography, title);
+    font-style: italic;
+    color: mat-color($stardrive-primary, 500);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .details-link-1x {
+    font-size: 1.125rem;
+    margin-left: 0.5rem;
+  }
+
+  .details-link-2x {
+    font-size: 1.5rem;
+    margin-left: 0.75rem;
+  }
+
+ [class*="icofont-"] {
+    color: #e57200;
+    transition: margin-left 0.5s;
+  }
+
+  &:hover [class*="icofont-"] {
+    margin-left: 10px;
+  }
+}

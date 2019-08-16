@@ -15,7 +15,7 @@ elasticsearch-dsl>=6.0.0,<7.0.0
 XlsxWriter==1.1.5
 openpyxl==2.6.2
 apscheduler==3.6.0
-requests==2.21.0
+requests==2.22.0
 nose2==0.6.0
 googlemaps==3.0.2
 HTTPretty==0.9.6

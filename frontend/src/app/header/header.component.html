@@ -1,6 +1,6 @@
 <div
   id="header-bg"
-  [@toggleBackground]="headerState"
+  [@toggleBackground]="menuState"
 ></div>
 <div
   id="uva-header"
@@ -14,7 +14,7 @@
   ><a
       target="_blank"
       href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"
-    ><img src="/assets/logo/UVA_STAR-logo.svg"></a></div>
+    >Return to UVA STAR project home page</a></div>
   <span fxFlex></span>
   <a
     mat-button
@@ -42,12 +42,14 @@
       id="menu-bar"
       fxLayout="row"
     >
-      <app-logo variant="light"></app-logo>
+      <app-logo variant="dark"></app-logo>
+      <span fxFlex></span>
       <div
         id="primary-nav"
         *ngIf="!mobileQuery.matches"
       >
-        <a
+        <ul>
+          <li><a
           mat-button
           [routerLink]="[ '/enroll' ]"
           routerLinkActive="selected"
@@ -56,13 +58,13 @@
           <span
             fxHide
             fxShow.lt-lg
-          >Join</span>
+          >About</span>
           <span
             fxHide
             fxShow.gt-md
-          >Join the Autism Registry</span>
-        </a>
-        <a
+          >About Autism DRIVE</span>
+        </a></li>
+        <li><a
           mat-button
           [routerLink]="[ '/studies' ]"
           routerLinkActive="selected"
@@ -76,8 +78,8 @@
             fxHide
             fxShow.gt-md
           >Current Studies</span>
-        </a>
-        <a
+        </a></li>
+        <li><a
           mat-button
           [routerLink]="[ '/resources' ]"
           routerLinkActive="selected"
@@ -86,57 +88,38 @@
           <span
             fxHide
             fxShow.lt-lg
-          >Resources</span>
+          >Support</span>
           <span
             fxHide
             fxShow.gt-md
-          >Training &amp; Resources</span>
-        </a>
-      </div>
+          >Find Support</span>
+        </a></li>
 
-      <span fxFlex></span>
-      <app-search-box
-        variant="dark-bg"
-        fxHide
-        fxShow.gt-sm
-      ></app-search-box>
-      <span fxFlex></span>
-
-      <div
-        id="utility-nav"
-        fxHide
-        fxShow.gt-sm
-      >
-        <a
+        <li *ngIf="!currentUser"><a
           mat-button
-          *ngIf="!currentUser"
           [routerLink]="[ '/register' ]"
           routerLinkActive="selected"
           id="register-button"
         >
-          <mat-icon>person_add</mat-icon>
           <span
             fxHide
             fxShow.lt-lg
-          >Register</span>
+          >Join</span>
           <span
             fxHide
             fxShow.gt-md
-          >Create Account</span>
-        </a>
-        <a
+          >Join Us</span>
+        </a></li>
+        <li *ngIf="!currentUser"><a
           mat-button
-          *ngIf="!currentUser"
           [routerLink]="[ '/login' ]"
           routerLinkActive="selected"
           id="login-button"
         >
-          <mat-icon>account_circle</mat-icon>
           Sign in
-        </a>
-        <a
+        </a></li>
+        <li *ngIf="currentUser"><a
           mat-button
-          *ngIf="currentUser"
           [routerLink]="[ '/profile' ]"
           routerLinkActive="selected"
           id="profile-button"
@@ -150,17 +133,19 @@
             fxHide
             fxShow.gt-md
           > View Profile</span>
-        </a>
-        <a
+        </a></li>
+        <li *ngIf="currentUser"><a
           mat-button
-          *ngIf="currentUser"
           (click)="goLogout($event)"
           id="logout-button"
         >
           <mat-icon>exit_to_app</mat-icon>
           Logout
-        </a>
+        </a></li>
+
+        </ul>
       </div>
+
       <button
         mat-button
         (click)="toggleMenu()"
@@ -171,7 +156,16 @@
         <mat-icon>menu</mat-icon>
       </button>
     </mat-toolbar-row>
+    <mat-toolbar-row class="search">
+      <p>A centralized system for autism research, resources and supports for individuals, families and professionals.</p>
+      <app-search-box
+        variant="dark-bg"
+        fxHide
+        fxShow.gt-sm
+      ></app-search-box>
+    </mat-toolbar-row>
   </mat-toolbar>
+
 </div>
 <div
   id="mobile-menu"
@@ -184,6 +178,27 @@
   <app-search-box variant="dark-bg"></app-search-box>
   <a
     mat-button
+    [routerLink]="[ '/enroll' ]"
+    routerLinkActive="selected"
+    id="enroll-button-mobile"
+    (click)="toggleMenu()"
+  >About Autism DRIVE</a>
+  <a
+    mat-button
+    [routerLink]="[ '/studies' ]"
+    routerLinkActive="selected"
+    id="studies-button-mobile"
+    (click)="toggleMenu()"
+  >Current studies</a>
+  <a
+    mat-button
+    [routerLink]="[ '/resources' ]"
+    routerLinkActive="selected"
+    id="resources-button-mobile"
+    (click)="toggleMenu()"
+  >Find Support</a>
+  <a
+    mat-button
     *ngIf="!currentUser"
     [routerLink]="[ '/register' ]"
     routerLinkActive="selected"
@@ -191,7 +206,7 @@
     (click)="toggleMenu()"
   >
     <mat-icon>person_add</mat-icon>
-    Create Account
+    Join Us
   </a>
   <a
     mat-button
@@ -236,25 +251,4 @@
     <mat-icon>exit_to_app</mat-icon>
     Logout
   </a>
-  <a
-    mat-button
-    [routerLink]="[ '/enroll' ]"
-    routerLinkActive="selected"
-    id="enroll-button-mobile"
-    (click)="toggleMenu()"
-  >Join the Autism Registry</a>
-  <a
-    mat-button
-    [routerLink]="[ '/studies' ]"
-    routerLinkActive="selected"
-    id="studies-button-mobile"
-    (click)="toggleMenu()"
-  >Current studies</a>
-  <a
-    mat-button
-    [routerLink]="[ '/resources' ]"
-    routerLinkActive="selected"
-    id="resources-button-mobile"
-    (click)="toggleMenu()"
-  >Training &amp; Resources</a>
 </div>

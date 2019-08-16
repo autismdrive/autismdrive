@@ -1,7 +1,22 @@
+// Import theming functions
+@import '../../../node_modules/@angular/material/theming';
+// Import your custom theme
+@import '../../stardrive_material';
+// Load the STAR DRIVE Theme
+@include stardrive-theme($stardrive-theme);
+
 #logo {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  a {
+    @include mat-typography-level-to-styles($custom-typography, display-1);
+    text-transform: uppercase;
+  }
+
+  &.dark-lg a, &.dark a { color: mat-color($stardrive-primary, 500); }
+  &.light-lg a, &.light a { color: white; }
 
   &.dark-lg, &.light-lg {
     img {
