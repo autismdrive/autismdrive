@@ -27,6 +27,9 @@ class Study(db.Model):
     __label__ = "Research Studies"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
+    short_title = db.Column(db.String)
+    short_description = db.Column(db.String)
+    image_url = db.Column(db.String)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     description = db.Column(db.String)
     participant_description = db.Column(db.String)
