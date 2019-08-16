@@ -26,9 +26,9 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
   }
 
-  goEnroll($event) {
+  goAbout($event) {
     $event.preventDefault();
-    this.router.navigate(['enroll']);
+    this.router.navigate(['about']);
   }
 
   goResources($event) {

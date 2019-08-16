@@ -100,7 +100,6 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
 
   get headerState(): string {
     const visibilityState = this.headerVisible ? VisibilityState.Visible : VisibilityState.Hidden;
-    console.log(visibilityState + '-' + this.viewportWidth);
     return visibilityState + '-' + this.viewportWidth;
   }
 

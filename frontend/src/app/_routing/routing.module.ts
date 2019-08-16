@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, UrlSegment } from '@angular/router';
 import { AdminHomeComponent } from '../admin-home/admin-home.component';
-import { EnrollComponent } from '../enroll/enroll.component';
+import { AboutComponent } from '../about/about.component';
 import { FlowCompleteComponent } from '../flow-complete/flow-complete.component';
 import { FlowComponent } from '../flow/flow.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
@@ -42,7 +42,7 @@ export function searchFilterMatcher(url: UrlSegment[]) {
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]  },
   { path: 'home', component: HomeComponent, data: { title: 'Welcome STAR Drive' } , canActivate: [NotMirroredGuard]  },
-  { path: 'enroll', component: EnrollComponent, data: { title: 'Enroll in a STAR Drive Study' } , canActivate: [NotMirroredGuard]  },
+  { path: 'about', component: AboutComponent, data: { title: 'Enroll in a STAR Drive Study' } , canActivate: [NotMirroredGuard]  },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Log in to STAR Drive', hideHeader: true } },
   { path: 'login', component: LoginComponent, data: { title: 'Log in to STAR Drive', hideHeader: true } },
   {
