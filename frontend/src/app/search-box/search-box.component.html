@@ -2,15 +2,20 @@
   *ngIf="queryParams"
   [class]="'search-bar ' + variant"
 >
-  <mat-form-field id="search-field">
+  <mat-form-field id="search-field" fxFlex="100%">
     <input
       #searchInput
       matInput
       type="text"
-      placeholder="Search"
+      placeholder="Search for Autism Support Resources"
       (keyup)="updateSearch(false)"
       [(ngModel)]="words"
     >
+    <mat-icon
+      *ngIf="!hasWords()"
+      matSuffix
+      (click)="updateSearch(true)"
+    >search</mat-icon>
     <mat-icon
       [ngClass]="{'ghost': !hasWords()}"
       matSuffix

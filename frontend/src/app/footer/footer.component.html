@@ -1,7 +1,18 @@
-<div  *ngIf="status" class="footer">
-  <p>© 2019 BY THE RECTOR AND VISITORS OF THE UNIVERSITY OF VIRGINIA</p>
+<footer *ngIf="status" class="global-footer">
+  <div class="funded-by">Funded by</div>
+  <a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star" target="_blank">
+    <img src="/assets/logo/UVA_STAR-logo.svg" class="footer-logo">
+  </a>
+
+  <div class="footer-contact">
+    <address class="address">417 Emmet Street, Charlottesville, VA 22904</address>
+    <a href="tel:434-924-0742" class="tel">434-243-8747</a>
+    <a href="mailto:uvastar@virginia.edu" class="email">uvastar@virginia.edu</a>
+  </div>
+
+  <p>&copy; 2019 BY THE RECTOR AND VISITORS OF THE UNIVERSITY OF VIRGINIA</p>
 
   <div *ngIf="status.development">Currently running in Development Mode.</div>
   <div *ngIf="status.testing">Currently running in Test mode.</div>
   <div *ngIf="status.mirroring">This is a mirrored server with de-identified data.</div>
-</div>
+</footer>

@@ -12,6 +12,11 @@ import { protractor } from 'protractor/built/ptor';
 
 export class AppPage {
 
+  constructor() {
+    browser.driver.manage().window().maximize();
+  }
+
+
   waitForAnimations() {
     browser.sleep(3000);
   }

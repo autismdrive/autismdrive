@@ -171,20 +171,21 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
-                              benefit_description=row[3], organization=org, location=row[5])
+                              benefit_description=row[3], organization=org, location=row[5],
+                              short_title=row[6], short_description=row[7], image_url=row[8])
 
-                if row[6].strip() == 'Currently Enrolling':
+                if row[9].strip() == 'Currently Enrolling':
                     study.status = Status.currently_enrolling
-                elif row[6].strip() == 'Study In Progress':
+                elif row[9].strip() == 'Study In Progress':
                     study.status = Status.study_in_progress
-                elif row[6].strip() == 'Results Being Analyzed':
+                elif row[9].strip() == 'Results Being Analyzed':
                     study.status = Status.results_being_analyzed
-                elif row[6].strip() == 'Study Results Published':
+                elif row[9].strip() == 'Study Results Published':
                     study.status = Status.study_results_published
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(19, len(row)):
+                for i in range(22, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
@@ -192,7 +193,7 @@ class DataLoader:
 
                         study_category = StudyCategory(study_id=study_id, category_id=category_id)
                         db.session.add(study_category)
-                for i in [7, 11, 15]:
+                for i in [10, 14, 18]:
                     if row[i]:
                         investigator = db.session.query(Investigator).filter(Investigator.name == row[i]).first()
                         if investigator is None:
