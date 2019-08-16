@@ -50,8 +50,6 @@ export class GoogleAnalyticsService {
         gtag('config', environment.googleAnalyticsKey, {
           'page_path': event.urlAfterRedirects,
         });
-        console.log('Sending Google Analytics hit for route', event.urlAfterRedirects);
-        console.log('Property ID', environment.googleAnalyticsKey);
       }
     });
   }
