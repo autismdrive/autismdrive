@@ -14,7 +14,17 @@
   ><a
       target="_blank"
       href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"
-    >Return to UVA STAR project home page</a></div>
+    >
+      <span
+        fxHide
+        fxShow.lt-lg
+      >Return to UVA STAR project</span>
+      <span
+        fxHide
+        fxShow.gt-md
+      >Return to UVA STAR project home page</span>
+
+    </a></div>
   <span fxFlex></span>
   <a
     mat-button
@@ -157,7 +167,9 @@
       </button>
     </mat-toolbar-row>
     <mat-toolbar-row class="search">
-      <p>A centralized system for autism research, resources and supports for individuals, families and professionals.</p>
+      <p class="tagline">
+        A centralized system for autism research, resources and <br fxHide fxShow.lt-md />
+        supports for individuals, families and professionals.</p>
       <app-search-box
         variant="dark-bg"
         fxHide
