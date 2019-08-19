@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import {map} from 'rxjs/operators';
 import {User} from '../../_models/user';
 import {environment} from '../../../environments/environment';
+import {GoogleAnalyticsService} from '../../google-analytics.service';
 
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class AuthenticationService {
   refresh_url = `${environment.api}/api/session`;
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private googleAnalyticsService: GoogleAnalyticsService) {
     const userDict = JSON.parse(localStorage.getItem('currentUser'));
     if (userDict) {
       this.currentUserSubject = new BehaviorSubject<User>(new User(userDict));
@@ -38,6 +39,7 @@ export class AuthenticationService {
       localStorage.setItem('currentUser', JSON.stringify(userDict));
       this.currentUserSubject.next(user);
       this.currentUser = this.currentUserSubject.asObservable();
+      this.googleAnalyticsService.set_user(user.id);
       return user;
     }
   }

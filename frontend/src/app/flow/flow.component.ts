@@ -10,6 +10,7 @@ import { Flow } from '../_models/flow';
 import { Step, StepStatus } from '../_models/step';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 enum FlowState {
   NO_CONSENT = 'no_consent',
@@ -54,8 +55,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     private authenticationService: AuthenticationService,
     private router: Router,
     private route: ActivatedRoute,
+    private googleAnalyticsService: GoogleAnalyticsService,
     changeDetectorRef: ChangeDetectorRef,
-    media: MediaMatcher
+    media: MediaMatcher,
   ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -219,12 +221,22 @@ export class FlowComponent implements OnInit, OnDestroy {
     if (this.currentStep().questionnaire_id > 0) {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
+          this.googleAnalyticsService.event('update',  {
+            'event_category': 'flow progress',
+            'event_label': this.currentStep().name,
+            'value': this.flow.percentComplete()
+          });
           this.loadFlow(this.flow.name);
           this.scrollToTop();
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
         .subscribe(() => {
+          this.googleAnalyticsService.event('submit',  {
+            'event_category': 'flow progress',
+            'event_label': this.currentStep().name,
+            'value': this.flow.percentComplete()
+          });
           this.loadFlow(this.flow.name);
           this.scrollToTop();
         });

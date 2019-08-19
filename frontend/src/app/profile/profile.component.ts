@@ -5,6 +5,7 @@ import { ParticipantRelationship } from '../_models/participantRelationship';
 import { Router } from '@angular/router';
 import { Participant } from '../_models/participant';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -24,7 +25,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
-              private router: Router) {
+              private router: Router,
+              private googleAnalyticsSerice: GoogleAnalyticsService) {
 
     this.authenticationService.refresh().subscribe(
       user => {
@@ -81,6 +83,8 @@ export class ProfileComponent implements OnInit {
     });
 
     this.api.addParticipant(newParticipant).subscribe(participant => {
+      this.googleAnalyticsSerice.event(flow,  {'event_category': 'enrollment'});
+
       console.log('Navigating to flow/', flow, '/', participant.id);
       this.router.navigate(['flow', flow,  participant.id]);
     });

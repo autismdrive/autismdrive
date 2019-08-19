@@ -45,7 +45,8 @@ import { AutocompleteSectionComponent } from './_forms/autocomplete-section/auto
 import { CardWrapperComponent } from './_forms/card-wrapper/card-wrapper.component';
 import { HelpWrapperComponent } from './_forms/help-wrapper/help-wrapper.component';
 import { RepeatSectionComponent } from './_forms/repeat-section/repeat-section.component';
-import { EmailValidator, EmailValidatorMessage, PhoneValidator, PhoneValidatorMessage, UrlValidator, UrlValidatorMessage } from './_forms/validators/formly.validator';
+import { EmailValidator, EmailValidatorMessage, PhoneValidator,
+        PhoneValidatorMessage, UrlValidator, UrlValidatorMessage } from './_forms/validators/formly.validator';
 import { ErrorInterceptor } from './_routing/error-interceptor';
 import { JwtInterceptor } from './_routing/jwt-interceptor';
 import { RoutingModule } from './_routing/routing.module';
@@ -57,7 +58,7 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { AppComponent } from './app.component';
 import { AvatarDialogComponent } from './avatar-dialog/avatar-dialog.component';
 import { CategoryChipsComponent } from './category-chips/category-chips.component';
-import { EnrollComponent } from './enroll/enroll.component';
+import { AboutComponent } from './about/about.component';
 import { FiltersComponent } from './filters/filters.component';
 import { FlowCompleteComponent } from './flow-complete/flow-complete.component';
 import { FlowIntroComponent } from './flow-intro/flow-intro.component';
@@ -99,6 +100,8 @@ import { FooterComponent } from './footer/footer.component';
 import { MirrorComponent } from './mirror/mirror.component';
 import { AdminExportComponent } from './admin-export/admin-export.component';
 import { AdminExportDetailsComponent } from './admin-export-details/admin-export-details.component';
+import { GoogleAnalyticsService } from './google-analytics.service';
+import { DetailsLinkComponent } from './details-link/details-link.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -139,7 +142,7 @@ export class FormlyConfig {
     AvatarDialogComponent,
     CardWrapperComponent,
     CategoryChipsComponent,
-    EnrollComponent,
+    AboutComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,
@@ -188,6 +191,7 @@ export class FormlyConfig {
     MirrorComponent,
     AdminExportComponent,
     AdminExportDetailsComponent,
+    DetailsLinkComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),
@@ -230,7 +234,7 @@ export class FormlyConfig {
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,
-    RoutingModule,
+    RoutingModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
@@ -239,6 +243,8 @@ export class FormlyConfig {
     ApiService,
     IntervalService,
     SearchService,
+    GoogleAnalyticsService
+
   ],
   bootstrap: [AppComponent],
   entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent]

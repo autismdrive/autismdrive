@@ -10,5 +10,6 @@
     <span class="item-type">{{item.label}}</span>
     <h3 [routerLink]="[ item.url ]">{{item.title}}</h3>
     <p>{{item.description}}</p>
+    <app-details-link [url]="item.url"></app-details-link>
   </div>
 </div>

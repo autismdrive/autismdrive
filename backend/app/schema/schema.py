@@ -244,7 +244,7 @@ class EventSchema(ModelSchema):
         model = Event
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'organization', 'resource_categories', '_links')
+                  'phone', 'website', 'organization', 'resource_categories', 'latitude', 'longitude', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -347,9 +347,9 @@ class LocationCategorySchema(ModelSchema):
 class StudySchema(ModelSchema):
     class Meta:
         model = Study
-        fields = ('id', 'title', 'last_updated', 'description', 'participant_description', 'benefit_description',
-                  'organization_id', 'organization', 'location', 'status', 'study_categories',
-                  'study_investigators', '_links')
+        fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
+                  'participant_description', 'benefit_description', 'organization_id', 'organization', 'location',
+                  'status', 'study_categories', 'study_investigators', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     status = EnumField(Status)
