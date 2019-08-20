@@ -1,14 +1,15 @@
 <div
   class="container mat-typography"
-  fxLayout="row"
-  fxLayout.xs="column"
+  fxLayout.gt-md="row"
+  fxLayout.lt-lg="column"
   fxLayoutWrap
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
   id="logout-message"
 >
   <div
-    fxFlex="50%"
+    fxFlex.gt-md="50%"
+    fxFlex.lt-lg="80%"
     class="message"
   >
     <app-logo variant="dark-lg" (click)="goHome($event)"></app-logo>

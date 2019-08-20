@@ -96,8 +96,10 @@ $header-height-lg: ($uva-header-height + $site-header-height + $search-bar-heigh
   $accent: map-get($theme, accent); // Global style overrides
 
   body {
+    padding-top: ($header-height-sm - 8px);
+
     // SM
-    @media (max-width: 959px) {
+    @media (min-width: 600px) {
       padding-top: $header-height-sm;
     }
 

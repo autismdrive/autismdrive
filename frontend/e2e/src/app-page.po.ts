@@ -16,6 +16,10 @@ export class AppPage {
     browser.driver.manage().window().maximize();
   }
 
+  waitFor(t: number) {
+    browser.sleep(t);
+  }
+
 
   waitForAnimations() {
     browser.sleep(3000);

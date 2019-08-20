@@ -2,18 +2,19 @@
 <div
   hidden="loading"
   class="container mat-typography"
-  fxLayout="row"
+  fxLayout.gt-md="row"
+  fxLayout.lt-lg="column"
   fxLayoutWrap
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
 >
   <div
     class="form"
-    fxFlex="50%"
-    fxFlex.xs="90%"
+    fxFlex.gt-md="50%"
+    fxFlex.lt-lg="80%"
   >
     <app-logo variant="dark-lg"></app-logo>
-    <h1>Sign in to the registry</h1>
+    <h1>Sign in</h1>
     <form
       [formGroup]="form"
       (ngSubmit)="submit(model)"
