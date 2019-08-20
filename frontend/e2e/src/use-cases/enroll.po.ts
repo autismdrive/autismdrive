@@ -35,16 +35,27 @@ export class EnrollUseCases {
     });
   }
 
+  cancelIntro() {
+    this.page.waitFor(3000);
+    expect(this.page.getElements('#intro-cancel-button').count()).toEqual(1);
+    this.page.clickAndExpectRoute('#intro-cancel-button', '/profile');
+  }
+
   cancelEditing() {
-    expect(this.page.getElements('#cancel-button').count()).toEqual(1);
-    this.page.clickAndExpectRoute('#cancel-button', '/profile');
+    expect(this.page.getElements('#flow-cancel-button').count()).toEqual(1);
+    this.page.clickAndExpectRoute('#flow-cancel-button', '/profile');
   }
 
   displayGuardianTerms() {
     expect(this.page.getElements('app-terms').count()).toEqual(1);
     expect(this.page.getElements('#guardian-terms').count()).toEqual(1);
     expect(this.page.getElements('#agree-button').count()).toEqual(1);
-    expect(this.page.getElements('#cancel-button').count()).toEqual(1);
+    expect(this.page.getElements('#terms-cancel-button').count()).toEqual(1);
+  }
+
+  cancelTerms() {
+    expect(this.page.getElements('#terms-cancel-button').count()).toEqual(1);
+    this.page.clickAndExpectRoute('#terms-cancel-button', '/profile');
   }
 
   acceptTerms() {

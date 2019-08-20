@@ -11,7 +11,7 @@
     }
   }
 
-  #primary-nav, #utility-nav {
+  #primary-nav {
     .mat-button {
       &.selected {
         border-bottom-left-radius: 0px;
@@ -23,8 +23,7 @@
     }
   }
 
-  #primary-nav .mat-button,
-  #utility-nav .mat-button {
+  #primary-nav .mat-button {
     margin-top: 0px;
     margin-bottom: 0px;
   }
@@ -112,7 +111,9 @@
       height: $search-bar-height-lg;
     }
 
-    p {
+    p.tagline {
+      font-style: italic;
+
       // SM
       @media (max-width: 959px) {
         justify-self: center;

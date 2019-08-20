@@ -178,6 +178,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       } else {
         this.renderForm(step, q);
       }
+      this.scrollToTop();
     });
   }
 
