@@ -1,4 +1,4 @@
-@import '../../stardrive_material';
+@import '../../material';
 
 
 #menu-bar {
@@ -29,7 +29,7 @@
 
 
 #header-bg {
-  background-color: mat-color($stardrive-primary, 500);
+  background-color: $brand-primary;
   position: fixed;
   width: 100%;
   z-index: 98;
@@ -58,7 +58,7 @@
   top: 0;
   width: 100%;
   height: $uva-header-height;
-  background-color: mat-color($stardrive-primary, 500);;
+  background-color: $brand-primary;;
   z-index: 101;
   padding-left: 20px;
 
@@ -81,11 +81,11 @@
 
   mat-toolbar {
     background-color: white;
-    color: mat-color($stardrive-primary, 500);
+    color: $brand-primary;
   }
 
   mat-toolbar-row.search {
-    background-color: mat-color($stardrive-primary, 500);
+    background-color: $brand-primary;
     color: white;
     display: grid;
 
@@ -147,7 +147,7 @@
     }
 
     li {
-      border-right: 1px solid mat-color($stardrive-accent, 500);
+      border-right: 1px solid $brand-accent;
       height: 2em;
       padding: 0px 18px 0px 18px;
       margin: 0px;
@@ -166,7 +166,7 @@
         font-weight: 700;
         font-style: italic;
         font-size: 18px;
-        color: mat-color($stardrive-primary, 500);
+        color: $brand-primary;
         text-transform: uppercase;
         position: relative;
         display: flex;
@@ -185,7 +185,7 @@
       }
 
       a.selected:after {
-        background-color: mat-color($stardrive-accent, 500);
+        background-color: $brand-accent;
         bottom: 0px;
       }
 
@@ -197,7 +197,7 @@
         }
 
         a:after {
-          background-color: mat-color($stardrive-accent, 500);
+          background-color: $brand-accent;
           bottom: 0px;
         }
       }
@@ -220,7 +220,7 @@ div.mirror-message {
   position: fixed;
   top: -100vh;
   width: 100%;
-  background-color: mat-color($stardrive-primary, 500);
+  background-color: $brand-primary;
   color: white;
   z-index: 97;
   padding: 1em;

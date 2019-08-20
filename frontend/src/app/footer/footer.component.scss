@@ -1,4 +1,5 @@
-@import '../../stardrive_material';
+@import '../../config';
+@import '../../mixins';
 
 footer {
   margin: 50px 10px 10px 10px;
@@ -39,7 +40,7 @@ footer {
   max-width: 15.625rem;
 
   .address, .tel, .email {
-      color: #4e4e4e;
+      color: $body-color;
       line-height: 1.5;
       font-style: italic;
       display: inline;

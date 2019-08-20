@@ -1,4 +1,4 @@
-@import '../../stardrive_material';
+@import '../../config';
 
 th.mat-header-cell {
   padding-right: 1em;
@@ -12,5 +12,5 @@ button {
 }
 
 button.mat-flat-button.mat-accent.selected {
-  background: mat-color($stardrive-primary, default, 1);
+  background: $brand-primary;
 }

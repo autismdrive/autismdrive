@@ -1,11 +1,11 @@
-@import '../../stardrive_material';
+@import '../../material';
 
 #logo {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  &.dark-lg a, &.dark a { color: mat-color($stardrive-primary, 500); }
+  &.dark-lg a, &.dark a { color: $brand-primary; }
   &.light-lg a, &.light a { color: white; }
 
   &.dark-lg, &.light-lg {
