@@ -37,7 +37,6 @@ import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { PdfJsViewerModule } from 'ng2-pdfjs-viewer';
-import { ColorPickerModule } from 'ngx-color-picker';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgProgressModule } from 'ngx-progressbar';
 import { environment } from 'src/environments/environment';
@@ -198,7 +197,6 @@ export class FormlyConfig {
     AgmJsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
-    ColorPickerModule,
     CommonModule,
     FlexLayoutModule,
     FormlyMatDatepickerModule,
