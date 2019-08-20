@@ -1,3 +1,5 @@
+import logging.config
+from config.logging import logging_config
 
 from flask import Flask, jsonify
 from flask_migrate import Migrate
@@ -13,6 +15,10 @@ from app.elastic_index import ElasticIndex
 from app.email_service import EmailService
 from app.rest_exception import RestException
 
+# Configure logging before creating app.
+logging.config.dictConfig(logging_config)
+
+
 app = Flask(__name__, instance_relative_config=True)
 
 # Load the default configuration
@@ -27,7 +33,6 @@ if "TESTING" in os.environ and os.environ["TESTING"] == "true":
 
 if "MIRRORING" in os.environ and os.environ["MIRRORING"] == "true":
     app.config.from_object('config.mirror')
-
 
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

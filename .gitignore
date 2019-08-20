@@ -5,3 +5,4 @@ frontend/package-lock.json
 .vscode
 .isort.cfg
 setup.cfg
+backend/star_drive.log
