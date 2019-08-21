@@ -1,4 +1,4 @@
-@import '../../stardrive_material';
+@import '../../material';
 
 a {
   text-decoration: none;
@@ -8,7 +8,7 @@ a {
   [class*="details-link-"] {
     @include mat-typography-level-to-styles($custom-typography, title);
     font-style: italic;
-    color: mat-color($stardrive-primary, 500);
+    color: $brand-primary;
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
@@ -24,7 +24,7 @@ a {
   }
 
  [class*="icofont-"] {
-    color: #e57200;
+    color: $brand-accent;
     transition: margin-left 0.5s;
   }
 

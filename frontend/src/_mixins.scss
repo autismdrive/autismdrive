@@ -1,0 +1,26 @@
+// MIXINS
+@mixin border-dots {
+  background-image: url('/assets/theme/orange-dotted-border-x.png');
+  background-repeat: repeat-x;
+  width: 100%;
+  height: 4px;
+  display: block;
+  position: absolute;
+  left: 0;
+}
+
+@mixin bottom-border-dots {
+  &:after {
+    @include border-dots;
+    content: '';
+    bottom: -2em;
+  }
+}
+
+@mixin top-border-dots {
+  &:before {
+    @include border-dots;
+    content: '';
+    top: -2em;
+  }
+}

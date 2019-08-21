@@ -1,4 +1,4 @@
-@import '../../stardrive_material';
+@import '../../config';
 
 $dot_size: 8px;
 
@@ -33,7 +33,7 @@ $dot_size: 8px;
       height: $dot_size;
       width: $dot_size;
       border-radius: 50%;
-      border: 1px solid mat-color($stardrive-primary, default, 1);
+      border: 1px solid $brand-primary;
       background-color: white;
       float: left;
       margin-left: 10px;
@@ -41,7 +41,7 @@ $dot_size: 8px;
       cursor: pointer;
 
       &.active, &.inactive:hover {
-        background-color: mat-color($stardrive-primary, default, 1);
+        background-color: $brand-primary;
         opacity: 1;
       }
       &.inactive { opacity: 0.5; }
