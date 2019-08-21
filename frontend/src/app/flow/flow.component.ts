@@ -11,6 +11,7 @@ import { Step, StepStatus } from '../_models/step';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {scrollToTop} from '../../util/scrollToTop';
 
 enum FlowState {
   NO_CONSENT = 'no_consent',
@@ -94,6 +95,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         } else {
           this.goToNextAvailableStep();
         }
+        scrollToTop();
       });
   }
 
@@ -131,7 +133,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     } else {
       console.log('This flow is already completed.');
       this.state = FlowState.COMPLETE;
-      this.scrollToTop();
+      scrollToTop();
     }
   }
 
@@ -139,6 +141,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     participant.has_consented = true;
     this.api.updateParticipant(participant).subscribe(participant => {
       this.loadFlow(this.flow.name);
+      scrollToTop();
     });
   }
 
@@ -158,6 +161,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     if (this.mobileQuery.matches) {
       this.sidebarOpen = false;
     }
+    scrollToTop();
   }
 
   currentStep(): Step {
@@ -178,8 +182,9 @@ export class FlowComponent implements OnInit, OnDestroy {
       } else {
         this.renderForm(step, q);
       }
-      this.scrollToTop();
+      scrollToTop();
     });
+    scrollToTop();
   }
 
 
@@ -198,6 +203,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       }
     };
     this.state = this.flowState.SHOW_FORM;
+    scrollToTop();
   }
 
   private infoToForm(info) {
@@ -228,7 +234,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             'value': this.flow.percentComplete()
           });
           this.loadFlow(this.flow.name);
-          this.scrollToTop();
+          scrollToTop();
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
@@ -239,17 +245,9 @@ export class FlowComponent implements OnInit, OnDestroy {
             'value': this.flow.percentComplete()
           });
           this.loadFlow(this.flow.name);
-          this.scrollToTop();
+          scrollToTop();
         });
     }
-  }
-
-  scrollToTop() {
-    window.scroll({
-      top: 0,
-      left: 0,
-      behavior: 'smooth'
-    });
   }
 
   numCompletedSteps() {
