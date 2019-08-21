@@ -1,40 +1,6 @@
-@import '../../material';
+@import '../../config';
 
-.profile {
-  margin: 2%;
-}
-
-.pad-1 {
-  padding: 1em;
-}
-
-.pad-2 {
-  padding: 2em;
-}
-
-.pad-3 {
-  padding: 3em;
-}
-
-.pad-4 {
-  padding: 4em;
-}
-
-.pad-5 {
-  padding: 5em;
-}
-
-.pad-6 {
-  padding: 6em;
-}
-
-.pad-7 {
-  padding: 7em;
-}
-
-.pad-8 {
-  padding: 8em;
-}
+.profile { margin: 2%; }
 
 .button-row button {
   margin-right: 8px;
@@ -57,5 +23,5 @@ h1 {
 h1 small {
   position: absolute;
   right: 0px;
-  color: mat-color($stardrive-primary, default, 1);
+  color: $brand-primary;
 }

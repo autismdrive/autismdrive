@@ -26,7 +26,7 @@
   background-color: transparent;
 
   &:hover {
-    color: mat-color($stardrive-primary, default, 1);
+    color: $brand-primary;
     background-color: transparent;
   }
 }

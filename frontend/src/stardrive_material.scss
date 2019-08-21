@@ -154,7 +154,7 @@
   }
 
   .mat-drawer .mat-nav-list .mat-list-item.active {
-    background-color: mat-color($stardrive-primary, default, 1);
+    background-color: $brand-primary;
     color: white;
   }
 
@@ -326,4 +326,13 @@
 
       .border-box-tile-inner p { color: $body-color; }
   }
+
+  .pad-1 { padding: 1em; }
+  .pad-2 { padding: 2em; }
+  .pad-3 { padding: 3em; }
+  .pad-4 { padding: 4em; }
+  .pad-5 { padding: 5em; }
+  .pad-6 { padding: 6em; }
+  .pad-7 { padding: 7em; }
+  .pad-8 { padding: 8em; }
 }
