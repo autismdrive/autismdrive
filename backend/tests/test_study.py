@@ -38,6 +38,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         response["short_title"] = 'Edwardos'
         response["short_description"] = 'Better fluids yada yada.'
         response["image_url"] = '/some/url'
+        response["coordinator_email"] = 'hello@study.com'
         orig_date = response['last_updated']
         rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True)
@@ -51,6 +52,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(response["short_title"], 'Edwardos')
         self.assertEqual(response["short_description"], 'Better fluids yada yada.')
         self.assertEqual(response["image_url"], '/some/url')
+        self.assertEqual(response["coordinator_email"], 'hello@study.com')
         self.assertNotEqual(orig_date, response['last_updated'])
 
     def test_delete_study(self):
