@@ -4,7 +4,6 @@ from functools import wraps
 
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy import func
-
 from app import app, RestException, db, auth, email_service
 from app.model.email_log import EmailLog
 from app.model.user import User

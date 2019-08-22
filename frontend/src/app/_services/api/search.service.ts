@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 export class SearchService {
   private querySubject: BehaviorSubject<Query>;
   public currentQuery: Observable<Query>;
-  query_url = `${environment.api}/api/search`;
+  query_url = `${environment.api}/api/search/resources`;
 
   constructor(private http: HttpClient) {
     const queryDict = JSON.parse(localStorage.getItem('currentQuery'));

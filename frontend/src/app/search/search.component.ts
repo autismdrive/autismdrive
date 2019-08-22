@@ -18,6 +18,8 @@ import { StudyStatus } from '../_models/study';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {scrollToTop} from '../../util/scrollToTop';
+import {log} from "util";
 
 interface SortMethod {
   name: string;
@@ -31,7 +33,7 @@ interface SortMethod {
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
-  query =  new Query({
+  query = new Query({
     words: '',
     filters: [],
     size: 20,
@@ -176,11 +178,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       relativeTo: this.route,
       queryParams: queryParams
     }).then(() => {
-      window.scroll({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
+      console.log('Done navigating to new route.', queryParams);
+      scrollToTop();
     });
   }
 
@@ -192,25 +191,16 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.query.equals(queryWithResults)) {
           this.query = queryWithResults;
           this.checkWindowWidth();
-          this.searchFeaturedStudies();
           this.loading = false;
         } else {
-          this.updateUrl(this.query);
+          console.log('queryWithResults', queryWithResults);
+          this.updateUrl(queryWithResults);
         }
       });
     this.googleAnalyticsService.event(this.query.words,
       {
         'event_category': 'search',
       });
-  }
-
-  searchFeaturedStudies() {
-    const query = new Query(this.query);
-    query.replaceFilter('Type', HitLabel.STUDY);
-    query.filters.push({field: 'Status', value: [StudyStatus.currently_enrolling]});
-    this.featuredSearchService.search(query).subscribe(queryWithResults => {
-      console.log('Featured studies queryWithResults', queryWithResults);
-    });
   }
 
   loadMapLocation(callback: Function) {
