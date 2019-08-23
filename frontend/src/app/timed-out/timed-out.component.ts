@@ -1,6 +1,7 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { fadeTransition } from '../_animations/animations';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-timedout',
@@ -12,16 +13,16 @@ export class TimedoutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 
-  constructor(
-    private router: Router
+  constructor(private router: Router,
+              private authenticationService: AuthenticationService
   ) {
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.authenticationService.logout();
+  }
 
   goHome() {
-    localStorage.clear();
-    sessionStorage.clear();
     this.router.navigate(['']);
   }
 }
