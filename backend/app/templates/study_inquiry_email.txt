@@ -1,0 +1,13 @@
+Dear Study Coordinator,
+One of the STAR Drive Users recently requested information about participating in your study. Here are the details we have:
+Study: {{ study.title }}
+
+User Details:
+First Name: {{ user.get_contact()["name"] }}
+Relationship: {{ user.get_contact()["relationship"] }}
+Email: {{ user.get_contact()["contact"].email }}
+Phone: {{ user.get_contact()["contact"].phone }}
+Is it OK to leave a voicemail? {{ user.get_contact()["contact"].can_leave_voicemail }}
+Best time to call: {{ user.get_contact()["contact"].contact_times }}
+
+

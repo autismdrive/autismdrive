@@ -85,6 +85,7 @@ class User(db.Model):
         except jwt.InvalidTokenError:
             raise RestException(RestException.TOKEN_INVALID)
 
-
-
-
+    def get_contact(self):
+        for p in self.participants:
+            if p.contact:
+                return {'name': p.get_name(), 'relationship': p.relationship.name, 'contact': p.contact}

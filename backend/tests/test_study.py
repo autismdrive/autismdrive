@@ -1,15 +1,18 @@
 import unittest
 from flask import json
 from tests.base_test import BaseTest
-from app import db, elastic_index
+from app import db
+from app.email_service import TEST_MESSAGES
+from app.model.email_log import EmailLog
 from app.model.investigator import Investigator
+from app.model.participant import Relationship
+from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 
 
 class TestStudy(BaseTest, unittest.TestCase):
-
-
 
     def test_study_basics(self):
         self.construct_study()
@@ -308,3 +311,101 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(response['name'], 'Tara Tarantula')
         self.assertEqual(response['title'], 'Assistant Professor of Arachnology')
         self.assertIsNotNone(response['id'])
+
+    def test_study_inquiry_sends_email(self):
+        message_count = len(TEST_MESSAGES)
+        s = self.construct_study(title="The Best Study")
+        u = self.construct_user()
+        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        dependent1 = self.construct_participant(user=u, relationship=Relationship.dependent)
+        self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
+        self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
+        self.construct_identification_questionnaire(user=u, participant=dependent1, first_name="Fred", is_first_name_preferred=False, nickname="Zorba")
+
+        data = {'user_id': u.id, 'study_id': s.id}
+        rv = self.app.post('/api/study_inquiry',
+                           data=json.dumps(data),
+                           follow_redirects=True,
+                           content_type="application/json",
+                           headers=self.logged_in_headers())
+        self.assert_success(rv)
+        self.assertGreater(len(TEST_MESSAGES), message_count)
+        self.assertEqual("STAR Drive: Study Inquiry Email",
+                         self.decode(TEST_MESSAGES[-1]['subject']))
+
+        logs = EmailLog.query.all()
+        self.assertIsNotNone(logs[-1].tracking_code)
+
+    def test_study_inquiry_fails_without_valid_study_or_user(self):
+        s = self.construct_study(title="The Best Study")
+        u = self.construct_user()
+        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
+        self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
+
+        data = {'user_id': u.id, 'study_id': 456}
+        rv = self.app.post('/api/study_inquiry',
+                           data=json.dumps(data),
+                           follow_redirects=True,
+                           content_type="application/json",
+                           headers=self.logged_in_headers())
+        self.assertEqual(400, rv.status_code)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['message'], 'Error in finding correct user and study to complete study inquiry')
+        data = {'user_id': 456, 'study_id': s.id}
+        rv = self.app.post('/api/study_inquiry',
+                           data=json.dumps(data),
+                           follow_redirects=True,
+                           content_type="application/json",
+                           headers=self.logged_in_headers())
+        self.assertEqual(400, rv.status_code)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['message'], 'Error in finding correct user and study to complete study inquiry')
+
+    def construct_identification_questionnaire(self, relationship_to_participant='adoptFather', first_name='Karl',
+                                               is_first_name_preferred=True, nickname=None, participant=None, user=None):
+
+        iq = IdentificationQuestionnaire(relationship_to_participant=relationship_to_participant, first_name=first_name,
+                                         is_first_name_preferred=is_first_name_preferred, nickname=nickname)
+        if user is None:
+            u = self.construct_user(email='ident@questionnaire.com')
+            iq.user_id = u.id
+        else:
+            u = user
+            iq.user_id = u.id
+
+        if participant is None:
+            iq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
+        else:
+            iq.participant_id = participant.id
+
+        db.session.add(iq)
+        db.session.commit()
+
+        db_iq = db.session.query(IdentificationQuestionnaire).filter_by(participant_id=iq.participant_id).first()
+        self.assertEqual(db_iq.nickname, iq.nickname)
+        return db_iq
+
+    def construct_contact_questionnaire(self, phone="123-456-7890", can_leave_voicemail=True, contact_times="whenever",
+                                        email='contact@questionnaire.com', participant=None, user=None):
+
+        cq = ContactQuestionnaire(phone=phone, can_leave_voicemail=can_leave_voicemail, contact_times=contact_times,
+                                  email=email)
+        if user is None:
+            u = self.construct_user(email='contact@questionnaire.com')
+            cq.user_id = u.id
+        else:
+            u = user
+            cq.user_id = u.id
+
+        if participant is None:
+            cq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
+        else:
+            cq.participant_id = participant.id
+
+        db.session.add(cq)
+        db.session.commit()
+
+        db_cq = db.session.query(ContactQuestionnaire).filter_by(zip=cq.zip).first()
+        self.assertEqual(db_cq.phone, cq.phone)
+        return db_cq
