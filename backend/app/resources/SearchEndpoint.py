@@ -2,16 +2,15 @@ import elasticsearch
 import flask_restful
 from flask import request, json
 
-from app import elastic_index, RestException
+from app import elastic_index, RestException, db
 from app.model.search import Facet, FacetCount, Hit
 from app.schema.schema import SearchSchema
-from typing import List, Dict
+from typing import List, Dict, Type, Any
 
 
 class SearchEndpoint(flask_restful.Resource):
-    def _post(self, result_types: List[str] = None):
+    def __post__(self, result_types: List[str] = None):
         request_data: Dict = request.get_json()
-        print('request_data before', request_data)
 
         if request_data is not None and request_data['filters'] is not None and result_types is not None:
             filters: List[dict] = list(request_data['filters'])
@@ -24,8 +23,6 @@ class SearchEndpoint(flask_restful.Resource):
                             f['value'] = list(result_types)
             else:
                 request_data['filters'] = [{'field': 'Type', 'value': list(result_types)}]
-
-        print('request_data after', request_data)
 
         search, errors = SearchSchema().load(request_data)
         if errors:
@@ -40,10 +37,9 @@ class SearchEndpoint(flask_restful.Resource):
         for facet_name in results.facets:
             facet = Facet(facet_name)
             facet.facetCounts = []
-            for category, hit_count, is_selected in results.facets[
-                    facet_name]:
-                facet.facetCounts.append(
-                    FacetCount(category, hit_count, is_selected))
+            for category, hit_count, is_selected in results.facets[facet_name]:
+                if (facet_name != 'Type') or ((result_types is None) or (category in result_types)):
+                    facet.facetCounts.append(FacetCount(category, hit_count, is_selected))
             search.facets.append(facet)
 
         search.hits = []
@@ -54,10 +50,7 @@ class SearchEndpoint(flask_restful.Resource):
             hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.last_updated, highlights, hit.latitude, hit.longitude)
             search.hits.append(hit)
 
-        search_results = SearchSchema().jsonify(search)
-
-        print('search_results: ', search_results)
-        return search_results
+        return SearchSchema().jsonify(search)
 
     def post(self):
-        return self._post()
+        return self.__post__()
