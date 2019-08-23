@@ -11,8 +11,10 @@ from typing import List, Dict, Type, Any
 class SearchEndpoint(flask_restful.Resource):
     def __post__(self, result_types: List[str] = None):
         request_data: Dict = request.get_json()
+        has_request_data = request_data is not None
+        has_filters = has_request_data and 'filters' in request_data and request_data['filters'] is not None
 
-        if request_data is not None and request_data['filters'] is not None and result_types is not None:
+        if has_filters and result_types is not None:
             filters: List[dict] = list(request_data['filters'])
 
             if len(filters) > 0:
