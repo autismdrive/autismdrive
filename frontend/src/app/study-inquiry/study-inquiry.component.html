@@ -1,0 +1,47 @@
+<div *ngIf="!inquirySent">
+  <h2>Interested in enrolling?</h2>
+  <div
+    *ngIf="!currentUser"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <p>Joining Autism Drive is the first step toward participating in our clinical research.</p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="goRegister($event)"
+    >Join Autism Drive</button>
+    <p>Already a user? Sign in</p>
+    <button
+      mat-flat-button
+      color="accent"
+      (click)="goLogin($event)"
+    >Sign In</button>
+  </div>
+  <div
+    *ngIf="currentUser"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <div *ngIf="haveUserContact">
+      <p>Select the “Learn More” button for a member of the research team to contact you to learn more.</p>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="sendInquiry()"
+      >Learn More</button>
+    </div>
+    <div *ngIf="!haveUserContact">
+      <p>We need your contact details to give to the study team. Please complete your profile.</p>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="goProfile($event)"
+      >Edit Enrollment Info</button>
+    </div>
+  </div>
+</div>
+<div *ngIf="inquirySent">
+  <h2>Thank You</h2>
+  <p>We’ve let the researchers know that you are interested in the study.</p>
+</div>

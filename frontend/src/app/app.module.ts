@@ -101,6 +101,7 @@ import { AdminExportComponent } from './admin-export/admin-export.component';
 import { AdminExportDetailsComponent } from './admin-export-details/admin-export-details.component';
 import { GoogleAnalyticsService } from './google-analytics.service';
 import { DetailsLinkComponent } from './details-link/details-link.component';
+import { StudyInquiryComponent } from './study-inquiry/study-inquiry.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -191,6 +192,7 @@ export class FormlyConfig {
     AdminExportComponent,
     AdminExportDetailsComponent,
     DetailsLinkComponent,
+    StudyInquiryComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({ apiKey: environment.gc_api_key }),

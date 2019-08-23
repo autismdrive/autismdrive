@@ -27,12 +27,5 @@ export class StudyDetailComponent implements OnInit {
   ngOnInit() {
   }
 
-  goLogin($event: MouseEvent) {
-    $event.preventDefault();
-    if (this.study) {
-      this.router.navigateByUrl('/login');
-    }
-  }
-
   get snakeToUpperCase() { return snakeToUpperCase; }
 }
