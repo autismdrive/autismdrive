@@ -3,10 +3,12 @@
     (click)="selectStep(step)"
     [ngClass]="{'active': stepName === step.name, 'step-link': true}"
   >
+    <mat-icon *ngIf="step.type === 'sensitive'" [ngClass]="{'visible': true}">lock</mat-icon>
+    <mat-icon *ngIf="step.type !== 'sensitive'" [ngClass]="{'hidden': true}">lock</mat-icon>
     {{step.label}}
     <span fxFlex></span>
-    <mat-icon *ngIf="step.status === 'COMPLETE'" [ngClass]="{'complete': true}">done</mat-icon>
-    <mat-icon *ngIf="step.status !== 'COMPLETE'" [ngClass]="{'incomplete': true}">done</mat-icon>
+    <mat-icon *ngIf="step.status === 'COMPLETE'" [ngClass]="{'visible': true}">done</mat-icon>
+    <mat-icon *ngIf="step.status !== 'COMPLETE'" [ngClass]="{'hidden': true}">done</mat-icon>
   </mat-list-item>
 </mat-nav-list>
 

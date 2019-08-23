@@ -18,7 +18,7 @@ enum FlowState {
   INTRO = 'intro',
   LOADING = 'loading',
   COMPLETE = 'complete',
-  SHOW_FORM = 'form',
+  SHOW_FORM = 'form'
 }
 
 @Component({
@@ -39,7 +39,8 @@ export class FlowComponent implements OnInit, OnDestroy {
   flowState = FlowState;
   state = FlowState.LOADING;
   startTime: number;
-
+  showResubmitMessage = false;
+  hideForm = false;
   sidebarOpen = true;
 
   model: any = {};
@@ -171,8 +172,14 @@ export class FlowComponent implements OnInit, OnDestroy {
   loadActiveStep() {
     const step = this.flow.steps[this.activeStep];
     this.api.getQuestionnaireMeta(this.flow.name, step.name).subscribe(q => {
+      this.showResubmitMessage = false;
+      this.hideForm = false;
       // Load the form with previously-submitted data, if available
-      if (step.questionnaire_id > 0) {
+      if (step.type === 'sensitive' && step.questionnaire_id > 0) {
+        this.showResubmitMessage = true;
+        this.hideForm = true;
+        this.renderForm(step, q);
+      } else if (step.questionnaire_id > 0) {
         this.api
           .getQuestionnaire(step.name, step.questionnaire_id)
           .subscribe(qData => {
