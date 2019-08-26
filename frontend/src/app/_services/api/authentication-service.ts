@@ -53,7 +53,7 @@ export class AuthenticationService {
       }));
   }
 
-  refresh(): Observable<User> {
+  private refresh(): Observable<User> {
     // For a refresh, we'll hold to the existing token, and try to make the request.
     return this.http.get<any>(this.refresh_url)
       .pipe(map(userDict => {

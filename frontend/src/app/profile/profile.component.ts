@@ -28,7 +28,7 @@ export class ProfileComponent implements OnInit {
               private router: Router,
               private googleAnalyticsSerice: GoogleAnalyticsService) {
 
-    this.authenticationService.refresh().subscribe(
+    this.authenticationService.currentUser.subscribe(
       user => {
         this.user = user;
         this.state = this.getState();
