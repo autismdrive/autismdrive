@@ -45,8 +45,8 @@ describe('Participant (Guardian - Self)', () => {
   it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
-  it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
-  it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
+  fit('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
+  fit('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
 
   // Search
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
@@ -70,13 +70,13 @@ describe('Participant (Guardian - Self)', () => {
   // Enrollment Flow
   it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
   it('should cancel out of the terms consent page', () => enrollUseCases.cancelTerms());
-  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
+  fit('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
   it('should accept the terms', () => enrollUseCases.acceptTerms());
   it('should display a menu link to all steps of the flow', () => enrollUseCases.displayMenuLinks());
   it('should display completed status of each step', () => enrollUseCases.displayCompletedStatus());
   it('should cancel enrollment instructions', () => enrollUseCases.cancelIntro());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
-  it('should navigate to each step of the flow', () => enrollUseCases.navigateToEachStep());
+  fit('should navigate to each step of the flow', () => enrollUseCases.navigateToEachStep());
   it('should cancel editing enrollment info', () => enrollUseCases.cancelEditing());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
   it('should display instructions for the entire flow', () => enrollUseCases.displayInstructions());

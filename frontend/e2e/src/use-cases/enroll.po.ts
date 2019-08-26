@@ -1,4 +1,5 @@
 import { AppPage } from '../app-page.po';
+import {by} from 'protractor';
 
 export class EnrollUseCases {
   constructor(private page: AppPage) {
@@ -16,21 +17,21 @@ export class EnrollUseCases {
     const numSteps = parseInt(numStepsStr, 10);
     const numCompletedStepsStr: string = await this.page.getElement('#num_completed_steps').getText();
     const numCompletedSteps = parseInt(numCompletedStepsStr, 10);
-    const incompleteLinks = await this.page.getElements('app-questionnaire-steps-list .step-link mat-icon.incomplete');
-    const completeLinks = await this.page.getElements('app-questionnaire-steps-list .step-link mat-icon.complete');
+    const incompleteLinks = await this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.hidden');
+    const completeLinks = await this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.visible');
     expect(completeLinks.length).toEqual(numCompletedSteps);
-
     const totalNumLinks = incompleteLinks.length + completeLinks.length;
     expect(totalNumLinks).toEqual(numSteps);
   }
 
   navigateToEachStep() {
     this.page.getElements('app-questionnaire-steps-list .step-link').each(link => {
+      const link_span = link.element(by.css('.step-link-text')).getWebElement();
       link.click();
       this.page.waitForVisible('form');
       this.page.waitForVisible('form h1');
       // this.page.waitForAnimations();
-      expect(this.page.getElement('form h1').getText().then(s => s.toLowerCase())).toEqual(link.getText().then(s => s.toLowerCase()));
+      expect(this.page.getElement('form h1').getText().then(s => s.toLowerCase())).toEqual(link_span.getText().then(s => s.toLowerCase()));
       expect(this.page.getElements('form mat-form-field').count()).toBeGreaterThan(0);
     });
   }
