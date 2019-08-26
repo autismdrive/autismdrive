@@ -15,9 +15,7 @@ from app.elastic_index import ElasticIndex
 from app.email_service import EmailService
 from app.rest_exception import RestException
 
-# Configure logging before creating app.
 logging.config.dictConfig(logging_config)
-
 
 app = Flask(__name__, instance_relative_config=True)
 
@@ -173,14 +171,18 @@ def run_full_export():
         click.echo('This system is not configured to run exports. Ingoring.')
 
 
-
 from app import views
 
+
+def schedule_tasks():
+    if app.config["MIRRORING"]:
+        from app.import_service import ImportService
+        importer = ImportService(app, db)
+        importer.start()
+    else:
+        from app.export_service import ExportService
+        ExportService.start()
+
+
 # Cron scheduler
-if app.config["MIRRORING"]:
-    from app.import_service import ImportService
-    importer = ImportService(app, db)
-    importer.start()
-else:
-    from app.export_service import ExportService
-    ExportService.start()
+app.before_first_request(schedule_tasks)
