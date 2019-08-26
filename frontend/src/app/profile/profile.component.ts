@@ -38,6 +38,7 @@ export class ProfileComponent implements OnInit {
         this.user = null;
         this.loading = false;
       });
+    this.authenticationService.refresh();
   }
 
   ngOnInit() {
@@ -84,7 +85,7 @@ export class ProfileComponent implements OnInit {
 
     this.api.addParticipant(newParticipant).subscribe(participant => {
       this.googleAnalyticsSerice.event(flow,  {'event_category': 'enrollment'});
-
+      this.user.participants.push(participant);
       console.log('Navigating to flow/', flow, '/', participant.id);
       this.router.navigate(['flow', flow,  participant.id]);
     });

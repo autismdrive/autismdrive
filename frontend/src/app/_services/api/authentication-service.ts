@@ -24,7 +24,7 @@ export class AuthenticationService {
     this.currentUserSubject = new BehaviorSubject<User>(null);
     this.currentUser = this.currentUserSubject.asObservable();
     if (this.token) {
-      this.refresh().subscribe();  // Make sure the api still considers the in-memory user as valid.
+      this._refresh().subscribe();  // Make sure the api still considers the in-memory user as valid.
     }
   }
 
@@ -53,7 +53,7 @@ export class AuthenticationService {
       }));
   }
 
-  private refresh(): Observable<User> {
+  private _refresh(): Observable<User> {
     // For a refresh, we'll hold to the existing token, and try to make the request.
     return this.http.get<any>(this.refresh_url)
       .pipe(map(userDict => {
@@ -61,6 +61,10 @@ export class AuthenticationService {
         return this.loadUser(userDict);
       }),
       );
+  }
+
+  refresh() {
+    this._refresh().subscribe();
   }
 
   resetPassword(newPassword: string, email_token: string): Observable<any>  {
