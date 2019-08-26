@@ -65,7 +65,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
 
-    this.authenticationService.refresh().subscribe(user => {
+    this.authenticationService.currentUser.subscribe(user => {
       this.user = user;
       this.route.params.subscribe(params => {
         this.participant = this.user.getParticipantById(parseInt(params.participantId, 10));

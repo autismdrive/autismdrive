@@ -1,20 +1,32 @@
 logging_config = {
   'version': 1,
+  'disable_existing_loggers': False,
   "loggers": {
-    "console": {
-      "level": "DEBUG",
-      "propagate": False,
-      "handlers": [
-        "console"
-      ]
+    '': {  # root logger
+      'handlers': ['console', 'file'],
+      'level': 'INFO',
+      'propagate': True
     },
-    "file": {
-      "level": "DEBUG",
-      "propagate": False,
-      "handlers": [
-        "file"
-      ]
-    }
+    'alembic.runtime.migration': {
+      'handlers': ['console', 'file'],
+      'level': 'WARN',
+      'propagate': False
+    },
+    'urllib3.connectionpool': {
+      'handlers': ['console', 'file'],
+      'level': 'WARN',
+      'propagate': False
+    },
+    'elasticsearch': {
+      'handlers': ['console', 'file'],
+      'level': 'WARN',
+      'propagate': False
+    },
+    'ElasticIndex': {
+      'handlers': ['console', 'file'],
+      'level': 'WARN',
+      'propagate': False
+    },
   },
   "formatters": {
     "simple": {
