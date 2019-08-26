@@ -25,4 +25,8 @@ export class TimedoutComponent implements OnInit {
   goHome() {
     this.router.navigate(['']);
   }
+
+  goLogin() {
+    this.router.navigate(['/login']);
+  }
 }
