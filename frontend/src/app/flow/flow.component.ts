@@ -232,7 +232,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
-    if (this.currentStep().questionnaire_id > 0) {
+    if ((this.currentStep().questionnaire_id > 0) && (this.currentStep().type != 'sensitive')) {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
           this.googleAnalyticsService.event('update',  {

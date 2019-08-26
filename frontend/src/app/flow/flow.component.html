@@ -61,10 +61,10 @@
               <p>{{ currentStep().description }}</p>
 
               <div *ngIf="showResubmitMessage">
-                <p *ngIf="hideForm" class="alert alert-warn">In order to protect certain sensitive information about you, this information
-                  is carefully protected and is no longer accessible via this web site. If you feel
+                <p *ngIf="hideForm" class="alert alert-warn">In order to protect certain sensitive information about you,
+                  this information is no longer accessible via this web site. If you feel
                   that this information should be updated, you may choose to re-complete
-                  this information again and re-submit it.</p>
+                  this form and re-submit it.</p>
                 <button
                   *ngIf="hideForm"
                   mat-flat-button
@@ -86,12 +86,12 @@
                 </formly-form>
 
                 <p *ngIf="showResubmitMessage" class="alert alert-warn">You are about to re-submit this form. While this
-                  will not replace previous records, will will defer to the information you complete here when
+                  will not replace previous records, we will defer to the information you submit now when
                   considering your eligibility to future studies and notifications.</p>
 
                 <p *ngIf="currentStep().type === 'sensitive'" class="alert alert-warn">This information is considered sensitive. While
-                  you may complete this form again in full, you may not edit these values later as the data
-                  will be placed in a secure location and is not accessible from this website.</p>
+                  you may complete this form again in full, you may not view or edit these values later as the data
+                  will be placed in a secure location and will no longer be accessible from this website.</p>
 
                 <div class="button-row">
                   <button
