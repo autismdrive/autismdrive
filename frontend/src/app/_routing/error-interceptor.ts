@@ -3,7 +3,8 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/c
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {Router} from '@angular/router';
-
+import {GoogleAnalyticsService} from '../google-analytics.service';
+import {StarError} from '../star-error';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -11,7 +12,16 @@ export class ErrorInterceptor implements HttpInterceptor {
   isSession = new RegExp('.*/api/session');
 
 
-  constructor(private router: Router) { }
+  constructor(private router: Router,
+              private googleAnalyticsService: GoogleAnalyticsService) { }
+
+  private logError(error: StarError) {
+    this.googleAnalyticsService.event(error.code, {
+      'event_category': 'error messages',
+      'event_label': error.message
+    });
+  }
+
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(catchError(err => {
@@ -25,7 +35,12 @@ export class ErrorInterceptor implements HttpInterceptor {
         this.router.navigate(['timedout']);
       }
 
-      const error = err.error.message || err.statusText;
+      // Log error to google if possible
+      if (err.error)  { this.logError(err.error); }
+
+      // You can put anything in an Error.  In this case we are putting an error
+      // object with a code and a message.
+      const error = err.error || err.statusText;
       return throwError(error);
     }));
   }

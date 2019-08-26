@@ -18,8 +18,13 @@ import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
 import {Organization} from '../../_models/organization';
+import {StarError} from '../../star-error';
 
-@Injectable()
+
+
+@Injectable({
+  providedIn: 'root'
+})
 export class ApiService {
 
   apiRoot = environment.api;
@@ -88,27 +93,10 @@ export class ApiService {
     this.setServerStatus();
   }
 
-  private _handleError(error: HttpErrorResponse) {
-    const message = 'Something bad happened; please try again later.';
-
-    console.error(error);
-
-    if (error.error instanceof ErrorEvent) {
-      // A client-side or network error occurred. Handle it accordingly.
-      console.error('An error occurred:', error.error.message);
-    } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong,
-      let errorMessage = `Backend returned a status code ${error.status}, `;
-      if (error.error) {
-        errorMessage +=
-          `Code was: ${JSON.stringify(error.error.code)}, ` +
-          `Message was: ${JSON.stringify(error.error.message)}`;
-      }
-      console.error(errorMessage);
-    }
+  private _handleError(error: StarError) {
+    let message = 'Something bad happened; please try again later.';
+    message = error.message;
     // return an observable with a user-facing error message
-    // FIXME: Log all error messages to Google Analytics
     return throwError(message);
   }
 
