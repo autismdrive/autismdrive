@@ -14,11 +14,14 @@
       message="Loading..."
     ></app-loading>
 
-    <div  *ngIf="state !== flowState.LOADING">
+    <div *ngIf="state !== flowState.LOADING">
       <h1 *ngIf="state !== flowState.NO_CONSENT">
-        <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+        <button mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
         <span *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</span>
-        <span *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment
+        <span *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}}
+          enrollment
       info</span>
         <small class="mat-small">
           <span id="num_completed_steps">{{numCompletedSteps()}}</span> of
@@ -34,14 +37,14 @@
       <div *ngIf="state !== flowState.NO_CONSENT">
         <mat-drawer-container>
           <mat-drawer #sidenav
-            [mode]="mobileQuery.matches ? 'over' : 'side'"
-            [(opened)]="sidebarOpen">
-              <app-questionnaire-steps-list
-                [flow]="flow"
-                [stepIndex]="activeStep"
-                (stepSelected)="goToStep($event)"
-              >
-              </app-questionnaire-steps-list>
+                      [mode]="mobileQuery.matches ? 'over' : 'side'"
+                      [(opened)]="sidebarOpen">
+            <app-questionnaire-steps-list
+              [flow]="flow"
+              [stepIndex]="activeStep"
+              (stepSelected)="goToStep($event)"
+            >
+            </app-questionnaire-steps-list>
           </mat-drawer>
           <mat-drawer-content>
             <app-flow-complete *ngIf="state === flowState.COMPLETE" [flow]="flow">
@@ -57,31 +60,59 @@
               <h1>{{ currentStep().label }}</h1>
               <p>{{ currentStep().description }}</p>
 
-              <formly-form
-                [form]="form"
-                [model]="model"
-                [fields]="fields"
-                [options]="options"
-              >
-              </formly-form>
-
-              <div class="button-row">
+              <div *ngIf="showResubmitMessage">
+                <p *ngIf="hideForm" class="alert alert-warn">In order to protect certain sensitive information about you,
+                  this information is no longer accessible via this web site. If you feel
+                  that this information should be updated, you may choose to re-complete
+                  this form and re-submit it.</p>
                 <button
-                  *ngIf="form"
+                  *ngIf="hideForm"
                   mat-flat-button
                   type="button"
-                  (click)="submit()"
+                  (click)="hideForm = false"
                   color="primary"
-                  [disabled]="!form.valid"
-                  id="save-next-button"
-                >Save &amp; Next</button>
-                <button
-                  *ngIf="form"
-                  mat-flat-button
-                  type="button"
-                  [routerLink]="['/profile']"
-                  id="flow-cancel-button"
-                >Cancel</button>
+                >Show {{currentStep().label}} Form
+                </button>
+              </div>
+
+              <div *ngIf="!hideForm">
+
+                <formly-form
+                  [form]="form"
+                  [model]="model"
+                  [fields]="fields"
+                  [options]="options"
+                >
+                </formly-form>
+
+                <p *ngIf="showResubmitMessage" class="alert alert-warn">You are about to re-submit this form. While this
+                  will not replace previous records, we will defer to the information you submit now when
+                  considering your eligibility to future studies and notifications.</p>
+
+                <p *ngIf="currentStep().type === 'sensitive'" class="alert alert-warn">This information is considered sensitive. While
+                  you may complete this form again in full, you may not view or edit these values later as the data
+                  will be placed in a secure location and will no longer be accessible from this website.</p>
+
+                <div class="button-row">
+                  <button
+                    *ngIf="form"
+                    mat-flat-button
+                    type="button"
+                    (click)="submit()"
+                    color="primary"
+                    [disabled]="!form.valid"
+                    id="save-next-button"
+                  >Save &amp; Next
+                  </button>
+                  <button
+                    *ngIf="form"
+                    mat-flat-button
+                    type="button"
+                    [routerLink]="['/profile']"
+                    id="flow-cancel-button"
+                  >Cancel
+                  </button>
+                </div>
               </div>
             </form>
           </mat-drawer-content>

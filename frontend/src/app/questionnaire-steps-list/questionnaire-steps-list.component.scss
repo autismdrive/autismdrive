@@ -1,7 +1,12 @@
-mat-icon.complete {
+mat-icon {
+  font-size: .8em;
+  margin-right: 8px;
+}
+
+mat-icon.visible {
   opacity: 1;
 }
 
-mat-icon.incomplete {
+mat-icon.hidden {
   opacity: 0;
 }

@@ -21,6 +21,11 @@ export class HomeComponent implements OnInit {
       console.log('all studies:', all);
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
     });
+    this.api.serverStatus.subscribe(s => {
+      if (s.mirroring) {
+        router.navigate(['mirrored']);
+      }
+    });
   }
 
   ngOnInit() {
