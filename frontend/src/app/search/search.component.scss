@@ -1,5 +1,13 @@
 @import '../../material';
 
+#hero {
+  background-image: url('/assets/home/hero-parent-child.jpg');
+
+  h1 {
+    color: white;
+  }
+}
+
 form.search-box {
   background: transparent;
   border-radius: 5px;
