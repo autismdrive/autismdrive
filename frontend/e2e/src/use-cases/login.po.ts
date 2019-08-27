@@ -50,6 +50,7 @@ export class LoginUseCases {
     this.page.waitForNotVisible('app-loading');
     expect(this.page.getElements('#confirmation_message').count()).toEqual(0);
     expect(this.page.getElements('#error_message').count()).toEqual(1);
+    expect(this.page.getElement('#error_message').getText()).toEqual('The email you provided is already in use.');
     this.page.clickAndExpectRoute('#cancel', '/home');
   }
 

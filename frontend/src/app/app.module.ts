@@ -238,10 +238,10 @@ export class FormlyConfig {
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
+    GoogleAnalyticsService,
     ApiService,
     IntervalService,
     SearchService,
-    GoogleAnalyticsService
 
   ],
   bootstrap: [AppComponent],
