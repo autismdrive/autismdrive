@@ -34,12 +34,13 @@ source ./backend/python-env/bin/activate
 export FLASK_APP=${HOME_DIR}/backend/app/__init__.py
 eval 'cd ${HOME_DIR}/backend && pip3 install -r requirements.txt'
 
+# Make sure database migrations are in sync
+eval 'cd ${HOME_DIR}/backend && flask db upgrade'
+
 # Load up the staging environment
 if [ "$ENV" == "staging" ]; then
 eval 'cd ${HOME_DIR}/backend && flask resourcereset'
 fi
-
-eval 'cd ${HOME_DIR}/backend && flask db upgrade'
 
 # clear and rebuild the index
 eval 'cd ${HOME_DIR}/backend && flask clearindex'
