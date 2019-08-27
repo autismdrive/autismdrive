@@ -78,6 +78,7 @@ export class ApiService {
     studycategorylist: '/api/study_category',
     study: '/api/study/<id>',
     studylist: '/api/study',
+    studyinquiry: '/api/study_inquiry',
     user: '/api/user/<id>',
     userEmailLog: '/api/user/email_log/<id>',
     userlist: '/api/user',
@@ -112,6 +113,14 @@ export class ApiService {
   sendResetPasswordEmail(email: string): Observable<any> {
     const email_data = { email: email };
     return this.httpClient.post<any>(this._endpointUrl('forgot_password'), email_data)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** sendStudyInquiryEmail
+   * StudyInquiry */
+  sendStudyInquiryEmail(user: User, study: Study): Observable<any> {
+    const email_data = { user_id: user.id, study_id: study.id };
+    return this.httpClient.post<any>(this._endpointUrl('studyinquiry'), email_data)
       .pipe(catchError(this._handleError));
   }
 

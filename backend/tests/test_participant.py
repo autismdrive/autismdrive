@@ -1,6 +1,3 @@
-import base64
-import quopri
-import re
 import unittest
 
 from flask import json
@@ -8,9 +5,6 @@ from flask import json
 from app.model.participant import Relationship, Participant
 from tests.base_test import BaseTest
 from app import db
-from app.email_service import TEST_MESSAGES
-from app.model.email_log import EmailLog
-from app.model.user import User, Role
 
 
 class TestParticipant(BaseTest, unittest.TestCase):
@@ -162,4 +156,3 @@ class TestParticipant(BaseTest, unittest.TestCase):
         self.assertEqual(u.id, response['id'])
         self.assertEqual(1, len(response['participants']))
         self.assertEqual(p.relationship.name, response['participants'][0]["relationship"])
-

@@ -113,6 +113,25 @@ class EmailService:
 
         return tracking_code
 
+    def study_inquiry_email(self, study, user):
+        tracking_code = self.tracking_code()
+
+        subject = "STAR Drive: Study Inquiry Email"
+        logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
+        text_body = render_template("study_inquiry_email.txt",
+                                    user=user, study=study,
+                                    tracking_code=tracking_code)
+
+        html_body = render_template("study_inquiry_email.html",
+                                    user=user, study=study,
+                                    logo_url=logo_url,
+                                    tracking_code=tracking_code)
+
+        self.send_email(subject,
+                        recipients=[study.coordinator_email], text_body=text_body, html_body=html_body)
+
+        return tracking_code
+
     def admin_alert_email(self, subject, message, alert_principal_investigator=False):
         with self.app.app_context():
             context = {}

@@ -1,9 +1,5 @@
-import datetime
 import enum
 
-from dateutil.tz import tzutc
-from marshmallow_enum import EnumField
-from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
 from app import db
@@ -11,6 +7,9 @@ from app import db
 
 # Describes the relationship between the User model and the participant
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+
+# Provides contact information for the participant
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 
 
 class Relationship(enum.Enum):
@@ -37,6 +36,7 @@ class Participant(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'))
     user = db.relationship("User", back_populates="participants")
     identification = db.relationship(IdentificationQuestionnaire, uselist=False)
+    contact = db.relationship(ContactQuestionnaire, uselist=False)
     relationship = db.Column(db.Enum(Relationship))
     avatar_icon = db.Column(db.String)
     avatar_color = db.Column(db.String)
