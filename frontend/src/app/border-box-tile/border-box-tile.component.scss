@@ -12,6 +12,9 @@
   text-align: center;
   color: mat-color($stardrive-primary, 500);
 
+  &.border-box-tile-1x { height: $tile-height-1x; }
+  &.border-box-tile-2x { height: $tile-height-2x; }
+
   .border-box-tile-inner {
     padding: 2.4375rem;
 
@@ -70,21 +73,29 @@
       opacity: 0;
     }
 
-  }
+    p.intro {
+      padding: 0 20px 0 20px;
+      color: $body-color;
+      font-weight: bold;
+    }
 
-  .border-box-tile-label {
-    @include mat-typography-level-to-styles($custom-typography, title);
-    margin-top: 1em;
-    margin-bottom: 1em;
-    font-weight: 700;
-    font-size: 1.25rem;
-    font-style: italic;
-    text-transform: uppercase;
-    letter-spacing: 1.8px;
-  }
+    .border-box-tile-label {
+      &.border-box-tile-label-1x {
+        @include mat-typography-level-to-styles($custom-typography, title);
+        margin-top: 1em;
+        margin-bottom: 1em;
+        font-style: italic;
+        text-transform: uppercase;
+        letter-spacing: 1.8px;
+      }
 
-  .border-box-tile-description {
-    margin-top: 1em;
-    margin-bottom: 1em;
+      &.border-box-tile-label-2x {
+        @include mat-typography-level-to-styles($custom-typography, display-1);
+        margin-top: 1em;
+        margin-bottom: 1em;
+        font-style: italic;
+        text-transform: uppercase;
+      }
+    }
   }
 }

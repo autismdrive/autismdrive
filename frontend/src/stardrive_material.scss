@@ -251,19 +251,10 @@
   }
 
   #hero.with-escaping-tiles {
-    margin-bottom: 12rem;
-  }
+    margin-bottom: ($tile-height-1x * 0.5);
 
-  #hero .escaping-tiles {
-    margin-bottom: -12rem;
-  }
-
-  #hero .border-box-tile {
-      .border-box-tile-label {
-        @include mat-typography-level-to-styles($custom-typography, display-1);
-      }
-
-      .border-box-tile-inner p { color: $body-color; }
+    .row.escaping-tiles-1x { margin-bottom: -($tile-height-1x * 0.5); }
+    .row.escaping-tiles-2x { margin-bottom: -($tile-height-2x * 0.75); }
   }
 
   .pad-1 { padding: 1em; }
