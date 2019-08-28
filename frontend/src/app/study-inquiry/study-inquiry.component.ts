@@ -35,7 +35,7 @@ export class StudyInquiryComponent implements OnInit {
   goLogin($event: MouseEvent) {
     $event.preventDefault();
     if (this.study) {
-      this.router.navigateByUrl('/login');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
     }
   }
 
