@@ -27,7 +27,7 @@
           [size]="2"
         ></app-type-icon>
         <div class="border-box-tile-label">{{resourceType.label}}</div>
-        <app-details-link url="/search" label=""></app-details-link>
+        <app-details-link url="/search" label="" [selected]="isSelectedResourceType(resourceType)"></app-details-link>
       </div>
     </div>
   </div>
@@ -76,15 +76,13 @@
         </agm-marker-cluster>
       </ng-container>
     </agm-map>
-    <app-loading *ngIf="loading"></app-loading>
   </div>
 </div>
 
 <div class="container" fxLayout="row" fxLayoutGap="80px" fxLayoutAlign="space-evenly start">
-
   <div fxFlex="calc(30% - 160px)" class="filters">
     <h2>Sort by</h2>
-    <mat-radio-group [(ngModel)]="selectedSort.name">
+    <mat-radio-group *ngIf="selectedSort && selectedSort.name" [(ngModel)]="selectedSort.name">
       <mat-radio-button
         *ngFor="let s of sortMethods"
         (click)="sortBy(s)"
@@ -118,7 +116,6 @@
     fxFlex="calc(70% - 160px)"
     fxLayout="column"
     fxLayoutAlign="start start"
-    *ngIf="!loading"
   >
     <div class="row search-tools">
       <mat-chip-list class="applied-filters">
@@ -160,18 +157,18 @@
           [mapLoc]="mapLoc"
         >
         </app-search-result>
-        <mat-paginator
-            #paginator
-            [length]="query.total"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
-            (page)="updatePage()"
-        >
-        </mat-paginator>
       </div>
     </div>
   </div>
 </div>
+<mat-paginator
+  #paginator
+  [length]="query.total"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+  (page)="updatePage($event)"
+>
+</mat-paginator>
 <div class="container">
   <div class="row">
     <h1>Resource partners</h1>

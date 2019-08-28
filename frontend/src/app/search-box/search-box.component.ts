@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { MatInput } from '@angular/material/input';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { SearchService } from '../_services/api/search.service';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {MatInput} from '@angular/material/input';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {SearchService} from '../_services/api/search.service';
 import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {Subject, timer} from 'rxjs';
 
@@ -11,7 +11,7 @@ import {Subject, timer} from 'rxjs';
   styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit {
-  @ViewChild('searchInput', { read: MatInput, static: false }) public searchInput: MatInput;
+  @ViewChild('searchInput', {read: MatInput, static: false}) public searchInput: MatInput;
   words = '';
   queryParams: Params;
   @Input() variant: string;
@@ -42,36 +42,32 @@ export class SearchBoxComponent implements OnInit {
     return (this.router.url.split('/')[1] === 'search');
   }
 
-  showSearch() {
+  showSearch(): void {
     if (this.searchInput) {
       this.searchInput.focus();
     }
   }
 
-  updateSearch(removeWords: boolean) {
+  updateSearch(removeWords: boolean): Promise<boolean> {
     if (removeWords) {
       this.words = '';
+      this.searchInput.value = this.words;
     }
-
-    console.log('this.searchInput', this.searchInput);
-
 
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
     const words: string = this.searchInput && this.searchInput.value || '';
     newParams.words = removeWords ? undefined : words;
     const hasFilters = Object.keys(newParams).length > 0;
 
-    console.log('newParams.words', newParams.words);
-
     if (hasFilters) {
-      this.router.navigate(['/search/filter'], { queryParams: newParams });
+      return this.router.navigate(['/search/filter'], {queryParams: newParams});
     } else {
-      this.router.navigateByUrl('/search');
+      return this.router.navigateByUrl('/search');
     }
   }
 
   hasWords(): boolean {
-    return this.words && (this.words.length > 0);
+    return this.words && this.words.length > 0;
   }
 
 }

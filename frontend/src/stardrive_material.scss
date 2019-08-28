@@ -321,12 +321,6 @@
 
     }
 
-    .border-box-tile-inner {
-      &:hover app-details-link [class*="icofont-"] {
-        margin-left: 10px;
-      }
-    }
-
     .border-box-tile-label {
       @include mat-typography-level-to-styles($custom-typography, title);
       margin-top: 1em;

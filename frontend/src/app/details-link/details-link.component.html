@@ -1,4 +1,4 @@
-<a [routerLink]="[ url ]">
-  <i class="icofont-circled-right icofont-{{size}}x"></i>
-  <span class="details-link-{{size}}x">{{label}}</span>
+<a [routerLink]="[ url ]" class="chevron-link">
+  <i class="icofont-circled-right icofont-{{size}}x details-link-icon-{{selected ? 'selected' : 'deselected'}}"></i>
+  <span class="details-link-text-{{size}}x">{{label}}</span>
 </a>

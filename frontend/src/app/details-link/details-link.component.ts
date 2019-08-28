@@ -9,6 +9,7 @@ export class DetailsLinkComponent implements OnInit {
   @Input() url: string;
   @Input() label = 'Details';
   @Input() size = 1;
+  @Input() selected = false;
 
   constructor() { }
 

@@ -1,12 +1,10 @@
 import {LatLngLiteral} from '@agm/core';
 import {MediaMatcher} from '@angular/cdk/layout';
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Filter, HitLabel, HitType, Query, Sort} from '../_models/query';
 import {SearchService} from '../_services/api/search.service';
-import {merge} from 'rxjs';
-import {tap} from 'rxjs/operators';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
@@ -33,15 +31,38 @@ class MapControlDiv extends HTMLDivElement {
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SearchComponent implements OnInit, OnDestroy {
+
+  constructor(
+    changeDetectorRef: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
+    private renderer: Renderer2,
+    private searchService: SearchService,
+    private locSearchService: SearchService,
+    private featuredSearchService: SearchService,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private authenticationService: AuthenticationService,
+    media: MediaMatcher,
+  ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
+
+    this.loadMapLocation(() => {
+      this.loadLocResources();
+      this.route.queryParamMap.subscribe(qParams => {
+        console.log('=== route.queryParamMap.subscribe ===');
+        this.query = this._queryParamsToQuery(qParams);
+        this.sortBy(this.sortMethods[0]);
+      });
+    });
+  }
   resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
     return {name: HitType[t], label: HitLabel[t]};
   });
-  query = new Query({
-    words: '',
-    filters: [],
-    size: 20,
-  });
+  query = this._queryParamsToQuery({});
   locQuery: Query;
   loading = true;
   hideResults = false;
@@ -85,7 +106,14 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
   selectedSort: SortMethod;
-  @ViewChild('paginator', {static: true}) paginator: MatPaginator;
+
+  pageEvent: PageEvent;
+  paginatorElement: MatPaginator;
+
+  @ViewChild(MatPaginator, {static: false})
+  set paginator(value: MatPaginator) {
+    this.paginatorElement = value;
+  }
   currentUser: User;
   resourceGatherers: AccordionItem[] = [
     {
@@ -123,56 +151,44 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   private readonly _mobileQueryListener: () => void;
 
-  constructor(
-    changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute,
-    private router: Router,
-    private renderer: Renderer2,
-    private searchService: SearchService,
-    private locSearchService: SearchService,
-    private featuredSearchService: SearchService,
-    private googleAnalyticsService: GoogleAnalyticsService,
-    private authenticationService: AuthenticationService,
-    media: MediaMatcher,
-  ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+  private _queryToQueryParams(query: Query): Params {
+    const queryParams: Params = {};
 
+    if (query.hasOwnProperty('words') && query.words) {
+      queryParams.words = query.words;
+    } else {
+      queryParams.words = undefined;
+    }
 
-    this.loadMapLocation(() => {
-      this.loadLocResources();
-      this.route.queryParamMap.subscribe(qParams => {
-        let words = '';
-        const filters: Filter[] = [];
+    for (const filter of query.filters) {
+      queryParams[filter.field] = filter.value;
+    }
 
-        for (const key of qParams.keys) {
-          if (key === 'words') {
-            words = qParams.get(key);
-          } else {
-            filters.push({field: key, value: qParams.getAll(key)});
-          }
+    return queryParams;
+  }
+
+  private _queryParamsToQuery(qParams: Params): Query {
+    let words = '';
+    const filters: Filter[] = [];
+
+    if (qParams && qParams.keys) {
+      for (const key of qParams.keys) {
+        if (key === 'words') {
+          words = qParams.get(key);
+        } else {
+          filters.push({field: key, value: qParams.getAll(key)});
         }
+      }
+    }
 
-        this.query = new Query({
-          words: words,
-          filters: filters,
-          size: this.pageSize,
-        });
-
-        this.sortBy(this.sortMethods[0]);
-      });
+    return new Query({
+      words: words,
+      filters: filters,
+      size: this.pageSize,
     });
   }
 
   ngOnInit() {
-  }
-
-  ngAfterViewInit() {
-    merge(this.paginator.page).pipe(
-      tap(() => this.doSearch())
-    ).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -210,34 +226,17 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   removeWords() {
     this.query.words = '';
     this.query.start = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    } else {
-      console.log('NO PAGINATOR?', this.paginator);
-    }
-    this.updateUrl(this.query);
+    this.paginatorElement.firstPage();
+    this.doSearch();
   }
 
   updateUrl(query: Query) {
-    const queryParams: Params = {};
-
-    if (query.hasOwnProperty('words') && query.words) {
-      queryParams.words = query.words;
-    } else {
-      queryParams.words = undefined;
-    }
-
-    for (const filter of query.filters) {
-      queryParams[filter.field] = filter.value;
-    }
-
     this.router.navigate(
       [],
       {
         relativeTo: this.route,
-        queryParams: queryParams
+        queryParams: this._queryToQueryParams(query)
       }).then(() => {
-      console.log('Done navigating to new route.', queryParams);
       scrollToTop();
     });
   }
@@ -247,13 +246,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchService
       .search(this.query)
       .subscribe(queryWithResults => {
-        if (this.query.equals(queryWithResults)) {
-          this.query = queryWithResults;
-          this.loading = false;
-        } else {
-          console.log('queryWithResults', queryWithResults);
-          this.updateUrl(queryWithResults);
-        }
+        this.query = queryWithResults;
+        this.loading = false;
+        scrollToTop();
       });
     this.googleAnalyticsService.event(this.query.words,
       {
@@ -296,8 +291,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.query.addFilter(field, fieldValue);
     this.query.start = 0;
 
-    if (this.paginator) {
-      this.paginator.firstPage();
+    if (this.paginatorElement) {
+      this.paginatorElement.firstPage();
     }
 
     this.updateUrl(this.query);
@@ -322,12 +317,11 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateUrl(this.query);
   }
 
-  updatePage() {
-    if (this.paginator) {
-      this.query.size = this.paginator.pageSize;
-      this.query.start = (this.paginator.pageIndex * this.paginator.pageSize) + 1;
-      this.updateUrl(this.query);
-    }
+  updatePage(event: PageEvent) {
+    this.pageEvent = event;
+    this.query.size = event.pageSize;
+    this.query.start = (event.pageIndex * event.pageSize) + 1;
+    this.doSearch();
   }
 
   addMyLocationControl(mapUI: google.maps.Map) {
@@ -367,15 +361,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     mapUI.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
   }
 
-  addMapResources( mapUI: google.maps.Map) {
-    if (this.locQuery) {
-      console.log(this.locQuery.hits);
-    }
-  }
-
   protected mapLoad(map: google.maps.Map) {
     this.addMyLocationControl(map);
-    this.addMapResources(map);
   }
 
   isSelectedResourceType(rt: ResourceType) {
