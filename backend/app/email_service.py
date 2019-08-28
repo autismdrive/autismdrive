@@ -120,10 +120,12 @@ class EmailService:
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("study_inquiry_email.txt",
                                     user=user, study=study,
+                                    user_detail_url=self.site_url + '/#/admin/user/' + str(user.id),
                                     tracking_code=tracking_code)
 
         html_body = render_template("study_inquiry_email.html",
                                     user=user, study=study,
+                                    user_detail_url=self.site_url + '/#/admin/user/' + str(user.id),
                                     logo_url=logo_url,
                                     tracking_code=tracking_code)
 

@@ -13,6 +13,7 @@ import {AuthenticationService} from '../_services/api/authentication-service';
 export class LoginComponent implements OnInit {
   loading = false;
   emailToken: string;
+  returnUrl: string;
   errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
   model: any = {};
@@ -48,6 +49,11 @@ export class LoginComponent implements OnInit {
         this.emailToken = params['email_token'];
       }
     });
+    this.route.queryParams.subscribe(params => {
+      if ('returnUrl' in params) {
+        this.returnUrl = params['returnUrl'];
+      }
+    });
   }
 
   ngOnInit() {
@@ -59,7 +65,11 @@ export class LoginComponent implements OnInit {
     if (this.form.valid) {
       this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
           data => {
-            this.router.navigate(['profile']);
+            if (this.returnUrl) {
+              this.router.navigate([this.returnUrl]);
+            } else {
+              this.router.navigate(['profile']);
+            }
           },
           error => {
             if (error) {
