@@ -1,6 +1,7 @@
 @import '../../material';
 
 a {
+  transition: all 0.5s;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -13,12 +14,12 @@ a {
     letter-spacing: 0.1em;
   }
 
-  .details-link-1x {
+  .details-link-text-1x {
     font-size: 1.125rem;
     margin-left: 0.5rem;
   }
 
-  .details-link-2x {
+  .details-link-text-2x {
     font-size: 1.5rem;
     margin-left: 0.75rem;
   }
@@ -26,17 +27,29 @@ a {
   [class*="icofont-"] {
     color: $brand-accent;
     transition: all 0.5s;
+  }
+}
 
-    &.details-link-icon-selected {
+a {
+  .details-link-icon {
+    transform: rotate(0deg);
+  }
+
+  &.selected {
+    .details-link-icon {
       transform: rotate(90deg);
     }
+  }
 
-    &.details-link-icon-deselected {
-      transform: rotate(0deg);
+  &.hover {
+    transform: translateX(10px);
+
+    &.selected {
+      transform: translateY(10px);
     }
   }
 }
 
-:hover [class*="icofont-"] {
-  margin-left: 10px;
+.muted {
+  color: #999999;
 }

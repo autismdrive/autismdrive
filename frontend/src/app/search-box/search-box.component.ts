@@ -67,7 +67,7 @@ export class SearchBoxComponent implements OnInit {
   }
 
   hasWords(): boolean {
-    return this.words && this.words.length > 0;
+    return this.searchInput && this.searchInput.value && (this.searchInput.value.length > 0);
   }
 
 }

@@ -19,34 +19,22 @@
     fxLayoutGap="40px"
     fxLayoutAlign="center auto"
   >
-    <div
-      class="border-box-tile"
+    <app-border-box-tile
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
-    >
-      <div
-        class="border-box-tile-inner selected"
-        routerLink="/register"
-      >
-        <div class="border-box-tile-label">Join Autism DRIVE</div>
-        <p class="intro">Connect to upcoming studies at UVA and resources across the state relevant to you.</p>
-        <app-details-link [url]="'/register'" label="" size="2"></app-details-link>
-      </div>
-    </div>
-    <div
-      class="border-box-tile"
+      url="/register"
+      title="Join Autism DRIVE"
+      subtitle="Connect to upcoming studies at UVA and resources across the state relevant to you."
+      linkSize="2"
+    ></app-border-box-tile>
+    <app-border-box-tile
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
-    >
-      <div
-        class="border-box-tile-inner selected"
-        routerLink="/resources"
-      >
-        <div class="border-box-tile-label">Find Support</div>
-        <p class="intro">Access autism-focused resources available in Virginia and online.</p>
-        <app-details-link [url]="'/resources'" label="" size="2"></app-details-link>
-      </div>
-    </div>
+      url="/resources"
+      title="Find Support"
+      subtitle="Access autism-focused resources available in Virginia and online."
+      linkSize="2"
+    ></app-border-box-tile>
   </div>
 </div>
 <div class="container mat-typography">

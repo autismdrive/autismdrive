@@ -1,0 +1,90 @@
+@import '../../material';
+
+.border-box-tile {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  color: mat-color($stardrive-primary, 500);
+
+  .border-box-tile-inner {
+    padding: 2.4375rem;
+
+    &.hover {
+      &:before {
+        opacity: 0;
+      }
+
+      &:after {
+        opacity: 1;
+      }
+    }
+
+    &:before,
+    &:after {
+      content: '';
+      pointer-events: none;
+      transition: opacity 0.5s;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+    }
+
+    &:before {
+      border: 11px solid #dadada;
+      border-image: linear-gradient(to bottom, #dadada 0%, #f1f1ef 100%);
+      border-image-slice: 1;
+      opacity: 1;
+    }
+
+    &:after {
+      border: 11px solid #002f6c;
+      border-image: linear-gradient($brand-primary 0%, $brand-accent 100%);
+      border-image-slice: 1;
+      opacity: 0;
+    }
+
+    &.deselected:after {
+      opacity: 0;
+    }
+
+    &.deselected:before {
+      opacity: 1;
+    }
+
+    &.selected:after {
+      opacity: 1;
+    }
+
+    &.selected:before {
+      opacity: 0;
+    }
+
+  }
+
+  .border-box-tile-label {
+    @include mat-typography-level-to-styles($custom-typography, title);
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+  }
+
+  .border-box-tile-description {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+}

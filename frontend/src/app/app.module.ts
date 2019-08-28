@@ -107,6 +107,7 @@ import {AdminExportDetailsComponent} from './admin-export-details/admin-export-d
 import {GoogleAnalyticsService} from './google-analytics.service';
 import {DetailsLinkComponent} from './details-link/details-link.component';
 import {MatRadioModule} from '@angular/material/radio';
+import { BorderBoxTileComponent } from './border-box-tile/border-box-tile.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -197,6 +198,7 @@ export class FormlyConfig {
     AdminExportComponent,
     AdminExportDetailsComponent,
     DetailsLinkComponent,
+    BorderBoxTileComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),

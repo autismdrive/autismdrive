@@ -12,24 +12,17 @@
     fxLayoutGap="40px"
     fxLayoutAlign="center auto"
   >
-    <div
+    <app-border-box-tile
       *ngFor="let resourceType of resourceTypes"
-      class="border-box-tile {{resourceType.name.toLowerCase()}}"
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
-    >
-      <div
-        ngClass="border-box-tile-inner {{isSelectedResourceType(resourceType) ? 'selected' : 'deselected'}}"
-        (click)="selectResourceType(resourceType.label)"
-      >
-        <app-type-icon
-          [iconType]="resourceType.name"
-          [size]="2"
-        ></app-type-icon>
-        <div class="border-box-tile-label">{{resourceType.label}}</div>
-        <app-details-link url="/search" label="" [selected]="isSelectedResourceType(resourceType)"></app-details-link>
-      </div>
-    </div>
+      [iconSize]="2"
+      [iconType]="resourceType.name"
+      [title]="resourceType.label"
+      [linkSize]="1"
+      [isSelected]="isSelectedResourceType(resourceType)"
+      (click)="selectResourceType(resourceType.label)"
+    ></app-border-box-tile>
   </div>
 </div>
 <div class="container">
