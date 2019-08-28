@@ -540,10 +540,12 @@ class FlowSchema(Schema):
 class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
+        include_fk = True
 
 
 class StepLogSchema(ModelSchema):
     class Meta:
         model = StepLog
+        include_fk = True
 
 
