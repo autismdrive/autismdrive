@@ -1,5 +1,4 @@
 <div
-  *ngIf="queryParams"
   [class]="'search-bar ' + variant"
 >
   <mat-form-field fxFlex="100%" id="search-field">
@@ -18,7 +17,7 @@
       <button
         mat-icon-button
         matSuffix
-        *ngIf="hasWords()"
+        [ngClass]="{'hidden': !hasWords()}"
         (click)="updateSearch(true)"
       ><mat-icon>cancel</mat-icon>
       </button>

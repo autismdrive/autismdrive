@@ -11,7 +11,12 @@ import {Subject, timer} from 'rxjs';
   styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit {
-  @ViewChild('searchInput', {read: MatInput, static: false}) public searchInput: MatInput;
+  searchInputElement: MatInput;
+  @ViewChild('searchInput', {read: MatInput, static: false})
+  set searchInput(value: MatInput) {
+    this.searchInputElement = value;
+  }
+
   words = '';
   queryParams: Params;
   @Input() variant: string;
@@ -43,19 +48,19 @@ export class SearchBoxComponent implements OnInit {
   }
 
   showSearch(): void {
-    if (this.searchInput) {
-      this.searchInput.focus();
+    if (this.searchInputElement) {
+      this.searchInputElement.focus();
     }
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
     if (removeWords) {
       this.words = '';
-      this.searchInput.value = this.words;
+      this.searchInputElement.value = this.words;
     }
 
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
-    const words: string = this.searchInput && this.searchInput.value || '';
+    const words: string = this.searchInputElement && this.searchInputElement.value || '';
     newParams.words = removeWords ? undefined : words;
     const hasFilters = Object.keys(newParams).length > 0;
 
@@ -67,7 +72,7 @@ export class SearchBoxComponent implements OnInit {
   }
 
   hasWords(): boolean {
-    return this.searchInput && this.searchInput.value && (this.searchInput.value.length > 0);
+    return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
   }
 
 }

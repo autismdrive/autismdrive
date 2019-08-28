@@ -51,9 +51,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery.addListener(this._mobileQueryListener);
 
     this.loadMapLocation(() => {
-      this.loadLocResources();
       this.route.queryParamMap.subscribe(qParams => {
-        console.log('=== route.queryParamMap.subscribe ===');
         this.query = this._queryParamsToQuery(qParams);
         this.sortBy(this.sortMethods[0]);
       });
@@ -62,7 +60,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
     return {name: HitType[t], label: HitLabel[t]};
   });
-  query = this._queryParamsToQuery({});
+  query: Query;
   locQuery: Query;
   loading = true;
   hideResults = false;
@@ -231,11 +229,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   updateUrl(query: Query) {
+    const qParams = this._queryToQueryParams(query);
+
     this.router.navigate(
       [],
       {
         relativeTo: this.route,
-        queryParams: this._queryToQueryParams(query)
+        queryParams: qParams
       }).then(() => {
       scrollToTop();
     });
@@ -378,5 +378,14 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     }
     return false;
+  }
+
+  showBreadcrumbs() {
+    const hasWords = this.query.words && (this.query.words.length > 0);
+    const hasFilters = this.query.filters.some(f => {
+      return (f.field !== 'Type') && (f.value.length > 0);
+    });
+
+    return hasWords || hasFilters;
   }
 }

@@ -64,7 +64,7 @@
     fxLayout="column"
     fxLayoutAlign="start start"
   >
-    <div class="row search-tools">
+    <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
       <mat-chip-list class="applied-filters">
         <ng-container *ngIf="query.words">
           <mat-chip
