@@ -53,6 +53,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
+
+        const types = this.selectedTypes();
+        if (types && (types.length === 1)) {
+          this.selectedResourceType = types[0];
+        }
+
         this.sortBy(this.sortMethods[0]);
       });
     });
@@ -60,6 +66,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
     return {name: HitType[t], label: HitLabel[t]};
   });
+  selectedResourceType: ResourceType;
   query: Query;
   locQuery: Query;
   loading = true;
@@ -307,6 +314,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectResourceType(keepType: string) {
     this.resourceTypes.forEach(t => {
       if (t.label === keepType) {
+        this.selectedResourceType = t;
         this.query.addFilter('Type', t.label);
       } else {
         this.query.removeFilter('Type', t.label);
@@ -365,24 +373,43 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.addMyLocationControl(map);
   }
 
-  isSelectedResourceType(rt: ResourceType) {
-    const types = this.query.filters.find(f => f.field === 'Type');
+  selectedTypes(): ResourceType[] {
+    if (this.query) {
+      const typeFilter = this.query.filters.find(f => f.field === 'Type');
+
+      if (typeFilter) {
+        return this.resourceTypes.filter(f => typeFilter.value.includes(f.label));
+      } else {
+        return this.resourceTypes;
+      }
+    }
+  }
+
+  isSelectedResourceType(rt: ResourceType): boolean {
+    const types = this.selectedTypes();
 
     if (types) {
-      const f = types.value.find(t => {
-        return t === rt.label;
-      });
-
-      if (f) {
-        return true;
-      }
+      return !!types.find(t => t.label === rt.label);
     }
     return false;
   }
 
+  hasFilters() {
+    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
+    const hasFilters = this.query && this.query.filters.some(f => {
+      if (f.field === 'Type') {
+        return f.value.length === 1;
+      } else {
+        return f.value.length > 0;
+      }
+    });
+
+    return hasWords || hasFilters;
+  }
+
   showBreadcrumbs() {
-    const hasWords = this.query.words && (this.query.words.length > 0);
-    const hasFilters = this.query.filters.some(f => {
+    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
+    const hasFilters = this.query && this.query.filters.some(f => {
       return (f.field !== 'Type') && (f.value.length > 0);
     });
 
