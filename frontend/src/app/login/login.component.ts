@@ -1,9 +1,10 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup } from '@angular/forms';
-import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../_services/api/api.service';
+import {Component, EventEmitter, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormGroup} from '@angular/forms';
+import {FormlyFieldConfig} from '@ngx-formly/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {scrollToTop} from '../../util/scrollToTop';
+import {User} from '../_models/user';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ export class LoginComponent implements OnInit {
   errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
   model: any = {};
+  returnUrl: string;
   fields: FormlyFieldConfig[] = [
     {
       key: 'email',
@@ -43,9 +45,16 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authenticationService: AuthenticationService
   ) {
+    this.route.queryParams.subscribe(qParams => {
+      if (qParams.hasOwnProperty('returnUrl')) {
+        this.returnUrl = qParams.returnUrl;
+        this.authenticationService.currentUser.subscribe(u => this._goToReturnUrl(u));
+      }
+    });
+
     this.route.params.subscribe(params => {
-      if ('email_token' in params) {
-        this.emailToken = params['email_token'];
+      if (params.hasOwnProperty('email_token')) {
+        this.emailToken = params.email_token;
       }
     });
   }
@@ -57,21 +66,24 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     if (this.form.valid) {
-      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
-          data => {
-            this.router.navigate(['profile']);
-          },
-          error => {
-            if (error) {
-              this.errorEmitter.emit(error);
-            } else {
-              this.errorEmitter.emit('An unexpected error occurred. Please contact support');
-            }
-            this.loading = false;
-          });
+      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(u => this._goToReturnUrl(u),
+        error => {
+          if (error) {
+            this.errorEmitter.emit(error);
+          } else {
+            this.errorEmitter.emit('An unexpected error occurred. Please contact support');
+          }
+          this.loading = false;
+        });
     } else {
       this.loading = false;
       this.errorEmitter.emit('Please enter a valid email address and password.');
+    }
+  }
+
+  private _goToReturnUrl(user: User) {
+    if (user) {
+      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop());
     }
   }
 
