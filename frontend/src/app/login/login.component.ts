@@ -48,6 +48,12 @@ export class LoginComponent implements OnInit {
         this.emailToken = params['email_token'];
       }
     });
+    this.authenticationService.currentUser.subscribe(user => {
+      // If the login firm discovers there is a user, just send folks to the profile page.
+      if (user) {
+        this.router.navigate(['profile']);
+      }
+    });
   }
 
   ngOnInit() {
@@ -58,8 +64,9 @@ export class LoginComponent implements OnInit {
 
     if (this.form.valid) {
       this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
-          data => {
-            this.router.navigate(['profile']);
+          user => {
+            // Will nagivate away from ths page as soon as the process completes successfully, so
+            // really just a noop here.
           },
           error => {
             if (error) {
