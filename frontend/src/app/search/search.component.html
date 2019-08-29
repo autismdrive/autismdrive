@@ -158,14 +158,19 @@
     <h1>Resource partners</h1>
     <p>We are partnering with the following initiatives and organizations to identify resources that will improve
       outcomes for individuals with autism and their families.</p>
-    <a
-      *ngFor="let rg of resourceGatherers"
-      [href]="rg.url">
-      <img
-        [alt]="rg.name"
-        [src]="rg.image"
+    <div fxLayout="row" fxLayoutAlign="space-between">
+      <a
+        *ngFor="let rg of resourceGatherers"
+        [href]="rg.url"
+        [title]="rg.name"
+        [matTooltip]="rg.shortName + ' - ' + rg.description"
       >
-    </a>
+        <img
+          [alt]="rg.shortName"
+          [src]="rg.image"
+        >
+      </a>
+    </div>
   </div>
 </div>
 

@@ -115,17 +115,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   currentUser: User;
   resourceGatherers: AccordionItem[] = [
     {
-      name: 'Charlottesville Region Autism Action Group',
-      shortName: 'CRAAG',
-      description: `
-        CRAAG is a parent-run advocacy group, one of three active all-volunteer regional Autism Action Groups
-        initiated by Commonwealth Autism. Established in 2010, it serves Charlottesville, Albemarle, Greene,
-        Fluvanna, Louisa, and Nelson counties.
-      `,
-      image: '/assets/partners/craag.png',
-      url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
-    },
-    {
       name: 'UVA Supporting Transformative Autism Research',
       shortName: 'UVA STAR',
       description: `
@@ -137,10 +126,21 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star',
     },
     {
+      name: 'Charlottesville Region Autism Action Group',
+      shortName: 'CRAAG',
+      description: `
+        A parent-run advocacy group, one of three active all-volunteer regional Autism Action Groups
+        initiated by Commonwealth Autism. Established in 2010, it serves Charlottesville, Albemarle, Greene,
+        Fluvanna, Louisa, and Nelson counties.
+      `,
+      image: '/assets/partners/craag.png',
+      url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
+    },
+    {
       name: 'Autism Speaks Inc.',
       shortName: 'Autism Speaks',
       description: `
-        Autism Speaks Inc. is the largest autism advocacy organization in the United States. It sponsors autism research
+        The largest autism advocacy organization in the United States. It sponsors autism research
         and conducts awareness and outreach activities aimed at families, governments, and the public.
       `,
       image: '/assets/partners/autism_speaks.png',
