@@ -95,7 +95,8 @@ export class LoginUseCases {
     this.page.clickAndExpectRoute('#ok-button', '/home');
   }
 
-  refreshAndRedirectToReturnUrl() {
-    this.page.refresh().then(() => expect(this.page.getRoute()).toEqual('/profile'));
+  async refreshAndRedirectToReturnUrl() {
+    const previousRoute = await this.page.getRoute();
+    this.page.refresh().then(() => expect(this.page.getRoute()).toEqual(previousRoute));
   }
 }
