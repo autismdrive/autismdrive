@@ -26,7 +26,7 @@
 </div>
 
 <div *ngIf="!loading" class="container">
-  <div class="row">
+  <div class="row margin-bottom-none">
     <h1 *ngIf="selectedResourceType">{{selectedResourceType.label}}</h1>
     <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
     <div fxLayout="row" fxLayoutGap="80px" fxLayoutAlign="space-evenly start">
@@ -121,10 +121,10 @@
             id="results"
             fxLayout="column"
             fxLayoutGap="40px"
-            *ngIf="!(loading || hideResults)"
+            *ngIf="!loading"
           >
             <agm-map
-              *ngIf="!loading"
+              *ngIf="showMap()"
               [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
               [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
               [streetViewControl]="false"
@@ -138,27 +138,25 @@
                 [longitude]="mapLoc.lng"
                 iconUrl="/assets/map/your-location.svg"
               ></agm-marker>
-              <ng-container *ngIf="locQuery && locQuery.hits">
-                <agm-marker-cluster imagePath="/assets/map/m">
-                  <ng-container *ngFor="let hit of locQuery.hits">
-                    <agm-marker
-                      *ngIf="hit.hasCoords()"
-                      [latitude]="hit.latitude"
-                      [longitude]="hit.longitude"
-                    >
-                      <agm-info-window>
-                        <h4>{{hit.title}}</h4>
-                        <p>{{hit.description}}</p>
-                        <a
-                          class="chevron-link"
-                          [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
-                          routerLinkActive="router-link-active"
-                        >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
-                      </agm-info-window>
-                    </agm-marker>
-                  </ng-container>
-                </agm-marker-cluster>
-              </ng-container>
+              <agm-marker-cluster imagePath="/assets/map/m">
+                <ng-container *ngFor="let hit of getMapResults()">
+                  <agm-marker
+                    *ngIf="hit.hasCoords()"
+                    [latitude]="hit.latitude"
+                    [longitude]="hit.longitude"
+                  >
+                    <agm-info-window>
+                      <h4>{{hit.title}}</h4>
+                      <p>{{hit.description}}</p>
+                      <a
+                        class="chevron-link"
+                        [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
+                        routerLinkActive="router-link-active"
+                      >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
+                    </agm-info-window>
+                  </agm-marker>
+                </ng-container>
+              </agm-marker-cluster>
             </agm-map>
             <app-search-result
               *ngFor="let hit of query.hits"
@@ -170,7 +168,10 @@
         </div>
       </div>
     </div>
-
+  </div>
+</div>
+<div class="container">
+  <div class="row margin-top-none">
     <mat-paginator
       #paginator
       [length]="query.total"
@@ -179,9 +180,7 @@
       (page)="updatePage($event)"
     >
     </mat-paginator>
-  </div>
 
-  <div class="row">
     <h1>Resource partners</h1>
     <p>We are partnering with the following initiatives and organizations to identify resources that will improve
       outcomes for individuals with autism and their families.</p>

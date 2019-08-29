@@ -126,5 +126,34 @@ button {
   justify-self: end;
 }
 
+agm-map {
+  height: 400px;
+  width: 100%;
+}
 
+::ng-deep mat-paginator.mat-paginator {
 
+  .mat-paginator-page-size-select.mat-form-field-appearance-outline {
+    width: 84px;
+
+    .mat-form-field-wrapper {
+      padding-bottom: 0.75em;
+    }
+
+    .mat-form-field-outline {
+      top: 0.75em;
+      bottom: -0.25em;
+    }
+
+    .mat-select-arrow-wrapper {
+      transform: translateY(0%);
+    }
+
+    .mat-form-field-infix {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      margin-top: 0px;
+      margin-bottom: 0px;
+    }
+  }
+}

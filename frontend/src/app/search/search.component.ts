@@ -3,7 +3,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Filter, HitLabel, HitType, Query, Sort} from '../_models/query';
+import {Filter, Hit, HitLabel, HitType, Query, Sort} from '../_models/query';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 import {scrollToTop} from '../../util/scrollToTop';
@@ -70,7 +70,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   query: Query;
   locQuery: Query;
   loading = true;
-  hideResults = false;
   filters: Filter[];
   pageSize = 20;
   mapLoc: LatLngLiteral;
@@ -326,6 +325,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   updatePage(event: PageEvent) {
+    this.loading = true;
     this.pageEvent = event;
     this.query.size = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
@@ -414,5 +414,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     return hasWords || hasFilters;
+  }
+
+  getMapResults(): Hit[] {
+    if (this.query && this.query.hits && (this.query.hits.length > 0)) {
+      return this.query.hits.filter(h => h.hasCoords());
+    }
+  }
+
+  showMap() {
+    const mapResults = this.getMapResults();
+    return mapResults && (mapResults.length > 0);
   }
 }
