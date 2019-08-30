@@ -26,11 +26,15 @@
 
     </a></div>
   <span fxFlex></span>
+  <div class="mirror-message" *ngIf="status.mirroring">THIS IS A MIRRORED SERVER</div>
   <a
     mat-button
+    fxHide
+    fxShow.gt-sm
     *ngIf="currentUser && currentUser.role == 'admin'"
     [routerLink]="[ '/admin' ]"
     routerLinkActive="selected"
+    color="accent"
     id="admin-button"
   >
     <mat-icon>build</mat-icon>
@@ -45,8 +49,6 @@
   fxLayoutAlign="center center"
   [@toggleDock]="headerState"
 >
-  <div class="mirror-message" *ngIf="status.mirroring">THIS IS A MIRRORED SERVER</div>
-
   <mat-toolbar [ngClass]="{'mirroring': status.mirroring}">
     <mat-toolbar-row
       id="menu-bar"

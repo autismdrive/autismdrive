@@ -131,6 +131,8 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.NOT_IN_THE_FLOW)
         request_data = request.get_json()
         request_data["user_id"] = g.user.id
+        if "_links" in request_data:
+            request_data.pop("_links")
         schema = ExportService.get_schema(ExportService.camel_case_it(questionnaire_name))
         new_quest, errors = schema.load(request_data, session=db.session)
 

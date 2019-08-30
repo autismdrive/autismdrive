@@ -348,7 +348,7 @@ class StudySchema(ModelSchema):
     class Meta:
         model = Study
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
-                  'participant_description', 'benefit_description', 'organization_id', 'organization', 'location',
+                  'participant_description', 'benefit_description', 'coordinator_email', 'organization_id', 'organization', 'location',
                   'status', 'study_categories', 'study_investigators', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -437,7 +437,7 @@ class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
         fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
-                  'has_consented')
+                  'has_consented', 'contact')
     id = fields.Integer(required=False, allow_none=True)
     name = fields.Function(lambda obj: obj.get_name())
     relationship = EnumField(Relationship)

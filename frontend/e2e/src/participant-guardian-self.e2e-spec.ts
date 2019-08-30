@@ -46,6 +46,8 @@ describe('Participant (Guardian - Self)', () => {
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
+  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should stay on the profile screen on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
   it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
 
   // Search

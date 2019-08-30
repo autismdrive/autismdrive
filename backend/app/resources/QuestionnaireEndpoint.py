@@ -52,6 +52,8 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
         schema = ExportService.get_schema(name, session=db.session)
         request_data = request.get_json()
+        if "_links" in request_data:
+            request_data.pop("_links")
         updated, errors = schema.load(request_data, instance=instance)
 
         if errors:

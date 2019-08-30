@@ -199,10 +199,12 @@ class BaseTest:
 
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
                         participant_description="Even your pet hamster could benefit from participating in this study",
-                        benefit_description="You can expect to have your own rainbow following you around afterwards"):
+                        benefit_description="You can expect to have your own rainbow following you around afterwards",
+                        coordinator_email="hello@study.com"):
 
         study = Study(title=title, description=description, participant_description=participant_description,
-                      benefit_description=benefit_description, status=Status.currently_enrolling)
+                      benefit_description=benefit_description, status=Status.currently_enrolling,
+                      coordinator_email=coordinator_email)
         study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()

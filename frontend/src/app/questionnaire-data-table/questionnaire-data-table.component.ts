@@ -24,12 +24,11 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   ) {}
 
   ngOnChanges() {
-    if (this.selected_info == null) {this.selected_info = this.questionnaire_info; }
+    this.selected_info = this.questionnaire_info;
     this.changeTable(this.selected_info);
   }
 
   changeTable(table_info) {
-    console.log('SEtting table to ', table_info);
     this.selected_info = table_info;
     this.dataSource = new QuestionnaireDataSource(this.api);
     this.dataSource.loadQuestionnaires(this.selected_info.table_name);
@@ -64,7 +63,6 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   }
 
   exportQ(info) {
-    console.log('clicking the button for export ', info.display_name);
     this.api.exportQuestionnaire(info.table_name).subscribe( response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');

@@ -50,4 +50,12 @@ export class User {
     throw Error('The user does not have a participant with the given id.');
   }
 
+  hasContactInfo(participant: Participant): boolean {
+     return participant.contact != null;
+  }
+
+  checkContact() {
+    return this.participants.find(p => this.hasContactInfo(p)) != null;
+  }
+
 }

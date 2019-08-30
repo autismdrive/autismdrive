@@ -172,7 +172,7 @@ class DataLoader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
                               benefit_description=row[3], organization=org, location=row[5],
-                              short_title=row[6], short_description=row[7], image_url=row[8])
+                              short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22])
 
                 if row[9].strip() == 'Currently Enrolling':
                     study.status = Status.currently_enrolling
@@ -185,7 +185,7 @@ class DataLoader:
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(22, len(row)):
+                for i in range(23, len(row)):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id

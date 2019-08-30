@@ -19,6 +19,7 @@ class RestException(Exception):
     NOT_IN_THE_FLOW = {'code': 'not_in_the_flow', 'message': 'The Questionnaire you submitted is not in the flow'}
     UNRELATED_PARTICIPANT = {'code': 'unrelated_participant', 'message': 'You must be related to the participant.'}
     UNKNOWN_RELATIONSHIP = {'code': 'unknown_relationship', 'message': 'please use a pre-defined relationship'}
+    STUDY_INQUIRY_ERROR = {'code': 'study_inquiry_error', 'message': 'Error in finding correct user and study to complete study inquiry'}
 
     def __init__(self, payload, status_code=None, details=None):
         Exception.__init__(self)

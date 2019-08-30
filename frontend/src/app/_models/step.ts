@@ -1,7 +1,7 @@
 
 export interface Step {
   name: string;
-  question_type: string;
+  type: string;
   description: string;
   label: string;
   status: string;
@@ -13,3 +13,4 @@ export class StepStatus {
   public static readonly COMPLETE = 'COMPLETE';
   public static readonly INCOMPLETE = 'INCOMPLETE';
 }
+
