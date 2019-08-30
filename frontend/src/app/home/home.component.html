@@ -59,13 +59,10 @@
   </header>
 </div>
 
-<div class="container mat-typography" *ngIf="currentStudies">
-  <div
-    class="row news"
-    fxLayout="column"
-  >
+<div class="container">
+  <div class="row">
     <app-news-item
-      *ngFor="let item of studiesToNewsItems(currentStudies); let i = index"
+      *ngFor="let item of newsItems; let i = index"
       [item]="item"
       [index]="i"
     ></app-news-item>

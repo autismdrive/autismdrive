@@ -1,13 +1,15 @@
-<div *ngIf="item" [ngClass]="{
-  'news-item': true,
-  'even': isEven(index),
-  'odd': !isEven(index) }
-">
+<div
+  [ngClass]="{
+    'news-item': true,
+    'even': isEven(index),
+    'odd': !isEven(index)
+  }"
+>
   <div class="image">
     <img src="{{item.img}}">
   </div>
   <div class="content">
-    <span class="item-type">{{item.label}}</span>
+    <span class="item-type">{{item.type.toString()}}</span>
     <h3 [routerLink]="[ item.url ]">{{item.title}}</h3>
     <p>{{item.description}}</p>
     <app-details-link [url]="item.url"></app-details-link>

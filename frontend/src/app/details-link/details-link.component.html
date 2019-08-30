@@ -1,4 +1,4 @@
-<a [routerLink]="[ url ]" [ngClass]="{'hover': hover, 'selected': selected}">
+<a [routerLink]="[ url ]" [ngClass]="{'hover': hover || shouldHover, 'selected': selected}" (mouseenter)="onMouseOver()" (mouseleave)="onMouseOut()">
   <i class="icofont-circled-right icofont-{{size}}x details-link-icon"></i>
   <span class="details-link-text-{{size}}x">
     {{label}}

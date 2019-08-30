@@ -12,44 +12,36 @@ import {HitLabel} from '../_models/query';
 })
 export class HomeComponent implements OnInit {
   currentStudies: Study[];
+  newsItems: NewsItem[];
 
   constructor(
-    private router: Router,
     private api: ApiService
   ) {
     this.api.getStudies().subscribe(all => {
-      console.log('all studies:', all);
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
+      this.newsItems = this._studiesToNewsItems(this.currentStudies);
     });
   }
 
   ngOnInit() {
   }
 
-  goAbout($event) {
-    $event.preventDefault();
-    this.router.navigate(['about']);
-  }
+  private _studiesToNewsItems(studies: Study[]): NewsItem[] {
+    if (this.currentStudies && this.currentStudies.length > 0) {
+      return studies
+        .sort((a, b) => (a.id > b.id) ? 1 : -1)
+        .map((s, i) => {
+          const n: NewsItem = {
+            title: s.short_title || s.title,
+            description: s.short_description || s.description,
+            url: `/study/${s.id}`,
+            type: HitLabel.STUDY,
+            img: s.image_url,
+            imgClass: 'center-center',
+          };
 
-  goResources($event) {
-    $event.preventDefault();
-    this.router.navigate(['resources']);
-  }
-
-  studiesToNewsItems(studies: Study[]): NewsItem[] {
-    return studies
-      .sort((a, b) => (a.id > b.id) ? 1 : -1)
-      .map((s, i) => {
-        const n: NewsItem = {
-          title: s.short_title || s.title,
-          description: s.short_description || s.description,
-          url: `/study/${s.id}`,
-          type: HitLabel.STUDY,
-          img: s.image_url,
-          imgClass: 'center-center',
-        };
-
-        return n;
-      });
+          return n;
+        });
+    }
   }
 }

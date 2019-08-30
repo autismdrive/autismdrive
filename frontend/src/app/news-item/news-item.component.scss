@@ -50,11 +50,11 @@
       font-style: italic;
       color: $brand-primary;
       text-transform: uppercase;
-
+      cursor: pointer;
 
       &:after {
         content: '';
-        background-color: #e57200;
+        background-color: $brand-accent;
         width: 6.25rem;
         height: .125rem;
         display: block;
