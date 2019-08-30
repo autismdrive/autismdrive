@@ -146,7 +146,8 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     const onLoginScreen = /^\/login/.test(this.router.url);
     const onLogoutScreen = /^\/logout/.test(this.router.url);
     const onHomeScreen = /^\/home/.test(this.router.url);
-    if (onHomeScreen || onLoginScreen || onLogoutScreen) {
+    const onTimedOutScreen = /^\/timedout/.test(this.router.url);
+    if (onHomeScreen || onLoginScreen || onLogoutScreen || onTimedOutScreen) {
       this.router.navigate(['/login']);
     } else {
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
