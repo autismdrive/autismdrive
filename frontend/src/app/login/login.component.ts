@@ -1,9 +1,10 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup } from '@angular/forms';
-import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../_services/api/api.service';
+import {Component, EventEmitter, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormGroup} from '@angular/forms';
+import {FormlyFieldConfig} from '@ngx-formly/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {scrollToTop} from '../../util/scrollToTop';
+import {User} from '../_models/user';
 
 @Component({
   selector: 'app-login',
@@ -13,10 +14,10 @@ import {AuthenticationService} from '../_services/api/authentication-service';
 export class LoginComponent implements OnInit {
   loading = false;
   emailToken: string;
-  returnUrl: string;
   errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
   model: any = {};
+  returnUrl: string;
   fields: FormlyFieldConfig[] = [
     {
       key: 'email',
@@ -44,14 +45,22 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authenticationService: AuthenticationService
   ) {
-    this.route.params.subscribe(params => {
-      if ('email_token' in params) {
-        this.emailToken = params['email_token'];
+    this.route.queryParams.subscribe(qParams => {
+      if (qParams.hasOwnProperty('returnUrl')) {
+        this.returnUrl = qParams.returnUrl;
+        this.authenticationService.currentUser.subscribe(u => this._goToReturnUrl(u));
       }
     });
-    this.route.queryParams.subscribe(params => {
-      if ('returnUrl' in params) {
-        this.returnUrl = params['returnUrl'];
+
+    this.route.params.subscribe(params => {
+      if (params.hasOwnProperty('email_token')) {
+        this.emailToken = params.email_token;
+      }
+    });
+    this.authenticationService.currentUser.subscribe(user => {
+      // If the login firm discovers there is a user, just send folks to the profile page.
+      if (user) {
+        this.router.navigate(['profile']);
       }
     });
   }
@@ -63,25 +72,26 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     if (this.form.valid) {
-      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
-          data => {
-            if (this.returnUrl) {
-              this.router.navigate([this.returnUrl]);
-            } else {
-              this.router.navigate(['profile']);
-            }
-          },
-          error => {
-            if (error) {
-              this.errorEmitter.emit(error);
-            } else {
-              this.errorEmitter.emit('An unexpected error occurred. Please contact support');
-            }
-            this.loading = false;
-          });
+      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(u => this._goToReturnUrl(u),
+        // Will nagivate away from ths page as soon as the process completes successfully, so
+        // really just a noop here.
+        error => {
+          if (error) {
+            this.errorEmitter.emit(error);
+          } else {
+            this.errorEmitter.emit('An unexpected error occurred. Please contact support');
+          }
+          this.loading = false;
+        });
     } else {
       this.loading = false;
       this.errorEmitter.emit('Please enter a valid email address and password.');
+    }
+  }
+
+  private _goToReturnUrl(user: User) {
+    if (user) {
+      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop());
     }
   }
 
