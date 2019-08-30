@@ -10,7 +10,7 @@
   </div>
   <div class="content">
     <span class="item-type">{{item.type.toString()}}</span>
-    <h3 [routerLink]="[ item.url ]">{{item.title}}</h3>
+    <a class="item-title" [routerLink]="[ item.url ]">{{item.title}}</a>
     <p>{{item.description}}</p>
     <app-details-link [url]="item.url"></app-details-link>
   </div>

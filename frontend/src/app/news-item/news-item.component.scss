@@ -45,12 +45,13 @@
       text-transform: uppercase;
     }
 
-    h3 {
+    .item-title {
       @include mat-typography-level-to-styles($custom-typography, headline);
       font-style: italic;
       color: $brand-primary;
       text-transform: uppercase;
       cursor: pointer;
+      margin-top: 0.75rem;
 
       &:after {
         content: '';
