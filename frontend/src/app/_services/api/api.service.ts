@@ -95,7 +95,7 @@ export class ApiService {
   }
 
   private _handleError(error: StarError) {
-    let message = 'Something bad happened; please try again later.';
+    let message = 'Could not complete your request; please try again later.';
     message = error.message;
     // return an observable with a user-facing error message
     return throwError(message);
