@@ -111,8 +111,16 @@ export class AppPage {
     expect(field.getAttribute('value')).toEqual(textToEnter);
   }
 
+  navigateToUrl(url: string) {
+    return browser.get(url);
+  }
+
   navigateToHome() {
     return browser.get('/');
+  }
+
+  refresh() {
+    return browser.refresh();
   }
 
   clickAndExpectRoute(clickSelector: string, expectedRoute: string | RegExp) {

@@ -94,4 +94,9 @@ export class LoginUseCases {
     expect(this.page.getElements('app-logout').count()).toEqual(1);
     this.page.clickAndExpectRoute('#ok-button', '/home');
   }
+
+  async refreshAndRedirectToReturnUrl() {
+    const previousRoute = await this.page.getRoute();
+    this.page.refresh().then(() => expect(this.page.getRoute()).toEqual(previousRoute));
+  }
 }
