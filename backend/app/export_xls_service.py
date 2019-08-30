@@ -83,7 +83,7 @@ class ExportXlsService:
                         continue
                     if isinstance(item[key], dict):
                         continue
-                    if isinstance(item[key], list) and isinstance(item[key][0], dict):
+                    if isinstance(item[key], list) and len(item[key]) > 0 and isinstance(item[key][0], dict):
                         continue # Don't try to represent sub-table data.
                     if isinstance(item[key], list):
                         list_string = ''
