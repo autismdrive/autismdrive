@@ -87,7 +87,7 @@
         fxLayoutAlign="start start"
       >
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
-          <mat-chip-list class="applied-filters">
+          <mat-chip-list class="applied-filters" fxLayout="row wrap">
             <ng-container *ngIf="query && query.words">
               <mat-chip
                 (click)="removeWords()"
