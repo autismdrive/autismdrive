@@ -104,6 +104,10 @@ export class AppPage {
     return url.split('#')[1];
   }
 
+  pressKey(keyCode: string) {
+    browser.actions().sendKeys(protractor.Key[keyCode]).perform();
+  }
+
   inputText(selector: string, textToEnter: string) {
     expect(this.getElements(selector).count()).toEqual(1);
     const field = this.getElement(selector);

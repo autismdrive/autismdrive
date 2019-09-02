@@ -16,7 +16,7 @@
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
       [iconSize]="2"
-      [iconType]="resourceType.name"
+      [iconType]="resourceType.name.toLowerCase()"
       [title]="resourceType.label"
       [linkSize]="1"
       [isSelected]="isSelectedResourceType(resourceType)"
@@ -71,7 +71,7 @@
                   (click)="addFilter(facet.field, count.category)"
                   [ngClass]="{'filter-facet-item': true}"
                 >
-                  {{count.category}}
+                  <span class="filter-facet-label">{{count.category}}</span>
                   <div fxFlex></div>
                   <span class="hit-count">{{count.hit_count}}</span>
                 </mat-list-item>
@@ -86,29 +86,64 @@
         fxLayout="column"
         fxLayoutAlign="start start"
       >
+        <agm-map
+          *ngIf="showMap()"
+          [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
+          [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
+          [streetViewControl]="false"
+          mapTypeId="roadmap"
+          [zoom]="7"
+          (mapReady)="mapLoad($event)"
+        >
+          <agm-marker
+            *ngIf="mapLoc"
+            [latitude]="mapLoc.lat"
+            [longitude]="mapLoc.lng"
+            iconUrl="/assets/map/your-location.svg"
+          ></agm-marker>
+          <agm-marker-cluster imagePath="/assets/map/m">
+            <ng-container *ngFor="let hit of getMapResults()">
+              <agm-marker
+                *ngIf="hit.hasCoords()"
+                [latitude]="hit.latitude"
+                [longitude]="hit.longitude"
+              >
+                <agm-info-window>
+                  <h4>{{hit.title}}</h4>
+                  <p>{{hit.description}}</p>
+                  <a
+                    class="chevron-link"
+                    [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
+                    routerLinkActive="router-link-active"
+                  >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
+                </agm-info-window>
+              </agm-marker>
+            </ng-container>
+          </agm-marker-cluster>
+        </agm-map>
+
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
-          <mat-chip-list class="applied-filters" fxLayout="row wrap">
+          <mat-chip-list class="applied-filters">
             <ng-container *ngIf="query && query.words">
               <mat-chip
                 (click)="removeWords()"
                 class="applied-filter"
               >
-                "{{query.words}}"
+                <span class="applied-filter-label">"{{query.words}}"</span>
                 <mat-icon>close</mat-icon>
               </mat-chip>
             </ng-container>
 
-            <ng-container *ngFor="let filter of query.filters">
-              <ng-container *ngIf="filter.field !== 'Type'">
-                <ng-container *ngFor="let fieldValue of filter.value">
-                  <mat-chip
-                    (click)="removeFilter(filter.field, fieldValue)"
-                    class="applied-filter"
-                  >
-                    {{fieldValue}}
-                    <mat-icon>close</mat-icon>
-                  </mat-chip>
-                </ng-container>
+            <ng-container *ngFor="let filter of displayFilters; let i = index">
+              <ng-container *ngFor="let fieldValue of filter.value; let j = index">
+                <mat-chip
+                  (click)="removeFilter(filter.field, fieldValue)"
+                  class="applied-filter"
+                >
+                  <span class="applied-filter-label">{{fieldValue}}</span>
+                  <mat-icon>close</mat-icon>
+                </mat-chip>
+                <mat-icon *ngIf="j < filter.value.length -1  || i < displayFilters.length - 1">chevron_right</mat-icon>
               </ng-container>
             </ng-container>
           </mat-chip-list>
@@ -123,41 +158,6 @@
             fxLayoutGap="40px"
             *ngIf="!loading"
           >
-            <agm-map
-              *ngIf="showMap()"
-              [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
-              [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
-              [streetViewControl]="false"
-              mapTypeId="roadmap"
-              [zoom]="7"
-              (mapReady)="mapLoad($event)"
-            >
-              <agm-marker
-                *ngIf="mapLoc"
-                [latitude]="mapLoc.lat"
-                [longitude]="mapLoc.lng"
-                iconUrl="/assets/map/your-location.svg"
-              ></agm-marker>
-              <agm-marker-cluster imagePath="/assets/map/m">
-                <ng-container *ngFor="let hit of getMapResults()">
-                  <agm-marker
-                    *ngIf="hit.hasCoords()"
-                    [latitude]="hit.latitude"
-                    [longitude]="hit.longitude"
-                  >
-                    <agm-info-window>
-                      <h4>{{hit.title}}</h4>
-                      <p>{{hit.description}}</p>
-                      <a
-                        class="chevron-link"
-                        [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
-                        routerLinkActive="router-link-active"
-                      >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
-                    </agm-info-window>
-                  </agm-marker>
-                </ng-container>
-              </agm-marker-cluster>
-            </agm-map>
             <app-search-result
               *ngFor="let hit of query.hits"
               [hit]="hit"
@@ -174,7 +174,7 @@
   <div class="row margin-top-none">
     <mat-paginator
       #paginator
-      [length]="query.total"
+      [length]="query ? query.total : 0"
       [pageSize]="pageSize"
       [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
       (page)="updatePage($event)"
@@ -190,6 +190,7 @@
         [href]="rg.url"
         [title]="rg.name"
         [matTooltip]="rg.shortName + ' - ' + rg.description"
+        class="resource-gatherer"
       >
         <img
           [alt]="rg.shortName"

@@ -92,21 +92,28 @@ button {
 }
 
 .breadcrumbs-container {
-  display: grid;
-  grid-template-areas: "filters sort";
-  grid-template-columns: 1fr 1fr;
-  justify-items: stretch;
   width: 100%;
-  padding-right: 2em;
+  padding-right: 2rem;
   padding-left: 0;
   margin: 0;
   margin-top: 3rem;
+  margin-bottom: 1rem;
 }
 
 .applied-filters {
   grid-area: filters;
   margin-left: 0;
   justify-self: start;
+
+  .mat-chip-list-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: auto;
+
+    .mat-chip {
+      flex: 0 0 auto;
+    }
+  }
 
   .applied-filter {
     color: white;

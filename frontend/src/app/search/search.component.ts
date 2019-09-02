@@ -39,8 +39,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     private router: Router,
     private renderer: Renderer2,
     private searchService: SearchService,
-    private locSearchService: SearchService,
-    private featuredSearchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
@@ -59,6 +57,8 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.selectedResourceType = types[0];
         }
 
+        this.displayFilters = this.query.filters.filter(f => f.field !== 'Type');
+
         this.sortBy(this.sortMethods[0]);
       });
     });
@@ -68,9 +68,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   });
   selectedResourceType: ResourceType;
   query: Query;
-  locQuery: Query;
   loading = true;
-  filters: Filter[];
+  displayFilters: Filter[];
   pageSize = 20;
   mapLoc: LatLngLiteral;
 
@@ -153,7 +152,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'https://www.autismspeaks.org/',
     }
   ];
-  private readonly _mobileQueryListener: () => void;
+  private _mobileQueryListener: () => void;
 
   private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};
@@ -197,34 +196,6 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchService.reset();
-  }
-
-  loadLocResources() {
-    this.loading = true;
-
-    this.locQuery = new Query({
-      filters: [{field: 'Type', value: HitLabel.LOCATION}],
-      start: 0,
-      size: 999
-    });
-    if (this.mapLoc) {
-      this.locQuery.sort = {
-        field: 'geo_point',
-        latitude: this.mapLoc.lat,
-        longitude: this.mapLoc.lng,
-        order: 'asc',
-        unit: 'mi'
-      };
-    }
-
-    this.locSearchService
-      .search(this.locQuery)
-      .subscribe(queryWithResults => {
-        if (this.locQuery.equals(queryWithResults)) {
-          this.locQuery = queryWithResults;
-          this.loading = false;
-        }
-      });
   }
 
   removeWords() {

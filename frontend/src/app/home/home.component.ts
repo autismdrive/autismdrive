@@ -15,7 +15,8 @@ export class HomeComponent implements OnInit {
   newsItems: NewsItem[];
 
   constructor(
-    private api: ApiService
+    private api: ApiService,
+    private router: Router
   ) {
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');

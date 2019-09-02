@@ -1,9 +1,9 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {SearchService} from '../_services/api/search.service';
 import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {Subject, timer} from 'rxjs';
+import {SearchService} from "../_services/api/search.service";
 
 @Component({
   selector: 'app-search-box',
@@ -35,22 +35,19 @@ export class SearchBoxComponent implements OnInit {
       debounceTime(400),
       distinctUntilChanged())
       .subscribe(value => {
-        console.log(value);
         this.updateSearch(false);
       });
+
+    this.searchService.currentQuery.subscribe(q => {
+      if (q === null || (q && q.hasOwnProperty('words') && q.words === '')) {
+        if (this.searchInputElement) {
+          this.searchInputElement.value = '';
+        }
+      }
+    });
   }
 
   ngOnInit() {
-  }
-
-  isSearchPage(): boolean {
-    return (this.router.url.split('/')[1] === 'search');
-  }
-
-  showSearch(): void {
-    if (this.searchInputElement) {
-      this.searchInputElement.focus();
-    }
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
@@ -63,11 +60,15 @@ export class SearchBoxComponent implements OnInit {
     const words: string = this.searchInputElement && this.searchInputElement.value || '';
     newParams.words = removeWords ? undefined : words;
     const hasFilters = Object.keys(newParams).length > 0;
+    const isOnSearch = this.router.url.split('/')[1] === 'search';
+    const doNotRedirect = !isOnSearch && removeWords;
 
-    if (hasFilters) {
-      return this.router.navigate(['/search/filter'], {queryParams: newParams});
-    } else {
-      return this.router.navigateByUrl('/search');
+    if (!doNotRedirect) {
+      if (hasFilters) {
+        return this.router.navigate(['/search/filter'], {queryParams: newParams});
+      } else {
+        return this.router.navigateByUrl('/search');
+      }
     }
   }
 

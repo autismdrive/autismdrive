@@ -20,21 +20,11 @@ export class DetailsLinkComponent implements OnInit {
   }
 
   onMouseOver() {
-    console.log('onMouseOver this.hover =', this.hover);
-    if (this.hover === undefined) {
-      this.shouldHover = true;
-    }
-
-    console.log('this.shouldHover = ', this.shouldHover);
+    if (this.hover === undefined) { this.shouldHover = true; }
   }
 
   onMouseOut() {
-    console.log('onMouseOut this.hover =', this.hover);
-    if (this.hover === undefined) {
-      this.shouldHover = false;
-    }
-
-    console.log('this.shouldHover = ', this.shouldHover);
+    if (this.hover === undefined) { this.shouldHover = false; }
   }
 
 }
