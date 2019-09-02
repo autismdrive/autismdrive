@@ -58,9 +58,9 @@ export class LoginComponent implements OnInit {
       }
     });
     this.authenticationService.currentUser.subscribe(user => {
-      // If the login firm discovers there is a user, just send folks to the profile page.
+      // If the login form discovers there is a user, send folks to the return url.
       if (user) {
-        this.router.navigate(['profile']);
+        this._goToReturnUrl(user);
       }
     });
   }
