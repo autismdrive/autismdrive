@@ -27,16 +27,6 @@ describe('Participant (Guardian - Self)', () => {
     page.navigateToHome();
   });
 
-  // Global Header
-  it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
-  it('should display logged-out state in navigation', () => globalHeaderUseCases.displayLoggedOutState());
-  it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
-  it('should visit about page', () => globalHeaderUseCases.visitAboutPage());
-  it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
-  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
-
   // Login & Register
   it('should display login form', () => loginUseCases.displayLoginForm());
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
@@ -48,14 +38,16 @@ describe('Participant (Guardian - Self)', () => {
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should stay on the profile screen on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
-  it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
 
-  // Search
+  // Global Header - Logged In
+  it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
+  it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
+  it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected filters', () => searchUseCases.displaySelectedFilters());
-  it('should sort results by distance from user location');
-  it('should sort by last date updated');
+  it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
+  it('should visit about page', () => globalHeaderUseCases.visitAboutPage());
+  it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
+  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Profile
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
@@ -87,6 +79,14 @@ describe('Participant (Guardian - Self)', () => {
   it('should display progress on the Profile screen');
   it('should allow user to view/edit non-sensitive responses');
   it('should not allow user to view or edit sensitive responses');
+
+  // Search - Logged In
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should display selected filters', () => searchUseCases.displaySelectedFilters());
+  it('should sort results by distance from user location');
+  it('should sort by last date updated');
+  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
   // Log out
   it('should log out', () => loginUseCases.logout());

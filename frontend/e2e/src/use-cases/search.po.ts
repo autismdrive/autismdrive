@@ -31,4 +31,14 @@ export class SearchUseCases {
     expect(filter_text).toEqual(applied_filter_text);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
+
+  async clearSearchBox() {
+    const input_text_before = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
+    expect(input_text_before).toEqual('autism');
+
+    this.page.clickLinkTo('/home');
+
+    const input_text_after = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
+    expect(input_text_after).toEqual('');
+  }
 }
