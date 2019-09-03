@@ -2,20 +2,19 @@ import elasticsearch
 import flask_restful
 from flask import request, json
 
-from app import elastic_index, RestException, db
+from app import elastic_index, RestException
 from app.model.search import Facet, FacetCount, Hit
 from app.schema.schema import SearchSchema
-from typing import List, Dict, Type, Any
 
 
 class SearchEndpoint(flask_restful.Resource):
-    def __post__(self, result_types: List[str] = None):
-        request_data: Dict = request.get_json()
+    def __post__(self, result_types = None):
+        request_data = request.get_json()
         has_request_data = request_data is not None
         has_filters = has_request_data and 'filters' in request_data and request_data['filters'] is not None
 
         if has_filters and result_types is not None:
-            filters: List[dict] = list(request_data['filters'])
+            filters = list(request_data['filters'])
 
             if len(filters) > 0:
                 for f in filters:

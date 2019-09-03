@@ -35,6 +35,7 @@ describe('Anonymous User', () => {
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location');
   it('should sort by last date updated');
+  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
   // Login & Register
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
