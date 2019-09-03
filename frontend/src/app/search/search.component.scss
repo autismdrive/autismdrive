@@ -1,5 +1,13 @@
 @import '../../material';
 
+#hero {
+  background-image: url('/assets/home/hero-parent-child.jpg');
+
+  h1 {
+    color: white;
+  }
+}
+
 form.search-box {
   background: transparent;
   border-radius: 5px;
@@ -23,83 +31,136 @@ form.search-box {
   padding-right: 2em;
 }
 
-::ng-deep mat-sidenav-container#sidenavContainer {
-  min-height: 100vh;
-
-  ::ng-deep .mat-sidenav {
-    width: 100%;
-    padding-top: 2em;
-
-    h2 {
-      display: flex;
-      margin-left: 24px;
-      line-height: 2.2;
-
-      span {
-        flex: 1 1 auto;
-      }
-    }
+.mat-list-base[dense] {
+  h3.mat-subheader {
+    font-size: 1.25rem;
+    margin-top: 1em;
+    padding-left: 0px;
   }
 
-  @media screen and (min-width: 720px) {
-    ::ng-deep .mat-sidenav {
-      width: 400px;
-    }
+  h3.mat-subheader:first-child {
+    margin-top: 0px;
   }
 
-  mat-list-item {
+  .mat-list-item {
     cursor: pointer;
-  }
+    font-weight: bold;
+    color: $brand-primary;
+    padding-top: 0px;
+    padding-bottom: 0px;
 
-  mat-list-item:hover {
-    background-color: mat-color($stardrive-primary, 100)
-  }
-
-  button {
-    flex: 0 0 auto;
-    border: none;
-  }
-
-  .filter-facet-item, .sort-order {
-    font-size: 1em;
-    line-height: 1.2;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-  }
-
-  .hit-count { text-align: right; white-space: nowrap; }
-
-  .search-tools {
-    display: grid;
-    grid-template-areas: "filters sort";
-    grid-template-columns: 1fr 1fr;
-    justify-items: stretch;
-    width: 100%;
-    padding-right: 2em;
-    margin-bottom: 0;
-    margin-left: 1em;
-  }
-
-  .applied-filters {
-    grid-area: filters;
-    margin-left: 1em;
-    justify-self: start;
-
-    li {
-      list-style: none;
-      margin-left: 0px;
+    &:hover {
+      background-color: rgba(0,0,0,0.1);
+      text-decoration: underline;
     }
-  }
 
-  .sort-order {
-    grid-area: sort;
-    justify-self: end;
-  }
+    .mat-list-item-content {
+      line-height: 0.8;
+    }
 
-  #results {
-    padding: 2em;
+    .hit-count {
+      color: $body-color;
+      font-weight: normal;
+      text-align: right;
+      white-space: nowrap;
+    }
   }
 }
 
 
+button {
+  flex: 0 0 auto;
+  border: none;
+}
 
+.filters {
+  #reset-filters {
+    color: $brand-accent;
+    font-weight: bold;
+    padding-left: 0px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+
+.filter-facet-item, .sort-order {
+  font-size: 1em;
+  line-height: 1;
+}
+
+.breadcrumbs-container {
+  width: 100%;
+  padding-right: 2rem;
+  padding-left: 0;
+  margin: 0;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.applied-filters {
+  grid-area: filters;
+  margin-left: 0;
+  justify-self: start;
+
+  .mat-chip-list-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: auto;
+
+    .mat-chip {
+      flex: 0 0 auto;
+    }
+  }
+
+  .applied-filter {
+    color: white;
+    background-color: $brand-accent;
+
+    mat-icon {
+      margin-left: 0.75rem;
+      margin-right: -0.25rem;
+      font-size: 1.25rem;
+      line-height: 1.25;
+    }
+  }
+}
+
+.sort-order {
+  grid-area: sort;
+  justify-self: end;
+}
+
+agm-map {
+  height: 400px;
+  width: 100%;
+}
+
+::ng-deep mat-paginator.mat-paginator {
+
+  .mat-paginator-page-size-select.mat-form-field-appearance-outline {
+    width: 84px;
+
+    .mat-form-field-wrapper {
+      padding-bottom: 0.75em;
+    }
+
+    .mat-form-field-outline {
+      top: 0.75em;
+      bottom: -0.25em;
+    }
+
+    .mat-select-arrow-wrapper {
+      transform: translateY(0%);
+    }
+
+    .mat-form-field-infix {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      margin-top: 0px;
+      margin-bottom: 0px;
+    }
+  }
+}

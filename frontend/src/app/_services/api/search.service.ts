@@ -8,43 +8,44 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
-  private querySubject: BehaviorSubject<Query>;
+  private _querySubject: BehaviorSubject<Query>;
   public currentQuery: Observable<Query>;
-  query_url = `${environment.api}/api/search`;
+  query_url = `${environment.api}/api/search/resources`;
 
-  constructor(private http: HttpClient) {
+  constructor(private _http: HttpClient) {
     const queryDict = JSON.parse(localStorage.getItem('currentQuery'));
     if (queryDict) {
-      this.querySubject = new BehaviorSubject<Query>(new Query(queryDict));
+      this._querySubject = new BehaviorSubject<Query>(new Query(queryDict));
     } else {
-      this.querySubject = new BehaviorSubject<Query>(null);
+      this._querySubject = new BehaviorSubject<Query>(null);
     }
-    this.currentQuery = this.querySubject.asObservable();
+    this.currentQuery = this._querySubject.asObservable();
   }
 
   public get currentQueryValue(): Query {
-    return this.querySubject.value;
+    return this._querySubject.value;
   }
 
-  private loadQuery(queryDict): Query {
+  private _loadQuery(queryDict): Query {
     if (queryDict && queryDict.hits) {
       const query = new Query(queryDict);
       localStorage.setItem('currentQuery', JSON.stringify(queryDict));
-      this.querySubject.next(query);
-      this.currentQuery = this.querySubject.asObservable();
+      this._querySubject.next(query);
+      this.currentQuery = this._querySubject.asObservable();
       return query;
     }
   }
 
   search(query: Query): Observable<Query> {
-    return this.http.post<any>(this.query_url, query)
+    return this._http
+      .post<any>(this.query_url, query)
       .pipe(map(queryDict => {
-        return this.loadQuery(queryDict);
+        return this._loadQuery(queryDict);
       }));
   }
 
   reset() {
     localStorage.removeItem('currentQuery');
-    this.querySubject.next(null);
+    this._querySubject.next(null);
   }
 }

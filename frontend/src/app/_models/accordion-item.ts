@@ -4,4 +4,5 @@ export interface AccordionItem {
   description: string;
   url: string;
   expanded?: boolean;
+  image?: string;
 }

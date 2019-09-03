@@ -9,10 +9,22 @@ export class DetailsLinkComponent implements OnInit {
   @Input() url: string;
   @Input() label = 'Details';
   @Input() size = 1;
+  @Input() hover;
+  @Input() selected = false;
+  @Input() subtitle = '';
+  shouldHover = false;
 
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onMouseOver() {
+    if (this.hover === undefined) { this.shouldHover = true; }
+  }
+
+  onMouseOut() {
+    if (this.hover === undefined) { this.shouldHover = false; }
   }
 
 }

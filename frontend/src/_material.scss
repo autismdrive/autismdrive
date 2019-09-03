@@ -9,14 +9,14 @@ $custom-typography: mat-typography-config(
   $display-2:     mat-typography-level(2.000rem, 1.0, 800, $heading-font-family),
   $display-1:     mat-typography-level(1.750rem, 1.0, 800, $heading-font-family),
   $headline:      mat-typography-level(1.625rem, 1.0, 500, $heading-font-family),
-  $title:         mat-typography-level(1.500rem, 1.0, 700),
-  $subheading-2:  mat-typography-level(1.375rem, 1.0, 500),
-  $subheading-1:  mat-typography-level(1.250rem, 1.0, 500),
-  $body-2:        mat-typography-level(1.000rem, 1.5, 500),
-  $body-1:        mat-typography-level(1.000rem, 1.5, 500),
-  $caption:       mat-typography-level(1.000rem, 1.5, 500),
-  $button:        mat-typography-level(1.000rem, 1.5, 500),
-  $input:         mat-typography-level(1.000rem, 1.5, 500)
+  $title:         mat-typography-level(1.500rem, 1.0, 700, $body-font-family),
+  $subheading-2:  mat-typography-level(1.375rem, 1.0, 500, $body-font-family),
+  $subheading-1:  mat-typography-level(1.250rem, 1.0, 500, $body-font-family),
+  $body-2:        mat-typography-level(1.000rem, 1.5, 500, $body-font-family),
+  $body-1:        mat-typography-level(1.000rem, 1.5, 500, $body-font-family),
+  $caption:       mat-typography-level(1.000rem, 1.5, 500, $body-font-family),
+  $button:        mat-typography-level(1.000rem, 1.5, 500, $body-font-family),
+  $input:         mat-typography-level(1.000rem, 1.5, 500, $body-font-family)
 );
 
 $mat-blue: (

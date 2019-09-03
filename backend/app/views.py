@@ -9,6 +9,8 @@ from app.resources.StatusEndpoint import StatusEndpoint
 from app.resources.Auth import auth_blueprint
 from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
+from app.resources.SearchResourcesEndpoint import SearchResourcesEndpoint
+from app.resources.SearchStudiesEndpoint import SearchStudiesEndpoint
 from app.resources.StepLogEndpoint import StepLogListEndpoint
 from app.resources.Tracking import tracking_blueprint
 from app.resources.FlowEndpoint import (
@@ -201,6 +203,8 @@ endpoints = [
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
     # Search Endpoint
     (SearchEndpoint, "/search"),
+    (SearchResourcesEndpoint, "/search/resources"),
+    (SearchStudiesEndpoint, "/search/studies"),
     (ExportListEndpoint, "/export"),
     (ExportEndpoint, "/export/<string:name>"),
     (EmailLogListEndpoint, "/email_log"),

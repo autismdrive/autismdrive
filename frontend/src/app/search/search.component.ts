@@ -1,23 +1,15 @@
-import { LatLngLiteral } from '@agm/core';
-import { MediaMatcher } from '@angular/cdk/layout';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  ViewChild
-} from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSidenav } from '@angular/material/sidenav';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Filter, Query, Sort, Hit, HitLabel } from '../_models/query';
-import { SearchService } from '../_services/api/search.service';
-import { StudyStatus } from '../_models/study';
-import {merge} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {LatLngLiteral} from '@agm/core';
+import {MediaMatcher} from '@angular/cdk/layout';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Filter, Hit, HitLabel, HitType, Query, Sort} from '../_models/query';
+import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {scrollToTop} from '../../util/scrollToTop';
+import {User} from '../_models/user';
+import {AuthenticationService} from '../_services/api/authentication-service';
+import {AccordionItem} from '../_models/accordion-item';
 
 interface SortMethod {
   name: string;
@@ -25,28 +17,68 @@ interface SortMethod {
   sortQuery: Sort;
 }
 
+interface ResourceType {
+  name: string;
+  label: string;
+}
+
+class MapControlDiv extends HTMLDivElement {
+  index?: number;
+}
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
-  query =  new Query({
-    words: '',
-    filters: [],
-    size: 20,
+export class SearchComponent implements OnInit, OnDestroy {
+
+  constructor(
+    changeDetectorRef: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
+    private renderer: Renderer2,
+    private searchService: SearchService,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private authenticationService: AuthenticationService,
+    media: MediaMatcher,
+  ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
+
+    this.loadMapLocation(() => {
+      this.route.queryParamMap.subscribe(qParams => {
+        this.query = this._queryParamsToQuery(qParams);
+
+        const types = this.selectedTypes();
+        if (types && (types.length === 1)) {
+          this.selectedResourceType = types[0];
+        }
+
+        this.displayFilters = this.query.filters.filter(f => f.field !== 'Type');
+
+        this.sortBy(this.sortMethods[0]);
+      });
+    });
+  }
+  resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
+    return {name: HitType[t], label: HitLabel[t]};
   });
-  showFilters = false;
+  selectedResourceType: ResourceType;
+  query: Query;
   loading = true;
-  hideResults = false;
-  filters: Filter[];
+  displayFilters: Filter[];
   pageSize = 20;
-  mapLoc: LatLngLiteral = {
+  mapLoc: LatLngLiteral;
+
+  defaultLoc: LatLngLiteral = {
     lat: 37.9864031,
     lng: -81.6645856
   };
+
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: () => void;
   sortMethods: SortMethod[] = [
     {
       name: 'Relevance',
@@ -61,8 +93,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       label: 'Near me',
       sortQuery: {
         field: 'geo_point',
-        latitude: this.mapLoc.lat,
-        longitude: this.mapLoc.lng,
+        latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
+        longitude: this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng,
         order: 'asc',
         unit: 'mi'
       }
@@ -77,87 +109,52 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
   selectedSort: SortMethod;
-  @ViewChild('sidenav', {static: true}) public sideNav: MatSidenav;
-  @ViewChild('paginator', {static: true}) paginator: MatPaginator;
-  featuredStudies: Hit[];
 
-  constructor(
-    changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute,
-    private router: Router,
-    private renderer: Renderer2,
-    private searchService: SearchService,
-    private featuredSearchService: SearchService,
-    private googleAnalyticsService: GoogleAnalyticsService,
-    media: MediaMatcher,
-  ) {
-    this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
-    this.loadMapLocation(() => {
-      this.route.queryParamMap.subscribe(qParams => {
-        let words = '';
-        const filters: Filter[] = [];
+  pageEvent: PageEvent;
+  paginatorElement: MatPaginator;
 
-        for (const key of qParams.keys) {
-          if (key === 'words') {
-            words = qParams.get(key);
-          } else {
-            filters.push({ field: key, value: qParams.getAll(key) });
-          }
-        }
-
-        this.query = new Query({
-          words: words,
-          filters: filters,
-          size: this.pageSize,
-        });
-
-        this.sortBy(this.sortMethods[0]);
-        this.updateFilters();
-      });
-    });
-
-    this.renderer.listen(window, 'resize', (event) => {
-      this.checkWindowWidth();
-    });
+  @ViewChild(MatPaginator, {static: false})
+  set paginator(value: MatPaginator) {
+    this.paginatorElement = value;
   }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewInit() {
-    merge(this.paginator.page).pipe(
-      tap(() => this.doSearch())
-    ).subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.searchService.reset();
-  }
-
-  private checkWindowWidth(): void {
-    if (window.innerWidth > 768) {
-      this.sideNav.mode = 'side';
-    } else {
-      this.sideNav.mode = 'over';
+  currentUser: User;
+  resourceGatherers: AccordionItem[] = [
+    {
+      name: 'UVA Supporting Transformative Autism Research',
+      shortName: 'UVA STAR',
+      description: `
+        The STAR initiative, led by the Curry School in partnership with colleagues across the University,
+        aims to improve the lives of individuals with autism through groundbreaking research and innovative
+        models for intervention and training.
+      `,
+      image: '/assets/partners/uva_star.png',
+      url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star',
+    },
+    {
+      name: 'Charlottesville Region Autism Action Group',
+      shortName: 'CRAAG',
+      description: `
+        A parent-run advocacy group, one of three active all-volunteer regional Autism Action Groups
+        initiated by Commonwealth Autism. Established in 2010, it serves Charlottesville, Albemarle, Greene,
+        Fluvanna, Louisa, and Nelson counties.
+      `,
+      image: '/assets/partners/craag.png',
+      url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
+    },
+    {
+      name: 'Autism Speaks Inc.',
+      shortName: 'Autism Speaks',
+      description: `
+        The largest autism advocacy organization in the United States. It sponsors autism research
+        and conducts awareness and outreach activities aimed at families, governments, and the public.
+      `,
+      image: '/assets/partners/autism_speaks.png',
+      url: 'https://www.autismspeaks.org/',
     }
+  ];
+  private _mobileQueryListener: () => void;
 
-    this.sideNav.opened = this.showFilters && !this.mobileQuery.matches;
-  }
-
-  removeWords() {
-    this.query.words = '';
-    this.query.start = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    } else {
-      console.log('NO PAGINATOR?', this.paginator);
-    }
-    this.updateUrl(this.query);
-  }
-
-  updateUrl(query: Query) {
+  private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};
 
     if (query.hasOwnProperty('words') && query.words) {
@@ -170,17 +167,54 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       queryParams[filter.field] = filter.value;
     }
 
+    return queryParams;
+  }
+
+  private _queryParamsToQuery(qParams: Params): Query {
+    let words = '';
+    const filters: Filter[] = [];
+
+    if (qParams && qParams.keys) {
+      for (const key of qParams.keys) {
+        if (key === 'words') {
+          words = qParams.get(key);
+        } else {
+          filters.push({field: key, value: qParams.getAll(key)});
+        }
+      }
+    }
+
+    return new Query({
+      words: words,
+      filters: filters,
+      size: this.pageSize,
+    });
+  }
+
+  ngOnInit() {
+  }
+
+  ngOnDestroy(): void {
+    this.searchService.reset();
+  }
+
+  removeWords() {
+    this.query.words = '';
+    this.query.start = 0;
+    this.paginatorElement.firstPage();
+    this.doSearch();
+  }
+
+  updateUrl(query: Query) {
+    const qParams = this._queryToQueryParams(query);
+
     this.router.navigate(
-    [],
-    {
-      relativeTo: this.route,
-      queryParams: queryParams
-    }).then(() => {
-      window.scroll({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: qParams
+      }).then(() => {
+      scrollToTop();
     });
   }
 
@@ -189,28 +223,14 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchService
       .search(this.query)
       .subscribe(queryWithResults => {
-        if (this.query.equals(queryWithResults)) {
-          this.query = queryWithResults;
-          this.checkWindowWidth();
-          this.searchFeaturedStudies();
-          this.loading = false;
-        } else {
-          this.updateUrl(this.query);
-        }
+        this.query = queryWithResults;
+        this.loading = false;
+        scrollToTop();
       });
     this.googleAnalyticsService.event(this.query.words,
       {
         'event_category': 'search',
       });
-  }
-
-  searchFeaturedStudies() {
-    const query = new Query(this.query);
-    query.replaceFilter('Type', HitLabel.STUDY);
-    query.filters.push({field: 'Status', value: [StudyStatus.currently_enrolling]});
-    this.featuredSearchService.search(query).subscribe(queryWithResults => {
-      console.log('Featured studies queryWithResults', queryWithResults);
-    });
   }
 
   loadMapLocation(callback: Function) {
@@ -233,7 +253,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.query.start = 0;
     this.query.sort = selectedSort.sortQuery;
 
-
     if (selectedSort.name === 'Distance') {
       this.loadMapLocation(() => {
         this.query.sort.latitude = this.mapLoc.lat;
@@ -249,8 +268,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.query.addFilter(field, fieldValue);
     this.query.start = 0;
 
-    if (this.paginator) {
-      this.paginator.firstPage();
+    if (this.paginatorElement) {
+      this.paginatorElement.firstPage();
     }
 
     this.updateUrl(this.query);
@@ -262,19 +281,120 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateUrl(this.query);
   }
 
-  updatePage() {
-    if (this.paginator) {
-      this.query.size = this.paginator.pageSize;
-      this.query.start = (this.paginator.pageIndex * this.paginator.pageSize) + 1;
-      this.updateUrl(this.query);
+  selectResourceType(keepType: string) {
+    this.resourceTypes.forEach(t => {
+      if (t.label === keepType) {
+        this.selectedResourceType = t;
+        this.query.addFilter('Type', t.label);
+      } else {
+        this.query.removeFilter('Type', t.label);
+      }
+    });
+
+    this.query.start = 0;
+    this.updateUrl(this.query);
+  }
+
+  updatePage(event: PageEvent) {
+    this.loading = true;
+    this.pageEvent = event;
+    this.query.size = event.pageSize;
+    this.query.start = (event.pageIndex * event.pageSize) + 1;
+    this.doSearch();
+  }
+
+  addMyLocationControl(mapUI: google.maps.Map) {
+    const controlDiv: MapControlDiv = document.createElement('div');
+
+    // Set CSS for the control border.
+    const controlUI = document.createElement('div');
+    controlUI.style.backgroundColor = '#fff';
+    controlUI.style.border = '2px solid #fff';
+    controlUI.style.borderRadius = '3px';
+    controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+    controlUI.style.cursor = 'pointer';
+    controlUI.style.marginBottom = '6px';
+    controlUI.style.marginRight = '12px';
+    controlUI.style.textAlign = 'center';
+    controlUI.title = 'Your Location';
+    controlDiv.appendChild(controlUI);
+
+    // Set CSS for the control interior.
+    const controlText = document.createElement('div');
+    controlText.style.fontSize = '16px';
+    controlText.style.lineHeight = '38px';
+    controlText.style.paddingLeft = '5px';
+    controlText.style.paddingRight = '5px';
+    controlText.innerHTML = '<img src="/assets/map/my-location.svg">';
+    controlUI.appendChild(controlText);
+
+    // Set the center to the user's location on click
+    controlUI.addEventListener('click', () => {
+      this.loadMapLocation(() => {
+        mapUI.setCenter(this.mapLoc);
+        mapUI.setZoom(9);
+      });
+    });
+
+    controlDiv.index = 1;
+    mapUI.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+  }
+
+  protected mapLoad(map: google.maps.Map) {
+    this.addMyLocationControl(map);
+  }
+
+  selectedTypes(): ResourceType[] {
+    if (this.query) {
+      const typeFilter = this.query.filters.find(f => f.field === 'Type');
+
+      if (typeFilter) {
+        return this.resourceTypes.filter(f => typeFilter.value.includes(f.label));
+      } else {
+        return this.resourceTypes;
+      }
     }
   }
 
-  // Show filters if all filters have been removed.
-  updateFilters() {
-    this.showFilters = this.query.filters.length === 0;
-    if (!this.mobileQuery.matches && this.showFilters && this.sideNav) {
-      this.sideNav.open();
+  isSelectedResourceType(rt: ResourceType): boolean {
+    const types = this.selectedTypes();
+
+    if (types) {
+      return !!types.find(t => t.label === rt.label);
     }
+    return false;
+  }
+
+  hasFilters() {
+    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
+    const hasFilters = this.query && this.query.filters.some(f => {
+      if (f.field === 'Type') {
+        return f.value.length === 1;
+      } else {
+        return f.value.length > 0;
+      }
+    });
+
+    return hasWords || hasFilters;
+  }
+
+  showBreadcrumbs() {
+    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
+    const hasFilters = this.query && this.query.filters.some(f => {
+      return (f.field !== 'Type') && (f.value.length > 0);
+    });
+
+    return hasWords || hasFilters;
+  }
+
+  getMapResults(): Hit[] {
+    if (this.query && this.query.hits && (this.query.hits.length > 0)) {
+      return this.query.hits.filter(h => h.hasCoords());
+    }
+  }
+
+  showMap() {
+    const mapResults = this.getMapResults();
+    return mapResults && (mapResults.length > 0);
   }
 }
