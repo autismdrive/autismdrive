@@ -1,27 +1,33 @@
 <div
-  *ngIf="queryParams"
   [class]="'search-bar ' + variant"
 >
-  <mat-form-field id="search-field" fxFlex="100%">
+  <mat-form-field fxFlex="100%" id="search-field">
     <input
-      #searchInput
       matInput
-      type="text"
+      #searchInput
+      (keyup.enter)="updateSearch(false)"
+      (keyup.escape)="updateSearch(true)"
       placeholder="Search for Autism Support Resources"
-      (keyup)="updateSearch(false)"
-      [(ngModel)]="words"
-      (ngModelChange)="this.searchUpdate.next($event)"
-      (keydown.enter)="this.updateSearch(false)"
+      type="text"
     >
-    <mat-icon
-      *ngIf="!hasWords()"
-      matSuffix
-      (click)="updateSearch(true)"
-    >search</mat-icon>
-    <mat-icon
-      [ngClass]="{'ghost': !hasWords()}"
-      matSuffix
-      (click)="updateSearch(true)"
-    >cancel</mat-icon>
+    <div
+       matSuffix
+      fxLayout="row"
+    >
+      <button
+        mat-icon-button
+        matSuffix
+        [ngClass]="{'btn-cancel': true, 'hidden': !hasWords()}"
+        (click)="updateSearch(true)"
+      ><mat-icon>cancel</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="updateSearch(false)"
+        [ngClass]="{'btn-search': true}"
+      ><mat-icon>search</mat-icon>
+      </button>
+    </div>
   </mat-form-field>
 </div>

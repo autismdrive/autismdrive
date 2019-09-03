@@ -1,149 +1,205 @@
-<app-loading *ngIf="loading"></app-loading>
-<mat-sidenav-container
-  [id]="'sidenavContainer'"
-  class="mat-typography"
-  [hasBackdrop]="false"
+<div
+  id="hero"
+  class="gradient-overlay container with-escaping-tiles"
 >
-  <mat-sidenav
-    #sidenav
-    class="sidenav filters"
+  <div class="hero-content">
+    <h1>Find Autism Support</h1>
+  </div>
+  <div
+    class="row escaping-tiles-1x"
+    fxLayout="row"
+    fxLayoutGap="40px"
+    fxLayoutAlign="center auto"
   >
-    <h2>
-      <span>
-        <mat-icon>filter_list</mat-icon>
-        Filter Resources By:
-      </span>
-      <div class="spacer"></div>
-      <button
-        mat-icon-button
-        (click)="sideNav.close()"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-    </h2>
-    <div class="spacer"></div>
-    <mat-accordion *ngIf="!loading">
-      <ng-container *ngFor="let facet of query.facets">
-        <mat-expansion-panel
-          *ngIf="facet.facetCounts.length > 0"
-          [ngClass]="{'filter-facet': true}"
-        >
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{facet.field}}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-list>
-            <mat-list-item
-              *ngFor="let count of facet.facetCounts"
-              (click)="addFilter(facet.field, count.category)"
-              [ngClass]="{'filter-facet-item': true}"
-            >
-              {{count.category}}
-              <div fxFlex></div>
-              <span class="hit-count">{{count.hit_count}}</span>
-            </mat-list-item>
-          </mat-list>
-        </mat-expansion-panel>
-      </ng-container>
-    </mat-accordion>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div
-      class="container"
-      fxLayout="column"
-      fxLayoutAlign="start center"
-      *ngIf="!loading"
-    >
-      <div class="row search-tools">
-        <ul class="applied-filters">
-          <li *ngIf="sideNav.opened">
-            <button
-              mat-button
-              (click)="sideNav.close()"
-            >
-              <i class="icofont-hand-left icofont-2x"></i>
-              Select a filter
-            </button>
-          </li>
-          <li *ngIf="!sideNav.opened">
-            <button
-              mat-button
-              (click)="sideNav.open()"
-            >
-              <mat-icon>filter_list</mat-icon>
-              Add a filter
-            </button>
-          </li>
-          <li
-            *ngIf="query.words"
-            class="applied-filter"
-          >
-            <button
-              mat-button
-              (click)="removeWords()"
-            >
-              <mat-icon>remove_circle_outline</mat-icon>
-              Search: {{query.words}}
-            </button>
-          </li>
+    <app-border-box-tile
+      *ngFor="let resourceType of resourceTypes"
+      fxFlex.gt-sm="calc(33% - 160px)"
+      fxFlex.sm="calc(50% - 120px)"
+      [iconSize]="2"
+      [iconType]="resourceType.name.toLowerCase()"
+      [title]="resourceType.label"
+      [linkSize]="1"
+      [isSelected]="isSelectedResourceType(resourceType)"
+      (click)="selectResourceType(resourceType.label)"
+    ></app-border-box-tile>
+  </div>
+</div>
 
-          <ng-container *ngFor="let filter of query.filters">
-            <li
-              *ngFor="let fieldValue of filter.value"
-              class="applied-filter"
-            >
-              <button
-                mat-button
-                (click)="removeFilter(filter.field, fieldValue)"
-              >
-                <mat-icon>remove_circle_outline</mat-icon>
-                {{filter.field}} : {{fieldValue}}
-              </button>
-            </li>
-          </ng-container>
-        </ul>
+<div *ngIf="!loading" class="container">
+  <div class="row margin-bottom-none">
+    <h1 *ngIf="selectedResourceType">{{selectedResourceType.label}}</h1>
+    <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
+    <div fxLayout="row" fxLayoutGap="80px" fxLayoutAlign="space-evenly start">
+      <div
+        fxFlex="calc(30% - 160px)"
+        class="filters"
+        fxLayout="column"
+        fxLayoutGap="40px"
+      >
         <div class="sort-order">
-          <mat-form-field>
-            <mat-label>
-              Sort Results By:
-            </mat-label>
-            <mat-select value="{{selectedSort.name}}">
-              <mat-option
-                *ngFor="let s of sortMethods"
-                (click)="sortBy(s)"
-                value="{{s.name}}"
-              >{{s.label}}</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <h2>Sort by</h2>
+          <mat-radio-group
+            *ngIf="selectedSort && selectedSort.name"
+            [(ngModel)]="selectedSort.name"
+            fxLayout="column"
+          >
+            <mat-radio-button
+              *ngFor="let s of sortMethods"
+              (click)="sortBy(s)"
+
+              [value]="s.name"
+            >{{s.label}}</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div class="filters-topics">
+          <h2>Narrow your results</h2>
+          <button
+            mat-button
+            [routerLink]="'/search'"
+            *ngIf="hasFilters()"
+            id="reset-filters"
+          >
+            Reset filters
+          </button>
+          <mat-list dense *ngIf="!loading">
+            <ng-container *ngFor="let facet of query.facets">
+              <ng-container *ngIf="facet.field !== 'Type' && facet.facetCounts.length > 0">
+                <h3 mat-subheader>{{facet.field}}</h3>
+                <mat-list-item
+                  *ngFor="let count of facet.facetCounts"
+                  (click)="addFilter(facet.field, count.category)"
+                  [ngClass]="{'filter-facet-item': true}"
+                >
+                  <span class="filter-facet-label">{{count.category}}</span>
+                  <div fxFlex></div>
+                  <span class="hit-count">{{count.hit_count}}</span>
+                </mat-list-item>
+              </ng-container>
+            </ng-container>
+          </mat-list>
         </div>
       </div>
+
       <div
-        class="row search-results"
-        style="margin-top: 0"
+        fxFlex="calc(70% - 160px)"
+        fxLayout="column"
+        fxLayoutAlign="start start"
       >
-        <div
-          id="results"
-          fxLayout="column"
-          fxLayoutGap="40px"
-          *ngIf="!(loading || hideResults)"
+        <agm-map
+          *ngIf="showMap()"
+          [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
+          [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
+          [streetViewControl]="false"
+          mapTypeId="roadmap"
+          [zoom]="7"
+          (mapReady)="mapLoad($event)"
         >
-          <app-search-result
-            *ngFor="let hit of query.hits"
-            [hit]="hit"
-            [mapLoc]="mapLoc"
+          <agm-marker
+            *ngIf="mapLoc"
+            [latitude]="mapLoc.lat"
+            [longitude]="mapLoc.lng"
+            iconUrl="/assets/map/your-location.svg"
+          ></agm-marker>
+          <agm-marker-cluster imagePath="/assets/map/m">
+            <ng-container *ngFor="let hit of getMapResults()">
+              <agm-marker
+                *ngIf="hit.hasCoords()"
+                [latitude]="hit.latitude"
+                [longitude]="hit.longitude"
+              >
+                <agm-info-window>
+                  <h4>{{hit.title}}</h4>
+                  <p>{{hit.description}}</p>
+                  <a
+                    class="chevron-link"
+                    [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
+                    routerLinkActive="router-link-active"
+                  >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
+                </agm-info-window>
+              </agm-marker>
+            </ng-container>
+          </agm-marker-cluster>
+        </agm-map>
+
+        <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
+          <mat-chip-list class="applied-filters">
+            <ng-container *ngIf="query && query.words">
+              <mat-chip
+                (click)="removeWords()"
+                class="applied-filter"
+              >
+                <span class="applied-filter-label">"{{query.words}}"</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *ngFor="let filter of displayFilters; let i = index">
+              <ng-container *ngFor="let fieldValue of filter.value; let j = index">
+                <mat-chip
+                  (click)="removeFilter(filter.field, fieldValue)"
+                  class="applied-filter"
+                >
+                  <span class="applied-filter-label">{{fieldValue}}</span>
+                  <mat-icon>close</mat-icon>
+                </mat-chip>
+                <mat-icon *ngIf="j < filter.value.length -1  || i < displayFilters.length - 1">chevron_right</mat-icon>
+              </ng-container>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+        <div
+          class="row search-results"
+          style="margin-top: 0"
+        >
+          <div
+            id="results"
+            fxLayout="column"
+            fxLayoutGap="40px"
+            *ngIf="!loading"
           >
-          </app-search-result>
+            <app-search-result
+              *ngFor="let hit of query.hits"
+              [hit]="hit"
+              [mapLoc]="mapLoc"
+            >
+            </app-search-result>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row margin-top-none">
     <mat-paginator
       #paginator
-      [length]="query.total"
+      [length]="query ? query.total : 0"
       [pageSize]="pageSize"
       [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
-      (page)="updatePage()"
+      (page)="updatePage($event)"
     >
     </mat-paginator>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+
+    <h1>Resource partners</h1>
+    <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify resources that will improve
+      outcomes for individuals with autism and their families.</p>
+    <div fxLayout="row" fxLayoutAlign="space-between">
+      <a
+        *ngFor="let rg of resourceGatherers"
+        [href]="rg.url"
+        [title]="rg.name"
+        [matTooltip]="rg.shortName + ' - ' + rg.description"
+        class="resource-gatherer"
+      >
+        <img
+          [alt]="rg.shortName"
+          [src]="rg.image"
+        >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+

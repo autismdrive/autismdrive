@@ -31,10 +31,11 @@ describe('Anonymous User', () => {
 
   // Search
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location');
   it('should sort by last date updated');
+  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
   // Login & Register
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());

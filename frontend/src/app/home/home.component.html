@@ -13,40 +13,30 @@
   </div>
 
   <div
-    class="row escaping-tiles"
+    class="row escaping-tiles-2x "
     fxLayout.lt-sm="column"
     fxLayout.gt-xs="row wrap"
     fxLayoutGap="40px"
     fxLayoutAlign="center auto"
   >
-    <div
-      class="border-box-tile"
+    <app-border-box-tile
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
-    >
-      <div
-        class="border-box-tile-inner"
-        routerLink="/register"
-      >
-        <div class="border-box-tile-label">Join Autism DRIVE</div>
-        <p class="intro">Connect to upcoming studies at UVA and resources across the state relevant to you.</p>
-        <app-details-link [url]="'/register'" label="" size="2"></app-details-link>
-      </div>
-    </div>
-    <div
-      class="border-box-tile"
+      url="/register"
+      title="Join Autism DRIVE"
+      subtitle="Connect to upcoming studies at UVA and resources across the state relevant to you."
+      linkSize="2"
+      routerLink="/register"
+    ></app-border-box-tile>
+    <app-border-box-tile
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
-    >
-      <div
-        class="border-box-tile-inner"
-        routerLink="/resources"
-      >
-        <div class="border-box-tile-label">Find Support</div>
-        <p class="intro">Access autism-focused resources available in Virginia and online.</p>
-        <app-details-link [url]="'/resources'" label="" size="2"></app-details-link>
-      </div>
-    </div>
+      url="/search"
+      title="Find Support"
+      subtitle="Access autism-focused resources available in Virginia and online."
+      linkSize="2"
+      routerLink="/search"
+    ></app-border-box-tile>
   </div>
 </div>
 <div class="container mat-typography">
@@ -69,13 +59,10 @@
   </header>
 </div>
 
-<div class="container mat-typography" *ngIf="currentStudies">
-  <div
-    class="row news"
-    fxLayout="column"
-  >
+<div class="container">
+  <div class="row">
     <app-news-item
-      *ngFor="let item of studiesToNewsItems(currentStudies); let i = index"
+      *ngFor="let item of newsItems; let i = index"
       [item]="item"
       [index]="i"
     ></app-news-item>

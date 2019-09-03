@@ -1,9 +1,6 @@
 <div
   *ngIf="hit"
-  [ngClass]="{
-  'result-item': true,
-  'mat-typography': true
-}"
+  class="result-item"
 >
   <div
     fxLayout="row"
@@ -31,8 +28,13 @@
     *ngIf="!hit.highlights"
     class="description"
   ><span class="muted">{{hit.last_updated | date}} - </span> {{hit.description}}</p>
-  <a
-    class="chevron-link"
-    [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]" routerLinkActive="router-link-active"
-  >View {{hit.type}} Details <span class="muted" *ngIf="hit.hasCoords()">({{hit.milesFrom(mapLoc)}}mi)</span></a>
+  <app-details-link
+    [url]="'/' + hit.type.toLowerCase() + '/' + hit.id"
+    size="1"
+    label="View {{hit.type}} Details"
+    subtitle="{{hit.hasCoords() ? '(' + hit.milesFrom(mapLoc) + 'mi)' : ''}}"
+    (mouseover)="hover = true"
+    (mouseout)="hover = false"
+    [hover]="hover"
+  ></app-details-link>
 </div>

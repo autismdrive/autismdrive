@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { MatInput } from '@angular/material/input';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { SearchService } from '../_services/api/search.service';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {MatInput} from '@angular/material/input';
+import {ActivatedRoute, Params, Router} from '@angular/router';
 import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {Subject, timer} from 'rxjs';
+import {SearchService} from "../_services/api/search.service";
 
 @Component({
   selector: 'app-search-box',
@@ -11,7 +11,12 @@ import {Subject, timer} from 'rxjs';
   styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit {
-  @ViewChild('searchInput', { read: MatInput, static: false }) public searchInput: MatInput;
+  searchInputElement: MatInput;
+  @ViewChild('searchInput', {read: MatInput, static: false})
+  set searchInput(value: MatInput) {
+    this.searchInputElement = value;
+  }
+
   words = '';
   queryParams: Params;
   @Input() variant: string;
@@ -30,48 +35,45 @@ export class SearchBoxComponent implements OnInit {
       debounceTime(400),
       distinctUntilChanged())
       .subscribe(value => {
-        console.log(value);
         this.updateSearch(false);
       });
+
+    this.searchService.currentQuery.subscribe(q => {
+      if (q === null || (q && q.hasOwnProperty('words') && q.words === '')) {
+        if (this.searchInputElement) {
+          this.searchInputElement.value = '';
+        }
+      }
+    });
   }
 
   ngOnInit() {
   }
 
-  isSearchPage(): boolean {
-    return (this.router.url.split('/')[1] === 'search');
-  }
-
-  showSearch() {
-    if (this.searchInput) {
-      this.searchInput.focus();
-    }
-  }
-
-  updateSearch(removeWords: boolean) {
+  updateSearch(removeWords: boolean): Promise<boolean> {
     if (removeWords) {
       this.words = '';
+      this.searchInputElement.value = this.words;
     }
 
-    console.log('this.searchInput', this.searchInput);
-
-
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
-    const words: string = this.searchInput && this.searchInput.value || '';
+    const words: string = this.searchInputElement && this.searchInputElement.value || '';
     newParams.words = removeWords ? undefined : words;
     const hasFilters = Object.keys(newParams).length > 0;
+    const isOnSearch = this.router.url.split('/')[1] === 'search';
+    const doNotRedirect = !isOnSearch && removeWords;
 
-    console.log('newParams.words', newParams.words);
-
-    if (hasFilters) {
-      this.router.navigate(['/search/filter'], { queryParams: newParams });
-    } else {
-      this.router.navigateByUrl('/search');
+    if (!doNotRedirect) {
+      if (hasFilters) {
+        return this.router.navigate(['/search/filter'], {queryParams: newParams});
+      } else {
+        return this.router.navigateByUrl('/search');
+      }
     }
   }
 
   hasWords(): boolean {
-    return this.words && (this.words.length > 0);
+    return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
   }
 
 }

@@ -64,10 +64,11 @@ export class GlobalHeaderUseCases {
   }
 
   visitResourcesPage() {
-    this.page.clickLinkTo('/resources');
+    this.page.clickLinkTo('/search');
+    this.page.waitForVisible('app-search-result');
 
     ['resource', 'location', 'event'].forEach(t => {
-      expect(this.page.getElements(`.border-box-tile.${t}`).count()).toEqual(1);
+      expect(this.page.getElements(`app-border-box-tile .${t}`).count()).toEqual(1);
     });
     expect(this.page.getElements('agm-map').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);

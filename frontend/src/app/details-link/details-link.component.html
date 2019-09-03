@@ -1,4 +1,7 @@
-<a [routerLink]="[ url ]">
-  <i class="icofont-circled-right icofont-{{size}}x"></i>
-  <span class="details-link-{{size}}x">{{label}}</span>
+<a [routerLink]="[ url ]" [ngClass]="{'hover': hover || shouldHover, 'selected': selected}" (mouseenter)="onMouseOver()" (mouseleave)="onMouseOut()">
+  <i class="icofont-circled-right icofont-{{size}}x details-link-icon"></i>
+  <span class="details-link-text-{{size}}x">
+    {{label}}
+    <span class="muted" *ngIf="subtitle">{{subtitle}}</span>
+  </span>
 </a>

@@ -84,11 +84,11 @@ Type of Resources ,
 Handout ,Type of Resources 
 Book ,Type of Resources 
 Event,Type of Resources 
-Life Ages,
-Pre-K (0 - 5 years),Life Ages
-Childhood (0 - 13 years),Life Ages
-School age (6 - 13 years),Life Ages
-Transition age (14 - 22 years),Life Ages
-Adulthood (23 - 64),Life Ages
-Aging (65+),Life Ages
-All Ages,Life Ages
+Age Range,
+Pre-K (0 - 5 years),Age Range
+Childhood (0 - 13 years),Age Range
+School age (6 - 13 years),Age Range
+Transition age (14 - 22 years),Age Range
+Adulthood (23 - 64),Age Range
+Aging (65+),Age Range
+All Ages,Age Range
