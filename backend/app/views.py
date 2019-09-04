@@ -68,6 +68,8 @@ from app.resources.StudyAndInvestigatorEndpoint import (
 )
 from app.resources.StudyAndUserEndpoint import (
     StudyByUserEndpoint,
+    StudyInquiryByUserEndpoint,
+    StudyEnrolledByUserEndpoint,
     StudyUserEndpoint,
     UserByStudyEndpoint,
     StudyUserListEndpoint
@@ -195,6 +197,8 @@ endpoints = [
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
     (StudyByUserEndpoint, "/user/<user_id>/study"),
+    (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),
+    (StudyEnrolledByUserEndpoint, "/user/<user_id>/enrolled/study"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     # Participants
     (ParticipantListEndpoint, "/participant"),

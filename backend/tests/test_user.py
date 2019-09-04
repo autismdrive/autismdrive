@@ -248,6 +248,41 @@ class TestUser(BaseTest, unittest.TestCase):
             "c1", response[0]["study"]["study_users"][0]["user"]
             ["email"])
 
+    def test_enrolled_vs_inquiry_studies_by_user(self):
+        u = self.construct_user(email="u1@sartography.com")
+        s1 = self.construct_study(title="Super Study")
+        s2 = self.construct_study(title="Amazing Study")
+        s3 = self.construct_study(title="Phenomenal Study")
+        su1 = StudyUser(study=s1, user=u, status=StudyUserStatus.inquiry_sent)
+        su2 = StudyUser(study=s3, user=u, status=StudyUserStatus.inquiry_sent)
+        su3 = StudyUser(study=s2, user=u, status=StudyUserStatus.enrolled)
+        db.session.add_all([su1, su2, su3])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/user/%i/study' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+        rv = self.app.get(
+            '/api/user/%i/inquiry/study' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, len(response))
+        self.assertNotEqual(s2.id, response[0]["study_id"])
+        self.assertNotEqual(s2.id, response[1]["study_id"])
+        rv = self.app.get(
+            '/api/user/%i/enrolled/study' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(s2.id, response[0]["study_id"])
+
     def test_get_user_by_study(self):
         u = self.construct_user()
         s = self.construct_study()

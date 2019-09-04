@@ -4,7 +4,7 @@ from flask import request
 from app import db, RestException
 from app.model.user import User
 from app.model.study import Study
-from app.model.study_user import StudyUser
+from app.model.study_user import StudyUser, StudyUserStatus
 from app.schema.schema import StudyUserSchema, UserStudiesSchema, StudyUsersSchema
 
 
@@ -16,6 +16,34 @@ class StudyByUserEndpoint(flask_restful.Resource):
         study_users = db.session.query(StudyUser)\
             .join(StudyUser.study)\
             .filter(StudyUser.user_id == user_id)\
+            .order_by(Study.title)\
+            .all()
+        return self.schema.dump(study_users, many=True)
+
+
+class StudyInquiryByUserEndpoint(flask_restful.Resource):
+
+    schema = UserStudiesSchema()
+
+    def get(self, user_id):
+        study_users = db.session.query(StudyUser)\
+            .join(StudyUser.study)\
+            .filter(StudyUser.user_id == user_id)\
+            .filter(StudyUser.status == StudyUserStatus.inquiry_sent)\
+            .order_by(Study.title)\
+            .all()
+        return self.schema.dump(study_users, many=True)
+
+
+class StudyEnrolledByUserEndpoint(flask_restful.Resource):
+
+    schema = UserStudiesSchema()
+
+    def get(self, user_id):
+        study_users = db.session.query(StudyUser)\
+            .join(StudyUser.study)\
+            .filter(StudyUser.user_id == user_id)\
+            .filter(StudyUser.status == StudyUserStatus.enrolled)\
             .order_by(Study.title)\
             .all()
         return self.schema.dump(study_users, many=True)
