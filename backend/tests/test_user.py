@@ -9,6 +9,7 @@ from tests.base_test import BaseTest
 from app import db
 from app.email_service import TEST_MESSAGES
 from app.model.email_log import EmailLog
+from app.model.study_user import StudyUser
 from app.model.user import User, Role
 
 
@@ -122,7 +123,6 @@ class TestUser(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['role'], 'admin')
 
-
     def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user, password="peterpass"):
         data = {
             "id": id,
@@ -185,7 +185,6 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assert_success(response)
         return json.loads(response.data.decode())
 
-
     def test_register_sends_email(self):
         message_count = len(TEST_MESSAGES)
         self.test_create_user_with_password()
@@ -211,3 +210,115 @@ class TestUser(BaseTest, unittest.TestCase):
 
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
+
+    def test_get_study_by_user(self):
+        u = self.construct_user()
+        s = self.construct_study()
+        su = StudyUser(study=s, user=u, status='inquiry')
+        db.session.add(su)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/user/%i/study' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(s.id, response[0]["study_id"])
+        self.assertEqual(s.description, response[0]["study"]["description"])
+
+    def test_get_study_by_user_includes_user_details(self):
+        u = self.construct_user(email="c1")
+        u2 = self.construct_user(email="c2")
+        s = self.construct_study()
+        su = StudyUser(study=s, user=u, status='inquiry')
+        su2 = StudyUser(study=s, user=u2, status='inquiry')
+        db.session.add_all([su, su2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/user/%i/study' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(s.id, response[0]["study_id"])
+        self.assertEqual(2,
+                         len(response[0]["study"]["study_users"]))
+        self.assertEqual(
+            "c1", response[0]["study"]["study_users"][0]["user"]
+            ["email"])
+
+    def test_get_user_by_study(self):
+        u = self.construct_user()
+        s = self.construct_study()
+        su = StudyUser(study=s, user=u, status='inquiry')
+        db.session.add(su)
+        db.session.commit()
+        rv = self.app.get(
+            '/api/study/%i/user' % s.id,
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(su.id, response[0]["id"])
+        self.assertEqual(u.id, response[0]["user"]["id"])
+        self.assertEqual(u.email, response[0]["user"]["email"])
+
+    def test_add_user_to_study(self):
+        u = self.construct_user()
+        s = self.construct_study()
+
+        us_data = {"study_id": s.id, "user_id": u.id}
+
+        rv = self.app.post(
+            '/api/study_user',
+            data=json.dumps(us_data),
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(u.id, response["user_id"])
+        self.assertEqual(s.id, response["study_id"])
+
+    def test_set_all_users_on_study(self):
+        u1 = self.construct_user(email="u1@sartography.com")
+        u2 = self.construct_user(email="u2@sartography.com")
+        u3 = self.construct_user(email="u3@sartography.com")
+        s = self.construct_study()
+
+        us_data = [
+            {
+                "user_id": u1.id
+            },
+            {
+                "user_id": u2.id
+            },
+            {
+                "user_id": u3.id
+            },
+        ]
+        rv = self.app.post(
+            '/api/study/%i/user' % s.id,
+            data=json.dumps(us_data),
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+
+        us_data = [{"user_id": u1.id}]
+        rv = self.app.post(
+            '/api/study/%i/user' % s.id,
+            data=json.dumps(us_data),
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+
+    def test_remove_user_from_study(self):
+        self.test_add_user_to_study()
+        rv = self.app.delete('/api/study_user/%i' % 1)
+        self.assert_success(rv)
+        rv = self.app.get(
+            '/api/study/%i/user' % 1, content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
