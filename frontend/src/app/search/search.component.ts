@@ -150,7 +150,17 @@ export class SearchComponent implements OnInit, OnDestroy {
       `,
       image: '/assets/partners/autism_speaks.png',
       url: 'https://www.autismspeaks.org/',
-    }
+    },
+    {
+      name: 'Piedmont Regional Education Program',
+      shortName: 'PREP',
+      description: `
+        A public regional organization designed to meet the needs of special education students. Provides special
+        education programming and related services to nine school districts under an umbrella of a regional program.
+      `,
+      image: '/assets/partners/prep.png',
+      url: 'http://www.prepivycreek.com/',
+    },
   ];
   private _mobileQueryListener: () => void;
 
