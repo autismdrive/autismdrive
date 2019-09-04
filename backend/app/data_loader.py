@@ -39,6 +39,8 @@ import os
 import csv
 import googlemaps
 
+from app.model.zip_code import ZipCode
+
 
 class DataLoader:
     backend_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -57,6 +59,7 @@ class DataLoader:
         self.user_file = directory + "/users.csv"
         self.participant_file = directory + "/participants.csv"
         self.user_participant_file = directory + "/user_participants.csv"
+        self.zip_code_coords_file = directory + "/zip_code_coords.csv"
         print("Data loader initialized")
 
     def load_categories(self):
@@ -235,6 +238,19 @@ class DataLoader:
             print("Participants loaded.  There are now %i participants in the database." % db.session.query(
                 Participant).count())
         db.session.commit()
+
+    def load_zip_codes(self):
+        with open(self.zip_code_coords_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                zip_code = ZipCode(zip_code=row[0], latitude=row[1], longitude=row[2])
+                db.session.add(zip_code)
+                self.__increment_id_sequence(ZipCode)
+            print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(
+                ZipCode).count())
+        db.session.commit()
+
 
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()
