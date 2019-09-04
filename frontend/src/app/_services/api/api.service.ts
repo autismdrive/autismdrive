@@ -1,25 +1,25 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable, of as observableOf, throwError} from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { Category } from '../../_models/category';
-import { EmailLog } from '../../_models/email_log';
-import { Flow } from '../../_models/flow';
-import { Participant } from '../../_models/participant';
-import { Query } from '../../_models/query';
-import { Resource } from '../../_models/resource';
-import { ResourceCategory } from '../../_models/resource_category';
-import { Study } from '../../_models/study';
-import { StepLog } from '../../_models/step_log';
-import { User } from '../../_models/user';
-import { UserSearchResults } from '../../_models/user_search_results';
-import { environment } from '../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
+import {Category} from '../../_models/category';
+import {EmailLog} from '../../_models/email_log';
+import {Flow} from '../../_models/flow';
+import {Participant} from '../../_models/participant';
+import {Query} from '../../_models/query';
+import {Resource} from '../../_models/resource';
+import {ResourceCategory} from '../../_models/resource_category';
+import {Study} from '../../_models/study';
+import {StepLog} from '../../_models/step_log';
+import {User} from '../../_models/user';
+import {UserSearchResults} from '../../_models/user_search_results';
+import {environment} from '../../../environments/environment';
 import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
 import {Organization} from '../../_models/organization';
 import {StarError} from '../../star-error';
-
+import {GeoLocation} from '../../_models/geolocation';
 
 
 @Injectable({
@@ -28,65 +28,65 @@ import {StarError} from '../../star-error';
 export class ApiService {
 
   apiRoot = environment.api;
-  private statusSubject: BehaviorSubject<Status>;
   public serverStatus: Observable<Status>;
-
   // REST endpoints
   public endpoints = {
+    category: '/api/category/<id>',
     categorybyresource: '/api/resource/<resource_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
-    category: '/api/category/<id>',
     categorylist: '/api/category',
+    data_transfer_log: '/api/data_transfer_log',
+    event: '/api/event/<id>',
+    eventbycategory: '/api/category/<category_id>/event',
+    eventcategory: '/api/event_category/<id>',
+    eventcategorylist: '/api/event_category',
+    eventlist: '/api/event',
     flow: '/api/flow/<name>/<participant_id>',
     flowAnonymous: '/api/flow/<name>',
     flowlist: '/api/flow',
     flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
     flowquestionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
-    organization: '/api/organization/<id>',
-    organizationlist: '/api/organization',
-    participantbysession: '/api/session/participant',
-    participant: '/api/participant/<id>',
-    participantStepLog: '/api/participant/step_log/<id>',
-    questionnaire: '/api/q/<name>/<id>',
-    questionnaireList: '/api/q/<name>',
-    questionnaireListMeta: '/api/q/<name>/meta',
-    questionnaireInfo: '/api/q',
-    questionnaireExport: '/api/q/<name>/export',
-    questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
-    eventbycategory: '/api/category/<category_id>/event',
-    eventcategory: '/api/event_category/<id>',
-    eventcategorylist: '/api/event_category',
-    event: '/api/event/<id>',
-    eventlist: '/api/event',
+    forgot_password: '/api/forgot_password',
+    location: '/api/location/<id>',
     locationbycategory: '/api/category/<category_id>/location',
     locationcategory: '/api/location_category/<id>',
     locationcategorylist: '/api/location_category',
-    location: '/api/location/<id>',
     locationlist: '/api/location',
+    organization: '/api/organization/<id>',
+    organizationlist: '/api/organization',
+    participant: '/api/participant/<id>',
+    participantbysession: '/api/session/participant',
+    participantStepLog: '/api/participant/step_log/<id>',
+    questionnaire: '/api/q/<name>/<id>',
+    questionnaireExport: '/api/q/<name>/export',
+    questionnaireInfo: '/api/q',
+    questionnaireList: '/api/q/<name>',
+    questionnaireListMeta: '/api/q/<name>/meta',
+    questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
+    resource: '/api/resource/<id>',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
     resourcecategorylist: '/api/resource_category',
-    resource: '/api/resource/<id>',
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
     search: '/api/search',
     session: '/api/session',
-    sessionstatus: '/api/session/status',
     sessionparticipants: '/api/session/participant',
+    sessionstatus: '/api/session/status',
+    status: '/api/status',
+    study: '/api/study/<id>',
     studybycategory: '/api/category/<category_id>/study',
     studycategory: '/api/study_category/<id>',
     studycategorylist: '/api/study_category',
-    study: '/api/study/<id>',
-    studylist: '/api/study',
     studyinquiry: '/api/study_inquiry',
+    studylist: '/api/study',
     user: '/api/user/<id>',
     userEmailLog: '/api/user/email_log/<id>',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
-    forgot_password: '/api/forgot_password',
-    status: '/api/status',
-    data_transfer_log: '/api/data_transfer_log',
+    zip_code_coords: '/api/zip_code_coords/<zip_code>',
   };
+  private statusSubject: BehaviorSubject<Status>;
 
   constructor(private httpClient: HttpClient) {
     this.statusSubject = new BehaviorSubject<Status>(null);
@@ -94,24 +94,10 @@ export class ApiService {
     this.setServerStatus();
   }
 
-  private _handleError(error: StarError) {
-    let message = 'Could not complete your request; please try again later.';
-    message = error.message;
-    // return an observable with a user-facing error message
-    return throwError(message);
-  }
-
-  private setServerStatus() {
-    this.httpClient.get<Status>(this._endpointUrl('status')).subscribe
-      (status => {
-        this.statusSubject.next(status);
-      });
-  }
-
   /** sendResetPasswordEmail
    * Reset password */
   sendResetPasswordEmail(email: string): Observable<any> {
-    const email_data = { email: email };
+    const email_data = {email: email};
     return this.httpClient.post<any>(this._endpointUrl('forgot_password'), email_data)
       .pipe(catchError(this._handleError));
   }
@@ -119,7 +105,7 @@ export class ApiService {
   /** sendStudyInquiryEmail
    * StudyInquiry */
   sendStudyInquiryEmail(user: User, study: Study): Observable<any> {
-    const email_data = { user_id: user.id, study_id: study.id };
+    const email_data = {user_id: user.id, study_id: study.id};
     return this.httpClient.post<any>(this._endpointUrl('studyinquiry'), email_data)
       .pipe(catchError(this._handleError));
   }
@@ -338,8 +324,14 @@ export class ApiService {
 
   /** findUsers */
   findUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0, pageSize = 3): Observable<UserSearchResults> {
-    const search_data = { filter: filter, sort: sort, sortOrder: sortOrder, pageNumber: String(pageNumber), pageSize: String(pageSize) };
-    return this.httpClient.get<UserSearchResults>(this._endpointUrl('userlist'), { params: search_data })
+    const search_data = {
+      filter: filter,
+      sort: sort,
+      sortOrder: sortOrder,
+      pageNumber: String(pageNumber),
+      pageSize: String(pageSize)
+    };
+    return this.httpClient.get<UserSearchResults>(this._endpointUrl('userlist'), {params: search_data})
       .pipe(catchError(this._handleError));
   }
 
@@ -388,7 +380,7 @@ export class ApiService {
     const url = this
       ._endpointUrl('questionnaireExport')
       .replace('<name>', name);
-    return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
+    return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
     // .pipe(catchError(this._handleError));
   }
 
@@ -430,18 +422,41 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** search */
   search(query: Query): Observable<Query> {
     const url = this._endpointUrl('search');
     return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }
 
+  /** getDataTransferLogs */
   getDataTransferLogs(pageNumber = 0, pageSize = 10): Observable<DataTransferPageResults> {
-    const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize) };
-    return this.httpClient.get<DataTransferPageResults>(this._endpointUrl('data_transfer_log'), { params: search_data })
+    const search_data = {pageNumber: String(pageNumber), pageSize: String(pageSize)};
+    return this.httpClient.get<DataTransferPageResults>(this._endpointUrl('data_transfer_log'), {params: search_data})
       .pipe(catchError(this._handleError));
   }
 
+  /** getZipCoords */
+  getZipCoords(zipCode: string): Observable<GeoLocation> {
+    const url = this._endpointUrl('zip_code_coords')
+      .replace('<zip_code>', zipCode);
+    return this.httpClient.get<any>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  private _handleError(error: StarError) {
+    let message = 'Could not complete your request; please try again later.';
+    message = error.message;
+    // return an observable with a user-facing error message
+    return throwError(message);
+  }
+
+  private setServerStatus() {
+    this.httpClient.get<Status>(this._endpointUrl('status')).subscribe
+    (status => {
+      this.statusSubject.next(status);
+    });
+  }
 
   private _endpointUrl(endpointName: string): string {
     const path = this.endpoints[endpointName];

@@ -10,6 +10,9 @@ import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
+import {MatDialog} from '@angular/material/dialog';
+import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
+import {ApiService} from '../_services/api/api.service';
 
 interface SortMethod {
   name: string;
@@ -42,6 +45,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
+    public locationDialog: MatDialog,
+    private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
@@ -49,6 +54,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery.addListener(this._mobileQueryListener);
 
     this.loadMapLocation(() => {
+      console.log('SearchComponent constructor > loadMapLocation > callback this.mapLoc', this.mapLoc);
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
 
@@ -71,11 +77,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   loading = true;
   displayFilters: Filter[];
   pageSize = 20;
+  noLocation = true;
+  settingLocation = false;
   mapLoc: LatLngLiteral;
-
   defaultLoc: LatLngLiteral = {
-    lat: 37.9864031,
-    lng: -81.6645856
+    lat: 37.32248,
+    lng: -78.36926
   };
 
   mobileQuery: MediaQueryList;
@@ -246,14 +253,21 @@ export class SearchComponent implements OnInit, OnDestroy {
   loadMapLocation(callback: Function) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
+        this.noLocation = false;
         this.mapLoc = {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
-        callback();
+        callback.call(this);
+      }, error => {
+        const storedZip = localStorage.getItem('zipCode');
+
+        if (this.isZipCode(storedZip)) {
+          this.loadZipCoords(storedZip, callback);
+        }
       });
     } else {
-      callback();
+      callback.call(this);
     }
   }
 
@@ -265,8 +279,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     if (selectedSort.name === 'Distance') {
       this.loadMapLocation(() => {
-        this.query.sort.latitude = this.mapLoc.lat;
-        this.query.sort.longitude = this.mapLoc.lng;
+        this.query.sort.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
+        this.query.sort.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
         this.doSearch();
       });
     } else {
@@ -341,7 +355,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
       this.loadMapLocation(() => {
-        mapUI.setCenter(this.mapLoc);
+        mapUI.setCenter(this.mapLoc || this.defaultLoc);
         mapUI.setZoom(9);
       });
     });
@@ -406,5 +420,35 @@ export class SearchComponent implements OnInit, OnDestroy {
   showMap() {
     const mapResults = this.getMapResults();
     return mapResults && (mapResults.length > 0);
+  }
+
+  openLocationDialog() {
+    const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
+      width: '320px',
+      data: {zipCode: localStorage.getItem('zipCode')}
+    });
+
+    dialogRef.afterClosed().subscribe(zipCode => {
+      localStorage.setItem('zipCode', zipCode);
+      this.loadMapLocation(() => this.updateUrl(this.query));
+    });
+  }
+
+  isZipCode(zipCode: string): boolean {
+    return (zipCode && (zipCode !== '') && (/^\d{5}$/.test(zipCode)));
+  }
+
+  loadZipCoords(zipCode: string, callback: Function) {
+    if (this.isZipCode(zipCode)) {
+      this.api.getZipCoords(zipCode).subscribe(z => {
+        this.noLocation = false;
+        this.mapLoc = {
+          lat: z.latitude,
+          lng: z.longitude
+        };
+
+        callback.call(this);
+      });
+    }
   }
 }

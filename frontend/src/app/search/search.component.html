@@ -46,9 +46,19 @@
             <mat-radio-button
               *ngFor="let s of sortMethods"
               (click)="sortBy(s)"
-
               [value]="s.name"
-            >{{s.label}}</mat-radio-button>
+              [disabled]="(s.name === 'Distance') && noLocation"
+            >
+              {{s.label}}
+              <button mat-button *ngIf="(s.name === 'Distance') && noLocation && !settingLocation" (click)="openLocationDialog()">
+                <mat-icon>location_searching</mat-icon>
+                Set location
+              </button>
+              <button mat-button *ngIf="(s.name === 'Distance') && !noLocation && !settingLocation" (click)="openLocationDialog()">
+                <mat-icon>location_searching</mat-icon>
+                Change location
+              </button>
+            </mat-radio-button>
           </mat-radio-group>
         </div>
 
@@ -86,6 +96,33 @@
         fxLayout="column"
         fxLayoutAlign="start start"
       >
+        <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
+          <mat-chip-list class="applied-filters">
+            <ng-container *ngIf="query && query.words">
+              <mat-chip
+                (click)="removeWords()"
+                class="applied-filter"
+              >
+                <span class="applied-filter-label">"{{query.words}}"</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *ngFor="let filter of displayFilters; let i = index">
+              <ng-container *ngFor="let fieldValue of filter.value; let j = index">
+                <mat-chip
+                  (click)="removeFilter(filter.field, fieldValue)"
+                  class="applied-filter"
+                >
+                  <span class="applied-filter-label">{{fieldValue}}</span>
+                  <mat-icon>close</mat-icon>
+                </mat-chip>
+                <mat-icon *ngIf="j < filter.value.length -1  || i < displayFilters.length - 1">chevron_right</mat-icon>
+              </ng-container>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+
         <agm-map
           *ngIf="showMap()"
           [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
@@ -115,39 +152,13 @@
                     class="chevron-link"
                     [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
                     routerLinkActive="router-link-active"
-                  >{{hit.type}} Details - {{hit.milesFrom(mapLoc)}}mi</a>
+                  >{{hit.type}} Details - {{hit.milesFrom(mapLoc || defaultLoc)}}mi</a>
                 </agm-info-window>
               </agm-marker>
             </ng-container>
           </agm-marker-cluster>
         </agm-map>
 
-        <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
-          <mat-chip-list class="applied-filters">
-            <ng-container *ngIf="query && query.words">
-              <mat-chip
-                (click)="removeWords()"
-                class="applied-filter"
-              >
-                <span class="applied-filter-label">"{{query.words}}"</span>
-                <mat-icon>close</mat-icon>
-              </mat-chip>
-            </ng-container>
-
-            <ng-container *ngFor="let filter of displayFilters; let i = index">
-              <ng-container *ngFor="let fieldValue of filter.value; let j = index">
-                <mat-chip
-                  (click)="removeFilter(filter.field, fieldValue)"
-                  class="applied-filter"
-                >
-                  <span class="applied-filter-label">{{fieldValue}}</span>
-                  <mat-icon>close</mat-icon>
-                </mat-chip>
-                <mat-icon *ngIf="j < filter.value.length -1  || i < displayFilters.length - 1">chevron_right</mat-icon>
-              </ng-container>
-            </ng-container>
-          </mat-chip-list>
-        </div>
         <div
           class="row search-results"
           style="margin-top: 0"
