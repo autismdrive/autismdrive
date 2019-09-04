@@ -79,7 +79,7 @@ class UsersOnStudySchema(ModelSchema):
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
     user = fields.Nested(UserSchema, dump_only=True)
-    status = EnumField(StudyUserStatus)
+    status = EnumField(StudyUserStatus, allow_none=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
@@ -92,7 +92,7 @@ class StudyUsersSchema(ModelSchema):
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
     user = fields.Nested(UserSchema, dump_only=True)
-    status = EnumField(StudyUserStatus)
+    status = EnumField(StudyUserStatus, allow_none=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
@@ -104,7 +104,7 @@ class StudyUserSchema(ModelSchema):
     class Meta:
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id')
-    status = EnumField(StudyUserStatus)
+    status = EnumField(StudyUserStatus, allow_none=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
@@ -435,7 +435,7 @@ class UserStudiesSchema(ModelSchema):
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'study')
     study = fields.Nested(StudySchema, dump_only=True)
-    status = EnumField(StudyUserStatus)
+    status = EnumField(StudyUserStatus, allow_none=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),

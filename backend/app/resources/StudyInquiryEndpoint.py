@@ -5,6 +5,7 @@ from app import RestException, db, email_service, auth
 from app.model.email_log import EmailLog
 from app.model.study import Study
 from app.model.user import User
+from app.model.study_user import StudyUser, StudyUserStatus
 
 
 class StudyInquiryEndpoint(flask_restful.Resource):
@@ -21,7 +22,9 @@ class StudyInquiryEndpoint(flask_restful.Resource):
         if user and study:
             tracking_code = email_service.study_inquiry_email(study=study, user=user)
             log = EmailLog(user_id=user.id, type="study_inquiry_email", tracking_code=tracking_code)
+            su = StudyUser(study_id=study.id, user_id=user.id, status=StudyUserStatus.inquiry_sent)
             db.session.add(log)
+            db.session.add(su)
             db.session.commit()
             return ''
         else:
