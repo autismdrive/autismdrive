@@ -66,6 +66,12 @@ from app.resources.StudyAndInvestigatorEndpoint import (
     InvestigatorByStudyEndpoint,
     StudyInvestigatorListEndpoint
 )
+from app.resources.StudyAndUserEndpoint import (
+    StudyByUserEndpoint,
+    StudyUserEndpoint,
+    UserByStudyEndpoint,
+    StudyUserListEndpoint
+)
 from app.resources.StudyInquiryEndpoint import (
     StudyInquiryEndpoint
 )
@@ -95,6 +101,7 @@ from app.resources.ExportEndpoint import (
     ExportListEndpoint
 )
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
+
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -169,6 +176,9 @@ endpoints = [
     (InvestigatorByStudyEndpoint, "/study/<study_id>/investigator"),
     (StudyInvestigatorListEndpoint, "/study_investigator"),
     (StudyInvestigatorEndpoint, "/study_investigator/<id>"),
+    (UserByStudyEndpoint, "/study/<study_id>/user"),
+    (StudyUserListEndpoint, "/study_user"),
+    (StudyUserEndpoint, "/study_user/<id>"),
     (StudyInquiryEndpoint, "/study_inquiry"),
 
     # Investigators
@@ -184,6 +194,7 @@ endpoints = [
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
+    (StudyByUserEndpoint, "/user/<user_id>/study"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     # Participants
     (ParticipantListEndpoint, "/participant"),
