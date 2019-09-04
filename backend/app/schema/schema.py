@@ -19,7 +19,7 @@ from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
-from app.model.study_user import StudyUser
+from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User, Role
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
@@ -79,6 +79,7 @@ class UsersOnStudySchema(ModelSchema):
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
     user = fields.Nested(UserSchema, dump_only=True)
+    status = EnumField(StudyUserStatus)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
@@ -91,6 +92,7 @@ class StudyUsersSchema(ModelSchema):
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
     user = fields.Nested(UserSchema, dump_only=True)
+    status = EnumField(StudyUserStatus)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
@@ -102,6 +104,7 @@ class StudyUserSchema(ModelSchema):
     class Meta:
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id')
+    status = EnumField(StudyUserStatus)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
@@ -432,6 +435,7 @@ class UserStudiesSchema(ModelSchema):
         model = StudyUser
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'study')
     study = fields.Nested(StudySchema, dump_only=True)
+    status = EnumField(StudyUserStatus)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),

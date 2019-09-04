@@ -9,7 +9,7 @@ from tests.base_test import BaseTest
 from app import db
 from app.email_service import TEST_MESSAGES
 from app.model.email_log import EmailLog
-from app.model.study_user import StudyUser
+from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User, Role
 
 
@@ -214,7 +214,7 @@ class TestUser(BaseTest, unittest.TestCase):
     def test_get_study_by_user(self):
         u = self.construct_user()
         s = self.construct_study()
-        su = StudyUser(study=s, user=u, status='inquiry')
+        su = StudyUser(study=s, user=u, status=StudyUserStatus.inquiry_sent)
         db.session.add(su)
         db.session.commit()
         rv = self.app.get(
@@ -231,8 +231,8 @@ class TestUser(BaseTest, unittest.TestCase):
         u = self.construct_user(email="c1")
         u2 = self.construct_user(email="c2")
         s = self.construct_study()
-        su = StudyUser(study=s, user=u, status='inquiry')
-        su2 = StudyUser(study=s, user=u2, status='inquiry')
+        su = StudyUser(study=s, user=u, status=StudyUserStatus.inquiry_sent)
+        su2 = StudyUser(study=s, user=u2, status=StudyUserStatus.enrolled)
         db.session.add_all([su, su2])
         db.session.commit()
         rv = self.app.get(
@@ -251,7 +251,7 @@ class TestUser(BaseTest, unittest.TestCase):
     def test_get_user_by_study(self):
         u = self.construct_user()
         s = self.construct_study()
-        su = StudyUser(study=s, user=u, status='inquiry')
+        su = StudyUser(study=s, user=u, status=StudyUserStatus.inquiry_sent)
         db.session.add(su)
         db.session.commit()
         rv = self.app.get(

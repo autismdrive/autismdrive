@@ -1,3 +1,5 @@
+import enum
+
 from sqlalchemy import func
 
 from app import db
@@ -8,11 +10,16 @@ from app.model.study import Study
 Base = declarative_base()
 
 
+class StudyUserStatus(enum.Enum):
+    inquiry_sent = 1
+    enrolled = 2
+
+
 class StudyUser(db.Model):
     __tablename__ = 'study_user'
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    status = db.Column(db.String)
+    status = db.Column(db.Enum(StudyUserStatus))
     study_id = db.Column(db.Integer, db.ForeignKey(Study.id), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     study = db.relationship(Study, backref='study_users')
