@@ -83,7 +83,7 @@ class ExportService:
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     @staticmethod
-    def get_data(name, last_updated=None):
+    def get_data(name, user_id=None, last_updated=None):
         model = ExportService.get_class(name)
         query = db.session.query(model)
         if last_updated:
@@ -92,7 +92,13 @@ class ExportService:
                 and 'polymorphic_identity' in model.__mapper_args__:
             query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
         query = query.order_by(model.id)
-        return query.all()
+        if user_id:
+            if hasattr(model, 'user_id'):
+                return query.filter(model.user_id == user_id)
+            else:
+                return []
+        else:
+            return query.all()
 
     # Returns a list of classes/tables with information about how they should be exported.
     @staticmethod

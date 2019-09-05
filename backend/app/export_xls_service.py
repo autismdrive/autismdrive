@@ -33,7 +33,7 @@ class ExportXlsService:
         return title.replace("Questionnaire", "").strip()[:30]
 
     @staticmethod
-    def export_xls(name, app):
+    def export_xls(name, app, user_id=None):
         # Flask response
         response = Response()
         response.status_code = 200
@@ -63,7 +63,10 @@ class ExportXlsService:
             # Get header fields from the schema in case the first record is missing fields
             schema = ExportService.get_schema(qname, many=True)
             header_fields = schema.fields
-            questionnaires = schema.dump(ExportService().get_data(qname))
+            if user_id:
+                questionnaires = schema.dump(ExportService().get_data(name=qname, user_id=user_id))
+            else:
+                questionnaires = schema.dump(ExportService().get_data(name=qname))
 
             # Start from the first cell. Rows and columns are zero indexed.
             row = 0

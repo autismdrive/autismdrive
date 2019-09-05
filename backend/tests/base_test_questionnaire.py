@@ -597,8 +597,9 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_sq.last_updated, sq.last_updated)
         return db_sq
 
-    def construct_all_questionnaires(self):
-        user = self.construct_user()
+    def construct_all_questionnaires(self, user=None):
+        if user is None:
+            user = self.construct_user()
         participant = self.construct_participant(user=user, relationship=Relationship.dependent)
         self.construct_clinical_diagnoses_questionnaire(user=user, participant=participant)
         self.construct_contact_questionnaire(user=user, participant=participant)

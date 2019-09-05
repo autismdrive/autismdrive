@@ -20,6 +20,7 @@ from app.wrappers import requires_roles
 #   * It has a date field called "last_updated"
 #   * When calling the endpoint, use the snakecase format of the name.
 
+
 class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
@@ -137,3 +138,24 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
             return schema.dump(ExportService().get_data(name))
         else:
             return ExportXlsService.export_xls(name=name, app=app)
+
+
+class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
+
+    @staticmethod
+    def request_wants_json():
+        best = request.accept_mimetypes \
+            .best_match(['application/json', 'text/html'])
+        return best == 'application/json' and \
+               request.accept_mimetypes[best] > \
+               request.accept_mimetypes['text/html']
+
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self, name, user_id):
+        name = ExportService.camel_case_it(name)
+        if self.request_wants_json():
+            schema = ExportService.get_schema(name, many=True)
+            return schema.dump(ExportService().get_data(name))
+        else:
+            return ExportXlsService.export_xls(name=name, user_id=user_id, app=app)

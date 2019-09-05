@@ -174,7 +174,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         db_user = db.session.query(User).filter_by(id=id).first()
         self.assertTrue(db_user.email_verified, msg="Email should now be verified.")
 
-    def test_identifying_questinnaire_does_not_export(self):
+    def test_identifying_questionnaire_does_not_export(self):
 
         # Construct the base user.
         u = self.construct_user()
