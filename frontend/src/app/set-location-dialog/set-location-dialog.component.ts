@@ -24,4 +24,9 @@ export class SetLocationDialogComponent {
     this.dialogRef.close();
   }
 
+  useGPSLocation(): void {
+    localStorage.removeItem('zipCode');
+    this.dialogRef.close();
+  }
+
 }

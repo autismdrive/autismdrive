@@ -54,7 +54,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery.addListener(this._mobileQueryListener);
 
     this.loadMapLocation(() => {
-      console.log('SearchComponent constructor > loadMapLocation > callback this.mapLoc', this.mapLoc);
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
 
@@ -78,7 +77,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   displayFilters: Filter[];
   pageSize = 20;
   noLocation = true;
-  settingLocation = false;
+  storedZip: string;
+  gpsEnabled = false;
   mapLoc: LatLngLiteral;
   defaultLoc: LatLngLiteral = {
     lat: 37.32248,
@@ -251,8 +251,20 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
+    this.storedZip = localStorage.getItem('zipCode');
+    if (this.isZipCode(this.storedZip)) {
+      this.api.getZipCoords(this.storedZip).subscribe(z => {
+        this.noLocation = false;
+        this.mapLoc = {
+          lat: z.latitude,
+          lng: z.longitude
+        };
+      });
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
+        this.gpsEnabled = true;
         this.noLocation = false;
         this.mapLoc = {
           lat: p.coords.latitude,
@@ -260,20 +272,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         };
         callback.call(this);
       }, error => {
-        const storedZip = localStorage.getItem('zipCode');
-
-        if (this.isZipCode(storedZip)) {
-          this.api.getZipCoords(storedZip).subscribe(z => {
-            this.noLocation = false;
-            this.mapLoc = {
-              lat: z.latitude,
-              lng: z.longitude
-            };
-            callback.call(this);
-          });
-        } else {
-          callback.call(this);
-        }
+        this.gpsEnabled = false;
+        callback.call(this);
       });
     } else {
       callback.call(this);
@@ -434,7 +434,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   openLocationDialog() {
     const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
       width: '320px',
-      data: {zipCode: localStorage.getItem('zipCode') || ''}
+      data: {
+        zipCode: localStorage.getItem('zipCode') || '',
+        gpsEnabled: this.gpsEnabled
+      }
     });
 
     dialogRef.afterClosed().subscribe(zipCode => {

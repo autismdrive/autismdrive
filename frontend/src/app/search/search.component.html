@@ -45,19 +45,23 @@
           >
             <mat-radio-button
               *ngFor="let s of sortMethods"
-              (click)="sortBy(s)"
+              (click)="noLocation ? openLocationDialog() : sortBy(s)"
               [value]="s.name"
               [disabled]="(s.name === 'Distance') && noLocation"
             >
               {{s.label}}
-              <button mat-button *ngIf="(s.name === 'Distance') && noLocation && !settingLocation" (click)="openLocationDialog()">
-                <mat-icon>location_searching</mat-icon>
-                Set location
-              </button>
-              <button mat-button *ngIf="(s.name === 'Distance') && !noLocation && !settingLocation" (click)="openLocationDialog()">
-                <mat-icon>location_searching</mat-icon>
-                Change location
-              </button>
+
+              <ng-container *ngIf="(s.name === 'Distance')">
+                <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
+                <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">(No location set)</ng-container>
+                <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
+                <button mat-button (click)="openLocationDialog()">
+                  <mat-icon>location_searching</mat-icon>
+                  <ng-container *ngIf="isZipCode(storedZip)">Change ZIP code</ng-container>
+                  <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
+                  <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">Use ZIP code instead</ng-container>
+                </button>
+              </ng-container>
             </mat-radio-button>
           </mat-radio-group>
         </div>
