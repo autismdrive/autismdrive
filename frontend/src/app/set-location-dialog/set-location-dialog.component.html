@@ -1,12 +1,12 @@
 <mat-dialog-content>
   <h1 mat-dialog-title>Set your location</h1>
   <mat-form-field>
-    <mat-label>Zip code</mat-label>
-    <input matInput placeholder="Zip code" cdkFocusInitial [(ngModel)]="data.zipCode" (keydown.enter)="onSubmit()">
+    <mat-label>ZIP Code</mat-label>
+    <input matInput placeholder="ZIP Code" cdkFocusInitial [(ngModel)]="data.zipCode" (keydown.enter)="onSubmit()">
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions fxLayout="row">
-    <button mat-flat-button matDialogClose (click)="onSubmit()">Save</button>
-    <button *ngIf="data.gpsEnabled" mat-flat-button matDialogClose (click)="useGPSLocation()">Use GPS instead</button>
-    <button mat-flat-button matDialogClose (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button matDialogClose (click)="onSubmit()" id="btn_save">Save</button>
+    <button *ngIf="data.gpsEnabled" mat-flat-button matDialogClose (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
+    <button mat-flat-button matDialogClose (click)="onNoClick()" id="btn_cancel">Cancel</button>
 </mat-dialog-actions>

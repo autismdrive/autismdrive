@@ -41,4 +41,36 @@ export class SearchUseCases {
     const input_text_after = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
     expect(input_text_after).toEqual('');
   }
+
+  async sortByDistance() {
+    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]');
+    this.page.waitForAnimations();
+    expect(this.page.getElements('agm-map').count()).toEqual(1);
+    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
+
+    const firstResult = this.page.getElements('app-search-result').first();
+    const lastResult = this.page.getElements('app-search-result').last();
+    const firstDistance: string = await this.page.getChildElement('app-details-link span.muted', firstResult).getText();
+    const lastDistance: string = await this.page.getChildElement('app-details-link span.muted', lastResult).getText();
+
+    // Extract number of miles from details link text: (1.23MI) --> 1.23
+    const pattern = /\(([\d]+)\.([\d]+)MI\)/;
+    const firstNum = parseFloat(firstDistance.replace(pattern, '$1.$2'));
+    const lastNum = parseFloat(lastDistance.replace(pattern, '$1.$2'));
+    expect(firstNum).toBeLessThan(lastNum);
+  }
+
+  async setZipCode() {
+    const zipCode = '24401'
+    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"] button');
+    this.page.waitForAnimations();
+
+    expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
+    this.page.inputText('mat-dialog-container [placeholder="ZIP Code"]', zipCode);
+    this.page.clickElement('#btn_save');
+    this.page.waitForAnimations();
+
+    const newText: string = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
+    expect(newText.includes(zipCode)).toBeTruthy();
+  }
 }
