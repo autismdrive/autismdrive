@@ -10,6 +10,7 @@ import { Query } from '../../_models/query';
 import { Resource } from '../../_models/resource';
 import { ResourceCategory } from '../../_models/resource_category';
 import { Study } from '../../_models/study';
+import { StudyUser } from '../../_models/study_user';
 import { StepLog } from '../../_models/step_log';
 import { User } from '../../_models/user';
 import { UserSearchResults } from '../../_models/user_search_results';
@@ -81,6 +82,7 @@ export class ApiService {
     studyinquiry: '/api/study_inquiry',
     user: '/api/user/<id>',
     userEmailLog: '/api/user/email_log/<id>',
+    userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     forgot_password: '/api/forgot_password',
@@ -340,6 +342,12 @@ export class ApiService {
   findUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0, pageSize = 3): Observable<UserSearchResults> {
     const search_data = { filter: filter, sort: sort, sortOrder: sortOrder, pageNumber: String(pageNumber), pageSize: String(pageSize) };
     return this.httpClient.get<UserSearchResults>(this._endpointUrl('userlist'), { params: search_data })
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get User Study Inquiries */
+  getUserStudyInquiries(id: number): Observable<StudyUser> {
+    return this.httpClient.get<StudyUser>(this._endpointUrl('userStudyInquiryList').replace('<id>', id.toString()))
       .pipe(catchError(this._handleError));
   }
 

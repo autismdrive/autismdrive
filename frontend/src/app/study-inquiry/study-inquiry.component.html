@@ -23,21 +23,26 @@
     fxLayout="column"
     fxLayoutGap="20px"
   >
-    <div *ngIf="haveUserContact">
-      <p>Select the “Learn More” button for a member of the research team to contact you to learn more.</p>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="sendInquiry()"
-      >Learn More</button>
+    <div *ngIf="!alreadyInquired">
+      <div *ngIf="haveUserContact">
+        <p>Select the “Learn More” button for a member of the research team to contact you to learn more.</p>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="sendInquiry()"
+        >Learn More</button>
+      </div>
+      <div *ngIf="!haveUserContact">
+        <p>We need your contact details to give to the study team. Please complete your profile.</p>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="goProfile()"
+        >Edit Enrollment Info</button>
+      </div>
     </div>
-    <div *ngIf="!haveUserContact">
-      <p>We need your contact details to give to the study team. Please complete your profile.</p>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="goProfile($event)"
-      >Edit Enrollment Info</button>
+    <div *ngIf="alreadyInquired">
+      <p>You have already sent an inquiry about this study. We’ve let the researchers know that you are interested and they will contact you about next steps.</p>
     </div>
   </div>
 </div>

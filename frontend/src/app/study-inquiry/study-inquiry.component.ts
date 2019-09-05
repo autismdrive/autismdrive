@@ -16,6 +16,7 @@ export class StudyInquiryComponent implements OnInit {
   @Input() study: Study;
   haveUserContact:boolean = false;
   inquirySent: boolean = false;
+  alreadyInquired: boolean = false;
 
   constructor(
     private api: ApiService,
@@ -25,6 +26,15 @@ export class StudyInquiryComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     if (this.currentUser) {
       this.haveUserContact = this.currentUser.checkContact();
+      this.api.getUserStudyInquiries(this.currentUser.id).subscribe(
+        userStudyInquiries => {
+          for ( let i in userStudyInquiries ) {
+            if (this.study.id == userStudyInquiries[i].study_id) {
+              this.alreadyInquired = true;
+            }
+          }
+        }
+      )
     }
   }
 
@@ -32,25 +42,16 @@ export class StudyInquiryComponent implements OnInit {
   }
 
 
-  goLogin($event: MouseEvent) {
-    $event.preventDefault();
-    if (this.study) {
-      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
-    }
+  goLogin() {
+    this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
   }
 
-  goRegister($event: MouseEvent) {
-    $event.preventDefault();
-    if (this.study) {
-      this.router.navigateByUrl('/register');
-    }
+  goRegister() {
+    this.router.navigateByUrl('/register');
   }
 
-  goProfile($event: MouseEvent) {
-    $event.preventDefault();
-    if (this.study) {
-      this.router.navigateByUrl('/profile');
-    }
+  goProfile() {
+    this.router.navigateByUrl('/profile');
   }
 
   sendInquiry() {
