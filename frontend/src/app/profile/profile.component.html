@@ -85,7 +85,7 @@
             <mat-card-content>
               <mat-list>
                 <div
-                  *ngIf="studyInquiries"
+                  *ngIf="studyInquiries && studyInquiries.length > 0"
                   id="study-inquiries"
                 >
                   <h2 mat-subheader>Studies about which you have inquired</h2>
@@ -98,7 +98,7 @@
                   </mat-list-item>
                 </div>
                 <div
-                  *ngIf="currentStudies"
+                  *ngIf="currentStudies && currentStudies.length > 0"
                   id="current-studies"
                 >
                   <h2 mat-subheader>All currently enrolling studies</h2>
