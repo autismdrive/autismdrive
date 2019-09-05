@@ -346,8 +346,8 @@ export class ApiService {
   }
 
   /** Get User Study Inquiries */
-  getUserStudyInquiries(id: number): Observable<StudyUser> {
-    return this.httpClient.get<StudyUser>(this._endpointUrl('userStudyInquiryList').replace('<id>', id.toString()))
+  getUserStudyInquiries(id: number): Observable<StudyUser[]> {
+    return this.httpClient.get<StudyUser[]>(this._endpointUrl('userStudyInquiryList').replace('<id>', id.toString()))
       .pipe(catchError(this._handleError));
   }
 

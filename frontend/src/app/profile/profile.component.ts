@@ -4,8 +4,10 @@ import { User } from '../_models/user';
 import { ParticipantRelationship } from '../_models/participantRelationship';
 import { Router } from '@angular/router';
 import { Participant } from '../_models/participant';
-import {AuthenticationService} from '../_services/api/authentication-service';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import { Study } from '../_models/study';
+import { StudyUser } from '../_models/study_user';
+import { AuthenticationService } from '../_services/api/authentication-service';
+import { GoogleAnalyticsService } from '../google-analytics.service';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -22,11 +24,13 @@ export class ProfileComponent implements OnInit {
   possibleStates = ProfileState;
   state = ProfileState.NO_PARTICIPANT;
   loading = true;
+  studyInquiries: StudyUser[];
+  currentStudies: Study[];
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
               private router: Router,
-              private googleAnalyticsSerice: GoogleAnalyticsService) {
+              private googleAnalyticsService: GoogleAnalyticsService) {
 
     this.authenticationService.currentUser.subscribe(
       user => {
@@ -42,6 +46,10 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.api.getUserStudyInquiries(this.user.id).subscribe( x => this.studyInquiries = x );
+    this.api.getStudies().subscribe(all => {
+      this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
+    });
   }
 
   getState() {
@@ -84,7 +92,7 @@ export class ProfileComponent implements OnInit {
     });
 
     this.api.addParticipant(newParticipant).subscribe(participant => {
-      this.googleAnalyticsSerice.event(flow,  {'event_category': 'enrollment'});
+      this.googleAnalyticsService.event(flow,  {'event_category': 'enrollment'});
       this.user.participants.push(participant);
       console.log('Navigating to flow/', flow, '/', participant.id);
       this.router.navigate(['flow', flow,  participant.id]);
