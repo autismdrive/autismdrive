@@ -291,7 +291,8 @@ class TestUser(BaseTest, unittest.TestCase):
         db.session.commit()
         rv = self.app.get(
             '/api/study/%i/user' % s.id,
-            content_type="application/json")
+            content_type="application/json",
+            headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
@@ -308,7 +309,8 @@ class TestUser(BaseTest, unittest.TestCase):
         rv = self.app.post(
             '/api/study_user',
             data=json.dumps(us_data),
-            content_type="application/json")
+            content_type="application/json",
+            headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(u.id, response["user_id"])
@@ -334,7 +336,8 @@ class TestUser(BaseTest, unittest.TestCase):
         rv = self.app.post(
             '/api/study/%i/user' % s.id,
             data=json.dumps(us_data),
-            content_type="application/json")
+            content_type="application/json",
+            headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(3, len(response))
@@ -343,17 +346,21 @@ class TestUser(BaseTest, unittest.TestCase):
         rv = self.app.post(
             '/api/study/%i/user' % s.id,
             data=json.dumps(us_data),
-            content_type="application/json")
+            content_type="application/json",
+            headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
 
     def test_remove_user_from_study(self):
         self.test_add_user_to_study()
-        rv = self.app.delete('/api/study_user/%i' % 1)
+        rv = self.app.delete('/api/study_user/%i' % 1,
+                             headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get(
-            '/api/study/%i/user' % 1, content_type="application/json")
+            '/api/study/%i/user' % 1,
+            content_type="application/json",
+            headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
