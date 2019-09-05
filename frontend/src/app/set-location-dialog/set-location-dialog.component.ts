@@ -20,7 +20,7 @@ export class SetLocationDialogComponent {
   }
 
   onSubmit(): void {
-    localStorage.setItem('zipCode', this.data.zipCode);
+    localStorage.setItem('zipCode', this.data.zipCode || '');
     this.dialogRef.close();
   }
 

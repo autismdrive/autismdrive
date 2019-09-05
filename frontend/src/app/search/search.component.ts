@@ -263,7 +263,16 @@ export class SearchComponent implements OnInit, OnDestroy {
         const storedZip = localStorage.getItem('zipCode');
 
         if (this.isZipCode(storedZip)) {
-          this.loadZipCoords(storedZip, callback);
+          this.api.getZipCoords(storedZip).subscribe(z => {
+            this.noLocation = false;
+            this.mapLoc = {
+              lat: z.latitude,
+              lng: z.longitude
+            };
+            callback.call(this);
+          });
+        } else {
+          callback.call(this);
         }
       });
     } else {
@@ -425,11 +434,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   openLocationDialog() {
     const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
       width: '320px',
-      data: {zipCode: localStorage.getItem('zipCode')}
+      data: {zipCode: localStorage.getItem('zipCode') || ''}
     });
 
     dialogRef.afterClosed().subscribe(zipCode => {
-      localStorage.setItem('zipCode', zipCode);
+      if (this.isZipCode(zipCode)) {
+        localStorage.setItem('zipCode', zipCode);
+      }
       this.loadMapLocation(() => this.updateUrl(this.query));
     });
   }
@@ -438,17 +449,4 @@ export class SearchComponent implements OnInit, OnDestroy {
     return (zipCode && (zipCode !== '') && (/^\d{5}$/.test(zipCode)));
   }
 
-  loadZipCoords(zipCode: string, callback: Function) {
-    if (this.isZipCode(zipCode)) {
-      this.api.getZipCoords(zipCode).subscribe(z => {
-        this.noLocation = false;
-        this.mapLoc = {
-          lat: z.latitude,
-          lng: z.longitude
-        };
-
-        callback.call(this);
-      });
-    }
-  }
 }
