@@ -53,6 +53,7 @@ export class ApiService {
     questionnaireListMeta: '/api/q/<name>/meta',
     questionnaireInfo: '/api/q',
     questionnaireExport: '/api/q/<name>/export',
+    questionnaireUserExport: '/api/q/all/export/user/<user_id>',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     eventbycategory: '/api/category/<category_id>/event',
     eventcategory: '/api/event_category/<id>',
@@ -396,6 +397,16 @@ export class ApiService {
     const url = this
       ._endpointUrl('questionnaireExport')
       .replace('<name>', name);
+    return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
+    // .pipe(catchError(this._handleError));
+  }
+
+  /** exportUser Questionnaire */
+  exportUserQuestionnaire(user_id:string): Observable<any> {
+    const url = this
+      ._endpointUrl('questionnaireUserExport')
+      .replace('<name>', name)
+      .replace('<user_id>', user_id);
     return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
     // .pipe(catchError(this._handleError));
   }
