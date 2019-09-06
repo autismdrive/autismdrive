@@ -85,7 +85,8 @@ describe('Participant (Guardian - Self)', () => {
   it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
-  it('should allow user to set location via ZIP code', () => searchUseCases.setZipCode())
+  it('should allow user to set location via ZIP code', () => searchUseCases.setZipCode());
+  it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode());
   it('should sort by last date updated');
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 

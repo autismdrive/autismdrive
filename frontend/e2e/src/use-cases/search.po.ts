@@ -73,4 +73,17 @@ export class SearchUseCases {
     const newText: string = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
     expect(newText.includes(zipCode)).toBeTruthy();
   }
+
+  async clearZipCode() {
+    const zipCode = '24401'
+    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"] button');
+    this.page.waitForAnimations();
+
+    expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
+    this.page.clickElement('#btn_gps');
+    this.page.waitForAnimations();
+
+    const newText: string = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
+    expect(newText.includes(zipCode)).toBeFalsy();
+  }
 }
