@@ -24,21 +24,38 @@
     fxLayoutGap="20px"
   >
     <div *ngIf="!alreadyInquired">
+      <p>Please make sure that your profile is complete before indicating your interest in this study. The researchers
+        have a much better chance of determining your eligibility if they can see complete details about you and/or
+        your dependant.</p>
+      <div *ngFor="let p of currentUser.participants">
+        <mat-card [class.mat-elevation-z0]="true">
+          <mat-card-title>{{p.name || "No User Name Set"}}</mat-card-title>
+          <mat-card-subtitle>{{currentUser.isSelf(p)? 'You' : p.relationship | titlecase}}</mat-card-subtitle>
+          <div
+            fxLayout="column"
+            fxLayoutGap="1em"
+          >
+          <mat-progress-bar
+            [mode]="'determinate'"
+            [value]="p.percent_complete"
+          ></mat-progress-bar>
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="goEditEnroll($event, p)"
+              id="edit_enroll_{{p.relationship}}_{{p.id}}"
+            >Edit {{p.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</button>
+          </div>
+        </mat-card>
+      </div>
       <div *ngIf="haveUserContact">
+        <h4>Send Inquiry</h4>
         <p>Select the “Learn More” button for a member of the research team to contact you to learn more.</p>
         <button
           mat-flat-button
-          color="primary"
+          color="accent"
           (click)="sendInquiry()"
         >Learn More</button>
-      </div>
-      <div *ngIf="!haveUserContact">
-        <p>We need your contact details to give to the study team. Please complete your profile.</p>
-        <button
-          mat-flat-button
-          color="primary"
-          (click)="goProfile()"
-        >Edit Enrollment Info</button>
       </div>
     </div>
     <div *ngIf="alreadyInquired">

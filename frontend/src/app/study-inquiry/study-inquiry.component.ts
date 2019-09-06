@@ -4,6 +4,7 @@ import { AuthenticationService } from '../_services/api/authentication-service';
 import { Router } from '@angular/router';
 import { Study } from '../_models/study';
 import { User } from '../_models/user';
+import { ParticipantRelationship } from '../_models/participantRelationship';
 
 @Component({
   selector: 'app-study-inquiry',
@@ -34,7 +35,14 @@ export class StudyInquiryComponent implements OnInit {
             }
           }
         }
-      )
+      );
+      for (let i in this.currentUser.participants) {
+        this.api
+          .getFlow(this.currentUser.participants[i].getFlowName(), this.currentUser.participants[i].id)
+          .subscribe(f => {
+            this.currentUser.participants[i].percent_complete = f.percentComplete();
+          });
+      }
     }
   }
 
