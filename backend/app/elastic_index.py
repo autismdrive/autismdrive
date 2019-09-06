@@ -1,7 +1,11 @@
-from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint
+from elasticsearch import RequestError
+from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
+    Search, A
 import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
+
+from elasticsearch_dsl.query import MultiMatch, MatchAll
 
 autocomplete = analyzer('autocomplete',
                         tokenizer=tokenizer('ngram', 'edge_ngram', min_gram=2, max_gram=15,
@@ -13,7 +17,8 @@ autocomplete_search = analyzer('autocomplete_search',
                                )
 
 
-# Star Documents are ElasticSearch documents and can be used to index an Event, Location, Resource, or Study
+# Star Documents are ElasticSearch documents and can be used to index an Event,
+# Location, Resource, or Study
 class StarDocument(Document):
     type = Keyword()
     label = Keyword()
@@ -27,6 +32,7 @@ class StarDocument(Document):
     location = Keyword()
     age_range = Keyword()
     status = Keyword()
+    topic = Keyword(multi=True)
     category = Keyword(multi=True)
     child_category = Keyword(multi=True)
     latitude = Double()
@@ -48,8 +54,14 @@ class ElasticIndex:
         self.index.doc_type(StarDocument)
         try:
             self.index.create()
-        except:
-            self.logger.info("Failed to create the index(s).  They may already exist.")
+        except RequestError as requestError:
+            if requestError.error == 'resource_already_exists_exception':
+                self.logger.info("The index already exists.")
+            else:
+                self.logger.fatal("Error Creating Index. ")
+                raise requestError
+        except Exception as e:
+            self.logger.info("Failed to create the index(s).  They may already exist." + str(e))
 
     def establish_connection(self, settings):
         """Establish connection to an ElasticSearch host, and initialize the Submission collection"""
@@ -109,6 +121,8 @@ class ElasticIndex:
                            location=None,
                            age_range=None,
                            status=None,
+                           # Fixme:  I'd love to rename topic to category, and remove child_category
+                           topic=[],
                            category=[],
                            child_category=[],
                            latitude=None,
@@ -127,6 +141,8 @@ class ElasticIndex:
             doc.organization = document.organization.name
 
         for cat in document.categories:
+            doc.topic.extend(cat.category.all_search_paths())
+            # Fixme:  I think we can drop all of this logic around parent category and cateogry fields
             if cat.category.parent:
                 if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
                     doc.location = cat.category.name
@@ -168,41 +184,48 @@ class ElasticIndex:
 
     def search(self, search):
         sort = None if search.sort is None else search.sort.translate()
-        document_search = DocumentSearch(search.words, search.jsonFilters(), index=self.index_name, sort=sort)
-        document_search = document_search[search.start:search.start + search.size]
-        return document_search.execute()
 
+        if not search.words:
+            query = MatchAll()
+        else:
+            query = MultiMatch(query=search.words, fields=['title^10', 'content^5', 'description^5', 'location^3', 'category^2', 'child_category^2',
+                      'organization', 'website'])
 
-class DocumentSearch(elasticsearch_dsl.FacetedSearch):
-    def __init__(self, *args, **kwargs):
-        self.index = kwargs["index"]
-        kwargs.pop("index")
-        self.my_sort = kwargs['sort']
-        kwargs.pop("sort")
-        # self.sort = kwargs["sort"]
-        # kwargs.pop("sort")
+        elastic_search = Search(index=self.index_name)\
+            .doc_type(StarDocument)\
+            .query(query)\
+            .highlight('content', fragment_size=50)
 
-        super(DocumentSearch, self).__init__(*args, **kwargs)
+        for f in search.filters:
+            elastic_search = elastic_search.post_filter('terms', **{f.field: f.value})
 
-    doc_types = [StarDocument]
-    fields = ['title^10', 'content^5', 'description^5', 'location^3', 'category^2', 'child_category^2', 'organization', 'website']
+        if sort is not None:
+            elastic_search = elastic_search.sort(sort)
 
-    facets = {
-        'Location': elasticsearch_dsl.TermsFacet(field='location'),
-        'Type': elasticsearch_dsl.TermsFacet(field='label'),
-        'Age Range': elasticsearch_dsl.TermsFacet(field='age_range'),
-        'Category': elasticsearch_dsl.TermsFacet(field='category'),
-        'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
-        'Status': elasticsearch_dsl.TermsFacet(field='status')
-    }
+        if search.category and search.category.id:
+            elastic_search = elastic_search.post_filter('terms', topic=[str(search.category.search_path())])
+            if search.category.calculate_level() == 0:
+                exclude = ".*\\,.*\\,.*";
+                include = str(search.category.id) + "\\,.*"
+                aggregation = A("terms", field='topic', exclude=exclude, include=include)
+            elif search.category.calculate_level() == 1:
+                include = ".*\\,.*\\,.*";
+                aggregation = A("terms", field='topic', include=include)
+            else:
+                aggregation = A("terms", field='topic')
+        else:
+            aggregation = A("terms", field='topic', exclude=".*\\,.*")
 
-    def highlight(self, search):
-        return search.highlight('content', fragment_size=50)
+        elastic_search.aggs.bucket('terms', aggregation)
 
-    def search(self):
-        s = super(DocumentSearch, self).search()
+        # KEEPING FOR NOW - THESE WERE THE ORIGINAL FACETS WE HAD SET UP.  WILL NEED TO CONVERT TO AGGREGATIONS
+        # IF WE WANT TO KEEP ANY OF THESE.
+        # 'Location': elasticsearch_dsl.TermsFacet(field='location'),
+        # 'Type': elasticsearch_dsl.TermsFacet(field='label'),
+        # 'Age Range': elasticsearch_dsl.TermsFacet(field='age_range'),
+        # 'Category': elasticsearch_dsl.TermsFacet(field='category'),
+        # 'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
+        # 'Status': elasticsearch_dsl.TermsFacet(field='status'),
+        # 'Topic': elasticsearch_dsl.TermsFacet(field='topic'),
 
-        if self.my_sort is not None:
-            s = s.sort(self.my_sort)
-
-        return s
+        return elastic_search.execute()

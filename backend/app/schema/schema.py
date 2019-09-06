@@ -83,6 +83,26 @@ class ParentCategorySchema(ModelSchema):
     })
 
 
+class ChildCategoryInSearchSchema(ModelSchema):
+    """Provides a view of the parent category, all the way to the top, but ignores children"""
+    class Meta:
+        model = Category
+        fields = ('id', 'name', '_links', 'hit_count')
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.categoryendpoint', id='<id>'),
+        'collection': ma.URLFor('api.categorylistendpoint')
+    })
+
+class CategoryInSearchSchema(ModelSchema):
+    """Provides detailed information about a category, including all the children"""
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level')
+    parent = fields.Nested(ParentCategorySchema, dump_only=True)
+    children = fields.Nested(ChildCategoryInSearchSchema, many=True, dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+
+
 class CategorySchema(ModelSchema):
     """Provides detailed information about a category, including all the children"""
     class Meta:
@@ -126,6 +146,7 @@ class CategorySchema(ModelSchema):
             .filter(StudyCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
+
 
 
 class CategoriesOnEventSchema(ModelSchema):
@@ -499,6 +520,7 @@ class SearchSchema(ma.Schema):
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)
     facets = ma.List(ma.Nested(FacetSchema), dump_only=True)
+    category = ma.Nested(CategoryInSearchSchema)
     ordered = True
 
     @post_load

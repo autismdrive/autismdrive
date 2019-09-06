@@ -50,10 +50,12 @@ class BaseTest:
     def tearDownClass(cls):
         db.drop_all()
         db.session.remove()
+        elastic_index.clear()
 
     def setUp(self):
         self.ctx.push()
         clean_db(db)
+        elastic_index.clear()
         self.auths = {}
 
     def tearDown(self):
@@ -156,14 +158,19 @@ class BaseTest:
         return db_category
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org"):
+                           phone="555-555-5555", website="http://stardrive.org", categories=[]):
 
         resource = Resource(title=title, description=description, phone=phone, website=website)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
+        db.session.commit()
+        for category in categories:
+            rc = ResourceCategory(resource_id=resource.id, category=category, type='resource')
+            db.session.add(rc)
 
         db_resource = db.session.query(Resource).filter_by(title=resource.title).first()
         self.assertEqual(db_resource.website, resource.website)
+
         elastic_index.add_document(db_resource, 'Resource')
         return db_resource
 

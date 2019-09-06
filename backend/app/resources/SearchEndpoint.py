@@ -2,8 +2,9 @@ import elasticsearch
 import flask_restful
 from flask import request, json
 
-from app import elastic_index, RestException
-from app.model.search import Facet, FacetCount, Hit
+from app import elastic_index, RestException, db
+from app.model.category import Category
+from app.model.search import Facet, FacetCount, Hit, Filter
 from app.schema.schema import SearchSchema
 
 
@@ -15,17 +16,17 @@ class SearchEndpoint(flask_restful.Resource):
 
         if has_filters and result_types is not None:
             filters = list(request_data['filters'])
-
             if len(filters) > 0:
                 for f in filters:
-                    if f['field'] == 'Type':
+                    if f['field'] == 'type':
                         has_types = len(f['value']) > 0 and set(f['value']).issubset(set(result_types))
                         if not has_types:  # Filter is empty or contains an item not in result_types
                             f['value'] = list(result_types)
             else:
-                request_data['filters'] = [{'field': 'Type', 'value': list(result_types)}]
+                request_data['filters'] = [{'field': 'type', 'value': list(result_types)}]
 
         search, errors = SearchSchema().load(request_data)
+
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         try:
@@ -35,13 +36,7 @@ class SearchEndpoint(flask_restful.Resource):
 
         search.total = results.hits.total
         search.facets = []
-        for facet_name in results.facets:
-            facet = Facet(facet_name)
-            facet.facetCounts = []
-            for category, hit_count, is_selected in results.facets[facet_name]:
-                if (facet_name != 'Type') or ((result_types is None) or (category in result_types)):
-                    facet.facetCounts.append(FacetCount(category, hit_count, is_selected))
-            search.facets.append(facet)
+        search.category = self.update_category_counts(search.category, results)
 
         search.hits = []
         for hit in results:
@@ -52,6 +47,20 @@ class SearchEndpoint(flask_restful.Resource):
             search.hits.append(hit)
 
         return SearchSchema().jsonify(search)
+
+    # given a results of a search, creates the appropriate category
+    def update_category_counts(self, category, results):
+        if not category:
+            category = Category(name="TOP")
+            category.children = db.session.query(Category)\
+                .filter(Category.parent_id == None)\
+                .order_by(Category.name)\
+                .all()
+        for child in category.children:
+            for bucket in results.aggregations.terms.buckets:
+                if bucket.key == child.search_path():
+                    child.hit_count = bucket.doc_count
+        return category
 
     def post(self):
         return self.__post__()

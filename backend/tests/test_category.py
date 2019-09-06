@@ -100,6 +100,26 @@ class TestCategory(BaseTest, unittest.TestCase):
         self.assertEqual(response["parent"]['id'], c2.id)
         self.assertNotIn("children", response["parent"])
 
+    def test_category_can_create_searchable_path(self):
+        c1 = self.construct_category()
+        c2 = self.construct_category(name="I'm the kid", parent=c1)
+        c3 = self.construct_category(name="I'm the grand kid", parent=c2)
+
+        c1_path = str(c1.id)
+        c2_path = str(c1.id) + "," + str(c2.id)
+        c3_path = str(c1.id) + "," + str(c2.id) + "," + str(c3.id)
+
+        self.assertEqual(1, len(c1.all_search_paths()))
+        self.assertEqual(2, len(c2.all_search_paths()))
+        self.assertEqual(3, len(c3.all_search_paths()))
+
+        self.assertIn(c3_path, c3.all_search_paths())
+        self.assertIn(c2_path, c3.all_search_paths())
+        self.assertIn(c1_path, c3.all_search_paths())
+        self.assertIn(c2_path, c2.all_search_paths())
+        self.assertIn(c1_path, c2.all_search_paths())
+        self.assertIn(c1_path, c1.all_search_paths())
+
     # def test_category_depth_is_limited(self):
     #     c1 = self.construct_category()
     #     c2 = self.construct_category(

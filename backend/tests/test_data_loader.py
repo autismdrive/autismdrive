@@ -6,37 +6,22 @@ from app.model.category import Category
 from app.model.event import Event
 from app.model.location import Location
 from app.model.participant import Participant
-from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
-from app.model.questionnaires.assistive_device import AssistiveDevice
-from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
-from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
-from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
-from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
-from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
-from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
-from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
-from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
-from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
-from app.model.questionnaires.evaluation_history_dependent_questionnaire import EvaluationHistoryDependentQuestionnaire
-from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
-from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
-from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
-from app.model.questionnaires.housemate import Housemate
-from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
-from app.model.questionnaires.medication import Medication
-from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
-from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
-from app.model.questionnaires.therapy import Therapy
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.search import Search, Filter
 from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.user import User
-from tests.base_test import BaseTest
+from tests.base_test import BaseTest, clean_db
 
 
 class TestDataLoader(BaseTest, unittest.TestCase):
+
+    def setUp(self):
+        self.ctx.push()
+        clean_db(db)
+        elastic_index.clear()
+        self.auths = {}
 
     def _load_and_assert_success(self, class_to_load, load_method='', category_class=None, category_type=''):
         num_rc_after = -math.inf
@@ -116,10 +101,10 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         num_db_studies = db.session.query(Study).count()
 
         # Get the number of items in the search index
-        es_resources = elastic_index.search(Search(filters=[Filter('Type', Resource.__label__)]))
-        es_events = elastic_index.search(Search(filters=[Filter('Type', Event.__label__)]))
-        es_locations = elastic_index.search(Search(filters=[Filter('Type', Location.__label__)]))
-        es_studies = elastic_index.search(Search(filters=[Filter('Type', Study.__label__)]))
+        es_resources = elastic_index.search(Search(filters=[Filter('type', [Resource.__tablename__])]))
+        es_events = elastic_index.search(Search(filters=[Filter('type', [Event.__tablename__])]))
+        es_locations = elastic_index.search(Search(filters=[Filter('type', [Location.__tablename__])]))
+        es_studies = elastic_index.search(Search(filters=[Filter('type', [Study.__tablename__])]))
 
         # Verify that the number of items in the database match the number of items in the search index
         self.assertEqual(num_db_resources, es_resources.hits.total)
