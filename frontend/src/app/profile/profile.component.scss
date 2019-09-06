@@ -2,22 +2,7 @@
   margin: 2%;
 }
 
-.pad-1 { padding: 1em; }
-.pad-2 { padding: 2em; }
-.pad-3 { padding: 3em; }
-.pad-4 { padding: 4em; }
-.pad-5 { padding: 5em; }
-.pad-6 { padding: 6em; }
-.pad-7 { padding: 7em; }
-.pad-8 { padding: 8em; }
-
-.button-row button { margin-right: 8px; }
-
-mat-drawer-container {
-  min-height: 100vh;
-  background-color: white;
-}
-
-mat-drawer-content {
-  background-color: white;
+mat-card-subtitle {
+  font-weight: bold;
+  font-size: large;
 }

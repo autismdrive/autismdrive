@@ -49,6 +49,7 @@
       <div
         *ngIf="!loading"
         fxLayout="row"
+        fxLayout.lt-md="column"
         fxLayoutGap="40px"
       >
         <div
@@ -88,7 +89,7 @@
                   *ngIf="studyInquiries && studyInquiries.length > 0"
                   id="study-inquiries"
                 >
-                  <h2 mat-subheader>Studies about which you have inquired</h2>
+                  <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
                   <mat-list-item *ngFor="let s of studyInquiries">
                     <a
                       mat-line
@@ -101,7 +102,7 @@
                   *ngIf="currentStudies && currentStudies.length > 0"
                   id="current-studies"
                 >
-                  <h2 mat-subheader>All currently enrolling studies</h2>
+                  <mat-card-subtitle>All currently enrolling studies</mat-card-subtitle>
                   <mat-list-item *ngFor="let s of currentStudies">
                     <a
                       mat-line
