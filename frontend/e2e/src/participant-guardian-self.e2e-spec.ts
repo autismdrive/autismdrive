@@ -27,6 +27,10 @@ describe('Participant (Guardian - Self)', () => {
     page.navigateToHome();
   });
 
+  afterAll(() => {
+    page.waitForAngularEnabled(true);
+  });
+
   // Login & Register
   it('should display login form', () => loginUseCases.displayLoginForm());
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
@@ -82,11 +86,20 @@ describe('Participant (Guardian - Self)', () => {
 
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user begins typing in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
-  it('should allow user to set location via ZIP code', () => searchUseCases.setZipCode());
-  it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode());
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
+  it('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
+  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('22101'));
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should open ZIP code dialog again', () => searchUseCases.openZipCodeDialog());
+  it('should change ZIP code', () => searchUseCases.enterZipCode('24248'));
+  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should sort by last date updated');
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 

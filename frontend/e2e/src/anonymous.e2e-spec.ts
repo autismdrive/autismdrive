@@ -19,6 +19,10 @@ describe('Anonymous User', () => {
     page.navigateToHome();
   });
 
+  afterAll(() => {
+    page.waitForAngularEnabled(true);
+  });
+
   // Global Header
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
   it('should display logged-out state in navigation', () => globalHeaderUseCases.displayLoggedOutState());
@@ -34,8 +38,17 @@ describe('Anonymous User', () => {
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should display selected filters', () => searchUseCases.displaySelectedFilters());
   it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
-  it('should allow user to set location via ZIP code', () => searchUseCases.setZipCode());
-  it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode());
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
+  it('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
+  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('22101'));
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should open ZIP code dialog again', () => searchUseCases.openZipCodeDialog());
+  it('should change ZIP code', () => searchUseCases.enterZipCode('24248'));
+  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
+  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should sort by last date updated');
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 

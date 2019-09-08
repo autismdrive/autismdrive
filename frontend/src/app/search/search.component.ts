@@ -79,6 +79,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   noLocation = true;
   storedZip: string;
   gpsEnabled = false;
+  zipLoc: LatLngLiteral;
+  gpsLoc: LatLngLiteral;
   mapLoc: LatLngLiteral;
   defaultLoc: LatLngLiteral = {
     lat: 37.32248,
@@ -251,32 +253,48 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
+    let numStepsComplete = 0;
+    const minStepsNeeded = 2;
+    const _callCallbackIfReady = () => {
+      numStepsComplete++;
+      if (numStepsComplete >= minStepsNeeded) {
+        this.mapLoc = this.zipLoc || this.gpsLoc;
+        callback.call(this);
+      }
+    };
+
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
+        console.log('z', z);
         this.noLocation = false;
-        this.mapLoc = {
+        this.zipLoc = {
           lat: z.latitude,
           lng: z.longitude
         };
+        _callCallbackIfReady();
       });
+    } else {
+      _callCallbackIfReady();
     }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
         this.noLocation = false;
-        this.mapLoc = {
+
+        this.gpsLoc = {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
-        callback.call(this);
+
+        _callCallbackIfReady();
       }, error => {
         this.gpsEnabled = false;
-        callback.call(this);
+        _callCallbackIfReady();
       });
     } else {
-      callback.call(this);
+      _callCallbackIfReady();
     }
   }
 
@@ -287,11 +305,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.query.sort = selectedSort.sortQuery;
 
     if (selectedSort.name === 'Distance') {
-      this.loadMapLocation(() => {
-        this.query.sort.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
-        this.query.sort.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
-        this.doSearch();
-      });
+      this.loadMapLocation(() => this._updateDistanceSort());
     } else {
       this.doSearch();
     }
@@ -440,16 +454,19 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     });
 
-    dialogRef.afterClosed().subscribe(zipCode => {
-      if (this.isZipCode(zipCode)) {
-        localStorage.setItem('zipCode', zipCode);
-      }
-      this.loadMapLocation(() => this.updateUrl(this.query));
+    dialogRef.afterClosed().subscribe(_ => {
+      this.loadMapLocation(() => this._updateDistanceSort());
     });
   }
 
   isZipCode(zipCode: string): boolean {
     return (zipCode && (zipCode !== '') && (/^\d{5}$/.test(zipCode)));
+  }
+
+  private _updateDistanceSort() {
+    this.query.sort.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
+    this.query.sort.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
+    this.doSearch();
   }
 
 }

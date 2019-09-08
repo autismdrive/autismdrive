@@ -33,10 +33,10 @@ export class GlobalHeaderUseCases {
 
   visitHomePage() {
     this.page.clickLinkTo('/home');
+    this.page.waitForVisible('app-news-item');
     expect(this.page.getElements('#hero').count()).toEqual(1);
     expect(this.page.getElements('.border-box-tile').count()).toBeGreaterThan(1);
     expect(this.page.getElements('app-news-item').count()).toBeGreaterThan(1);
-    this.page.clickLinkTo('/home');
   }
 
   async displayHomeHero() {
