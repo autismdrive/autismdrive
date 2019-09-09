@@ -330,7 +330,7 @@ class TestStudy(BaseTest, unittest.TestCase):
                            headers=self.logged_in_headers())
         self.assert_success(rv)
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("STAR Drive: Study Inquiry Email",
+        self.assertEqual("Autism DRIVE: Study Inquiry Email",
                          self.decode(TEST_MESSAGES[-1]['subject']))
 
         logs = EmailLog.query.all()

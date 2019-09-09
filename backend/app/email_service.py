@@ -74,7 +74,7 @@ class EmailService:
         token = ts.dumps(user.email, salt='email-reset-key')
         tracking_code = self.tracking_code()
 
-        subject = "STAR Drive: Confirm Email"
+        subject = "Autism DRIVE: Confirm Email"
         confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + token
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("confirm_email.txt",
@@ -96,7 +96,7 @@ class EmailService:
         token = ts.dumps(user.email, salt='email-reset-key')
         tracking_code = self.tracking_code()
 
-        subject = "STAR Drive: Password Reset Email"
+        subject = "Autism DRIVE: Password Reset Email"
         reset_url = self.app.config['FRONTEND_EMAIL_RESET'] + token
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("reset_email.txt",
@@ -116,7 +116,7 @@ class EmailService:
     def study_inquiry_email(self, study, user):
         tracking_code = self.tracking_code()
 
-        subject = "STAR Drive: Study Inquiry Email"
+        subject = "Autism DRIVE: Study Inquiry Email"
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("study_inquiry_email.txt",
                                     user=user, study=study,

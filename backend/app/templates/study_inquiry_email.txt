@@ -1,5 +1,5 @@
 Dear Study Coordinator,
-One of the STAR Drive Users recently requested information about participating in your study. Here are the details we have:
+One of the Autism DRIVE Users recently requested information about participating in your study. Here are the details we have:
 Study: {{ study.title }}
 
 User Details:
