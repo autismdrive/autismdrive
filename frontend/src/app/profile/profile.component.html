@@ -5,7 +5,7 @@
 
   <div *ngIf="state === possibleStates.NO_PARTICIPANT">
     <h1>Welcome!</h1>
-    <p>Thank you for creating an account on Star Drive! Please complete the following fields, and select
+    <p>Thank you for creating an account on Autism DRIVE! Please complete the following fields, and select
       the button that most closely applies to your situation.</p>
     <button
       mat-flat-button
@@ -37,7 +37,7 @@
   </div>
 
   <div *ngIf="state !== possibleStates.NO_PARTICIPANT">
-    <h1>Your STAR DRIVE Profile</h1>
+    <h1>Your Autism DRIVE Profile</h1>
     <div>
       <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
 
@@ -49,6 +49,7 @@
       <div
         *ngIf="!loading"
         fxLayout="row"
+        fxLayout.lt-md="column"
         fxLayoutGap="40px"
       >
         <div
@@ -62,14 +63,6 @@
             [user]="user"
             id="participant_{{participant.id}}"
           ></app-participant-profile>
-
-          <!-- <button
-            *ngIf="!user.getSelf()"
-            mat-flat-button
-            color="primary"
-            (click)="enrollSelf($event)"
-            id="edit_enroll_guardian"
-          >Enroll yourself</button> -->
 
           <button
             *ngIf="user.getSelf() && user.getDependents().length === 0"
@@ -88,7 +81,39 @@
           >Enroll another dependent</button>
         </div>
         <div fxFlex="40%">
-          [List of studies here]
+          <mat-card>
+            <mat-card-title>Research Studies</mat-card-title>
+            <mat-card-content>
+              <mat-list>
+                <div
+                  *ngIf="studyInquiries && studyInquiries.length > 0"
+                  id="study-inquiries"
+                >
+                  <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
+                  <mat-list-item *ngFor="let s of studyInquiries">
+                    <a
+                      mat-line
+                      href="/#/study/{{s.study.id}}"
+                    >{{ s.study.short_title }}</a>
+                    <p mat-line>{{ s.study.short_description }}</p>
+                  </mat-list-item>
+                </div>
+                <div
+                  *ngIf="currentStudies && currentStudies.length > 0"
+                  id="current-studies"
+                >
+                  <mat-card-subtitle>All currently enrolling studies</mat-card-subtitle>
+                  <mat-list-item *ngFor="let s of currentStudies">
+                    <a
+                      mat-line
+                      href="/#/study/{{s.id}}"
+                    >{{ s.short_title }}</a>
+                    <p mat-line>{{ s.short_description }}</p>
+                  </mat-list-item>
+                </div>
+              </mat-list>
+            </mat-card-content>
+          </mat-card>
         </div>
       </div>
 

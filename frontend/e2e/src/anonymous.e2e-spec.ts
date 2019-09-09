@@ -16,6 +16,7 @@ describe('Anonymous User', () => {
     loginUseCases = new LoginUseCases(page);
     searchUseCases = new SearchUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
+    page.waitForAngularEnabled(true);
     page.navigateToHome();
   });
 

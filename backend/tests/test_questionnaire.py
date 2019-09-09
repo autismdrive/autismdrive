@@ -1514,3 +1514,30 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual('Professional Profile', wb.worksheets[18].title)
         self.assertEqual('Supports', wb.worksheets[19].title)
         self.assertEqual('Therapy', wb.worksheets[20].title)
+
+    def test_export_questionnaires_by_user(self):
+        u1 = self.construct_user(email='1@sartography.com')
+        u2 = self.construct_user(email='2@sartography.com')
+        self.construct_all_questionnaires(u1)
+        self.construct_all_questionnaires(u2)
+        rv = self.app.get('/api/q/all/export/user/%i' % u1.id,
+                          follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        wb = openpyxl.load_workbook(io.BytesIO(rv.data))
+        ws = wb.get_active_sheet()
+        self.assertEqual(ws, wb.active)
+        self.assertEqual(21, len(wb.worksheets))
+        self.assertEqual(2, wb['Contact'].max_row)
+        self.assertEqual('user_id', wb['Contact']['E1'].value)
+        self.assertEqual(u1.id, wb['Contact']['E2'].value)
+        rv = self.app.get('/api/q/all/export/user/%i' % u2.id,
+                          follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        wb = openpyxl.load_workbook(io.BytesIO(rv.data))
+        self.assertEqual(2, wb['Contact'].max_row)
+        self.assertEqual('user_id', wb['Contact']['E1'].value)
+        self.assertEqual(u2.id, wb['Contact']['E2'].value)

@@ -5,6 +5,18 @@
 >
   <h1>User:</h1>
   <div
+    fxFlex="20%"
+    fxLayoutGap="2em"
+  >
+    <button
+      mat-flat-button
+      (click)="exportUserData()"
+      color="accent"
+    >
+      Export User Data
+    </button>
+  </div>
+  <div
     fxLayout="row"
   >
     <div>
@@ -53,7 +65,6 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
     </div>
   </div>
   <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>

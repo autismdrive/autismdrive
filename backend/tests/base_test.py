@@ -14,6 +14,7 @@ from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
+from app.model.study_user import StudyUser
 
 
 from flask import json
@@ -271,6 +272,7 @@ class BaseTest:
         self.construct_zip_code()
         investigator = Investigator(name="Sam I am", organization_id=org.id)
         db.session.add(StudyInvestigator(study = study, investigator = investigator))
+        db.session.add(StudyUser(study=study, user=self.construct_user()))
         db.session.add(investigator)
         db.session.add(EmailLog())
         db.session.add(StepLog())

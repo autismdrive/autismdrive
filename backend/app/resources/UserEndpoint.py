@@ -64,8 +64,10 @@ class UserListEndpoint(flask_restful.Resource):
         per_page = eval(args["pageSize"]) if ("pageSize" in args) else 20
         query = db.session.query(User)
         if "filter" in args:
-            f = '%' + args["filter"] + '%'
-            query = query.filter(User.email.ilike(f))
+            if args["filter"].isdigit():
+                query = query.filter(User.id == args["filter"])
+            else:
+                query = query.filter(User.email.ilike('%{args["filter"]}%'))
 
         sort_column = args["sort"] if ("sort" in args) else "email"
         col = getattr(User, sort_column)

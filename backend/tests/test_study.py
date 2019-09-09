@@ -330,11 +330,38 @@ class TestStudy(BaseTest, unittest.TestCase):
                            headers=self.logged_in_headers())
         self.assert_success(rv)
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("STAR Drive: Study Inquiry Email",
+        self.assertEqual("Autism DRIVE: Study Inquiry Email",
                          self.decode(TEST_MESSAGES[-1]['subject']))
 
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
+
+    def test_study_inquiry_creates_StudyUser(self):
+        s = self.construct_study(title="The Best Study")
+        u = self.construct_user()
+
+        rv = self.app.get('api/user/%i/study' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
+        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
+        self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
+
+        data = {'user_id': u.id, 'study_id': s.id}
+        rv = self.app.post('/api/study_inquiry',
+                           data=json.dumps(data),
+                           follow_redirects=True,
+                           content_type="application/json",
+                           headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/user/%i/study' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(s.id, response[0]["study_id"])
 
     def test_study_inquiry_fails_without_valid_study_or_user(self):
         s = self.construct_study(title="The Best Study")

@@ -76,6 +76,7 @@ export class AppPage {
   }
 
   clickElement(selector: string) {
+    this.waitForClickable(selector);
     this.getElement(selector).click();
   }
 
