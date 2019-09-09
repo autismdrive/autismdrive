@@ -41,27 +41,27 @@ export function searchFilterMatcher(url: UrlSegment[]) {
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
-  {path: 'home', component: HomeComponent, data: {title: 'Welcome STAR Drive'}, canActivate: [NotMirroredGuard]},
+  {path: 'home', component: HomeComponent, data: {title: 'Welcome Autism DRIVE'}, canActivate: [NotMirroredGuard]},
   {
     path: 'about',
     component: AboutComponent,
-    data: {title: 'Enroll in a STAR Drive Study'},
+    data: {title: 'Enroll in an Autism DRIVE Study'},
     canActivate: [NotMirroredGuard]
   },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
-    data: {title: 'Log in to STAR Drive', hideHeader: true}
+    data: {title: 'Log in to Autism DRIVE', hideHeader: true}
   },
-  {path: 'login', component: LoginComponent, data: {title: 'Log in to STAR Drive', hideHeader: true}},
+  {path: 'login', component: LoginComponent, data: {title: 'Log in to Autism DRIVE', hideHeader: true}},
   {
     path: 'reset_password/:email_token', component: PasswordResetComponent,
-    data: {title: 'Reset your STAR Drive password', hideHeader: true}
+    data: {title: 'Reset your Autism DRIVE password', hideHeader: true}
   },
   {
     path: 'profile',
     component: ProfileComponent,
-    data: {title: 'Your STAR Drive Account'},
+    data: {title: 'Your Autism DRIVE Account'},
     canActivate: [AuthGuard, NotMirroredGuard]
   },
   {
@@ -73,13 +73,13 @@ const routes: Routes = [
   {
     path: 'flow/:flowName/:participantId',
     component: FlowComponent,
-    data: {title: 'Your STAR Drive Account'},
+    data: {title: 'Your Autism DRIVE Account'},
     canActivate: [AuthGuard, NotMirroredGuard]
   },
-  {path: 'register', component: RegisterComponent, data: {title: 'Create a STAR Drive Account', hideHeader: true}},
+  {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account', hideHeader: true}},
   {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Event Details'}},
   {path: 'location/:resourceId', component: ResourceDetailComponent, data: {title: 'Location Details'}},
-  {path: 'resources', component: ResourcesComponent, data: {title: 'View STAR Drive Trainings & Resources'}},
+  {path: 'resources', component: ResourcesComponent, data: {title: 'View Autism DRIVE Trainings & Resources'}},
   {path: 'resource/:resourceId', component: ResourceDetailComponent, data: {title: 'Resource Details'}},
   {
     path: ':resourceType/:resourceId/edit',
@@ -88,12 +88,12 @@ const routes: Routes = [
     canActivate: [AdminGuard]
   },
   {path: 'resources/add', component: ResourceFormComponent, data: {title: 'Add Resource'}, canActivate: [AdminGuard]},
-  {path: 'studies', component: StudiesComponent, data: {title: 'Create a STAR Drive Account'}},
+  {path: 'studies', component: StudiesComponent, data: {title: 'Create an Autism DRIVE Account'}},
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
   {
     path: 'terms',
     component: TermsComponent,
-    data: {title: 'Agree to Terms and Conditions for a STAR Drive Account', hideHeader: true}
+    data: {title: 'Agree to Terms and Conditions for an Autism DRIVE Account', hideHeader: true}
   },
   {path: 'logout', component: LogoutComponent, data: {title: 'You have been logged out.', hideHeader: true}},
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},

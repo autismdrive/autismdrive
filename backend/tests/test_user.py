@@ -190,7 +190,7 @@ class TestUser(BaseTest, unittest.TestCase):
         message_count = len(TEST_MESSAGES)
         self.test_create_user_with_password()
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("STAR Drive: Confirm Email",
+        self.assertEqual("Autism DRIVE: Confirm Email",
                          self.decode(TEST_MESSAGES[-1]['subject']))
 
         logs = EmailLog.query.all()
@@ -206,7 +206,7 @@ class TestUser(BaseTest, unittest.TestCase):
             content_type="application/json")
         self.assert_success(rv)
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("STAR Drive: Password Reset Email",
+        self.assertEqual("Autism DRIVE: Password Reset Email",
                          self.decode(TEST_MESSAGES[-1]['subject']))
 
         logs = EmailLog.query.all()
