@@ -259,7 +259,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(type_query)
         self.assertEqual(4, len(search_results['hits']))
         self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
-        self.assertEqual("TOP", search_results['category']['name'], msg="It is a top level category if no filters are applied")
+        self.assertEqual("Topics", search_results['category']['name'], msg="It is a top level category if no filters are applied")
         self.assertEqual(2, len(search_results['category']['children']), msg="The two true Top level categories are returned as children")
         maker_cat = search_results['category']['children'][0]
         talker_cat = search_results['category']['children'][1]
@@ -305,4 +305,4 @@ class TestSearch(BaseTest, unittest.TestCase):
         type_query = {'words': '', 'category': {'id': maker_wood_cat.id}}
         search_results = self.search(type_query)
         self.assertEquals("Makers", search_results['category']['parent']['name'])
-        self.assertEquals("TOP", search_results['category']['parent']['parent']['name'])
+        self.assertEquals("Topics", search_results['category']['parent']['parent']['name'])
