@@ -103,6 +103,19 @@
       >
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
           <mat-chip-list class="applied-filters">
+            <ng-container *ngIf="query && query.category && query.category.id">
+              <mat-chip
+                (click)="removeCategory()"
+                class="applied-filter"
+              >
+                <span class="applied-filter-label">
+                  <span *ngIf="query.category.parent && query.category.parent.parent">{{query.category.parent.parent.name}} > </span>
+                  <span *ngIf="query.category.parent">{{query.category.parent.name}} > </span>
+                  {{query.category.name}}
+                </span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
             <ng-container *ngIf="query && query.words">
               <mat-chip
                 (click)="removeWords()"
@@ -163,46 +176,6 @@
             </ng-container>
           </agm-marker-cluster>
         </agm-map>
-        <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
-          <mat-chip-list class="applied-filters">
-            <ng-container *ngIf="query && query.category && query.category.id">
-              <mat-chip
-                (click)="removeCategory()"
-                class="applied-filter"
-              >
-                <span class="applied-filter-label">
-                  <span *ngIf="query.category.parent && query.category.parent.parent">{{query.category.parent.parent.name}} > </span>
-                  <span *ngIf="query.category.parent">{{query.category.parent.name}} > </span>
-                  {{query.category.name}}
-                </span>
-                <mat-icon>close</mat-icon>
-              </mat-chip>
-            </ng-container>
-
-            <ng-container *ngIf="query && query.words">
-              <mat-chip
-                (click)="removeWords()"
-                class="applied-filter"
-              >
-                <span class="applied-filter-label">"{{query.words}}"</span>
-                <mat-icon>close</mat-icon>
-              </mat-chip>
-            </ng-container>
-
-            <ng-container *ngFor="let filter of displayFilters; let i = index">
-              <ng-container *ngFor="let fieldValue of filter.value; let j = index">
-                <mat-chip
-                  (click)="removeFilter(filter.field, fieldValue)"
-                  class="applied-filter"
-                >
-                  <span class="applied-filter-label">{{fieldValue}}</span>
-                  <mat-icon>close</mat-icon>
-                </mat-chip>
-                <mat-icon *ngIf="j < filter.value.length -1  || i < displayFilters.length - 1">chevron_right</mat-icon>
-              </ng-container>
-            </ng-container>
-          </mat-chip-list>
-        </div>
         <div
           class="row search-results"
           style="margin-top: 0"
