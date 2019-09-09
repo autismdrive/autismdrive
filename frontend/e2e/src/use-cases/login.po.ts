@@ -37,6 +37,7 @@ export class LoginUseCases {
     this.page.inputText('[id*="input_email"]', email);
     this.page.clickElement('#submit');
     this.page.waitForNotVisible('app-loading');
+    this.page.waitForVisible('#confirmation_message');
     expect(this.page.getElements('#confirmation_message').count()).toEqual(1);
     expect(this.page.getElements('#error_message').count()).toEqual(0);
     this.page.clickAndExpectRoute('#continue', '/home');
@@ -45,7 +46,7 @@ export class LoginUseCases {
   displayRegisterError(email: string) {
     this.page.clickAndExpectRoute('#register-button', '/register');
     expect(this.page.getElements('app-register').count()).toEqual(1);
-    this.page.inputText('[id*="input_email"]', email);
+    this.page.inputText('[id*="input_email"]', email, true);
     this.page.clickElement('#submit');
     this.page.waitForNotVisible('app-loading');
     expect(this.page.getElements('#confirmation_message').count()).toEqual(0);
