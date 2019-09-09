@@ -18,11 +18,21 @@ export class AppPage {
 
   waitFor(t: number) {
     browser.sleep(t);
+    browser.waitForAngularEnabled(false);
   }
 
+  waitForAngularEnabled(enabled: boolean) {
+    browser.waitForAngularEnabled(enabled);
+  }
+
+  waitForText(selector: string, text: string) {
+    const e = this.getElement(selector);
+    browser.wait(ExpectedConditions.textToBePresentInElement(e, text), 5000);
+  }
 
   waitForAnimations() {
     browser.sleep(3000);
+    browser.waitForAngularEnabled(false);
   }
 
   waitForStale(selector: string) {
@@ -43,6 +53,10 @@ export class AppPage {
   waitForVisible(selector: string) {
     const e = this.getElement(selector);
     browser.wait(ExpectedConditions.visibilityOf(e), 5000);
+  }
+
+  getLocalStorageVar(name: string) {
+    return browser.executeScript(`return window.localStorage.getItem('${name}');`);
   }
 
   getSessionStorageVar(key: string) {
@@ -108,9 +122,15 @@ export class AppPage {
     browser.actions().sendKeys(protractor.Key[keyCode]).perform();
   }
 
-  inputText(selector: string, textToEnter: string) {
+  inputText(selector: string, textToEnter: string, clearFirst?: boolean) {
     expect(this.getElements(selector).count()).toEqual(1);
     const field = this.getElement(selector);
+
+    if (clearFirst) {
+      field.clear();
+      expect(field.getAttribute('value')).toEqual('');
+    }
+
     field.sendKeys(textToEnter);
     expect(field.getAttribute('value')).toEqual(textToEnter);
   }

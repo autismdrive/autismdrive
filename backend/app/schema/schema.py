@@ -46,6 +46,7 @@ import app.model.questionnaires.home_self_questionnaire
 import app.model.questionnaires.identification_questionnaire
 import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
+from app.model.zip_code import ZipCode
 
 
 class ParticipantSchema(ModelSchema):
@@ -602,3 +603,7 @@ class StepLogSchema(ModelSchema):
         model = StepLog
         include_fk = True
 
+class ZipCodeSchema(ModelSchema):
+    class Meta:
+        model = ZipCode
+        fields = ["id", "zip_code", "latitude", "longitude"]

@@ -104,6 +104,7 @@ from app.resources.ExportEndpoint import (
     ExportListEndpoint
 )
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
+from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -228,6 +229,9 @@ endpoints = [
     (StepLogListEndpoint, "/step_log"),
     (StatusEndpoint, "/status"),
     (DataTransferLogEndpoint, "/data_transfer_log"),
+
+    #ZIP Code Endpoint
+    (ZipCodeCoordsEndpoint, "/zip_code_coords/<zip_code>"),
 
 ]
 
