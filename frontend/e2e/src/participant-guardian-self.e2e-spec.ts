@@ -104,6 +104,10 @@ describe('Participant (Guardian - Self)', () => {
   it('should sort by last date updated');
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
+  // Search to Resource to Category Search
+  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+
+
   // Log out
   it('should log out', () => loginUseCases.logout());
   it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());

@@ -106,4 +106,17 @@ export class SearchUseCases {
     const newText = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText()
     expect(newText.includes(zipCode)).toBeFalsy();
   }
+
+  displayResourceAndClickChip() {
+    this.page.clickLinkTo('/search');
+    this.page.waitForVisible('app-search-result');
+    this.page.getElements('.result-item div a').first().click();
+    this.page.waitForVisible('app-resource-detail');
+
+    const cat_chip = this.page.getElements('mat-chip').first();
+    cat_chip.click();
+
+    const num_filters_after = this.page.getElements('.applied-filters .applied-filter').count();
+    expect(num_filters_after).toEqual(1);
+  }
 }

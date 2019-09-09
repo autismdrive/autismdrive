@@ -3,7 +3,7 @@
 .mat-list-base[dense] {
   h3.mat-subheader {
     font-size: 1.25rem;
-    line-height: 1.5rem;
+//    line-height: 1.5rem;
     margin-top: 1em;
     padding-left: 0px;
   }
@@ -20,8 +20,8 @@
     cursor: pointer;
     font-weight: bold;
     color: $brand-primary;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding-top: 0;
+    padding-bottom: 0;
 
     &:hover {
       background-color: rgba(0,0,0,0.1);
