@@ -67,7 +67,7 @@ const routes: Routes = [
   {
     path: 'flow/complete',
     component: FlowCompleteComponent,
-    data: {title: 'Enrollment application complete'},
+    data: {title: 'Enrollment complete'},
     canActivate: [AuthGuard, NotMirroredGuard]
   },
   {
