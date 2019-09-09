@@ -10,6 +10,7 @@ import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
+import {Category} from '../_models/category';
 
 interface SortMethod {
   name: string;
@@ -57,7 +58,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.selectedResourceType = types[0];
         }
 
-        this.displayFilters = this.query.filters.filter(f => f.field !== 'Type');
+        this.displayFilters = this.query.filters.filter(f => f.field !== 'type');
 
         this.sortBy(this.sortMethods[0]);
       });
@@ -166,18 +167,21 @@ export class SearchComponent implements OnInit, OnDestroy {
     for (const filter of query.filters) {
       queryParams[filter.field] = filter.value;
     }
-
-    return queryParams;
+    queryParams.category = query.category.id;
+    return queryParams
   }
 
   private _queryParamsToQuery(qParams: Params): Query {
     let words = '';
+    let cat = null;
     const filters: Filter[] = [];
 
     if (qParams && qParams.keys) {
       for (const key of qParams.keys) {
         if (key === 'words') {
           words = qParams.get(key);
+        } else if (key === 'category') {
+          cat = {'id' : qParams.get(key)};
         } else {
           filters.push({field: key, value: qParams.getAll(key)});
         }
@@ -188,6 +192,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       words: words,
       filters: filters,
       size: this.pageSize,
+      category: cat
     });
   }
 
@@ -207,6 +212,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   updateUrl(query: Query) {
     const qParams = this._queryToQueryParams(query);
+    console.log("Updating URL and navigating to ", qParams);
 
     this.router.navigate(
       [],
@@ -264,6 +270,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  selectCategory(newCategory: Category) {
+    console.log('Category Selected: ', newCategory);
+    this.query.category = newCategory;
+    this.query.start = 0;
+    if (this.paginatorElement) {
+      this.paginatorElement.firstPage();
+    }
+    this.updateUrl(this.query);
+  }
+
   addFilter(field: string, fieldValue: string) {
     this.query.addFilter(field, fieldValue);
     this.query.start = 0;
@@ -285,9 +301,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.resourceTypes.forEach(t => {
       if (t.label === keepType) {
         this.selectedResourceType = t;
-        this.query.addFilter('Type', t.label);
+        this.query.addFilter('type', t.name);
       } else {
-        this.query.removeFilter('Type', t.label);
+        this.query.removeFilter('type', t.name);
       }
     });
 
@@ -346,7 +362,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   selectedTypes(): ResourceType[] {
     if (this.query) {
-      const typeFilter = this.query.filters.find(f => f.field === 'Type');
+      const typeFilter = this.query.filters.find(f => f.field === 'type');
 
       if (typeFilter) {
         return this.resourceTypes.filter(f => typeFilter.value.includes(f.label));
@@ -368,7 +384,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   hasFilters() {
     const hasWords = this.query && this.query.words && (this.query.words.length > 0);
     const hasFilters = this.query && this.query.filters.some(f => {
-      if (f.field === 'Type') {
+      if (f.field === 'type') {
         return f.value.length === 1;
       } else {
         return f.value.length > 0;
@@ -381,7 +397,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   showBreadcrumbs() {
     const hasWords = this.query && this.query.words && (this.query.words.length > 0);
     const hasFilters = this.query && this.query.filters.some(f => {
-      return (f.field !== 'Type') && (f.value.length > 0);
+      return (f.field !== 'type') && (f.value.length > 0);
     });
 
     return hasWords || hasFilters;

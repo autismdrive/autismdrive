@@ -8,6 +8,7 @@ export interface Category {
   resource_count?: number;
   study_count?: number;
   training_count?: number;
+  hit_count?: number;
   // _links: any;
   // _meta: any;
 }

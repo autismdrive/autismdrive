@@ -1,0 +1,20 @@
+<h1>Topics</h1>
+<mat-list dense>
+    <ng-container *ngFor="let parent of parentList()">
+      <mat-list-item
+        (click)="selectCategory(parent)"
+      >
+        <span class="filter-facet-label">< {{parent.name}}</span>
+        </mat-list-item>
+    </ng-container>
+  <h3 mat-subheader>{{category.name}}</h3>
+  <ng-container *ngFor="let child of category.children">
+    <mat-list-item
+      (click)="selectCategory(child)"
+    >
+      <span class="filter-facet-label">{{child.name}}</span>
+      <div fxFlex></div>
+      <span class="hit-count">{{child.hit_count}}</span>
+    </mat-list-item>
+  </ng-container>
+</mat-list>

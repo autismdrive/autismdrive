@@ -54,6 +54,7 @@
 
         <div class="filters-topics">
           <h2>Narrow your results</h2>
+          <app-search-topics [category]="query.category" (catagorySelected)="selectCategory($event)"></app-search-topics>
           <button
             mat-button
             [routerLink]="'/search'"
