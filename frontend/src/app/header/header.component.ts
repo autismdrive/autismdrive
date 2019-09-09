@@ -11,7 +11,7 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  OnDestroy, OnInit
+  OnDestroy
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
@@ -25,8 +25,8 @@ import {
 } from 'rxjs/operators';
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
-import {ApiService} from '../_services/api/api.service';
-import {Status} from '../_models/status';
+import { ApiService } from '../_services/api/api.service';
+import { Status } from '../_models/status';
 
 export enum ViewportWidth {
   Small = 'sm',
@@ -140,6 +140,18 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     $event.preventDefault();
     this.authenticationService.logout();
     this.router.navigate(['logout']);
+  }
+
+  goLogin() {
+    const onLoginScreen = /^\/login/.test(this.router.url);
+    const onLogoutScreen = /^\/logout/.test(this.router.url);
+    const onHomeScreen = /^\/home/.test(this.router.url);
+    const onTimedOutScreen = /^\/timedout/.test(this.router.url);
+    if (onHomeScreen || onLoginScreen || onLogoutScreen || onTimedOutScreen) {
+      this.router.navigate(['/login']);
+    } else {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+    }
   }
 
   toggleMenu() {

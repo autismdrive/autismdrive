@@ -184,7 +184,10 @@ This will auto-generate a new migration that ties the streams together.
 
 ### Migrations with Enum columns
 Alembic probably will not generate migrations that do everything that you need them to do when it comes to handling Enum values.
-Look at migration versions 2fd0ab60fe3a_.py and 5fb917adc751_.py to see some examples of handling enum additions and changes.
+Look at migration versions 2fd0ab60fe3a_.py and 5fb917adc751_.py to see some examples of handling enum additions and changes. 
+2fd0ab60fe3a_.py shows how to delete an existing column and replace it with an enum (I haven't found a way to simply 
+alter the column and get the migrations to upgrade and downgrade successfully). 5fb917adc751_.py shows an example with 
+adding a value to the enum list.
 
 ## Best Practices
 There are a few things I hope to do consistently for this project, to avoid some pitfalls from the [Cadre Academy site](https://education.cadre.virginia.edu/#/home).  When adding code please follow these guidelines:

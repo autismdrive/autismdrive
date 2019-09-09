@@ -52,6 +52,7 @@ from app.resources.QuestionnaireEndpoint import (
     QuestionnaireListEndpoint,
     QuestionnaireListMetaEndpoint,
     QuestionnaireDataExportEndpoint,
+    QuestionnaireUserDataExportEndpoint,
     QuestionnaireInfoEndpoint)
 from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
@@ -65,6 +66,14 @@ from app.resources.StudyAndInvestigatorEndpoint import (
     StudyInvestigatorEndpoint,
     InvestigatorByStudyEndpoint,
     StudyInvestigatorListEndpoint
+)
+from app.resources.StudyAndUserEndpoint import (
+    StudyByUserEndpoint,
+    StudyInquiryByUserEndpoint,
+    StudyEnrolledByUserEndpoint,
+    StudyUserEndpoint,
+    UserByStudyEndpoint,
+    StudyUserListEndpoint
 )
 from app.resources.StudyInquiryEndpoint import (
     StudyInquiryEndpoint
@@ -96,6 +105,7 @@ from app.resources.ExportEndpoint import (
 )
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
+
 
 class StarDriveApi(flask_restful.Api):
     # Define a custom error handler for all rest endpoints that
@@ -170,6 +180,9 @@ endpoints = [
     (InvestigatorByStudyEndpoint, "/study/<study_id>/investigator"),
     (StudyInvestigatorListEndpoint, "/study_investigator"),
     (StudyInvestigatorEndpoint, "/study_investigator/<id>"),
+    (UserByStudyEndpoint, "/study/<study_id>/user"),
+    (StudyUserListEndpoint, "/study_user"),
+    (StudyUserEndpoint, "/study_user/<id>"),
     (StudyInquiryEndpoint, "/study_inquiry"),
 
     # Investigators
@@ -185,6 +198,9 @@ endpoints = [
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
     (UserEndpoint, "/user/<id>"),
+    (StudyByUserEndpoint, "/user/<user_id>/study"),
+    (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),
+    (StudyEnrolledByUserEndpoint, "/user/<user_id>/enrolled/study"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     # Participants
     (ParticipantListEndpoint, "/participant"),
@@ -197,6 +213,7 @@ endpoints = [
     (QuestionnaireListMetaEndpoint, "/q/<string:name>/meta"),
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireDataExportEndpoint, "/q/<string:name>/export"),
+    (QuestionnaireUserDataExportEndpoint, "/q/<string:name>/export/user/<string:user_id>"),
     # Flow Endpoint
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -11,9 +12,10 @@ import { User } from '../_models/user';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
+  private _stateSubject: BehaviorSubject<string>;
+  public registerState: Observable<string>;
 
   user: User;
-  registerState = 'form';
   errorMessage = '';
   form = new FormGroup({});
   model: any = {};
@@ -36,6 +38,8 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router
   ) {
+    this._stateSubject = new BehaviorSubject<string>('form');
+    this.registerState = this._stateSubject.asObservable();
     this.user = new User({
       id: null,
       email: this.model['email'],
@@ -48,16 +52,19 @@ export class RegisterComponent implements OnInit {
 
   submit() {
     if (this.form.valid) {
-      this.registerState = 'submitting';
+      this._stateSubject.next('submitting');
+      this.registerState = this._stateSubject.asObservable();
       this.errorMessage = '';
       this.user['email'] = this.model['email'];
 
       this.api.addUser(this.user).subscribe(u => {
         this.user = u;
-        this.registerState = 'wait_for_email';
+        this._stateSubject.next('wait_for_email');
+        this.registerState = this._stateSubject.asObservable();
         this.changeDetectorRef.detectChanges();
       }, error1 => {
-        this.registerState = 'form';
+        this._stateSubject.next('form');
+        this.registerState = this._stateSubject.asObservable();
         this.errorMessage = error1;
         this.changeDetectorRef.detectChanges();
       });
@@ -67,5 +74,9 @@ export class RegisterComponent implements OnInit {
   goHome($event) {
     $event.preventDefault();
     this.router.navigate(['home']);
+  }
+
+  public get registerStateValue(): string {
+    return this._stateSubject.value;
   }
 }

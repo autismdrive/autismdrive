@@ -43,6 +43,7 @@ export class EnrollUseCases {
   }
 
   cancelEditing() {
+    this.page.waitForVisible('#flow-cancel-button');
     expect(this.page.getElements('#flow-cancel-button').count()).toEqual(1);
     this.page.clickAndExpectRoute('#flow-cancel-button', '/profile');
   }
@@ -66,6 +67,7 @@ export class EnrollUseCases {
   }
 
   displayInstructions() {
+    this.page.waitForVisible('app-flow-intro');
     expect(this.page.getElements('app-flow-intro').count()).toEqual(1);
     expect(this.page.getElements('#instructions').count()).toEqual(1);
     expect(this.page.getElements('#next-button').count()).toEqual(1);

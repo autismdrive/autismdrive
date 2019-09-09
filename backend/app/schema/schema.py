@@ -19,6 +19,7 @@ from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
+from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User, Role
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
@@ -48,6 +49,70 @@ import app.model.questionnaires.supports_questionnaire
 from app.model.zip_code import ZipCode
 
 
+class ParticipantSchema(ModelSchema):
+    class Meta:
+        model = Participant
+        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
+                  'has_consented', 'contact')
+    id = fields.Integer(required=False, allow_none=True)
+    name = fields.Function(lambda obj: obj.get_name())
+    relationship = EnumField(Relationship)
+    user_id = fields.Integer(required=False, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.participantendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>')
+    })
+
+
+class UserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'last_updated', 'email', 'password', 'role',
+                  'participants', 'token')
+    password = fields.String(load_only=True)
+    participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
+    id = fields.Integer(required=False, allow_none=True)
+    role = EnumField(Role)
+
+
+class UsersOnStudySchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
+    user = fields.Nested(UserSchema, dump_only=True)
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class StudyUsersSchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
+    user = fields.Nested(UserSchema, dump_only=True)
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class StudyUserSchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id')
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
 class OrganizationSchema(ModelSchema):
     class Meta:
         model = Organization
@@ -56,6 +121,7 @@ class OrganizationSchema(ModelSchema):
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.organizationendpoint', id='<id>'),
     })
+
 
 class InvestigatorSchema(ModelSchema):
     class Meta:
@@ -350,17 +416,31 @@ class StudySchema(ModelSchema):
         model = Study
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
                   'participant_description', 'benefit_description', 'coordinator_email', 'organization_id', 'organization', 'location',
-                  'status', 'study_categories', 'study_investigators', '_links')
+                  'status', 'study_categories', 'study_investigators', 'study_users', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     status = EnumField(Status)
     study_categories = fields.Nested(CategoriesOnStudySchema(), many=True, dump_only=True)
     study_investigators = fields.Nested(InvestigatorsOnStudySchema(), many=True, dump_only=True)
+    study_users = fields.Nested(UsersOnStudySchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyendpoint', id='<id>'),
         'collection': ma.URLFor('api.studylistendpoint'),
         'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
         'categories': ma.UrlFor('api.categorybystudyendpoint', study_id='<id>')
+    })
+
+
+class UserStudiesSchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'study')
+    study = fields.Nested(StudySchema, dump_only=True)
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
     })
 
 
@@ -434,21 +514,6 @@ class StudyInvestigatorSchema(ModelSchema):
     })
 
 
-class ParticipantSchema(ModelSchema):
-    class Meta:
-        model = Participant
-        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
-                  'has_consented', 'contact')
-    id = fields.Integer(required=False, allow_none=True)
-    name = fields.Function(lambda obj: obj.get_name())
-    relationship = EnumField(Relationship)
-    user_id = fields.Integer(required=False, allow_none=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.participantendpoint', id='<id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>')
-    })
-
-
 class SearchSchema(ma.Schema):
 
     class HitSchema(ma.Schema):
@@ -507,17 +572,6 @@ class SearchSchema(ma.Schema):
         return Search(**data)
 
 
-class UserSchema(ModelSchema):
-    class Meta:
-        model = User
-        fields = ('id', 'last_updated', 'email', 'password', 'role',
-                  'participants', 'token')
-    password = fields.String(load_only=True)
-    participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
-    id = fields.Integer(required=False, allow_none=True)
-    role = EnumField(Role)
-
-
 class UserSearchSchema(ma.Schema):
     pages = fields.Integer()
     total = fields.Integer()
@@ -541,12 +595,13 @@ class FlowSchema(Schema):
 class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
+        include_fk = True
 
 
 class StepLogSchema(ModelSchema):
     class Meta:
         model = StepLog
-
+        include_fk = True
 
 class ZipCodeSchema(ModelSchema):
     class Meta:

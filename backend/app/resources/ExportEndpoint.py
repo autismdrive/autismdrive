@@ -31,7 +31,7 @@ class ExportEndpoint(flask_restful.Resource):
 
         name = ExportService.camel_case_it(name)
         schema = ExportService.get_schema(name, many=True)
-        return schema.dump(ExportService().get_data(name, get_date_arg()))
+        return schema.dump(ExportService().get_data(name, last_updated=get_date_arg()))
 
     def get_admin(self):
         query = db.session.query(User).filter(User.role == Role.admin)

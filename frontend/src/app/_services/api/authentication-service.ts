@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {BehaviorSubject, Observable, ObservableInput, of, ReplaySubject, Subject, throwError} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import {User} from '../../_models/user';
-import {environment} from '../../../environments/environment';
-import {GoogleAnalyticsService} from '../../google-analytics.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { User } from '../../_models/user';
+import { environment } from '../../../environments/environment';
+import { GoogleAnalyticsService } from '../../google-analytics.service';
+
 
 
 @Injectable({ providedIn: 'root' })
@@ -20,7 +21,7 @@ export class AuthenticationService {
 
   constructor(private http: HttpClient, private googleAnalyticsService: GoogleAnalyticsService) {
     const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
-    this.currentUserSubject = new ReplaySubject<User>();
+    this.currentUserSubject = new BehaviorSubject<User>(null);
     this.currentUser = this.currentUserSubject.asObservable();
     if (token) {
       console.log('A token is set.  Grabbing the user.');

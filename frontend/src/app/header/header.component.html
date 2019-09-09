@@ -124,7 +124,7 @@
         </a></li>
         <li *ngIf="!currentUser"><a
           mat-button
-          [routerLink]="[ '/login' ]"
+          (click)="goLogin()"
           routerLinkActive="selected"
           id="login-button"
         >

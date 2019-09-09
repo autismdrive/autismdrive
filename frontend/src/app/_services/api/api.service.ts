@@ -14,6 +14,7 @@ import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
 import {UserSearchResults} from '../../_models/user_search_results';
 import {environment} from '../../../environments/environment';
+import { StudyUser } from '../../_models/study_user';
 import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
@@ -62,6 +63,7 @@ export class ApiService {
     questionnaireInfo: '/api/q',
     questionnaireList: '/api/q/<name>',
     questionnaireListMeta: '/api/q/<name>/meta',
+    questionnaireUserExport: '/api/q/all/export/user/<user_id>',
     questionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     resource: '/api/resource/<id>',
     resourcebycategory: '/api/category/<category_id>/resource',
@@ -82,6 +84,7 @@ export class ApiService {
     studylist: '/api/study',
     user: '/api/user/<id>',
     userEmailLog: '/api/user/email_log/<id>',
+    userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     zip_code_coords: '/api/zip_code_coords/<zip_code>',
@@ -335,6 +338,12 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Get User Study Inquiries */
+  getUserStudyInquiries(id: number): Observable<StudyUser[]> {
+    return this.httpClient.get<StudyUser[]>(this._endpointUrl('userStudyInquiryList').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
   /** Get User Email Log */
   getUserEmailLog(user: User): Observable<EmailLog[]> {
     return this.httpClient.get<EmailLog[]>(this._endpointUrl('userEmailLog').replace('<id>', user.id.toString()))
@@ -381,6 +390,16 @@ export class ApiService {
       ._endpointUrl('questionnaireExport')
       .replace('<name>', name);
     return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
+    // .pipe(catchError(this._handleError));
+  }
+
+  /** exportUser Questionnaire */
+  exportUserQuestionnaire(user_id:string): Observable<any> {
+    const url = this
+      ._endpointUrl('questionnaireUserExport')
+      .replace('<name>', name)
+      .replace('<user_id>', user_id);
+    return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
     // .pipe(catchError(this._handleError));
   }
 
