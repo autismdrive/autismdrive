@@ -484,7 +484,7 @@ class SearchSchema(ma.Schema):
         longitude = fields.Float()
 
     class SortSchema(ma.Schema):
-        field = fields.Str()
+        field = fields.Str(allow_null=True)
         latitude = fields.Float(missing=None)
         longitude = fields.Float(missing=None)
         order = fields.Str(missing='asc')
@@ -515,7 +515,7 @@ class SearchSchema(ma.Schema):
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
-    sort = ma.Nested(SortSchema)
+    sort = ma.Nested(SortSchema, allow_none=True, default=None)
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)

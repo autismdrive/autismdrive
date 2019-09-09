@@ -267,6 +267,12 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEquals("Talkers", talker_cat['name'], "The second category returned is 'talkers'")
         self.assertEquals(3, maker_cat['hit_count'], "There are three makers present.")
 
+    def test_top_level_category_repost_does_not_create_error(self):
+        self.setup_category_aggregations()
+        type_query = {'words': ''}
+        search_results = self.search(type_query)
+        self.search(search_results)  # This should not create an error.
+
     def test_second_level_filtered_category_counts(self):
         self.setup_category_aggregations()
         type_query = {'words': '', 'category': {'id': 1}}
@@ -292,3 +298,11 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(1, len(search_results['category']['children']), msg="Woodworkers has only one child")
         cabinet_maker = search_results['category']['children'][0]
         self.assertEquals(1, cabinet_maker['hit_count'], "There is one cabinet maker.")
+
+    def test_that_top_level_category_is_always_present(self):
+        self.setup_category_aggregations()
+        maker_wood_cat = db.session.query(Category).filter(Category.name == 'Woodworkers').first()
+        type_query = {'words': '', 'category': {'id': maker_wood_cat.id}}
+        search_results = self.search(type_query)
+        self.assertEquals("Makers", search_results['category']['parent']['name'])
+        self.assertEquals("TOP", search_results['category']['parent']['parent']['name'])

@@ -25,6 +25,10 @@ class SearchEndpoint(flask_restful.Resource):
             else:
                 request_data['filters'] = [{'field': 'type', 'value': list(result_types)}]
 
+        # Handle some sloppy category data.
+        if 'category' in request_data and (not request_data['category'] or not request_data['category']['id']):
+            del request_data['category']
+
         search, errors = SearchSchema().load(request_data)
 
         if errors:
@@ -48,7 +52,8 @@ class SearchEndpoint(flask_restful.Resource):
 
         return SearchSchema().jsonify(search)
 
-    # given a results of a search, creates the appropriate category
+    # given a results of a search, creates the appropriate category.
+    # Also assures that there is a category at the top called "TOP".
     def update_category_counts(self, category, results):
         if not category:
             category = Category(name="TOP")
@@ -56,6 +61,12 @@ class SearchEndpoint(flask_restful.Resource):
                 .filter(Category.parent_id == None)\
                 .order_by(Category.name)\
                 .all()
+        else:
+            c = category
+            while c.parent:
+                c = c.parent
+            c.parent = Category(name="TOP")
+
         for child in category.children:
             for bucket in results.aggregations.terms.buckets:
                 if bucket.key == child.search_path():
