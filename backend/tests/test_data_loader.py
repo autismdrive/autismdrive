@@ -12,6 +12,7 @@ from app.model.search import Search, Filter
 from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.user import User
+from app.model.zip_code import ZipCode
 from tests.base_test import BaseTest, clean_db
 
 
@@ -67,6 +68,9 @@ class TestDataLoader(BaseTest, unittest.TestCase):
     def test_load_participants(self):
         self._load_and_assert_success(User, 'load_users')
         self._load_and_assert_success(Participant, 'load_participants')
+
+    def test_load_zip_codes(self):
+        self._load_and_assert_success(ZipCode, 'load_zip_codes')
 
     def test_get_org_by_name(self):
         expected_name = 'The Graham Institute for Magical Misfits'

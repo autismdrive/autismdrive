@@ -11,6 +11,9 @@ import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
+import {MatDialog} from '@angular/material/dialog';
+import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
+import {ApiService} from '../_services/api/api.service';
 
 interface SortMethod {
   name: string;
@@ -43,6 +46,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
+    public locationDialog: MatDialog,
+    private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
@@ -72,11 +77,15 @@ export class SearchComponent implements OnInit, OnDestroy {
   loading = true;
   displayFilters: Filter[];
   pageSize = 20;
+  noLocation = true;
+  storedZip: string;
+  gpsEnabled = false;
+  zipLoc: LatLngLiteral;
+  gpsLoc: LatLngLiteral;
   mapLoc: LatLngLiteral;
-
   defaultLoc: LatLngLiteral = {
-    lat: 37.9864031,
-    lng: -81.6645856
+    lat: 37.32248,
+    lng: -78.36926
   };
 
   mobileQuery: MediaQueryList;
@@ -151,7 +160,17 @@ export class SearchComponent implements OnInit, OnDestroy {
       `,
       image: '/assets/partners/autism_speaks.png',
       url: 'https://www.autismspeaks.org/',
-    }
+    },
+    {
+      name: 'Piedmont Regional Education Program',
+      shortName: 'PREP',
+      description: `
+        A public regional organization designed to meet the needs of special education students. Provides special
+        education programming and related services to nine school districts under an umbrella of a regional program.
+      `,
+      image: '/assets/partners/prep.png',
+      url: 'http://www.prepivycreek.com/',
+    },
   ];
   private _mobileQueryListener: () => void;
 
@@ -168,7 +187,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       queryParams[filter.field] = filter.value;
     }
     queryParams.category = query.category.id;
-    return queryParams
+    return queryParams;
   }
 
   private _queryParamsToQuery(qParams: Params): Query {
@@ -219,7 +238,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   updateUrl(query: Query) {
     const qParams = this._queryToQueryParams(query);
-    console.log("Updating URL and navigating to ", qParams);
+    console.log('Updating URL and navigating to ', qParams);
 
     this.router.navigate(
       [],
@@ -247,16 +266,48 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
+    let numStepsComplete = 0;
+    const minStepsNeeded = 2;
+    const _callCallbackIfReady = () => {
+      numStepsComplete++;
+      if (numStepsComplete >= minStepsNeeded) {
+        this.mapLoc = this.zipLoc || this.gpsLoc;
+        callback.call(this);
+      }
+    };
+
+    this.storedZip = localStorage.getItem('zipCode');
+    if (this.isZipCode(this.storedZip)) {
+      this.api.getZipCoords(this.storedZip).subscribe(z => {
+        console.log('z', z);
+        this.noLocation = false;
+        this.zipLoc = {
+          lat: z.latitude,
+          lng: z.longitude
+        };
+        _callCallbackIfReady();
+      });
+    } else {
+      _callCallbackIfReady();
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
-        this.mapLoc = {
+        this.gpsEnabled = true;
+        this.noLocation = false;
+
+        this.gpsLoc = {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
-        callback();
+
+        _callCallbackIfReady();
+      }, error => {
+        this.gpsEnabled = false;
+        _callCallbackIfReady();
       });
     } else {
-      callback();
+      _callCallbackIfReady();
     }
   }
 
@@ -267,11 +318,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.query.sort = selectedSort.sortQuery;
 
     if (selectedSort.name === 'Distance') {
-      this.loadMapLocation(() => {
-        this.query.sort.latitude = this.mapLoc.lat;
-        this.query.sort.longitude = this.mapLoc.lng;
-        this.doSearch();
-      });
+      this.loadMapLocation(() => this._updateDistanceSort());
     } else {
       this.doSearch();
     }
@@ -354,7 +401,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
       this.loadMapLocation(() => {
-        mapUI.setCenter(this.mapLoc);
+        mapUI.setCenter(this.mapLoc || this.defaultLoc);
         mapUI.setZoom(9);
       });
     });
@@ -421,4 +468,29 @@ export class SearchComponent implements OnInit, OnDestroy {
     const mapResults = this.getMapResults();
     return mapResults && (mapResults.length > 0);
   }
+
+  openLocationDialog() {
+    const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
+      width: '320px',
+      data: {
+        zipCode: localStorage.getItem('zipCode') || '',
+        gpsEnabled: this.gpsEnabled
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(_ => {
+      this.loadMapLocation(() => this._updateDistanceSort());
+    });
+  }
+
+  isZipCode(zipCode: string): boolean {
+    return (zipCode && (zipCode !== '') && (/^\d{5}$/.test(zipCode)));
+  }
+
+  private _updateDistanceSort() {
+    this.query.sort.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
+    this.query.sort.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
+    this.doSearch();
+  }
+
 }

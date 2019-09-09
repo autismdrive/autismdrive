@@ -110,6 +110,8 @@ import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.componen
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
 import { SearchTopicsComponent } from './search-topics/search-topics.component';
+import {MatDialogModule} from '@angular/material/dialog';
+import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -142,15 +144,19 @@ export class FormlyConfig {
 
 @NgModule({
   declarations: [
+    AboutComponent,
     AccordionComponent,
+    AdminExportComponent,
+    AdminExportDetailsComponent,
     AdminHomeComponent,
     AppComponent,
     AutocompleteSectionComponent,
     AvatarDialogComponent,
     AvatarDialogComponent,
+    BorderBoxTileComponent,
     CardWrapperComponent,
     CategoryChipsComponent,
-    AboutComponent,
+    DetailsLinkComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,
@@ -158,6 +164,7 @@ export class FormlyConfig {
     FlowComponent,
     FlowIntroComponent,
     FlowIntroComponent,
+    FooterComponent,
     ForgotPasswordComponent,
     HeaderComponent,
     HelpWrapperComponent,
@@ -168,6 +175,7 @@ export class FormlyConfig {
     LogoComponent,
     LogoutComponent,
     LogoutComponent,
+    MirrorComponent,
     NewsItemComponent,
     ParticipantDetailComponent,
     ParticipantProfileComponent,
@@ -188,8 +196,10 @@ export class FormlyConfig {
     SearchComponent,
     SearchResultComponent,
     SearchResultComponent,
+    SetLocationDialogComponent,
     StudiesComponent,
     StudyDetailComponent,
+    StudyInquiryComponent,
     TermsComponent,
     TimedoutComponent,
     TypeIconComponent,
@@ -223,6 +233,7 @@ export class FormlyConfig {
     MatCheckboxModule,
     MatChipsModule,
     MatDatepickerModule,
+    MatDialogModule,
     MatExpansionModule,
     MatFormFieldModule,
     MatGridListModule,
@@ -233,6 +244,7 @@ export class FormlyConfig {
     MatPaginatorModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    MatRadioModule,
     MatSelectModule,
     MatSidenavModule,
     MatSlideToggleModule,
@@ -245,19 +257,18 @@ export class FormlyConfig {
     PdfJsViewerModule,
     ReactiveFormsModule,
     RoutingModule,
-    MatRadioModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
     ApiService,
+    GoogleAnalyticsService,
     IntervalService,
     SearchService,
-    GoogleAnalyticsService
   ],
   bootstrap: [AppComponent],
-  entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent]
+  entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent, SetLocationDialogComponent]
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {
