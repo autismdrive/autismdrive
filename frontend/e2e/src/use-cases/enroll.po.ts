@@ -43,6 +43,7 @@ export class EnrollUseCases {
   }
 
   cancelEditing() {
+    this.page.waitForVisible('#flow-cancel-button');
     expect(this.page.getElements('#flow-cancel-button').count()).toEqual(1);
     this.page.clickAndExpectRoute('#flow-cancel-button', '/profile');
   }
