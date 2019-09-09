@@ -45,6 +45,7 @@ import app.model.questionnaires.home_self_questionnaire
 import app.model.questionnaires.identification_questionnaire
 import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
+from app.model.zip_code import ZipCode
 
 
 class OrganizationSchema(ModelSchema):
@@ -547,3 +548,7 @@ class StepLogSchema(ModelSchema):
         model = StepLog
 
 
+class ZipCodeSchema(ModelSchema):
+    class Meta:
+        model = ZipCode
+        fields = ["id", "zip_code", "latitude", "longitude"]

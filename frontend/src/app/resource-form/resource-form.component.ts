@@ -377,7 +377,7 @@ export class ResourceFormComponent implements OnInit {
 
   onDelete() {
     this.api.deleteResource(this.resource).subscribe(r => {
-      this.router.navigate(['resources']);
+      this.router.navigate(['search']);
     })
   }
 
@@ -386,7 +386,7 @@ export class ResourceFormComponent implements OnInit {
     if (this.updatedResource && this.updatedResource.id) {
       this.router.navigate([this.updatedResource.type, this.updatedResource.id]);
     } else {
-      this.router.navigate(['resources']);
+      this.router.navigate(['search']);
     }
   }
 

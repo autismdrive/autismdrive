@@ -26,7 +26,7 @@ from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.resource import Resource
 from app.model.user import User, Role
-
+from app.model.zip_code import ZipCode
 
 def clean_db(db):
     for table in reversed(db.metadata.sorted_tables):
@@ -240,6 +240,17 @@ class BaseTest:
         elastic_index.add_document(db_event, 'Event')
         return db_event
 
+    def construct_zip_code(self, zip_code=24401, latitude=38.146216, longitude=-79.07625):
+        z = ZipCode(zip_code=zip_code, latitude=latitude, longitude=longitude)
+        db.session.add(z)
+        db.session.commit()
+
+        db_z = ZipCode.query.filter_by(zip_code=zip_code).first()
+        self.assertEqual(db_z.zip_code, z.zip_code)
+        self.assertEqual(db_z.latitude, z.latitude)
+        self.assertEqual(db_z.longitude, z.longitude)
+        return db_z
+
     def construct_everything(self):
         self.construct_all_questionnaires()
         cat = self.construct_category()
@@ -250,6 +261,7 @@ class BaseTest:
         event = self.construct_event()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
+        self.construct_zip_code()
         investigator = Investigator(name="Sam I am", organization_id=org.id)
         db.session.add(StudyInvestigator(study = study, investigator = investigator))
         db.session.add(investigator)
