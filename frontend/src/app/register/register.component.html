@@ -13,7 +13,7 @@
           [form]="form"
           [fields]="fields"
           [model]="model"
-          *ngIf="registerState != 'wait_for_email'"
+          *ngIf="registerStateValue !== 'wait_for_email'"
         >
           <div
             id="error_message"
@@ -24,7 +24,7 @@
             fxLayout="column"
             fxLayoutGap="2%"
             fxLayoutAlign="center"
-            *ngIf="registerState === 'form'"
+            *ngIf="registerStateValue === 'form'"
           >
             <button
               mat-flat-button
@@ -39,11 +39,11 @@
               id="cancel"
             >Cancel</button>
           </footer>
-          <footer *ngIf="registerState === 'submitting'">
+          <footer *ngIf="registerStateValue === 'submitting'">
             <app-loading></app-loading>
           </footer>
         </formly-form>
-        <footer *ngIf="registerState === 'wait_for_email'" id="confirmation_message">
+        <footer *ngIf="registerStateValue === 'wait_for_email'" id="confirmation_message">
           <h2>Account Created!</h2>
           <p>Please check your email to complete the signin process.</p>
           <button
