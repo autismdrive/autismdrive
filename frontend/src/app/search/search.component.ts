@@ -186,7 +186,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     for (const filter of query.filters) {
       queryParams[filter.field] = filter.value;
     }
-    queryParams.category = query.category.id;
+
+    if (query.hasOwnProperty('category') && query.category) {
+      queryParams.category = query.category.id;
+    }
     return queryParams;
   }
 
@@ -361,6 +364,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.query.category = null;
     this.query.start = 0;
     this.updateUrl(this.query);
   }

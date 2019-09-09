@@ -13,22 +13,22 @@ export class SearchUseCases {
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 
-  async displaySelectedFilters() {
-    expect(this.page.getElements('.filters').count()).toEqual(1);
-    expect(this.page.getElements('.filters-topics .filter-facet-item').count()).toBeGreaterThan(1);
+  async displaySelectedCategory() {
+    expect(this.page.getElements('.filters-topics').count()).toEqual(1);
+    expect(this.page.getElements('.filters-topics app-search-topics').count()).toEqual(1);
 
     const num_filters_before = await this.page.getElements('.applied-filters .applied-filter').count();
     expect(num_filters_before).toEqual(1);
 
-    const filter = await this.page.getElements('.filters-topics .filter-facet-item').first();
+    const filter = await this.page.getElements('.filters-topics mat-list-item').first();
     filter.click();
 
     const num_filters_after = await this.page.getElements('.applied-filters .applied-filter').count();
     expect(num_filters_after).toEqual(2);
 
-    const filter_text = await filter.$('.filter-facet-label').getText();
-    const applied_filter_text = await this.page.getElements('.applied-filters .applied-filter .applied-filter-label').last().getText();
-    expect(filter_text).toEqual(applied_filter_text);
+    const selected_category = await this.page.getElement('h3.mat-subheader').getText();
+    const applied_filter_text = await this.page.getElements('.applied-filters .applied-filter .applied-filter-label').first().getText();
+    expect(applied_filter_text.toUpperCase()).toContain(selected_category);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 

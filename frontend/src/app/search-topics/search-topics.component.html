@@ -1,4 +1,5 @@
-<mat-list dense>
+<mat-spinner *ngIf="!category"></mat-spinner>
+<mat-list dense *ngIf="category">
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
         (click)="selectCategory(parent)"

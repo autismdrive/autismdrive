@@ -87,7 +87,7 @@ describe('Participant (Guardian - Self)', () => {
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected filters', () => searchUseCases.displaySelectedFilters());
+  it('should display selected category', () => searchUseCases.displaySelectedCategory());
   it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());

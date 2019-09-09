@@ -15,23 +15,6 @@ export class SearchTopicsComponent implements OnInit, OnChanges {
   @Output()
   catagorySelected = new EventEmitter<Category>();
 
-  changeCount = 0;
-
-  example_data = {
-        'id': 12, 'name': 'Toys', level: 3,
-        'parent': {
-          'id': 10, 'name': 'Dog', level: 2,
-          'parent': {
-            'id': 10, 'name': 'Animals', level: 1
-          }
-        },
-        'children': [
-          {'id': 25, 'name': 'Fetch Toys', level: 4, 'hit_count': 12},
-          {'id': 25, 'name': 'Chew Toys', level: 4, 'hit_count': 10},
-          {'id': 25, 'name': 'Plush Toys', level: 4, 'hit_count': 7}
-        ]
-  };
-
   constructor() { }
 
   ngOnInit() {
@@ -48,10 +31,6 @@ export class SearchTopicsComponent implements OnInit, OnChanges {
     } else {
       return parents;
     }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.changeCount++;
   }
 
 }
