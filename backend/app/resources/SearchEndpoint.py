@@ -56,7 +56,7 @@ class SearchEndpoint(flask_restful.Resource):
     # Also assures that there is a category at the top called "TOP".
     def update_category_counts(self, category, results):
         if not category:
-            category = Category(name="TOP")
+            category = Category(name="Topics")
             category.children = db.session.query(Category)\
                 .filter(Category.parent_id == None)\
                 .order_by(Category.name)\
@@ -65,7 +65,7 @@ class SearchEndpoint(flask_restful.Resource):
             c = category
             while c.parent:
                 c = c.parent
-            c.parent = Category(name="TOP")
+            c.parent = Category(name="Topics")
 
         for child in category.children:
             for bucket in results.aggregations.terms.buckets:

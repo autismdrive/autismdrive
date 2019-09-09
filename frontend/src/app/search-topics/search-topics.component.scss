@@ -3,8 +3,13 @@
 .mat-list-base[dense] {
   h3.mat-subheader {
     font-size: 1.25rem;
+    line-height: 1.5rem;
     margin-top: 1em;
     padding-left: 0px;
+  }
+
+  div.sub-level {
+    padding-left: 35px;
   }
 
   h3.mat-subheader:first-child {

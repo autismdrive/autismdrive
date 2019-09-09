@@ -203,6 +203,13 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchService.reset();
   }
 
+  removeCategory() {
+    this.query.category = null;
+    this.query.start = 0;
+    this.paginatorElement.firstPage();
+    this.doSearch();
+  }
+
   removeWords() {
     this.query.words = '';
     this.query.start = 0;
@@ -399,8 +406,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     const hasFilters = this.query && this.query.filters.some(f => {
       return (f.field !== 'type') && (f.value.length > 0);
     });
+    const hasCategory = this.query && this.query.category != null;
 
-    return hasWords || hasFilters;
+    return hasWords || hasFilters || hasCategory;
   }
 
   getMapResults(): Hit[] {
