@@ -197,7 +197,7 @@ class ElasticIndex:
             .highlight('content', fragment_size=50)
 
         for f in search.filters:
-            elastic_search = elastic_search.post_filter('terms', **{f.field: f.value})
+            elastic_search = elastic_search.filter('terms', **{f.field: f.value})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)

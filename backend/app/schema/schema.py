@@ -98,7 +98,8 @@ class CategoryInSearchSchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level')
-    parent = fields.Nested(ParentCategorySchema, dump_only=True)
+    parent_id = fields.Number(required=False, allow_none=True)
+    parent = fields.Nested(ParentCategorySchema, dump_only=True, required=False, allow_none=True)
     children = fields.Nested(ChildCategoryInSearchSchema, many=True, dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
 
