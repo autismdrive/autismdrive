@@ -7,7 +7,7 @@ import {Category} from '../_models/category';
   templateUrl: './search-topics.component.html',
   styleUrls: ['./search-topics.component.scss']
 })
-export class SearchTopicsComponent implements OnInit, OnChanges {
+export class SearchTopicsComponent implements OnInit {
 
   @Input()
   category: Category;
