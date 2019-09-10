@@ -67,7 +67,8 @@ class UserListEndpoint(flask_restful.Resource):
             if args["filter"].isdigit():
                 query = query.filter(User.id == args["filter"])
             else:
-                query = query.filter(User.email.ilike(f'%{args["filter"]}%'))
+                f = '%' + args["filter"] + '%'
+                query = query.filter(User.email.ilike(f))
 
         sort_column = args["sort"] if ("sort" in args) else "email"
         col = getattr(User, sort_column)
