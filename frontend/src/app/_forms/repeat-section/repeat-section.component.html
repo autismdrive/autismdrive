@@ -3,7 +3,7 @@
   fxLayoutGap="1em"
   class="container"
 >
-  <mat-card *ngFor="let field of field.fieldGroup; let i = index;" class="repeat">
+  <mat-card *ngFor="let f of field.fieldGroup; let i = index;" class="repeat">
     <mat-card-content fxLayout="row wrap">
       <mat-chip-list fxFlex="50">
         <mat-chip color="primary" selected>{{i + 1}}</mat-chip>
@@ -22,7 +22,17 @@
         </button>
       </div>
       <div fxFlex="100">
-        <formly-group [field]="field"></formly-group>
+        <ul>
+          <li *ngFor="let v of f.model | keyvalue">{{v.key}}: {{v.value}}</li>
+        </ul>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="openDialog(i, f)"
+        >
+          Edit
+        </button>
       </div>
     </mat-card-content>
   </mat-card>
@@ -33,7 +43,7 @@
     mat-flat-button
     color="primary"
     type="button"
-    (click)="add()"
+    (click)="openDialog(field.fieldGroup.length)"
   >
     {{ field.templateOptions.description }}
   </button>

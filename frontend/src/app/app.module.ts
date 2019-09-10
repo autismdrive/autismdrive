@@ -111,6 +111,7 @@ import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
 import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
+import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -204,6 +205,7 @@ export class FormlyConfig {
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
+    RepeatSectionDialogComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),
@@ -259,7 +261,12 @@ export class FormlyConfig {
     SearchService,
   ],
   bootstrap: [AppComponent],
-  entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent, SetLocationDialogComponent]
+  entryComponents: [
+    AdminExportDetailsComponent,
+    AvatarDialogComponent,
+    RepeatSectionDialogComponent,
+    SetLocationDialogComponent
+  ]
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {

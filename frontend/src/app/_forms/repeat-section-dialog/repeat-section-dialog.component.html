@@ -1,0 +1,22 @@
+<div
+  class="mat-typography"
+>
+  <div mat-dialog-content>
+    <h1 mat-dialog-title>Repeat Section Dialog</h1>
+    <formly-form
+      [fields]="data.fields"
+      [model]="data.model"
+    ></formly-form>
+  </div>
+  <div mat-dialog-actions>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="onSubmit()"
+    >Save</button>
+    <button
+      mat-button
+      (click)="onNoClick()"
+    >Cancel</button>
+  </div>
+</div>
