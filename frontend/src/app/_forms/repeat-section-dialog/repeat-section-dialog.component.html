@@ -6,12 +6,14 @@
     <formly-form
       [fields]="data.fields"
       [model]="data.model"
+      (click)="updateDisableSave()"
     ></formly-form>
   </div>
   <div mat-dialog-actions>
     <button
       mat-flat-button
       color="primary"
+      [disabled]="disableSave"
       (click)="onSubmit()"
     >Save</button>
     <button
