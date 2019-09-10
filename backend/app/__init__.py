@@ -157,6 +157,7 @@ def resourcereset():
     data_loader.load_locations()
     data_loader.load_resources()
     data_loader.load_studies()
+    data_loader.load_zip_codes()
     data_loader.build_index()
 
 
