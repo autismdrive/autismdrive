@@ -18,7 +18,8 @@ export class AppPage {
 
   waitFor(t: number) {
     browser.sleep(t);
-    browser.waitForAngularEnabled(false);
+    // Might need to enable this if Webdriver gets disconnected from DOM
+    // browser.waitForAngularEnabled(false);
   }
 
   waitForAngularEnabled(enabled: boolean) {
@@ -32,7 +33,8 @@ export class AppPage {
 
   waitForAnimations() {
     browser.sleep(3000);
-    browser.waitForAngularEnabled(false);
+    // Might need to enable this if Webdriver gets disconnected from DOM
+    // browser.waitForAngularEnabled(false);
   }
 
   waitForStale(selector: string) {
