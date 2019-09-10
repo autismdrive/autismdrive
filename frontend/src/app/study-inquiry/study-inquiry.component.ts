@@ -67,4 +67,21 @@ export class StudyInquiryComponent implements OnInit {
     this.inquirySent = true;
   }
 
+  goEditEnroll($event, participant) {
+    if (participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
+      $event.preventDefault();
+      this.router.navigate(['flow', 'self_intake', participant.id]);
+    } else if (participant.relationship === ParticipantRelationship.DEPENDENT) {
+      $event.preventDefault();
+      this.router.navigate(['flow', 'dependent_intake', participant.id]);
+    } else if (participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
+      $event.preventDefault();
+      this.router.navigate(['flow', 'professional_intake', participant.id]);
+    } else {
+      $event.preventDefault();
+      this.router.navigate(['flow', 'guardian_intake', participant.id]);
+    }
+  }
+
+
 }
