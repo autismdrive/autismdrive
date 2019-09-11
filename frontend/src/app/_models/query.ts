@@ -1,9 +1,11 @@
 import { GeoLocation } from './geolocation';
+import {Category} from './category';
 
 export class Query {
   words = '';
   filters: Array<Filter> = [];
   facets: Array<Facet> = [];
+  category: Category;
   total?: number;
   size = 20;
   start = 0;
@@ -74,10 +76,10 @@ export class Query {
 }
 
 export enum HitType {
-  LOCATION = 'LOCATION',
-  RESOURCE = 'RESOURCE',
-  STUDY = 'STUDY',
-  EVENT = 'EVENT'
+  LOCATION = 'location',
+  RESOURCE = 'resource',
+  STUDY = 'study',
+  EVENT = 'event'
 }
 
 export enum HitLabel {

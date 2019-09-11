@@ -1,6 +1,3 @@
-import datetime
-
-
 class Search:
     words = ""
     filters = []
@@ -10,20 +7,23 @@ class Search:
     start = 0
     size = 0
     sort = None
+    category = None
 
-    def __init__(self, words="", filters=[], start=0, size=10, sort=None):
+    def __init__(self, words="", filters=[], start=0, size=10, sort=None, category=None):
         self.words = words
         self.filters = filters
         self.start = start
         self.size = size
         self.sort = sort
+        self.category = category;
 
     def jsonFilters(self):
         jfilter = {}
         for f in self.filters:
             jfilter[f.field] = f.value
-
         return jfilter
+
+
 
 
 class Facet:
