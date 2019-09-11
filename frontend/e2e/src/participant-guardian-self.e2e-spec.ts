@@ -88,7 +88,7 @@ describe('Participant (Guardian - Self)', () => {
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected filters', () => searchUseCases.displaySelectedFilters());
+  it('should display selected category', () => searchUseCases.displaySelectedCategory());
   it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
@@ -103,6 +103,10 @@ describe('Participant (Guardian - Self)', () => {
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should sort by last date updated');
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
+
+  // Search to Resource to Category Search
+  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+
 
   // Log out
   it('should log out', () => loginUseCases.logout());

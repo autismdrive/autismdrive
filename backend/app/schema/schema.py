@@ -150,6 +150,27 @@ class ParentCategorySchema(ModelSchema):
     })
 
 
+class ChildCategoryInSearchSchema(ModelSchema):
+    """Provides a view of the parent category, all the way to the top, but ignores children"""
+    class Meta:
+        model = Category
+        fields = ('id', 'name', '_links', 'hit_count')
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.categoryendpoint', id='<id>'),
+        'collection': ma.URLFor('api.categorylistendpoint')
+    })
+
+class CategoryInSearchSchema(ModelSchema):
+    """Provides detailed information about a category, including all the children"""
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level')
+    parent_id = fields.Number(required=False, allow_none=True)
+    parent = fields.Nested(ParentCategorySchema, dump_only=True, required=False, allow_none=True)
+    children = fields.Nested(ChildCategoryInSearchSchema, many=True, dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+
+
 class CategorySchema(ModelSchema):
     """Provides detailed information about a category, including all the children"""
     class Meta:
@@ -193,6 +214,7 @@ class CategorySchema(ModelSchema):
             .filter(StudyCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
+
 
 
 class CategoriesOnEventSchema(ModelSchema):
@@ -529,7 +551,7 @@ class SearchSchema(ma.Schema):
         longitude = fields.Float()
 
     class SortSchema(ma.Schema):
-        field = fields.Str()
+        field = fields.Str(allow_null=True)
         latitude = fields.Float(missing=None)
         longitude = fields.Float(missing=None)
         order = fields.Str(missing='asc')
@@ -560,11 +582,12 @@ class SearchSchema(ma.Schema):
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
-    sort = ma.Nested(SortSchema)
+    sort = ma.Nested(SortSchema, allow_none=True, default=None)
     filters = ma.List(ma.Nested(FilterSchema))
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)
     facets = ma.List(ma.Nested(FacetSchema), dump_only=True)
+    category = ma.Nested(CategoryInSearchSchema)
     ordered = True
 
     @post_load

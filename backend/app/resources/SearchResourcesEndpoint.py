@@ -7,7 +7,7 @@ from app.model.location import Location
 class SearchResourcesEndpoint(SearchEndpoint):
     def post(self):
         return self.__post__([
-            Resource.__label__,
-            Location.__label__,
-            Event.__label__
+            Resource.__tablename__,
+            Location.__tablename__,
+            Event.__tablename__
         ])

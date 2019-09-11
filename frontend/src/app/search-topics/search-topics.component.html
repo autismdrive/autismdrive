@@ -1,0 +1,20 @@
+<mat-spinner *ngIf="!category"></mat-spinner>
+<mat-list dense *ngIf="category">
+    <ng-container *ngFor="let parent of parentList()">
+      <mat-list-item
+        (click)="selectCategory(parent)"
+      >
+        <span class="filter-facet-label">< {{parent.name}}</span>
+        </mat-list-item>
+    </ng-container>
+  <div [ngClass]="{'sub-level' : category.level > 0}">
+  <h3 mat-subheader>{{category.name}}</h3>
+  <ng-container *ngFor="let child of category.children">
+    <mat-list-item *ngIf="child.hit_count > 0" (click)="selectCategory(child)" [classList]="" >
+      <span class="filter-facet-label">{{child.name}}</span>
+      <div fxFlex></div>
+      <span class="hit-count">{{child.hit_count}}</span>
+    </mat-list-item>
+  </ng-container>
+  </div>
+</mat-list>

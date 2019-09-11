@@ -118,6 +118,7 @@ def cleardb():
 def initindex():
     """Delete all information from the elastic search Index."""
     click.echo('Loading data into Elastic Search')
+    elastic_index.clear()
     from app import data_loader
     data_loader = data_loader.DataLoader()
     data_loader.build_index()

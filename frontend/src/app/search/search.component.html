@@ -68,6 +68,7 @@
 
         <div class="filters-topics">
           <h2>Narrow your results</h2>
+          <app-search-topics [category]="query.category" (catagorySelected)="selectCategory($event)"></app-search-topics>
           <button
             mat-button
             [routerLink]="'/search'"
@@ -102,6 +103,19 @@
       >
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
           <mat-chip-list class="applied-filters">
+            <ng-container *ngIf="query && query.category && query.category.id">
+              <mat-chip
+                (click)="removeCategory()"
+                class="applied-filter"
+              >
+                <span class="applied-filter-label">
+                  <span *ngIf="query.category.parent && query.category.parent.parent">{{query.category.parent.parent.name}} > </span>
+                  <span *ngIf="query.category.parent">{{query.category.parent.name}} > </span>
+                  {{query.category.name}}
+                </span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
             <ng-container *ngIf="query && query.words">
               <mat-chip
                 (click)="removeWords()"
@@ -162,7 +176,6 @@
             </ng-container>
           </agm-marker-cluster>
         </agm-map>
-
         <div
           class="row search-results"
           style="margin-top: 0"

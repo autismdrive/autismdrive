@@ -109,6 +109,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
+import { SearchTopicsComponent } from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
 
@@ -204,6 +205,14 @@ export class FormlyConfig {
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
+    FooterComponent,
+    MirrorComponent,
+    AdminExportComponent,
+    AdminExportDetailsComponent,
+    DetailsLinkComponent,
+    BorderBoxTileComponent,
+    StudyInquiryComponent,
+    SearchTopicsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),
