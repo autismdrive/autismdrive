@@ -1,4 +1,4 @@
-import {AfterContentChecked, AfterContentInit, AfterViewInit, Component, Input} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 
 interface SelectFieldOption {
@@ -34,7 +34,9 @@ export class FormPrintoutComponent {
         }
       });
 
-      if (selectLabel) { return selectLabel; }
+      if (selectLabel) {
+        return selectLabel;
+      }
     }
 
     // If the value is not human-readable, at least strip the key name off the front of it.

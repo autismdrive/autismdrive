@@ -109,11 +109,11 @@ import {MatRadioModule} from '@angular/material/radio';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
-import { SearchTopicsComponent } from './search-topics/search-topics.component';
+import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
-import { FormPrintoutComponent } from './_forms/form-printout/form-printout.component';
+import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -168,6 +168,7 @@ export class FormlyConfig {
     FlowIntroComponent,
     FooterComponent,
     ForgotPasswordComponent,
+    FormPrintoutComponent,
     HeaderComponent,
     HelpWrapperComponent,
     HeroSlidesComponent,
@@ -189,6 +190,7 @@ export class FormlyConfig {
     QuestionnaireStepsListComponent,
     RegisterComponent,
     RepeatSectionComponent,
+    RepeatSectionDialogComponent,
     ResourceAddButtonComponent,
     ResourceDetailComponent,
     ResourceEditButtonComponent,
