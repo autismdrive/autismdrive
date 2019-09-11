@@ -161,8 +161,8 @@ class AssistiveDevice(db.Model):
                 ]
             },
             "expression_properties": {
-                'template_options.options': 'this.field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
-                'model.type': 'model.type_group === "other" ? "other" : (this.field.templateOptions.options.find(o => o.id === model.type) ? model.type : null)',
+                'template_options.options': 'field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
+                'model.type': 'model.type_group === "other" ? "other" : (field.templateOptions.options.find(o => o.value === model.type) ? model.type : null)',
             },
         }
     )

@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {FieldArrayType, FormlyFieldConfig, FormlyFormBuilder} from '@ngx-formly/core';
 import {MatDialog} from '@angular/material/dialog';
 import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-section-dialog.component';
+import {clone, isNullOrUndefined} from "../../../util/clone";
 
 @Component({
   selector: 'app-repeat-section',
@@ -10,10 +11,9 @@ import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-sect
 })
 export class RepeatSectionComponent extends FieldArrayType {
   constructor(
-    builder: FormlyFormBuilder,
     public dialog: MatDialog
   ) {
-    super(builder);
+    super();
   }
 
   openDialog(i: number, f?: FormlyFieldConfig) {
@@ -27,13 +27,10 @@ export class RepeatSectionComponent extends FieldArrayType {
 
     dialogRef.afterClosed().subscribe(data => {
       if (data && data.model) {
+        console.log('data.model', data.model);
         super.remove(i);
         super.add(i, data.model);
       }
     });
-  }
-
-  displayValues(f: FormlyFieldConfig) {
-    return Object.keys(f.model).forEach(k => { return {key: k, value: f.model[k]}; });
   }
 }

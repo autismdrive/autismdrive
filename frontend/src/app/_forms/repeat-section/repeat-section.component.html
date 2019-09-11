@@ -4,34 +4,28 @@
   class="container"
 >
   <mat-card *ngFor="let f of field.fieldGroup; let i = index;" class="repeat">
-    <mat-card-content fxLayout="row wrap">
-      <mat-chip-list fxFlex="50">
-        <mat-chip color="primary" selected>{{i + 1}}</mat-chip>
-      </mat-chip-list>
+    <mat-card-content fxLayout="row">
+      <div fxFlex="70">
+        <app-form-printout [field]="f"></app-form-printout>
+      </div>
       <div
-        fxFlex="50"
-        fxLayout="column"
+        fxFlex="30"
+        fxLayout="row"
+        fxLayoutAlign="end start"
       >
         <button
           mat-icon-button
           type="button"
-          (click)="remove(i)"
-          fxFlexAlign="end"
-        >
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      <div fxFlex="100">
-        <ul>
-          <li *ngFor="let v of f.model | keyvalue">{{v.key}}: {{v.value}}</li>
-        </ul>
-        <button
-          mat-flat-button
-          color="primary"
-          type="button"
           (click)="openDialog(i, f)"
         >
-          Edit
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="remove(i)"
+        >
+          <mat-icon>close</mat-icon>
         </button>
       </div>
     </mat-card-content>

@@ -48,10 +48,6 @@ export class FlowComponent implements OnInit, OnDestroy {
   fields = [];
   options: FormlyFormOptions;
 
-  static clone(o: any): any {
-    return JSON.parse(JSON.stringify(o));
-  }
-
   constructor(
     private api: ApiService,
     private authenticationService: AuthenticationService,
