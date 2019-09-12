@@ -1,7 +1,8 @@
-<mat-nav-list *ngFor="let step of flow.steps">
+<mat-nav-list *ngFor="let step of flow.steps; let i = index">
   <mat-list-item
     (click)="selectStep(step)"
     [ngClass]="{'active': stepName === step.name, 'step-link': true}"
+    [id]="'step_link_' + i"
   >
     <span class="lock">
       <mat-icon *ngIf="step.type === 'sensitive'" [ngClass]="{'visible': true}">lock</mat-icon>

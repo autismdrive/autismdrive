@@ -45,14 +45,14 @@ describe('Participant (Guardian - Self)', () => {
   it('should stay on the profile screen on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
 
   // Global Header - Logged In
-  it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
-  it('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
-  it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
-  it('should visit about page', () => globalHeaderUseCases.visitAboutPage());
-  it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
-  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
+  xit('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
+  xit('should display logged-in header state', () => globalHeaderUseCases.displayLoggedInState());
+  xit('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
+  xit('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  xit('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
+  xit('should visit about page', () => globalHeaderUseCases.visitAboutPage());
+  xit('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
+  xit('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Profile
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
@@ -79,36 +79,35 @@ describe('Participant (Guardian - Self)', () => {
   it('should cancel editing enrollment info', () => enrollUseCases.cancelEditing());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
   it('should display instructions for the entire flow', () => enrollUseCases.displayInstructions());
-  it('should fill out the required fields for each step', () => enrollUseCases.fillOutRequiredFields());
-  it('should check off steps as complete');
+  it('should fill out the required fields for all steps', () => enrollUseCases.completeAllSteps())
   it('should display progress on the Profile screen');
   it('should allow user to view/edit non-sensitive responses');
   it('should not allow user to view or edit sensitive responses');
 
   // Search - Logged In
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected category', () => searchUseCases.displaySelectedCategory());
-  it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
-  it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
-  it('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
-  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('22101'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
-  it('should open ZIP code dialog again', () => searchUseCases.openZipCodeDialog());
-  it('should change ZIP code', () => searchUseCases.enterZipCode('24248'));
-  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
-  it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
-  it('should sort by last date updated');
-  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
+  xit('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  xit('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  xit('should display selected category', () => searchUseCases.displaySelectedCategory());
+  xit('should sort results by distance from user location', () => searchUseCases.sortByDistance());
+  xit('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  xit('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
+  xit('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
+  xit('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('22101'));
+  xit('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  xit('should open ZIP code dialog again', () => searchUseCases.openZipCodeDialog());
+  xit('should change ZIP code', () => searchUseCases.enterZipCode('24248'));
+  xit('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
+  xit('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  xit('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
+  xit('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  xit('should sort by last date updated');
+  xit('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
   // Search to Resource to Category Search
-  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+  xit('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
 
 
   // Log out
-  it('should log out', () => loginUseCases.logout());
-  it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
+  xit('should log out', () => loginUseCases.logout());
+  xit('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
 });

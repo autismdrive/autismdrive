@@ -17,7 +17,7 @@ export class AppPage {
   }
 
   waitFor(t: number) {
-    browser.sleep(t);
+    return browser.sleep(t);
     // Might need to enable this if Webdriver gets disconnected from DOM
     // browser.waitForAngularEnabled(false);
   }
@@ -125,6 +125,12 @@ export class AppPage {
     browser.actions().sendKeys(protractor.Key[keyCode]).perform();
   }
 
+  focus(selector: string) {
+    browser.controlFlow().execute(() => {
+      browser.executeScript('arguments[0].focus()', this.getElement(selector).getWebElement());
+    });
+  }
+
   inputText(selector: string, textToEnter: string, clearFirst?: boolean) {
     expect(this.getElements(selector).count()).toEqual(1);
     const field = this.getElement(selector);
@@ -166,7 +172,7 @@ export class AppPage {
   }
 
   getRandomNumString(length: number) {
-    const s = '0123456789';
+    const s = '123456789';
     return Array(length).join().split(',').map(() => s.charAt(Math.floor(Math.random() * s.length))).join('');
   }
 
@@ -175,13 +181,13 @@ export class AppPage {
   }
 
   scrollTo(selector: string) {
-    this.getElement(selector).then(el => {
-      el.scrollIntoView(false);
+    browser.controlFlow().execute(() => {
+      browser.executeScript('arguments[0].scrollIntoView(false)', this.getElement(selector).getWebElement());
     });
   }
 
   tabThroughAllFields() {
-    this.getElement('formly-form').click();
+    this.focus('formly-form');
 
     const selector = '' +
       'formly-field [id*="_input_"],' +
@@ -190,14 +196,17 @@ export class AppPage {
       'formly-field [id*="_checkbox_"],' +
       'formly-field [id*="_select_"]';
 
-    this.getElements(selector).each(async (ff) => {
-      browser.actions().sendKeys(Key.TAB).perform();
-    });
+    this.getElements(selector).each(_ => this.pressKey('TAB'));
   }
 
-  fillOutInvalidFields() {
-    this.getElements('.ng-invalid').each(e => {
+  async fillOutInvalidFields() {
+    const elements = await this.getElements('.ng-invalid');
+    elements.forEach(e => {
       e.getAttribute('id').then(id => {
+        if (id) {
+          this.scrollTo(`#${id}`);
+        }
+
         if (/_input_email_/.test(id)) {
           const email = this.getRandomString(8) + '@whatever.com';
           e.sendKeys(email);
@@ -216,20 +225,25 @@ export class AppPage {
           const dd = date.getDate();
           const yyyy = date.getFullYear();
           const dateStr = `${mm}/${dd}/${yyyy}`;
+          e.clear();
           e.sendKeys(dateStr);
         } else if (/_radio_/.test(id)) {
-          e.click();
+          e.$(`#${id}_0`).click();
         } else if (/_checkbox_/.test(id)) {
           e.click();
         } else if (/_select_/.test(id)) {
           e.click();
-          e.findElement('mat-option').then(o => {
-            o.click();
+          const selector = '.mat-select-panel mat-option';
+          this.waitForVisible(selector);
+          this.getElements(selector).first().getAttribute('id').then(optionId => {
+            this.getElement(`#${optionId}`).click().then(() => {
+              this.waitForNotVisible(`#${optionId}`);
+              this.waitForNotVisible(selector);
+            });
           });
         }
       });
     });
-
 
     this.getElements('input[type="checkbox"][aria-invalid="true"]').click();
     this.getElements('input[type="text"][aria-invalid="true"]').sendKeys(this.getRandomString(8));

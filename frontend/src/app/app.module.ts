@@ -46,6 +46,8 @@ import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.com
 import {
   EmailValidator,
   EmailValidatorMessage,
+  MulticheckboxValidator,
+  MulticheckboxValidatorMessage,
   PhoneValidator,
   PhoneValidatorMessage,
   UrlValidator,
@@ -130,17 +132,22 @@ export class FormlyConfig {
       {name: 'phone', validation: PhoneValidator},
       {name: 'email', validation: EmailValidator},
       {name: 'url', validation: UrlValidator},
+      {name: 'multicheckbox', validation: MulticheckboxValidator},
     ],
     validationMessages: [
       {name: 'phone', message: PhoneValidatorMessage},
       {name: 'email', message: EmailValidatorMessage},
       {name: 'url', message: UrlValidatorMessage},
+      {name: 'multicheckbox', message: MulticheckboxValidatorMessage},
       {name: 'required', message: 'This field is required.'},
     ],
     wrappers: [
       {name: 'help', component: HelpWrapperComponent},
       {name: 'card', component: CardWrapperComponent},
     ],
+    extras: {
+      checkExpressionOn: 'modelChange',
+    }
   };
 }
 
