@@ -1,10 +1,11 @@
 import { LatLngLiteral } from '@agm/core';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HitLabel, HitType, Query, Hit } from '../_models/query';
+import { Query, Hit } from '../_models/query';
 import { SearchService } from '../_services/api/search.service';
 import { AccordionItem } from '../_models/accordion-item';
 import { AuthenticationService } from '../_services/api/authentication-service';
 import { User } from '../_models/user';
+import {HitType} from '../_models/hit_type';
 
 interface MostRecents {
   resource: Hit;
@@ -12,10 +13,6 @@ interface MostRecents {
   event: Hit;
 }
 
-interface ResourceType {
-  name: string;
-  label: string;
-}
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -27,9 +24,7 @@ class MapControlDiv extends HTMLDivElement {
   styleUrls: ['./resources.component.scss']
 })
 export class ResourcesComponent implements OnInit, OnDestroy {
-  resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
-    return { name: HitType[t], label: HitLabel[t] };
-  });
+  resourceTypes = HitType.all_resources();
 
   resourceGatherers: AccordionItem[] = [
     {
@@ -139,7 +134,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     this.locQuery = new Query({
-      filters: [{ field: 'Type', value: HitLabel.LOCATION }],
+      types: [HitType.LOCATION],
       start: 0,
       size: 999
     });

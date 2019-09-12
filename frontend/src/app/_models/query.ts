@@ -1,19 +1,25 @@
 import { GeoLocation } from './geolocation';
 import {Category} from './category';
+import {HitType} from './hit_type';
+
+
+
 
 export class Query {
+
   words = '';
-  filters: Array<Filter> = [];
-  facets: Array<Facet> = [];
-  category: Category;
   total?: number;
-  size = 20;
   start = 0;
+  size = 20;
+  types: String[] = [];
+  ages: String[] = [];
   sort: Sort = {
     field: '_score',
     order: 'asc'
   };
   hits?: Array<Hit>;
+  category: Category;
+  aggregations: {}; // aggregations[field][value]={"hit_count": 12, "is_selected": false};
 
   constructor(private _props) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));
@@ -30,68 +36,25 @@ export class Query {
 
   equals(otherQuery: Query) {
     const sameWords = this.words === otherQuery.words;
-    const sameFilters = this.filters.toString() === otherQuery.filters.toString();
-    return (sameWords && sameFilters);
+    const sameTypes = this.types === otherQuery.types;
+    const sameAges = this.ages === otherQuery.ages;
+    let sameCategory = true;
+    if (this.category && otherQuery.category) {
+      sameCategory = this.category.id === otherQuery.category.id;
+    }
+    return (sameWords && sameTypes && sameAges && sameCategory);
   }
 
-  addFilter(field: string, fieldValue: string) {
-    const i = this.filters.findIndex(f => f.field === field);
-
-    // Filter has already been set
-    if (i > -1) {
-
-      // Make sure it's not a duplicate value
-      const j = this.filters[i].value.findIndex(v => v === fieldValue);
-
-      if (j === -1) {
-        this.filters[i].value.push(fieldValue);
-      }
-    } else {
-      this.filters.push({ field: field, value: [fieldValue] });
-    }
-  }
-
-  removeFilter(field: string, fieldValue: string) {
-    const i = this.filters.findIndex(f => f.field === field);
-
-    if (i > -1) {
-      const j = this.filters[i].value.findIndex(v => v === fieldValue);
-      if (j > -1) {
-        this.filters[i].value.splice(j, 1);
-      }
-    }
-  }
-
-  replaceFilter(field: string, fieldValue: string) {
-    const i = this.filters.findIndex(f => f.field === field);
-
-    if (i === -1) {
-      // Filter has not been set yet. Add it.
-      this.filters.push({ field: field, value: [fieldValue] });
-    } else {
-      // Filter has already been set. Completely replace its value.
-      this.filters[i].value = [fieldValue];
-    }
+  getHitTypes(): HitType[] {
+      return HitType.all().filter(t => this.types.includes(t.name));
   }
 }
 
-export enum HitType {
-  LOCATION = 'location',
-  RESOURCE = 'resource',
-  STUDY = 'study',
-  EVENT = 'event'
-}
-
-export enum HitLabel {
-  LOCATION = 'Local Services',
-  RESOURCE = 'Online Information',
-  STUDY = 'Research Studies',
-  EVENT = 'Events and Training'
-}
 
 export class Hit extends GeoLocation {
   id: number;
   type: string;
+  ages: string[];
   label: string;
   title: string;
   content: string;
@@ -111,11 +74,6 @@ export class Hit extends GeoLocation {
   }
 }
 
-export interface Filter {
-  field: string;
-  value: string[];
-}
-
 export interface Sort {
   field: string;
   order?: string;
@@ -124,13 +82,4 @@ export interface Sort {
   longitude?: number;
 }
 
-export interface Facet {
-  field: string;
-  facetCounts: Array<FacetCount>;
-}
 
-export interface FacetCount {
-  category: string;
-  hit_count: number;
-  is_selected: boolean;
-}

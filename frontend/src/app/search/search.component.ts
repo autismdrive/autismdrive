@@ -3,7 +3,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Filter, Hit, HitLabel, HitType, Query, Sort} from '../_models/query';
+import {Hit, Query, Sort} from '../_models/query';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 import {scrollToTop} from '../../util/scrollToTop';
@@ -14,6 +14,8 @@ import {Category} from '../_models/category';
 import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
+import {Resource} from '../_models/resource';
+import {HitType} from '../_models/hit_type';
 
 interface SortMethod {
   name: string;
@@ -21,10 +23,6 @@ interface SortMethod {
   sortQuery: Sort;
 }
 
-interface ResourceType {
-  name: string;
-  label: string;
-}
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -57,25 +55,14 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
-
-        const types = this.selectedTypes();
-        if (types && (types.length === 1)) {
-          this.selectedResourceType = types[0];
-        }
-
-        this.displayFilters = this.query.filters.filter(f => f.field !== 'type');
-
         this.sortBy(this.sortMethods[0]);
       });
     });
   }
-  resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
-    return {name: HitType[t], label: HitLabel[t]};
-  });
-  selectedResourceType: ResourceType;
+
   query: Query;
+  resourceTypes = HitType.all_resources();
   loading = true;
-  displayFilters: Filter[];
   pageSize = 20;
   noLocation = true;
   storedZip: string;
@@ -174,6 +161,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   ];
   private _mobileQueryListener: () => void;
 
+
   private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};
 
@@ -183,9 +171,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       queryParams.words = undefined;
     }
 
-    for (const filter of query.filters) {
-      queryParams[filter.field] = filter.value;
-    }
+    queryParams.types = query.types;
+    queryParams.ages = query.ages;
 
     if (query.hasOwnProperty('category') && query.category) {
       queryParams.category = query.category.id;
@@ -194,28 +181,27 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private _queryParamsToQuery(qParams: Params): Query {
-    let words = '';
-    let cat = null;
-    const filters: Filter[] = [];
 
+    const query = new Query({});
+    query.size = this.pageSize;
     if (qParams && qParams.keys) {
       for (const key of qParams.keys) {
-        if (key === 'words') {
-          words = qParams.get(key);
-        } else if (key === 'category') {
-          cat = {'id' : qParams.get(key)};
-        } else {
-          filters.push({field: key, value: qParams.getAll(key)});
+        switch (key) {
+          case ('words'):
+            query.words = qParams.get(key);
+            break;
+          case ('category'):
+            query.category = {'id' : qParams.get(key)};
+            break;
+          case('ages'):
+            query.ages = qParams.getAll(key);
+            break;
+          case('types'):
+            query.types = qParams.getAll(key);
         }
       }
     }
-
-    return new Query({
-      words: words,
-      filters: filters,
-      size: this.pageSize,
-      category: cat
-    });
+    return query;
   }
 
   ngOnInit() {
@@ -337,33 +323,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.updateUrl(this.query);
   }
 
-  addFilter(field: string, fieldValue: string) {
-    this.query.addFilter(field, fieldValue);
-    this.query.start = 0;
-
-    if (this.paginatorElement) {
-      this.paginatorElement.firstPage();
-    }
-
-    this.updateUrl(this.query);
-  }
-
-  removeFilter(field: string, fieldValue: string) {
-    this.query.removeFilter(field, fieldValue);
-    this.query.start = 0;
-    this.updateUrl(this.query);
-  }
-
-  selectResourceType(keepType: string) {
-    this.resourceTypes.forEach(t => {
-      if (t.label === keepType) {
-        this.selectedResourceType = t;
-        this.query.addFilter('type', t.name);
-      } else {
-        this.query.removeFilter('type', t.name);
-      }
-    });
-
+  selectType(keepType: string) {
+    this.query.types = [keepType];
     this.query.category = null;
     this.query.start = 0;
     this.updateUrl(this.query);
@@ -418,48 +379,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.addMyLocationControl(map);
   }
 
-  selectedTypes(): ResourceType[] {
-    if (this.query) {
-      const typeFilter = this.query.filters.find(f => f.field === 'type');
-
-      if (typeFilter) {
-        return this.resourceTypes.filter(f => typeFilter.value.includes(f.label));
-      } else {
-        return this.resourceTypes;
-      }
-    }
-  }
-
-  isSelectedResourceType(rt: ResourceType): boolean {
-    const types = this.selectedTypes();
-
-    if (types) {
-      return !!types.find(t => t.label === rt.label);
-    }
-    return false;
-  }
-
-  hasFilters() {
-    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
-    const hasFilters = this.query && this.query.filters.some(f => {
-      if (f.field === 'type') {
-        return f.value.length === 1;
-      } else {
-        return f.value.length > 0;
-      }
-    });
-
-    return hasWords || hasFilters;
-  }
-
   showBreadcrumbs() {
-    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
-    const hasFilters = this.query && this.query.filters.some(f => {
-      return (f.field !== 'type') && (f.value.length > 0);
-    });
-    const hasCategory = this.query && this.query.category != null;
-
-    return hasWords || hasFilters || hasCategory;
+    if (!this.query) { return false; }
+    const hasWords = this.query.words && (this.query.words.length > 0);
+    return hasWords || this.query.types || this.query.ages || this.query.category;
   }
 
   getMapResults(): Hit[] {
