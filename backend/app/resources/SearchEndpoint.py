@@ -22,7 +22,7 @@ class SearchEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         try:
             # Overwrite the result types if requested.
-            if result_types:
+            if not search.types and result_types:
                 search.types = result_types
             results = elastic_index.search(search)
         except elasticsearch.ElasticsearchException as e:

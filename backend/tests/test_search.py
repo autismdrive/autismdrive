@@ -57,8 +57,11 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(basic_query)
         self.assertEqual(2, len(search_results['hits']))
 
-        self.assertEqual(1, search_results['aggregations']["types"]["location"]['hit_count'])
-        self.assertEqual(1, search_results['aggregations']["types"]["resource"]['hit_count'])
+        locations = next(x for x in search_results['type_counts'] if x['value'] == "location")
+        resources = next(x for x in search_results['type_counts'] if x['value'] == "resource")
+        self.assertEqual(1, locations["count"])
+        self.assertEqual(1, resources["count"])
+
 
 
     def test_search_has_counts_by_age_range(self):
@@ -76,8 +79,11 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(basic_query)
         self.assertEqual(2, len(search_results['hits']))
 
-        self.assertEqual(1, search_results['aggregations']["ages"]["young folks"]['hit_count'])
-        self.assertEqual(1, search_results['aggregations']["ages"]["old folks"]['hit_count'])
+        young_folks = next(x for x in search_results['age_counts'] if x['value'] == "young folks")
+        old_folks = next(x for x in search_results['age_counts'] if x['value'] == "old folks")
+
+        self.assertEqual(1, young_folks["count"])
+        self.assertEqual(1, old_folks["count"])
 
     def test_search_by_age_range_restricted_works_but_does_not_effect_age_aggregations(self):
         # For the Ages, we want to know the total counts regardless of what is selected.
@@ -93,8 +99,11 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(basic_query)
         self.assertEqual(1, len(search_results['hits']))
 
-        self.assertEqual(1, search_results['aggregations']["ages"]["young folks"]['hit_count'])
-        self.assertEqual(1, search_results['aggregations']["ages"]["old folks"]['hit_count'])
+        young_folks = next(x for x in search_results['age_counts'] if x['value'] == "young folks")
+        old_folks = next(x for x in search_results['age_counts'] if x['value'] == "old folks")
+
+        self.assertEqual(1, young_folks["count"])
+        self.assertEqual(1, old_folks["count"])
 
     def test_study_search_basics(self):
         umbrella_query = {'words': 'umbrellas'}
@@ -269,11 +278,13 @@ class TestSearch(BaseTest, unittest.TestCase):
             self.assertNotIn(hit['type'], not_expected_types)
 
         for expected in expected_types:
-            self.assertTrue( search_results['aggregations']["types"][expected]["hit_count"] > 0)
+            value = next(x for x in search_results['type_counts'] if x['value'] == expected)
+            self.assertTrue(value['count'] > 0)
 
         for expected in not_expected_types:
-            if expected in search_results['aggregations']["types"]:
-                self.assertEqual(1, search_results['aggregations']["types"][expected]['hit_count'])
+            for value in search_results['type_counts']:
+                if value['value'] == expected:
+                    self.assertTrue(value['count'] == 0)
 
     def setup_category_aggregations(self):
         # There are two types of people in this world.

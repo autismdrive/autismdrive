@@ -1,41 +1,35 @@
 class Search:
-    words = ""
-    total = 0
-    hits = []
-    start = 0
-    size = 0
-    sort = None
-    types = []  # list of types to include in search
-    ages = []  # list of age ranges to include in the search
-    aggregations = {}
-
-    category = None
 
     def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None):
         self.words = words
+        self.total = 0
+        self.hits = []
         self.types = types
         self.ages = ages
         self.start = start
         self.size = size
         self.sort = sort
         self.category = category;
+        self.type_counts = [];
+        self.age_counts = [];
 
     def add_aggregation(self, field, value, count, is_selected):
-        if field not in self.aggregations:
-            self.aggregations[field] = {}
-            self.aggregations[field][value] = {}
-        elif value not in self.aggregations[field]:
-            self.aggregations[field][value] = {}
-        self.aggregations[field][value]={"hit_count": count, "is_selected": is_selected};
+        if field == 'ages':
+            self.age_counts.append(AggCount(value, count, is_selected))
+        if field == 'types':
+            self.type_counts.append(AggCount(value, count, is_selected))
 
+class AggCount:
+    value = ""
+    count = 0
+    is_selected = False
+
+    def __init__(self, value, count, is_selected):
+        self.value = value
+        self.count = count
+        self.is_selected = is_selected
 
 class Sort:
-    field = ""
-    latitude = None
-    longitude = None
-    order = "desc"
-    unit = "mi"
-
     def __init__(self, field, latitude, longitude, order, unit):
         self.field = field
         self.latitude = latitude

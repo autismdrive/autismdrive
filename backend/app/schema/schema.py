@@ -562,11 +562,10 @@ class SearchSchema(ma.Schema):
         def make_sort(self, data):
             return Sort(**data)
 
-    class AggSchema(ma.Schema):
-        class AggCountSchema(ma.Schema):
-            hit_count = fields.Integer()
-            is_selected = fields.Boolean()
-        values = fields.Dict(keys=fields.Str(), values=ma.Nested(AggCountSchema), dump_only=True)
+    class AggCountSchema(ma.Schema):
+        value = fields.String()
+        count = fields.Integer()
+        is_selected = fields.Boolean()
 
     words = fields.Str()
     start = fields.Integer()
@@ -574,7 +573,8 @@ class SearchSchema(ma.Schema):
     sort = ma.Nested(SortSchema, allow_none=True, default=None)
     types = fields.List(fields.Str())
     ages = fields.List(fields.Str())
-    aggregations = fields.Dict(keys=fields.Str(), values=ma.Nested(AggSchema), dump_only=True)
+    age_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
+    type_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)
     category = ma.Nested(CategoryInSearchSchema)
