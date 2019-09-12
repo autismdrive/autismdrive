@@ -104,6 +104,7 @@ class DemographicsQuestionnaire(db.Model):
             "display_order": 3.1,
             "type": "multicheckbox",
             "template_options": {
+                "label": "Race/Ethnicity",
                 "type": "array",
                 "required": True,
                 "options": [
@@ -118,6 +119,7 @@ class DemographicsQuestionnaire(db.Model):
                 ],
                 "description": "(select all that apply)"
             },
+            "validators": {"required": "multicheckbox"},
         },
     )
     race_ethnicity_other = db.Column(

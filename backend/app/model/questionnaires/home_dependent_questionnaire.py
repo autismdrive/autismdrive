@@ -21,7 +21,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "template_options": {
                 "type": "array",
                 "required": True,
-                "label": "",
+                "label": "Current Living Situation",
                 "options": [
                     {"value": "fullTimeGuardian", "label": "With me full-time"},
                     {"value": "partTimeGuardian", "label": "With me part time"},
@@ -31,6 +31,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     {"value": "livingOther", "label": "Other (please explain)"},
                 ],
             },
+            "validators": {"required": "multicheckbox"},
         },
     )
     dependent_living_other = db.Column(

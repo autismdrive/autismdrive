@@ -19,6 +19,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "type": "multicheckbox",
             "template_options": {
                 "type": "array",
+                "label": "Current Living Situation",
                 "required": True,
                 "description": "(select all that apply)",
                 "options": [
@@ -29,6 +30,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     {"value": "caregiver", "label": "With a paid caregiver"},
                     {"value": "livingOther", "label": "Other"},
                 ],
+                "validators": {"required": "multicheckbox"},
             },
         },
     )

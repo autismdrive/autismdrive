@@ -70,6 +70,7 @@ class CurrentBehaviorsMixin(object):
                     "template_options.description": cls.academic_difficulty_areas_desc,
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
+                "validators": {"required": "multicheckbox"},
             },
         )
 
