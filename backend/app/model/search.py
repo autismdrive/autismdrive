@@ -1,53 +1,32 @@
 class Search:
     words = ""
-    filters = []
     total = 0
     hits = []
-    facets = []
     start = 0
     size = 0
     sort = None
+    types = []  # list of types to include in search
+    ages = []  # list of age ranges to include in the search
+    aggregations = {}
+
     category = None
 
-    def __init__(self, words="", filters=[], start=0, size=10, sort=None, category=None):
+    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None):
         self.words = words
-        self.filters = filters
+        self.types = types
+        self.ages = ages
         self.start = start
         self.size = size
         self.sort = sort
         self.category = category;
 
-    def jsonFilters(self):
-        jfilter = {}
-        for f in self.filters:
-            jfilter[f.field] = f.value
-        return jfilter
-
-
-
-
-class Facet:
-    field = ""
-    facetCounts = []
-
-    def __init__(self, field):
-        self.field = field
-
-
-class FacetCount:
-    def __init__(self, category, hit_count, is_selected):
-        self.category = category
-        self.hit_count = hit_count
-        self.is_selected = is_selected
-
-
-class Filter:
-    field = ""
-    value = ""
-
-    def __init__(self, field, value):
-        self.field = field
-        self.value = value
+    def add_aggregation(self, field, value, count, is_selected):
+        if field not in self.aggregations:
+            self.aggregations[field] = {}
+            self.aggregations[field][value] = {}
+        elif value not in self.aggregations[field]:
+            self.aggregations[field][value] = {}
+        self.aggregations[field][value]={"hit_count": count, "is_selected": is_selected};
 
 
 class Sort:

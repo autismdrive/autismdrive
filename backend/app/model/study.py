@@ -40,6 +40,7 @@ class Study(db.Model):
                                 db.ForeignKey('organization.id'))
     location = db.Column(db.String)
     status = db.Column(db.Enum(Status))
+    ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("StudyCategory", back_populates="study")
 
     def indexable_content(self):

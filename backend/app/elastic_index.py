@@ -30,11 +30,9 @@ class StarDocument(Document):
     organization = Keyword()
     website = Keyword()
     location = Keyword()
-    age_range = Keyword()
+    ages = Keyword(multi=True)
     status = Keyword()
-    topic = Keyword(multi=True)
     category = Keyword(multi=True)
-    child_category = Keyword(multi=True)
     latitude = Double()
     longitude = Double()
     geo_point = GeoPoint()
@@ -119,12 +117,9 @@ class ElasticIndex:
                            content=document.indexable_content(),
                            description=document.description,
                            location=None,
-                           age_range=None,
+                           ages=document.ages,
                            status=None,
-                           # Fixme:  I'd love to rename topic to category, and remove child_category
-                           topic=[],
                            category=[],
-                           child_category=[],
                            latitude=None,
                            longitude=None,
                            geo_point=None
@@ -141,25 +136,7 @@ class ElasticIndex:
             doc.organization = document.organization.name
 
         for cat in document.categories:
-            doc.topic.extend(cat.category.all_search_paths())
-            # Fixme:  I think we can drop all of this logic around parent category and cateogry fields
-            if cat.category.parent:
-                if cat.category.parent.name in ['Locations', 'Virginia', 'West Virginia']:
-                    doc.location = cat.category.name
-                    doc.child_category.append(cat.category.name)
-                elif cat.category.parent.name == 'Age Range':
-                    doc.age_range = cat.category.name
-                    doc.child_category.append(cat.category.name)
-                elif cat.category.parent.name == 'Type of Resources':
-                    doc.child_category.append(cat.category.name)
-                elif cat.category.parent.parent_id:
-                    doc.category.append(cat.category.parent.parent.name)
-                    doc.child_category.append(cat.category.name)
-                else:
-                    doc.category.append(cat.category.parent.name)
-                    doc.child_category.append(cat.category.name)
-            else:
-                doc.category.append(cat.category.name)
+            doc.category.extend(cat.category.all_search_paths())
 
         if (doc.type is 'location') and None not in (latitude, longitude):
             doc.latitude = latitude
@@ -188,35 +165,40 @@ class ElasticIndex:
         if not search.words:
             query = MatchAll()
         else:
-            query = MultiMatch(query=search.words, fields=['title^10', 'content^5', 'description^5', 'location^3', 'category^2', 'child_category^2',
-                      'organization', 'website'])
+            query = MultiMatch(query=search.words, fields=['title^10', 'content^5', 'description^5', 'location^3',
+                                                           'category^2', 'organization', 'website'])
 
         elastic_search = Search(index=self.index_name)\
             .doc_type(StarDocument)\
             .query(query)\
             .highlight('content', fragment_size=50)
 
-        for f in search.filters:
-            elastic_search = elastic_search.filter('terms', **{f.field: f.value})
+        # Filter results for typ and ages
+        if search.types:
+            elastic_search = elastic_search.filter('terms', **{"type": search.types})
+        if search.ages:
+            elastic_search = elastic_search.post_filter('terms', **{"ages": search.ages})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
 
         if search.category and search.category.id:
-            elastic_search = elastic_search.post_filter('terms', topic=[str(search.category.search_path())])
+            elastic_search = elastic_search.post_filter('terms', category=[str(search.category.search_path())])
             if search.category.calculate_level() == 0:
                 exclude = ".*\\,.*\\,.*";
                 include = str(search.category.id) + "\\,.*"
-                aggregation = A("terms", field='topic', exclude=exclude, include=include)
+                aggregation = A("terms", field='category', exclude=exclude, include=include)
             elif search.category.calculate_level() == 1:
                 include = ".*\\,.*\\,.*";
-                aggregation = A("terms", field='topic', include=include)
+                aggregation = A("terms", field='category', include=include)
             else:
-                aggregation = A("terms", field='topic')
+                aggregation = A("terms", field='category')
         else:
-            aggregation = A("terms", field='topic', exclude=".*\\,.*")
+            aggregation = A("terms", field='category', exclude=".*\\,.*")
 
         elastic_search.aggs.bucket('terms', aggregation)
+        elastic_search.aggs.bucket('type', A("terms", field='type'))
+        elastic_search.aggs.bucket('ages', A("terms", field='ages'))
 
         # KEEPING FOR NOW - THESE WERE THE ORIGINAL FACETS WE HAD SET UP.  WILL NEED TO CONVERT TO AGGREGATIONS
         # IF WE WANT TO KEEP ANY OF THESE.

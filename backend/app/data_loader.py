@@ -44,8 +44,8 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                parent = self.get_category_by_name(row[1].strip()) if row[1] else None
-                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent)
+                parent = self.get_category_by_name(row[1].strip(), create_missing=True) if row[1] else None
+                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent, create_missing=True)
                 db.session.add(category)
             print("Categories loaded.  There are now %i categories in the database." % db.session.query(
                 Category).count())
@@ -104,7 +104,7 @@ class DataLoader:
                 db.session.commit()
                 self.__increment_id_sequence(Resource)
 
-                for i in range(18, len(row)):
+                for i in range(18, 27):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
@@ -112,6 +112,10 @@ class DataLoader:
 
                         location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
                         db.session.add(location_category)
+
+                for i in range(28, len(row)):
+                    if row[i]:
+                        location.ages.append(row[i])
             print("Locations loaded.  There are now %i locations in the database." % db.session.query(
                 Location).filter(Location.type == 'location').count())
             print("There are now %i links between locations and categories in the database." %
@@ -130,7 +134,7 @@ class DataLoader:
                 db.session.commit()
                 self.__increment_id_sequence(Resource)
 
-                for i in range(7, len(row)):
+                for i in range(7, 14):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         resource_id = resource.id
@@ -138,6 +142,10 @@ class DataLoader:
 
                         resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
                         db.session.add(resource_category)
+
+                for i in range(15, len(row)):
+                    if row[i]:
+                        resource.ages.append(row[i])
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
                 Resource).filter(Resource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
@@ -165,7 +173,7 @@ class DataLoader:
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(23, len(row)):
+                for i in range(23, 30):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
@@ -173,6 +181,11 @@ class DataLoader:
 
                         study_category = StudyCategory(study_id=study_id, category_id=category_id)
                         db.session.add(study_category)
+
+                for i in range(30, len(row)):
+                    if row[i]:
+                        study.ages.append(row[i])
+
                 for i in [10, 14, 18]:
                     if row[i]:
                         investigator = db.session.query(Investigator).filter(Investigator.name == row[i]).first()
@@ -237,12 +250,15 @@ class DataLoader:
             db.session.commit()
         return organization
 
-    def get_category_by_name(self, category_name, parent=None):
+    def get_category_by_name(self, category_name, parent=None, create_missing=False):
         category = db.session.query(Category).filter(Category.name == category_name).first()
         if category is None:
-            category = Category(name=category_name, parent=parent)
-            db.session.add(category)
-            db.session.commit()
+            if create_missing:
+                category = Category(name=category_name, parent=parent)
+                db.session.add(category)
+                db.session.commit()
+            else:
+                raise(Exception("This category is not defined: " + category_name))
         return category
 
     def get_geocode(self, address_dict, lat_long_dict):

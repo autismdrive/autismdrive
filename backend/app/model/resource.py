@@ -20,6 +20,7 @@ class Resource(db.Model):
                                db.ForeignKey('organization.id'))
     phone = db.Column(db.String)
     website = db.Column(db.String)
+    ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
 
     __mapper_args__ = {

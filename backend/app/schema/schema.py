@@ -14,7 +14,7 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
-from app.model.search import Filter, Search, Sort
+from app.model.search import Search, Sort
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
@@ -151,7 +151,7 @@ class ParentCategorySchema(ModelSchema):
 
 
 class ChildCategoryInSearchSchema(ModelSchema):
-    """Provides a view of the parent category, all the way to the top, but ignores children"""
+    """Children within a category have hit counts when returned as a part of a search."""
     class Meta:
         model = Category
         fields = ('id', 'name', '_links', 'hit_count')
@@ -160,8 +160,9 @@ class ChildCategoryInSearchSchema(ModelSchema):
         'collection': ma.URLFor('api.categorylistendpoint')
     })
 
+
 class CategoryInSearchSchema(ModelSchema):
-    """Provides detailed information about a category, including all the children"""
+    """streamlined category representation for inclusion in search results to provide faceted search"""
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level')
@@ -561,32 +562,21 @@ class SearchSchema(ma.Schema):
         def make_sort(self, data):
             return Sort(**data)
 
-    class FilterSchema(ma.Schema):
-        field = fields.Str()
-        value = fields.Raw()
-
-        @post_load
-        def make_filter(self, data):
-            return Filter(**data)
-
-    class FacetSchema(ma.Schema):
-
-        class FacetCountSchema(ma.Schema):
-            category = fields.Str()
+    class AggSchema(ma.Schema):
+        class AggCountSchema(ma.Schema):
             hit_count = fields.Integer()
             is_selected = fields.Boolean()
-
-        field = fields.Str()
-        facetCounts = ma.List(ma.Nested(FacetCountSchema))
+        values = fields.Dict(keys=fields.Str(), values=ma.Nested(AggCountSchema), dump_only=True)
 
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
     sort = ma.Nested(SortSchema, allow_none=True, default=None)
-    filters = ma.List(ma.Nested(FilterSchema))
+    types = fields.List(fields.Str())
+    ages = fields.List(fields.Str())
+    aggregations = fields.Dict(keys=fields.Str(), values=ma.Nested(AggSchema), dump_only=True)
     total = fields.Integer(dump_only=True)
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)
-    facets = ma.List(ma.Nested(FacetSchema), dump_only=True)
     category = ma.Nested(CategoryInSearchSchema)
     ordered = True
 

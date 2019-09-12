@@ -1,8 +1,8 @@
 Flask==0.12.4
 Flask-RESTful==0.3.6
-marshmallow==2.15.1
-Flask-Marshmallow==0.7.0
-marshmallow_sqlalchemy==0.13.2
+marshmallow==3.0.3
+Flask-Marshmallow==0.10.1
+marshmallow_sqlalchemy==0.19
 Flask-Migrate==2.1.1
 psycopg2-binary==2.7.5
 flask-bcrypt==0.7.1

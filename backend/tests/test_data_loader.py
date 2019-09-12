@@ -8,7 +8,7 @@ from app.model.location import Location
 from app.model.participant import Participant
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
-from app.model.search import Search, Filter
+from app.model.search import Search
 from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.user import User
@@ -50,15 +50,19 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(Category, 'load_categories')
 
     def test_load_events(self):
+        self.test_load_categories()
         self._load_and_assert_success(Event, 'load_events', ResourceCategory, 'event')
 
     def test_load_locations(self):
+        self.test_load_categories()
         self._load_and_assert_success(Location, 'load_locations', ResourceCategory, 'location')
 
     def test_load_resources(self):
+        self.test_load_categories()
         self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
 
     def test_load_studies(self):
+        self.test_load_categories()
         self._load_and_assert_success(Study, 'load_studies', StudyCategory)
 
     def test_load_users(self):
@@ -82,7 +86,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
     def test_get_category_by_name(self):
         expected_name = 'Schools of Witchcraft and Wizardry'
         loader = data_loader.DataLoader()
-        cat = loader.get_category_by_name(expected_name)
+        cat = loader.get_category_by_name(expected_name, create_missing=True)
         self.assertIsNotNone(cat)
         self.assertEqual(cat.name, expected_name)
 
@@ -90,6 +94,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         elastic_index.clear()
 
         # Populate the database
+        self._load_and_assert_success(Category, 'load_categories')
         self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
         self._load_and_assert_success(Event, 'load_events', ResourceCategory, 'event')
         self._load_and_assert_success(Location, 'load_locations', ResourceCategory, 'location')
@@ -105,13 +110,17 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         num_db_studies = db.session.query(Study).count()
 
         # Get the number of items in the search index
-        es_resources = elastic_index.search(Search(filters=[Filter('type', [Resource.__tablename__])]))
-        es_events = elastic_index.search(Search(filters=[Filter('type', [Event.__tablename__])]))
-        es_locations = elastic_index.search(Search(filters=[Filter('type', [Location.__tablename__])]))
-        es_studies = elastic_index.search(Search(filters=[Filter('type', [Study.__tablename__])]))
+        es_resources = elastic_index.search(Search(types=[Resource.__tablename__]))
+        es_events = elastic_index.search(Search(types=[Event.__tablename__]))
+        es_locations = elastic_index.search(Search(types=[Location.__tablename__]))
+        es_studies = elastic_index.search(Search(types=[Study.__tablename__]))
 
         # Verify that the number of items in the database match the number of items in the search index
         self.assertEqual(num_db_resources, es_resources.hits.total)
         self.assertEqual(num_db_events, es_events.hits.total)
         self.assertEqual(num_db_locations, es_locations.hits.total)
         self.assertEqual(num_db_studies, es_studies.hits.total)
+
+        # Assure there are not age related categories.
+        self.assertEqual(0, db.session.query(Category).filter(Category.name == 'Age Range').count())
+        self.assertEqual(0, db.session.query(Category).filter(Category.name == 'Pre-K (0 - 5 years)').count())
