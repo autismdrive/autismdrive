@@ -23,38 +23,38 @@ export class AppPage {
   }
 
   waitForAngularEnabled(enabled: boolean) {
-    browser.waitForAngularEnabled(enabled);
+    return browser.waitForAngularEnabled(enabled);
   }
 
   waitForText(selector: string, text: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.textToBePresentInElement(e, text), 5000);
+    return browser.wait(ExpectedConditions.textToBePresentInElement(e, text), 5000);
   }
 
   waitForAnimations() {
-    browser.sleep(3000);
+    return browser.sleep(3000);
     // Might need to enable this if Webdriver gets disconnected from DOM
     // browser.waitForAngularEnabled(false);
   }
 
   waitForStale(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.stalenessOf(e), 5000);
+    return browser.wait(ExpectedConditions.stalenessOf(e), 5000);
   }
 
   waitForClickable(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.elementToBeClickable(e), 5000);
+    return browser.wait(ExpectedConditions.elementToBeClickable(e), 5000);
   }
 
   waitForNotVisible(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.invisibilityOf(e), 5000);
+    return browser.wait(ExpectedConditions.invisibilityOf(e), 5000);
   }
 
   waitForVisible(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.visibilityOf(e), 5000);
+    return browser.wait(ExpectedConditions.visibilityOf(e), 5000);
   }
 
   getLocalStorageVar(name: string) {
@@ -79,7 +79,7 @@ export class AppPage {
 
   clickElement(selector: string) {
     this.waitForClickable(selector);
-    this.getElement(selector).click();
+    return this.getElement(selector).click();
   }
 
   clickDropdownItem(label: string, nthItem: number) {
@@ -204,6 +204,7 @@ export class AppPage {
     elements.forEach(e => {
       e.getAttribute('id').then(id => {
         if (id) {
+          console.log('id:', id)
           this.scrollTo(`#${id}`);
         }
 
@@ -230,7 +231,7 @@ export class AppPage {
         } else if (/_radio_/.test(id)) {
           e.$(`#${id}_0`).click();
         } else if (/_checkbox_/.test(id)) {
-          e.click();
+          e.$(`#${id}_0`).click();
         } else if (/_select_/.test(id)) {
           e.click();
           const selector = '.mat-select-panel mat-option';
@@ -244,6 +245,14 @@ export class AppPage {
         }
       });
     });
+
+    const multicheckboxSelector = '.ng-invalid formly-field-mat-multicheckbox mat-checkbox:first-of-type';
+    const numCheckboxes = await this.getElements(multicheckboxSelector).count();
+    if (numCheckboxes > 0) {
+      this.getElements(`${multicheckboxSelector} .mat-checkbox-inner-container`).each(c => {
+        c.click();
+      });
+    }
 
     this.getElements('input[type="checkbox"][aria-invalid="true"]').click();
     this.getElements('input[type="text"][aria-invalid="true"]').sendKeys(this.getRandomString(8));

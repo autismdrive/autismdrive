@@ -16,7 +16,7 @@ describe('Participant (Guardian - Self)', () => {
   const email = 'aaron@sartography.com';
   const password = 'alouie3';
 
-  beforeAll(() => {
+  beforeAll(async () => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
@@ -24,12 +24,12 @@ describe('Participant (Guardian - Self)', () => {
     profileUseCases = new ProfileUseCases(page);
     enrollUseCases = new EnrollUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
-    page.waitForAngularEnabled(true);
-    page.navigateToHome();
+    await page.waitForAngularEnabled(true);
+    await page.navigateToHome();
   });
 
-  afterAll(() => {
-    page.waitForAngularEnabled(true);
+  afterAll(async () => {
+    await page.waitForAngularEnabled(true);
   });
 
   // Login & Register
@@ -79,7 +79,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should cancel editing enrollment info', () => enrollUseCases.cancelEditing());
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
   it('should display instructions for the entire flow', () => enrollUseCases.displayInstructions());
-  it('should fill out the required fields for all steps', () => enrollUseCases.completeAllSteps())
+  it('should fill out the required fields for all steps', () => enrollUseCases.completeAllSteps());
   it('should display progress on the Profile screen');
   it('should allow user to view/edit non-sensitive responses');
   it('should not allow user to view or edit sensitive responses');

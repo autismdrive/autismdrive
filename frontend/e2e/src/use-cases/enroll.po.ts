@@ -83,7 +83,7 @@ export class EnrollUseCases {
     await this.page.clickElement(btnSelector);
     await expect(this.page.getElements('.ng-invalid').count()).toBeGreaterThan(0);
     await this.page.fillOutInvalidFields();
-    await this.page.waitFor(10000);
+    await this.page.waitFor(1000);
     await expect(this.page.getElements('.ng-invalid').count()).toEqual(0);
     await expect(this.page.getElements(btnSelector).count()).toEqual(0);
   }
@@ -91,25 +91,31 @@ export class EnrollUseCases {
   async saveStep() {
     const selector = '.mat-list-item.step-link.active';
     const currentStepId = await this.page.getElement(selector).getAttribute('id');
-    this.page.clickElement('#save-next-button');
-    this.page.waitFor(1000);
-    this.page.waitForVisible('#save-next-button');
-    await expect(this.page.getElements(`#${currentStepId} .done`).count()).toEqual(1);
+    await this.page.clickElement('#save-next-button');
+    await this.page.waitFor(1000);
+    await this.page.waitForVisible('#save-next-button, app-flow-complete');
+    await expect(this.page.getElements(`#${currentStepId} .done .visible`).count()).toEqual(1);
   }
 
   async completeAllSteps() {
     const selector = '.mat-list-item.step-link';
     const numStepsTotal = await this.page.getElements(selector).count();
-    const numStepsComplete = await this.page.getElements(`${selector}.active`).count();
+    const numStepsComplete = await this.page.getElements(`${selector} .done .visible`).count();
     const numStepsToDo = numStepsTotal - numStepsComplete;
+
+    console.log('numStepsTotal', numStepsTotal);
+    console.log('numStepsComplete', numStepsComplete);
+    console.log('numStepsToDo', numStepsToDo);
 
     for (let i = 0; i < numStepsToDo; i++) {
       await this.fillOutRequiredFields();
-      this.page.waitFor(3000);
+      await this.page.waitFor(1000);
       await this.saveStep();
+      await this.page.waitFor(1000);
     }
 
-    const numDone = await this.page.getElements(`${selector} .done`).count();
+    const numDone = await this.page.getElements(`${selector} .done .visible`).count();
+    console.log('numDone', numDone);
     expect(numDone).toEqual(numStepsTotal);
   }
 }
