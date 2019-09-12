@@ -45,7 +45,7 @@
 
     &:before {
       border: 11px solid #dadada;
-      border-image: linear-gradient(to bottom, #dadada 0%, #f1f1ef 100%);
+      border-image: linear-gradient(to bottom, $brand-gray 0%, #f1f1ef 100%);
       border-image-slice: 1;
       opacity: 1;
     }

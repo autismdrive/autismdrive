@@ -25,3 +25,7 @@ h1 small {
   right: 0px;
   color: $brand-primary;
 }
+
+button.disabled {
+  background-color: $brand-gray;
+}
