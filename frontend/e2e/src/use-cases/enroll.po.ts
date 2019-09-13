@@ -78,13 +78,19 @@ export class EnrollUseCases {
 
   async fillOutRequiredFields() {
     const btnSelector = '#save-next-button.disabled';
-    await expect(this.page.getElements(btnSelector).count()).toEqual(1);
-    await expect(this.page.getElements('.mat-form-field-required-marker').count()).toBeGreaterThanOrEqual(1);
-    await this.page.clickElement(btnSelector);
-    await expect(this.page.getElements('.ng-invalid').count()).toBeGreaterThan(0);
-    await this.page.fillOutInvalidFields();
-    await this.page.waitFor(1000);
-    await expect(this.page.getElements('.ng-invalid').count()).toEqual(0);
+    const reqSelector = '.mat-form-field-required-marker';
+
+    const numRequired = await this.page.getElements(reqSelector).count();
+    if (numRequired === 0) {
+      await expect(this.page.getElements(btnSelector).count()).toEqual(0);
+    } else {
+      await expect(this.page.getElements(btnSelector).count()).toEqual(1);
+      await this.page.clickElement(btnSelector);
+      await expect(this.page.getElements('.ng-invalid').count()).toBeGreaterThan(0);
+      await this.page.fillOutInvalidFields();
+      await this.page.waitFor(500);
+    }
+
     await expect(this.page.getElements(btnSelector).count()).toEqual(0);
   }
 
@@ -92,7 +98,7 @@ export class EnrollUseCases {
     const selector = '.mat-list-item.step-link.active';
     const currentStepId = await this.page.getElement(selector).getAttribute('id');
     await this.page.clickElement('#save-next-button');
-    await this.page.waitFor(1000);
+    await this.page.waitFor(500);
     await this.page.waitForVisible('#save-next-button, app-flow-complete');
     await expect(this.page.getElements(`#${currentStepId} .done .visible`).count()).toEqual(1);
   }
@@ -103,19 +109,14 @@ export class EnrollUseCases {
     const numStepsComplete = await this.page.getElements(`${selector} .done .visible`).count();
     const numStepsToDo = numStepsTotal - numStepsComplete;
 
-    console.log('numStepsTotal', numStepsTotal);
-    console.log('numStepsComplete', numStepsComplete);
-    console.log('numStepsToDo', numStepsToDo);
-
     for (let i = 0; i < numStepsToDo; i++) {
       await this.fillOutRequiredFields();
-      await this.page.waitFor(1000);
+      await this.page.waitFor(500);
       await this.saveStep();
-      await this.page.waitFor(1000);
+      await this.page.waitFor(500);
     }
 
     const numDone = await this.page.getElements(`${selector} .done .visible`).count();
-    console.log('numDone', numDone);
     expect(numDone).toEqual(numStepsTotal);
   }
 }

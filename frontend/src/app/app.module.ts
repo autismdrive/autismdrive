@@ -144,10 +144,7 @@ export class FormlyConfig {
     wrappers: [
       {name: 'help', component: HelpWrapperComponent},
       {name: 'card', component: CardWrapperComponent},
-    ],
-    extras: {
-      checkExpressionOn: 'modelChange',
-    }
+    ]
   };
 }
 

@@ -3,7 +3,7 @@ import { GlobalHeaderUseCases } from './use-cases/global-header.po';
 import { LoginUseCases } from './use-cases/login.po';
 import { SearchUseCases } from './use-cases/search.po';
 
-xdescribe('Anonymous User', () => {
+describe('Anonymous User', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;

@@ -79,6 +79,8 @@ export class AppPage {
 
   clickElement(selector: string) {
     this.waitForClickable(selector);
+    this.scrollTo(selector);
+    this.focus(selector);
     return this.getElement(selector).click();
   }
 
@@ -201,10 +203,9 @@ export class AppPage {
 
   async fillOutInvalidFields() {
     const elements = await this.getElements('.ng-invalid');
-    elements.forEach(e => {
+    elements.forEach((e: ElementFinder) => {
       e.getAttribute('id').then(id => {
         if (id) {
-          console.log('id:', id)
           this.scrollTo(`#${id}`);
         }
 
@@ -218,8 +219,16 @@ export class AppPage {
           const zip = this.getRandomNumString(5);
           e.sendKeys(zip);
         } else if (/_input_/.test(id)) {
-          const str = this.getRandomString(16);
-          e.sendKeys(str);
+          e.getAttribute('type').then(eType => {
+            let str = '';
+
+            if (eType === 'number') {
+              str = this.getRandomNumString(2);
+            } else {
+              str = this.getRandomString(16);
+            }
+            e.sendKeys(str);
+          });
         } else if (/_datepicker_/.test(id)) {
           const date = this.getRandomDate(new Date(2000, 0, 1), new Date());
           const mm = date.getMonth() + 1;
