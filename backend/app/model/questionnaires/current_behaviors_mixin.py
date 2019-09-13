@@ -68,6 +68,7 @@ class CurrentBehaviorsMixin(object):
                 },
                 "expression_properties": {
                     "template_options.description": cls.academic_difficulty_areas_desc,
+                    "template_options.required": "model.has_academic_difficulties"
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
                 "validators": {"required": "multicheckbox"},
