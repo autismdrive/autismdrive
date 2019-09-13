@@ -40,18 +40,21 @@ class DataLoader:
         print("Data loader initialized")
 
     def load_categories(self):
+        items = []
         with open(self.category_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
                 parent = self.get_category_by_name(row[1].strip()) if row[1] else None
-                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent)
-                db.session.add(category)
-            print("Categories loaded.  There are now %i categories in the database." % db.session.query(
-                Category).count())
+                items.append(self.get_category_by_name(category_name=row[0].strip(), parent=parent))
+
+        db.session.bulk_save_objects(items)
         db.session.commit()
+        print("Categories loaded.  There are now %i categories in the database." % db.session.query(
+            Category).count())
 
     def load_events(self):
+        items = []
         with open(self.event_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -65,8 +68,7 @@ class DataLoader:
                               organization=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
                               street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
                               phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'])
-                db.session.add(event)
-                db.session.commit()
+                items.append(event)
                 self.__increment_id_sequence(Resource)
 
                 for i in range(17, len(row)):
@@ -74,16 +76,16 @@ class DataLoader:
                         category = self.get_category_by_name(row[i].strip())
                         event_id = event.id
                         category_id = category.id
+                        items.append(ResourceCategory(resource_id=event_id, category_id=category_id, type='event'))
 
-                        event_category = ResourceCategory(resource_id=event_id, category_id=category_id, type='event')
-                        db.session.add(event_category)
-            print("Events loaded.  There are now %i events in the database." % db.session.query(
-                Event).count())
-            print("There are now %i links between events and categories in the database." %
-                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event').count())
+        db.session.bulk_save_objects(items)
         db.session.commit()
+        print("Events loaded.  There are now %i events in the database." % db.session.query(Event).count())
+        print("There are now %i links between events and categories in the database." %
+              db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event').count())
 
     def load_locations(self):
+        items = []
         with open(self.location_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -100,8 +102,7 @@ class DataLoader:
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
                                     zip=row[11], website=row[13], phone=row[15], email=row[14],
                                     latitude=geocode['lat'], longitude=geocode['lng'])
-                db.session.add(location)
-                db.session.commit()
+                items.append(location)
                 self.__increment_id_sequence(Resource)
 
                 for i in range(18, len(row)):
@@ -109,25 +110,25 @@ class DataLoader:
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
                         category_id = category.id
+                        items.append(ResourceCategory(resource_id=location_id, category_id=category_id, type='location'))
 
-                        location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
-                        db.session.add(location_category)
-            print("Locations loaded.  There are now %i locations in the database." % db.session.query(
-                Location).filter(Location.type == 'location').count())
-            print("There are now %i links between locations and categories in the database." %
-                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'location').count())
+        db.session.bulk_save_objects(items)
         db.session.commit()
+        print("Locations loaded.  There are now %i locations in the database." % db.session.query(
+            Location).filter(Location.type == 'location').count())
+        print("There are now %i links between locations and categories in the database." %
+              db.session.query(ResourceCategory).filter(ResourceCategory.type == 'location').count())
 
     def load_resources(self):
+        items = []
         with open(self.resource_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
-                                        phone=row[6])
-                db.session.add(resource)
-                db.session.commit()
+                                    phone=row[6])
+                items.append(resource)
                 self.__increment_id_sequence(Resource)
 
                 for i in range(7, len(row)):
@@ -136,13 +137,14 @@ class DataLoader:
                         resource_id = resource.id
                         category_id = category.id
 
-                        resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
-                        db.session.add(resource_category)
-            print("Resources loaded.  There are now %i resources in the database." % db.session.query(
-                Resource).filter(Resource.type == 'resource').count())
-            print("There are now %i links between resources and categories in the database." %
-                  db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource').count())
+                        items.append(ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource'))
+
+        db.session.bulk_save_objects(items)
         db.session.commit()
+        print("Resources loaded.  There are now %i resources in the database." % db.session.query(
+            Resource).filter(Resource.type == 'resource').count())
+        print("There are now %i links between resources and categories in the database." %
+              db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource').count())
 
     def load_studies(self):
         with open(self.study_file, newline='') as csvfile:
@@ -217,14 +219,14 @@ class DataLoader:
         db.session.commit()
 
     def load_zip_codes(self):
-        zip_codes = []
+        items = []
         with open(self.zip_code_coords_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                zip_codes.append(ZipCode(id=row[0], latitude=row[1], longitude=row[2]))
+                items.append(ZipCode(id=row[0], latitude=row[1], longitude=row[2]))
 
-        db.session.bulk_save_objects(zip_codes)
+        db.session.bulk_save_objects(items)
         db.session.commit()
         print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(ZipCode).count())
 
@@ -269,6 +271,7 @@ class DataLoader:
                         loc = geocode_result[0]['geometry']['location']
                         lat = loc['lat']
                         lng = loc['lng']
+                        print(address_dict, loc)
 
         return {'lat': lat, 'lng': lng}
 
