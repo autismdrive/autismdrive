@@ -217,16 +217,16 @@ class DataLoader:
         db.session.commit()
 
     def load_zip_codes(self):
+        zip_codes = []
         with open(self.zip_code_coords_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                zip_code = ZipCode(zip_code=row[0], latitude=row[1], longitude=row[2])
-                db.session.add(zip_code)
-                self.__increment_id_sequence(ZipCode)
-            print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(
-                ZipCode).count())
+                zip_codes.append(ZipCode(id=row[0], latitude=row[1], longitude=row[2]))
+
+        db.session.bulk_save_objects(zip_codes)
         db.session.commit()
+        print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(ZipCode).count())
 
 
     def get_org_by_name(self, org_name):
