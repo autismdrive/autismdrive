@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
-import {FieldArrayType, FormlyFieldConfig, FormlyFormBuilder} from '@ngx-formly/core';
+import {FieldArrayType, FormlyFieldConfig} from '@ngx-formly/core';
 import {MatDialog} from '@angular/material/dialog';
 import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-section-dialog.component';
-import {clone, isNullOrUndefined} from "../../../util/clone";
 
 @Component({
   selector: 'app-repeat-section',

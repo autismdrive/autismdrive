@@ -1,7 +1,7 @@
 import {AfterContentInit, Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {RepeatSectionDialogData} from '../../_models/repeat_section_dialog_data';
-import {clone} from "../../../util/clone";
+import {clone} from '../../../util/clone';
 
 @Component({
   selector: 'app-repeat-section-dialog',
@@ -41,6 +41,15 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
 
     const isEmpty = Object.keys(this.data.model).length === 0 && this.data.model.constructor === Object;
     this.dialogRef.close(isEmpty ? undefined : this.data.model);
+  }
+
+  highlightRequiredFields() {
+    this.data.fields.forEach(f => {
+      f.formControl.updateValueAndValidity()
+      f.formControl.markAllAsTouched();
+    });
+
+    this.updateDisableSave();
   }
 
   onSubmit(): void {

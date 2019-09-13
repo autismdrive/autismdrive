@@ -6,19 +6,20 @@
     <formly-form
       [fields]="data.fields"
       [model]="data.model"
-      (click)="updateDisableSave()"
+      (change)="updateDisableSave()"
     ></formly-form>
   </div>
   <div mat-dialog-actions>
     <button
       mat-flat-button
       color="primary"
-      [disabled]="disableSave"
-      (click)="onSubmit()"
+      (click)="disableSave ? highlightRequiredFields() : onSubmit()"
+      [ngClass]="{'repeat-section-dialog-save': true, 'disabled': !noErrors()}"
     >Save</button>
     <button
       mat-button
       (click)="onNoClick()"
+      [ngClass]="{'repeat-section-dialog-cancel': true}"
     >Cancel</button>
   </div>
 </div>
