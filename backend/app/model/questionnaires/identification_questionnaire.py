@@ -52,7 +52,8 @@ class IdentificationQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter your relationship",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
         },

@@ -129,7 +129,8 @@ class EvaluationHistoryMixin(object):
             "type": "input",
             "template_options": {
                 "label": "First diagnosed by",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
         },
@@ -188,7 +189,8 @@ class EvaluationHistoryMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Where diagnosed?",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
         },

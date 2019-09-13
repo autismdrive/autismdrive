@@ -26,7 +26,8 @@ class Therapy(db.Model):
             "display_order": 1,
             "type": "select",
             "template_options": {
-                "required": False,
+                "label": "Select type",
+                "required": True,
                 "options": [
                     {
                         "value": "speechLanguage",
@@ -87,7 +88,7 @@ class Therapy(db.Model):
             "template_options": {
                 "label": "Enter therapy or service",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
             "hide_expression": '!(model.type && (model.type === "other"))',
         },
@@ -103,10 +104,7 @@ class Therapy(db.Model):
                 "options": [
                     {"value": "current", "label": "Currently receiving"},
                     {"value": "past", "label": "Received in the past"},
-                    {
-                        "value": "futureInterest",
-                        "label": "Interested in receiving",
-                    },
+                    {"value": "futureInterest", "label": "Interested in receiving"},
                 ],
             },
         },

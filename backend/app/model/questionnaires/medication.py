@@ -26,6 +26,7 @@ class Medication(db.Model):
             "display_order": 1,
             "type": "select",
             "template_options": {
+                "label": "Select symptom",
                 "required": True,
                 "options": [
                     {"value": "symptomAnxiety", "label": "Anxiety"},
@@ -45,7 +46,7 @@ class Medication(db.Model):
             "template_options": {
                 "label": "Enter symptom",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
             "hide_expression": '!(model.symptom && (model.symptom === "symptomOther"))',
         },

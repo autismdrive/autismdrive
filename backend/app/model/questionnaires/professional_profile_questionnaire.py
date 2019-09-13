@@ -99,7 +99,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Describe professional identity",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.professional_identity && model.professional_identity.includes("profOther"))',
         },
@@ -151,7 +152,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter other interests",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.learning_interests && model.learning_interests.includes("learnOther"))',
         },

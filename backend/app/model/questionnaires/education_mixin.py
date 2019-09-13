@@ -90,7 +90,8 @@ class EducationMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "Enter school placement",
-                    "appearance": "standard"
+                    "appearance": "standard",
+                    "required": True,
                 },
                 "hide_expression": cls.placement_other_hide_expression,
             },
@@ -105,7 +106,8 @@ class EducationMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "School grade level",
-                    "appearance": "standard"
+                    "appearance": "standard",
+                    "required": True,
                 },
                 "hide_expression": cls.current_grade_hide_expression,
             },
@@ -151,7 +153,8 @@ class EducationMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Describe additional services",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.school_services && model.school_services.includes("servicesOther"))',
         },

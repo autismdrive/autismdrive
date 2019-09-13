@@ -79,7 +79,8 @@ class Housemate(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Please enter their relationship",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.relationship && (model.relationship === "relationOther"))',
         },

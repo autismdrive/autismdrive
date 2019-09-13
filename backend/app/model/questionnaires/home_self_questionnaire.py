@@ -41,7 +41,8 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "type": "input",
             "template_options": {
                 "label": "Describe your current living situation",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))',
         },

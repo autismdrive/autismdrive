@@ -82,7 +82,8 @@ class CurrentBehaviorsMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Enter area of academic difficulty",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True
             },
             "hide_expression": '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))',
         },

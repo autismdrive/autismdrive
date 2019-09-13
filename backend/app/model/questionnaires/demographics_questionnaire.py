@@ -93,7 +93,8 @@ class DemographicsQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter gender identity",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.gender_identity && (model.gender_identity === "genderOther"))',
         },
@@ -129,7 +130,8 @@ class DemographicsQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter race/ethnicity",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))',
         },

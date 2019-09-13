@@ -26,7 +26,7 @@ class AlternativeAugmentative(db.Model):
             "display_order": 1.1,
             "type": "select",
             "template_options": {
-                "required": False,
+                "required": True,
                 "label": "Select device",
                 "options": [
                     {
@@ -57,7 +57,7 @@ class AlternativeAugmentative(db.Model):
             "template_options": {
                 "label": "Enter alternative and augmentative communication system",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
             "hide_expression": '!(model.type && (model.type === "other"))',
         },

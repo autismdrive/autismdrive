@@ -54,7 +54,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter developmental condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
 
             "hide_expression": '!(model.developmental && model.developmental.includes("developmentalOther"))',
@@ -91,7 +92,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter mental health condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.mental_health && model.mental_health.includes("mentalHealthOther"))',
         },
@@ -124,7 +126,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter medical condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.medical && model.medical.includes("medicalOther"))',
         },
@@ -158,7 +161,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter genetic condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.genetic && model.genetic.includes("geneticOther"))',
         },

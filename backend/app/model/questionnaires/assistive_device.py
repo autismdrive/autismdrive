@@ -27,7 +27,7 @@ class AssistiveDevice(db.Model):
             "display_order": 1.1,
             "type": "select",
             "template_options": {
-                "required": False,
+                "required": True,
                 "label": "Select category of device",
                 "options": [
                     {
@@ -60,7 +60,7 @@ class AssistiveDevice(db.Model):
             "display_order": 1.2,
             "type": "select",
             "template_options": {
-                "required": False,
+                "required": True,
                 "label": "Select device",
                 "all_options": [
                     {
@@ -174,7 +174,7 @@ class AssistiveDevice(db.Model):
             "template_options": {
                 "label": "Enter assistive device",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
             "hide_expression": '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))',
         },

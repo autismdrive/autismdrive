@@ -41,7 +41,8 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "type": "input",
             "template_options": {
                 "label": "",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
             "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
             "expression_properties": {
