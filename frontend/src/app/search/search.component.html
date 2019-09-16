@@ -132,11 +132,17 @@
                 (click)="removeCategory()"
                 class="applied-filter applied-filter-topic"
               >
-                <span class="applied-filter-label">
-                  <span *ngIf="query.category.parent && query.category.parent.parent">{{query.category.parent.parent.name}} > </span>
-                  <span *ngIf="query.category.parent">{{query.category.parent.name}} > </span>
+                <div class="applied-filter-label" fxLayout="row" fxLayoutAlign="center center">
+                  <ng-container *ngIf="query.category.parent && query.category.parent.parent">
+                    {{query.category.parent.parent.name}}
+                    <mat-icon>chevron_right</mat-icon>
+                  </ng-container>
+                  <ng-container *ngIf="query.category.parent">
+                    {{query.category.parent.name}}
+                    <mat-icon>chevron_right</mat-icon>
+                  </ng-container>
                   {{query.category.name}}
-                </span>
+                </div>
                 <mat-icon>close</mat-icon>
               </mat-chip>
             </ng-container>
