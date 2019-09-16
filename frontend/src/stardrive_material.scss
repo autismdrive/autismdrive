@@ -201,12 +201,23 @@
   .hero-slide {
     background-size: cover;
 
+    &.top-left { background-position: top left; }
+    &.top-center { background-position: top center; }
+    &.top-right { background-position: top right; }
+    &.center-left { background-position: center left; }
+    &.center-center { background-position: center center; }
+    &.center-right { background-position: center right; }
+    &.bottom-left { background-position: bottom left; }
+    &.bottom-center { background-position: bottom center; }
+    &.bottom-right { background-position: bottom right; }
+
     .hero-content {
       max-width: 320px;
       @media (min-width: 576px) { max-width: 476px; }
       @media (min-width: 768px) { max-width: 668px; }
       @media (min-width: 992px) { max-width: 892px; }
       @media (min-width: 1200px) { max-width: 1100px; }
+      @media (min-width: 1316px) { max-width: 1216px; }
 
       & > h1, & > p {
         color: white;

@@ -58,16 +58,6 @@ $dot_size: 8px;
   transition: opacity 1s ease-in-out;
   cursor: pointer;
 
-  &.top-left { background-position: top left; }
-  &.top-center { background-position: top center; }
-  &.top-right { background-position: top right; }
-  &.center-left { background-position: center left; }
-  &.center-center { background-position: center center; }
-  &.center-right { background-position: center right; }
-  &.bottom-left { background-position: bottom left; }
-  &.bottom-center { background-position: bottom center; }
-  &.bottom-right { background-position: bottom right; }
-
   &.active { opacity: 1; z-index: 1; }
   &.prev { opacity: 0; z-index: 0; }
   &.next { opacity: 0; z-index: 0; }
