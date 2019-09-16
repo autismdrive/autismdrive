@@ -196,9 +196,10 @@
             *ngIf="!loading"
           >
             <div *ngIf="query.hits.length === 0">
-              <h2>No Results Found.</h2>
+              <h2>No results currently available.</h2>
               <p>We could not find any results for your search.  Please try removing some of the conditions
               by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
+              <h3>Check back soon for more updates!</h3>
             </div>
             <app-search-result
               *ngFor="let hit of query.hits"
