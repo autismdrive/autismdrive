@@ -5,7 +5,7 @@ import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
 
-from elasticsearch_dsl.query import MultiMatch, MatchAll
+from elasticsearch_dsl.query import MultiMatch, MatchAll, Query, MoreLikeThis
 
 autocomplete = analyzer('autocomplete',
                         tokenizer=tokenizer('ngram', 'edge_ngram', min_gram=2, max_gram=15,
@@ -173,6 +173,8 @@ class ElasticIndex:
             .query(query)\
             .highlight('content', fragment_size=50)
 
+        elastic_search = elastic_search[search.start:search.start + search.size]
+
         # Filter results for typ and ages
         if search.types:
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
@@ -209,5 +211,25 @@ class ElasticIndex:
         # 'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
         # 'Status': elasticsearch_dsl.TermsFacet(field='status'),
         # 'Topic': elasticsearch_dsl.TermsFacet(field='topic'),
+
+        return elastic_search.execute()
+
+    # Finds all resources related to the resource with the given id.
+    def more_like_this(self, resource, max_hits=3):
+
+        query = MoreLikeThis(like={'_id': ElasticIndex._get_id(resource),
+                                   '_index': self.index_name},
+                             min_term_freq=1,
+                             min_doc_freq=3,
+                             max_query_terms=12,
+                             fields=['title', 'content', 'description', 'location',
+                                     'category', 'organization', 'website'])
+
+        elastic_search = Search(index=self.index_name)\
+            .doc_type(StarDocument)\
+            .query(query)
+
+        elastic_search = elastic_search[0:max_hits]
+
 
         return elastic_search.execute()

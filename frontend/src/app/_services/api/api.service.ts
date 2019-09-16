@@ -68,6 +68,7 @@ export class ApiService {
     resource: '/api/resource/<id>',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
+    relatedresources: '/api/resource/<id>/related',
     resourcecategorylist: '/api/resource_category',
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
@@ -273,6 +274,13 @@ export class ApiService {
     return this.httpClient.get<Resource[]>(this._endpointUrl('resourcelist'))
       .pipe(catchError(this._handleError));
   }
+
+  /** Get Resources related to the given resource */
+  getRelatedResources(id: number): Observable<Resource[]> {
+    return this.httpClient.get<Resource[]>(this._endpointUrl('relatedresources').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
 
   /** getResourceCategories */
   getResourceCategories(resource: Resource): Observable<ResourceCategory[]> {

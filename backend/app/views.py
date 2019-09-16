@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, url_for
 from flask_restful import reqparse
 
 from app import app
+from app.resources.RelatedResourcesEndpoint import RelatedResourcesEndpoint
 from app.resources.StatusEndpoint import StatusEndpoint
 from app.resources.Auth import auth_blueprint
 from app.resources.EmailLogEndpoint import EmailLogListEndpoint
@@ -171,6 +172,8 @@ endpoints = [
     (CategoryByResourceEndpoint, "/resource/<resource_id>/category"),
     (ResourceCategoryListEndpoint, "/resource_category"),
     (ResourceCategoryEndpoint, "/resource_category/<id>"),
+    (RelatedResourcesEndpoint, "/resource/<id>/related"),
+
     # Studies
     (StudyListEndpoint, "/study"),
     (StudyEndpoint, "/study/<id>"),
