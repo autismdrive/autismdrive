@@ -5,10 +5,9 @@ import {
   ElementArrayFinder,
   ElementFinder,
   ExpectedConditions,
-  Key,
-  WebDriver
 } from 'protractor';
 import { protractor } from 'protractor/built/ptor';
+
 
 export class AppPage {
 
@@ -17,42 +16,44 @@ export class AppPage {
   }
 
   waitFor(t: number) {
-    browser.sleep(t);
-    browser.waitForAngularEnabled(false);
+    return browser.sleep(t);
+    // Might need to enable this if Webdriver gets disconnected from DOM
+    // browser.waitForAngularEnabled(false);
   }
 
   waitForAngularEnabled(enabled: boolean) {
-    browser.waitForAngularEnabled(enabled);
+    return browser.waitForAngularEnabled(enabled);
   }
 
   waitForText(selector: string, text: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.textToBePresentInElement(e, text), 5000);
+    return browser.wait(ExpectedConditions.textToBePresentInElement(e, text), 5000);
   }
 
   waitForAnimations() {
-    browser.sleep(3000);
-    browser.waitForAngularEnabled(false);
+    return browser.sleep(3000);
+    // Might need to enable this if Webdriver gets disconnected from DOM
+    // browser.waitForAngularEnabled(false);
   }
 
   waitForStale(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.stalenessOf(e), 5000);
+    return browser.wait(ExpectedConditions.stalenessOf(e), 5000);
   }
 
   waitForClickable(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.elementToBeClickable(e), 5000);
+    return browser.wait(ExpectedConditions.elementToBeClickable(e), 5000);
   }
 
   waitForNotVisible(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.invisibilityOf(e), 5000);
+    return browser.wait(ExpectedConditions.invisibilityOf(e), 5000);
   }
 
   waitForVisible(selector: string) {
     const e = this.getElement(selector);
-    browser.wait(ExpectedConditions.visibilityOf(e), 5000);
+    return browser.wait(ExpectedConditions.visibilityOf(e), 5000);
   }
 
   getLocalStorageVar(name: string) {
@@ -77,11 +78,12 @@ export class AppPage {
 
   clickElement(selector: string) {
     this.waitForClickable(selector);
-    this.getElement(selector).click();
+    this.scrollTo(selector);
+    this.focus(selector);
+    return this.getElement(selector).click();
   }
 
-  clickDropdownItem(label: string, nthItem: number) {
-    const dropdownSelector = `[aria-label="${label}"]`;
+  clickDropdownItem(dropdownSelector: string, nthItem: number) {
     const optionSelector = `mat-option:nth-of-type(${nthItem})`;
     this.waitForVisible(dropdownSelector);
     this.clickElement(dropdownSelector);
@@ -121,6 +123,12 @@ export class AppPage {
 
   pressKey(keyCode: string) {
     browser.actions().sendKeys(protractor.Key[keyCode]).perform();
+  }
+
+  focus(selector: string) {
+    return browser.controlFlow().execute(() => {
+      return browser.executeScript('arguments[0].focus()', this.getElement(selector).getWebElement());
+    });
   }
 
   inputText(selector: string, textToEnter: string, clearFirst?: boolean) {
@@ -164,7 +172,7 @@ export class AppPage {
   }
 
   getRandomNumString(length: number) {
-    const s = '0123456789';
+    const s = '123456789';
     return Array(length).join().split(',').map(() => s.charAt(Math.floor(Math.random() * s.length))).join('');
   }
 
@@ -173,13 +181,13 @@ export class AppPage {
   }
 
   scrollTo(selector: string) {
-    this.getElement(selector).then(el => {
-      el.scrollIntoView(false);
+    browser.controlFlow().execute(() => {
+      browser.executeScript('arguments[0].scrollIntoView(false)', this.getElement(selector).getWebElement());
     });
   }
 
   tabThroughAllFields() {
-    this.getElement('formly-form').click();
+    this.focus('formly-form');
 
     const selector = '' +
       'formly-field [id*="_input_"],' +
@@ -188,14 +196,17 @@ export class AppPage {
       'formly-field [id*="_checkbox_"],' +
       'formly-field [id*="_select_"]';
 
-    this.getElements(selector).each(async (ff) => {
-      browser.actions().sendKeys(Key.TAB).perform();
-    });
+    this.getElements(selector).each(_ => this.pressKey('TAB'));
   }
 
-  fillOutInvalidFields() {
-    this.getElements('.ng-invalid').each(e => {
-      e.getAttribute('id').then(id => {
+  async fillOutFields(selector: string) {
+    const elements: ElementFinder[] = await this.getElements(selector);
+
+    for (const e of elements) {
+      const id = await e.getAttribute('id');
+      if (id) {
+        this.scrollTo(`#${id}`);
+
         if (/_input_email_/.test(id)) {
           const email = this.getRandomString(8) + '@whatever.com';
           e.sendKeys(email);
@@ -206,30 +217,44 @@ export class AppPage {
           const zip = this.getRandomNumString(5);
           e.sendKeys(zip);
         } else if (/_input_/.test(id)) {
-          const str = this.getRandomString(16);
-          e.sendKeys(str);
+          e.getAttribute('type').then(eType => {
+            let str = '';
+
+            if (eType === 'number') {
+              str = this.getRandomNumString(2);
+            } else {
+              str = this.getRandomString(16);
+            }
+            e.sendKeys(str);
+          });
         } else if (/_datepicker_/.test(id)) {
           const date = this.getRandomDate(new Date(2000, 0, 1), new Date());
           const mm = date.getMonth() + 1;
           const dd = date.getDate();
           const yyyy = date.getFullYear();
           const dateStr = `${mm}/${dd}/${yyyy}`;
+          e.clear();
           e.sendKeys(dateStr);
         } else if (/_radio_/.test(id)) {
-          e.click();
+          e.$(`#${id}_0`).click();
         } else if (/_checkbox_/.test(id)) {
-          e.click();
+          e.$(`#${id}_0`).click();
         } else if (/_select_/.test(id)) {
           e.click();
-          e.findElement('mat-option').then(o => {
-            o.click();
-          });
+          const optionSelector = 'mat-option:first-of-type';
+          await this.waitForVisible(optionSelector);
+          await this.getElement(optionSelector).click();
+          await this.waitForNotVisible(optionSelector);
         }
+      }
+    }
+
+    const multicheckboxSelector = `${selector} formly-field-mat-multicheckbox mat-checkbox:first-of-type`;
+    const numCheckboxes = await this.getElements(multicheckboxSelector).count();
+    if (numCheckboxes > 0) {
+      this.getElements(`${multicheckboxSelector} .mat-checkbox-inner-container`).each(c => {
+        c.click();
       });
-    });
-
-
-    this.getElements('input[type="checkbox"][aria-invalid="true"]').click();
-    this.getElements('input[type="text"][aria-invalid="true"]').sendKeys(this.getRandomString(8));
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { FormControl, ValidationErrors } from '@angular/forms';
-import { FormlyFieldConfig } from '@ngx-formly/core';
+import {FieldType, FormlyFieldConfig} from '@ngx-formly/core';
 import EMAIL_REGEX from './email.regex';
 import PHONE_REGEX from './phone.regex';
 import URL_REGEX from './url.regex';
@@ -26,4 +26,19 @@ export function PhoneValidator(control: FormControl): ValidationErrors {
 
 export function PhoneValidatorMessage(err, field: FormlyFieldConfig) {
   return `"${field.formControl.value}" is not a valid phone number`;
+}
+
+export function MulticheckboxValidator(control: FormControl): ValidationErrors {
+  if (control.value) {
+    for (const key in control.value) {
+      if (control.value[key] === true) {
+        return null;
+      }
+    }
+  }
+  return { required: true };
+}
+
+export function MulticheckboxValidatorMessage(err, field: FormlyFieldConfig) {
+  return 'At least one of these checkboxes must be selected.';
 }

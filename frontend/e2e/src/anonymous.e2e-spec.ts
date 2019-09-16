@@ -10,18 +10,18 @@ describe('Anonymous User', () => {
   let searchUseCases: SearchUseCases;
   let randomEmail;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
     searchUseCases = new SearchUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
-    page.waitForAngularEnabled(true);
-    page.navigateToHome();
+    await page.waitForAngularEnabled(true);
+    await page.navigateToHome();
   });
 
-  afterAll(() => {
-    page.waitForAngularEnabled(true);
+  afterAll(async () => {
+    await page.waitForAngularEnabled(true);
   });
 
   // Global Header

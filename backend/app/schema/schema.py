@@ -619,4 +619,4 @@ class StepLogSchema(ModelSchema):
 class ZipCodeSchema(ModelSchema):
     class Meta:
         model = ZipCode
-        fields = ["id", "zip_code", "latitude", "longitude"]
+        fields = ["id", "latitude", "longitude"]

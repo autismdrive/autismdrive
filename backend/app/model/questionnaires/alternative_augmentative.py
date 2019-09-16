@@ -13,6 +13,7 @@ class AlternativeAugmentative(db.Model):
     __tablename__ = "alternative_augmentative"
     __label__ = "Alternative and Augmentative Communication"
     __no_export__ = True  # This will be transferred as a part of a parent class
+    type_other_hide_expression = '!(model.type && (model.type === "other"))'
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     supports_questionnaire_id = db.Column(
@@ -26,7 +27,7 @@ class AlternativeAugmentative(db.Model):
             "display_order": 1.1,
             "type": "select",
             "template_options": {
-                "required": False,
+                "required": True,
                 "label": "Select device",
                 "options": [
                     {
@@ -57,9 +58,12 @@ class AlternativeAugmentative(db.Model):
             "template_options": {
                 "label": "Enter alternative and augmentative communication system",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
-            "hide_expression": '!(model.type && (model.type === "other"))',
+            "hide_expression": type_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + type_other_hide_expression
+            }
         },
     )
     timeframe = db.Column(

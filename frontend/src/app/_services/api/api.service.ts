@@ -87,7 +87,7 @@ export class ApiService {
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
-    zip_code_coords: '/api/zip_code_coords/<zip_code>',
+    zip_code_coords: '/api/zip_code_coords/<id>',
   };
   private statusSubject: BehaviorSubject<Status>;
 
@@ -458,7 +458,7 @@ export class ApiService {
   /** getZipCoords */
   getZipCoords(zipCode: string): Observable<GeoLocation> {
     const url = this._endpointUrl('zip_code_coords')
-      .replace('<zip_code>', zipCode);
+      .replace('<id>', zipCode);
     return this.httpClient.get<any>(url)
       .pipe(catchError(this._handleError));
   }

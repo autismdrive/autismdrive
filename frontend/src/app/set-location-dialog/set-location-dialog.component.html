@@ -1,3 +1,7 @@
+<div
+  class="mat-typography"
+  *ngIf="data"
+>
 <mat-dialog-content>
   <h1 mat-dialog-title>Set your location</h1>
   <p>Our index is currently restricted to resources in Virginia and West Virginia only.</p>
@@ -11,3 +15,4 @@
     <button *ngIf="data.gpsEnabled" mat-flat-button (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
     <button mat-flat-button (click)="onNoClick()" id="btn_cancel">Cancel</button>
 </mat-dialog-actions>
+</div>

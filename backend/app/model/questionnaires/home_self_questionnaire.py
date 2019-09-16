@@ -9,6 +9,7 @@ from app.model.questionnaires.home_mixin import HomeMixin
 class HomeSelfQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
     __label__ = "Home"
+    self_living_other_hide_expression = '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))'
 
     struggle_to_afford_desc = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
 
@@ -19,6 +20,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "type": "multicheckbox",
             "template_options": {
                 "type": "array",
+                "label": "Current Living Situation",
                 "required": True,
                 "description": "(select all that apply)",
                 "options": [
@@ -29,6 +31,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                     {"value": "caregiver", "label": "With a paid caregiver"},
                     {"value": "livingOther", "label": "Other"},
                 ],
+                "validators": {"required": "multicheckbox"},
             },
         },
     )
@@ -39,9 +42,13 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             "type": "input",
             "template_options": {
                 "label": "Describe your current living situation",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))',
+            "hide_expression": self_living_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + self_living_other_hide_expression
+            }
         },
     )
 

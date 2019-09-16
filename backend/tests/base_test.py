@@ -248,13 +248,13 @@ class BaseTest:
         elastic_index.add_document(db_event, 'Event')
         return db_event
 
-    def construct_zip_code(self, zip_code=24401, latitude=38.146216, longitude=-79.07625):
-        z = ZipCode(zip_code=zip_code, latitude=latitude, longitude=longitude)
+    def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):
+        z = ZipCode(id=id, latitude=latitude, longitude=longitude)
         db.session.add(z)
         db.session.commit()
 
-        db_z = ZipCode.query.filter_by(zip_code=zip_code).first()
-        self.assertEqual(db_z.zip_code, z.zip_code)
+        db_z = ZipCode.query.filter_by(id=id).first()
+        self.assertEqual(db_z.id, z.id)
         self.assertEqual(db_z.latitude, z.latitude)
         self.assertEqual(db_z.longitude, z.longitude)
         return db_z

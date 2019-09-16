@@ -9,6 +9,7 @@ from app.model.questionnaires.home_mixin import HomeMixin
 class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
+    dependent_living_other_hide_expression = '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))'
 
     struggle_to_afford_desc = '"Do you or " + (formState.preferredName || "your child") + "\'s other caregivers ever struggle with being ' \
                                'able to afford to pay for household needs, food, or security for the family?"'
@@ -21,7 +22,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "template_options": {
                 "type": "array",
                 "required": True,
-                "label": "",
+                "label": "Current Living Situation",
                 "options": [
                     {"value": "fullTimeGuardian", "label": "With me full-time"},
                     {"value": "partTimeGuardian", "label": "With me part time"},
@@ -31,6 +32,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                     {"value": "livingOther", "label": "Other (please explain)"},
                 ],
             },
+            "validators": {"required": "multicheckbox"},
         },
     )
     dependent_living_other = db.Column(
@@ -40,11 +42,13 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "type": "input",
             "template_options": {
                 "label": "",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
+            "hide_expression": dependent_living_other_hide_expression,
             "expression_properties": {
-                "template_options.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"'
+                "template_options.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"',
+                "template_options.required": '!' + dependent_living_other_hide_expression
             },
         },
     )

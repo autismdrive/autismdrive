@@ -12,6 +12,7 @@ class Medication(db.Model):
     __tablename__ = "medication"
     __label__ = "Medication"
     __no_export__ = True  # This will be transferred as a part of a parent class
+    symptom_other_hide_expression = '!(model.symptom && (model.symptom === "symptomOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -26,6 +27,7 @@ class Medication(db.Model):
             "display_order": 1,
             "type": "select",
             "template_options": {
+                "label": "Select symptom",
                 "required": True,
                 "options": [
                     {"value": "symptomAnxiety", "label": "Anxiety"},
@@ -45,9 +47,12 @@ class Medication(db.Model):
             "template_options": {
                 "label": "Enter symptom",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
-            "hide_expression": '!(model.symptom && (model.symptom === "symptomOther"))',
+            "hide_expression": symptom_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + symptom_other_hide_expression
+            }
         },
     )
     name = db.Column(

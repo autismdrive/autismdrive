@@ -1,0 +1,25 @@
+<div
+  class="mat-typography"
+>
+  <div mat-dialog-content>
+    <h1 mat-dialog-title>Repeat Section Dialog</h1>
+    <formly-form
+      [fields]="data.fields"
+      [model]="data.model"
+      (change)="updateDisableSave()"
+    ></formly-form>
+  </div>
+  <div mat-dialog-actions>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="disableSave ? highlightRequiredFields() : onSubmit()"
+      [ngClass]="{'repeat-section-dialog-save': true, 'disabled': !noErrors()}"
+    >Save</button>
+    <button
+      mat-button
+      (click)="onNoClick()"
+      [ngClass]="{'repeat-section-dialog-cancel': true}"
+    >Cancel</button>
+  </div>
+</div>

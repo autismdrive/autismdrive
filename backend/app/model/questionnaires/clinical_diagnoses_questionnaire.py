@@ -13,6 +13,10 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
     __label__ = "Clinical Diagnosis"
     __question_type__ = ExportService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
+    developmental_other_hide_expression = '!(model.developmental && model.developmental.includes("developmentalOther"))'
+    mental_health_other_hide_expression = '!(model.mental_health && model.mental_health.includes("mentalHealthOther"))'
+    medical_other_hide_expression = '!(model.medical && model.medical.includes("medicalOther"))'
+    genetic_other_hide_expression = '!(model.genetic && model.genetic.includes("geneticOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -54,10 +58,14 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter developmental condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
 
-            "hide_expression": '!(model.developmental && model.developmental.includes("developmentalOther"))',
+            "hide_expression": developmental_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + developmental_other_hide_expression
+            }
         },
     )
     mental_health = db.Column(
@@ -91,9 +99,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter mental health condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.mental_health && model.mental_health.includes("mentalHealthOther"))',
+            "hide_expression": mental_health_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + mental_health_other_hide_expression
+            }
         },
     )
     medical = db.Column(
@@ -124,9 +136,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter medical condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.medical && model.medical.includes("medicalOther"))',
+            "hide_expression": medical_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + medical_other_hide_expression
+            }
         },
     )
     genetic = db.Column(
@@ -158,9 +174,13 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter genetic condition",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True,
             },
-            "hide_expression": '!(model.genetic && model.genetic.includes("geneticOther"))',
+            "hide_expression": genetic_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + genetic_other_hide_expression
+            }
         },
     )
 

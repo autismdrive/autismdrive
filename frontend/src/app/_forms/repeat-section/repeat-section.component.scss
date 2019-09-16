@@ -1,5 +1,8 @@
+@import '../../../config';
+
 mat-card.repeat {
-  background: #fbfbfb;
+  background-color: lighten($brand-primary, 75);
+  border-left: solid 8px $brand-primary;
 
   &:active, &:hover, &:focus, &:focus-within {
     background: #eeeeee;
