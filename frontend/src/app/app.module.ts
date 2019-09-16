@@ -112,6 +112,7 @@ import {GoogleAnalyticsService} from './google-analytics.service';
 import { SearchTopicsComponent } from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
+import { SearchFilterComponent } from './search-filter/search-filter.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -213,6 +214,7 @@ export class FormlyConfig {
     BorderBoxTileComponent,
     StudyInquiryComponent,
     SearchTopicsComponent,
+    SearchFilterComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),

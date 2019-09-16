@@ -177,13 +177,13 @@ class ElasticIndex:
         if search.types:
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
         if search.ages:
-            elastic_search = elastic_search.post_filter('terms', **{"ages": search.ages})
+            elastic_search = elastic_search.filter('terms', **{"ages": search.ages})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
 
         if search.category and search.category.id:
-            elastic_search = elastic_search.post_filter('terms', category=[str(search.category.search_path())])
+            elastic_search = elastic_search.filter('terms', category=[str(search.category.search_path())])
             if search.category.calculate_level() == 0:
                 exclude = ".*\\,.*\\,.*";
                 include = str(search.category.id) + "\\,.*"

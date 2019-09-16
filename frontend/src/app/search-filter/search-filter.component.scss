@@ -1,0 +1,37 @@
+@import '../../material';
+
+.mat-list-base[dense] {
+
+
+  div.sub-level {
+    padding-left: 35px;
+  }
+
+  h3.mat-subheader:first-child {
+    margin-top: 0px;
+  }
+
+  .mat-list-item {
+    cursor: pointer;
+    font-weight: bold;
+    color: $brand-primary;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    &:hover {
+      background-color: rgba(0,0,0,0.1);
+      text-decoration: underline;
+    }
+
+    .mat-list-item-content {
+      line-height: 0.8;
+    }
+
+    .hit-count {
+      color: $body-color;
+      font-weight: normal;
+      text-align: right;
+      white-space: nowrap;
+    }
+  }
+}

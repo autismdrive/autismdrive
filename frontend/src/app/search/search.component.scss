@@ -31,42 +31,13 @@ form.search-box {
   padding-right: 2em;
 }
 
-.mat-list-base[dense] {
-  h3.mat-subheader {
-    font-size: 1.25rem;
-    margin-top: 1em;
-    padding-left: 0px;
-  }
-
-  h3.mat-subheader:first-child {
-    margin-top: 0px;
-  }
-
-  .mat-list-item {
-    cursor: pointer;
-    font-weight: bold;
-    color: $brand-primary;
-    padding-top: 0px;
-    padding-bottom: 0px;
-
-    &:hover {
-      background-color: rgba(0,0,0,0.1);
-      text-decoration: underline;
-    }
-
-    .mat-list-item-content {
-      line-height: 0.8;
-    }
-
-    .hit-count {
-      color: $body-color;
-      font-weight: normal;
-      text-align: right;
-      white-space: nowrap;
-    }
-  }
+h3.mat-subheader {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  margin-top: 1em;
+  padding-left: 0px;
+  padding-bottom: 0px;
 }
-
 
 button {
   flex: 0 0 auto;

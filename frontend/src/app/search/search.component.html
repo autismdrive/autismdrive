@@ -26,10 +26,14 @@
   </div>
 </div>
 
+<span id="TopOfSearch"></span>
 <div *ngIf="!loading" class="container">
   <div class="row margin-bottom-none">
-    <h1 *ngIf="query.types.length > 0">
+    <h1 *ngIf="query.types.length === 1" fragment="filter-top">
       <span *ngFor="let hitType of query.getHitTypes()">{{hitType.label}}</span>
+    </h1>
+    <h1 *ngIf="query.types.length >  1" fragment="filter-top">
+      All Resources
     </h1>
     <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
     <div fxLayout="row" fxLayoutGap="80px" fxLayoutAlign="space-evenly start">
@@ -46,59 +50,52 @@
             [(ngModel)]="selectedSort.name"
             fxLayout="column"
           >
-            <mat-radio-button
-              *ngFor="let s of sortMethods"
-              (click)="noLocation ? openLocationDialog() : sortBy(s)"
-              [value]="s.name"
-              [disabled]="(s.name === 'Distance') && noLocation"
-            >
-              {{s.label}}
-
-              <ng-container *ngIf="(s.name === 'Distance')">
-                <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
-                <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">(No location set)</ng-container>
-                <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
-                <button mat-button (click)="openLocationDialog()">
-                  <mat-icon>location_searching</mat-icon>
-                  <ng-container *ngIf="isZipCode(storedZip)">Change ZIP code</ng-container>
-                  <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
-                  <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">Use ZIP code instead</ng-container>
-                </button>
-              </ng-container>
-            </mat-radio-button>
+            <ng-container *ngFor="let s of sortMethods">
+              <mat-radio-button
+                *ngIf="isSortVisible(s)"
+                (click)="noLocation ? openLocationDialog() : sortBy(s)"
+                [value]="s.name"
+                [disabled]="isSortDisabled(s)"
+              >
+                {{s.label}}
+                <ng-container *ngIf="(s.name === 'Relevance' && query.words != '')">
+                  to "{{query.words}}"
+                </ng-container>
+                <ng-container *ngIf="(s.name === 'Distance')">
+                  <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
+                  <!--
+                  <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">(No location set)</ng-container>
+                  -->
+                  <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
+                  <button mat-button (click)="openLocationDialog()">
+                    <mat-icon matTooltip="Set your location">location_searching</mat-icon>
+                    <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
+                    <!--
+                    <ng-container *ngIf="isZipCode(storedZip)">Change ZIP code</ng-container>
+                    <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">Use ZIP code instead</ng-container>
+                    -->
+                  </button>
+                </ng-container>
+              </mat-radio-button>
+            </ng-container>
           </mat-radio-group>
         </div>
 
         <div class="filters-topics">
           <h2>Narrow your results</h2>
-
-          <!--
-          <mat-list dense *ngIf="!loading">
-            <ng-container *ngFor="let agg of query.aggregations">
-              <ng-container *ngIf="facet.field !== 'Type' && facet.facetCounts.length > 0">
-                <h3 mat-subheader>{{facet.field}}</h3>
-                <mat-list-item
-                  *ngFor="let count of facet.facetCounts"
-                  (click)="addFilter(facet.field, count.category)"
-                  [ngClass]="{'filter-facet-item': true}"
-                >
-                  <span class="filter-facet-label">{{count.category}}</span>
-                  <div fxFlex></div>
-                  <span class="hit-count">{{count.hit_count}}</span>
-                </mat-list-item>
-              </ng-container>
-            </ng-container>
-          </mat-list>
-          -->
+          <h3 class="mat-subheader">By Age</h3>
+          <div *ngIf="!query.hasAgeCounts()">No age restrictions available for these search results.</div>
+          <app-search-filter [aggregations]="query.age_counts"
+                             [label_map]="ageLabels"
+                             (filterSelected)="selectAgeRange($event)">
+          </app-search-filter>
+          <h3 class="mat-subheader">By Type</h3>
+          <app-search-filter [aggregations]="query.type_counts"
+                             [label_map]="typeLabels"
+                             (filterSelected)="selectType($event)">
+          </app-search-filter>
+          <h3 class="mat-subheader">By Topic</h3>
           <app-search-topics [category]="query.category" (catagorySelected)="selectCategory($event)"></app-search-topics>
-
-          <button
-            mat-button
-            [routerLink]="'/search'"
-            id="reset-filters"
-          >
-            Reset filters
-          </button>
         </div>
       </div>
 
@@ -109,6 +106,7 @@
       >
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
           <mat-chip-list class="applied-filters">
+
             <ng-container *ngIf="query && query.category && query.category.id">
               <mat-chip
                 (click)="removeCategory()"
@@ -122,6 +120,7 @@
                 <mat-icon>close</mat-icon>
               </mat-chip>
             </ng-container>
+
             <ng-container *ngIf="query && query.words">
               <mat-chip
                 (click)="removeWords()"
@@ -132,17 +131,11 @@
               </mat-chip>
             </ng-container>
 
-            <ng-container *ngFor="let filter of displayFilters; let i = index">
-              <ng-container *ngFor="let fieldValue of filter.value; let j = index">
-                <mat-chip
-                  (click)="removeFilter(filter.field, fieldValue)"
-                  class="applied-filter"
-                >
-                  <span class="applied-filter-label">{{fieldValue}}</span>
+            <ng-container *ngFor="let age of query.ages let i = index">
+                <mat-chip  (click)="selectAgeRange()" class="applied-filter" >
+                  <span class="applied-filter-label">{{ageLabels[age]}}</span>
                   <mat-icon>close</mat-icon>
                 </mat-chip>
-                <mat-icon *ngIf="j < filter.value.length -1  || i < displayFilters.length - 1">chevron_right</mat-icon>
-              </ng-container>
             </ng-container>
           </mat-chip-list>
         </div>
@@ -192,6 +185,11 @@
             fxLayoutGap="40px"
             *ngIf="!loading"
           >
+            <div *ngIf="query.hits.length === 0">
+              <h2>No Results Found.</h2>
+              <p>We could not find any results for your search.  Please try removing some of the conditions
+              by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
+            </div>
             <app-search-result
               *ngFor="let hit of query.hits"
               [hit]="hit"

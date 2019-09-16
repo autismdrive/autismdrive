@@ -1,3 +1,4 @@
+from app.model.age_range import AgeRange
 from app.model.category import Category
 from app.model.investigator import Investigator
 from app.model.organization import Organization
@@ -6,6 +7,7 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
+from app.model.search import Search
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -99,7 +101,12 @@ class DataLoader:
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
                                     zip=row[11], website=row[13], phone=row[15], email=row[14],
-                                    latitude=geocode['lat'], longitude=geocode['lng'])
+                                    latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
+
+                for i in range(28, len(row)):
+                    if row[i]:
+                        location.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 db.session.add(location)
                 db.session.commit()
                 self.__increment_id_sequence(Resource)
@@ -113,9 +120,6 @@ class DataLoader:
                         location_category = ResourceCategory(resource_id=location_id, category_id=category_id, type='location')
                         db.session.add(location_category)
 
-                for i in range(28, len(row)):
-                    if row[i]:
-                        location.ages.append(row[i])
             print("Locations loaded.  There are now %i locations in the database." % db.session.query(
                 Location).filter(Location.type == 'location').count())
             print("There are now %i links between locations and categories in the database." %
@@ -129,7 +133,11 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
-                                        phone=row[6])
+                                        phone=row[6], ages=[])
+                for i in range(15, len(row)):
+                    if row[i]:
+                        resource.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 db.session.add(resource)
                 db.session.commit()
                 self.__increment_id_sequence(Resource)
@@ -143,9 +151,6 @@ class DataLoader:
                         resource_category = ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource')
                         db.session.add(resource_category)
 
-                for i in range(15, len(row)):
-                    if row[i]:
-                        resource.ages.append(row[i])
             print("Resources loaded.  There are now %i resources in the database." % db.session.query(
                 Resource).filter(Resource.type == 'resource').count())
             print("There are now %i links between resources and categories in the database." %
@@ -160,7 +165,8 @@ class DataLoader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
                               benefit_description=row[3], organization=org, location=row[5],
-                              short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22])
+                              short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22],
+                              ages=[])
 
                 if row[9].strip() == 'Currently Enrolling':
                     study.status = Status.currently_enrolling
@@ -170,6 +176,11 @@ class DataLoader:
                     study.status = Status.results_being_analyzed
                 elif row[9].strip() == 'Study Results Published':
                     study.status = Status.study_results_published
+
+                for i in range(30, len(row)):
+                    if row[i]:
+                        study.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
@@ -182,9 +193,6 @@ class DataLoader:
                         study_category = StudyCategory(study_id=study_id, category_id=category_id)
                         db.session.add(study_category)
 
-                for i in range(30, len(row)):
-                    if row[i]:
-                        study.ages.append(row[i])
 
                 for i in [10, 14, 18]:
                     if row[i]:

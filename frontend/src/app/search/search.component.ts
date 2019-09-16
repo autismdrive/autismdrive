@@ -3,10 +3,10 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
+import { Location } from '@angular/common';
 import {Hit, Query, Sort} from '../_models/query';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
@@ -14,8 +14,7 @@ import {Category} from '../_models/category';
 import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
-import {Resource} from '../_models/resource';
-import {HitType} from '../_models/hit_type';
+import {AgeRange, HitType} from '../_models/hit_type';
 
 interface SortMethod {
   name: string;
@@ -39,6 +38,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private renderer: Renderer2,
     private searchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
@@ -62,6 +62,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   query: Query;
   resourceTypes = HitType.all_resources();
+  ageLabels = AgeRange.labels;
+  typeLabels = HitType.labels;
   loading = true;
   pageSize = 20;
   noLocation = true;
@@ -87,7 +89,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     },
     {
       name: 'Distance',
-      label: 'Near me',
+      label: 'Distance from me',
       sortQuery: {
         field: 'geo_point',
         latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
@@ -225,18 +227,18 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.doSearch();
   }
 
-  updateUrl(query: Query) {
-    const qParams = this._queryToQueryParams(query);
+  updateUrlAndDoSearch(query: Query) {
+    const qParams = this._queryToQueryParams(query)
     console.log('Updating URL and navigating to ', qParams);
 
-    this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: qParams
-      }).then(() => {
-      scrollToTop();
-    });
+    this.location.go(
+      this.router.createUrlTree([this.router.url],
+        { queryParams:  qParams }).toString());
+    this.doSearch();
+  }
+
+  scrollToTopOfSearch() {
+    document.getElementById('TopOfSearch').scrollIntoView();
   }
 
   doSearch() {
@@ -246,7 +248,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe(queryWithResults => {
         this.query = queryWithResults;
         this.loading = false;
-        scrollToTop();
+        this.scrollToTopOfSearch();
       });
     this.googleAnalyticsService.event(this.query.words,
       {
@@ -300,6 +302,24 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  isSortVisible(sort: SortMethod) {
+    if (sort.name === 'Relevance' && this.query.words === '') {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  isSortDisabled(sort: SortMethod) {
+    if (sort.name === 'Relevance' && this.query.words === '') {
+      return true;
+    } else if (sort.name === 'Distance' && this.noLocation) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   sortBy(selectedSort: SortMethod) {
     this.loading = true;
     this.selectedSort = selectedSort;
@@ -313,6 +333,19 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  selectAgeRange(age: string = null) {
+    if (age) {
+      this.query.ages = [age];
+    } else {
+      this.query.ages = [];
+    }
+    this.query.start = 0;
+    if (this.paginatorElement) {
+      this.paginatorElement.firstPage();
+    }
+    this.updateUrlAndDoSearch(this.query);
+  }
+
   selectCategory(newCategory: Category) {
     console.log('Category Selected: ', newCategory);
     this.query.category = newCategory;
@@ -320,14 +353,30 @@ export class SearchComponent implements OnInit, OnDestroy {
     if (this.paginatorElement) {
       this.paginatorElement.firstPage();
     }
-    this.updateUrl(this.query);
+    this.updateUrlAndDoSearch(this.query);
   }
 
-  selectType(keepType: string) {
-    this.query.types = [keepType];
+
+  selectType(keepType: string = null) {
+    if (keepType) {
+      this.query.types = [keepType];
+      if (keepType === HitType.LOCATION.name) {
+        this.selectedSort = this.sortMethods.filter(s => s.name === 'Distance')[0];
+      } else if (keepType === HitType.RESOURCE.name) {
+        if (this.query.words !== '') {
+          this.selectedSort = this.sortMethods.filter(s => s.name === 'Relevance')[0];
+        } else {
+          this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+        }
+      } else if(keepType === HitType.EVENT.name) {
+        this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+      }
+    } else {
+      this.query.types = [];
+    }
     this.query.category = null;
     this.query.start = 0;
-    this.updateUrl(this.query);
+    this.updateUrlAndDoSearch(this.query);
   }
 
   updatePage(event: PageEvent) {
@@ -415,9 +464,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private _updateDistanceSort() {
-    this.query.sort.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
-    this.query.sort.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
-    this.doSearch();
+    const distance_sort = this.sortMethods.filter(s => s.name === 'Distance')[0];
+    distance_sort.sortQuery.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
+    distance_sort.sortQuery.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
+    if(this.selectedSort.name === 'Distance') {
+      this.doSearch();
+    }
   }
 
 }

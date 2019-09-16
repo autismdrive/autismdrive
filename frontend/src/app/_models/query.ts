@@ -3,8 +3,6 @@ import {Category} from './category';
 import {HitType} from './hit_type';
 
 
-
-
 export class Query {
 
   words = '';
@@ -19,7 +17,8 @@ export class Query {
   };
   hits?: Array<Hit>;
   category: Category;
-  aggregations: {}; // aggregations[field][value]={"hit_count": 12, "is_selected": false};
+  type_counts: Aggregation[] = [];
+  age_counts: Aggregation[] = [];
 
   constructor(private _props) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));
@@ -48,8 +47,18 @@ export class Query {
   getHitTypes(): HitType[] {
       return HitType.all().filter(t => this.types.includes(t.name));
   }
+
+  hasAgeCounts() {
+    return this.age_counts.filter(a => a.count > 0).length > 0;
+  }
+
 }
 
+export class Aggregation {
+  value: string;
+  count: number;
+  is_selected: Boolean;
+}
 
 export class Hit extends GeoLocation {
   id: number;
