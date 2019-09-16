@@ -432,7 +432,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   openLocationDialog() {
     const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
-      width: '320px',
+      width: '400px',
       data: {
         zipCode: localStorage.getItem('zipCode') || '',
         gpsEnabled: this.gpsEnabled
