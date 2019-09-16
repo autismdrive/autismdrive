@@ -29,7 +29,7 @@ class Category(db.Model):
         return level
 
     # Returns an array of paths that should be used to search for
-    # this category. , for instance "aninals,cats,smelly-cats" would return
+    # this category. , for instance "animals,cats,smelly-cats" would return
     # an array of three paths: ["animal", "animal,cats" and "animal,cats,smelly-cats"
     # but using the id of the category, not the name.
     def all_search_paths(self):
