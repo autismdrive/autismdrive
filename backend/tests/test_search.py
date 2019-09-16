@@ -85,26 +85,6 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(1, young_folks["count"])
         self.assertEqual(1, old_folks["count"])
 
-    def test_search_by_age_range_restricted_works_but_does_not_effect_age_aggregations(self):
-        # For the Ages, we want to know the total counts regardless of what is selected.
-
-        basic_query = {'words': '', 'ages': ['young folks']}
-        search_results = self.search(basic_query)
-        self.assertEqual(0, len(search_results['hits']))
-
-        # test that elastic resource is created with post
-        res = self.construct_resource(title="Bart", description="free lovin young fella", ages=['young folks'])
-        res2 = self.construct_resource(title="Abe", description="delightful grandpop.", ages=['old folks'])
-
-        search_results = self.search(basic_query)
-        self.assertEqual(1, len(search_results['hits']))
-
-        young_folks = next(x for x in search_results['age_counts'] if x['value'] == "young folks")
-        old_folks = next(x for x in search_results['age_counts'] if x['value'] == "old folks")
-
-        self.assertEqual(1, young_folks["count"])
-        self.assertEqual(1, old_folks["count"])
-
     def test_study_search_basics(self):
         umbrella_query = {'words': 'umbrellas'}
         universe_query = {'words': 'universe'}
