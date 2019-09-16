@@ -39,9 +39,9 @@ class TestSearch(BaseTest, unittest.TestCase):
 
     def test_config(self):
         self.assertEqual(elastic_index.index_name, "stardrive_test_resources",
-                        msg="Something is wrong with you configuration or import order.  " +
-                            "You are not working with the test index.  Make sure the " +
-                            "first thing you import in this file is base_test.")
+                         msg="Something is wrong with you configuration or import order.  " +
+                             "You are not working with the test index.  Make sure the " +
+                             "first thing you import in this file is base_test.")
 
     def test_search_has_counts_by_type(self):
         basic_query = {'words': ''}
@@ -61,8 +61,6 @@ class TestSearch(BaseTest, unittest.TestCase):
         resources = next(x for x in search_results['type_counts'] if x['value'] == "resource")
         self.assertEqual(1, locations["count"])
         self.assertEqual(1, resources["count"])
-
-
 
     def test_search_has_counts_by_age_range(self):
 
@@ -146,13 +144,19 @@ class TestSearch(BaseTest, unittest.TestCase):
         }
 
         # Add a location within the distance filter
-        location_near = self.construct_location(title='local unicorn', description="delivering rainbows within the orbit of Uranus", latitude=38.149595, longitude=-79.072557)
+        location_near = self.construct_location(title='local unicorn',
+                                                description="delivering rainbows within the orbit of Uranus",
+                                                latitude=38.149595, longitude=-79.072557)
 
         # Add a location beyond the distance filter
-        location_far = self.construct_location(title='distant unicorn', description="delivering rainbows to the greater Trans-Neptunian Region", latitude=-38.149595, longitude=100.927443)
+        location_far = self.construct_location(title='distant unicorn',
+                                               description="delivering rainbows to the greater Trans-Neptunian Region",
+                                               latitude=-38.149595, longitude=100.927443)
 
         # Add a location somewhere in between
-        location_mid = self.construct_location(title='middle unicorn', description="delivering rainbows somewhere in between", latitude=37.5246403, longitude=-77.5633015)
+        location_mid = self.construct_location(title='middle unicorn',
+                                               description="delivering rainbows somewhere in between",
+                                               latitude=37.5246403, longitude=-77.5633015)
 
         search_results = self.search(geo_query)
         self.assertEqual(3, len(search_results['hits']))
@@ -224,10 +228,14 @@ class TestSearch(BaseTest, unittest.TestCase):
     def test_search_resources_returns_only_resources(self):
         rainbow_query = {'words': 'rainbows'}
 
-        r = self.construct_resource(title='space unicorn online resource', description="Electronically-delivered rainbows through the internets")
-        l = self.construct_location(title='space unicorn main office', description="Where rainbows are manufactured for galactic distribution")
-        e = self.construct_event(title='space unicorn workshop', description="Learn how to deliver sparkling rainbows in this interactive workshop")
-        s = self.construct_study(title='space unicorn research study', description="Investigating the long-term outcomes of interstellar unicorn-based delivery of rainbows")
+        r = self.construct_resource(title='space unicorn online resource',
+                                    description="Electronically-delivered rainbows through the internets")
+        l = self.construct_location(title='space unicorn main office',
+                                    description="Where rainbows are manufactured for galactic distribution")
+        e = self.construct_event(title='space unicorn workshop',
+                                 description="Learn how to deliver sparkling rainbows in this interactive workshop")
+        s = self.construct_study(title='space unicorn research study',
+                                 description="Investigating the long-term outcomes of interstellar unicorn-based delivery of rainbows")
 
         search_results = self.search_resources(rainbow_query)
         self.assertEqual(3, len(search_results['hits']), 'should only return 3 results')
@@ -239,10 +247,14 @@ class TestSearch(BaseTest, unittest.TestCase):
     def test_search_studies_returns_only_studies(self):
         rainbow_query = {'words': 'rainbows'}
 
-        r = self.construct_resource(title='space unicorn online resource', description="Electronically-delivered rainbows through the internets")
-        l = self.construct_location(title='space unicorn main office', description="Where rainbows are manufactured for galactic distribution")
-        e = self.construct_event(title='space unicorn workshop', description="Learn how to deliver sparkling rainbows in this interactive workshop")
-        s = self.construct_study(title='space unicorn research study', description="Investigating the long-term outcomes of interstellar unicorn-based delivery of rainbows")
+        r = self.construct_resource(title='space unicorn online resource',
+                                    description="Electronically-delivered rainbows through the internets")
+        l = self.construct_location(title='space unicorn main office',
+                                    description="Where rainbows are manufactured for galactic distribution")
+        e = self.construct_event(title='space unicorn workshop',
+                                 description="Learn how to deliver sparkling rainbows in this interactive workshop")
+        s = self.construct_study(title='space unicorn research study',
+                                 description="Investigating the long-term outcomes of interstellar unicorn-based delivery of rainbows")
 
         search_results = self.search_studies(rainbow_query)
 
@@ -291,8 +303,10 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(type_query)
         self.assertEqual(4, len(search_results['hits']))
         self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
-        self.assertEqual("Topics", search_results['category']['name'], msg="It is a top level category if no filters are applied")
-        self.assertEqual(2, len(search_results['category']['children']), msg="The two true Top level categories are returned as children")
+        self.assertEqual("Topics", search_results['category']['name'],
+                         msg="It is a top level category if no filters are applied")
+        self.assertEqual(2, len(search_results['category']['children']),
+                         msg="The two true Top level categories are returned as children")
         maker_cat = search_results['category']['children'][0]
         talker_cat = search_results['category']['children'][1]
         self.assertEquals("Makers", maker_cat['name'], "The first category returned is 'makers'")
@@ -311,8 +325,10 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(type_query)
         self.assertEqual(3, len(search_results['hits']))
         self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
-        self.assertEqual("Makers", search_results['category']['name'], msg="Selected Category Id should be the category returned")
-        self.assertEqual(2, len(search_results['category']['children']), msg="The two true Top level categories are returned as children")
+        self.assertEqual("Makers", search_results['category']['name'],
+                         msg="Selected Category Id should be the category returned")
+        self.assertEqual(2, len(search_results['category']['children']),
+                         msg="The two true Top level categories are returned as children")
         children = search_results['category']['children']
         self.assertEqual(1, len(list(filter(lambda cat: cat['name'] == 'Woodworkers', children))))
         self.assertEqual(1, len(list(filter(lambda cat: cat['name'] == 'Potters', children))))
@@ -326,7 +342,8 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(type_query)
         self.assertEqual(1, len(search_results['hits']))
         self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
-        self.assertEqual("Woodworkers", search_results['category']['name'], msg="Selected Category Id should be the category returned")
+        self.assertEqual("Woodworkers", search_results['category']['name'],
+                         msg="Selected Category Id should be the category returned")
         self.assertEqual(1, len(search_results['category']['children']), msg="Woodworkers has only one child")
         cabinet_maker = search_results['category']['children'][0]
         self.assertEquals(1, cabinet_maker['hit_count'], "There is one cabinet maker.")
@@ -338,4 +355,72 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(query)
         self.assertEquals("Makers", search_results['category']['parent']['name'])
         self.assertEquals("Topics", search_results['category']['parent']['parent']['name'])
+
+    def test_find_related_resource(self):
+        # You have to build a lot of documents for this to start working ....  And I liked 1985.
+
+        breakfast_club = self.construct_resource(title="The Breakfast Club",
+                                                 description="A 1985 American comedy-drama film written, produced, and "
+                                                             "directed by John Hughes. Teenagers from different high "
+                                                             "school cliques who spend a Saturday in detention with "
+                                                             "their authoritarian assistant principal")
+        back_to_the_future = self.construct_location(title="Back to the Future",
+                                                     description="1985 American comedy science fiction film directed by"
+                                                                 " Robert Zemeckisteenager. Marty McFly, who "
+                                                                 "accidentally travels back in time from 1985 to 1955, "
+                                                                 "where he meets his future parents and becomes his "
+                                                                 "mother's romantic interest.")
+        andouillette = self.construct_location(title="Andouillette",
+                                               description="A coarse-grained sausage made with pork (or occasionally "
+                                                           "veal), intestines or chitterlings, pepper, wine, onions, "
+                                                           "and seasonings.")
+        goonies = self.construct_location(title="The Goonies",
+                                          description="a 1985 American adventure comedy film co-produced"
+                                                      " and directed by Richard Donner from a screenplay "
+                                                      "by Chris Columbus, based on a story by executive "
+                                                      "producer Steven Spielberg. In the film, a band of"
+                                                      " kids who live in the \"Goon Docks\" neighborhood")
+        weird_sicene = self.construct_location(title="Weird Science",
+                                               description="a 1985 American teen comic science fiction film "
+                                                           "written and directed by John Hughes and starring "
+                                                           "Anthony Michael Hall, Ilan Mitchell-Smith and "
+                                                           "Kelly LeBrock.")
+        weird_sicene = self.construct_location(title="Weird Science",
+                                               description="a 1985 American teen comic science fiction film "
+                                                           "written and directed by John Hughes and starring "
+                                                           "Anthony Michael Hall, Ilan Mitchell-Smith and "
+                                                           "Kelly LeBrock.")
+        cocoon = self.construct_location(title="Cocoon",
+                                         description="a 1985 American science-fiction fantasy comedy-drama "
+                                                     "film directed by Ron Howard about a group of elderly "
+                                                     "people rejuvenated by aliens")
+
+        rv = self.app.get('/api/resource/%i/related' % breakfast_club.id, content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, len(response))  # Not really sure why it is just 2, but rolling with it.
+        self.assertEqual("Back to the Future", response[0]['title'])
+
+    def test_search_paginates(self):
+        self.construct_location(title="one")
+        self.construct_location(title="two")
+        self.construct_location(title="three")
+
+        query = {'start': 0, 'size': 1}
+        search_results = self.search(query)
+        self.assertEqual(1, len(search_results['hits']))
+        title1 = search_results['hits'][0]['title']
+
+        query = {'start': 1, 'size': 1}
+        search_results = self.search(query)
+        self.assertEqual(1, len(search_results['hits']))
+        title2 = search_results['hits'][0]['title']
+
+        query = {'start': 2, 'size': 1}
+        search_results = self.search(query)
+        self.assertEqual(1, len(search_results['hits']))
+        title3 = search_results['hits'][0]['title']
+
+        self.assertNotEqual(title1, title2)
+        self.assertNotEqual(title2, title3)
 

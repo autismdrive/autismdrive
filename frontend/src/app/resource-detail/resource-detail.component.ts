@@ -15,6 +15,7 @@ export class ResourceDetailComponent implements OnInit {
   resource: Resource;
   mapLoc: LatLngLiteral;
   currentUser: User;
+  related: Resource[];
 
   constructor(
     private api: ApiService,
@@ -31,6 +32,10 @@ export class ResourceDetailComponent implements OnInit {
           this.resource = new Resource(resource);
           this.loadMapLocation();
         });
+        this.api.getRelatedResources(resourceId).subscribe(related => {
+          this.related = related;
+        });
+
       }
     });
 
