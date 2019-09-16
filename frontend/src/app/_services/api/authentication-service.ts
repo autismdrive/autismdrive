@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {Observable, BehaviorSubject, Subject, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 import { User } from '../../_models/user';
 import { environment } from '../../../environments/environment';
 import { GoogleAnalyticsService } from '../../google-analytics.service';
+import {StarError} from '../../star-error';
 
 
 
@@ -32,6 +33,13 @@ export class AuthenticationService {
     }
   }
 
+  private _handleError(error: StarError) {
+    let message = 'Could not complete your request; please try again later.';
+    message = error.message;
+    // return an observable with a user-facing error message
+    return throwError(message);
+  }
+
   private loadUser(userDict): User {
     // login successful if there's a jwt token in the response
     if (userDict.token) {
@@ -47,9 +55,9 @@ export class AuthenticationService {
   login(email: string, password: string, email_token = ''): Observable<User>  {
     const body = { email, password, email_token };
     return this.http.post<any>(this.login_url, body)
-      .pipe(map(userDict => {
-          return this.loadUser(userDict);
-      }));
+      .pipe(
+        map(userDict => this.loadUser(userDict)),
+      catchError(this._handleError));
   }
 
   private _refresh(): Observable<User> {

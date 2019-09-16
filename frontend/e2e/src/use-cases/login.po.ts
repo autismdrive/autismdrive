@@ -78,6 +78,19 @@ export class LoginUseCases {
     this.page.clickAndExpectRoute('#cancel', '/home');
   }
 
+  loginWithBadPassword(email: string) {
+    this.page.waitForClickable('#login-button');
+    this.page.clickElement('#login-button');
+    expect(this.page.getElements('app-login').count()).toEqual(1);
+    expect(this.page.getElements('[id*="input_email"]').count()).toEqual(1);
+    expect(this.page.getElements('[id*="input_password"]').count()).toEqual(1);
+    this.page.inputText('[id*="input_email"]', email);
+    this.page.inputText('[id*="input_password"]', 'not a valid password');
+    this.page.clickAndExpectRoute('#submit', '/login');
+    expect(this.page.getElements('#error_message').count()).toEqual(1);
+    expect(this.page.getElement('#error_message').getText()).toEqual('The credentials you supplied are incorrect.');
+  }
+
   loginWithCredentials(email: string, password: string) {
     this.page.waitForClickable('#login-button');
     this.page.clickElement('#login-button');
