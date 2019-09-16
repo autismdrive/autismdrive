@@ -5,10 +5,9 @@ import {
   ElementArrayFinder,
   ElementFinder,
   ExpectedConditions,
-  Key,
-  WebDriver
 } from 'protractor';
 import { protractor } from 'protractor/built/ptor';
+
 
 export class AppPage {
 
@@ -84,8 +83,7 @@ export class AppPage {
     return this.getElement(selector).click();
   }
 
-  clickDropdownItem(label: string, nthItem: number) {
-    const dropdownSelector = `[aria-label="${label}"]`;
+  clickDropdownItem(dropdownSelector: string, nthItem: number) {
     const optionSelector = `mat-option:nth-of-type(${nthItem})`;
     this.waitForVisible(dropdownSelector);
     this.clickElement(dropdownSelector);
@@ -128,8 +126,8 @@ export class AppPage {
   }
 
   focus(selector: string) {
-    browser.controlFlow().execute(() => {
-      browser.executeScript('arguments[0].focus()', this.getElement(selector).getWebElement());
+    return browser.controlFlow().execute(() => {
+      return browser.executeScript('arguments[0].focus()', this.getElement(selector).getWebElement());
     });
   }
 
@@ -201,13 +199,13 @@ export class AppPage {
     this.getElements(selector).each(_ => this.pressKey('TAB'));
   }
 
-  async fillOutInvalidFields() {
-    const elements = await this.getElements('.ng-invalid');
-    elements.forEach((e: ElementFinder) => {
-      e.getAttribute('id').then(id => {
-        if (id) {
-          this.scrollTo(`#${id}`);
-        }
+  async fillOutFields(selector: string) {
+    const elements: ElementFinder[] = await this.getElements(selector);
+
+    for (const e of elements) {
+      const id = await e.getAttribute('id');
+      if (id) {
+        this.scrollTo(`#${id}`);
 
         if (/_input_email_/.test(id)) {
           const email = this.getRandomString(8) + '@whatever.com';
@@ -243,27 +241,20 @@ export class AppPage {
           e.$(`#${id}_0`).click();
         } else if (/_select_/.test(id)) {
           e.click();
-          const selector = '.mat-select-panel mat-option';
-          this.waitForVisible(selector);
-          this.getElements(selector).first().getAttribute('id').then(optionId => {
-            this.getElement(`#${optionId}`).click().then(() => {
-              this.waitForNotVisible(`#${optionId}`);
-              this.waitForNotVisible(selector);
-            });
-          });
+          const optionSelector = 'mat-option:first-of-type';
+          await this.waitForVisible(optionSelector);
+          await this.getElement(optionSelector).click();
+          await this.waitForNotVisible(optionSelector);
         }
-      });
-    });
+      }
+    }
 
-    const multicheckboxSelector = '.ng-invalid formly-field-mat-multicheckbox mat-checkbox:first-of-type';
+    const multicheckboxSelector = `${selector} formly-field-mat-multicheckbox mat-checkbox:first-of-type`;
     const numCheckboxes = await this.getElements(multicheckboxSelector).count();
     if (numCheckboxes > 0) {
       this.getElements(`${multicheckboxSelector} .mat-checkbox-inner-container`).each(c => {
         c.click();
       });
     }
-
-    this.getElements('input[type="checkbox"][aria-invalid="true"]').click();
-    this.getElements('input[type="text"][aria-invalid="true"]').sendKeys(this.getRandomString(8));
   }
 }
