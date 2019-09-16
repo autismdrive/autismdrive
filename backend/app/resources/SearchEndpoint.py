@@ -28,6 +28,7 @@ class SearchEndpoint(flask_restful.Resource):
         except elasticsearch.ElasticsearchException as e:
             raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e.info))
 
+        search.reset()  # zero out any existing counts or data on the search prior to populating.
         search.total = results.hits.total
         search.category = self.update_category_counts(search.category, results)
         self.update_aggregations(search, results.aggregations)
