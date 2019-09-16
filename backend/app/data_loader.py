@@ -11,6 +11,7 @@ from app.model.search import Search
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
+from app.model.study_user import StudyUser
 from app.model.user import User
 from app import app, db, elastic_index
 from sqlalchemy import Sequence
@@ -314,6 +315,7 @@ class DataLoader:
 
     def clear_resources(self):
         db.session.query(ResourceCategory).delete()
+        db.session.query(StudyUser).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
         db.session.query(Category).delete()
