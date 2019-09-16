@@ -325,6 +325,7 @@ class DataLoader:
         db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.query(Organization).delete()
+        db.session.query(ZipCode).delete()
         db.session.commit()
 
     def __increment_id_sequence(self, model):
