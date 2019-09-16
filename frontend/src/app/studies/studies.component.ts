@@ -20,7 +20,7 @@ export class StudiesComponent implements OnInit {
 
   loadStudies() {
     const query = new Query({
-      types: HitType.STUDY.name
+      types: [HitType.STUDY.name]
     });
     this.api.search(query).subscribe(q => this.query = new Query(q));
   }

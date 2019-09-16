@@ -3,8 +3,12 @@
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
         (click)="selectCategory(parent)"
+        class="show-all"
       >
-        <span class="filter-facet-label">< {{parent.name}}</span>
+        <mat-icon>chevron_left</mat-icon>
+        <span class="filter-facet-label">
+          {{parent.name}}
+        </span>
         </mat-list-item>
     </ng-container>
   <div [ngClass]="{'sub-level' : category.level > 0}">

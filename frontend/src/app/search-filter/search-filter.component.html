@@ -1,8 +1,8 @@
 <mat-spinner *ngIf="!aggregations"></mat-spinner>
 <mat-list dense *ngIf="aggregations">
   <ng-container *ngIf="hasSelection()">
-    <mat-list-item (click)="select('')">
-      <span class="filter-facet-label">< Show All</span>
+    <mat-list-item (click)="select('')" class="show-all">
+      <mat-icon>chevron_left</mat-icon> Show All
     </mat-list-item>
     <mat-list-item>
       <span class="filter-facet-label">{{label_map[selectedAgg().value]}}</span>

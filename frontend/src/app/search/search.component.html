@@ -11,6 +11,7 @@
     fxLayout="row"
     fxLayoutGap="40px"
     fxLayoutAlign="center auto"
+    id="TopOfSearch"
   >
     <app-border-box-tile
       *ngFor="let type of resourceTypes"
@@ -26,13 +27,12 @@
   </div>
 </div>
 
-<span id="TopOfSearch"></span>
 <div *ngIf="!loading" class="container">
   <div class="row margin-bottom-none">
-    <h1 *ngIf="query.types.length === 1" fragment="filter-top">
+    <h1 *ngIf="query && (query.types.length === 1)" fragment="filter-top">
       <span *ngFor="let hitType of query.getHitTypes()">{{hitType.label}}</span>
     </h1>
-    <h1 *ngIf="query.types.length >  1" fragment="filter-top">
+    <h1 *ngIf="query && query.types.length >  1" fragment="filter-top">
       All Resources
     </h1>
     <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
@@ -53,7 +53,7 @@
             <ng-container *ngFor="let s of sortMethods">
               <mat-radio-button
                 *ngIf="isSortVisible(s)"
-                (click)="noLocation ? openLocationDialog() : sortBy(s)"
+                (click)="noLocation ? openLocationDialog() : sortBy(s.name)"
                 [value]="s.name"
                 [disabled]="isSortDisabled(s)"
               >
@@ -107,10 +107,30 @@
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container">
           <mat-chip-list class="applied-filters">
 
+            <ng-container *ngIf="query && query.words">
+              <mat-chip
+                (click)="removeWords()"
+                class="applied-filter applied-filter-keyword"
+              >
+                <span class="applied-filter-label">"{{query.words}}"</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *ngFor="let age of query.ages let i = index">
+                <mat-chip
+                  (click)="selectAgeRange()"
+                  class="applied-filter applied-filter-age"
+                >
+                  <span class="applied-filter-label">{{ageLabels[age]}}</span>
+                  <mat-icon>close</mat-icon>
+                </mat-chip>
+            </ng-container>
+
             <ng-container *ngIf="query && query.category && query.category.id">
               <mat-chip
                 (click)="removeCategory()"
-                class="applied-filter"
+                class="applied-filter applied-filter-topic"
               >
                 <span class="applied-filter-label">
                   <span *ngIf="query.category.parent && query.category.parent.parent">{{query.category.parent.parent.name}} > </span>
@@ -121,25 +141,9 @@
               </mat-chip>
             </ng-container>
 
-            <ng-container *ngIf="query && query.words">
-              <mat-chip
-                (click)="removeWords()"
-                class="applied-filter"
-              >
-                <span class="applied-filter-label">"{{query.words}}"</span>
-                <mat-icon>close</mat-icon>
-              </mat-chip>
-            </ng-container>
-
-            <ng-container *ngFor="let age of query.ages let i = index">
-                <mat-chip  (click)="selectAgeRange()" class="applied-filter" >
-                  <span class="applied-filter-label">{{ageLabels[age]}}</span>
-                  <mat-icon>close</mat-icon>
-                </mat-chip>
-            </ng-container>
           </mat-chip-list>
+          <p class="num-results">Page {{this.paginatorElement.pageIndex + 1}} of {{this.query.total}} results</p>
         </div>
-
         <agm-map
           *ngIf="showMap()"
           [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"

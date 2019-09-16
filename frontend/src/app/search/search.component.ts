@@ -55,7 +55,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
-        this.sortBy(this.sortMethods[0]);
+        this.sortBy(this.mapLoc ? 'Distance' : 'Relevance');
       });
     });
   }
@@ -116,6 +116,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
+
   currentUser: User;
   resourceGatherers: AccordionItem[] = [
     {
@@ -215,22 +216,16 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   removeCategory() {
     this.query.category = null;
-    this.query.start = 0;
-    this.paginatorElement.firstPage();
-    this.doSearch();
+    this._goToFirstPage();
   }
 
   removeWords() {
     this.query.words = '';
-    this.query.start = 0;
-    this.paginatorElement.firstPage();
-    this.doSearch();
+    this._goToFirstPage();
   }
 
   updateUrlAndDoSearch(query: Query) {
-    const qParams = this._queryToQueryParams(query)
-    console.log('Updating URL and navigating to ', qParams);
-
+    const qParams = this._queryToQueryParams(query);
     this.location.go(
       this.router.createUrlTree([this.router.url],
         { queryParams:  qParams }).toString());
@@ -270,7 +265,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
-        console.log('z', z);
         this.noLocation = false;
         this.zipLoc = {
           lat: z.latitude,
@@ -320,13 +314,13 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  sortBy(selectedSort: SortMethod) {
+  sortBy(sortName: string) {
     this.loading = true;
-    this.selectedSort = selectedSort;
+    this.selectedSort = this.sortMethods.find(s => s.name === sortName);
     this.query.start = 0;
-    this.query.sort = selectedSort.sortQuery;
+    this.query.sort = this.selectedSort.sortQuery;
 
-    if (selectedSort.name === 'Distance') {
+    if (this.selectedSort.name === 'Distance') {
       this.loadMapLocation(() => this._updateDistanceSort());
     } else {
       this.doSearch();
@@ -339,21 +333,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     } else {
       this.query.ages = [];
     }
-    this.query.start = 0;
-    if (this.paginatorElement) {
-      this.paginatorElement.firstPage();
-    }
-    this.updateUrlAndDoSearch(this.query);
+    this._goToFirstPage(true);
   }
 
   selectCategory(newCategory: Category) {
-    console.log('Category Selected: ', newCategory);
     this.query.category = newCategory;
-    this.query.start = 0;
-    if (this.paginatorElement) {
-      this.paginatorElement.firstPage();
-    }
-    this.updateUrlAndDoSearch(this.query);
+    this._goToFirstPage(true);
   }
 
 
@@ -368,15 +353,14 @@ export class SearchComponent implements OnInit, OnDestroy {
         } else {
           this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
         }
-      } else if(keepType === HitType.EVENT.name) {
+      } else if (keepType === HitType.EVENT.name) {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
       }
     } else {
       this.query.types = [];
     }
     this.query.category = null;
-    this.query.start = 0;
-    this.updateUrlAndDoSearch(this.query);
+    this._goToFirstPage(true);
   }
 
   updatePage(event: PageEvent) {
@@ -384,6 +368,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.pageEvent = event;
     this.query.size = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
+    this.scrollToTopOfSearch();
     this.doSearch();
   }
 
@@ -455,7 +440,13 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(_ => {
-      this.loadMapLocation(() => this._updateDistanceSort());
+      this.loadMapLocation(() => {
+        if (this.mapLoc) {
+          this.selectedSort = this.sortMethods.find(s => s.name === 'Distance');
+        }
+
+        this._updateDistanceSort();
+      });
     });
   }
 
@@ -464,10 +455,23 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private _updateDistanceSort() {
-    const distance_sort = this.sortMethods.filter(s => s.name === 'Distance')[0];
+    const distance_sort = this.sortMethods.find(s => s.name === 'Distance');
     distance_sort.sortQuery.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
     distance_sort.sortQuery.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
-    if(this.selectedSort.name === 'Distance') {
+    if (this.selectedSort.name === 'Distance') {
+      this.selectedSort = distance_sort;
+      this.query.sort = this.selectedSort.sortQuery;
+      this.doSearch();
+    }
+  }
+
+  private _goToFirstPage(shouldUpdateUrl = false) {
+    this.query.start = 0;
+    this.paginatorElement.firstPage();
+
+    if (shouldUpdateUrl) {
+      this.updateUrlAndDoSearch(this.query);
+    } else {
       this.doSearch();
     }
   }

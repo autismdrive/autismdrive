@@ -26,9 +26,9 @@ export class SearchUseCases {
     const num_filters_after = await this.page.getElements('.applied-filters .applied-filter').count();
     expect(num_filters_after).toEqual(2);
 
-    const selected_category = await this.page.getElement('h3.mat-subheader').getText();
-    const applied_filter_text = await this.page.getElements('.applied-filters .applied-filter .applied-filter-label').first().getText();
-    expect(applied_filter_text.toUpperCase()).toContain(selected_category);
+    const category_text = await this.page.getElement('app-search-filter:first-of-type .filter-facet-label').getText();
+    const applied_filter_text = await this.page.getElement('.applied-filters .applied-filter-age').getText();
+    expect(applied_filter_text).toContain(category_text);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 
@@ -113,10 +113,8 @@ export class SearchUseCases {
     this.page.getElements('.result-item div a').first().click();
     this.page.waitForVisible('app-resource-detail');
 
-    const cat_chip = this.page.getElements('mat-chip').first();
-    cat_chip.click();
-
-    const num_filters_after = this.page.getElements('.applied-filters .applied-filter').count();
-    expect(num_filters_after).toEqual(1);
+    this.page.clickElement('mat-chip');
+    this.page.waitForVisible('.applied-filter');
+    return expect(this.page.getElements('.applied-filter').count()).toEqual(1);
   }
 }
