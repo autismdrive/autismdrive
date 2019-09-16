@@ -11,6 +11,8 @@ from app.export_service import ExportService
 class EvaluationHistoryMixin(object):
     __question_type__ = ExportService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 5
+    who_diagnosed_other_hide_expression = '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))'
+    where_diagnosed_other_hide_expression = '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -132,7 +134,10 @@ class EvaluationHistoryMixin(object):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.who_diagnosed && (model.who_diagnosed === "diagnosisOther"))',
+            "hide_expression": who_diagnosed_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + who_diagnosed_other_hide_expression
+            }
         },
     )
 
@@ -192,7 +197,10 @@ class EvaluationHistoryMixin(object):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))',
+            "hide_expression": where_diagnosed_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + where_diagnosed_other_hide_expression
+            }
         },
     )
 

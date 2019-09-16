@@ -9,6 +9,7 @@ from app.model.questionnaires.home_mixin import HomeMixin
 class HomeDependentQuestionnaire(db.Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
+    dependent_living_other_hide_expression = '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))'
 
     struggle_to_afford_desc = '"Do you or " + (formState.preferredName || "your child") + "\'s other caregivers ever struggle with being ' \
                                'able to afford to pay for household needs, food, or security for the family?"'
@@ -44,9 +45,10 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))',
+            "hide_expression": dependent_living_other_hide_expression,
             "expression_properties": {
-                "template_options.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"'
+                "template_options.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"',
+                "template_options.required": '!' + dependent_living_other_hide_expression
             },
         },
     )

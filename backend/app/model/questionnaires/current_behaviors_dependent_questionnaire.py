@@ -9,6 +9,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
 
     has_academic_difficulties_desc = '"Does " + (formState.preferredName || "your child") + " have any difficulties with academics?"'
     academic_difficulty_areas_desc = '"What areas of academics are difficult for " + (formState.preferredName || "your child")'
+    concerning_behaviors_other_hide_expression = '!(model.concerning_behaviors && model.concerning_behaviors.includes("concerningOther"))'
 
     dependent_verbal_ability = db.Column(
         db.String,
@@ -80,7 +81,10 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.concerning_behaviors && model.concerning_behaviors.includes("concerningOther"))',
+            "hide_expression": concerning_behaviors_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + concerning_behaviors_other_hide_expression
+            }
         },
     )
 

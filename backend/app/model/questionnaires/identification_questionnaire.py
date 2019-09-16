@@ -13,6 +13,7 @@ class IdentificationQuestionnaire(db.Model):
     __label__ = "Identification"
     __question_type__ = ExportService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
+    relationship_to_participant_other_hide_expression = '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -55,7 +56,10 @@ class IdentificationQuestionnaire(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.relationship_to_participant && (model.relationship_to_participant === "other"))',
+            "hide_expression": relationship_to_participant_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + relationship_to_participant_other_hide_expression
+            }
         },
     )
     first_name = db.Column(

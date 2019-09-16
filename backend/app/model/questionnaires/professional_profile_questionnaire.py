@@ -13,6 +13,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
     __label__ = "Professional Profile"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 2
+    professional_identity_other_hide_expression = '!(model.professional_identity && model.professional_identity.includes("profOther"))'
+    learning_interests_other_hide_expression = '!(model.learning_interests && model.learning_interests.includes("learnOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -102,7 +104,10 @@ class ProfessionalProfileQuestionnaire(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.professional_identity && model.professional_identity.includes("profOther"))',
+            "hide_expression": professional_identity_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + professional_identity_other_hide_expression
+            }
         },
     )
     learning_interests = db.Column(
@@ -155,7 +160,10 @@ class ProfessionalProfileQuestionnaire(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.learning_interests && model.learning_interests.includes("learnOther"))',
+            "hide_expression": learning_interests_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + learning_interests_other_hide_expression
+            }
         },
     )
     currently_work_with_autistic = db.Column(

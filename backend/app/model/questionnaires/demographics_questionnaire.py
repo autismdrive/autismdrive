@@ -13,6 +13,8 @@ class DemographicsQuestionnaire(db.Model):
     __label__ = "Demographics"
     __question_type__ = ExportService.TYPE_SENSITIVE
     __estimated_duration_minutes__ = 8
+    gender_identity_other_hide_expression = '!(model.gender_identity && (model.gender_identity === "genderOther"))'
+    race_ethnicity_other_hide_expression = '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -96,7 +98,10 @@ class DemographicsQuestionnaire(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.gender_identity && (model.gender_identity === "genderOther"))',
+            "hide_expression": gender_identity_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + gender_identity_other_hide_expression
+            }
         },
     )
     race_ethnicity = db.Column(
@@ -133,7 +138,10 @@ class DemographicsQuestionnaire(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))',
+            "hide_expression": race_ethnicity_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + race_ethnicity_other_hide_expression
+            }
         },
     )
 

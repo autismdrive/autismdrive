@@ -11,6 +11,7 @@ from app.export_service import ExportService
 class EducationMixin(object):
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
+    school_services_other_hide_expression = '!(model.school_services && model.school_services.includes("servicesOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -94,6 +95,9 @@ class EducationMixin(object):
                     "required": True,
                 },
                 "hide_expression": cls.placement_other_hide_expression,
+                "expression_properties": {
+                    "template_options.required": '!' + cls.placement_other_hide_expression
+                }
             },
         )
 
@@ -110,6 +114,9 @@ class EducationMixin(object):
                     "required": True,
                 },
                 "hide_expression": cls.current_grade_hide_expression,
+                "expression_properties": {
+                    "template_options.required": '!' + cls.current_grade_hide_expression
+                }
             },
         )
 
@@ -156,7 +163,10 @@ class EducationMixin(object):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.school_services && model.school_services.includes("servicesOther"))',
+            "hide_expression": school_services_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + school_services_other_hide_expression
+            }
         },
     )
 

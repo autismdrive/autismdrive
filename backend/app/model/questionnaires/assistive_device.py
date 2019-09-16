@@ -13,6 +13,7 @@ class AssistiveDevice(db.Model):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
     __no_export__ = True  # This will be transferred as a part of a parent class
+    type_other_hide_expression = '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -176,7 +177,10 @@ class AssistiveDevice(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))',
+            "hide_expression": type_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + type_other_hide_expression
+            }
         },
     )
     timeframe = db.Column(

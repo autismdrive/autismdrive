@@ -13,6 +13,7 @@ class Housemate(db.Model):
     __tablename__ = "housemate"
     __label__ = "Housemate"
     __no_export__ = True  # This will be transferred as a part of a parent class
+    relationship_other_hide_expression = '!(model.relationship && (model.relationship === "relationOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -82,7 +83,10 @@ class Housemate(db.Model):
                 "appearance": "standard",
                 "required": True,
             },
-            "hide_expression": '!(model.relationship && (model.relationship === "relationOther"))',
+            "hide_expression": relationship_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + relationship_other_hide_expression
+            }
         },
     )
     age = db.Column(
