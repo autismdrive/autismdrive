@@ -17,6 +17,11 @@ export class ProfileUseCases {
     this.page.clickAndExpectRoute('#enroll_guardian', pattern);
   }
 
+  startDependentFlow() {
+    const pattern = /\/flow\/dependent_intake\/([0-9]+)/;
+    this.page.clickAndExpectRoute('#enroll_first_dependent', pattern);
+  }
+
   navigateToProfile() {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
   }

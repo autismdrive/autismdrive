@@ -58,7 +58,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
             ('api.studylistendpoint', '/api/study'),
             ('api.userendpoint', '/api/user/<id>'),
             ('api.userlistendpoint', '/api/user'),
-            ('api.zipcodecoordsendpoint', '/api/zip_code_coords/<zip_code>'),
+            ('api.zipcodecoordsendpoint', '/api/zip_code_coords/<id>'),
             ('auth.forgot_password', '/api/forgot_password'),
             ('auth.login_password', '/api/login_password'),
             ('auth.reset_password', '/api/reset_password'),

@@ -46,6 +46,8 @@ import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.com
 import {
   EmailValidator,
   EmailValidatorMessage,
+  MulticheckboxValidator,
+  MulticheckboxValidatorMessage,
   PhoneValidator,
   PhoneValidatorMessage,
   UrlValidator,
@@ -109,9 +111,11 @@ import {MatRadioModule} from '@angular/material/radio';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
-import { SearchTopicsComponent } from './search-topics/search-topics.component';
+import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
+import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
+import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -128,17 +132,19 @@ export class FormlyConfig {
       {name: 'phone', validation: PhoneValidator},
       {name: 'email', validation: EmailValidator},
       {name: 'url', validation: UrlValidator},
+      {name: 'multicheckbox', validation: MulticheckboxValidator},
     ],
     validationMessages: [
       {name: 'phone', message: PhoneValidatorMessage},
       {name: 'email', message: EmailValidatorMessage},
       {name: 'url', message: UrlValidatorMessage},
+      {name: 'multicheckbox', message: MulticheckboxValidatorMessage},
       {name: 'required', message: 'This field is required.'},
     ],
     wrappers: [
       {name: 'help', component: HelpWrapperComponent},
       {name: 'card', component: CardWrapperComponent},
-    ],
+    ]
   };
 }
 
@@ -166,6 +172,7 @@ export class FormlyConfig {
     FlowIntroComponent,
     FooterComponent,
     ForgotPasswordComponent,
+    FormPrintoutComponent,
     HeaderComponent,
     HelpWrapperComponent,
     HeroSlidesComponent,
@@ -187,6 +194,7 @@ export class FormlyConfig {
     QuestionnaireStepsListComponent,
     RegisterComponent,
     RepeatSectionComponent,
+    RepeatSectionDialogComponent,
     ResourceAddButtonComponent,
     ResourceDetailComponent,
     ResourceEditButtonComponent,
@@ -205,13 +213,6 @@ export class FormlyConfig {
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
-    FooterComponent,
-    MirrorComponent,
-    AdminExportComponent,
-    AdminExportDetailsComponent,
-    DetailsLinkComponent,
-    BorderBoxTileComponent,
-    StudyInquiryComponent,
     SearchTopicsComponent,
   ],
   imports: [
@@ -268,7 +269,12 @@ export class FormlyConfig {
     SearchService,
   ],
   bootstrap: [AppComponent],
-  entryComponents: [AvatarDialogComponent, AdminExportDetailsComponent, SetLocationDialogComponent]
+  entryComponents: [
+    AdminExportDetailsComponent,
+    AvatarDialogComponent,
+    RepeatSectionDialogComponent,
+    SetLocationDialogComponent
+  ]
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {

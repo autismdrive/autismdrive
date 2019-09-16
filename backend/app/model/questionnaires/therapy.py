@@ -12,6 +12,7 @@ class Therapy(db.Model):
     __tablename__ = "therapy"
     __label__ = "Therapy or Service"
     __no_export__ = True  # This will be transferred as a part of a parent class
+    type_other_hide_expression = '!(model.type && (model.type === "other"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -26,7 +27,8 @@ class Therapy(db.Model):
             "display_order": 1,
             "type": "select",
             "template_options": {
-                "required": False,
+                "label": "Select type",
+                "required": True,
                 "options": [
                     {
                         "value": "speechLanguage",
@@ -87,9 +89,12 @@ class Therapy(db.Model):
             "template_options": {
                 "label": "Enter therapy or service",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
-            "hide_expression": '!(model.type && (model.type === "other"))',
+            "hide_expression": type_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + type_other_hide_expression
+            }
         },
     )
     timeframe = db.Column(
@@ -103,10 +108,7 @@ class Therapy(db.Model):
                 "options": [
                     {"value": "current", "label": "Currently receiving"},
                     {"value": "past", "label": "Received in the past"},
-                    {
-                        "value": "futureInterest",
-                        "label": "Interested in receiving",
-                    },
+                    {"value": "futureInterest", "label": "Interested in receiving"},
                 ],
             },
         },

@@ -1,0 +1,4 @@
+<ng-container *ngFor="let f of field.fieldGroup">
+  <app-form-printout *ngIf="f.fieldGroup && (f.fieldGroup.length > 0)" [field]="f"></app-form-printout>
+  <p *ngIf="!f.fieldGroup && getModelValue(f.name)">{{getModelValue(f.name)}}</p>
+</ng-container>

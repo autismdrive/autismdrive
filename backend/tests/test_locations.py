@@ -190,9 +190,9 @@ class TestLocations(BaseTest, unittest.TestCase):
     def test_zip_code_coordinates(self):
         z = self.construct_zip_code()
         rv = self.app.get(
-            '/api/zip_code_coords/%i' % z.zip_code, content_type="application/json")
+            '/api/zip_code_coords/%i' % z.id, content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(z.zip_code, response["zip_code"])
+        self.assertEqual(z.id, response["id"])
         self.assertEqual(z.latitude, response["latitude"])
         self.assertEqual(z.longitude, response["longitude"])

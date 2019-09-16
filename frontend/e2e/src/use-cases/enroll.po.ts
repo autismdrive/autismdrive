@@ -1,5 +1,5 @@
 import { AppPage } from '../app-page.po';
-import {by} from 'protractor';
+import {by, ElementFinder} from 'protractor';
 
 export class EnrollUseCases {
   constructor(private page: AppPage) {
@@ -76,13 +76,97 @@ export class EnrollUseCases {
     expect(this.page.getElements('[id*="_input_"]').count()).toBeGreaterThanOrEqual(1);
   }
 
-  fillOutRequiredFields() {
-    expect(this.page.getElements('#save-next-button[disabled]').count()).toEqual(1);
-    expect(this.page.getElements('.mat-form-field-required-marker').count()).toBeGreaterThanOrEqual(1);
-    this.page.tabThroughAllFields();
-    expect(this.page.getElements('.ng-invalid').count()).toBeGreaterThan(0);
-    this.page.fillOutInvalidFields();
-    expect(this.page.getElements('#save-next-button[disabled]').count()).toEqual(0);
-    expect(this.page.getElements('mat-error formly-validation-message').count()).toEqual(0);
+  async fillOutRequiredFields(reqSelector: string, btnSelector: string, invalidSelector: string) {
+    const numRequired = await this.page.getElements(reqSelector).count();
+    if (numRequired === 0) {
+      await expect(this.page.getElements(btnSelector).count()).toEqual(0);
+    } else {
+      await expect(this.page.getElements(btnSelector).count()).toEqual(1);
+      await this.page.clickElement(btnSelector).then(async () => {
+        await expect(this.page.getElements(invalidSelector).count()).toBeGreaterThan(0);
+        await this.page.fillOutFields(invalidSelector);
+        await this.page.waitFor(500);
+      });
+    }
+
+    return expect(this.page.getElements(btnSelector).count()).toEqual(0);
+  }
+
+  async saveStep(stepIndex: number) {
+    const selector = `#step_link_${stepIndex}`;
+    const currentStepId = await this.page.getElement(selector).getAttribute('id');
+    await this.page.clickElement('#save-next-button');
+    await this.page.waitFor(500);
+    await this.page.waitForVisible('#save-next-button, app-flow-complete');
+    return expect(this.page.getElements(`#${currentStepId} .done .visible`).count()).toEqual(1);
+  }
+
+  async completeStep(stepIndex: number) {
+    const selector = `#step_link_${stepIndex}`;
+    this.page.getElement(selector).click();
+    expect(this.page.getElements(`${selector} .done .visible`).count()).toEqual(0);
+
+    await this.fillOutRequiredFields(
+      '.mat-form-field-required-marker',
+      '#save-next-button.disabled',
+      '.ng-invalid'
+    );
+    await this.fillOutRepeatSections();
+    await this.page.waitFor(500);
+    await this.saveStep(stepIndex);
+    await this.page.waitFor(500);
+
+    return expect(this.page.getElements(`${selector} .done .visible`).count()).toEqual(1);
+  }
+
+  async fillOutRepeatSections() {
+    const itemSelector = 'mat-card.repeat';
+    const dialogSelector = 'app-repeat-section-dialog .mat-dialog-content';
+    const saveBtnSelector = 'app-repeat-section-dialog .repeat-section-dialog-save';
+    const numRepeats = await this.page.getElements('app-repeat-section').count();
+    if (numRepeats > 0) {
+      const repeatSections: ElementFinder[] = await this.page.getElements('app-repeat-section');
+      for (const e of repeatSections) {
+        const numDialogs = await this.page.getElements(dialogSelector).count();
+        if (numDialogs > 0) {
+          await expect(this.page.getElement(dialogSelector).isDisplayed()).toBeFalsy();
+        } else {
+          await expect(this.page.getElements(dialogSelector).count()).toEqual(0);
+        }
+        await expect(e.$$(itemSelector).count()).toEqual(0);
+        await e.$('.repeat-action button').click();
+        await this.page.waitForVisible(dialogSelector);
+        await expect(this.page.getElement(dialogSelector).isDisplayed()).toBeTruthy();
+        await this.page.waitFor(100);
+        await this.fillOutRequiredFields(
+          `${dialogSelector} .mat-form-field-required-marker`,
+          `${saveBtnSelector}.disabled`,
+          `${dialogSelector} .ng-invalid`
+        );
+        await this.page.waitFor(100).then(async () => {
+          await this.page.waitForNotVisible(`${saveBtnSelector}.disabled`);
+          await this.page.waitForClickable(saveBtnSelector);
+          await this.page.waitFor(100);
+
+          // Silly hack to force mat-dialog to notice click
+          for (let i = 0; i < 10; i++) {
+            const numDialogs2 = await this.page.getElements(dialogSelector).count();
+            if (numDialogs2 > 0) {
+              await this.page.waitFor(100);
+              await this.page.clickElement(saveBtnSelector);
+              await this.page.waitFor(100);
+            } else {
+              break;
+            }
+          }
+          await this.page.waitForNotVisible(dialogSelector);
+          await expect(e.$$(itemSelector).count()).toEqual(1);
+          await expect(this.page.getElements(dialogSelector).count()).toEqual(0);
+          await this.page.waitFor(100);
+        });
+      }
+    }
+
+    return expect(this.page.getElements(itemSelector).count()).toEqual(numRepeats);
   }
 }

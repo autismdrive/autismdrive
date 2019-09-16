@@ -13,6 +13,7 @@ class AssistiveDevice(db.Model):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
     __no_export__ = True  # This will be transferred as a part of a parent class
+    type_other_hide_expression = '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -27,7 +28,7 @@ class AssistiveDevice(db.Model):
             "display_order": 1.1,
             "type": "select",
             "template_options": {
-                "required": False,
+                "required": True,
                 "label": "Select category of device",
                 "options": [
                     {
@@ -60,7 +61,7 @@ class AssistiveDevice(db.Model):
             "display_order": 1.2,
             "type": "select",
             "template_options": {
-                "required": False,
+                "required": True,
                 "label": "Select device",
                 "all_options": [
                     {
@@ -161,8 +162,8 @@ class AssistiveDevice(db.Model):
                 ]
             },
             "expression_properties": {
-                'template_options.options': 'this.field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
-                'model.type': 'model.type_group === "other" ? "other" : (this.field.templateOptions.options.find(o => o.id === model.type) ? model.type : null)',
+                'template_options.options': 'field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
+                'model.type': 'model.type_group === "other" ? "other" : (field.templateOptions.options.find(o => o.value === model.type) ? model.type : null)',
             },
         }
     )
@@ -174,9 +175,12 @@ class AssistiveDevice(db.Model):
             "template_options": {
                 "label": "Enter assistive device",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
-            "hide_expression": '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))',
+            "hide_expression": type_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + type_other_hide_expression
+            }
         },
     )
     timeframe = db.Column(

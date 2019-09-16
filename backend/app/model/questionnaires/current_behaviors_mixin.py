@@ -13,6 +13,7 @@ class CurrentBehaviorsMixin(object):
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __label__ = "Current Behaviors"
     __estimated_duration_minutes__ = 5
+    academic_difficulty_other_hide_expression = '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -68,8 +69,10 @@ class CurrentBehaviorsMixin(object):
                 },
                 "expression_properties": {
                     "template_options.description": cls.academic_difficulty_areas_desc,
+                    "template_options.required": "model.has_academic_difficulties"
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
+                "validators": {"required": "multicheckbox"},
             },
         )
 
@@ -80,9 +83,13 @@ class CurrentBehaviorsMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Enter area of academic difficulty",
-                "appearance": "standard"
+                "appearance": "standard",
+                "required": True
             },
-            "hide_expression": '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))',
+            "hide_expression": academic_difficulty_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + academic_difficulty_other_hide_expression
+            }
         },
     )
 

@@ -48,10 +48,6 @@ export class FlowComponent implements OnInit, OnDestroy {
   fields = [];
   options: FormlyFormOptions;
 
-  static clone(o: any): any {
-    return JSON.parse(JSON.stringify(o));
-  }
-
   constructor(
     private api: ApiService,
     private authenticationService: AuthenticationService,
@@ -226,13 +222,18 @@ export class FlowComponent implements OnInit, OnDestroy {
     return fields;
   }
 
+  highlightRequiredFields() {
+    this.form.updateValueAndValidity();
+    this.form.markAllAsTouched();
+  }
+
   submit() {
     // force the correct participant id.
     this.model['participant_id'] = this.participant.id;
     this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
-    if ((this.currentStep().questionnaire_id > 0) && (this.currentStep().type != 'sensitive')) {
+    if ((this.currentStep().questionnaire_id > 0) && (this.currentStep().type !== 'sensitive')) {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
           this.googleAnalyticsService.event('update',  {

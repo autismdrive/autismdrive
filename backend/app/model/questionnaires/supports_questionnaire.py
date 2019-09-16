@@ -18,6 +18,7 @@ class SupportsQuestionnaire(db.Model):
     __label__ = "Supports"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
+    alternative_med_other_hide_expression = '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -63,9 +64,12 @@ class SupportsQuestionnaire(db.Model):
             "template_options": {
                 "label": "Enter other alternative treatment",
                 "appearance": "standard",
-                "required": False,
+                "required": True,
             },
-            "hide_expression": '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))',
+            "hide_expression": alternative_med_other_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + alternative_med_other_hide_expression
+            }
         },
     )
     therapies = db.relationship(

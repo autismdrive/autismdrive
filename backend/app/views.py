@@ -231,7 +231,7 @@ endpoints = [
     (DataTransferLogEndpoint, "/data_transfer_log"),
 
     #ZIP Code Endpoint
-    (ZipCodeCoordsEndpoint, "/zip_code_coords/<zip_code>"),
+    (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
 
 ]
 
