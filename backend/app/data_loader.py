@@ -42,16 +42,15 @@ class DataLoader:
         print("Data loader initialized")
 
     def load_categories(self):
-        items = []
         with open(self.category_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                parent = self.get_category_by_name(row[1].strip()) if row[1] else None
-                items.append(self.get_category_by_name(category_name=row[0].strip(), parent=parent, create_missing=True))
+                parent = self.get_category_by_name(category_name=row[1].strip(), create_missing=True) if row[1] else None
+                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent, create_missing=True)
+                db.session.add(category)
+                db.session.commit()
 
-        db.session.bulk_save_objects(items)
-        db.session.commit()
         print("Categories loaded.  There are now %i categories in the database." % db.session.query(
             Category).count())
 
@@ -104,13 +103,13 @@ class DataLoader:
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
                                     zip=row[11], website=row[13], phone=row[15], email=row[14],
                                     latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
-                                    
-                items.append(location)
+
                 self.__increment_id_sequence(Resource)
-                                    latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
+
                 for i in range(28, len(row)):
                     if row[i]:
                         location.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 items.append(location)
 
                 for i in range(18, 27):
@@ -135,11 +134,12 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
-                                    phone=row[6])
-                for i in range(15, len(row)):
+                                    phone=row[6], ages=[])
+
                 for i in range(15, len(row)):
                     if row[i]:
                         resource.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 items.append(resource)
                 self.__increment_id_sequence(Resource)
 
@@ -148,7 +148,6 @@ class DataLoader:
                         category = self.get_category_by_name(row[i].strip())
                         resource_id = resource.id
                         category_id = category.id
-
                         items.append(ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource'))
 
         db.session.bulk_save_objects(items)
@@ -190,10 +189,8 @@ class DataLoader:
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
                         category_id = category.id
-
                         study_category = StudyCategory(study_id=study_id, category_id=category_id)
                         db.session.add(study_category)
-
 
                 for i in [10, 14, 18]:
                     if row[i]:
