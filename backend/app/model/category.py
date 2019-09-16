@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from sqlalchemy import func
 
 from app import db
@@ -47,4 +44,3 @@ class Category(db.Model):
             cat = cat.parent
             path = str(cat.id) + "," + path
         return path
-
