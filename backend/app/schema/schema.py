@@ -21,6 +21,7 @@ from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User, Role
+from app.model.zip_code import ZipCode
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
@@ -46,7 +47,6 @@ import app.model.questionnaires.home_self_questionnaire
 import app.model.questionnaires.identification_questionnaire
 import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
-from app.model.zip_code import ZipCode
 
 
 class ParticipantSchema(ModelSchema):
@@ -215,7 +215,6 @@ class CategorySchema(ModelSchema):
             .filter(StudyCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
-
 
 
 class CategoriesOnEventSchema(ModelSchema):
@@ -615,6 +614,7 @@ class StepLogSchema(ModelSchema):
     class Meta:
         model = StepLog
         include_fk = True
+
 
 class ZipCodeSchema(ModelSchema):
     class Meta:
