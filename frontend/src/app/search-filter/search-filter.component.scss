@@ -1,0 +1,53 @@
+@import '../../config';
+
+.mat-list-base[dense] {
+  h3.mat-subheader {
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    padding-left: 0px;
+  }
+
+  div.sub-level {
+    padding-left: 16px;
+  }
+
+  h3.mat-subheader:first-child {
+    margin-top: 0.5em;
+  }
+
+  mat-list-item.mat-list-item {
+    cursor: pointer;
+    font-weight: bold;
+    color: $brand-primary;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 24px;
+
+    &:hover {
+      background-color: rgba(0,0,0,0.1);
+    }
+
+    ::ng-deep &.show-all .mat-list-item-content {
+      padding-left: 0;
+      margin-left: -10px;
+    }
+
+    ::ng-deep .mat-list-item-content {
+      line-height: 12px;
+      align-content: center;
+
+      .filter-facet-label {
+        align-self: center;
+      }
+    }
+
+    .hit-count {
+      color: $body-color;
+      font-weight: normal;
+      text-align: right;
+      white-space: nowrap;
+    }
+  }
+}

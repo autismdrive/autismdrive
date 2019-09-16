@@ -6,12 +6,15 @@ Treatment and Therapies ,
     Medication,Treatment and Therapies 
     Early Intervention,Treatment and Therapies 
     Applied Behavior Analysis,Treatment and Therapies 
-    Speech and Communication Supports,Treatment and Therapies 
-    Occupational Therapy ,Treatment and Therapies 
+    Speech and Communication,Treatment and Therapies
+    Occupational Therapy ,Treatment and Therapies
+    Physical Therapy, Treatment and Therapies
+    Music Therapy, Treatment and Therapies
     Counseling,Treatment and Therapies 
           Cognitive Behavioral Therapy ,    Counseling
           Dialectical Behavior Therapy,    Counseling
-    Social Skills Training,Treatment and Therapies 
+    Social Skills Training,Treatment and Therapies
+				Video Modeling, Treatment and Therapies
 Physical and Mental Health ,
      Wellness,Physical and Mental Health 
               Dental Care,     Wellness
@@ -83,12 +86,4 @@ National ,Locations
 Type of Resources ,
 Handout ,Type of Resources 
 Book ,Type of Resources 
-Event,Type of Resources 
-Age Range,
-Pre-K (0 - 5 years),Age Range
-Childhood (0 - 13 years),Age Range
-School age (6 - 13 years),Age Range
-Transition age (14 - 22 years),Age Range
-Adulthood (23 - 64),Age Range
-Aging (65+),Age Range
-All Ages,Age Range
+Event,Type of Resources

@@ -1,4 +1,4 @@
-@import '../../material';
+@import '../../config';
 
 #hero {
   background-image: url('/assets/home/hero-parent-child.jpg');
@@ -31,42 +31,13 @@ form.search-box {
   padding-right: 2em;
 }
 
-.mat-list-base[dense] {
-  h3.mat-subheader {
-    font-size: 1.25rem;
-    margin-top: 1em;
-    padding-left: 0px;
-  }
-
-  h3.mat-subheader:first-child {
-    margin-top: 0px;
-  }
-
-  .mat-list-item {
-    cursor: pointer;
-    font-weight: bold;
-    color: $brand-primary;
-    padding-top: 0px;
-    padding-bottom: 0px;
-
-    &:hover {
-      background-color: rgba(0,0,0,0.1);
-      text-decoration: underline;
-    }
-
-    .mat-list-item-content {
-      line-height: 0.8;
-    }
-
-    .hit-count {
-      color: $body-color;
-      font-weight: normal;
-      text-align: right;
-      white-space: nowrap;
-    }
-  }
+h3.mat-subheader {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  margin-top: 1em;
+  padding-left: 0px;
+  padding-bottom: 0px;
 }
-
 
 button {
   flex: 0 0 auto;
@@ -93,11 +64,16 @@ button {
 
 .breadcrumbs-container {
   width: 100%;
-  padding-right: 2rem;
+  padding-right: 0;
   padding-left: 0;
   margin: 0;
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5em;
+
+
+
+  .num-results {
+    text-align: right;
+  }
 }
 
 .applied-filters {
@@ -105,10 +81,11 @@ button {
   margin-left: 0;
   justify-self: start;
 
-  .mat-chip-list-wrapper {
+  ::ng-deep .mat-chip-list-wrapper {
     display: flex;
     flex-wrap: wrap;
     overflow-x: auto;
+    padding-bottom: 1em;
 
     .mat-chip {
       flex: 0 0 auto;
@@ -124,6 +101,10 @@ button {
       margin-right: -0.25rem;
       font-size: 1.25rem;
       line-height: 1.25;
+    }
+
+    .applied-filter-label mat-icon {
+      margin-left: 0;
     }
   }
 }

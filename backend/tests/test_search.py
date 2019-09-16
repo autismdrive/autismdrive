@@ -43,22 +43,51 @@ class TestSearch(BaseTest, unittest.TestCase):
                             "You are not working with the test index.  Make sure the " +
                             "first thing you import in this file is base_test.")
 
-    def test_search_facets(self):
-        type_query = {'words': '', 'filters': [{"field": "type", "value": ["resource"]}]}
-        search_results = self.search(type_query)
+    def test_search_has_counts_by_type(self):
+        basic_query = {'words': ''}
+        search_results = self.search(basic_query)
         self.assertEqual(0, len(search_results['hits']))
 
         # test that elastic resource is created with post
         res = self.construct_resource(title="space unicorn", description="delivering rainbows")
+        res2 = self.construct_location(title="space unicorn Palace", description="come buy unicorn poop here.")
         rv = self.app.get('api/resource/%i' % res.id, content_type="application/json", follow_redirects=True)
         self.assert_success(rv)
 
-        search_results = self.search(type_query)
-        self.assertEqual(1, len(search_results['hits']))
+        search_results = self.search(basic_query)
+        self.assertEqual(2, len(search_results['hits']))
+
+        locations = next(x for x in search_results['type_counts'] if x['value'] == "location")
+        resources = next(x for x in search_results['type_counts'] if x['value'] == "resource")
+        self.assertEqual(1, locations["count"])
+        self.assertEqual(1, resources["count"])
+
+
+
+    def test_search_has_counts_by_age_range(self):
+
+        basic_query = {'words': ''}
+        search_results = self.search(basic_query)
+        self.assertEqual(0, len(search_results['hits']))
+
+        # test that elastic resource is created with post
+        res = self.construct_resource(title="Bart", description="free lovin young fella", ages=['young folks'])
+        res2 = self.construct_resource(title="Abe", description="delightful grandpop.", ages=['old folks'])
+        rv = self.app.get('api/resource/%i' % res.id, content_type="application/json", follow_redirects=True)
+        self.assert_success(rv)
+
+        search_results = self.search(basic_query)
+        self.assertEqual(2, len(search_results['hits']))
+
+        young_folks = next(x for x in search_results['age_counts'] if x['value'] == "young folks")
+        old_folks = next(x for x in search_results['age_counts'] if x['value'] == "old folks")
+
+        self.assertEqual(1, young_folks["count"])
+        self.assertEqual(1, old_folks["count"])
 
     def test_study_search_basics(self):
-        umbrella_query = {'words': 'umbrellas', 'filters': []}
-        universe_query = {'words': 'universe', 'filters': []}
+        umbrella_query = {'words': 'umbrellas'}
+        universe_query = {'words': 'universe'}
         search_results = self.search(umbrella_query)
         self.assertEqual(0, len(search_results['hits']))
         search_results = self.search(universe_query)
@@ -79,8 +108,8 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(0, len(search_results['hits']))
 
     def test_search_basics(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows'}
+        world_query = {'words': 'world'}
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results['hits']))
         search_results = self.search(world_query)
@@ -156,8 +185,8 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(search_results['hits'][2]['title'], location_far.title)
 
     def test_modify_resource_search_basics(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
-        world_query = {'words': 'world', 'filters': []}
+        rainbow_query = {'words': 'rainbows'}
+        world_query = {'words': 'world'}
         # create the resource
         resource = self.construct_resource(
             title='space unicorn', description="delivering rainbows")
@@ -183,7 +212,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(resource.id, search_results['hits'][0]['id'])
 
     def test_delete_search_item(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
+        rainbow_query = {'words': 'rainbows'}
         resource = self.construct_resource(
             title='space unicorn', description="delivering rainbows")
         search_results = self.search(rainbow_query)
@@ -193,7 +222,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(0, len(search_results['hits']))
 
     def test_search_resources_returns_only_resources(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
+        rainbow_query = {'words': 'rainbows'}
 
         r = self.construct_resource(title='space unicorn online resource', description="Electronically-delivered rainbows through the internets")
         l = self.construct_location(title='space unicorn main office', description="Where rainbows are manufactured for galactic distribution")
@@ -203,12 +232,12 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search_resources(rainbow_query)
         self.assertEqual(3, len(search_results['hits']), 'should only return 3 results')
 
-        expected_types = ['Online Information', 'Local Services', 'Events and Training']
-        not_expected_types = ['Research Studies']
+        expected_types = ['resource', 'location', 'event']
+        not_expected_types = ['study']
         self.check_search_results(search_results, expected_types, not_expected_types)
 
     def test_search_studies_returns_only_studies(self):
-        rainbow_query = {'words': 'rainbows', 'filters': []}
+        rainbow_query = {'words': 'rainbows'}
 
         r = self.construct_resource(title='space unicorn online resource', description="Electronically-delivered rainbows through the internets")
         l = self.construct_location(title='space unicorn main office', description="Where rainbows are manufactured for galactic distribution")
@@ -219,20 +248,23 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         self.assertEqual(1, len(search_results['hits']), 'should only return 1 result')
 
-        expected_types = ['Research Studies']
-        not_expected_types = ['Online Information', 'Local Services', 'Events and Training']
+        expected_types = ['study']
+        not_expected_types = ['resource', 'location', 'event']
         self.check_search_results(search_results, expected_types, not_expected_types)
 
     def check_search_results(self, search_results, expected_types, not_expected_types):
         for hit in search_results['hits']:
-            self.assertIn(hit['label'], expected_types)
-            self.assertNotIn(hit['label'], not_expected_types)
+            self.assertIn(hit['type'], expected_types)
+            self.assertNotIn(hit['type'], not_expected_types)
 
-        for facet in search_results['facets']:
-            if facet['field'] == 'Type':
-                for fc in facet['facetCounts']:
-                    self.assertIn(fc['category'], expected_types)
-                    self.assertNotIn(fc['category'], not_expected_types)
+        for expected in expected_types:
+            value = next(x for x in search_results['type_counts'] if x['value'] == expected)
+            self.assertTrue(value['count'] > 0)
+
+        for expected in not_expected_types:
+            for value in search_results['type_counts']:
+                if value['value'] == expected:
+                    self.assertTrue(value['count'] == 0)
 
     def setup_category_aggregations(self):
         # There are two types of people in this world.
@@ -302,7 +334,8 @@ class TestSearch(BaseTest, unittest.TestCase):
     def test_that_top_level_category_is_always_present(self):
         self.setup_category_aggregations()
         maker_wood_cat = db.session.query(Category).filter(Category.name == 'Woodworkers').first()
-        type_query = {'words': '', 'category': {'id': maker_wood_cat.id}}
-        search_results = self.search(type_query)
+        query = {'words': '', 'category': {'id': maker_wood_cat.id}}
+        search_results = self.search(query)
         self.assertEquals("Makers", search_results['category']['parent']['name'])
         self.assertEquals("Topics", search_results['category']['parent']['parent']['name'])
+

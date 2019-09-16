@@ -1,3 +1,4 @@
+from app.model.age_range import AgeRange
 from app.model.category import Category
 from app.model.investigator import Investigator
 from app.model.organization import Organization
@@ -6,6 +7,7 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
+from app.model.search import Search
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -40,16 +42,15 @@ class DataLoader:
         print("Data loader initialized")
 
     def load_categories(self):
-        items = []
         with open(self.category_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                parent = self.get_category_by_name(row[1].strip()) if row[1] else None
-                items.append(self.get_category_by_name(category_name=row[0].strip(), parent=parent))
+                parent = self.get_category_by_name(category_name=row[1].strip(), create_missing=True) if row[1] else None
+                category = self.get_category_by_name(category_name=row[0].strip(), parent=parent, create_missing=True)
+                db.session.add(category)
+                db.session.commit()
 
-        db.session.bulk_save_objects(items)
-        db.session.commit()
         print("Categories loaded.  There are now %i categories in the database." % db.session.query(
             Category).count())
 
@@ -101,11 +102,17 @@ class DataLoader:
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
                                     street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
                                     zip=row[11], website=row[13], phone=row[15], email=row[14],
-                                    latitude=geocode['lat'], longitude=geocode['lng'])
-                items.append(location)
+                                    latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
+
                 self.__increment_id_sequence(Resource)
 
-                for i in range(18, len(row)):
+                for i in range(28, len(row)):
+                    if row[i]:
+                        location.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
+                items.append(location)
+
+                for i in range(18, 27):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
@@ -127,16 +134,20 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
-                                    phone=row[6])
+                                    phone=row[6], ages=[])
+
+                for i in range(15, len(row)):
+                    if row[i]:
+                        resource.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 items.append(resource)
                 self.__increment_id_sequence(Resource)
 
-                for i in range(7, len(row)):
+                for i in range(7, 14):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         resource_id = resource.id
                         category_id = category.id
-
                         items.append(ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource'))
 
         db.session.bulk_save_objects(items)
@@ -154,7 +165,8 @@ class DataLoader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
                               benefit_description=row[3], organization=org, location=row[5],
-                              short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22])
+                              short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22],
+                              ages=[])
 
                 if row[9].strip() == 'Currently Enrolling':
                     study.status = Status.currently_enrolling
@@ -164,17 +176,22 @@ class DataLoader:
                     study.status = Status.results_being_analyzed
                 elif row[9].strip() == 'Study Results Published':
                     study.status = Status.study_results_published
+
+                for i in range(30, len(row)):
+                    if row[i]:
+                        study.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(23, len(row)):
+                for i in range(23, 30):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
                         category_id = category.id
-
                         study_category = StudyCategory(study_id=study_id, category_id=category_id)
                         db.session.add(study_category)
+
                 for i in [10, 14, 18]:
                     if row[i]:
                         investigator = db.session.query(Investigator).filter(Investigator.name == row[i]).first()
@@ -239,12 +256,15 @@ class DataLoader:
             db.session.commit()
         return organization
 
-    def get_category_by_name(self, category_name, parent=None):
+    def get_category_by_name(self, category_name, parent=None, create_missing=False):
         category = db.session.query(Category).filter(Category.name == category_name).first()
         if category is None:
-            category = Category(name=category_name, parent=parent)
-            db.session.add(category)
-            db.session.commit()
+            if create_missing:
+                category = Category(name=category_name, parent=parent)
+                db.session.add(category)
+                db.session.commit()
+            else:
+                raise(Exception("This category is not defined: " + category_name))
         return category
 
     def get_geocode(self, address_dict, lat_long_dict):

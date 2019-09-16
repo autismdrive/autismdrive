@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -20,6 +17,7 @@ class Resource(db.Model):
                                db.ForeignKey('organization.id'))
     phone = db.Column(db.String)
     website = db.Column(db.String)
+    ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
 
     __mapper_args__ = {

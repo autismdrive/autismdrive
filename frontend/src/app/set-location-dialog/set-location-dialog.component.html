@@ -2,16 +2,17 @@
   class="mat-typography"
   *ngIf="data"
 >
-  <div mat-dialog-content>
-    <h1 mat-dialog-title>Set your location</h1>
-    <mat-form-field>
-      <mat-label>ZIP Code</mat-label>
-      <input matInput placeholder="ZIP Code" cdkFocusInitial [(ngModel)]="data.zipCode" (keydown.enter)="onSubmit()">
-    </mat-form-field>
-  </div>
-  <div mat-dialog-actions fxLayout="row">
-      <button mat-flat-button (click)="onSubmit()" id="btn_save">Save</button>
-      <button *ngIf="data.gpsEnabled" mat-flat-button (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
-      <button mat-flat-button (click)="onNoClick()" id="btn_cancel">Cancel</button>
-  </div>
+<mat-dialog-content>
+  <h1 mat-dialog-title>Set your location</h1>
+  <p>Our index is currently restricted to resources in Virginia and West Virginia only.</p>
+  <mat-form-field>
+    <mat-label>ZIP Code</mat-label>
+    <input matInput placeholder="ZIP Code" cdkFocusInitial [(ngModel)]="data.zipCode" (keydown.enter)="onSubmit()">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row">
+    <button mat-flat-button (click)="onSubmit()" id="btn_save">Save</button>
+    <button *ngIf="data.gpsEnabled" mat-flat-button (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
+    <button mat-flat-button (click)="onNoClick()" id="btn_cancel">Cancel</button>
+</mat-dialog-actions>
 </div>

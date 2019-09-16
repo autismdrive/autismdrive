@@ -1,10 +1,10 @@
-import { HitLabel } from './query';
+import {HitType} from './hit_type';
 
 export interface NewsItem {
   title: string;
   description: string;
   url: string;
-  type?: HitLabel;
+  type?: HitType;
   img: string;
   imgClass?: string;
 }

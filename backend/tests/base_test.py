@@ -159,9 +159,9 @@ class BaseTest:
         return db_category
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org", categories=[]):
+                           phone="555-555-5555", website="http://stardrive.org", categories=[], ages=[]):
 
-        resource = Resource(title=title, description=description, phone=phone, website=website)
+        resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
         db.session.commit()

@@ -1,10 +1,10 @@
 export interface Category {
   id: number;
-  name: string;
-  children: Category[];
+  name?: string;
+  children?: Category[];
   parent_id?: number;
   parent?: Category;
-  level: number;
+  level?: number;
   resource_count?: number;
   study_count?: number;
   training_count?: number;

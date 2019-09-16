@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { HitType } from '../_models/query';
+import {HitType} from '../_models/hit_type';
 
 @Component({
   selector: 'app-type-icon',
@@ -10,7 +10,7 @@ export class TypeIconComponent implements OnInit {
   @Input() iconType: string;
   @Input() size: number;
 
-  iconTypes: string[] = Object.values(HitType);
+  iconTypes: string[] = HitType.all().map(ht => ht.name);
 
   constructor() { }
 
@@ -18,7 +18,7 @@ export class TypeIconComponent implements OnInit {
   }
 
   is(actual: string, expected: string) {
-    return HitType[expected.toUpperCase()].toLowerCase() === actual.toLowerCase();
+    return actual === expected;
   }
 
 }

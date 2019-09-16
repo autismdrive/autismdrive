@@ -3,10 +3,10 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Filter, Hit, HitLabel, HitType, Query, Sort} from '../_models/query';
+import { Location } from '@angular/common';
+import {Hit, Query, Sort} from '../_models/query';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
@@ -14,6 +14,7 @@ import {Category} from '../_models/category';
 import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
+import {AgeRange, HitType} from '../_models/hit_type';
 
 interface SortMethod {
   name: string;
@@ -21,10 +22,6 @@ interface SortMethod {
   sortQuery: Sort;
 }
 
-interface ResourceType {
-  name: string;
-  label: string;
-}
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -41,6 +38,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private renderer: Renderer2,
     private searchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
@@ -57,25 +55,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
-
-        const types = this.selectedTypes();
-        if (types && (types.length === 1)) {
-          this.selectedResourceType = types[0];
-        }
-
-        this.displayFilters = this.query.filters.filter(f => f.field !== 'type');
-
-        this.sortBy(this.sortMethods[0]);
+        this.sortBy(this.mapLoc ? 'Distance' : 'Relevance');
       });
     });
   }
-  resourceTypes: ResourceType[] = ['RESOURCE', 'LOCATION', 'EVENT'].map(t => {
-    return {name: HitType[t], label: HitLabel[t]};
-  });
-  selectedResourceType: ResourceType;
+
   query: Query;
+  resourceTypes = HitType.all_resources();
+  ageLabels = AgeRange.labels;
+  typeLabels = HitType.labels;
   loading = true;
-  displayFilters: Filter[];
   pageSize = 20;
   noLocation = true;
   storedZip: string;
@@ -100,7 +89,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     },
     {
       name: 'Distance',
-      label: 'Near me',
+      label: 'Distance from me',
       sortQuery: {
         field: 'geo_point',
         latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
@@ -127,6 +116,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
+
   currentUser: User;
   resourceGatherers: AccordionItem[] = [
     {
@@ -174,6 +164,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   ];
   private _mobileQueryListener: () => void;
 
+
   private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};
 
@@ -183,9 +174,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       queryParams.words = undefined;
     }
 
-    for (const filter of query.filters) {
-      queryParams[filter.field] = filter.value;
-    }
+    queryParams.types = query.types;
+    queryParams.ages = query.ages;
 
     if (query.hasOwnProperty('category') && query.category) {
       queryParams.category = query.category.id;
@@ -194,28 +184,27 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private _queryParamsToQuery(qParams: Params): Query {
-    let words = '';
-    let cat = null;
-    const filters: Filter[] = [];
 
+    const query = new Query({});
+    query.size = this.pageSize;
     if (qParams && qParams.keys) {
       for (const key of qParams.keys) {
-        if (key === 'words') {
-          words = qParams.get(key);
-        } else if (key === 'category') {
-          cat = {'id' : qParams.get(key)};
-        } else {
-          filters.push({field: key, value: qParams.getAll(key)});
+        switch (key) {
+          case ('words'):
+            query.words = qParams.get(key);
+            break;
+          case ('category'):
+            query.category = {'id' : qParams.get(key)};
+            break;
+          case('ages'):
+            query.ages = qParams.getAll(key);
+            break;
+          case('types'):
+            query.types = qParams.getAll(key);
         }
       }
     }
-
-    return new Query({
-      words: words,
-      filters: filters,
-      size: this.pageSize,
-      category: cat
-    });
+    return query;
   }
 
   ngOnInit() {
@@ -227,30 +216,24 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   removeCategory() {
     this.query.category = null;
-    this.query.start = 0;
-    this.paginatorElement.firstPage();
-    this.doSearch();
+    this._goToFirstPage();
   }
 
   removeWords() {
     this.query.words = '';
-    this.query.start = 0;
-    this.paginatorElement.firstPage();
+    this._goToFirstPage();
+  }
+
+  updateUrlAndDoSearch(query: Query) {
+    const qParams = this._queryToQueryParams(query);
+    this.location.go(
+      this.router.createUrlTree([this.router.url],
+        { queryParams:  qParams }).toString());
     this.doSearch();
   }
 
-  updateUrl(query: Query) {
-    const qParams = this._queryToQueryParams(query);
-    console.log('Updating URL and navigating to ', qParams);
-
-    this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: qParams
-      }).then(() => {
-      scrollToTop();
-    });
+  scrollToTopOfSearch() {
+    document.getElementById('TopOfSearch').scrollIntoView();
   }
 
   doSearch() {
@@ -260,7 +243,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe(queryWithResults => {
         this.query = queryWithResults;
         this.loading = false;
-        scrollToTop();
+        this.scrollToTopOfSearch();
       });
     this.googleAnalyticsService.event(this.query.words,
       {
@@ -282,7 +265,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
-        console.log('z', z);
         this.noLocation = false;
         this.zipLoc = {
           lat: z.latitude,
@@ -314,59 +296,71 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  sortBy(selectedSort: SortMethod) {
-    this.loading = true;
-    this.selectedSort = selectedSort;
-    this.query.start = 0;
-    this.query.sort = selectedSort.sortQuery;
+  isSortVisible(sort: SortMethod) {
+    if (sort.name === 'Relevance' && this.query.words === '') {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-    if (selectedSort.name === 'Distance') {
+  isSortDisabled(sort: SortMethod) {
+    if (sort.name === 'Relevance' && this.query.words === '') {
+      return true;
+    } else if (sort.name === 'Distance' && this.noLocation) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  sortBy(sortName: string) {
+    this.loading = true;
+    this.selectedSort = this.sortMethods.find(s => s.name === sortName);
+    this.query.start = 0;
+    this.query.sort = this.selectedSort.sortQuery;
+
+    if (this.selectedSort.name === 'Distance') {
       this.loadMapLocation(() => this._updateDistanceSort());
     } else {
       this.doSearch();
     }
   }
 
+  selectAgeRange(age: string = null) {
+    if (age) {
+      this.query.ages = [age];
+    } else {
+      this.query.ages = [];
+    }
+    this._goToFirstPage(true);
+  }
+
   selectCategory(newCategory: Category) {
-    console.log('Category Selected: ', newCategory);
     this.query.category = newCategory;
-    this.query.start = 0;
-    if (this.paginatorElement) {
-      this.paginatorElement.firstPage();
-    }
-    this.updateUrl(this.query);
+    this._goToFirstPage(true);
   }
 
-  addFilter(field: string, fieldValue: string) {
-    this.query.addFilter(field, fieldValue);
-    this.query.start = 0;
 
-    if (this.paginatorElement) {
-      this.paginatorElement.firstPage();
-    }
-
-    this.updateUrl(this.query);
-  }
-
-  removeFilter(field: string, fieldValue: string) {
-    this.query.removeFilter(field, fieldValue);
-    this.query.start = 0;
-    this.updateUrl(this.query);
-  }
-
-  selectResourceType(keepType: string) {
-    this.resourceTypes.forEach(t => {
-      if (t.label === keepType) {
-        this.selectedResourceType = t;
-        this.query.addFilter('type', t.name);
-      } else {
-        this.query.removeFilter('type', t.name);
+  selectType(keepType: string = null) {
+    if (keepType) {
+      this.query.types = [keepType];
+      if (keepType === HitType.LOCATION.name) {
+        this.selectedSort = this.sortMethods.filter(s => s.name === 'Distance')[0];
+      } else if (keepType === HitType.RESOURCE.name) {
+        if (this.query.words !== '') {
+          this.selectedSort = this.sortMethods.filter(s => s.name === 'Relevance')[0];
+        } else {
+          this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+        }
+      } else if (keepType === HitType.EVENT.name) {
+        this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
       }
-    });
-
+    } else {
+      this.query.types = [];
+    }
     this.query.category = null;
-    this.query.start = 0;
-    this.updateUrl(this.query);
+    this._goToFirstPage(true);
   }
 
   updatePage(event: PageEvent) {
@@ -374,6 +368,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.pageEvent = event;
     this.query.size = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
+    this.scrollToTopOfSearch();
     this.doSearch();
   }
 
@@ -418,48 +413,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.addMyLocationControl(map);
   }
 
-  selectedTypes(): ResourceType[] {
-    if (this.query) {
-      const typeFilter = this.query.filters.find(f => f.field === 'type');
-
-      if (typeFilter) {
-        return this.resourceTypes.filter(f => typeFilter.value.includes(f.label));
-      } else {
-        return this.resourceTypes;
-      }
-    }
-  }
-
-  isSelectedResourceType(rt: ResourceType): boolean {
-    const types = this.selectedTypes();
-
-    if (types) {
-      return !!types.find(t => t.label === rt.label);
-    }
-    return false;
-  }
-
-  hasFilters() {
-    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
-    const hasFilters = this.query && this.query.filters.some(f => {
-      if (f.field === 'type') {
-        return f.value.length === 1;
-      } else {
-        return f.value.length > 0;
-      }
-    });
-
-    return hasWords || hasFilters;
-  }
-
   showBreadcrumbs() {
-    const hasWords = this.query && this.query.words && (this.query.words.length > 0);
-    const hasFilters = this.query && this.query.filters.some(f => {
-      return (f.field !== 'type') && (f.value.length > 0);
-    });
-    const hasCategory = this.query && this.query.category != null;
-
-    return hasWords || hasFilters || hasCategory;
+    if (!this.query) { return false; }
+    const hasWords = this.query.words && (this.query.words.length > 0);
+    return hasWords || this.query.types || this.query.ages || this.query.category;
   }
 
   getMapResults(): Hit[] {
@@ -475,7 +432,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   openLocationDialog() {
     const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
-      width: '320px',
+      width: '400px',
       data: {
         zipCode: localStorage.getItem('zipCode') || '',
         gpsEnabled: this.gpsEnabled
@@ -483,7 +440,13 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(_ => {
-      this.loadMapLocation(() => this._updateDistanceSort());
+      this.loadMapLocation(() => {
+        if (this.mapLoc) {
+          this.selectedSort = this.sortMethods.find(s => s.name === 'Distance');
+        }
+
+        this._updateDistanceSort();
+      });
     });
   }
 
@@ -492,9 +455,25 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private _updateDistanceSort() {
-    this.query.sort.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
-    this.query.sort.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
-    this.doSearch();
+    const distance_sort = this.sortMethods.find(s => s.name === 'Distance');
+    distance_sort.sortQuery.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
+    distance_sort.sortQuery.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
+    if (this.selectedSort.name === 'Distance') {
+      this.selectedSort = distance_sort;
+      this.query.sort = this.selectedSort.sortQuery;
+      this.doSearch();
+    }
+  }
+
+  private _goToFirstPage(shouldUpdateUrl = false) {
+    this.query.start = 0;
+    this.paginatorElement.firstPage();
+
+    if (shouldUpdateUrl) {
+      this.updateUrlAndDoSearch(this.query);
+    } else {
+      this.doSearch();
+    }
   }
 
 }

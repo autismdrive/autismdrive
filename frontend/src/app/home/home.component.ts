@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {Study} from '../_models/study';
 import {ApiService} from '../_services/api/api.service';
 import {NewsItem} from '../_models/news-item';
-import {HitLabel} from '../_models/query';
+import {HitType} from '../_models/hit_type';
 
 @Component({
   selector: 'app-home',
@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit {
             title: s.short_title || s.title,
             description: s.short_description || s.description,
             url: `/study/${s.id}`,
-            type: HitLabel.STUDY,
+            type: HitType.STUDY,
             img: s.image_url,
             imgClass: 'center-center',
           };
