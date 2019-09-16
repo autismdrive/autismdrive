@@ -1,4 +1,5 @@
-import { AppPage } from '../app-page.po';
+import {AppPage} from '../app-page.po';
+import {ElementFinder} from 'protractor';
 
 export class GlobalHeaderUseCases {
   constructor(private page: AppPage) {
@@ -77,5 +78,21 @@ export class GlobalHeaderUseCases {
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     expect(this.page.getElements('.resource-gatherer').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
+  }
+
+  async checkForDoubleNavLabels() {
+    await this.page.resizeTo(1280, 720);
+    const spans: ElementFinder[] = await this.page.getElements('#resources-button .mat-button-wrapper span');
+    let numDisplayed = 0;
+
+    for (const s of spans) {
+      const isDisplayed = await s.isDisplayed();
+      if (isDisplayed) {
+        numDisplayed++;
+      }
+    }
+
+    await expect(numDisplayed).toEqual(1);
+    await this.page.maximize();
   }
 }

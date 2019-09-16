@@ -26,6 +26,8 @@ describe('Anonymous User', () => {
 
   // Global Header
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
+  it('should not display double nav labels', () => globalHeaderUseCases.checkForDoubleNavLabels());
+  it('should stay on the home page on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
   it('should display logged-out state in navigation', () => globalHeaderUseCases.displayLoggedOutState());
   it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());

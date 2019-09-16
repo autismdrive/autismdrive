@@ -12,7 +12,15 @@ import { protractor } from 'protractor/built/ptor';
 export class AppPage {
 
   constructor() {
-    browser.driver.manage().window().maximize();
+    this.maximize();
+  }
+
+  maximize() {
+    return browser.driver.manage().window().maximize();
+  }
+
+  resizeTo(width: number, height: number) {
+    return browser.driver.manage().window().setSize(width, height);
   }
 
   waitFor(t: number) {
