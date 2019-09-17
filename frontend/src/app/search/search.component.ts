@@ -99,11 +99,19 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     },
     {
-      name: 'Date',
+      name: 'Updated',
       label: 'Recently Updated',
       sortQuery: {
         field: 'last_updated',
         order: 'desc'
+      }
+    },
+    {
+      name: 'Event Date',
+      label: 'Happening Soon',
+      sortQuery: {
+        field: 'date',
+        order: 'asc'
       }
     },
   ];
@@ -320,7 +328,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.query.start = 0;
     this.query.sort = this.selectedSort.sortQuery;
 
-    if (this.selectedSort.name === 'Distance') {
+    if (this.selectedSort.name === 'Event Date') {
+      this.selectType(HitType.EVENT.name);
+    } else if (this.selectedSort.name === 'Distance') {
       this.loadMapLocation(() => this._updateDistanceSort());
     } else {
       this.doSearch();
@@ -345,16 +355,18 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectType(keepType: string = null) {
     if (keepType) {
       this.query.types = [keepType];
+      this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
+
       if (keepType === HitType.LOCATION.name) {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Distance')[0];
       } else if (keepType === HitType.RESOURCE.name) {
         if (this.query.words !== '') {
           this.selectedSort = this.sortMethods.filter(s => s.name === 'Relevance')[0];
         } else {
-          this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+          this.selectedSort = this.sortMethods.filter(s => s.name === 'Updated')[0];
         }
       } else if (keepType === HitType.EVENT.name) {
-        this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+        this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
       }
     } else {
       this.query.types = [];
