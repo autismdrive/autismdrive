@@ -72,7 +72,7 @@ class DemographicsQuestionnaire(db.Model):
                     {"value": "no_answer", "label": "Prefer not to answer"},
                 ],
                 "label": "Your current gender identity:",
-                "description": "(how you describe yourself)"
+                "description": "What's your gender?"
             },
             "expression_properties": {
                 "template_options.label": {
@@ -82,7 +82,7 @@ class DemographicsQuestionnaire(db.Model):
                 },
                 "template_options.description": {
                     "RELATIONSHIP_SPECIFIC": {
-                        "dependent": '"(how " + (formState.preferredName || "your child") + " describes themselves):"',
+                        "dependent": '"What\'s " + (formState.preferredName || "your child") + "\'s gender?"',
                     }
                 }
             },
