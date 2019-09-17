@@ -193,7 +193,7 @@ class EvaluationHistoryMixin(object):
             "display_order": 7,
             "type": "input",
             "template_options": {
-                "label": "Where diagnosed?",
+                "label": "Where was this diagnosis made?",
                 "appearance": "standard",
                 "required": True,
             },
