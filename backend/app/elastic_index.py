@@ -24,6 +24,7 @@ class StarDocument(Document):
     label = Keyword()
     id = Integer()
     title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    date = Date()
     last_updated = Date()
     content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     description = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
@@ -125,6 +126,9 @@ class ElasticIndex:
                            geo_point=None
                            )
 
+        if hasattr(document, 'date'):
+            doc.date = document.date
+
         doc.meta.id = self._get_id(document)
 
         if document.__tablename__ is not 'study':
@@ -175,11 +179,13 @@ class ElasticIndex:
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
-        # Filter results for typ and ages
+        # Filter results for type, ages, and date
         if search.types:
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
         if search.ages:
             elastic_search = elastic_search.filter('terms', **{"ages": search.ages})
+        if search.date:
+            elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
