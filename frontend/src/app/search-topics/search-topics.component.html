@@ -12,7 +12,7 @@
         </mat-list-item>
     </ng-container>
   <div [ngClass]="{'sub-level' : category.level > 0}">
-  <h3 mat-subheader>{{category.name}}</h3>
+  <div class="current-facet-label">{{category.name}}</div>
   <ng-container *ngFor="let child of category.children">
     <mat-list-item *ngIf="child.hit_count > 0" (click)="selectCategory(child)" [classList]="" >
       <span class="filter-facet-label">{{child.name}}</span>

@@ -1,4 +1,5 @@
 import { AppPage } from '../app-page.po';
+import {by, element} from 'protractor';
 
 export class SearchUseCases {
   constructor(private page: AppPage) {
@@ -11,6 +12,8 @@ export class SearchUseCases {
     this.page.pressKey('ENTER');
     this.page.waitForVisible('app-search-result');
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
+    const relevance_radio = this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Relevance"]');
+    expect(relevance_radio.isSelected());
   }
 
   async displaySelectedCategory() {

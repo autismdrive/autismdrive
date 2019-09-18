@@ -1,1 +1,8 @@
 @import '../search-filter/search-filter.component';
+
+div.current-facet-label {
+  cursor: pointer;
+  font-weight: 700;
+  color: $body-color;
+  padding: 5px 0 5px 0;
+}
