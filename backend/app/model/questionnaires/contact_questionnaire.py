@@ -146,7 +146,7 @@ class ContactQuestionnaire(db.Model):
             "type": "select",
             "template_options": {
                 "label": "",
-                "placeholder": "",
+                "placeholder": "Please select how you heard about us",
                 "description": "",
                 "required": True,
                 "options": [

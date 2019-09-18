@@ -43,6 +43,7 @@ class Housemate(db.Model):
             "template_options": {
                 "required": False,
                 "label": "Relationship",
+                "placeholder": "Please select",
                 "options": [
                     {"value": "bioParent", "label": "Biological Parent"},
                     {"value": "bioSibling", "label": "Biological Sibling"},

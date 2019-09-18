@@ -101,6 +101,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "label": "First Diagnosed by:",
+                    "placeholder": "Please select from these options",
                     "options": [
                         {
                             "value": "pediatrician",
@@ -150,6 +151,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "label": "Diagnosed At",
+                    "placeholder": "Please select from these options",
                     "options": [
                         {"value": "1uvaDp", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children's Rehabilitation Center, KCRC)"},
                         {"value": "2sjcCse", "label": "Sheila Johnson Center or Curry School of Education"},

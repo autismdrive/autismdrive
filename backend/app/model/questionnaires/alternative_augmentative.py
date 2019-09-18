@@ -29,6 +29,7 @@ class AlternativeAugmentative(db.Model):
             "template_options": {
                 "required": True,
                 "label": "Select device",
+                "placeholder": "Please select",
                 "options": [
                     {
                         "value": "noTechAAC",
