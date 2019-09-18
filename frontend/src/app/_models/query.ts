@@ -15,7 +15,7 @@ export class Query {
     field: '_score',
     order: 'asc'
   };
-  hits?: Array<Hit>;
+  hits?: Array<Hit> = [];
   category: Category;
   type_counts: Aggregation[] = [];
   age_counts: Aggregation[] = [];
@@ -32,6 +32,13 @@ export class Query {
     if (this.hits && (this.hits.length > 0)) {
       this.hits = this.hits.map(h => new Hit(h));
     }
+  }
+
+  hasFilters() {
+    const hasWords = this.words && (this.words.length > 0);
+    return hasWords || this.types.length > 0 ||
+      this.ages.length > 0 ||
+      this.category;
   }
 
   equals(otherQuery: Query) {

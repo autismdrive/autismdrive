@@ -6,7 +6,6 @@
     <h1>Find Autism Support</h1>
   </div>
   <div
-    *ngIf="query"
     class="row escaping-tiles-1x"
     fxLayout="row"
     fxLayoutGap="40px"
@@ -21,13 +20,13 @@
       [iconType]="type.name"
       [title]="type.label"
       [linkSize]="1"
-      [isSelected]="query.types.includes(type.name)"
+      [isSelected]="query && query.types && query.types.includes(type.name)"
       (click)="selectType(type.name)"
     ></app-border-box-tile>
   </div>
 </div>
 
-<div *ngIf="!loading" class="container">
+<div class="container">
   <div class="row margin-bottom-none">
     <h1 *ngIf="query && (query.types.length === 1)" fragment="filter-top">
       <span *ngFor="let hitType of query.getHitTypes()">{{hitType.label}}</span>
@@ -84,18 +83,24 @@
         <div class="filters-topics">
           <h2>Narrow your results</h2>
           <h3 class="mat-subheader">By Age</h3>
-          <div *ngIf="!query.hasAgeCounts()">No age restrictions available for these search results.</div>
-          <app-search-filter [aggregations]="query.age_counts"
-                             [label_map]="ageLabels"
-                             (filterSelected)="selectAgeRange($event)">
-          </app-search-filter>
+          <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+          <div *ngIf="query">
+            <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
+            <app-search-filter [aggregations]="query.age_counts"
+                               [label_map]="ageLabels"
+                               (filterSelected)="selectAgeRange($event)">
+            </app-search-filter>
+          </div>
           <h3 class="mat-subheader">By Type</h3>
-          <app-search-filter [aggregations]="query.type_counts"
+          <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+          <app-search-filter *ngIf="query"
+                             [aggregations]="query.type_counts"
                              [label_map]="typeLabels"
                              (filterSelected)="selectType($event)">
           </app-search-filter>
           <h3 class="mat-subheader">By Topic</h3>
-          <app-search-topics [category]="query.category" (catagorySelected)="selectCategory($event)"></app-search-topics>
+          <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+          <app-search-topics *ngIf="query" [category]="query.category" (catagorySelected)="selectCategory($event)"></app-search-topics>
         </div>
       </div>
 
@@ -126,6 +131,15 @@
                   <mat-icon>close</mat-icon>
                 </mat-chip>
             </ng-container>
+
+            <div *ngIf="query.types.length === 1">
+              <mat-chip
+                (click)="selectType()"
+                class="applied-filter applied-filter-age">
+                <span class="applied-filter-label">{{typeLabels[query.types[0]]}}</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </div>
 
             <ng-container *ngIf="query && query.category && query.category.id">
               <mat-chip
@@ -190,22 +204,23 @@
             id="results"
             fxLayout="column"
             fxLayoutGap="40px"
-            *ngIf="!loading"
           >
-            <div *ngIf="query.hits.length === 0" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" class="pad-4">
-              <h2>No results currently available.</h2>
-              <p>We could not find any results for your search.  Please try removing some of the conditions
-              by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
-              <h3>Check back soon for more updates!</h3>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+              <div *ngIf="query && query.hits.length === 0" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" class="pad-4">
+                <h2>No results currently available.</h2>
+                <p>We could not find any results for your search.  Please try removing some of the conditions
+                by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
+                <h3>Check back soon for more updates!</h3>
+              </div>
+            <div *ngIf="query && query.hits.length > 0">
+              <app-search-result
+                *ngFor="let hit of query.hits"
+                [hit]="hit"
+                [mapLoc]="mapLoc"
+              >
+              </app-search-result>
             </div>
-            <app-search-result
-              *ngFor="let hit of query.hits"
-              [hit]="hit"
-              [mapLoc]="mapLoc"
-            >
-            </app-search-result>
           </div>
-        </div>
       </div>
     </div>
   </div>
