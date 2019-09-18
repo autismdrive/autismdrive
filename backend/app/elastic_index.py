@@ -142,7 +142,7 @@ class ElasticIndex:
         for cat in document.categories:
             doc.category.extend(cat.category.all_search_paths())
 
-        if (doc.type is 'location') and None not in (latitude, longitude):
+        if (doc.type in ['location', 'event']) and None not in (latitude, longitude):
             doc.latitude = latitude
             doc.longitude = longitude
             doc.geo_point = dict(lat=latitude, lon=longitude)
@@ -156,7 +156,7 @@ class ElasticIndex:
         for r in resources:
             self.add_document(r, flush=False)
         for e in events:
-            self.add_document(e, flush=False)
+            self.add_document(e, flush=False, latitude=e.latitude, longitude=e.longitude)
         for l in locations:
             self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
         for s in studies:
