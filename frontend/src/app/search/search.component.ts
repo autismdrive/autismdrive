@@ -15,6 +15,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 interface SortMethod {
   name: string;
@@ -30,7 +31,7 @@ class MapControlDiv extends HTMLDivElement {
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit, OnDestroy {
 
@@ -55,7 +56,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
-        this.sortBy(this.mapLoc ? 'Distance' : 'Relevance');
+        this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
     });
   }
@@ -226,8 +227,11 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   updateUrlAndDoSearch(query: Query) {
     const qParams = this._queryToQueryParams(query);
+    const urlTree = this.router.parseUrl(this.router.url);
+    const urlWithoutParams = urlTree.root.children['primary'].segments.map(it => it.path).join('/');
+
     this.location.go(
-      this.router.createUrlTree([this.router.url],
+      this.router.createUrlTree([urlWithoutParams],
         { queryParams:  qParams }).toString());
     this.doSearch();
   }
@@ -243,7 +247,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe(queryWithResults => {
         this.query = queryWithResults;
         this.loading = false;
-        this.scrollToTopOfSearch();
       });
     this.googleAnalyticsService.event(this.query.words,
       {
@@ -415,8 +418,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   showBreadcrumbs() {
     if (!this.query) { return false; }
-    const hasWords = this.query.words && (this.query.words.length > 0);
-    return hasWords || this.query.types || this.query.ages || this.query.category;
+    return this.query.hasFilters();
   }
 
   getMapResults(): Hit[] {
@@ -426,8 +428,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   showMap() {
-    const mapResults = this.getMapResults();
-    return mapResults && (mapResults.length > 0);
+    const is_location_or_event_type = this.query &&
+      this.query.types &&
+      this.query.types.length === 1 &&
+      (this.query.types.includes('location') ||
+      this.query.types.includes('event'));
+    const is_sort_by_distance = this.selectedSort && this.selectedSort.name === 'Distance';
+    return is_location_or_event_type || is_sort_by_distance;
   }
 
   openLocationDialog() {
