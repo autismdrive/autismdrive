@@ -173,13 +173,16 @@
                 [longitude]="hit.longitude"
               >
                 <agm-info-window>
-                  <h4>{{hit.title}}</h4>
+                  <a
+                    class="title mat-h2"
+                    href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+                  >{{hit.title}}</a>
                   <p>{{hit.description}}</p>
                   <a
                     class="chevron-link"
                     [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
                     routerLinkActive="router-link-active"
-                  >{{hit.type}} Details - {{hit.milesFrom(mapLoc || defaultLoc)}}mi</a>
+                  >Resource Details - {{hit.milesFrom(mapLoc || defaultLoc)}}mi</a>
                 </agm-info-window>
               </agm-marker>
             </ng-container>
