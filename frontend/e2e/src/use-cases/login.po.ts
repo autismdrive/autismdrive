@@ -95,6 +95,8 @@ export class LoginUseCases {
     this.page.waitForClickable('#login-button');
     this.page.clickElement('#login-button');
     expect(this.page.getElements('app-login').count()).toEqual(1);
+    this.page.getElement('[id*="input_email"]').clear();
+    this.page.getElement('[id*="input_password"]').clear();
     expect(this.page.getElements('[id*="input_email"]').count()).toEqual(1);
     expect(this.page.getElements('[id*="input_password"]').count()).toEqual(1);
     this.page.inputText('[id*="input_email"]', email);
