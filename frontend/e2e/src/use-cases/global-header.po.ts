@@ -53,7 +53,6 @@ export class GlobalHeaderUseCases {
     this.page.clickLinkTo('/about');
     expect(this.page.getElements('.about').count()).toEqual(1);
     expect(this.page.getElements('#hero').count()).toEqual(1);
-    expect(this.page.getElements('#feature').count()).toEqual(1);
     this.page.clickLinkTo('/home');
   }
 
