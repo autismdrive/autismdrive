@@ -433,7 +433,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.query.types.length === 1 &&
       (this.query.types.includes('location') ||
       this.query.types.includes('event'));
-    const is_sort_by_distance = this.selectedSort.name === 'Distance';
+    const is_sort_by_distance = this.selectedSort && this.selectedSort.name === 'Distance';
     return is_location_or_event_type || is_sort_by_distance;
   }
 
