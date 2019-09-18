@@ -2,10 +2,9 @@ import unittest
 
 from flask import json
 
-from tests.base_test import BaseTest
-
+from app import elastic_index, db
 from app.model.category import Category
-from app import elastic_index, db, app
+from tests.base_test import BaseTest
 
 
 class TestSearch(BaseTest, unittest.TestCase):
@@ -335,7 +334,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         woodworkers = next(x for x in children if x['name'] == "Woodworkers")
         self.assertEquals(1, woodworkers['hit_count'], "There is one wood worker.")
 
-    def test_thrid_level_filtered_category_counts(self):
+    def test_third_level_filtered_category_counts(self):
         self.setup_category_aggregations()
         maker_wood_cat = db.session.query(Category).filter(Category.name == 'Woodworkers').first()
         type_query = {'words': '', 'category': {'id': maker_wood_cat.id}}
@@ -358,48 +357,63 @@ class TestSearch(BaseTest, unittest.TestCase):
 
     def test_find_related_resource(self):
         # You have to build a lot of documents for this to start working ....  And I liked 1985.
+        movie = self.construct_category("Movies Vaguely Remembered by Middle-Aged Gen Xers")
+        sausage = self.construct_category("Sausages of the World")
+        sweets = self.construct_category("Delicious Treats Full of Sugar")
 
         breakfast_club = self.construct_resource(title="The Breakfast Club",
                                                  description="A 1985 American comedy-drama film written, produced, and "
                                                              "directed by John Hughes. Teenagers from different high "
                                                              "school cliques who spend a Saturday in detention with "
-                                                             "their authoritarian assistant principal")
-        back_to_the_future = self.construct_location(title="Back to the Future",
+                                                             "their authoritarian assistant principal",
+                                                 categories=[movie])
+        back_to_the_future = self.construct_resource(title="Back to the Future",
                                                      description="1985 American comedy science fiction film directed by"
                                                                  " Robert Zemeckisteenager. Marty McFly, who "
                                                                  "accidentally travels back in time from 1985 to 1955, "
                                                                  "where he meets his future parents and becomes his "
-                                                                 "mother's romantic interest.")
-        andouillette = self.construct_location(title="Andouillette",
-                                               description="A coarse-grained sausage made with pork (or occasionally "
-                                                           "veal), intestines or chitterlings, pepper, wine, onions, "
-                                                           "and seasonings.")
-        goonies = self.construct_location(title="The Goonies",
+                                                                 "mother's romantic interest.",
+                                                     categories=[movie])
+        goonies = self.construct_resource(title="The Goonies",
                                           description="a 1985 American adventure comedy film co-produced"
                                                       " and directed by Richard Donner from a screenplay "
                                                       "by Chris Columbus, based on a story by executive "
                                                       "producer Steven Spielberg. In the film, a band of"
-                                                      " kids who live in the \"Goon Docks\" neighborhood")
-        weird_sicene = self.construct_location(title="Weird Science",
-                                               description="a 1985 American teen comic science fiction film "
-                                                           "written and directed by John Hughes and starring "
-                                                           "Anthony Michael Hall, Ilan Mitchell-Smith and "
-                                                           "Kelly LeBrock.")
-        weird_sicene = self.construct_location(title="Weird Science",
-                                               description="a 1985 American teen comic science fiction film "
-                                                           "written and directed by John Hughes and starring "
-                                                           "Anthony Michael Hall, Ilan Mitchell-Smith and "
-                                                           "Kelly LeBrock.")
-        cocoon = self.construct_location(title="Cocoon",
+                                                      " kids who live in the \"Goon Docks\" neighborhood",
+                                          categories=[movie])
+        weird_science = self.construct_resource(title="Weird Science",
+                                                description="a 1985 American teen comic science fiction film "
+                                                            "written and directed by John Hughes and starring "
+                                                            "Anthony Michael Hall, Ilan Mitchell-Smith and "
+                                                            "Kelly LeBrock.",
+                                                categories=[movie])
+        cocoon = self.construct_resource(title="Cocoon",
                                          description="a 1985 American science-fiction fantasy comedy-drama "
                                                      "film directed by Ron Howard about a group of elderly "
-                                                     "people rejuvenated by aliens")
+                                                     "people rejuvenated by aliens",
+                                         categories=[movie])
+
+        # Add a bunch of other irrelevant stuff
+        for i in range(10):
+            self.construct_resource(title="Andouillette",
+                                    description="Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette ",
+                                    categories=[sausage])
+            self.construct_resource(title="Snickers Candy Bar",
+                                    description="Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar ",
+                                    categories=[sweets])
 
         rv = self.app.get('/api/resource/%i/related' % breakfast_club.id, content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(2, len(response))  # Not really sure why it is just 2, but rolling with it.
-        self.assertEqual("Back to the Future", response[0]['title'])
+        self.assertGreater(len(response), 1)
+
+        # Most relevant result should be another movie, not sausage or candy
+        self.assertIn(response[0]['title'], [
+            back_to_the_future.title,
+            goonies.title,
+            weird_science.title,
+            cocoon.title
+        ])
 
     def test_search_paginates(self):
         self.construct_location(title="one")
@@ -423,4 +437,3 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(title1, title2)
         self.assertNotEqual(title2, title3)
-
