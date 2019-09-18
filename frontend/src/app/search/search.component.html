@@ -148,7 +148,7 @@
             </ng-container>
 
           </mat-chip-list>
-          <p class="num-results">Page {{this.paginatorElement.pageIndex + 1}} of {{this.query.total}} results</p>
+          <p [ngClass]="{'num-results': true, 'ghost': (!query || (query.total === 0))}">Page {{paginatorElement.pageIndex + 1}} of {{query.total}} results</p>
         </div>
         <agm-map
           *ngIf="showMap()"
@@ -185,17 +185,14 @@
             </ng-container>
           </agm-marker-cluster>
         </agm-map>
-        <div
-          class="row search-results"
-          style="margin-top: 0"
-        >
+        <div class="row search-results margin-top-none">
           <div
             id="results"
             fxLayout="column"
             fxLayoutGap="40px"
             *ngIf="!loading"
           >
-            <div *ngIf="query.hits.length === 0">
+            <div *ngIf="query.hits.length === 0" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" class="pad-4">
               <h2>No results currently available.</h2>
               <p>We could not find any results for your search.  Please try removing some of the conditions
               by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
@@ -221,6 +218,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
       (page)="updatePage($event)"
+      [ngClass]="{'ghost': (!query || (query.total === 0))}"
     >
     </mat-paginator>
 
