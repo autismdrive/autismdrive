@@ -2,9 +2,15 @@
 $body-font-family: '"franklin-gothic-urw", sans-serif';
 $heading-font-family: '"bodoni-urw", serif';
 $body-color: #4e4e4e;
+$body-color-muted: desaturate(lighten($body-color, 20), 60);
+$body-color-light: desaturate(lighten($body-color, 80), 60);
 $brand-gray: #cacaca;
 $brand-primary: #002f6c;
+$brand-primary-muted: desaturate(lighten($brand-primary, 20), 60);
+$brand-primary-light: desaturate(lighten($brand-primary, 80), 60);
 $brand-accent: #e57200;
+$brand-accent-muted: desaturate(lighten($brand-accent, 20), 60);
+$brand-accent-light: desaturate(lighten($brand-accent, 80), 60);
 $easeDuration: 300ms;
 $animationDuration: 500ms;
 $tile-height-1x: 226px;

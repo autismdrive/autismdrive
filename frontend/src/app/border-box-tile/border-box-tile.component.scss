@@ -10,7 +10,7 @@
   margin: 0;
   background-color: rgba(255, 255, 255, 0.8);
   text-align: center;
-  color: mat-color($stardrive-primary, 500);
+  color: $brand-primary;
 
   &.border-box-tile-1x { height: $tile-height-1x; }
   &.border-box-tile-2x { height: $tile-height-2x; }
