@@ -23,11 +23,11 @@
   <markdown
     *ngIf="hit.highlights"
     class="highlights"
-  ><span class="muted">{{hit.last_updated | date}} - </span> {{hit.highlights}}</markdown>
+  ><span class="{{hit.date ? 'date' : 'muted'}}">{{hit.date || hit.last_updated | date}} - </span> {{hit.highlights}}</markdown>
   <p
     *ngIf="!hit.highlights"
     class="description"
-  ><span class="muted">{{hit.last_updated | date}} - </span> {{hit.description}}</p>
+  ><span class="{{hit.date ? 'date' : 'muted'}}">{{hit.date || hit.last_updated | date}} - </span> {{hit.description}}</p>
   <app-details-link
     [url]="'/' + hit.type.toLowerCase() + '/' + hit.id"
     size="1"

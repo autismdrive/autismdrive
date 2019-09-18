@@ -34,3 +34,8 @@
 ::ng-deep .highlights em {
   font-weight: 700;
 }
+
+.highlights .date, .description .date {
+  color: $brand-accent;
+  font-weight: 700;
+}
