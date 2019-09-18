@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime, timedelta
 
 from flask import json
 
@@ -437,3 +438,51 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(title1, title2)
         self.assertNotEqual(title2, title3)
+
+    def test_search_sort_by_date_filters_out_past_events(self):
+        now = datetime.now()
+        last_year = self.construct_event(title="A year ago", date=now + timedelta(days=-365))
+        last_week = self.construct_event(title="A week ago", date=now + timedelta(days=-7))
+        yesterday = self.construct_event(title="Yesterday", date=now + timedelta(days=-1))
+        tomorrow = self.construct_event(title="Tomorrow", date=now + timedelta(days=1))
+        next_week = self.construct_event(title="Next week", date=now + timedelta(days=7))
+        next_year = self.construct_event(title="Next year", date=now + timedelta(days=365))
+
+        query = {
+            'date': now,
+            'sort': {
+                'field': 'date',
+                'order': 'asc'
+            }
+        }
+        search_results = self.search(query)
+        self.assertEqual(3, len(search_results['hits']))
+        self.assertEqual(search_results['hits'][0]['title'], tomorrow.title)
+        self.assertEqual(search_results['hits'][1]['title'], next_week.title)
+        self.assertEqual(search_results['hits'][2]['title'], next_year.title)
+
+    def test_search_filters_out_past_events(self):
+        now = datetime.now()
+        self.construct_resource(title="How to style unicorn hair")
+        self.construct_resource(title="Rainbow-emitting capabilities of unicorn horns")
+        self.construct_resource(title="Tips for time travel with a unicorn")
+        self.construct_event(title="Unicorn council last year", date=now + timedelta(days=-365))
+        self.construct_event(title="Unicorn meetup a week ago", date=now + timedelta(days=-7))
+        self.construct_event(title="Unicorn workshop yesterday", date=now + timedelta(days=-1))
+        self.construct_event(title="Unicorn playdate tomorrow", date=now + timedelta(days=1))
+        self.construct_event(title="Unicorn training next week", date=now + timedelta(days=7))
+        self.construct_event(title="Unicorn conference next year", date=now + timedelta(days=365))
+
+        query = {'words': 'unicorn'}
+        search_results = self.search(query)
+        self.assertEqual(6, len(search_results['hits']))
+        for hit in search_results['hits']:
+            if hit['type'] == 'event':
+                self.assertGreaterEqual(datetime.strptime(hit['date'], "%Y-%m-%dT%H:%M:%S.%f"), now)
+            else:
+                self.assertTrue(hit['date'] is None)
+
+
+
+
+

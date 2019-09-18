@@ -1,3 +1,5 @@
+import datetime
+
 from elasticsearch import RequestError
 from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
     Search, A
@@ -179,13 +181,20 @@ class ElasticIndex:
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
-        # Filter results for type, ages, and date
+        # Filter results for type and ages
         if search.types:
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
         if search.ages:
             elastic_search = elastic_search.filter('terms', **{"ages": search.ages})
+
+        # Filter results by date
         if search.date:
             elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
+        else:
+            elastic_search = elastic_search.filter('bool', **{"should": [
+                {"range": {"date": {"gte": datetime.datetime.now()}}},  # Future events OR
+                {"bool": {"must_not": {"exists": {"field": "date"}}}}   # Date field is empty
+            ]})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)

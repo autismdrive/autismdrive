@@ -1,6 +1,7 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import base64
+import datetime
 import os
 import quopri
 import re
@@ -236,10 +237,11 @@ class BaseTest:
     def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
                            street_address1="123 Some Pl", street_address2="Apt. 45",
                            city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org"):
+                           website="http://stardrive.org", date=datetime.datetime.now() + datetime.timedelta(days=7)):
 
-        event = Event(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip, phone=phone, website=website)
+        event = Event(title=title, description=description, street_address1=street_address1,
+                      street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
+                      date=date)
         event.organization_id = self.construct_organization().id
         db.session.add(event)
 
