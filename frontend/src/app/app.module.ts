@@ -91,7 +91,6 @@ import {ResourceAddButtonComponent} from './resource-add-button/resource-add-but
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
 import {ResourceEditButtonComponent} from './resource-edit-button/resource-edit-button.component';
 import {ResourceFormComponent} from './resource-form/resource-form.component';
-import {ResourcesComponent} from './resources/resources.component';
 import {SearchBoxComponent} from './search-box/search-box.component';
 import {SearchResultComponent} from './search-result/search-result.component';
 import {SearchComponent} from './search/search.component';
@@ -200,7 +199,6 @@ export class FormlyConfig {
     ResourceDetailComponent,
     ResourceEditButtonComponent,
     ResourceFormComponent,
-    ResourcesComponent,
     SearchBoxComponent,
     SearchComponent,
     SearchResultComponent,
