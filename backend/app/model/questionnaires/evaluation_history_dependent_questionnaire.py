@@ -15,7 +15,6 @@ class EvaluationHistoryDependentQuestionnaire(db.Model, EvaluationHistoryMixin):
     where_diagnosed_label = '"Where did " + (formState.preferredName || "your child") + " receive this diagnosis?"'
     gives_permission_to_link_evaluation_data_desc = '"Do we have your permission to link " + (formState.preferredName + "\'s") + " evaluation data to the UVa Autism Database?"'
     has_iq_test_desc = '"Has " + (formState.preferredName) + " been given an IQ or intelligence test?"'
-    recent_iq_score_desc = '"What was the most recent IQ score?"'
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()

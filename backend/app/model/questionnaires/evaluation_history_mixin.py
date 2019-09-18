@@ -278,10 +278,11 @@ class EvaluationHistoryMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "IQ Score",
+                    "placeholder": "Please enter the number of the most recent score, if known. Otherwise, leave this field blank.",
+                    "type": "number",
+                    "max": 200,
+                    "min": 0,
                     "appearance": "standard",
-                },
-                "expression_properties": {
-                    "template_options.description": cls.recent_iq_score_desc
                 },
                 "hide_expression": "!(model.has_iq_test)",
             },
