@@ -112,6 +112,12 @@ button {
 .sort-order {
   grid-area: sort;
   justify-self: end;
+
+  mat-radio-button {
+    height: 36px;
+    margin-top: 0;
+    padding: 0;
+  }
 }
 
 agm-map {
