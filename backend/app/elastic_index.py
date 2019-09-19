@@ -3,7 +3,6 @@ import datetime
 from elasticsearch import RequestError
 from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
     Search, A
-import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
 

@@ -302,7 +302,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         type_query = {'words': ''}
         search_results = self.search(type_query)
         self.assertEqual(4, len(search_results['hits']))
-        self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
+        self.assertIsNotNone(search_results['category'], msg="A category should always exist")
         self.assertEqual("Topics", search_results['category']['name'],
                          msg="It is a top level category if no filters are applied")
         self.assertEqual(2, len(search_results['category']['children']),
@@ -321,10 +321,11 @@ class TestSearch(BaseTest, unittest.TestCase):
 
     def test_second_level_filtered_category_counts(self):
         self.setup_category_aggregations()
-        type_query = {'words': '', 'category': {'id': 1}}
+        maker_cat = db.session.query(Category).filter(Category.name == 'Makers').first()
+        type_query = {'words': '', 'category': {'id': maker_cat.id}}
         search_results = self.search(type_query)
         self.assertEqual(3, len(search_results['hits']))
-        self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
+        self.assertIsNotNone(search_results['category'], msg="A category should always exist")
         self.assertEqual("Makers", search_results['category']['name'],
                          msg="Selected Category Id should be the category returned")
         self.assertEqual(2, len(search_results['category']['children']),
@@ -341,7 +342,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         type_query = {'words': '', 'category': {'id': maker_wood_cat.id}}
         search_results = self.search(type_query)
         self.assertEqual(1, len(search_results['hits']))
-        self.assertIsNotNone(search_results['category'], msg="A category should alwasy exists")
+        self.assertIsNotNone(search_results['category'], msg="A category should always exist")
         self.assertEqual("Woodworkers", search_results['category']['name'],
                          msg="Selected Category Id should be the category returned")
         self.assertEqual(1, len(search_results['category']['children']), msg="Woodworkers has only one child")
