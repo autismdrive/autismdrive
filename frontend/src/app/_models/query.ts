@@ -80,6 +80,7 @@ export class Hit extends GeoLocation {
   date?: Date;
   highlights: string;
   url?: string;
+  status?: string;
 
   constructor(private _props) {
     super(_props);

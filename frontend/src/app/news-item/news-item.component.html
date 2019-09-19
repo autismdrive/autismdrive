@@ -9,7 +9,7 @@
     <img src="{{item.img}}">
   </div>
   <div class="content">
-    <span class="item-type">{{item.type.toString()}}</span>
+    <span class="item-type">{{item.type.label.toString()}}</span>
     <a class="item-title" [routerLink]="[ item.url ]">{{item.title}}</a>
     <p>{{item.description}}</p>
     <app-details-link [url]="item.url"></app-details-link>

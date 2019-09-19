@@ -39,3 +39,14 @@
   color: $brand-accent;
   font-weight: 700;
 }
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  line-height: 2;
+}
+.status-currently-enrolling     { color: $brand-accent; }
+.status-study-in-progress       { color: $brand-primary-tint-1; }
+.status-results-being-analyzed  { color: $brand-primary-tint-2; }
+.status-study-results-published { color: $brand-primary-tint-3; }
