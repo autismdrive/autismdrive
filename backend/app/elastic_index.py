@@ -38,6 +38,7 @@ class StarDocument(Document):
     latitude = Double()
     longitude = Double()
     geo_point = GeoPoint()
+    status = Keyword()
 
 
 class ElasticIndex:
@@ -135,7 +136,7 @@ class ElasticIndex:
         if document.__tablename__ is not 'study':
             doc.website = document.website
         elif document.status is not None:
-                doc.status = document.status.value
+            doc.status = document.status.value
 
         if document.organization is not None:
             doc.organization = document.organization.name
