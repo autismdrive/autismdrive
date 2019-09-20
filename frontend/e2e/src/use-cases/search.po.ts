@@ -78,32 +78,27 @@ export class SearchUseCases {
     const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
     this.page.clickElement(`${distSelector} button`);
     expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
-    this.page.waitForVisible('mat-dialog-container');
-    this.page.waitFor(1000);
+//    this.page.waitForVisible('mat-dialog-container');
+//    this.page.waitFor(1000);
   }
 
   enterZipCode(zipCode = '24401') {
     this.page.inputText('mat-dialog-container [placeholder="ZIP Code"]', zipCode, true);
     this.page.clickElement('#btn_save');
-    this.page.waitForNotVisible('mat-dialog-container');
-    this.page.waitFor(1000);
   }
 
-  checkSavedZipCode(zipCode = '24401') {
+  async checkSavedZipCode(zipCode = '24401') {
     const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
     this.page.waitForText(distSelector, zipCode);
-    this.page.waitFor(1000);
     expect(this.page.getLocalStorageVar('zipCode')).toEqual(zipCode);
     expect(this.page.getElement(distSelector).getText()).toContain(zipCode);
   }
 
   async clearZipCode(zipCode = '24401') {
     this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"] button');
-    this.page.waitFor(1000);
 
     expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
     this.page.clickElement('#btn_gps');
-    this.page.waitFor(1000);
 
     const newText = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
     expect(newText.includes(zipCode)).toBeFalsy();

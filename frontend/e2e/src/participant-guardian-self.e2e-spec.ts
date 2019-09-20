@@ -116,7 +116,6 @@ describe('Participant (Guardian - Self)', () => {
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
-  it('should sort by last date updated');
   it('should clear the search box when leaving the search page', () => searchUseCases.goHomeClearsSearch());
 
   // Search to Resource to Category Search

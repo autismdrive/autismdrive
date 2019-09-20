@@ -126,20 +126,20 @@
         </mat-card>
       </div>
       <div id="resource-categories">
-        <app-category-chips [categories]="resource.resource_categories"></app-category-chips>
+        <app-category-chips [categories]="resource.resource_categories" [ages]="resource.ages"></app-category-chips>
       </div>
       <div id="resource-related">
         <mat-card>
           <mat-card-title>Related Resources</mat-card-title>
           <mat-card-content>
-            <mat-list *ngIf="related && related.length > 0">
-              <mat-list-item *ngFor="let relatedResource of related">
-                <a mat-line
+            <div *ngIf="related && related.length > 0">
+              <div *ngFor="let relatedResource of related">
+                <a
                   [href]="'/#/resource/' + relatedResource.id"
                 >{{relatedResource.title}}</a>
-                <p mat-line>{{relatedResource.description}}</p>
-              </mat-list-item>
-            </mat-list>
+                <p >{{relatedResource.description}}</p>
+              </div>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>
