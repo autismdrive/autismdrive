@@ -12,7 +12,7 @@
   </ng-container>
   <ng-container *ngIf="!hasSelection()">
     <ng-container *ngFor="let agg of aggregations">
-      <mat-list-item *ngIf="agg.count > 0" (click)="select(agg.value)" [classList]="" >
+      <mat-list-item *ngIf="agg.count > 0" (click)="select(agg.value)" [classList]="" [id]="'filter_' + agg.value" >
         <span class="filter-facet-label">{{label_map[agg.value]}}</span>
         <div fxFlex></div>
         <span class="hit-count">{{agg.count}}</span>

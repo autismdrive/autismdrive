@@ -21,6 +21,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
             "type": "select",
             "template_options": {
                 "label": '',
+                "placeholder": "Please select placement",
                 "required": False,
                 "options": [
                     {"value": "daycare", "label": "Daycare center"},
