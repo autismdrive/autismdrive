@@ -168,17 +168,17 @@ export class SearchUseCases {
     const numFiltersBefore = await this.page.getElements(chipSelector).count();
     const numRemoveChipsBefore = await this.page.getElements(removeChipSelector).count();
     const numPreserveChipsBefore = await this.page.getElements(preserveChipSelector).count();
-    expect(numRemoveChipsBefore).toEqual(1);
+    await expect(numRemoveChipsBefore).toEqual(1);
 
-    this.page.clickElement(removeChipSelector);
-    this.page.waitFor(500);
+    await this.page.clickElement(removeChipSelector);
+    await this.page.waitFor(500);
     const numFiltersAfter = await this.page.getElements(chipSelector).count();
     const numRemoveChipsAfter = await this.page.getElements(removeChipSelector).count();
     const numPreserveChipsAfter = await this.page.getElements(preserveChipSelector).count();
 
-    expect(numRemoveChipsAfter).toEqual(0);
-    expect(numFiltersAfter).toEqual(numFiltersBefore - 1);
-    expect(numPreserveChipsAfter).toEqual(numPreserveChipsBefore);
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
+    await expect(numRemoveChipsAfter).toEqual(0);
+    await expect(numFiltersAfter).toEqual(numFiltersBefore - 1);
+    await expect(numPreserveChipsAfter).toEqual(numPreserveChipsBefore);
+    return expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 }

@@ -127,7 +127,6 @@
 
             <ng-container *ngFor="let age of query.ages let i = index">
                 <mat-chip
-                  [id]="'remove_filter_' + age"
                   (click)="selectAgeRange()"
                   class="applied-filter applied-filter-age"
                 >
@@ -139,8 +138,7 @@
             <div *ngIf="query.types.length === 1">
               <mat-chip
                 (click)="selectType()"
-                [id]="'remove_filter_' + type"
-                class="applied-filter applied-filter-age">
+                class="applied-filter applied-filter-type">
                 <span class="applied-filter-label">{{typeLabels[query.types[0]]}}</span>
                 <mat-icon>close</mat-icon>
               </mat-chip>
