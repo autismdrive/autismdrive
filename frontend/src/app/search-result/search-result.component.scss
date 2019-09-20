@@ -3,6 +3,7 @@
 
 .result-item {
   margin-top: 2em;
+  padding-bottom: 2em;
   position: relative;
 
   @include top-border-dots;
@@ -32,10 +33,5 @@
 }
 
 ::ng-deep .highlights em {
-  font-weight: 700;
-}
-
-.highlights .date, .description .date {
-  color: $brand-accent;
   font-weight: 700;
 }

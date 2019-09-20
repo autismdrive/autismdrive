@@ -116,6 +116,8 @@ import {SetLocationDialogComponent} from './set-location-dialog/set-location-dia
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
 import { SearchFilterComponent } from './search-filter/search-filter.component';
+import { EventDateComponent } from './event-date/event-date.component';
+import { LastUpdatedDateComponent } from './last-updated-date/last-updated-date.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -214,6 +216,8 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
     SearchTopicsComponent,
     SearchFilterComponent,
+    EventDateComponent,
+    LastUpdatedDateComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),

@@ -74,27 +74,36 @@
           </mat-radio-group>
         </div>
 
-        <div class="filters-topics">
+        <div class="filters-column">
           <h2>Narrow your results</h2>
           <h3 class="mat-subheader">By Age</h3>
           <div *ngIf="!query"><mat-spinner></mat-spinner></div>
           <div *ngIf="query">
             <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
-            <app-search-filter [aggregations]="query.age_counts"
-                               [label_map]="ageLabels"
-                               (filterSelected)="selectAgeRange($event)">
-            </app-search-filter>
+            <app-search-filter
+              [aggregations]="query.age_counts"
+              [label_map]="ageLabels"
+              (filterSelected)="selectAgeRange($event)"
+              [ngClass]="'filter-by-age'"
+            ></app-search-filter>
           </div>
           <h3 class="mat-subheader">By Type</h3>
           <div *ngIf="!query"><mat-spinner></mat-spinner></div>
-          <app-search-filter *ngIf="query"
-                             [aggregations]="query.type_counts"
-                             [label_map]="typeLabels"
-                             (filterSelected)="selectType($event)">
-          </app-search-filter>
+          <app-search-filter
+            *ngIf="query"
+            [aggregations]="query.type_counts"
+            [label_map]="typeLabels"
+            (filterSelected)="selectType($event)"
+            [ngClass]="'filter-by-type'"
+          ></app-search-filter>
           <h3 class="mat-subheader">By Topic</h3>
           <div *ngIf="!query"><mat-spinner></mat-spinner></div>
-          <app-search-topics *ngIf="query" [category]="query.category" (catagorySelected)="selectCategory($event)"></app-search-topics>
+          <app-search-topics
+            *ngIf="query"
+            [category]="query.category"
+            (categorySelected)="selectCategory($event)"
+            [ngClass]="'filter-by-topic'"
+          ></app-search-topics>
         </div>
       </div>
 
@@ -129,7 +138,7 @@
             <div *ngIf="query.types.length === 1">
               <mat-chip
                 (click)="selectType()"
-                class="applied-filter applied-filter-age">
+                class="applied-filter applied-filter-type">
                 <span class="applied-filter-label">{{typeLabels[query.types[0]]}}</span>
                 <mat-icon>close</mat-icon>
               </mat-chip>

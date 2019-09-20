@@ -378,7 +378,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.query.date = null;
       this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
-    this.query.category = null;
     this._goToFirstPage(true);
   }
 

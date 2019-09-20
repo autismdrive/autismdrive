@@ -1,0 +1,5 @@
+<span *ngIf="eventDate" class="hit-event-date" fxLayoutAlign="start center" [attr.data-iso-date-string]="eventDate">
+  <br/>
+  <mat-icon>event_available</mat-icon>
+  Event date: {{eventDate | date}}
+</span>
