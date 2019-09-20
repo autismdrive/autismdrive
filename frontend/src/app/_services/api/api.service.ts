@@ -221,14 +221,14 @@ export class ApiService {
   }
 
   /** Get AdminNotes by Resource */
-  getResourceAdminNotes(resource: Resource): Observable<AdminNote[]> {
-    return this.httpClient.get<AdminNote[]>(this._endpointUrl('resourceAdminNote').replace('<id>', resource.id.toString()))
+  getResourceAdminNotes(resource_id: number): Observable<AdminNote[]> {
+    return this.httpClient.get<AdminNote[]>(this._endpointUrl('resourceAdminNoteList').replace('<resource_id>', resource_id.toString()))
       .pipe(catchError(this._handleError));
   }
 
   /** Get AdminNotes by User */
-  getUserAdminNotes(user: User): Observable<AdminNote[]> {
-    return this.httpClient.get<AdminNote[]>(this._endpointUrl('userAdminNote').replace('<id>', user.id.toString()))
+  getUserAdminNotes(user_id: number): Observable<AdminNote[]> {
+    return this.httpClient.get<AdminNote[]>(this._endpointUrl('userAdminNoteList').replace('<user_id>', user_id.toString()))
       .pipe(catchError(this._handleError));
   }
 

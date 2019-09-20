@@ -42,6 +42,9 @@
           (click)="goWebsite($event)"
         >Visit website</button>
       </div>
+      <div *ngIf="currentUser && currentUser.role == 'admin'">
+        <app-admin-note-display [currentUser]="currentUser" [currentResource]="resource"></app-admin-note-display>
+      </div>
     </div>
     <div
       id="resource-meta"

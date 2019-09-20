@@ -118,7 +118,9 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
-import { SearchFilterComponent } from './search-filter/search-filter.component';
+import {SearchFilterComponent} from './search-filter/search-filter.component';
+import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.component';
+import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -220,6 +222,8 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
     SearchTopicsComponent,
     SearchFilterComponent,
+    AdminNoteFormComponent,
+    AdminNoteDisplayComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),
@@ -279,7 +283,8 @@ export class FormlyConfig {
     AdminExportDetailsComponent,
     AvatarDialogComponent,
     RepeatSectionDialogComponent,
-    SetLocationDialogComponent
+    SetLocationDialogComponent,
+    AdminNoteFormComponent
   ]
 })
 export class AppModule {
