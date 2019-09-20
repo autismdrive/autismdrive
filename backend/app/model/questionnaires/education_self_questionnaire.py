@@ -21,6 +21,7 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
             "type": "select",
             "template_options": {
                 "label": "Program Type",
+                "placeholder": "Please select program type",
                 "required": False,
                 "options": [
                     {"value": "highSchool", "label": "High school"},

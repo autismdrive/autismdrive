@@ -206,9 +206,21 @@ class IdentificationQuestionnaire(db.Model):
 
     def get_field_groups(self):
         return {
+                "relationship": {
+                    "RELATIONSHIP_REQUIRED": ['dependent'],
+                    "fields": [
+                        "relationship_to_participant",
+                        "relationship_to_participant_other",
+                    ],
+                    "display_order": 0,
+                    "wrappers": ["card"],
+                    "template_options": {
+                        "label": "Your relationship to your child or the person with autism on whom you are providing information:"
+                    },
+                },
                 "intro": {
                     "fields": [],
-                    "display_order": 0,
+                    "display_order": 1,
                     "wrappers": ["help"],
                     "template_options": {
                         "description": {
@@ -219,18 +231,6 @@ class IdentificationQuestionnaire(db.Model):
                                 "dependent": "Please answer the following questions about your child or the person with autism on whom you are providing information",
                             }
                         }
-                    },
-                },
-                "relationship": {
-                    "RELATIONSHIP_REQUIRED": ['dependent'],
-                    "fields": [
-                        "relationship_to_participant",
-                        "relationship_to_participant_other",
-                    ],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                     },
                 },
             }

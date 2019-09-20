@@ -28,6 +28,7 @@ class Therapy(db.Model):
             "type": "select",
             "template_options": {
                 "label": "Select type",
+                "placeholder": "Please select",
                 "required": True,
                 "options": [
                     {

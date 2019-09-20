@@ -28,6 +28,7 @@ class Medication(db.Model):
             "type": "select",
             "template_options": {
                 "label": "Select symptom",
+                "placeholder": "Please select",
                 "required": True,
                 "options": [
                     {"value": "symptomAnxiety", "label": "Anxiety"},

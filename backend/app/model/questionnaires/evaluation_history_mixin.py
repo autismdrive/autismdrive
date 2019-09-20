@@ -101,6 +101,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "label": "First Diagnosed by:",
+                    "placeholder": "Please select from these options",
                     "options": [
                         {
                             "value": "pediatrician",
@@ -150,6 +151,7 @@ class EvaluationHistoryMixin(object):
                 "type": "select",
                 "template_options": {
                     "label": "Diagnosed At",
+                    "placeholder": "Please select from these options",
                     "options": [
                         {"value": "1uvaDp", "label": "UVA Developmental Pediatrics or UVA Child Development and Rehabilitation Center (formerly Kluge Children's Rehabilitation Center, KCRC)"},
                         {"value": "2sjcCse", "label": "Sheila Johnson Center or Curry School of Education"},
@@ -193,7 +195,7 @@ class EvaluationHistoryMixin(object):
             "display_order": 7,
             "type": "input",
             "template_options": {
-                "label": "Where diagnosed?",
+                "label": "Where was this diagnosis made?",
                 "appearance": "standard",
                 "required": True,
             },
@@ -278,10 +280,11 @@ class EvaluationHistoryMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "IQ Score",
+                    "placeholder": "Please enter the number of the most recent score, if known. Otherwise, leave this field blank.",
+                    "type": "number",
+                    "max": 200,
+                    "min": 0,
                     "appearance": "standard",
-                },
-                "expression_properties": {
-                    "template_options.description": cls.recent_iq_score_desc
                 },
                 "hide_expression": "!(model.has_iq_test)",
             },

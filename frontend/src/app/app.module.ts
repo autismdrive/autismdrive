@@ -46,6 +46,8 @@ import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.com
 import {
   EmailValidator,
   EmailValidatorMessage,
+  MaxValidationMessage,
+  MinValidationMessage,
   MulticheckboxValidator,
   MulticheckboxValidatorMessage,
   PhoneValidator,
@@ -141,6 +143,8 @@ export class FormlyConfig {
       {name: 'url', message: UrlValidatorMessage},
       {name: 'multicheckbox', message: MulticheckboxValidatorMessage},
       {name: 'required', message: 'This field is required.'},
+      {name: 'min', message: MinValidationMessage},
+      {name: 'max', message: MaxValidationMessage},
     ],
     wrappers: [
       {name: 'help', component: HelpWrapperComponent},
