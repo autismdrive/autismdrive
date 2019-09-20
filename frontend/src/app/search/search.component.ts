@@ -217,12 +217,12 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   removeCategory() {
     this.query.category = null;
-    this._goToFirstPage();
+    this._goToFirstPage(true);
   }
 
   removeWords() {
     this.query.words = '';
-    this._goToFirstPage();
+    this._goToFirstPage(true);
   }
 
   updateUrlAndDoSearch(query: Query) {

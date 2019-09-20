@@ -28,17 +28,6 @@ import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {AdminExportComponent} from '../admin-export/admin-export.component';
 
-export function searchFilterMatcher(url: UrlSegment[]) {
-  if (
-    (url.length === 2) &&
-    (url[0].path === ('search')) &&
-    (url[1].path === ('filter'))
-  ) {
-    return {consumed: url};
-  }
-  return null;
-}
-
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
   {path: 'home', component: HomeComponent, data: {title: 'Welcome Autism DRIVE'}, canActivate: [NotMirroredGuard]},
@@ -99,7 +88,6 @@ const routes: Routes = [
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
   {path: 'search', component: SearchComponent, data: {title: 'Search'}},
   {path: 'search/:query', component: SearchComponent, data: {title: 'Search Resources'}},
-  {matcher: searchFilterMatcher, component: SearchComponent, data: {title: 'Search'}},
   {path: 'admin', component: AdminHomeComponent, data: {title: 'Admin Home'}, canActivate: [AdminGuard]},
   {
     path: 'admin/data',

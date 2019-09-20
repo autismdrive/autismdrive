@@ -1,5 +1,5 @@
 import { AppPage } from '../app-page.po';
-import {by, element} from 'protractor';
+import {browser, ExpectedConditions} from 'protractor';
 
 export class SearchUseCases {
   constructor(private page: AppPage) {
@@ -16,31 +16,30 @@ export class SearchUseCases {
     expect(relevance_radio.isSelected());
   }
 
-  async displaySelectedCategory() {
-    expect(this.page.getElements('.filters-topics').count()).toEqual(1);
-    expect(this.page.getElements('.filters-topics app-search-topics').count()).toEqual(1);
-
-    const num_filters_before = await this.page.getElements('.applied-filters .applied-filter').count();
-    expect(num_filters_before).toEqual(1);
-
-    const filter = await this.page.getElements('.filters-topics mat-list-item').first();
-    filter.click();
-
-    const num_filters_after = await this.page.getElements('.applied-filters .applied-filter').count();
-    expect(num_filters_after).toEqual(2);
-
-    const category_text = await this.page.getElement('app-search-filter:first-of-type .filter-facet-label').getText();
-    const applied_filter_text = await this.page.getElement('.applied-filters .applied-filter-age').getText();
-    expect(applied_filter_text).toContain(category_text);
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
+  removeSearchTerm() {
+    const applied_filter = this.page.getElement('.applied-filters .applied-filter-keyword');
+    expect(browser.getCurrentUrl()).toContain('words=autism');
+    applied_filter.click();
+    expect(browser.getCurrentUrl()).not.toContain('words=autism');
   }
 
-  async clearSearchBox() {
-    const input_text_before = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
-    expect(input_text_before).toEqual('autism');
+  async filterByAge() {
 
+    this.page.clickElement('#filter_pre-k');
+    const applied_filter = await this.page.getElement('#remove_filter_pre-k');
+    browser.wait(ExpectedConditions.urlContains('ages='), 5000);
+
+    // Remove the age filter, and wait for it to go away.
+    applied_filter.click();
+
+    // Assure that it is removed from the display, and in the browser url (so history is updated)
+    expect(applied_filter.isPresent()).toEqual(false);
+    expect(browser.getCurrentUrl()).not.toContain('ages=');
+  }
+
+  async goHomeClearsSearch() {
+    this.page.inputText('#site-header .search-bar input', 'autism', true);
     this.page.clickLinkTo('/home');
-
     const input_text_after = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
     expect(input_text_after).toEqual('');
   }
@@ -106,7 +105,7 @@ export class SearchUseCases {
     this.page.clickElement('#btn_gps');
     this.page.waitFor(1000);
 
-    const newText = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText()
+    const newText = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
     expect(newText.includes(zipCode)).toBeFalsy();
   }
 

@@ -39,7 +39,8 @@ describe('Anonymous User', () => {
   // Search
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected category', () => searchUseCases.displaySelectedCategory());
+  it('should  clear search terms', () => searchUseCases.removeSearchTerm());
+  it('should display selected age range', () => searchUseCases.filterByAge());
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
@@ -53,7 +54,7 @@ describe('Anonymous User', () => {
   it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should sort by last date updated');
-  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
+  it('should clear the search box when leaving the search page', () => searchUseCases.goHomeClearsSearch());
 
   // Login & Register
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
