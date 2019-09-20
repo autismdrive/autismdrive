@@ -85,6 +85,8 @@ export class SearchUseCases {
   enterZipCode(zipCode = '24401') {
     this.page.inputText('mat-dialog-container [placeholder="ZIP Code"]', zipCode, true);
     this.page.clickElement('#btn_save');
+    this.page.waitForNotVisible('mat-dialog-container');
+    this.page.waitFor(1000);
   }
 
   checkSavedZipCode(zipCode = '24401') {
