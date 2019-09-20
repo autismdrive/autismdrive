@@ -5,6 +5,7 @@ from sqlalchemy import func
 
 
 from app import ma, db
+from app.model.admin_note import AdminNote
 from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
@@ -607,6 +608,12 @@ class FlowSchema(Schema):
 class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
+        include_fk = True
+
+
+class AdminNoteSchema(ModelSchema):
+    class Meta:
+        model = AdminNote
         include_fk = True
 
 
