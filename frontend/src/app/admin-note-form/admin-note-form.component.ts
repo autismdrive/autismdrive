@@ -11,7 +11,7 @@ export class AdminNoteFormComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<AdminNoteDisplayComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {note: AdminNote}
+    @Inject(MAT_DIALOG_DATA) public data: {adminNote: AdminNote}
     ) { }
 
   ngOnInit() {

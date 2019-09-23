@@ -3,20 +3,20 @@
     <mat-card-title>Admin Notes</mat-card-title>
     <mat-card-content>
       <mat-list *ngIf="notes && notes.length > 0">
-        <mat-list-item *ngFor="let note of notes; let i = index;">
-          <p mat-line>User #{{note.user_id}} - last updated: {{note.last_updated | date:'longDate'}}</p>
-          <p mat-line>{{note.note}}</p>
+        <mat-list-item *ngFor="let adminNote of notes; let i = index;">
+          <p mat-line>{{adminNote.note}}</p>
+          <p mat-line>User #{{adminNote.user_id}} - last updated: {{adminNote.last_updated | date:'longDate'}}</p>
           <button
           mat-icon-button
           type="button"
-          (click)="openDialog(note)"
+          (click)="openDialog(adminNote)"
           >
             <mat-icon>edit</mat-icon>
           </button>
           <button
             mat-icon-button
             type="button"
-            (click)="deleteNote(note)"
+            (click)="deleteNote(adminNote)"
           >
             <mat-icon>close</mat-icon>
           </button>

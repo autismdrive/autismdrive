@@ -24,6 +24,7 @@ export class ResourceDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
   ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
@@ -37,13 +38,14 @@ export class ResourceDetailComponent implements OnInit {
         this.api.getRelatedResources(resourceId).subscribe(related => {
           this.related = related;
         });
-        this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
-          this.notes = notes;
-        })
+        if (this.currentUser && this.currentUser.role == 'Admin') {
+          this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
+            this.notes = notes;
+          })
+        }
       }
     });
 
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
   ngOnInit() {

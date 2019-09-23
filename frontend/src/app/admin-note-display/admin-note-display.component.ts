@@ -33,27 +33,29 @@ export class AdminNoteDisplayComponent implements OnInit {
     })
   }
 
-  openDialog(note): void {
+  openDialog(adminNote): void {
     const dialogRef = this.dialog.open(AdminNoteFormComponent, {
       width: `${window.innerWidth / 2}px`,
-      data: { note: note.note || '' }
+      data: { adminNote: adminNote || {"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": ''} }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (note) {
-        note.note = result;
-        this.api.updateAdminNote(note).subscribe();
-        this.getNotes();
-      } else {
-        this.api.addAdminNote({"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": result}).subscribe(note => {
+      if (adminNote) {
+        adminNote.note = result;
+        this.api.updateAdminNote(adminNote).subscribe(x => {
+          this.getNotes();
         });
-        this.getNotes();
+      } else {
+        this.api.addAdminNote({"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": result}).subscribe(x => {
+          this.getNotes();
+        });
       }
     });
   }
 
   deleteNote(note) {
-    this.api.deleteAdminNote(note).subscribe();
-    this.getNotes();
+    this.api.deleteAdminNote(note).subscribe(x => {
+      this.getNotes();
+    });
   }
 }
