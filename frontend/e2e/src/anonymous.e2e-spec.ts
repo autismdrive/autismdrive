@@ -62,6 +62,10 @@ describe('Anonymous User', () => {
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
+  // Resrouce details returns to search
+  it('should visit search page', () => globalHeaderUseCases.visitResourcesPage());
+  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+
   // Login & Register
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should display login form', () => loginUseCases.displayLoginForm());
