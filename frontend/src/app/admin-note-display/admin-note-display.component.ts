@@ -35,7 +35,7 @@ export class AdminNoteDisplayComponent implements OnInit {
 
   openDialog(adminNote): void {
     const dialogRef = this.dialog.open(AdminNoteFormComponent, {
-      width: `${window.innerWidth / 2}px`,
+      width: `${window.innerWidth}px`,
       data: { adminNote: adminNote || {"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": ''} }
     });
 
