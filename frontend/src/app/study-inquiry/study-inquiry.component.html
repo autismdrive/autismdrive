@@ -60,10 +60,26 @@
     </div>
     <div *ngIf="alreadyInquired">
       <p>You have already sent an inquiry about this study. We’ve let the researchers know that you are interested and they will contact you about next steps.</p>
+      <div *ngIf="study.eligibility_url">
+        <p>This study has an additional screener to complete in order to determine if you are eligible to participate. If you haven't already completed that screener, you can click the "Go to screener" button to be directed there.</p>
+        <button
+          mat-flat-button
+          color="accent"
+          (click)="goEligibility()"
+        >Go to screener</button>
+      </div>
     </div>
   </div>
 </div>
 <div *ngIf="inquirySent">
   <h2>Thank You</h2>
   <p>We’ve let the researchers know that you are interested in the study.</p>
+  <div *ngIf="study.eligibility_url">
+    <p>This study has an additional screener to complete in order to determine if you are eligible to participate. Click the "Go to screener" button to be directed there.</p>
+    <button
+      mat-flat-button
+      color="accent"
+      (click)="goEligibility()"
+    >Go to screener</button>
+  </div>
 </div>

@@ -83,5 +83,9 @@ export class StudyInquiryComponent implements OnInit {
     }
   }
 
-
+  goEligibility() {
+    if (this.study && this.study.eligibility_url) {
+      window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank')
+    }
+  }
 }
