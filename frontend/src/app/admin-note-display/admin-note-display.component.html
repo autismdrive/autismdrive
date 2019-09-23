@@ -5,7 +5,7 @@
       <mat-list *ngIf="notes && notes.length > 0">
         <mat-list-item *ngFor="let adminNote of notes; let i = index;">
           <p mat-line>{{adminNote.note}}</p>
-          <p mat-line>User #{{adminNote.user_id}} - last updated: {{adminNote.last_updated | date:'longDate'}}</p>
+          <p mat-line>User #{{adminNote.user_id}} - last updated: {{adminNote.last_updated | date:'short'}}</p>
           <button
           mat-icon-button
           type="button"
