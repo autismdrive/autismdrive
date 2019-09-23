@@ -36,7 +36,7 @@ class EventEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()
-        elastic_index.update_document(updated, 'Event')
+        elastic_index.update_document(updated, 'Event', latitude=updated.latitude, longitude=updated.longitude)
         return self.schema.dump(updated)
 
 
@@ -55,7 +55,7 @@ class EventListEndpoint(flask_restful.Resource):
             load_result = self.eventSchema.load(request_data).data
             db.session.add(load_result)
             db.session.commit()
-            elastic_index.add_document(load_result, 'Event')
+            elastic_index.add_document(load_result, 'Event', latitude=load_result.latitude, longitude=load_result.longitude)
             return self.eventSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,

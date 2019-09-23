@@ -93,7 +93,6 @@ import {ResourceAddButtonComponent} from './resource-add-button/resource-add-but
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
 import {ResourceEditButtonComponent} from './resource-edit-button/resource-edit-button.component';
 import {ResourceFormComponent} from './resource-form/resource-form.component';
-import {ResourcesComponent} from './resources/resources.component';
 import {SearchBoxComponent} from './search-box/search-box.component';
 import {SearchResultComponent} from './search-result/search-result.component';
 import {SearchComponent} from './search/search.component';
@@ -121,6 +120,8 @@ import {FormPrintoutComponent} from './_forms/form-printout/form-printout.compon
 import {SearchFilterComponent} from './search-filter/search-filter.component';
 import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.component';
 import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
+import {EventDateComponent} from './event-date/event-date.component';
+import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -206,7 +207,6 @@ export class FormlyConfig {
     ResourceDetailComponent,
     ResourceEditButtonComponent,
     ResourceFormComponent,
-    ResourcesComponent,
     SearchBoxComponent,
     SearchComponent,
     SearchResultComponent,
@@ -224,6 +224,8 @@ export class FormlyConfig {
     SearchFilterComponent,
     AdminNoteFormComponent,
     AdminNoteDisplayComponent,
+    EventDateComponent,
+    LastUpdatedDateComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),

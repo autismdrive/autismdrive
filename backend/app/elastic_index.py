@@ -1,7 +1,8 @@
+import datetime
+
 from elasticsearch import RequestError
 from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
     Search, A
-import elasticsearch_dsl
 from elasticsearch_dsl.connections import connections
 import logging
 
@@ -24,6 +25,7 @@ class StarDocument(Document):
     label = Keyword()
     id = Integer()
     title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    date = Date()
     last_updated = Date()
     content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
     description = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
@@ -125,6 +127,9 @@ class ElasticIndex:
                            geo_point=None
                            )
 
+        if hasattr(document, 'date'):
+            doc.date = document.date
+
         doc.meta.id = self._get_id(document)
 
         if document.__tablename__ is not 'study':
@@ -138,7 +143,7 @@ class ElasticIndex:
         for cat in document.categories:
             doc.category.extend(cat.category.all_search_paths())
 
-        if (doc.type is 'location') and None not in (latitude, longitude):
+        if (doc.type in ['location', 'event']) and None not in (latitude, longitude):
             doc.latitude = latitude
             doc.longitude = longitude
             doc.geo_point = dict(lat=latitude, lon=longitude)
@@ -152,7 +157,7 @@ class ElasticIndex:
         for r in resources:
             self.add_document(r, flush=False)
         for e in events:
-            self.add_document(e, flush=False)
+            self.add_document(e, flush=False, latitude=e.latitude, longitude=e.longitude)
         for l in locations:
             self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
         for s in studies:
@@ -175,11 +180,20 @@ class ElasticIndex:
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
-        # Filter results for typ and ages
+        # Filter results for type and ages
         if search.types:
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
         if search.ages:
             elastic_search = elastic_search.filter('terms', **{"ages": search.ages})
+
+        # Filter results by date
+        if search.date:
+            elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
+        else:
+            elastic_search = elastic_search.filter('bool', **{"should": [
+                {"range": {"date": {"gte": datetime.datetime.now()}}},  # Future events OR
+                {"bool": {"must_not": {"exists": {"field": "date"}}}}   # Date field is empty
+            ]})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)

@@ -1,15 +1,16 @@
-@import '../../material';
+@import '../../config';
 @import '../../mixins';
 
 .result-item {
   margin-top: 2em;
+  padding-bottom: 2em;
   position: relative;
 
   @include top-border-dots;
 
   .title {
     margin: 0px;
-    color: mat-color($stardrive-primary, 500, 1);
+    color: $brand-primary;
     font-weight: 800;
     font-style: italic;
     text-transform: uppercase;
@@ -21,7 +22,7 @@
 .type {
   text-transform: uppercase;
   white-space: nowrap;
-  color: mat-color($stardrive-primary, 300, 1);
+  color: $brand-primary-muted;
   font-size: 3em;
   background-color: transparent;
 
