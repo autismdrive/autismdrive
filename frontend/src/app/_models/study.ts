@@ -24,5 +24,6 @@ export interface Study {
   study_categories?: StudyCategory[];
   study_investigators?: StudyInvestigator[];
   image_url?: string;
+  eligibility_url?: string;
   ages?: string[];
 }
