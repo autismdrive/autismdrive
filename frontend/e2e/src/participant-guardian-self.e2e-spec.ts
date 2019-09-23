@@ -126,8 +126,6 @@ describe('Participant (Guardian - Self)', () => {
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
-  // Search to Resource to Category Search
-  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
 
   // Log out
   it('should log out', () => loginUseCases.logout());
