@@ -30,6 +30,7 @@ class AssistiveDevice(db.Model):
             "template_options": {
                 "required": True,
                 "label": "Select category of device",
+                "placeholder": "Please select",
                 "options": [
                     {
                         "value": "mobility",
@@ -63,6 +64,7 @@ class AssistiveDevice(db.Model):
             "template_options": {
                 "required": True,
                 "label": "Select device",
+                "placeholder": "Please select",
                 "all_options": [
                     {
                         "value": "cane",

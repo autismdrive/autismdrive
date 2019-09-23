@@ -35,6 +35,7 @@ class ContactQuestionnaire(db.Model):
                 "type": "tel",
                 "label": "Preferred number",
                 "description": "(including area code)",
+                "placeholder": "555-555-5555"
             },
             "validators": {"validation": ["phone"]},
         },
@@ -145,7 +146,7 @@ class ContactQuestionnaire(db.Model):
             "type": "select",
             "template_options": {
                 "label": "",
-                "placeholder": "",
+                "placeholder": "Please select how you heard about us",
                 "description": "",
                 "required": True,
                 "options": [

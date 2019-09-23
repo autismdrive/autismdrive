@@ -65,7 +65,7 @@ export class SearchBoxComponent implements OnInit {
 
     if (!doNotRedirect) {
       if (hasFilters) {
-        return this.router.navigate(['/search/filter'], {queryParams: newParams});
+        return this.router.navigate(['/search'], {queryParams: newParams});
       } else {
         return this.router.navigateByUrl('/search');
       }

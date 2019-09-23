@@ -37,6 +37,7 @@ class ProfessionalProfileQuestionnaire(db.Model):
             "type": "select",
             "template_options": {
                 "label": 'For what purposes are you interested in accessing the Autism DRIVE?',
+                "placeholder": "Please select",
                 "options": [
                     {"value": "profResources", "label": "To learn more about Autism and Autism Resources available"},
                     {"value": "profResearch", "label": "To learn about and engage in research projects"},

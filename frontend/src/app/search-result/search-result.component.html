@@ -13,7 +13,7 @@
       {{hit.title}}
     </a>
     <button mat-button
-        [routerLink]="[ '/search/filter' ]"
+        [routerLink]="[ '/search' ]"
         [queryParams]="{'Type': hit.label}"
         class="type"
         [disableRipple]="true"
@@ -29,11 +29,19 @@
   <markdown
     *ngIf="hit.highlights"
     class="highlights"
-  ><span class="{{hit.date ? 'date' : 'muted'}}">{{hit.date || hit.last_updated | date}} - </span> {{hit.highlights}}</markdown>
+  >
+    <app-last-updated-date [lastUpdatedDate]="hit.last_updated"></app-last-updated-date>
+    {{hit.highlights}}
+    <app-event-date *ngIf="hit.date" [eventDate]="hit.date"></app-event-date>
+  </markdown>
   <p
     *ngIf="!hit.highlights"
     class="description"
-  ><span class="{{hit.date ? 'date' : 'muted'}}">{{hit.date || hit.last_updated | date}} - </span> {{hit.description}}</p>
+  >
+    <app-last-updated-date [lastUpdatedDate]="hit.last_updated"></app-last-updated-date>
+    {{hit.description}}
+    <app-event-date *ngIf="hit.date" [eventDate]="hit.date"></app-event-date>
+  </p>
   <app-details-link
     [url]="'/' + hit.type.toLowerCase() + '/' + hit.id"
     size="1"

@@ -103,8 +103,8 @@ describe('Participant (Guardian - Self)', () => {
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected category', () => searchUseCases.displaySelectedCategory());
-  it('should sort results by distance from user location', () => searchUseCases.sortByDistance());
+  it('should display selected category', () => searchUseCases.displaySelectedCategory('age'));
+  it('should sort results by distance from me', () => searchUseCases.sortByDistance());
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code ZIP code dialog', () => searchUseCases.openZipCodeDialog());
   it('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
@@ -116,12 +116,18 @@ describe('Participant (Guardian - Self)', () => {
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
-  it('should sort by last date updated');
+  it('should show all age ranges', () => searchUseCases.removeFilter('age', 'keyword'));
+  it('should clear search keyword', () => searchUseCases.removeFilter('keyword', 'type'));
+  it('should sort results by event date', () => searchUseCases.sortByEventDate());
+  it('should display selected category', () => searchUseCases.displaySelectedCategory('topic'));
+  it('should preserve selected topic when removing type filter', () => searchUseCases.removeFilter('type', 'topic'));
+  it('should sort results by last date updated', () => searchUseCases.sortByLastUpdated());
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
   // Search to Resource to Category Search
   it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
-
 
   // Log out
   it('should log out', () => loginUseCases.logout());
