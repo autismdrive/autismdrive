@@ -167,7 +167,7 @@ class DataLoader:
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
                               benefit_description=row[3], organization=org, location=row[5],
                               short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22],
-                              ages=[])
+                              eligibility_url=row[23], ages=[])
 
                 if row[9].strip() == 'Currently Enrolling':
                     study.status = Status.currently_enrolling
@@ -178,14 +178,14 @@ class DataLoader:
                 elif row[9].strip() == 'Study Results Published':
                     study.status = Status.study_results_published
 
-                for i in range(30, len(row)):
+                for i in range(31, len(row)):
                     if row[i]:
                         study.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
 
                 db.session.add(study)
                 self.__increment_id_sequence(Study)
 
-                for i in range(23, 30):
+                for i in range(24, 31):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
