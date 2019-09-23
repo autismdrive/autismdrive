@@ -79,4 +79,18 @@
       <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>
   </div>
+  <mat-card *ngIf="adminNotes && adminNotes.length > 0">
+    <mat-card-title>Admin Notes</mat-card-title>
+    <mat-card-content>
+      <div
+        *ngFor="let adminNote of adminNotes; let i = index;"
+      >
+        <a [href]="'/#/resource/' + adminNote.resource_id">
+          <b>Resource #{{adminNote.resource_id}} - {{adminNote.resource.title}}</b>
+        </a>
+        <p mat-line><i>Admin note last updated: {{adminNote.last_updated | date:'short'}}</i></p>
+        <p mat-line>{{adminNote.note}}</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
