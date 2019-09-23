@@ -1,3 +1,5 @@
+@import '../../config';
+
 mat-card-header {
   position: relative;
 }
@@ -18,14 +20,24 @@ mat-card-header:before {
   pointer-events: none;
 }
 
-mat-card-subtitle {
-  mat-progress-bar {
-    height: 16px;
+
+::ng-deep   mat-progress-bar {
+  height: 16px;
+
+  .mat-progress-bar-buffer { background-color: $body-color-light; }
+
+  .mat-progress-bar-background {
+    fill: $body-color-light;
+    pattern { fill: $body-color-light; }
   }
+}
+
+::ng-deep mat-card-subtitle {
   button {
     margin-top: 20px;
   }
   .mat-subheading-2 {
     color: black;
   }
+
 }

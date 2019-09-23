@@ -207,7 +207,7 @@
 }
 
 #site-header.mirroring, #site-header mat-toolbar.mirroring, #mobile-menu.mirroring {
-  background-color: mat-color($stardrive-warn, 500);
+  background-color: $brand-warning-muted;
 }
 
 div.mirror-message {

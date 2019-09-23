@@ -143,12 +143,12 @@
     margin-bottom: 2em;
 
     &.alert-info {
-      background-color: mat-color($stardrive-primary, 50, 1);
+      background-color: $brand-primary-light;
       color: black;
     }
 
     &.alert-warn {
-      background-color: mat-color($stardrive-warn, 900, 1);
+      background-color: $brand-warning;
       color: white;
     }
   }
@@ -287,4 +287,7 @@
 
   .margin-top-none, .row.margin-top-none       { margin-top: 0px; }
   .margin-bottom-none, .row.margin-bottom-none { margin-bottom: 0px; }
+
+  .ghost { opacity: 0; }
+
 }

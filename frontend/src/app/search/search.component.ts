@@ -3,7 +3,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import { Location } from '@angular/common';
+import {Location} from '@angular/common';
 import {Hit, Query, Sort} from '../_models/query';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
@@ -15,7 +15,6 @@ import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
-import {animate, state, style, transition, trigger} from '@angular/animations';
 
 interface SortMethod {
   name: string;
@@ -100,11 +99,19 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     },
     {
-      name: 'Date',
+      name: 'Updated',
       label: 'Recently Updated',
       sortQuery: {
         field: 'last_updated',
         order: 'desc'
+      }
+    },
+    {
+      name: 'Event Date',
+      label: 'Happening Soon',
+      sortQuery: {
+        field: 'date',
+        order: 'asc'
       }
     },
   ];
@@ -231,8 +238,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     const urlWithoutParams = urlTree.root.children['primary'].segments.map(it => it.path).join('/');
 
     this.location.go(
-      this.router.createUrlTree([urlWithoutParams],
-        { queryParams:  qParams }).toString());
+      this.router.createUrlTree(
+        [urlWithoutParams],
+        {queryParams: qParams}
+      ).toString()
+    );
     this.doSearch();
   }
 
@@ -323,7 +333,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.query.start = 0;
     this.query.sort = this.selectedSort.sortQuery;
 
-    if (this.selectedSort.name === 'Distance') {
+    if (this.selectedSort.name === 'Event Date') {
+      this.selectType(HitType.EVENT.name);
+    } else if (this.selectedSort.name === 'Distance') {
       this.loadMapLocation(() => this._updateDistanceSort());
     } else {
       this.doSearch();
@@ -348,21 +360,24 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectType(keepType: string = null) {
     if (keepType) {
       this.query.types = [keepType];
+      this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
+
       if (keepType === HitType.LOCATION.name) {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Distance')[0];
       } else if (keepType === HitType.RESOURCE.name) {
         if (this.query.words !== '') {
           this.selectedSort = this.sortMethods.filter(s => s.name === 'Relevance')[0];
         } else {
-          this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+          this.selectedSort = this.sortMethods.filter(s => s.name === 'Updated')[0];
         }
       } else if (keepType === HitType.EVENT.name) {
-        this.selectedSort = this.sortMethods.filter(s => s.name === 'Date')[0];
+        this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
       }
     } else {
       this.query.types = [];
+      this.query.date = null;
+      this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
-    this.query.category = null;
     this._goToFirstPage(true);
   }
 
@@ -482,5 +497,4 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.doSearch();
     }
   }
-
 }
