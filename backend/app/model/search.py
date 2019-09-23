@@ -18,7 +18,7 @@ class Search:
     def known_age_counts():
         return list(map(lambda age_name: (AggCount(age_name, 0, False)), AgeRange.ages))
 
-    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None):
+    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None, date=None):
         self.words = words
         self.total = 0
         self.hits = []
@@ -30,6 +30,7 @@ class Search:
         self.category = category
         self.type_counts = []
         self.age_counts = Search.known_age_counts()
+        self.date = date
 
     # Method called when updating a search with fresh results.
     # This should zero-out any existing data that should be overwritten.
@@ -82,7 +83,7 @@ class Sort:
 
 class Hit:
 
-    def __init__(self, result_id, content, description, title, doc_type, label, last_updated, highlights, latitude,
+    def __init__(self, result_id, content, description, title, doc_type, label, date, last_updated, highlights, latitude,
                  longitude):
         self.id = result_id
         self.content = content
@@ -90,6 +91,7 @@ class Hit:
         self.title = title
         self.type = doc_type
         self.label = label
+        self.date = date
         self.last_updated = last_updated
         self.highlights = highlights
         self.latitude = latitude

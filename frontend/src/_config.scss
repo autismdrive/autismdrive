@@ -1,10 +1,48 @@
 // GLOBAL SCSS VARIABLES
 $body-font-family: '"franklin-gothic-urw", sans-serif';
 $heading-font-family: '"bodoni-urw", serif';
-$body-color: #4e4e4e;
-$brand-gray: #cacaca;
-$brand-primary: #002f6c;
-$brand-accent: #e57200;
+
+// COLOR PALETTE
+
+// gray
+$brand-gray: #4e4e4e;
+$brand-gray-tint-1: #666666;
+$brand-gray-tint-2: #DADADA;
+$brand-gray-tint-3: #F1F1EF;
+$body-color: $brand-gray;
+$body-color-muted: $brand-gray-tint-1;
+$body-color-light: $brand-gray-tint-3;
+
+// primary (UVA "Jefferson Blue")
+$brand-primary: #232D4B;
+$brand-primary-tint-1: #394E79;
+$brand-primary-tint-2: #6C799C;
+$brand-primary-tint-3: #A9AFC7;
+$brand-primary-shade-1: #092255;
+$brand-primary-shade-2: #041D4F;
+$brand-primary-shade-3: #02194A;
+$brand-primary-shade-4: #021745;
+$brand-primary-shade-5: #03143E;
+$brand-primary-muted: $brand-primary-tint-1;
+$brand-primary-light: $brand-primary-tint-3;
+
+// accent (UVA "Rotunda Orange")
+$brand-accent: #E57200;
+$brand-accent-tint-1: #F69350;
+$brand-accent-tint-2: #FAB584;
+$brand-accent-tint-3: #FDD8BB;
+$brand-accent-shade-1: #E76E25;
+$brand-accent-shade-2: #DD6923;
+$brand-accent-shade-3: #D36421;
+$brand-accent-shade-4: #C8601F;
+$brand-accent-shade-5: #C05B1D;
+$brand-accent-muted: $brand-accent-tint-1;
+$brand-accent-light: $brand-accent-tint-3;
+
+// warning (UVA "Emergency Red")
+$brand-warning: #DF1E43;
+$brand-warning-muted: desaturate(scale-color($brand-warning, $lightness: 30%), 20%);
+$brand-warning-light: scale-color($brand-warning, $lightness: 90%);
 $easeDuration: 300ms;
 $animationDuration: 500ms;
 $tile-height-1x: 226px;

@@ -549,6 +549,7 @@ class SearchSchema(ma.Schema):
         highlights = fields.Str()
         latitude = fields.Float()
         longitude = fields.Float()
+        date = fields.Date(missing=None)
 
     class SortSchema(ma.Schema):
         field = fields.Str(allow_null=True)
@@ -578,6 +579,7 @@ class SearchSchema(ma.Schema):
     hits = fields.List(ma.Nested(HitSchema), dump_only=True)
     category = ma.Nested(CategoryInSearchSchema)
     ordered = True
+    date = fields.Date(allow_none=True)
 
     @post_load
     def make_search(self, data):

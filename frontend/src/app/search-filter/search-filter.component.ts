@@ -18,8 +18,8 @@ export class SearchFilterComponent implements OnInit {
   ngOnInit() {
   }
 
-  select($event) {
-    this.filterSelected.emit($event);
+  select(keepType: string) {
+    this.filterSelected.emit(keepType);
   }
 
   hasSelection(): boolean {

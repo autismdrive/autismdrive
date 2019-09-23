@@ -1,4 +1,4 @@
-@import '../../material';
+@import '../../config';
 
 .userList {
   text-align: center;
@@ -22,7 +22,7 @@
 
 mat-row:hover {
   cursor: pointer;
-  background: mat-color($stardrive-accent, 100, 1.0);
+  background-color: $brand-accent-light;
 }
 
 .mat-column-id, .mat-column-role {

@@ -19,6 +19,7 @@ export class Query {
   category: Category;
   type_counts: Aggregation[] = [];
   age_counts: Aggregation[] = [];
+  date?: Date;
 
   constructor(private _props) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));
@@ -76,6 +77,7 @@ export class Hit extends GeoLocation {
   content: string;
   description: string;
   last_updated: Date;
+  date?: Date;
   highlights: string;
   url?: string;
 

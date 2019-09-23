@@ -10,7 +10,7 @@
   margin: 0;
   background-color: rgba(255, 255, 255, 0.8);
   text-align: center;
-  color: mat-color($stardrive-primary, 500);
+  color: $brand-primary;
 
   &.border-box-tile-1x { height: $tile-height-1x; }
   &.border-box-tile-2x { height: $tile-height-2x; }
@@ -45,7 +45,7 @@
 
     &:before {
       border: 11px solid #dadada;
-      border-image: linear-gradient(to bottom, $brand-gray 0%, #f1f1ef 100%);
+      border-image: linear-gradient(to bottom, $brand-gray-tint-2 0%, $brand-gray-tint-3 100%);
       border-image-slice: 1;
       opacity: 1;
     }

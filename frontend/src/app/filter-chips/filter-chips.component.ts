@@ -4,7 +4,7 @@ import { ResourceCategory } from '../_models/resource_category';
 import {AgeRange} from '../_models/hit_type';
 
 @Component({
-  selector: 'app-category-chips',
+  selector: 'app-filter-chips',
   templateUrl: './filter-chips.component.html',
   styleUrls: ['./filter-chips.component.scss']
 })

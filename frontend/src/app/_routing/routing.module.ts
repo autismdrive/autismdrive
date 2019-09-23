@@ -14,7 +14,6 @@ import {QuestionnaireDataViewComponent} from '../questionnaire-data-view/questio
 import {RegisterComponent} from '../register/register.component';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
 import {ResourceFormComponent} from '../resource-form/resource-form.component';
-import {ResourcesComponent} from '../resources/resources.component';
 import {SearchComponent} from '../search/search.component';
 import {StudiesComponent} from '../studies/studies.component';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
@@ -68,7 +67,6 @@ const routes: Routes = [
   {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account', hideHeader: true}},
   {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Event Details'}},
   {path: 'location/:resourceId', component: ResourceDetailComponent, data: {title: 'Location Details'}},
-  {path: 'resources', component: ResourcesComponent, data: {title: 'View Autism DRIVE Trainings & Resources'}},
   {path: 'resource/:resourceId', component: ResourceDetailComponent, data: {title: 'Resource Details'}},
   {
     path: ':resourceType/:resourceId/edit',

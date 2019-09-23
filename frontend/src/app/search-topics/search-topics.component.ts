@@ -13,7 +13,7 @@ export class SearchTopicsComponent implements OnInit {
   category: Category;
 
   @Output()
-  catagorySelected = new EventEmitter<Category>();
+  categorySelected = new EventEmitter<Category>();
 
   constructor() { }
 
@@ -21,7 +21,7 @@ export class SearchTopicsComponent implements OnInit {
   }
 
   selectCategory(cat: Category) {
-    this.catagorySelected.emit(cat);
+    this.categorySelected.emit(cat);
   }
 
   parentList(current: Category = this.category, parents: any[] = []): any[] {
