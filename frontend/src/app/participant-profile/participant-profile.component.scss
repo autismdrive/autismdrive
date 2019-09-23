@@ -24,11 +24,11 @@ mat-card-header:before {
 ::ng-deep   mat-progress-bar {
   height: 16px;
 
-  .mat-progress-bar-buffer { background-color: $body-color-light; }
+  .mat-progress-bar-buffer { background-color: $brand-gray-tint-2; }
 
   .mat-progress-bar-background {
-    fill: $body-color-light;
-    pattern { fill: $body-color-light; }
+    fill: $brand-gray-tint-2;
+    pattern { fill: $brand-gray-tint-2; }
   }
 }
 
