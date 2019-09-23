@@ -65,7 +65,7 @@ import {AccordionComponent} from './accordion/accordion.component';
 import {AdminHomeComponent} from './admin-home/admin-home.component';
 import {AppComponent} from './app.component';
 import {AvatarDialogComponent} from './avatar-dialog/avatar-dialog.component';
-import {CategoryChipsComponent} from './category-chips/category-chips.component';
+import {FilterChipsComponent} from './filter-chips/filter-chips.component';
 import {AboutComponent} from './about/about.component';
 import {FiltersComponent} from './filters/filters.component';
 import {FlowCompleteComponent} from './flow-complete/flow-complete.component';
@@ -167,7 +167,7 @@ export class FormlyConfig {
     AvatarDialogComponent,
     BorderBoxTileComponent,
     CardWrapperComponent,
-    CategoryChipsComponent,
+    FilterChipsComponent,
     DetailsLinkComponent,
     FiltersComponent,
     FiltersComponent,
