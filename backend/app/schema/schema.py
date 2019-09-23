@@ -614,7 +614,8 @@ class EmailLogSchema(ModelSchema):
 class AdminNoteSchema(ModelSchema):
     class Meta:
         model = AdminNote
-        include_fk = True
+        fields = ('id', 'resource_id', 'user_id', 'user', 'last_updated', 'note')
+    user = fields.Nested(UserSchema, dump_only=True)
 
 
 class StepLogSchema(ModelSchema):
