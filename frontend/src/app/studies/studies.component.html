@@ -1,37 +1,55 @@
 <div
-  class="studies"
-  fxLayout.lt-md="column"
-  fxLayout.gt-sm="row"
-  fxLayoutGap="40px"
-  fxLayoutAlign="center auto"
+  id="hero"
+  class="center-center gradient-overlay container with-escaping-tiles"
 >
-  <div fxFlex.gt-sm="30%">
-    <h1>STAR Research</h1>
-    <h2>About our research</h2>
-    <p>The Supporting Transformative Autism Research (STAR) project was designed to
-      ignite discovery, improve systems of care, and equip communities with best practices
-      to support people with autism across the lifespan. STAR brings together researchers,
-      community partners, individuals with autism and their families to identify challenges
-      and co-develop innovative solutions.</p>
-    <p>We aim to address critical knowledge gaps in areas that have the greatest potential
-      to improve the lives of individuals with autism and their families.  Our projects focus
-      on understanding the biological, social and cognitive underpinnings of autism,
-      developing more effective and personalized interventions and supports, and developing
-      innovative models to bridge the gap between research and practice through training and
-      knowledge sharing.  Our research ranges from basic neuroscience to applied practice.
-      The ultimate goal of this work is to empower individuals with autism, their families,
-      and their communities to achieve positive outcomes and quality of life.</p>
+  <div class="hero-content">
+    <h1>Autism Research Studies</h1>
   </div>
   <div
-    fxFlex.gt-sm="60%"
-    fxLayout="column"
+    class="row escaping-tiles-1x"
+    fxLayout="row"
     fxLayoutGap="40px"
-    *ngIf="query && query.hits"
+    fxLayoutAlign="center auto"
+    id="TopOfSearch"
   >
-    <h1>Current Studies</h1>
-    <app-search-result
-      *ngFor="let hit of query.hits"
-      [hit]="hit"
-    ></app-search-result>
+    <app-border-box-tile
+      *ngFor="let status of studyStatuses"
+      fxFlex.gt-sm="calc(33% - 160px)"
+      fxFlex.sm="calc(50% - 120px)"
+      [iconSize]="2"
+      [iconType]="status.name"
+      [title]="status.label"
+      [linkSize]="1"
+      [isSelected]="selectedStatus.name === status.name"
+      (click)="selectStatus(status)"
+      [attr.data-study-status]="status.name"
+    ></app-border-box-tile>
   </div>
+</div>
+
+<div
+  class="studies pad-4"
+  fxLayout="column"
+  fxLayoutGap="40px"
+>
+  <h2>{{selectedStatus.label}}</h2>
+  <ng-container *ngIf="query && query.hits && studyHits && (studyHits.length > 0)">
+    <app-search-result
+      *ngFor="let hit of studyHits"
+      [hit]="hit"
+      [attr.data-study-status]="selectedStatus.name"
+    ></app-search-result>
+  </ng-container>
+  <p
+    *ngIf="!query || !query.hits || !studyHits || (studyHits.length === 0)"
+    class="no-results"
+    [attr.data-study-status]="selectedStatus.name"
+  >
+    We don't have any Autism DRIVE studies
+    <span *ngIf="selectedStatus.name === 'currently_enrolling'">that are enrolling</span>
+    <span *ngIf="selectedStatus.name === 'study_in_progress'">that are in progress</span>
+    <span *ngIf="selectedStatus.name === 'results_being_analyzed'">where results are being analyzed</span>
+    <span *ngIf="selectedStatus.name === 'study_results_published'">where results have been published</span>
+    at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!
+  </p>
 </div>

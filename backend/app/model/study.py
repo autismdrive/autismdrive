@@ -45,7 +45,18 @@ class Study(db.Model):
     categories = db.relationship("StudyCategory", back_populates="study")
 
     def indexable_content(self):
-        return ' '.join(filter(None, (self.description,
+        return ' '.join(filter(None, (self.category_names(),
+                                      self.title,
+                                      self.short_title,
+                                      self.short_description,
+                                      self.description,
                                       self.participant_description,
                                       self.benefit_description,
                                       self.location)))
+
+    def category_names(self):
+        cat_text = ''
+        for cat in self.categories:
+            cat_text = cat_text + ' ' + cat.category.indexable_content()
+
+        return cat_text + ' ' + ' '.join(self.ages)

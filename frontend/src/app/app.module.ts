@@ -122,6 +122,7 @@ import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.componen
 import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
 import {EventDateComponent} from './event-date/event-date.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
+import { RelatedItemsComponent } from './related-items/related-items.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -226,6 +227,7 @@ export class FormlyConfig {
     AdminNoteDisplayComponent,
     EventDateComponent,
     LastUpdatedDateComponent,
+    RelatedItemsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),

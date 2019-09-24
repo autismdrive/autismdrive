@@ -20,6 +20,7 @@ export class Query {
   type_counts: Aggregation[] = [];
   age_counts: Aggregation[] = [];
   date?: Date;
+  status?: string;
 
   constructor(private _props) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));
@@ -80,6 +81,7 @@ export class Hit extends GeoLocation {
   date?: Date;
   highlights: string;
   url?: string;
+  status?: string;
 
   constructor(private _props) {
     super(_props);

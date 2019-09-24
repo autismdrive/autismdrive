@@ -1,3 +1,13 @@
+@import '../../config';
+
+#hero {
+  background-image: url('/assets/studies/hero.jpg');
+
+  h1 {
+    color: white;
+  }
+}
+
 .studies {
   margin: 2%;
 
