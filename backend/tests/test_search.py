@@ -1,10 +1,12 @@
 import unittest
+import time
 from datetime import datetime, timedelta
 
 from flask import json
 
 from app import elastic_index, db
 from app.model.category import Category
+from app.model.study_category import StudyCategory
 from tests.base_test import BaseTest
 
 
@@ -126,7 +128,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(search_results['hits'][0]['id'], response['id'])
         self.assertEqual(search_results['hits'][0]['title'], response['title'])
         self.assertEqual(search_results['hits'][0]['type'], "resource")
-        self.assertEqual(search_results['hits'][0]['highlights'], "delivering <em>rainbows</em>")
+        self.assertEqual(search_results['hits'][0]['highlights'], "space unicorn delivering <em>rainbows</em>")
         self.assertIsNotNone(search_results['hits'][0]['last_updated'])
         search_results = self.search(world_query)
         self.assertEqual(0, len(search_results['hits']))
@@ -394,28 +396,81 @@ class TestSearch(BaseTest, unittest.TestCase):
                                                      "film directed by Ron Howard about a group of elderly "
                                                      "people rejuvenated by aliens",
                                          categories=[movie])
+        study = self.construct_study(title="Narrative analysis of 1985 movies vaguely remembered by Middle-Aged Gen Xers",
+                                     description="If you remember Marty McFly, who accidentally traveled back in time "
+                                                 "from 1985 to 1955, or have watched every John Hughes movie starring "
+                                                 "Anthony Michael Hall, feel like you lived in the Goon Docks with "
+                                                 "the Goonies, you might be interested in this study.",
+                                     participant_description="We're looking for elderly people rejuvenated by aliens, "
+                                                             "teens conducting weird science experiments, and parents "
+                                                             "who have gone back to the future to spend detention "
+                                                             "with their authoritarian assistant principal.",
+                                     benefit_description="Participants will receive a cocoon breakfast screenplay "
+                                                         "treatment, delivered by a club of band kids from an 1985 "
+                                                         "American teen comic science fiction film format.",
+                                     categories=[movie])
 
         # Add a bunch of other irrelevant stuff
         for i in range(10):
-            self.construct_resource(title="Andouillette",
-                                    description="Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette ",
+            self.construct_resource(title="Andouillette %d" % i,
+                                    description="Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot "
+                                                "Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage "
+                                                "Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo "
+                                                "Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot Dog "
+                                                "Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette "
+                                                "Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot "
+                                                "Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage "
+                                                "Andouillette %d" % i,
                                     categories=[sausage])
-            self.construct_resource(title="Snickers Candy Bar",
-                                    description="Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar ",
+            self.construct_resource(title="Snickers Candy Bar %d" % i,
+                                    description="Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw "
+                                                "Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers "
+                                                "Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's "
+                                                "Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals "
+                                                "Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco "
+                                                "Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers "
+                                                "Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers "
+                                                "Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy "
+                                                "Bar %d" % i,
                                     categories=[sweets])
+            self.construct_study(title="The correlation between sausage and beer consumption %d" % i,
+                                 description="Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot "
+                                             "Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette "
+                                             "Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot "
+                                             "Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette "
+                                             "Chorizo Bratwurst Hot Dog Sausage Andouillette Chorizo Bratwurst Hot "
+                                             "Dog Sausage Andouillette Chorizo Bratwurst Hot Dog Sausage Andouillette "
+                                             "Chorizo Bratwurst Hot Dog Sausage Andouillette %d" % i,
+                                 categories=[sausage])
+            self.construct_study(title="Ethnographic study of sugar as a construction material %d" % i,
+                                 description="Jaw Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw "
+                                             "Breakers Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers "
+                                             "Brach's Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's "
+                                             "Royals Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals "
+                                             "Necco Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco "
+                                             "Wafers Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers "
+                                             "Snickers Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers "
+                                             "Candy Bar Jaw Breakers Brach's Royals Necco Wafers Snickers Candy "
+                                             "Bar %d" % i,
+                                 categories=[sweets])
 
-        rv = self.app.get('/api/resource/%i/related' % breakfast_club.id, content_type="application/json")
+        rv = self.app.post('/api/related', data=json.dumps({'resource_id': breakfast_club.id}), content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertGreater(len(response), 1)
+        self.assertTrue('resources' in response.keys())
+        self.assertGreater(len(response['resources']), 0)
+
+        self.assertTrue('studies' in response.keys())
+        self.assertGreater(len(response['studies']), 0)
 
         # Most relevant result should be another movie, not sausage or candy
-        self.assertIn(response[0]['title'], [
+        self.assertIn(response['resources'][0]['title'], [
             back_to_the_future.title,
             goonies.title,
             weird_science.title,
             cocoon.title
         ])
+        self.assertIn(study.title, list(map(lambda s: s['title'], response['studies'])))
 
     def test_search_paginates(self):
         self.construct_location(title="one")
