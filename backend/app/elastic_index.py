@@ -229,16 +229,19 @@ class ElasticIndex:
 
         return elastic_search.execute()
 
-    # Finds all resources related to the resource with the given id.
-    def more_like_this(self, resource, max_hits=3):
+    # Finds all resources related to the given item.
+    def more_like_this(self, item, max_hits=3):
 
-        query = MoreLikeThis(like={'_id': ElasticIndex._get_id(resource),
-                                   '_index': self.index_name},
-                             min_term_freq=1,
-                             min_doc_freq=3,
-                             max_query_terms=12,
-                             fields=['title', 'content', 'description', 'location',
-                                     'category', 'organization', 'website'])
+        query = MoreLikeThis(
+            like=[
+                # {'_id': ElasticIndex._get_id(item), '_index': self.index_name},
+                item.indexable_content(),
+                item.category_names()
+            ],
+            min_term_freq=1,
+            min_doc_freq=2,
+            max_query_terms=12,
+            fields=['title', 'content', 'description', 'location', 'category', 'organization', 'website'])
 
         elastic_search = Search(index=self.index_name)\
             .doc_type(StarDocument)\
