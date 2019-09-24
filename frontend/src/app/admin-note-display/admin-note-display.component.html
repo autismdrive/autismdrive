@@ -9,7 +9,12 @@
           fxLayoutAlign="space-between"
         >
           <div fxFlex="70%">
-            <p mat-line><b>User #{{adminNote.user_id}} - {{adminNote.user.email}} - last updated: {{adminNote.last_updated | date:'short'}}</b></p>
+            <p mat-line>
+              <a [href]="'/#/admin/user/' + adminNote.user_id">
+                <b>User #{{adminNote.user_id}} - {{adminNote.user.email}}</b>
+              </a>
+              <i> - last updated: {{adminNote.last_updated | date:'short'}}</i>
+            </p>
             <p mat-line>{{adminNote.note}}</p>
           </div>
           <div
