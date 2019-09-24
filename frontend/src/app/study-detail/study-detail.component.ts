@@ -11,14 +11,17 @@ import { snakeToUpperCase } from '../../util/snakeToUpper';
 })
 export class StudyDetailComponent implements OnInit {
   study: Study;
+  loading = true;
 
   constructor(private api: ApiService, private route: ActivatedRoute, private router: Router) {
     this.route.params.subscribe(params => {
+      this.loading = true;
       const studyId = params.studyId ? parseInt(params.studyId, 10) : null;
 
       if (isFinite(studyId)) {
         this.api.getStudy(studyId).subscribe(study => {
           this.study = study;
+          this.loading = false;
         });
       }
     });

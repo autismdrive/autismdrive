@@ -12,6 +12,7 @@ import {RelatedOptions} from '../_models/related_results';
 export class RelatedItemsComponent implements OnInit {
   @Input() resource: Resource;
   @Input() study: Study;
+  @Input() loading: boolean;
   relatedResources: Resource[] = [];
   relatedStudies: Study[] = [];
 

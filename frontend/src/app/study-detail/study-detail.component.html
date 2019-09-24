@@ -1,5 +1,5 @@
 <div
-  *ngIf="study"
+  *ngIf="!loading && study"
   class="container"
   id="study"
 >
@@ -63,7 +63,7 @@
         <app-filter-chips [categories]="study.study_categories" [ages]="study.ages"></app-filter-chips>
       </div>
       <div id="study-related">
-        <app-related-items [study]="study"></app-related-items>
+        <app-related-items [study]="study" [loading]="loading"></app-related-items>
       </div>
     </div>
   </div>

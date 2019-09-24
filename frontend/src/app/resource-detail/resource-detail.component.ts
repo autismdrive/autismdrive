@@ -17,6 +17,7 @@ export class ResourceDetailComponent implements OnInit {
   mapLoc: LatLngLiteral;
   currentUser: User;
   notes: AdminNote[];
+  loading = true;
 
   constructor(
     private api: ApiService,
@@ -25,6 +26,7 @@ export class ResourceDetailComponent implements OnInit {
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
+      this.loading = true;
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
@@ -33,6 +35,7 @@ export class ResourceDetailComponent implements OnInit {
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
           this.resource = new Resource(resource);
           this.loadMapLocation();
+          this.loading = false;
         });
         if (this.currentUser && this.currentUser.role == 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {

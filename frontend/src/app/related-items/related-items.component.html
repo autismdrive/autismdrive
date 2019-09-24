@@ -1,4 +1,4 @@
-<mat-card *ngIf="relatedResources.length > 0 || relatedStudies.length > 0">
+<mat-card *ngIf="!loading && (relatedResources.length > 0 || relatedStudies.length > 0)">
   <mat-card-title>Related</mat-card-title>
   <mat-card-content>
     <mat-list>
