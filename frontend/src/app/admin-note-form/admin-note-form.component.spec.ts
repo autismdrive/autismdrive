@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CategoryChipsComponent } from './category-chips.component';
+import { AdminNoteFormComponent } from './admin-note-form.component';
 
-describe('CategoryChipsComponent', () => {
-  let component: CategoryChipsComponent;
-  let fixture: ComponentFixture<CategoryChipsComponent>;
+describe('AdminNoteFormComponent', () => {
+  let component: AdminNoteFormComponent;
+  let fixture: ComponentFixture<AdminNoteFormComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CategoryChipsComponent ]
+      declarations: [ AdminNoteFormComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CategoryChipsComponent);
+    fixture = TestBed.createComponent(AdminNoteFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

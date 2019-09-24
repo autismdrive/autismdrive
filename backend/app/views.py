@@ -22,6 +22,11 @@ from app.resources.FlowEndpoint import (
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
 from app.resources.EmailLogEndpoint import EmailLogEndpoint
 from app.resources.StepLogEndpoint import StepLogEndpoint
+from app.resources.AdminNoteEndpoint import (
+    AdminNoteListByUserEndpoint,
+    AdminNoteListByResourceEndpoint,
+    AdminNoteListEndpoint,
+    AdminNoteEndpoint)
 from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
 from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
@@ -172,6 +177,7 @@ endpoints = [
     (CategoryByResourceEndpoint, "/resource/<resource_id>/category"),
     (ResourceCategoryListEndpoint, "/resource_category"),
     (ResourceCategoryEndpoint, "/resource_category/<id>"),
+    (AdminNoteListByResourceEndpoint, "/resource/<resource_id>/admin_note"),
 
     # Studies
     (StudyListEndpoint, "/study"),
@@ -204,6 +210,7 @@ endpoints = [
     (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),
     (StudyEnrolledByUserEndpoint, "/user/<user_id>/enrolled/study"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
+    (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
     # Participants
     (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
@@ -231,10 +238,12 @@ endpoints = [
     (ExportEndpoint, "/export/<string:name>"),
     (EmailLogListEndpoint, "/email_log"),
     (StepLogListEndpoint, "/step_log"),
+    (AdminNoteListEndpoint, "/admin_note"),
+    (AdminNoteEndpoint, "/admin_note/<string:id>"),
     (StatusEndpoint, "/status"),
     (DataTransferLogEndpoint, "/data_transfer_log"),
 
-    #ZIP Code Endpoint
+    # ZIP Code Endpoint
     (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
 
 ]

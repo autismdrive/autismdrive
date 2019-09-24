@@ -2,7 +2,6 @@ import datetime
 import jwt
 import enum
 
-from dateutil.tz import tzutc
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 

@@ -65,7 +65,7 @@ import {AccordionComponent} from './accordion/accordion.component';
 import {AdminHomeComponent} from './admin-home/admin-home.component';
 import {AppComponent} from './app.component';
 import {AvatarDialogComponent} from './avatar-dialog/avatar-dialog.component';
-import {CategoryChipsComponent} from './category-chips/category-chips.component';
+import {FilterChipsComponent} from './filter-chips/filter-chips.component';
 import {AboutComponent} from './about/about.component';
 import {FiltersComponent} from './filters/filters.component';
 import {FlowCompleteComponent} from './flow-complete/flow-complete.component';
@@ -117,9 +117,11 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
-import { SearchFilterComponent } from './search-filter/search-filter.component';
-import { EventDateComponent } from './event-date/event-date.component';
-import { LastUpdatedDateComponent } from './last-updated-date/last-updated-date.component';
+import {SearchFilterComponent} from './search-filter/search-filter.component';
+import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.component';
+import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
+import {EventDateComponent} from './event-date/event-date.component';
+import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 import { RelatedItemsComponent } from './related-items/related-items.component';
 
 @Injectable()
@@ -168,7 +170,7 @@ export class FormlyConfig {
     AvatarDialogComponent,
     BorderBoxTileComponent,
     CardWrapperComponent,
-    CategoryChipsComponent,
+    FilterChipsComponent,
     DetailsLinkComponent,
     FiltersComponent,
     FiltersComponent,
@@ -221,6 +223,8 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
     SearchTopicsComponent,
     SearchFilterComponent,
+    AdminNoteFormComponent,
+    AdminNoteDisplayComponent,
     EventDateComponent,
     LastUpdatedDateComponent,
     RelatedItemsComponent,
@@ -283,7 +287,8 @@ export class FormlyConfig {
     AdminExportDetailsComponent,
     AvatarDialogComponent,
     RepeatSectionDialogComponent,
-    SetLocationDialogComponent
+    SetLocationDialogComponent,
+    AdminNoteFormComponent
   ]
 })
 export class AppModule {

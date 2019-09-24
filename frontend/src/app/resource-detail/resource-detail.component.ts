@@ -5,6 +5,7 @@ import {User} from '../_models/user';
 import {ActivatedRoute} from '@angular/router';
 import {LatLngLiteral} from '@agm/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {AdminNote} from '../_models/admin_note';
 
 @Component({
   selector: 'app-resource-detail',
@@ -15,12 +16,14 @@ export class ResourceDetailComponent implements OnInit {
   resource: Resource;
   mapLoc: LatLngLiteral;
   currentUser: User;
+  notes: AdminNote[];
 
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
   ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
@@ -31,10 +34,14 @@ export class ResourceDetailComponent implements OnInit {
           this.resource = new Resource(resource);
           this.loadMapLocation();
         });
+        if (this.currentUser && this.currentUser.role == 'Admin') {
+          this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
+            this.notes = notes;
+          })
+        }
       }
     });
 
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
   ngOnInit() {

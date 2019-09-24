@@ -5,6 +5,7 @@ from sqlalchemy import func
 
 
 from app import ma, db
+from app.model.admin_note import AdminNote
 from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
@@ -281,7 +282,7 @@ class ResourceSchema(ModelSchema):
     class Meta:
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
-                  'organization', 'resource_categories', '_links')
+                  'organization', 'resource_categories',  'ages', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
@@ -333,7 +334,7 @@ class EventSchema(ModelSchema):
         model = Event
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'organization', 'resource_categories', 'latitude', 'longitude', '_links')
+                  'phone', 'website', 'organization', 'resource_categories', 'latitude', 'longitude',  'ages', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -386,7 +387,7 @@ class LocationSchema(ModelSchema):
         model = Location
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'organization', 'resource_categories', 'latitude', 'longitude', '_links')
+                  'organization', 'resource_categories', 'latitude', 'longitude', '_links', 'ages')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -437,8 +438,9 @@ class StudySchema(ModelSchema):
     class Meta:
         model = Study
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
-                  'participant_description', 'benefit_description', 'coordinator_email', 'organization_id', 'organization', 'location',
-                  'status', 'study_categories', 'study_investigators', 'study_users', '_links')
+                  'participant_description', 'benefit_description', 'coordinator_email', 'organization_id',
+                  'organization', 'location', 'status', 'study_categories', 'study_investigators', 'study_users',
+                  'eligibility_url', 'ages', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     status = EnumField(Status)
@@ -611,6 +613,14 @@ class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
         include_fk = True
+
+
+class AdminNoteSchema(ModelSchema):
+    class Meta:
+        model = AdminNote
+        fields = ('id', 'resource_id', 'user_id', 'resource', 'user', 'last_updated', 'note')
+    user = fields.Nested(UserSchema, dump_only=True)
+    resource = fields.Nested(ResourceSchema, dump_only=True)
 
 
 class StepLogSchema(ModelSchema):

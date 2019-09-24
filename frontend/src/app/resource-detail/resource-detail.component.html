@@ -42,6 +42,9 @@
           (click)="goWebsite($event)"
         >Visit website</button>
       </div>
+      <div *ngIf="currentUser && currentUser.role == 'admin'">
+        <app-admin-note-display [currentUser]="currentUser" [currentResource]="resource"></app-admin-note-display>
+      </div>
     </div>
     <div
       id="resource-meta"
@@ -126,7 +129,7 @@
         </mat-card>
       </div>
       <div id="resource-categories">
-        <app-category-chips [categories]="resource.resource_categories"></app-category-chips>
+        <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages"></app-filter-chips>
       </div>
       <div id="resource-related">
         <app-related-items [resource]="resource"></app-related-items>

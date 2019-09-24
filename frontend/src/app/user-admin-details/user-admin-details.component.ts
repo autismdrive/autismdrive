@@ -5,6 +5,7 @@ import { User } from '../_models/user';
 import { ApiService } from '../_services/api/api.service';
 import { MatTableDataSource } from '@angular/material';
 import { EmailLog } from '../_models/email_log';
+import {AdminNote} from '../_models/admin_note';
 
 @Component({
   selector: 'app-user-admin-details',
@@ -15,6 +16,7 @@ export class UserAdminDetailsComponent implements OnInit {
   user: User;
   dataSource: MatTableDataSource<EmailLog>;
   displayedColumns:  string[] = ['id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed'];
+  adminNotes: AdminNote[];
 
   constructor(
     private api: ApiService, private route: ActivatedRoute
@@ -29,6 +31,10 @@ export class UserAdminDetailsComponent implements OnInit {
           this.api.getUserEmailLog(this.user).subscribe( log => {
             this.user.email_log = log;
             this.dataSource = new MatTableDataSource<EmailLog>(log);
+          });
+
+          this.api.getUserAdminNotes(this.user.id).subscribe( notes =>{
+            this.adminNotes = notes;
           });
 
           for (let pi in this.user.participants) {
