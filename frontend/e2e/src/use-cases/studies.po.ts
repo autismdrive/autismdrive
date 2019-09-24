@@ -34,6 +34,10 @@ export class StudiesUseCases {
       // Check that status of all displayed results matches selected status
       return this.page.getElements('app-search-result').each(result => {
         expect(result.getAttribute('data-study-status')).toEqual(selectedStatus);
+
+        if (selectedStatus === 'currently_enrolling') {
+          expect(this.page.getElements('.status-badge.status-currently-enrolling').count()).toBeGreaterThan(0);
+        }
       });
     } else {
       // Check that the "no results" message matches the selected status
