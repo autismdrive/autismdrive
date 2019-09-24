@@ -1,5 +1,5 @@
 <div
-  *ngIf="study"
+  *ngIf="!loading && study"
   class="container"
   id="study"
 >
@@ -63,34 +63,7 @@
         <app-filter-chips [categories]="study.study_categories" [ages]="study.ages"></app-filter-chips>
       </div>
       <div id="study-related">
-        <mat-card>
-          <mat-card-title>Related</mat-card-title>
-          <mat-card-content>
-            <mat-list>
-              <h3 mat-subheader>Resources</h3>
-              <mat-list-item>
-                <a
-                  mat-line
-                  href="/#/resource/1"
-                >Resource 1</a>
-                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                  accusantium
-                  doloremque laudantium, totam rem aperiam...</p>
-              </mat-list-item>
-
-              <h3 mat-subheader>Research Studies</h3>
-              <mat-list-item>
-                <a
-                  mat-line
-                  href="/#/study/1"
-                >Study 1</a>
-                <p mat-line>Description goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                  accusantium
-                  doloremque laudantium, totam rem aperiam...</p>
-              </mat-list-item>
-            </mat-list>
-          </mat-card-content>
-        </mat-card>
+        <app-related-items [study]="study" [loading]="loading"></app-related-items>
       </div>
     </div>
   </div>

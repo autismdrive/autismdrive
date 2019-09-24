@@ -217,18 +217,28 @@ class BaseTest:
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
                         participant_description="Even your pet hamster could benefit from participating in this study",
                         benefit_description="You can expect to have your own rainbow following you around afterwards",
-                        coordinator_email="hello@study.com"):
+                        coordinator_email="hello@study.com", categories=[]):
 
         study = Study(title=title, description=description, participant_description=participant_description,
                       benefit_description=benefit_description, status=Status.currently_enrolling,
                       coordinator_email=coordinator_email)
+
         study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()
-
         db_study = db.session.query(Study).filter_by(title=study.title).first()
         self.assertEqual(db_study.description, description)
+
+        for category in categories:
+            sc = StudyCategory(study_id=db_study.id, category_id=category.id)
+            db.session.add(sc)
+
+        db.session.commit()
         elastic_index.add_document(db_study, 'Study')
+
+        db_study = db.session.query(Study).filter_by(id=db_study.id).first()
+        self.assertEqual(len(db_study.categories), len(categories))
+
         return db_study
 
     def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):

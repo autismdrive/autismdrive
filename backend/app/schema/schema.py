@@ -552,6 +552,7 @@ class SearchSchema(ma.Schema):
         latitude = fields.Float()
         longitude = fields.Float()
         date = fields.Date(missing=None)
+        status = fields.Str(missing=None)
 
     class SortSchema(ma.Schema):
         field = fields.Str(allow_null=True)

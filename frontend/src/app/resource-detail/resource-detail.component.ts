@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
-import { Resource } from '../_models/resource';
-import { User } from '../_models/user';
-import { ActivatedRoute } from '@angular/router';
-import { LatLngLiteral } from '@agm/core';
-import { AuthenticationService } from '../_services/api/authentication-service';
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from '../_services/api/api.service';
+import {Resource} from '../_models/resource';
+import {User} from '../_models/user';
+import {ActivatedRoute} from '@angular/router';
+import {LatLngLiteral} from '@agm/core';
+import {AuthenticationService} from '../_services/api/authentication-service';
 import {AdminNote} from '../_models/admin_note';
 
 @Component({
@@ -16,8 +16,8 @@ export class ResourceDetailComponent implements OnInit {
   resource: Resource;
   mapLoc: LatLngLiteral;
   currentUser: User;
-  related: Resource[];
   notes: AdminNote[];
+  loading = true;
 
   constructor(
     private api: ApiService,
@@ -26,6 +26,7 @@ export class ResourceDetailComponent implements OnInit {
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
+      this.loading = true;
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
@@ -34,9 +35,7 @@ export class ResourceDetailComponent implements OnInit {
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
           this.resource = new Resource(resource);
           this.loadMapLocation();
-        });
-        this.api.getRelatedResources(resourceId).subscribe(related => {
-          this.related = related;
+          this.loading = false;
         });
         if (this.currentUser && this.currentUser.role == 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
@@ -73,7 +72,7 @@ export class ResourceDetailComponent implements OnInit {
   goWebsite($event: MouseEvent) {
     $event.preventDefault();
     if (this.resource && this.resource.website) {
-      window.open(this.resource.website, '_blank')
+      window.open(this.resource.website, '_blank');
     }
   }
 

@@ -7,7 +7,7 @@ import {Category} from '../../_models/category';
 import {EmailLog} from '../../_models/email_log';
 import {Flow} from '../../_models/flow';
 import {Participant} from '../../_models/participant';
-import {Query} from '../../_models/query';
+import {Hit, Query} from '../../_models/query';
 import {Resource} from '../../_models/resource';
 import {ResourceCategory} from '../../_models/resource_category';
 import {Study} from '../../_models/study';
@@ -22,6 +22,7 @@ import {DataTransferPageResults} from '../../_models/data_transfer_log';
 import {Organization} from '../../_models/organization';
 import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
+import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
 
 
 @Injectable({
@@ -71,12 +72,13 @@ export class ApiService {
     resource: '/api/resource/<id>',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
-    relatedresources: '/api/resource/<id>/related',
     resourceAdminNoteList: '/api/resource/<resource_id>/admin_note',
+    relatedresults: '/api/related',
     resourcecategorylist: '/api/resource_category',
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
     search: '/api/search',
+    searchstudies: '/api/search/studies',
     session: '/api/session',
     sessionparticipants: '/api/session/participant',
     sessionstatus: '/api/session/status',
@@ -322,12 +324,11 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** Get Resources related to the given resource */
-  getRelatedResources(id: number): Observable<Resource[]> {
-    return this.httpClient.get<Resource[]>(this._endpointUrl('relatedresources').replace('<id>', id.toString()))
+  /** Get search results related to the given resource or study*/
+  getRelatedResults(relatedOptions: RelatedOptions): Observable<RelatedResults> {
+    return this.httpClient.post<RelatedResults>(this._endpointUrl('relatedresults'), relatedOptions)
       .pipe(catchError(this._handleError));
   }
-
 
   /** getResourceCategories */
   getResourceCategories(resource: Resource): Observable<ResourceCategory[]> {
@@ -449,12 +450,12 @@ export class ApiService {
   }
 
   /** exportUser Questionnaire */
-  exportUserQuestionnaire(user_id:string): Observable<any> {
+  exportUserQuestionnaire(user_id: string): Observable<any> {
     const url = this
       ._endpointUrl('questionnaireUserExport')
       .replace('<name>', name)
       .replace('<user_id>', user_id);
-    return this.httpClient.get(url, { observe: 'response', responseType: 'blob' as 'json' });
+    return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
     // .pipe(catchError(this._handleError));
   }
 
@@ -499,6 +500,13 @@ export class ApiService {
   /** search */
   search(query: Query): Observable<Query> {
     const url = this._endpointUrl('search');
+    return this.httpClient.post<Query>(url, query)
+      .pipe(catchError(this._handleError));
+  }
+
+    /** search only studies */
+  searchStudies(query: Query): Observable<Query> {
+    const url = this._endpointUrl('searchstudies');
     return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }

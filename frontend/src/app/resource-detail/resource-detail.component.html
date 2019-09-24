@@ -1,5 +1,5 @@
 <div
-  *ngIf="resource"
+  *ngIf="!loading && resource"
   class="container"
   id="resource"
 >
@@ -132,19 +132,7 @@
         <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages"></app-filter-chips>
       </div>
       <div id="resource-related">
-        <mat-card>
-          <mat-card-title>Related Resources</mat-card-title>
-          <mat-card-content>
-            <div *ngIf="related && related.length > 0">
-              <div *ngFor="let relatedResource of related">
-                <a
-                  [href]="'/#/resource/' + relatedResource.id"
-                >{{relatedResource.title}}</a>
-                <p >{{relatedResource.description}}</p>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <app-related-items [resource]="resource" [loading]="loading"></app-related-items>
       </div>
     </div>
   </div>

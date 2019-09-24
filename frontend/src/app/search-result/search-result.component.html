@@ -20,6 +20,12 @@
         matTooltip="{{ hit.label }}"
       ><app-type-icon [iconType]="hit.type.toLowerCase()" [size]="1"></app-type-icon></button>
   </div>
+  <ng-container *ngIf="hit && hit.status && isEnrolling(hit.status)">
+    <em [ngClass]="'status-badge status-' + statusKey()">
+      <mat-icon>timer</mat-icon>
+      {{hit.status}}
+    </em>
+  </ng-container>
   <markdown
     *ngIf="hit.highlights"
     class="highlights"
