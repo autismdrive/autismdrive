@@ -70,12 +70,12 @@ describe('Anonymous User', () => {
   it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
 
   // Studies & study details
-  fit('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  fit('should navigate to studies page', () => studiesUseCases.navigateToStudiesPage());
-  fit('should show currently-enrolling studies', () => studiesUseCases.filterByStatus('currently_enrolling'));
-  fit('should show studies in progress', () => studiesUseCases.filterByStatus('study_in_progress'));
-  fit('should show studies where results are being analyzed', () => studiesUseCases.filterByStatus('results_being_analyzed'));
-  fit('should show studies that have been published', () => studiesUseCases.filterByStatus('study_results_published'));
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should navigate to studies page', () => studiesUseCases.navigateToStudiesPage());
+  it('should show currently-enrolling studies', () => studiesUseCases.filterByStatus('currently_enrolling'));
+  it('should show studies in progress', () => studiesUseCases.filterByStatus('study_in_progress'));
+  it('should show studies where results are being analyzed', () => studiesUseCases.filterByStatus('results_being_analyzed'));
+  it('should show studies that have been published', () => studiesUseCases.filterByStatus('study_results_published'));
 
   // Login & Register
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
