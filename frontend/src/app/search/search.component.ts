@@ -62,6 +62,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   query: Query;
   resourceTypes = HitType.all_resources();
+  selectedType: HitType;
   ageLabels = AgeRange.labels;
   typeLabels = HitType.labels;
   loading = true;
@@ -359,6 +360,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   selectType(keepType: string = null) {
     if (keepType) {
+      this.selectedType = this.resourceTypes.find(t => t.name === keepType);
       this.query.types = [keepType];
       this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
 

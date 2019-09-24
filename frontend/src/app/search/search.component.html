@@ -12,8 +12,33 @@
     fxLayoutAlign="center auto"
     id="TopOfSearch"
   >
+    <mat-form-field fxhide fxShow.lt-md>
+      <mat-label>Resource types</mat-label>
+      <mat-select [(value)]="selectedType" placeholder="All types of resources">
+        <mat-select-trigger>
+          <app-type-icon
+            *ngIf="selectedType"
+            [iconType]="selectedType && selectedType.name"
+            [size]="1"
+          ></app-type-icon>
+          <span class="type-label">{{(selectedType && selectedType.label) || 'All types of resources'}}</span>
+        </mat-select-trigger>
+        <mat-option (click)="selectType()">All types of resources</mat-option>
+        <mat-option
+          *ngFor="let type of resourceTypes"
+          [value]="type"
+          (click)="selectType(type.name)"
+        >
+          <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+          <span class="type-label">{{type.label}}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <app-border-box-tile
       *ngFor="let type of resourceTypes"
+      fxShow
+      fxHide.lt-md
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
       [iconSize]="2"
