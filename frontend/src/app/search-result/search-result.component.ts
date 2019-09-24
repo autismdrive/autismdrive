@@ -18,7 +18,6 @@ export class SearchResultComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('hit', this.hit);
   }
 
   isEnrolling(status: string) {

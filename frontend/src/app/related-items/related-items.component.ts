@@ -25,7 +25,6 @@ export class RelatedItemsComponent implements OnInit {
     };
     if (this.resource || this.study) {
       this.api.getRelatedResults(options).subscribe(relatedItems => {
-        console.log('relatedItems', relatedItems);
         this.relatedResources = relatedItems.resources;
         this.relatedStudies = relatedItems.studies;
       });
