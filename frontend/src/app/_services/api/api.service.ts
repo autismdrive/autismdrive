@@ -78,6 +78,7 @@ export class ApiService {
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
     search: '/api/search',
+    searchstudies: '/api/search/studies',
     session: '/api/session',
     sessionparticipants: '/api/session/participant',
     sessionstatus: '/api/session/status',
@@ -499,6 +500,13 @@ export class ApiService {
   /** search */
   search(query: Query): Observable<Query> {
     const url = this._endpointUrl('search');
+    return this.httpClient.post<Query>(url, query)
+      .pipe(catchError(this._handleError));
+  }
+
+    /** search only studies */
+  searchStudies(query: Query): Observable<Query> {
+    const url = this._endpointUrl('searchstudies');
     return this.httpClient.post<Query>(url, query)
       .pipe(catchError(this._handleError));
   }
