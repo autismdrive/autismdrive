@@ -1,0 +1,24 @@
+<mat-card *ngIf="relatedResources.length > 0 || relatedStudies.length > 0">
+  <mat-card-title>Related</mat-card-title>
+  <mat-card-content>
+    <mat-list>
+
+      <ng-container *ngIf="relatedResources.length > 0">
+        <h3 mat-subheader>Resources</h3>
+        <mat-list-item>
+          <a  mat-line [routerLink]="['/resource', relatedResources[0].id]">{{relatedResources[0].title}}</a>
+          <p mat-line>{{relatedResources[0].description}}</p>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngIf="relatedStudies.length > 0">
+        <h3 mat-subheader>Research Studies</h3>
+        <mat-list-item>
+          <a  mat-line [routerLink]="['/study', relatedStudies[0].id]">{{relatedStudies[0].short_title || relatedStudies[0].title}}</a>
+          <p mat-line>{{relatedStudies[0].short_description || relatedStudies[0].description}}</p>
+        </mat-list-item>
+      </ng-container>
+
+    </mat-list>
+  </mat-card-content>
+</mat-card>

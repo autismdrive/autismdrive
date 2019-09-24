@@ -129,19 +129,7 @@
         <app-category-chips [categories]="resource.resource_categories"></app-category-chips>
       </div>
       <div id="resource-related">
-        <mat-card>
-          <mat-card-title>Related Resources</mat-card-title>
-          <mat-card-content>
-            <mat-list *ngIf="related && related.length > 0">
-              <mat-list-item *ngFor="let relatedResource of related">
-                <a mat-line
-                  [href]="'/#/resource/' + relatedResource.id"
-                >{{relatedResource.title}}</a>
-                <p mat-line>{{relatedResource.description}}</p>
-              </mat-list-item>
-            </mat-list>
-          </mat-card-content>
-        </mat-card>
+        <app-related-items [resource]="resource"></app-related-items>
       </div>
     </div>
   </div>

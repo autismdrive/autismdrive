@@ -120,6 +120,7 @@ import {FormPrintoutComponent} from './_forms/form-printout/form-printout.compon
 import { SearchFilterComponent } from './search-filter/search-filter.component';
 import { EventDateComponent } from './event-date/event-date.component';
 import { LastUpdatedDateComponent } from './last-updated-date/last-updated-date.component';
+import { RelatedItemsComponent } from './related-items/related-items.component';
 
 @Injectable()
 export class FormlyConfig {
@@ -222,6 +223,7 @@ export class FormlyConfig {
     SearchFilterComponent,
     EventDateComponent,
     LastUpdatedDateComponent,
+    RelatedItemsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
-import { Resource } from '../_models/resource';
-import { User } from '../_models/user';
-import { ActivatedRoute } from '@angular/router';
-import { LatLngLiteral } from '@agm/core';
-import { AuthenticationService } from '../_services/api/authentication-service';
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from '../_services/api/api.service';
+import {Resource} from '../_models/resource';
+import {User} from '../_models/user';
+import {ActivatedRoute} from '@angular/router';
+import {LatLngLiteral} from '@agm/core';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-resource-detail',
@@ -15,7 +15,6 @@ export class ResourceDetailComponent implements OnInit {
   resource: Resource;
   mapLoc: LatLngLiteral;
   currentUser: User;
-  related: Resource[];
 
   constructor(
     private api: ApiService,
@@ -32,10 +31,6 @@ export class ResourceDetailComponent implements OnInit {
           this.resource = new Resource(resource);
           this.loadMapLocation();
         });
-        this.api.getRelatedResources(resourceId).subscribe(related => {
-          this.related = related;
-        });
-
       }
     });
 
@@ -67,7 +62,7 @@ export class ResourceDetailComponent implements OnInit {
   goWebsite($event: MouseEvent) {
     $event.preventDefault();
     if (this.resource && this.resource.website) {
-      window.open(this.resource.website, '_blank')
+      window.open(this.resource.website, '_blank');
     }
   }
 
