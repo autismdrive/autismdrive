@@ -2,6 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
+import {AdminNote} from '../../_models/admin_note';
 import {Category} from '../../_models/category';
 import {EmailLog} from '../../_models/email_log';
 import {Flow} from '../../_models/flow';
@@ -14,7 +15,7 @@ import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
 import {UserSearchResults} from '../../_models/user_search_results';
 import {environment} from '../../../environments/environment';
-import { StudyUser } from '../../_models/study_user';
+import {StudyUser} from '../../_models/study_user';
 import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
@@ -32,6 +33,8 @@ export class ApiService {
   public serverStatus: Observable<Status>;
   // REST endpoints
   public endpoints = {
+    adminNote: '/api/admin_note/<id>',
+    adminNoteList: '/api/admin_note',
     category: '/api/category/<id>',
     categorybyresource: '/api/resource/<resource_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
@@ -69,6 +72,7 @@ export class ApiService {
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
     relatedresources: '/api/resource/<id>/related',
+    resourceAdminNoteList: '/api/resource/<resource_id>/admin_note',
     resourcecategorylist: '/api/resource_category',
     resourcelist: '/api/resource',
     rootcategorylist: '/api/category/root',
@@ -86,6 +90,7 @@ export class ApiService {
     user: '/api/user/<id>',
     userEmailLog: '/api/user/email_log/<id>',
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
+    userAdminNoteList: '/api/user/<user_id>/admin_note',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
     zip_code_coords: '/api/zip_code_coords/<id>',
@@ -182,6 +187,48 @@ export class ApiService {
   /** Get Studies */
   getStudies(): Observable<Study[]> {
     return this.httpClient.get<Study[]>(this._endpointUrl('studylist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  // Add AdminNote
+  addAdminNote(admin_note: AdminNote): Observable<AdminNote> {
+    return this.httpClient.post<AdminNote>(this._endpointUrl('adminNoteList'), admin_note)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update AdminNote */
+  updateAdminNote(admin_note: AdminNote): Observable<AdminNote> {
+    return this.httpClient.put<AdminNote>(this._endpointUrl('adminNote').replace('<id>', admin_note.id.toString()), admin_note)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete AdminNote */
+  deleteAdminNote(admin_note: AdminNote): Observable<AdminNote> {
+    return this.httpClient.delete<AdminNote>(this._endpointUrl('adminNote').replace('<id>', admin_note.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get AdminNote */
+  getAdminNote(id: number): Observable<AdminNote> {
+    return this.httpClient.get<AdminNote>(this._endpointUrl('adminNote').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get AdminNotes */
+  getAdminNotes(): Observable<AdminNote[]> {
+    return this.httpClient.get<AdminNote[]>(this._endpointUrl('adminNoteList'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get AdminNotes by Resource */
+  getResourceAdminNotes(resource_id: number): Observable<AdminNote[]> {
+    return this.httpClient.get<AdminNote[]>(this._endpointUrl('resourceAdminNoteList').replace('<resource_id>', resource_id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get AdminNotes by User */
+  getUserAdminNotes(user_id: number): Observable<AdminNote[]> {
+    return this.httpClient.get<AdminNote[]>(this._endpointUrl('userAdminNoteList').replace('<user_id>', user_id.toString()))
       .pipe(catchError(this._handleError));
   }
 

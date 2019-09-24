@@ -21,6 +21,7 @@ from app.model.study_user import StudyUser
 from flask import json
 
 from app import app, db, elastic_index
+from app.model.admin_note import AdminNote
 from app.model.category import Category
 from app.model.resource_category import ResourceCategory
 from app.model.location import Location
@@ -63,7 +64,6 @@ class BaseTest:
     def tearDown(self):
         db.session.rollback()
         self.ctx.pop()
-
 
     def logged_in_headers(self, user=None):
 
@@ -136,6 +136,14 @@ class BaseTest:
 #        db_participant = db.session.query(Participant).filter_by(id=participant.id).first()
 #        self.assertEqual(db_participant.relationship, participant.relationship)
         return participant
+
+    def construct_admin_note(self, user, resource, id=976, note="I think all sorts of things about this resource and I'm telling you now."):
+        admin_note = AdminNote(id=id, user_id=user.id, resource_id=resource.id, note=note)
+        db.session.add(admin_note)
+        db.session.commit()
+        db_admin_note = db.session.query(AdminNote).filter_by(id=admin_note.id).first()
+        self.assertEqual(db_admin_note.note, admin_note.note)
+        return db_admin_note
 
     def construct_organization(self, name="Staunton Makerspace",
                                description="A place full of surprise, delight, and amazing people. And tools. Lots of exciting tools."):
@@ -275,6 +283,7 @@ class BaseTest:
         investigator = Investigator(name="Sam I am", organization_id=org.id)
         db.session.add(StudyInvestigator(study = study, investigator = investigator))
         db.session.add(StudyUser(study=study, user=self.construct_user()))
+        db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))
         db.session.add(investigator)
         db.session.add(EmailLog())
         db.session.add(StepLog())

@@ -5,6 +5,7 @@ from sqlalchemy import func
 
 
 from app import ma, db
+from app.model.admin_note import AdminNote
 from app.model.category import Category
 from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
@@ -611,6 +612,14 @@ class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
         include_fk = True
+
+
+class AdminNoteSchema(ModelSchema):
+    class Meta:
+        model = AdminNote
+        fields = ('id', 'resource_id', 'user_id', 'resource', 'user', 'last_updated', 'note')
+    user = fields.Nested(UserSchema, dump_only=True)
+    resource = fields.Nested(ResourceSchema, dump_only=True)
 
 
 class StepLogSchema(ModelSchema):

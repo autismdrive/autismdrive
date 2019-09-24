@@ -1,0 +1,49 @@
+<div id="admin_notes" *ngIf="currentUser && currentUser.role == 'admin'">
+  <mat-card>
+    <mat-card-title>Admin Notes</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="notes && notes.length > 0">
+        <div
+          *ngFor="let adminNote of notes; let i = index;"
+          fxLayout="row"
+          fxLayoutAlign="space-between"
+        >
+          <div fxFlex="70%">
+            <p mat-line><b>User #{{adminNote.user_id}} - {{adminNote.user.email}} - last updated: {{adminNote.last_updated | date:'short'}}</b></p>
+            <p mat-line>{{adminNote.note}}</p>
+          </div>
+          <div
+            fxFlex="20%"
+          >
+            <button
+              mat-mini-fab
+              type="button"
+              color="primary"
+              (click)="openDialog(adminNote)"
+              matTooltip="Edit Note"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-mini-fab
+              type="button"
+              color="accent"
+              (click)="deleteNote(adminNote)"
+              matTooltip="Delete Note"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="openDialog()"
+      >
+        Add Note
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>
