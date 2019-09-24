@@ -1,13 +1,15 @@
-import { AppPage } from './app-page.po';
-import { GlobalHeaderUseCases } from './use-cases/global-header.po';
-import { LoginUseCases } from './use-cases/login.po';
-import { SearchUseCases } from './use-cases/search.po';
+import {AppPage} from './app-page.po';
+import {GlobalHeaderUseCases} from './use-cases/global-header.po';
+import {LoginUseCases} from './use-cases/login.po';
+import {SearchUseCases} from './use-cases/search.po';
+import {StudiesUseCases} from './use-cases/studies.po';
 
 describe('Anonymous User', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
   let searchUseCases: SearchUseCases;
+  let studiesUseCases: StudiesUseCases;
   let randomEmail;
 
   beforeAll(async () => {
@@ -15,6 +17,7 @@ describe('Anonymous User', () => {
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
     searchUseCases = new SearchUseCases(page);
+    studiesUseCases = new StudiesUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
     await page.waitForAngularEnabled(true);
     await page.navigateToHome();
@@ -62,9 +65,17 @@ describe('Anonymous User', () => {
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
 
-  // Resrouce details returns to search
+  // Resource details returns to search
   it('should visit search page', () => globalHeaderUseCases.visitResourcesPage());
   it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+
+  // Studies & study details
+  fit('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  fit('should navigate to studies page', () => studiesUseCases.navigateToStudiesPage());
+  fit('should show currently-enrolling studies', () => studiesUseCases.filterByStatus('currently_enrolling'));
+  fit('should show studies in progress', () => studiesUseCases.filterByStatus('study_in_progress'));
+  fit('should show studies where results are being analyzed', () => studiesUseCases.filterByStatus('results_being_analyzed'));
+  fit('should show studies that have been published', () => studiesUseCases.filterByStatus('study_results_published'));
 
   // Login & Register
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());

@@ -22,6 +22,7 @@
       [linkSize]="1"
       [isSelected]="selectedStatus.name === status.name"
       (click)="selectStatus(status)"
+      [attr.data-study-status]="status.name"
     ></app-border-box-tile>
   </div>
 </div>
@@ -36,16 +37,19 @@
     <app-search-result
       *ngFor="let hit of studyHits"
       [hit]="hit"
+      [attr.data-study-status]="selectedStatus.name"
     ></app-search-result>
   </ng-container>
-  <ng-container *ngIf="!query || !query.hits || !studyHits || (studyHits.length === 0)">
-    <p>
-      We don't have any Autism DRIVE studies
-      <ng-container *ngIf="selectedStatus.name === 'currently_enrolling'">that are enrolling</ng-container>
-      <ng-container *ngIf="selectedStatus.name === 'study_in_progress'">that are in progress</ng-container>
-      <ng-container *ngIf="selectedStatus.name === 'results_being_analyzed'">where results are being analyzed</ng-container>
-      <ng-container *ngIf="selectedStatus.name === 'study_results_published'">where results have been published</ng-container>
-      at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!
-    </p>
-  </ng-container>
+  <p
+    *ngIf="!query || !query.hits || !studyHits || (studyHits.length === 0)"
+    class="no-results"
+    [attr.data-study-status]="selectedStatus.name"
+  >
+    We don't have any Autism DRIVE studies
+    <span *ngIf="selectedStatus.name === 'currently_enrolling'">that are enrolling</span>
+    <span *ngIf="selectedStatus.name === 'study_in_progress'">that are in progress</span>
+    <span *ngIf="selectedStatus.name === 'results_being_analyzed'">where results are being analyzed</span>
+    <span *ngIf="selectedStatus.name === 'study_results_published'">where results have been published</span>
+    at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!
+  </p>
 </div>
