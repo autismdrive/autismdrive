@@ -13,15 +13,16 @@
     id="TopOfSearch"
   >
     <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
-      <mat-label>Resource types</mat-label>
-      <mat-select [(value)]="selectedType" placeholder="All types of resources">
+      <mat-label>{{selectedType ? 'Resource types' : 'All types of resources'}}</mat-label>
+      <mat-select [(value)]="selectedType" placeholder="All">
         <mat-select-trigger>
           <app-type-icon
             *ngIf="selectedType"
             [iconType]="selectedType && selectedType.name"
             [size]="1"
           ></app-type-icon>
-          <span class="type-label">{{(selectedType && selectedType.label) || 'All types of resources'}}</span>
+          <span class="type-label" *ngIf="!selectedType">All types of resources</span>
+          <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
         </mat-select-trigger>
         <mat-option (click)="selectType()">All types of resources</mat-option>
         <mat-option

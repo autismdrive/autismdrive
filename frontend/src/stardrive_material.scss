@@ -275,6 +275,23 @@
 
     .row.escaping-tiles-1x { margin-bottom: -($tile-height-1x * 0.5); }
     .row.escaping-tiles-2x { margin-bottom: -($tile-height-2x * 0.75); }
+
+    @media (max-width: 576px) {
+      height: 200px;
+
+      .mat-form-field-appearance-outline .mat-form-field-label {
+        margin-top: 0.1em;
+      }
+
+      .mat-form-field-outline-gap {
+        display: none;
+      }
+
+      .mat-form-field-outline {
+        background-color: white;
+        border-radius: 5px;
+      }
+    }
   }
 
   .pad-0 { padding: 0px; }

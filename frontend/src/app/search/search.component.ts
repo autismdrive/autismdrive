@@ -376,6 +376,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
       }
     } else {
+      this.selectedType = null;
       this.query.types = [];
       this.query.date = null;
       this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
