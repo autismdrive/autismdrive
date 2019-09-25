@@ -42,7 +42,6 @@ export class ProfileComponent implements OnInit {
         this.user = null;
         this.loading = false;
       });
-    this.authenticationService.refresh();
   }
 
   ngOnInit() {
