@@ -12,7 +12,7 @@
     fxLayoutAlign="center auto"
     id="TopOfSearch"
   >
-    <mat-form-field fxhide fxShow.lt-md>
+    <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
       <mat-label>Resource types</mat-label>
       <mat-select [(value)]="selectedType" placeholder="All types of resources">
         <mat-select-trigger>
@@ -37,7 +37,7 @@
 
     <app-border-box-tile
       *ngFor="let type of resourceTypes"
-      fxShow
+      fxShow.md fxShow.lg fxShow.xl
       fxHide.lt-md
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
