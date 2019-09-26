@@ -16,8 +16,9 @@ export class RepeatSectionComponent extends FieldArrayType {
   }
 
   openDialog(i: number, f?: FormlyFieldConfig) {
+    const width = Math.max(window.innerWidth * 0.75, 375);
     const dialogRef = this.dialog.open(RepeatSectionDialogComponent, {
-      width: `${window.innerWidth / 2}px`,
+      width: `${width}px`,
       data: {
         fields: [this.field.fieldArray],
         model: f ? this.field.fieldGroup[i].model : {},

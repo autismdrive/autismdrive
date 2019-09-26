@@ -2,6 +2,10 @@
   // SM
   @media (max-width: 959px) {
     min-height: 60vh;
+
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0.25em;
+    }
   }
 
   // MD
