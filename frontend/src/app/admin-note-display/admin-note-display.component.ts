@@ -45,7 +45,7 @@ export class AdminNoteDisplayComponent implements OnInit {
         this.api.updateAdminNote(adminNote).subscribe(x => {
           this.getNotes();
         });
-      } else {
+      } else if (result && !adminNote) {
         this.api.addAdminNote({"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": result}).subscribe(x => {
           this.getNotes();
         });
