@@ -58,13 +58,13 @@
           fxLayoutGap="40px"
         >
           <app-participant-profile
-            [participant]="user.getSelf()"
+            [participant]="self"
             [user]="user"
-            id="self_participant_{{user.getSelf().id}}"
+            id="self_participant_{{self.id}}"
           ></app-participant-profile>
 
           <app-participant-profile
-            *ngFor="let participant of user.getDependents()"
+            *ngFor="let participant of dependents"
             [participant]="participant"
             [user]="user"
             id="dependent_participant_{{participant.id}}"

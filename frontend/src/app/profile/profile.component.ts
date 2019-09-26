@@ -26,6 +26,8 @@ export class ProfileComponent implements OnInit {
   loading = true;
   studyInquiries: StudyUser[];
   currentStudies: Study[];
+  self: Participant;
+  dependents: Participant[];
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
@@ -35,6 +37,8 @@ export class ProfileComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(
       user => {
         this.user = user;
+        this.self = user.getSelf();
+        this.dependents = user.getDependents();
         this.state = this.getState();
         this.loading = false;
       }, error1 => {
@@ -45,10 +49,22 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.refreshParticipants();
     this.api.getUserStudyInquiries(this.user.id).subscribe( x => this.studyInquiries = x );
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
     });
+  }
+
+  refreshParticipants() {
+    if (this.user) {
+      this.api.getUser(this.user.id).subscribe( u => {
+        console.log('this is u', u);
+        let newU = new User(u);
+        this.self = newU.getSelf();
+        this.dependents = newU.getDependents();
+      })
+    }
   }
 
   getState() {
