@@ -175,6 +175,7 @@
           mapTypeId="roadmap"
           [zoom]="7"
           (mapReady)="mapLoad($event)"
+          [scrollwheel]="null"
         >
           <agm-marker
             *ngIf="mapLoc"
