@@ -1,4 +1,7 @@
 import logging.config
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from config.logging import logging_config
 
 from flask import Flask, jsonify
@@ -166,10 +169,10 @@ def resourcereset():
 def run_full_export():
     """Remove all data and recreate it from the example data files"""
     if app.config["MIRRORING"]:
-        click.echo('Exporting all data.')
         from app.import_service import ImportService
-        importer = ImportService(app, db)
-        importer.run_full_backup()
+        click.echo('Exporting all data.')
+        import_service = ImportService(app, db)
+        import_service.run_full_backup()
     else:
         click.echo('This system is not configured to run exports. Ingoring.')
 
@@ -178,13 +181,19 @@ from app import views
 
 
 def schedule_tasks():
+    from app.export_service import ExportService
+    from app.import_service import ImportService
+
+    scheduler = BackgroundScheduler(daemon=True)
+    scheduler.start()
     if app.config["MIRRORING"]:
-        from app.import_service import ImportService
-        importer = ImportService(app, db)
-        importer.start()
+        import_service = ImportService(app, db)
+        scheduler.add_job(import_service.run_backup, 'interval',
+                          minutes=import_service.import_interval_minutes)
+        scheduler.add_job(import_service.run_full_backup, 'interval', days=1)
     else:
-        from app.export_service import ExportService
-        ExportService.start()
+        scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval',
+                          minutes=app.config['EXPORT_CHECK_INTERNAL_MINUTES'])
 
 
 # Cron scheduler
