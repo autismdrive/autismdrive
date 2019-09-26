@@ -1,6 +1,7 @@
 <div
   id="hero"
   class="gradient-overlay container with-escaping-tiles"
+  ngClass.lt-md="margin-bottom-none"
 >
   <div class="hero-content">
     <h1>Find Autism Support</h1>
@@ -51,7 +52,7 @@
 </div>
 
 <div class="container">
-  <div class="row margin-bottom-none">
+  <div class="row margin-bottom-none" ngClass.lt-md="margin-top-none">
     <h1 *ngIf="selectedType" fragment="filter-top">
       {{selectedType.label}}
     </h1>
@@ -59,14 +60,15 @@
       All Resources
     </h1>
     <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
-    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap="80px" fxLayoutAlign="space-evenly start">
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="80px" fxLayoutAlign="space-evenly start">
       <mat-accordion displayMode="flat">
         <mat-expansion-panel
+          fxFlex="100%"
           fxFlex.gt-sm="calc(30% - 160px)"
           class="filters"
         >
           <mat-expansion-panel-header>
-            {{(panelElement && panelElement.expanded) ? 'Hide' : ''}} Filter & Sort
+            {{(panelElement && panelElement.expanded && mobileQuery.matches) ? 'Hide' : ''}} Filter & Sort
           </mat-expansion-panel-header>
 
           <div class="sort-order">

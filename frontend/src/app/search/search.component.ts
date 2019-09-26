@@ -49,7 +49,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this.mobileQuery = media.matchMedia('(max-width: 967px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
 
@@ -137,6 +137,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.panelElement.close();
     } else {
       this.panelElement.open();
+      this.panelElement.hideToggle = true;
+      this.panelElement.disabled = true;
     }
   }
 
@@ -186,7 +188,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     },
   ];
   private _mobileQueryListener: () => void;
-
 
   private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};

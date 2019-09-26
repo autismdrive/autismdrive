@@ -46,7 +46,14 @@ button {
   border: none;
 }
 
+mat-expansion-panel, mat-accordion {
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+
 .filters {
+
   #reset-filters {
     color: $brand-accent;
     font-weight: bold;
