@@ -287,9 +287,15 @@
         display: none;
       }
 
-      .mat-form-field-outline {
+      .mat-form-field-appearance-outline .mat-form-field-outline {
         background-color: white;
+        opacity: 1;
         border-radius: 5px;
+      }
+
+      :hover .mat-form-field-appearance-outline .mat-form-field-outline {
+        background-color: white;
+        opacity: 1;
       }
     }
   }

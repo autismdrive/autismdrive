@@ -15,6 +15,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
+import {MatExpansionPanel} from "@angular/material/expansion";
 
 interface SortMethod {
   name: string;
@@ -62,7 +63,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   query: Query;
   resourceTypes = HitType.all_resources();
-  selectedType: HitType;
+  selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
   typeLabels = HitType.labels;
   loading = true;
@@ -124,6 +125,19 @@ export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator, {static: false})
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
+  }
+
+  panelElement: MatExpansionPanel;
+
+  @ViewChild(MatExpansionPanel, {static: false})
+  set panel(value: MatExpansionPanel) {
+    this.panelElement = value;
+
+    if (this.mobileQuery.matches) {
+      this.panelElement.close();
+    } else {
+      this.panelElement.open();
+    }
   }
 
   currentUser: User;
@@ -361,7 +375,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectType(keepType: string = null) {
     if (keepType) {
       this.selectedType = this.resourceTypes.find(t => t.name === keepType);
-      this.query.types = [keepType];
+
+      if (keepType === HitType.ALL_RESOURCES.name) {
+        this.query.types = this.resourceTypesFilteredNames();
+      } else {
+        this.query.types = [keepType];
+      }
       this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
 
       if (keepType === HitType.LOCATION.name) {
@@ -376,12 +395,20 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
       }
     } else {
-      this.selectedType = null;
-      this.query.types = [];
+      this.selectedType = this.resourceTypes.find(t => t.name === HitType.ALL_RESOURCES.name);
+      this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
       this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
     this._goToFirstPage(true);
+  }
+
+  resourceTypesFiltered(): HitType[] {
+    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
+  }
+
+  resourceTypesFilteredNames(): string[] {
+    return this.resourceTypesFiltered().map(t => t.name);
   }
 
   updatePage(event: PageEvent) {
