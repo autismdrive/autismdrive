@@ -49,9 +49,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this._mobileQueryListener = () => this._updateFilterPanelState();
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this.mobileQuery.addEventListener('change', () => this._updateFilterPanelState());
-    window.addEventListener('resize', () => this._updateFilterPanelState());
+    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    window.addEventListener('resize', this._mobileQueryListener);
 
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
@@ -80,6 +81,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
 
   mobileQuery: MediaQueryList;
+  private _mobileQueryListener: () => void;
   sortMethods: SortMethod[] = [
     {
       name: 'Relevance',
@@ -121,14 +123,12 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   pageEvent: PageEvent;
   paginatorElement: MatPaginator;
-
   @ViewChild(MatPaginator, {static: false})
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
 
   panelElement: MatExpansionPanel;
-
   @ViewChild(MatExpansionPanel, {static: false})
   set panel(value: MatExpansionPanel) {
     this.panelElement = value;
@@ -228,6 +228,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchService.reset();
+    this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   removeCategory() {
@@ -522,14 +524,16 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private _updateFilterPanelState() {
-    if (this.mobileQuery.matches) {
-      this.panelElement.close();
-      this.panelElement.hideToggle = false;
-      this.panelElement.disabled = false;
-    } else {
-      this.panelElement.open();
-      this.panelElement.hideToggle = true;
-      this.panelElement.disabled = true;
+    if (this.panelElement) {
+      if (this.mobileQuery.matches) {
+        this.panelElement.close();
+        this.panelElement.hideToggle = false;
+        this.panelElement.disabled = false;
+      } else {
+        this.panelElement.open();
+        this.panelElement.hideToggle = true;
+        this.panelElement.disabled = true;
+      }
     }
 
     this.changeDetectorRef.detectChanges();
