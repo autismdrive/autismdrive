@@ -6,3 +6,6 @@ frontend/package-lock.json
 .isort.cfg
 setup.cfg
 backend/star_drive.log
+
+.release-it.json
+			

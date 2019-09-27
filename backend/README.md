@@ -28,6 +28,11 @@ export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 apt-get install postgresql postgresql-client
 ```
 
+#### ElasticSearch
+We are currently using version 6, and should look at upgrading this in the future when my hair isn't on fire.
+# Debian
+https://medium.com/@pierangelo1982/how-to-install-elasticsearch-6-on-ubuntu-64316dc2de1c
+
 #### Angular
 ```BASH
 npm install -g @angular/cli
@@ -296,3 +301,22 @@ ALL the environment settings with the flask command for it to work correctly.
 ```bash
 FLASK_APP=app/__init__.py MIRRORING=true flask db upgrade
 ```
+
+# Production Deployment
+You will need to install:
+  * Python 3
+  * Elastic Search 6
+  * Apache Web Server
+     * mod-wsgi  (for running flask apps within apache)
+  * Postgres 
+ 
+I've tended to set up the website under /var/www/star or /var/www/autismdrive (the new name and url)
+In the /var/www/autismdrive/ I create a python virtual enviroment with the comnand:
+```
+python3 -m venv python-env
+```
+
+
+
+
+ 
