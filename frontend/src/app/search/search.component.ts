@@ -15,7 +15,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
-import {MatExpansionPanel} from "@angular/material/expansion";
+import {MatExpansionPanel} from '@angular/material/expansion';
 
 interface SortMethod {
   name: string;
@@ -36,7 +36,7 @@ class MapControlDiv extends HTMLDivElement {
 export class SearchComponent implements OnInit, OnDestroy {
 
   constructor(
-    changeDetectorRef: ChangeDetectorRef,
+    private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
@@ -49,9 +49,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.mobileQuery = media.matchMedia('(max-width: 967px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this.mobileQuery.addEventListener('change', () => this._updateFilterPanelState());
+    window.addEventListener('resize', () => this._updateFilterPanelState());
 
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
@@ -132,14 +132,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild(MatExpansionPanel, {static: false})
   set panel(value: MatExpansionPanel) {
     this.panelElement = value;
-
-    if (this.mobileQuery.matches) {
-      this.panelElement.close();
-    } else {
-      this.panelElement.open();
-      this.panelElement.hideToggle = true;
-      this.panelElement.disabled = true;
-    }
+    this._updateFilterPanelState();
   }
 
   currentUser: User;
@@ -187,7 +180,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'http://www.prepivycreek.com/',
     },
   ];
-  private _mobileQueryListener: () => void;
 
   private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};
@@ -527,5 +519,19 @@ export class SearchComponent implements OnInit, OnDestroy {
     } else {
       this.doSearch();
     }
+  }
+
+  private _updateFilterPanelState() {
+    if (this.mobileQuery.matches) {
+      this.panelElement.close();
+      this.panelElement.hideToggle = false;
+      this.panelElement.disabled = false;
+    } else {
+      this.panelElement.open();
+      this.panelElement.hideToggle = true;
+      this.panelElement.disabled = true;
+    }
+
+    this.changeDetectorRef.detectChanges();
   }
 }
