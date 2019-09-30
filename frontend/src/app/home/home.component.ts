@@ -4,6 +4,7 @@ import {Study} from '../_models/study';
 import {ApiService} from '../_services/api/api.service';
 import {NewsItem} from '../_models/news-item';
 import {HitType} from '../_models/hit_type';
+import {ConfigService} from '../_services/config.service.ts/config';
 
 @Component({
   selector: 'app-home',
@@ -16,17 +17,17 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private configService: ConfigService
   ) {
+    console.log("Home Component loading ....")
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
       this.newsItems = this._studiesToNewsItems(this.currentStudies);
     });
-    this.api.serverStatus.subscribe(s => {
-      if (s.mirroring) {
-        router.navigate(['mirrored']);
-      }
-    });
+    if (this.configService.mirroring) {
+      router.navigate(['mirrored']);
+    }
   }
 
   ngOnInit() {

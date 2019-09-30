@@ -3,16 +3,16 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Query } from 'src/app/_models/query';
-import { environment } from '../../../environments/environment';
+import {ConfigService} from '../config.service.ts/config';
 
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
   private _querySubject: BehaviorSubject<Query>;
   public currentQuery: Observable<Query>;
-  query_url = `${environment.api}/api/search/resources`;
+  query_url = '/api/search/resources';
 
-  constructor(private _http: HttpClient) {
+  constructor(private _http: HttpClient, private config: ConfigService) {
     const queryDict = JSON.parse(localStorage.getItem('currentQuery'));
     if (queryDict) {
       this._querySubject = new BehaviorSubject<Query>(new Query(queryDict));
@@ -37,8 +37,9 @@ export class SearchService {
   }
 
   search(query: Query): Observable<Query> {
+    const url = this.config.apiUrl + this.query_url;
     return this._http
-      .post<any>(this.query_url, query)
+      .post<any>(url, query)
       .pipe(map(queryDict => {
         return this._loadQuery(queryDict);
       }));

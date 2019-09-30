@@ -7,6 +7,7 @@ import {DataTransferDataSource} from '../_models/data_transfer_data_source';
 import { merge } from 'rxjs/internal/observable/merge';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 import {DataTransferLog} from '../_models/data_transfer_log';
+import {ConfigService} from '../_services/config.service.ts/config';
 
 @Component({
   selector: 'app-admin-export',
@@ -27,20 +28,18 @@ export class AdminExportComponent implements OnInit {
 
   constructor(
     private api: ApiService,
+    private configService: ConfigService,
     private router: Router,
     private resolver: ComponentFactoryResolver
   ) {}
 
   ngOnInit(): void {
-    this.api.serverStatus.subscribe(status => {
-      this.mirroring = status.mirroring;
-      this.loadData();
-      this.loadLatestLog();
-
-      merge(this.paginator.page).pipe(
-        tap(() => this.loadData())
-      ).subscribe();
-    });
+    this.mirroring = this.configService.mirroring;
+    this.loadData();
+    this.loadLatestLog();
+    merge(this.paginator.page).pipe(
+      tap(() => this.loadData())
+    ).subscribe();
   }
 
   loadData() {

@@ -5,8 +5,8 @@ from flask import Blueprint, jsonify, url_for
 from flask_restful import reqparse
 
 from app import app
+from app.resources.ConfigEndpoint import ConfigEndpoint
 from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
-from app.resources.StatusEndpoint import StatusEndpoint
 from app.resources.Auth import auth_blueprint
 from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
@@ -200,7 +200,6 @@ endpoints = [
 
     # User Sessions
     (SessionEndpoint, "/session"),
-    (SessionStatusEndpoint, '/session/status'),
     (ParticipantBySessionEndpoint, "/session/participant"),
 
     # User Schema, Admin endpoints
@@ -240,7 +239,7 @@ endpoints = [
     (StepLogListEndpoint, "/step_log"),
     (AdminNoteListEndpoint, "/admin_note"),
     (AdminNoteEndpoint, "/admin_note/<string:id>"),
-    (StatusEndpoint, "/status"),
+    (ConfigEndpoint, "/config"),
     (DataTransferLogEndpoint, "/data_transfer_log"),
 
     # ZIP Code Endpoint

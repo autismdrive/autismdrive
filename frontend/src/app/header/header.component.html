@@ -27,7 +27,7 @@
 
     </a></div>
   <span fxFlex></span>
-  <div class="mirror-message" *ngIf="status.mirroring">THIS IS A MIRRORED SERVER</div>
+  <div class="mirror-message" *ngIf="config.mirroring">THIS IS A MIRRORED SERVER</div>
   <a
     mat-button
     fxHide
@@ -45,12 +45,12 @@
 </div>
 <div
   id="site-header"
-  [ngClass]="{'mirroring': status.mirroring}"
+  [ngClass]="{'mirroring': config.mirroring}"
   fxLayout="row"
   fxLayoutAlign="center center"
   [@toggleDock]="headerState"
 >
-  <mat-toolbar [ngClass]="{'mirroring': status.mirroring}">
+  <mat-toolbar [ngClass]="{'mirroring': config.mirroring}">
     <mat-toolbar-row
       id="menu-bar"
       fxLayout="row"
@@ -191,7 +191,7 @@
   fxHide
   fxShow.lt-md
   [@toggleMobileMenu]="menuState"
-  [ngClass]="{'mirroring': status.mirroring}"
+  [ngClass]="{'mirroring': config.mirroring}"
   class="mat-typography"
 >
   <app-search-box variant="dark-bg"></app-search-box>

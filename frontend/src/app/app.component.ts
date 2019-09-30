@@ -3,7 +3,7 @@ import { ActivationEnd, ActivationStart, Router } from '@angular/router';
 import { User } from './_models/user';
 import { AuthenticationService } from './_services/api/authentication-service';
 import {ApiService} from './_services/api/api.service';
-import {Status} from './_models/status';
+import {ConfigService} from './_services/config.service.ts/config';
 import {GoogleAnalyticsService} from './google-analytics.service';
 
 @Component({
@@ -15,13 +15,13 @@ export class AppComponent implements OnInit {
   title = 'star-drive';
   hideHeader = false;
   currentUser: User;
-  systemStatus: Status;
 
   public constructor(
     private authenticationService: AuthenticationService,
     private api: ApiService,
     private router: Router,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private configService: ConfigService
   ) {
     this.googleAnalyticsService.init();
     this.router.events.subscribe((e) => {
@@ -33,7 +33,6 @@ export class AppComponent implements OnInit {
       }
     });
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.api.serverStatus.subscribe(s => this.systemStatus = s);
   }
 
   ngOnInit() {

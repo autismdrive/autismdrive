@@ -26,7 +26,7 @@ import {
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
 import { ApiService } from '../_services/api/api.service';
-import { Status } from '../_models/status';
+import { ConfigService } from '../_services/config.service.ts/config';
 
 export enum ViewportWidth {
   Small = 'sm',
@@ -82,7 +82,6 @@ export enum Direction {
 export class HeaderComponent implements AfterViewInit, OnDestroy {
   private headerVisible = true;
   @Input() currentUser: User;
-  @Input() status: Status;
   menuVisible = false;
   mobileQuery: MediaQueryList;
   mdMediaQuery: MediaQueryList;
@@ -112,6 +111,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     private authenticationService: AuthenticationService,
     private router: Router,
     private api: ApiService,
+    private config: ConfigService,
     media: MediaMatcher
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
