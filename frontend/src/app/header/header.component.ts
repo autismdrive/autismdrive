@@ -26,7 +26,7 @@ import {
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
 import { ApiService } from '../_services/api/api.service';
-import { ConfigService } from '../_services/config.service.ts/config';
+import {ConfigService} from '../_services/config.service';
 
 export enum ViewportWidth {
   Small = 'sm',

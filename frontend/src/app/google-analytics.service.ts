@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {ConfigService} from './_services/config.service.ts/config';
+import {ConfigService} from './_services/config.service';
 
 declare var gtag: Function;
 

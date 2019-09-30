@@ -21,7 +21,7 @@ import {Organization} from '../../_models/organization';
 import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
-import {ConfigService} from '../config.service.ts/config';
+import {ConfigService} from '../config.service';
 
 
 @Injectable({

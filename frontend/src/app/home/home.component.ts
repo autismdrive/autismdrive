@@ -4,7 +4,7 @@ import {Study} from '../_models/study';
 import {ApiService} from '../_services/api/api.service';
 import {NewsItem} from '../_models/news-item';
 import {HitType} from '../_models/hit_type';
-import {ConfigService} from '../_services/config.service.ts/config';
+import {ConfigService} from '../_services/config.service';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +20,6 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private configService: ConfigService
   ) {
-    console.log("Home Component loading ....")
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
       this.newsItems = this._studiesToNewsItems(this.currentStudies);

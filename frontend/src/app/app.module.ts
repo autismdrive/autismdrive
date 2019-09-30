@@ -124,8 +124,8 @@ import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.co
 import { RelatedItemsComponent } from './related-items/related-items.component';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, ObservableInput, of} from 'rxjs';
-import {ConfigService} from './_services/config.service.ts/config';
 import {environment} from '../environments/environment';
+import {ConfigService} from './_services/config.service';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port

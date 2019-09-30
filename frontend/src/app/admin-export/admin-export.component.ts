@@ -7,7 +7,7 @@ import {DataTransferDataSource} from '../_models/data_transfer_data_source';
 import { merge } from 'rxjs/internal/observable/merge';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 import {DataTransferLog} from '../_models/data_transfer_log';
-import {ConfigService} from '../_services/config.service.ts/config';
+import {ConfigService} from '../_services/config.service';
 
 @Component({
   selector: 'app-admin-export',

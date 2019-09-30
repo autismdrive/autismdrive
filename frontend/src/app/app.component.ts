@@ -3,8 +3,8 @@ import { ActivationEnd, ActivationStart, Router } from '@angular/router';
 import { User } from './_models/user';
 import { AuthenticationService } from './_services/api/authentication-service';
 import {ApiService} from './_services/api/api.service';
-import {ConfigService} from './_services/config.service.ts/config';
 import {GoogleAnalyticsService} from './google-analytics.service';
+import {ConfigService} from './_services/config.service';
 
 @Component({
   selector: 'app-root',

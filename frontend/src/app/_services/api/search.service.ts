@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Query } from 'src/app/_models/query';
-import {ConfigService} from '../config.service.ts/config';
+import {ConfigService} from '../config.service';
 
 
 @Injectable({ providedIn: 'root' })
