@@ -32,25 +32,23 @@
   <p>You can continue to edit any unlocked questionnaires by selecting them from the
     column on the left.</p>
 
-  <div>
+  <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap="10px" fxLayoutAlign="center center">
     <button
       mat-flat-button
       type="button"
       color="primary"
-      (click)="goProfile($event)"
+      routerLink="/profile"
     >Return to Profile Page</button>
     <button
       mat-flat-button
       type="button"
-      color="primary"
-      (click)="goStudies($event)"
+      routerLink="/studies"
     >View Studies</button>
     <button
       mat-flat-button
       type="button"
-      color="primary"
-      (click)="goResources($event)"
+      color="accent"
+      routerLink="/search"
     >Search Resources</button>
   </div>
-
 </div>

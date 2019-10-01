@@ -29,7 +29,7 @@ export class FlowCompleteComponent implements OnInit {
 
   goResources($event) {
     $event.preventDefault();
-    this.router.navigate(['resources']);
+    this.router.navigate(['search']);
   }
 
 }

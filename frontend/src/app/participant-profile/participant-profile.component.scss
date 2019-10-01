@@ -1,5 +1,9 @@
 @import '../../config';
 
+::ng-deep mat-card {
+  width: 100%;
+}
+
 mat-card-header {
   position: relative;
 }
@@ -20,8 +24,11 @@ mat-card-header:before {
   pointer-events: none;
 }
 
+::ng-deep .mat-card-header-text {
+  width: 100%;
+}
 
-::ng-deep   mat-progress-bar {
+::ng-deep mat-progress-bar {
   height: 16px;
 
   .mat-progress-bar-buffer { background-color: $brand-gray-tint-2; }
@@ -40,4 +47,12 @@ mat-card-header:before {
     color: black;
   }
 
+}
+
+button {
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 50%;
+  }
 }

@@ -1,0 +1,15 @@
+.related-items {
+  .mat-list-item {
+    max-width: 100vw;
+  }
+
+  ::ng-deep .mat-list .mat-list-item .mat-line {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  ::ng-deep .mat-list .mat-list-item {
+    height: initial;
+  }
+}
+

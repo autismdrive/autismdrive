@@ -1,13 +1,5 @@
-
-.mat-list-item {
-  margin: 10px 0;
-}
-
-address p {
-  margin: 0;
-}
-
-agm-map {
+#resource-map agm-map {
   height: 400px;
   width: 100%;
+  max-width: 100vw;
 }

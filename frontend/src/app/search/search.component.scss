@@ -41,28 +41,44 @@ form.search-box {
   font-size: 1.625rem;
 }
 
-h3.mat-subheader {
-  font-size: 1.25rem;
-  line-height: 1.5rem;
-  margin-top: 1em;
-  padding-left: 0px;
-  padding-bottom: 0px;
-}
-
 button {
   flex: 0 0 auto;
   border: none;
 }
 
+mat-expansion-panel, mat-accordion {
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+
 .filters {
+
   #reset-filters {
     color: $brand-accent;
     font-weight: bold;
     padding-left: 0px;
   }
 
-  h2 {
+  h3 {
     font-size: 1.5rem;
+    margin-top: 2em;
+    margin-bottom: 0;
+  }
+
+  .sort-order h3 { margin-top: 1em; }
+
+  h4.mat-subheader {
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+    margin-top: 1em;
+    margin-bottom: 0;
+    padding-left: 0px;
+    padding-bottom: 0px;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
   }
 }
 
@@ -159,5 +175,13 @@ agm-map {
       margin-top: 0px;
       margin-bottom: 0px;
     }
+  }
+}
+
+
+::ng-deep .mat-option, ::ng-deep .mat-select-trigger {
+  app-type-icon  {
+    [class*="icofont-"] { margin-right: 0.5em; }
+    .mat-icon { margin-right: 0em; margin-top: 0.5em; }
   }
 }

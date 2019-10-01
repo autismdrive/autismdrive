@@ -1,6 +1,7 @@
 <div
   id="hero"
   class="gradient-overlay container with-escaping-tiles"
+  ngClass.lt-md="margin-bottom-none"
 >
   <div class="hero-content">
     <h1>Find Autism Support</h1>
@@ -12,8 +13,32 @@
     fxLayoutAlign="center auto"
     id="TopOfSearch"
   >
+    <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+      <mat-label>Resource types</mat-label>
+      <mat-select [(value)]="selectedType">
+        <mat-select-trigger>
+          <app-type-icon
+            *ngIf="selectedType"
+            [iconType]="selectedType && selectedType.name"
+            [size]="1"
+          ></app-type-icon>
+          <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
+        </mat-select-trigger>
+        <mat-option
+          *ngFor="let type of resourceTypes"
+          [value]="type"
+          (click)="selectType(type.name)"
+        >
+          <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+          <span class="type-label">{{type.label}}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <app-border-box-tile
-      *ngFor="let type of resourceTypes"
+      *ngFor="let type of resourceTypesFiltered()"
+      fxShow.md fxShow.lg fxShow.xl
+      fxHide.lt-md
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
       [iconSize]="2"
@@ -28,87 +53,93 @@
 
 <div class="container">
   <div class="row margin-bottom-none">
-    <h1 *ngIf="query && (query.types.length === 1)" fragment="filter-top">
-      <span *ngFor="let hitType of query.getHitTypes()">{{hitType.label}}</span>
+    <h1 *ngIf="selectedType" fragment="filter-top">
+      {{selectedType.label}}
     </h1>
-    <h1 *ngIf="query && query.types.length >  1" fragment="filter-top">
+    <h1 *ngIf="!selectedType" fragment="filter-top">
       All Resources
     </h1>
     <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
-    <div fxLayout="row" fxLayoutGap="80px" fxLayoutAlign="space-evenly start">
-      <div
-        fxFlex="calc(30% - 160px)"
-        class="filters"
-        fxLayout="column"
-        fxLayoutGap="40px"
-      >
-        <div class="sort-order">
-          <h2>Sort by</h2>
-          <mat-radio-group
-            *ngIf="selectedSort && selectedSort.name"
-            [(ngModel)]="selectedSort.name"
-            fxLayout="column"
-          >
-            <ng-container *ngFor="let s of sortMethods">
-              <mat-radio-button
-                *ngIf="isSortVisible(s)"
-                (click)="noLocation ? openLocationDialog() : sortBy(s.name)"
-                [value]="s.name"
-                [disabled]="isSortDisabled(s)"
-              >
-                {{s.label}}
-                <ng-container *ngIf="(s.name === 'Relevance' && query.words != '')">
-                  to "{{query.words}}"
-                </ng-container>
-                <ng-container *ngIf="(s.name === 'Distance')">
-                  <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
-                  <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
-                  <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
-                    <mat-icon>location_searching</mat-icon>
-                    <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
-                  </button>
-                </ng-container>
-                <button *ngIf="(s.name !== 'Distance')" mat-button class="ghost"><mat-icon>code</mat-icon></button>
-              </mat-radio-button>
-            </ng-container>
-          </mat-radio-group>
-        </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="80px" fxLayoutAlign="space-evenly start">
+      <mat-accordion displayMode="flat">
+        <mat-expansion-panel
+          fxFlex="100%"
+          fxFlex.gt-sm="calc(30% - 160px)"
+          class="filters"
+        >
+          <mat-expansion-panel-header>
+            {{(panelElement && panelElement.expanded && mobileQuery.matches) ? 'Hide' : ''}} Filter & Sort
+          </mat-expansion-panel-header>
 
-        <div class="filters-column">
-          <h2>Narrow your results</h2>
-          <h3 class="mat-subheader">By Age</h3>
-          <div *ngIf="!query"><mat-spinner></mat-spinner></div>
-          <div *ngIf="query">
-            <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
-            <app-search-filter
-              [aggregations]="query.age_counts"
-              [label_map]="ageLabels"
-              (filterSelected)="selectAgeRange($event)"
-              [ngClass]="'filter-by-age'"
-            ></app-search-filter>
+          <div class="sort-order">
+            <h3>Sort by</h3>
+            <mat-radio-group
+              *ngIf="selectedSort && selectedSort.name"
+              [(ngModel)]="selectedSort.name"
+              fxLayout="column"
+            >
+              <ng-container *ngFor="let s of sortMethods">
+                <mat-radio-button
+                  *ngIf="isSortVisible(s)"
+                  (click)="noLocation ? openLocationDialog() : sortBy(s.name)"
+                  [value]="s.name"
+                  [disabled]="isSortDisabled(s)"
+                >
+                  {{s.label}}
+                  <ng-container *ngIf="(s.name === 'Relevance' && query.words != '')">
+                    to "{{query.words}}"
+                  </ng-container>
+                  <ng-container *ngIf="(s.name === 'Distance')">
+                    <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
+                    <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
+                    <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
+                      <mat-icon>location_searching</mat-icon>
+                      <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
+                    </button>
+                  </ng-container>
+                  <button *ngIf="(s.name !== 'Distance')" mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
+              </ng-container>
+            </mat-radio-group>
           </div>
-          <h3 class="mat-subheader">By Type</h3>
-          <div *ngIf="!query"><mat-spinner></mat-spinner></div>
-          <app-search-filter
-            *ngIf="query"
-            [aggregations]="query.type_counts"
-            [label_map]="typeLabels"
-            (filterSelected)="selectType($event)"
-            [ngClass]="'filter-by-type'"
-          ></app-search-filter>
-          <h3 class="mat-subheader">By Topic</h3>
-          <div *ngIf="!query"><mat-spinner></mat-spinner></div>
-          <app-search-topics
-            *ngIf="query"
-            [category]="query.category"
-            (categorySelected)="selectCategory($event)"
-            [ngClass]="'filter-by-topic'"
-          ></app-search-topics>
-        </div>
-      </div>
+
+          <div class="filters-column">
+            <h3>Narrow your results</h3>
+            <h4 class="mat-subheader">By Age</h4>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <div *ngIf="query">
+              <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
+              <app-search-filter
+                [aggregations]="query.age_counts"
+                [label_map]="ageLabels"
+                (filterSelected)="selectAgeRange($event)"
+                [ngClass]="'filter-by-age'"
+              ></app-search-filter>
+            </div>
+            <h4 class="mat-subheader">By Type</h4>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <app-search-filter
+              *ngIf="query"
+              [aggregations]="query.type_counts"
+              [label_map]="typeLabels"
+              (filterSelected)="selectType($event)"
+              [ngClass]="'filter-by-type'"
+            ></app-search-filter>
+            <h4 class="mat-subheader">By Topic</h4>
+            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <app-search-topics
+              *ngIf="query"
+              [category]="query.category"
+              (categorySelected)="selectCategory($event)"
+              [ngClass]="'filter-by-topic'"
+            ></app-search-topics>
+          </div>
+        </mat-expansion-panel>
+
+      </mat-accordion>
 
       <div
-        fxFlex="calc(70% - 160px)"
+        fxFlex.gt-sm="calc(70% - 160px)"
         fxLayout="column"
         fxLayoutAlign="start start"
       >
@@ -165,7 +196,7 @@
             </ng-container>
 
           </mat-chip-list>
-          <p [ngClass]="{'num-results': true, 'ghost': (!query || (query.total === 0))}">Page {{paginatorElement.pageIndex + 1}} of {{query.total}} results</p>
+          <p *ngIf="paginatorElement" [ngClass]="{'num-results': true, 'ghost': (!query || (query.total === 0))}">Page {{paginatorElement.pageIndex + 1}} of {{query.total}} results</p>
         </div>
         <agm-map
           *ngIf="showMap()"
@@ -175,6 +206,7 @@
           mapTypeId="roadmap"
           [zoom]="7"
           (mapReady)="mapLoad($event)"
+          [scrollwheel]="null"
         >
           <agm-marker
             *ngIf="mapLoc"
@@ -205,7 +237,7 @@
             </ng-container>
           </agm-marker-cluster>
         </agm-map>
-        <div class="row search-results margin-top-none">
+        <div class="search-results margin-top-none">
           <div
             id="results"
             fxLayout="column"

@@ -2,7 +2,6 @@ import datetime
 import importlib
 import re
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.tz import UTC
 from flask import url_for, logging
 from sqlalchemy import func, desc
@@ -26,14 +25,6 @@ class ExportService:
     TYPE_SUB_TABLE = 'sub-table'
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-
-    @staticmethod
-    def start():
-        scheduler = BackgroundScheduler()
-        scheduler.start()
-        scheduler.add_job(ExportService.send_alert_if_exports_not_running,
-                          'interval',
-                          minutes=app.config['EXPORT_CHECK_INTERNAL_MINUTES'])
 
     @staticmethod
     def get_class_for_table(table):
