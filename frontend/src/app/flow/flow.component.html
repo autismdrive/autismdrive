@@ -3,32 +3,35 @@
   class="profile mat-typography"
 >
   <div>
-    <mat-progress-bar
-      *ngIf="flow.percentComplete() < 100"
-      mode="determinate"
-      [value]="flow.percentComplete()"
-    ></mat-progress-bar>
-
     <app-loading
       *ngIf="state === flowState.LOADING"
       message="Loading..."
     ></app-loading>
 
     <div *ngIf="state !== flowState.LOADING">
-      <h1 *ngIf="state !== flowState.NO_CONSENT">
-        <button mat-icon-button (click)="sidenav.toggle()">
-          <mat-icon>menu</mat-icon>
+      <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
+        <button mat-icon-button (click)="toggleSidenav()" fxHide.gt-sm>
+          <mat-icon>toc</mat-icon>
         </button>
-        <span *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</span>
-        <span *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}}
-          enrollment
-      info</span>
-        <small class="mat-small">
+        <h1 *ngIf="state !== flowState.NO_CONSENT" class="margin-bottom-none">
+          <ng-container *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</ng-container>
+          <ng-container *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment info</ng-container>
+        </h1>
+        <span fxFlex></span>
+        <div class="mat-small" fxFlexAlign="end center">
           <span id="num_completed_steps">{{numCompletedSteps()}}</span> of
           <span id="num_total_steps">{{numTotalSteps()}}</span> steps complete
-        </small>
-      </h1>
+        </div>
+      </div>
+    </div>
 
+    <mat-progress-bar
+      *ngIf="flow.percentComplete() < 100"
+      mode="determinate"
+      [value]="flow.percentComplete()"
+    ></mat-progress-bar>
+
+    <div *ngIf="state !== flowState.LOADING">
       <mat-drawer-container>
         <mat-drawer #sidenav
                     [mode]="mobileQuery.matches ? 'over' : 'side'"

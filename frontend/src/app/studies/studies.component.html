@@ -1,6 +1,7 @@
 <div
   id="hero"
   class="center-center gradient-overlay container with-escaping-tiles"
+  ngClass.lt-md="margin-bottom-none"
 >
   <div class="hero-content">
     <h1>Autism Research Studies</h1>
@@ -12,8 +13,31 @@
     fxLayoutAlign="center auto"
     id="TopOfSearch"
   >
+    <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+      <mat-label>Resource types</mat-label>
+      <mat-select [(value)]="selectedStatus">
+        <mat-select-trigger>
+          <app-type-icon
+            *ngIf="selectedStatus"
+            [iconType]="selectedStatus && selectedStatus.name"
+            [size]="1"
+          ></app-type-icon>
+          <span class="type-label" *ngIf="selectedStatus">{{selectedStatus.label}}</span>
+        </mat-select-trigger>
+        <mat-option
+          *ngFor="let status of studyStatuses"
+          [value]="status"
+          (click)="selectStatus(status)"
+        >
+          <span class="type-label">{{status.label}}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <app-border-box-tile
       *ngFor="let status of studyStatuses"
+      fxShow.md fxShow.lg fxShow.xl
+      fxHide.lt-md
       fxFlex.gt-sm="calc(33% - 160px)"
       fxFlex.sm="calc(50% - 120px)"
       [iconSize]="2"

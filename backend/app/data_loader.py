@@ -1,3 +1,4 @@
+from app.model.admin_note import AdminNote
 from app.model.age_range import AgeRange
 from app.model.category import Category
 from app.model.investigator import Investigator
@@ -219,7 +220,6 @@ class DataLoader:
                 user = User(id=row[0], email=row[1], password=row[2],
                             role=row[3], email_verified=True)
                 db.session.add(user)
-                self.__increment_id_sequence(User)
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())
         db.session.commit()
@@ -314,6 +314,7 @@ class DataLoader:
         db.session.commit()
 
     def clear_resources(self):
+        db.session.query(AdminNote).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyUser).delete()
         db.session.query(StudyCategory).delete()

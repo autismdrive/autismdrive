@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { ApiService } from '../_services/api/api.service';
 import { snakeToUpperCase } from '../../util/snakeToUpper';
@@ -9,7 +9,7 @@ import {TableInfo} from '../_models/table_info';
   templateUrl: './questionnaire-data-view.component.html',
   styleUrls: ['./questionnaire-data-view.component.scss']
 })
-export class QuestionnaireDataViewComponent implements OnInit {
+export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   questionnaire_info: TableInfo[];
   currentQuestionnaire: TableInfo;
 
@@ -25,7 +25,8 @@ export class QuestionnaireDataViewComponent implements OnInit {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    window.addEventListener('resize', this._mobileQueryListener);
   }
 
   ngOnInit() {
@@ -34,6 +35,11 @@ export class QuestionnaireDataViewComponent implements OnInit {
         this.questionnaire_info = info;
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   selectQuestionnaire(info: TableInfo) {

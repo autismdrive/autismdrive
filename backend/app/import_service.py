@@ -1,7 +1,5 @@
 import datetime
-
 import requests
-from apscheduler.schedulers.background import BackgroundScheduler
 
 # Fire of the scheduler
 # The Data Importer should run on the MIRROR, and will make calls to the primary server to download
@@ -31,12 +29,6 @@ class ImportService:
         self.email = app.config["MASTER_EMAIL"]
         self.password = app.config["MASTER_PASS"]
         self.import_interval_minutes = app.config['IMPORT_INTERVAL_MINUTES']
-
-    def start(self):
-        scheduler = BackgroundScheduler()
-        scheduler.start()
-        scheduler.add_job(self.run_backup, 'interval', minutes=self.import_interval_minutes)
-        scheduler.add_job(self.run_full_backup, 'interval', days=1)
 
     def run_backup(self, load_admin=True, full_backup=False):
         date_started = datetime.datetime.now()
