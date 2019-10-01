@@ -306,7 +306,7 @@ export class FormlyConfig {
   ],
   providers: [
     {provide: APP_INITIALIZER,  useFactory: load, deps: [HttpClient, ConfigService], multi: true },
-    {provide: LAZY_MAPS_API_CONFIG,  useClass: ConfigService,  deps: [ConfigService]},
+    {provide: LAZY_MAPS_API_CONFIG,  useExisting: ConfigService},
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
