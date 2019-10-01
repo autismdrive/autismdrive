@@ -25,6 +25,17 @@
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
+
+      <mat-card id="resource-contact">
+        <mat-card-title><h4>Contact</h4></mat-card-title>
+        <mat-card-content>
+          <app-contact-item
+            *ngFor="let c of contactItems"
+            [contactItem]="c"
+          ></app-contact-item>
+        </mat-card-content>
+      </mat-card>
+
       <div
         fxLayout="column"
         fxLayoutGap="20px"
@@ -52,81 +63,31 @@
       fxLayout="column"
       fxLayoutGap="20px"
     >
-      <div id="resource-contact">
-        <mat-card *ngIf="resource && resource.hasCoords()">
-          <mat-card-content>
-            <agm-map
-              [latitude]="resource.latitude"
-              [longitude]="resource.longitude"
-              [streetViewControl]="false"
-              mapTypeId="roadmap"
-              [zoom]="7"
-            >
-              <agm-marker
-                *ngIf="resource.hasCoords()"
-                [latitude]="resource.latitude"
-                [longitude]="resource.longitude"
-              >
-                <agm-info-window *ngIf="mapLoc">
-                  <h5>{{resource.title}}</h5>
-                  <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
-                  <a
-                    class="chevron-link"
-                    href="{{getGoogleMapsUrl()}}"
-                    target="_blank"
-                  >Driving directions</a>
-                </agm-info-window>
-              </agm-marker>
-            </agm-map>
-          </mat-card-content>
-        </mat-card>
-        <mat-card>
-          <mat-card-title>Contact:</mat-card-title>
-          <mat-card-content>
-            <mat-list>
-              <mat-list-item *ngIf="resource.organization">
-                <h4>{{resource.organization.name}}</h4>
-              </mat-list-item>
-              <mat-list-item *ngIf="resource.date">
-                <mat-icon>access_time</mat-icon>
-                {{resource.date | date:'longDate'}}: {{resource.time}}
-              </mat-list-item>
-              <mat-list-item *ngIf="resource.location_name ||
-              resource.street_address1 ||
-              resource.street_address2 ||
-              resource.city ||
-              resource.state ||
-              resource.zip">
-                <mat-icon>location_on</mat-icon>
-                <address>
-                  <p *ngIf="resource.location_name">{{resource.location_name}},</p>
-                  <p *ngIf="resource.street_address1">{{resource.street_address1}}</p>
-                  <p *ngIf="resource.street_address2">{{resource.street_address2}}</p>
-                  <p>{{resource.city}}, {{resource.state}} {{resource.zip}}</p>
-                </address>
-              </mat-list-item>
-              <mat-list-item *ngIf="resource.primary_contact">
-                <mat-icon>person_pin</mat-icon>
-                {{resource.primary_contact}}
-              </mat-list-item>
-              <mat-list-item *ngIf="resource.ticket_cost">
-                <mat-icon>monetization_on</mat-icon>
-                {{resource.ticket_cost}}
-              </mat-list-item>
-              <mat-list-item *ngIf="resource.phone">
-                <mat-icon>phone</mat-icon>
-                <a href="tel://{{resource.phone}}">{{resource.phone}}</a>
-              </mat-list-item>
-              <mat-list-item *ngIf="resource.website">
-                <mat-icon>link</mat-icon>
-                <a
-                  target="_blank"
-                  href="{{resource.website}}"
-                >{{resource.website}}</a>
-              </mat-list-item>
-            </mat-list>
-          </mat-card-content>
-        </mat-card>
+      <div *ngIf="resource && resource.hasCoords()" id="resource-map">
+        <agm-map
+          [latitude]="resource.latitude"
+          [longitude]="resource.longitude"
+          [streetViewControl]="false"
+          mapTypeId="roadmap"
+          [zoom]="7"
+          [scrollwheel]="null"
+        >
+          <agm-marker
+            *ngIf="resource.hasCoords()"
+            [latitude]="resource.latitude"
+            [longitude]="resource.longitude"
+          >
+            <agm-info-window *ngIf="mapLoc">
+              <h5>{{resource.title}}</h5>
+              <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
+              <a
+                class="chevron-link"
+                href="{{getGoogleMapsUrl()}}"
+                target="_blank"
+              >Driving directions</a>
+            </agm-info-window>
+          </agm-marker>
+        </agm-map>
       </div>
       <div id="resource-categories">
         <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages"></app-filter-chips>

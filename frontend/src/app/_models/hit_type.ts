@@ -5,13 +5,17 @@ export class HitType {
       'location': 'Local Services',
       'resource': 'Online Information',
       'event': 'Events and Training',
-      'study': 'Research Studies'
+      'study': 'Research Studies',
+      'all': 'All Results',
+      'all_resources': 'All Resources',
     };
 
   static LOCATION = new HitType('location', HitType.labels.location);
   static RESOURCE = new HitType('resource', HitType.labels.resource);
   static EVENT =  new HitType('event', HitType.labels.event);
   static STUDY = new HitType('study', HitType.labels.study);
+  static ALL = new HitType('all', HitType.labels.all);
+  static ALL_RESOURCES = new HitType('all_resources', HitType.labels.all_resources);
 
   constructor(public name: string, public label: string) {}
 
@@ -20,7 +24,7 @@ export class HitType {
   }
 
   static all_resources(): HitType[] {
-      return [this.LOCATION, this.RESOURCE, this.EVENT];
+      return [this.ALL_RESOURCES, this.LOCATION, this.RESOURCE, this.EVENT];
   }
 }
 

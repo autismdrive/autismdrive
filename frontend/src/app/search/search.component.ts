@@ -15,6 +15,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
+import {MatExpansionPanel} from '@angular/material/expansion';
 
 interface SortMethod {
   name: string;
@@ -35,7 +36,7 @@ class MapControlDiv extends HTMLDivElement {
 export class SearchComponent implements OnInit, OnDestroy {
 
   constructor(
-    changeDetectorRef: ChangeDetectorRef,
+    private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
@@ -48,9 +49,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this._mobileQueryListener = () => this._updateFilterPanelState();
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    window.addEventListener('resize', this._mobileQueryListener);
 
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
@@ -62,6 +64,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   query: Query;
   resourceTypes = HitType.all_resources();
+  selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
   typeLabels = HitType.labels;
   loading = true;
@@ -78,6 +81,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
 
   mobileQuery: MediaQueryList;
+  private _mobileQueryListener: () => void;
   sortMethods: SortMethod[] = [
     {
       name: 'Relevance',
@@ -119,10 +123,16 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   pageEvent: PageEvent;
   paginatorElement: MatPaginator;
-
   @ViewChild(MatPaginator, {static: false})
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
+  }
+
+  panelElement: MatExpansionPanel;
+  @ViewChild(MatExpansionPanel, {static: false})
+  set panel(value: MatExpansionPanel) {
+    this.panelElement = value;
+    this._updateFilterPanelState();
   }
 
   currentUser: User;
@@ -170,8 +180,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'http://www.prepivycreek.com/',
     },
   ];
-  private _mobileQueryListener: () => void;
-
 
   private _queryToQueryParams(query: Query): Params {
     const queryParams: Params = {};
@@ -220,6 +228,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchService.reset();
+    this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   removeCategory() {
@@ -359,7 +369,13 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   selectType(keepType: string = null) {
     if (keepType) {
-      this.query.types = [keepType];
+      this.selectedType = this.resourceTypes.find(t => t.name === keepType);
+
+      if (keepType === HitType.ALL_RESOURCES.name) {
+        this.query.types = this.resourceTypesFilteredNames();
+      } else {
+        this.query.types = [keepType];
+      }
       this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
 
       if (keepType === HitType.LOCATION.name) {
@@ -374,11 +390,20 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
       }
     } else {
-      this.query.types = [];
+      this.selectedType = this.resourceTypes.find(t => t.name === HitType.ALL_RESOURCES.name);
+      this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
       this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
     this._goToFirstPage(true);
+  }
+
+  resourceTypesFiltered(): HitType[] {
+    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
+  }
+
+  resourceTypesFilteredNames(): string[] {
+    return this.resourceTypesFiltered().map(t => t.name);
   }
 
   updatePage(event: PageEvent) {
@@ -496,5 +521,21 @@ export class SearchComponent implements OnInit, OnDestroy {
     } else {
       this.doSearch();
     }
+  }
+
+  private _updateFilterPanelState() {
+    if (this.panelElement) {
+      if (this.mobileQuery.matches) {
+        this.panelElement.close();
+        this.panelElement.hideToggle = false;
+        this.panelElement.disabled = false;
+      } else {
+        this.panelElement.open();
+        this.panelElement.hideToggle = true;
+        this.panelElement.disabled = true;
+      }
+    }
+
+    this.changeDetectorRef.detectChanges();
   }
 }

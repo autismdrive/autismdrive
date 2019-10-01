@@ -73,12 +73,16 @@ export class SearchUseCases {
     expect(numChecked).toEqual(results.length - 1);
   }
 
-  openZipCodeDialog() {
-    const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
-    this.page.clickElement(`${distSelector} button`);
-    expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
-    this.page.waitForVisible('mat-dialog-container');
-    this.page.waitFor(500);
+  async openZipCodeDialog() {
+    const numDialogs = await this.page.getElements('mat-dialog-container').count();
+
+    if (numDialogs === 0) {
+      const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
+      this.page.clickElement(`${distSelector} button`);
+      expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
+      this.page.waitForVisible('mat-dialog-container');
+      this.page.waitFor(500);
+    }
   }
 
   enterZipCode(zipCode = '24401') {
