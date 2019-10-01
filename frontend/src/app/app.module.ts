@@ -131,7 +131,7 @@ import {ConfigService} from './_services/config.service';
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
 // 5000 on the local server.
-function load(http: HttpClient, config: ConfigService): (() => Promise<boolean>) {
+export function load(http: HttpClient, config: ConfigService): (() => Promise<boolean>) {
   return (): Promise<boolean> => {
     return new Promise<boolean>((resolve: (a: boolean) => void): void => {
       let url = './api/config';

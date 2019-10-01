@@ -111,7 +111,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     private authenticationService: AuthenticationService,
     private router: Router,
     private api: ApiService,
-    private config: ConfigService,
+    public config: ConfigService,
     media: MediaMatcher
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');

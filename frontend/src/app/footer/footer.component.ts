@@ -1,5 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ApiService} from '../_services/api/api.service';
+import {Component} from '@angular/core';
 import {ConfigService} from '../_services/config.service';
 
 @Component({
@@ -9,7 +8,6 @@ import {ConfigService} from '../_services/config.service';
 })
 export class FooterComponent {
 
-  constructor(private api: ApiService,
-              private config: ConfigService) { }
+  constructor(public config: ConfigService) { }
 
 }
