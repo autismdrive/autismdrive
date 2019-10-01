@@ -364,3 +364,11 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def test_user_ids_are_not_sequential(self):
+        u1 = self.construct_user(email="hopper@strangerthings.org")
+        u2 = self.construct_user(email="eleven@strangerthings.org")
+        u3 = self.construct_user(email="murray@strangerthings.org")
+
+        self.assertNotEqual(u1.id + 1, u2.id)
+        self.assertNotEqual(u2.id + 1, u3.id)

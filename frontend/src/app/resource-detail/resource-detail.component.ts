@@ -6,6 +6,8 @@ import {ActivatedRoute} from '@angular/router';
 import {LatLngLiteral} from '@agm/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AdminNote} from '../_models/admin_note';
+import {ContactItem} from '../_models/contact_item';
+import {formatDate} from '@angular/common';
 
 @Component({
   selector: 'app-resource-detail',
@@ -18,6 +20,7 @@ export class ResourceDetailComponent implements OnInit {
   currentUser: User;
   notes: AdminNote[];
   loading = true;
+  contactItems: ContactItem[];
 
   constructor(
     private api: ApiService,
@@ -34,10 +37,11 @@ export class ResourceDetailComponent implements OnInit {
         const resourceType = path.charAt(0).toUpperCase() + path.slice(1);
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
           this.resource = new Resource(resource);
+          this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;
         });
-        if (this.currentUser && this.currentUser.role == 'Admin') {
+        if (this.currentUser && this.currentUser.role === 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
             this.notes = notes;
           })
@@ -88,6 +92,50 @@ export class ResourceDetailComponent implements OnInit {
 
       return `https://www.google.com/maps/dir/${this.mapLoc.lat},${this.mapLoc.lng}/${encodeURIComponent(address)}`;
     }
+  }
+
+  initializeContactItems() {
+    const r = this.resource;
+    this.contactItems = [
+      {
+        condition: !!r.primary_contact,
+        icon: 'person_pin',
+        details: [r.primary_contact]
+      },
+      {
+        condition: !!r.organization,
+        icon: 'business',
+        details: [r.organization && r.organization.name]
+      },
+      {
+        condition: !!r.date,
+        icon: 'access_time',
+        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US')}: ${r.time}`]
+      },
+      {
+        condition: !!(r.location_name || r.street_address1 || r.street_address2 || r.city || r.state || r.zip),
+        icon: 'location_on',
+        details: [r.location_name, r.street_address1, r.street_address2, `${r.city ? r.city + ',' : r.city} ${r.state} ${r.zip}`],
+        type: 'address',
+      },
+      {
+        condition: !!r.ticket_cost,
+        icon: 'monetization_on',
+        details: [r.ticket_cost]
+      },
+      {
+        condition: !!r.phone,
+        icon: 'phone',
+        details: [r.phone],
+        type: 'phone',
+      },
+      {
+        condition: !!r.website,
+        icon: 'link',
+        details: [r.website],
+        type: 'link',
+      },
+    ];
   }
 
 }

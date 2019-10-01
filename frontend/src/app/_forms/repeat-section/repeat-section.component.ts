@@ -16,11 +16,15 @@ export class RepeatSectionComponent extends FieldArrayType {
   }
 
   openDialog(i: number, f?: FormlyFieldConfig) {
+    const isEdit = !!f
+    const title = this.field.templateOptions.description;
     const dialogRef = this.dialog.open(RepeatSectionDialogComponent, {
-      width: `${window.innerWidth / 2}px`,
+      maxWidth: '100vw',
+      maxHeight: '100vh',
       data: {
+        title: isEdit ? title.replace(/^Add an|^Add a|^Add/, 'Edit') : title,
         fields: [this.field.fieldArray],
-        model: f ? this.field.fieldGroup[i].model : {},
+        model: isEdit ? this.field.fieldGroup[i].model : {},
       }
     });
 

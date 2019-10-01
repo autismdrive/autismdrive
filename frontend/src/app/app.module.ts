@@ -122,6 +122,7 @@ import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display
 import {EventDateComponent} from './event-date/event-date.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 import { RelatedItemsComponent } from './related-items/related-items.component';
+import { ContactItemComponent } from './contact-item/contact-item.component';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, ObservableInput, of} from 'rxjs';
 import {environment} from '../environments/environment';
@@ -144,7 +145,7 @@ function load(http: HttpClient, config: ConfigService): (() => Promise<boolean>)
             resolve(true);
           }),
           catchError((x: { status: number }, caught: Observable<void>): ObservableInput<{}> => {
-            console.log("Failed to load configuration, unable to find ./api/config");
+            console.log('Failed to load configuration, unable to find ./api/config');
             resolve(false);
             return of({});
           })
@@ -257,6 +258,7 @@ export class FormlyConfig {
     EventDateComponent,
     LastUpdatedDateComponent,
     RelatedItemsComponent,
+    ContactItemComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
