@@ -10,8 +10,8 @@
       "publish": false
     },
     "hooks": {
-      "before:init": "git clone git@github.com:sartography/star-drive.git -b dist .stage",
-      "before:release": "cp environment.prod.ts .stage/frontend/src/environments; cd .stage/frontend; npm install; ng build --prod -c production; cd -",
+      "before:init": "cd .stage; git pull; cd -",
+      "before:release": "cd .stage/frontend; npm install; ng build --prod -c production; cd -",
       "after:release": "cd .stage && git add -f frontend/dist && git commit -m 'Updated!' && git push && cd -"
     }
   }
