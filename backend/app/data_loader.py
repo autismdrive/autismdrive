@@ -1,3 +1,4 @@
+from app.model.admin_note import AdminNote
 from app.model.age_range import AgeRange
 from app.model.category import Category
 from app.model.investigator import Investigator
@@ -313,6 +314,7 @@ class DataLoader:
         db.session.commit()
 
     def clear_resources(self):
+        db.session.query(AdminNote).delete()
         db.session.query(ResourceCategory).delete()
         db.session.query(StudyUser).delete()
         db.session.query(StudyCategory).delete()
