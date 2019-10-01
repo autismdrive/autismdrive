@@ -7,7 +7,6 @@ import { Participant } from '../_models/participant';
 import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
 import { AuthenticationService } from '../_services/api/authentication-service';
-import { GoogleAnalyticsService } from '../google-analytics.service';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -31,8 +30,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
-              private router: Router,
-              private googleAnalyticsService: GoogleAnalyticsService) {
+              private router: Router) {
 
     this.authenticationService.currentUser.subscribe(
       user => {
@@ -79,38 +77,21 @@ export class ProfileComponent implements OnInit {
 
   enrollSelf($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_PARTICIPANT, 'self_intake');
+    this.router.navigate(['terms', ParticipantRelationship.SELF_PARTICIPANT]);
   }
 
   enrollGuardian($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_GUARDIAN, 'guardian_intake');
+    this.router.navigate(['terms', ParticipantRelationship.SELF_GUARDIAN]);
   }
 
   enrollDependent($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.DEPENDENT, 'dependent_intake');
+    this.router.navigate(['terms', ParticipantRelationship.DEPENDENT]);
   }
 
   enrollProfessional($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_PROFESSIONAL, 'professional_intake');
-  }
-
-  addParticipantAndGoToFlow(relationship: string, flow: string) {
-    this.loading = true;
-    const newParticipant = new Participant({
-      user_id: this.user.id,
-      user: this.user,
-      last_updated: new Date(),
-      relationship: relationship
-    });
-
-    this.api.addParticipant(newParticipant).subscribe(participant => {
-      this.googleAnalyticsService.event(flow,  {'event_category': 'enrollment'});
-      this.user.participants.push(participant);
-      console.log('Navigating to flow/', flow, '/', participant.id);
-      this.router.navigate(['flow', flow,  participant.id]);
-    });
+    this.router.navigate(['terms', ParticipantRelationship.SELF_PROFESSIONAL]);
   }
 }

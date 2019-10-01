@@ -29,93 +29,86 @@
         </small>
       </h1>
 
-      <app-terms *ngIf="state === flowState.NO_CONSENT"
-                 [relationship]="participant.relationship"
-                 [preview]="false"
-                 (next)="markConsentAndGoToFlow(participant)">
-      </app-terms>
-      <div *ngIf="state !== flowState.NO_CONSENT">
-        <mat-drawer-container>
-          <mat-drawer #sidenav
-                      [mode]="mobileQuery.matches ? 'over' : 'side'"
-                      [(opened)]="sidebarOpen">
-            <app-questionnaire-steps-list
-              [flow]="flow"
-              [stepIndex]="activeStep"
-              (stepSelected)="goToStep($event)"
-            >
-            </app-questionnaire-steps-list>
-          </mat-drawer>
-          <mat-drawer-content>
-            <app-flow-complete *ngIf="state === flowState.COMPLETE" [flow]="flow">
-            </app-flow-complete>
-            <app-flow-intro *ngIf="state === flowState.INTRO" [flow]="flow" (next)="goToNextAvailableStep()">
-            </app-flow-intro>
+      <mat-drawer-container>
+        <mat-drawer #sidenav
+                    [mode]="mobileQuery.matches ? 'over' : 'side'"
+                    [(opened)]="sidebarOpen">
+          <app-questionnaire-steps-list
+            [flow]="flow"
+            [stepIndex]="activeStep"
+            (stepSelected)="goToStep($event)"
+          >
+          </app-questionnaire-steps-list>
+        </mat-drawer>
+        <mat-drawer-content>
+          <app-flow-complete *ngIf="state === flowState.COMPLETE" [flow]="flow">
+          </app-flow-complete>
+          <app-flow-intro *ngIf="state === flowState.INTRO" [flow]="flow" (next)="goToNextAvailableStep()">
+          </app-flow-intro>
 
-            <form
-              *ngIf="state === flowState.SHOW_FORM"
-              [formGroup]="form"
-              class="pad-2"
-            >
-              <h1>{{ currentStep().label }}</h1>
-              <p>{{ currentStep().description }}</p>
+          <form
+            *ngIf="state === flowState.SHOW_FORM"
+            [formGroup]="form"
+            class="pad-2"
+          >
+            <h1>{{ currentStep().label }}</h1>
+            <p>{{ currentStep().description }}</p>
 
-              <div *ngIf="showResubmitMessage">
-                <p *ngIf="hideForm" class="alert alert-warn">In order to protect certain sensitive information about you,
-                  this information is no longer accessible via this web site. If you feel
-                  that this information should be updated, you may choose to re-complete
-                  this form and re-submit it.</p>
+            <div *ngIf="showResubmitMessage">
+              <p *ngIf="hideForm" class="alert alert-warn">In order to protect certain sensitive information about you,
+                this information is no longer accessible via this web site. If you feel
+                that this information should be updated, you may choose to re-complete
+                this form and re-submit it.</p>
+              <button
+                *ngIf="hideForm"
+                mat-flat-button
+                type="button"
+                (click)="hideForm = false"
+                color="primary"
+              >Show {{currentStep().label}} Form
+              </button>
+            </div>
+
+            <div *ngIf="!hideForm">
+
+              <formly-form
+                [form]="form"
+                [model]="model"
+                [fields]="fields"
+                [options]="options"
+              >
+              </formly-form>
+
+              <p *ngIf="showResubmitMessage" class="alert alert-warn">You are about to re-submit this form. While this
+                will not replace previous records, we will defer to the information you submit now when
+                considering your eligibility to future studies and notifications.</p>
+
+              <p *ngIf="currentStep().type === 'sensitive'" class="alert alert-warn">This information is considered sensitive and to protect your privacy is saved on a secure server which will only be accessed as needed by approved STAR study team members for study purposes. You can provide this information again in full at any time if you need to edit what is currently stored on the secure server, which is not accessible by this site.</p>
+
+              <div class="button-row">
                 <button
-                  *ngIf="hideForm"
+                  *ngIf="form"
                   mat-flat-button
                   type="button"
-                  (click)="hideForm = false"
+                  (click)="form.valid ? submit() : highlightRequiredFields()"
                   color="primary"
-                >Show {{currentStep().label}} Form
+                  [ngClass]="{'disabled': !form.valid}"
+                  id="save-next-button"
+                >Save &amp; Next
+                </button>
+                <button
+                  *ngIf="form"
+                  mat-flat-button
+                  type="button"
+                  [routerLink]="['/profile']"
+                  id="flow-cancel-button"
+                >Cancel
                 </button>
               </div>
-
-              <div *ngIf="!hideForm">
-
-                <formly-form
-                  [form]="form"
-                  [model]="model"
-                  [fields]="fields"
-                  [options]="options"
-                >
-                </formly-form>
-
-                <p *ngIf="showResubmitMessage" class="alert alert-warn">You are about to re-submit this form. While this
-                  will not replace previous records, we will defer to the information you submit now when
-                  considering your eligibility to future studies and notifications.</p>
-
-                <p *ngIf="currentStep().type === 'sensitive'" class="alert alert-warn">This information is considered sensitive and to protect your privacy is saved on a secure server which will only be accessed as needed by approved STAR study team members for study purposes. You can provide this information again in full at any time if you need to edit what is currently stored on the secure server, which is not accessible by this site.</p>
-
-                <div class="button-row">
-                  <button
-                    *ngIf="form"
-                    mat-flat-button
-                    type="button"
-                    (click)="form.valid ? submit() : highlightRequiredFields()"
-                    color="primary"
-                    [ngClass]="{'disabled': !form.valid}"
-                    id="save-next-button"
-                  >Save &amp; Next
-                  </button>
-                  <button
-                    *ngIf="form"
-                    mat-flat-button
-                    type="button"
-                    [routerLink]="['/profile']"
-                    id="flow-cancel-button"
-                  >Cancel
-                  </button>
-                </div>
-              </div>
-            </form>
-          </mat-drawer-content>
-        </mat-drawer-container>
-      </div>
+            </div>
+          </form>
+        </mat-drawer-content>
+      </mat-drawer-container>
     </div>
   </div>
 </div>
