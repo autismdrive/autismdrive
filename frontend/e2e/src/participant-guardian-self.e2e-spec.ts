@@ -55,22 +55,13 @@ describe('Participant (Guardian - Self)', () => {
   it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
-  // Profile
+  // Enrollment Flow
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
-  it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
-  it('should display avatars for each participant', () => profileUseCases.displayAvatars());
-  it('should display the avatar selection dialog', () => profileUseCases.displayAvatarDialog());
-  it('should edit the avatar image', () => profileUseCases.editAvatarImg());
-  it('should edit the avatar color', () => profileUseCases.editAvatarColor());
-  it('should save changes to the avatar', () => profileUseCases.saveAvatar());
-  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
-
-  // Enrollment Flow
   it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
   it('should cancel out of the terms consent page', () => enrollUseCases.cancelTerms());
-  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
+  it('should navigate back to the Guardian flow', () => profileUseCases.startGuardianFlow());
   it('should accept the terms', () => enrollUseCases.acceptTerms());
   it('should display a menu link to all steps of the flow', () => enrollUseCases.displayMenuLinks());
   it('should display completed status of each step', () => enrollUseCases.displayCompletedStatus());
@@ -99,6 +90,15 @@ describe('Participant (Guardian - Self)', () => {
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should allow user to view/edit non-sensitive responses');
   it('should not allow user to view or edit sensitive responses');
+
+  // Profile
+  it('should display avatars for each participant', () => profileUseCases.displayAvatars());
+  it('should display the avatar selection dialog', () => profileUseCases.displayAvatarDialog());
+  it('should edit the avatar image', () => profileUseCases.editAvatarImg());
+  it('should edit the avatar color', () => profileUseCases.editAvatarColor());
+  it('should save changes to the avatar', () => profileUseCases.saveAvatar());
+  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
+  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
 
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());

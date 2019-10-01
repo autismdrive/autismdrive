@@ -1,5 +1,4 @@
 import { AppPage } from '../app-page.po';
-import { browser } from 'protractor';
 
 export class ProfileUseCases {
   constructor(private page: AppPage) {
@@ -13,13 +12,11 @@ export class ProfileUseCases {
   }
 
   startGuardianFlow() {
-    const pattern = /\/flow\/guardian_intake\/([0-9]+)/;
-    this.page.clickAndExpectRoute('#enroll_guardian', pattern);
+    this.page.clickAndExpectRoute('#enroll_guardian', '/terms/self_guardian');
   }
 
   startDependentFlow() {
-    const pattern = /\/flow\/dependent_intake\/([0-9]+)/;
-    this.page.clickAndExpectRoute('#enroll_first_dependent', pattern);
+    this.page.clickAndExpectRoute('#enroll_first_dependent', '/terms/dependent');
   }
 
   navigateToProfile() {
@@ -27,12 +24,12 @@ export class ProfileUseCases {
   }
 
   async displayAvatars() {
-    expect(this.page.getElements('[id^=participant_').count()).toBeGreaterThan(0);
-    const btnEls = await this.page.getElements('[id^=participant_');
+    expect(this.page.getElements('[id^=self_participant_').count()).toBeGreaterThan(0);
+    const btnEls = await this.page.getElements('[id^=self_participant_');
     for (const btnEl of btnEls) {
       const btnId: string = await btnEl.getAttribute('id');
-      const participantId = btnId.replace('participant_', '');
-      expect(this.page.getElements('#participant_' + participantId).count()).toEqual(1);
+      const participantId = btnId.replace('self_participant_', '');
+      expect(this.page.getElements('#self_participant_' + participantId).count()).toEqual(1);
     }
   }
 
