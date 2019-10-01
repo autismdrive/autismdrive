@@ -257,7 +257,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_export_admin_details(self):
         user = self.construct_user(email="testadmin@test.com", role=Role.admin)
-        user.password = "this_is_my_password!"
+        user.password = "This_is_my_password!12345"
         db.session.add(user)
         db.session.commit()
 
