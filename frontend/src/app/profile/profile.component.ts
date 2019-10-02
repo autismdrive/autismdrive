@@ -7,7 +7,6 @@ import { Participant } from '../_models/participant';
 import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
 import { AuthenticationService } from '../_services/api/authentication-service';
-import { GoogleAnalyticsService } from '../google-analytics.service';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -26,15 +25,18 @@ export class ProfileComponent implements OnInit {
   loading = true;
   studyInquiries: StudyUser[];
   currentStudies: Study[];
+  self: Participant;
+  dependents: Participant[];
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
-              private router: Router,
-              private googleAnalyticsService: GoogleAnalyticsService) {
+              private router: Router) {
 
     this.authenticationService.currentUser.subscribe(
       user => {
         this.user = user;
+        this.self = user.getSelf();
+        this.dependents = user.getDependents();
         this.state = this.getState();
         this.loading = false;
       }, error1 => {
@@ -42,14 +44,24 @@ export class ProfileComponent implements OnInit {
         this.user = null;
         this.loading = false;
       });
-    this.authenticationService.refresh();
   }
 
   ngOnInit() {
+    this.refreshParticipants();
     this.api.getUserStudyInquiries(this.user.id).subscribe( x => this.studyInquiries = x );
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
     });
+  }
+
+  refreshParticipants() {
+    if (this.user) {
+      this.api.getUser(this.user.id).subscribe( u => {
+        let newU = new User(u);
+        this.self = newU.getSelf();
+        this.dependents = newU.getDependents();
+      })
+    }
   }
 
   getState() {
@@ -64,38 +76,21 @@ export class ProfileComponent implements OnInit {
 
   enrollSelf($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_PARTICIPANT, 'self_intake');
+    this.router.navigate(['terms', ParticipantRelationship.SELF_PARTICIPANT]);
   }
 
   enrollGuardian($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_GUARDIAN, 'guardian_intake');
+    this.router.navigate(['terms', ParticipantRelationship.SELF_GUARDIAN]);
   }
 
   enrollDependent($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.DEPENDENT, 'dependent_intake');
+    this.router.navigate(['terms', ParticipantRelationship.DEPENDENT]);
   }
 
   enrollProfessional($event) {
     $event.preventDefault();
-    this.addParticipantAndGoToFlow(ParticipantRelationship.SELF_PROFESSIONAL, 'professional_intake');
-  }
-
-  addParticipantAndGoToFlow(relationship: string, flow: string) {
-    this.loading = true;
-    const newParticipant = new Participant({
-      user_id: this.user.id,
-      user: this.user,
-      last_updated: new Date(),
-      relationship: relationship
-    });
-
-    this.api.addParticipant(newParticipant).subscribe(participant => {
-      this.googleAnalyticsService.event(flow,  {'event_category': 'enrollment'});
-      this.user.participants.push(participant);
-      console.log('Navigating to flow/', flow, '/', participant.id);
-      this.router.navigate(['flow', flow,  participant.id]);
-    });
+    this.router.navigate(['terms', ParticipantRelationship.SELF_PROFESSIONAL]);
   }
 }

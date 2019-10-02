@@ -1,6 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantRelationship } from '../_models/participantRelationship';
+import {Participant} from '../_models/participant';
+import {ApiService} from '../_services/api/api.service';
+import {GoogleAnalyticsService} from '../google-analytics.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
+import {User} from '../_models/user';
 
 
 @Component({
@@ -10,22 +15,31 @@ import { ParticipantRelationship } from '../_models/participantRelationship';
 })
 export class TermsComponent implements OnInit {
 
-  @Input() relationship: ParticipantRelationship;
-
-  @Input() preview: boolean;
-
-  @Output() next: EventEmitter<any> = new EventEmitter();
+  user: User;
+  relationship: ParticipantRelationship;
+  preview: boolean = false;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    private authenticationService: AuthenticationService,
+    private api: ApiService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {
     this.route.params.subscribe(params => {
-      if ('relationship' in params) {
-        this.relationship = params['relationship'];
-        this.preview = true;
+      this.relationship = params.relationship;
+      if ('preview' in params) {
+        this.preview = params['preview'];
       }
     });
+
+    this.authenticationService.currentUser.subscribe(
+      user => {
+        this.user = user;
+      }, error1 => {
+        console.error(error1);
+        this.user = null;
+      });
   }
 
   ngOnInit() {
@@ -36,7 +50,34 @@ export class TermsComponent implements OnInit {
     this.router.navigate(['profile']);
   }
 
-  continue() {
-    this.next.emit();
+  getFlow(relationship: ParticipantRelationship) {
+    if (relationship === ParticipantRelationship.SELF_PARTICIPANT) {
+      return 'self_intake'
+    } else if (relationship === ParticipantRelationship.SELF_GUARDIAN) {
+      return 'guardian_intake'
+    } else if (relationship === ParticipantRelationship.DEPENDENT) {
+      return 'dependent_intake'
+    } else if (relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
+      return 'professional_intake'
+    }
+  }
+
+  addParticipantAndGoToFlow() {
+    const newParticipant = new Participant({
+      user_id: this.user.id,
+      user: this.user,
+      last_updated: new Date(),
+      relationship: this.relationship,
+      has_consented: true
+    });
+
+    let flow = this.getFlow(this.relationship);
+
+    this.api.addParticipant(newParticipant).subscribe(participant => {
+      this.googleAnalyticsService.event(flow,  {'event_category': 'enrollment'});
+      this.user.participants.push(participant);
+      console.log('Navigating to flow/', flow, '/', participant.id);
+      this.router.navigate(['flow', flow,  participant.id]);
+    });
   }
 }

@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {RouterModule, Routes, UrlSegment} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 import {AdminHomeComponent} from '../admin-home/admin-home.component';
 import {AboutComponent} from '../about/about.component';
 import {FlowCompleteComponent} from '../flow-complete/flow-complete.component';
@@ -78,7 +78,7 @@ const routes: Routes = [
   {path: 'studies', component: StudiesComponent, data: {title: 'Create an Autism DRIVE Account'}},
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
   {
-    path: 'terms',
+    path: 'terms/:relationship',
     component: TermsComponent,
     data: {title: 'Agree to Terms and Conditions for an Autism DRIVE Account', hideHeader: true}
   },
