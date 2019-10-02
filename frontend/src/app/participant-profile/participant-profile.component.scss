@@ -11,17 +11,22 @@ mat-card-header {
 [mat-card-avatar] {
   width: 100px;
   height: 100px;
+  cursor: pointer;
 }
 
-mat-card-header:before {
-  content: 'Change';
+[mat-card-avatar]:hover {
+  opacity: .5;
+}
+
+.change_text {
   position: absolute;
-  width: 100px;
-  left: 0px;
-  bottom: 16px;
-  text-align: center;
-  font-size: 12px;
-  pointer-events: none;
+  top: 105px;
+  left: 7px;
+  cursor: pointer;
+}
+
+.change_text:hover {
+  opacity: .5;
 }
 
 ::ng-deep .mat-card-header-text {
