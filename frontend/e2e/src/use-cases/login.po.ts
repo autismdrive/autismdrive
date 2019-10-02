@@ -43,6 +43,30 @@ export class LoginUseCases {
     this.page.clickAndExpectRoute('#continue', '/home');
   }
 
+  async displayResetPasswordForm() {
+    const tokenUrl = await this.page.getLocalStorageVar('token_url');
+    expect(tokenUrl).toBeTruthy();
+    this.page.navigateToUrl(tokenUrl.toString());
+  }
+
+  displayErrorOnInsecurePassword(badPassword: string) {
+    this.page.inputText('[id*=_input_password_]', badPassword, true);
+    expect(this.page.getElements('.mat-error').count()).toEqual(1);
+    expect(this.page.getElement('.mat-error').getText()).toContain('Your password must be at least');
+  }
+
+  fillOutPasswordForm(goodPassword: string) {
+    this.page.inputText('[id*=_input_password_]', goodPassword, true);
+    expect(this.page.getElements('.mat-error').count()).toEqual(0);
+  }
+
+  submitResetPasswordForm(password: string) {
+    this.page.inputText('[id*=_input_password_]', password, true);
+    this.page.inputText('[id*=_input_passwordConfirm_]', password, true);
+    expect(this.page.getElements('.mat-error').count()).toEqual(0);
+    this.page.clickAndExpectRoute('#submit', '/profile');
+  }
+
   displayRegisterError(email: string) {
     this.page.clickAndExpectRoute('#register-button', '/register');
     expect(this.page.getElements('app-register').count()).toEqual(1);
