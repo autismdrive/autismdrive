@@ -53,6 +53,7 @@ class User(db.Model):
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
     token = ''
+    token_url = ''
 
     def related_to_participant(self, participant_id):
         for p in self.participants:

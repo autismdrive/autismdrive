@@ -156,8 +156,10 @@ class TestUser(BaseTest, unittest.TestCase):
             content_type="application/json")
         self.assert_success(rv)
         user = User.query.filter_by(id=id).first()
-        user.role = role
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(user.token_url)
 
+        user.role = role
         password = "Wowbagger the Infinitely Prolonged !@#%$12354"
         user.password = password
 

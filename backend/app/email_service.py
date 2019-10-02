@@ -70,6 +70,7 @@ class EmailService:
         server.quit()
 
     def confirm_email(self, user):
+        user.token_url = ''
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
         role = '' + user.role.name + '/'
@@ -90,9 +91,13 @@ class EmailService:
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
 
+        if self.app.config.get('TESTING') or self.app.config.get('DEVELOPMENT'):
+            user.token_url = confirm_url
+
         return tracking_code
 
     def reset_email(self, user):
+        user.token_url = ''
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
         role = '' + user.role.name + '/'
@@ -112,6 +117,9 @@ class EmailService:
 
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
+
+        if self.app.config.get('TESTING') or self.app.config.get('DEVELOPMENT'):
+            user.token_url = reset_url
 
         return tracking_code
 
