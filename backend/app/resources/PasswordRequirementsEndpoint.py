@@ -28,7 +28,7 @@ class PasswordRequirementsEndpoint(flask_restful.Resource):
             if request_data and 'password' in request_data:
                 s = request_data['password']
                 if isinstance(s, str):
-                    return jsonify(User.password_meets_requirements(role, urllib.parse.unquote_plus(s)))
+                    return jsonify(User.password_meets_requirements(role, s))
                 else:
                     raise RestException(RestException.INVALID_INPUT, details=message)
             else:

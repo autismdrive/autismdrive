@@ -72,10 +72,11 @@ class EmailService:
     def confirm_email(self, user):
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
+        role = '' + user.role.name + '/'
         tracking_code = self.tracking_code()
 
         subject = "Autism DRIVE: Confirm Email"
-        confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + token
+        confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("confirm_email.txt",
                                     user=user, confirm_url=confirm_url,
@@ -94,10 +95,11 @@ class EmailService:
     def reset_email(self, user):
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
+        role = '' + user.role.name + '/'
         tracking_code = self.tracking_code()
 
         subject = "Autism DRIVE: Password Reset Email"
-        reset_url = self.app.config['FRONTEND_EMAIL_RESET'] + token
+        reset_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("reset_email.txt",
                                     user=user, reset_url=reset_url,
