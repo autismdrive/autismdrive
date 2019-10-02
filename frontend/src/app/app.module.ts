@@ -130,7 +130,6 @@ import {ContactItemComponent} from './contact-item/contact-item.component';
 export class FormlyConfig {
   public static config = {
     extras: {
-      checkExpressionOn: 'changeDetectionCheck',
       showError: ShowError,
     },
     types: [
