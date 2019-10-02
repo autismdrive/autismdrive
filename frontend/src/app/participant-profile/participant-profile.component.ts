@@ -64,7 +64,7 @@ export class ParticipantProfileComponent implements OnInit {
 
   goTerms($event) {
     $event.preventDefault();
-    this.router.navigate(['terms', {relationship:this.participant.relationship}]);
+    this.router.navigate(['terms', this.participant.relationship, {preview:true}]);
   }
 
   chooseAvatar($event, participant): void {
