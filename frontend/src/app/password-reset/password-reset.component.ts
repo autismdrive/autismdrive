@@ -106,4 +106,8 @@ export class PasswordResetComponent implements OnInit {
         });
     }
   }
+
+  updateValidationState() {
+    this.form.updateValueAndValidity();
+  }
 }

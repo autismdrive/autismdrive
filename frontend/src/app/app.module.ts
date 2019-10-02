@@ -33,7 +33,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyModule} from '@ngx-formly/core';
-import {FormlyMaterialModule} from '@ngx-formly/material';
+import {FieldType, FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {MarkdownModule} from 'ngx-markdown';
@@ -52,6 +52,7 @@ import {
   MulticheckboxValidatorMessage,
   PhoneValidator,
   PhoneValidatorMessage,
+  ShowError,
   UrlValidator,
   UrlValidatorMessage
 } from './_forms/validators/formly.validator';
@@ -122,12 +123,16 @@ import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.componen
 import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
 import {EventDateComponent} from './event-date/event-date.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
-import { RelatedItemsComponent } from './related-items/related-items.component';
-import { ContactItemComponent } from './contact-item/contact-item.component';
+import {RelatedItemsComponent} from './related-items/related-items.component';
+import {ContactItemComponent} from './contact-item/contact-item.component';
 
 @Injectable()
 export class FormlyConfig {
   public static config = {
+    extras: {
+      checkExpressionOn: 'changeDetectionCheck',
+      showError: ShowError,
+    },
     types: [
       {name: 'repeat', component: RepeatSectionComponent},
       {
