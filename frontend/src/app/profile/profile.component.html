@@ -58,10 +58,16 @@
           fxLayoutGap="40px"
         >
           <app-participant-profile
-            *ngFor="let participant of user.participants"
+            [participant]="self"
+            [user]="user"
+            id="self_participant_{{self.id}}"
+          ></app-participant-profile>
+
+          <app-participant-profile
+            *ngFor="let participant of dependents"
             [participant]="participant"
             [user]="user"
-            id="participant_{{participant.id}}"
+            id="dependent_participant_{{participant.id}}"
           ></app-participant-profile>
 
           <button
