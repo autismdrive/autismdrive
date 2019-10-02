@@ -57,7 +57,6 @@ export class ProfileComponent implements OnInit {
   refreshParticipants() {
     if (this.user) {
       this.api.getUser(this.user.id).subscribe( u => {
-        console.log('this is u', u);
         let newU = new User(u);
         this.self = newU.getSelf();
         this.dependents = newU.getDependents();

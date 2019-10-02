@@ -93,7 +93,6 @@ export class FlowComponent implements OnInit, OnDestroy {
       .getFlow(flowName, this.participant.id)
       .subscribe(f => {
         this.flow = new Flow(f);
-        console.log('Flow Loaded:' + this.flow.name);
         if (this.flow.percentComplete() === 0) {
           this.state = this.flowState.INTRO;
         } else {
