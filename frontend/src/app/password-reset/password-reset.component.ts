@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router} from '@angular/router';
-import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../_services/api/api.service';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {FormGroup} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {PasswordRequirements} from '../_models/password_requirements';
 
 @Component({
   selector: 'app-password-reset',
@@ -17,45 +18,51 @@ export class PasswordResetComponent implements OnInit {
   errorMessage = '';
   form = new FormGroup({});
   model: any = {};
+  role: string;
+  passwordRequirements: PasswordRequirements;
+  passwordRegex: RegExp;
   fields: FormlyFieldConfig[] = [
     {
       key: 'password',
       validators: {
-      fieldMatch: {
-        expression: (control) => {
-          const value = control.value;
+        fieldMatch: {
+          expression: (control) => {
+            const value = control.value;
 
-          return value.passwordConfirm === value.password
             // avoid displaying the message error when values are empty
-            || (!value.passwordConfirm || !value.password);
-        },
-        message: 'Password Not Matching',
-        errorPath: 'passwordConfirm',
-      },
-    },
-    fieldGroup: [
-      {
-        key: 'password',
-        type: 'input',
-        templateOptions: {
-          type: 'password',
-          label: 'Password',
-          placeholder: 'Must be at least 3 characters',
-          required: true,
-          minLength: 3,
+            return value.passwordConfirm === value.password  || (!value.passwordConfirm || !value.password);
+          },
+          message: 'Password Not Matching',
+          errorPath: 'passwordConfirm',
         },
       },
-      {
-        key: 'passwordConfirm',
-        type: 'input',
-        templateOptions: {
-          type: 'password',
-          label: 'Confirm Password',
-          placeholder: 'Please re-enter your password',
-          required: true,
+      fieldGroup: [
+        {
+          key: 'password',
+          type: 'input',
+          templateOptions: {
+            type: 'password',
+            label: 'Password',
+            required: true,
+          },
+          validators: {
+            password: {
+              expression: (c) => !c.value || this.passwordRegex.test(c.value),
+              message: (error, field: FormlyFieldConfig) => this.passwordRequirements.instructions,
+            }
+          }
         },
-      },
-    ],
+        {
+          key: 'passwordConfirm',
+          type: 'input',
+          templateOptions: {
+            type: 'password',
+            label: 'Confirm Password',
+            placeholder: 'Please re-enter your password',
+            required: true,
+          },
+        },
+      ],
     },
   ];
 
@@ -63,9 +70,16 @@ export class PasswordResetComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private route: ActivatedRoute,
     private router: Router,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {this.route.params.subscribe(params => {
+    private changeDetectorRef: ChangeDetectorRef,
+    private apiService: ApiService,
+  ) {
+    this.route.params.subscribe(params => {
       this.token = params['email_token'];
+      this.role = params['role'];
+      this.apiService.getPasswordRequirements(this.role).subscribe(reqs => {
+        this.passwordRequirements = reqs;
+        this.passwordRegex = RegExp(reqs.regex);
+      });
     });
   }
 
@@ -90,6 +104,6 @@ export class PasswordResetComponent implements OnInit {
           this.errorMessage = error1;
           this.changeDetectorRef.detectChanges();
         });
-      }
+    }
   }
 }

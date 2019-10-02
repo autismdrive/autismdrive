@@ -7,7 +7,7 @@ import {Category} from '../../_models/category';
 import {EmailLog} from '../../_models/email_log';
 import {Flow} from '../../_models/flow';
 import {Participant} from '../../_models/participant';
-import {Hit, Query} from '../../_models/query';
+import {Query} from '../../_models/query';
 import {Resource} from '../../_models/resource';
 import {ResourceCategory} from '../../_models/resource_category';
 import {Study} from '../../_models/study';
@@ -23,6 +23,7 @@ import {Organization} from '../../_models/organization';
 import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
+import {PasswordRequirements} from '../../_models/password_requirements';
 
 
 @Injectable({
@@ -62,6 +63,7 @@ export class ApiService {
     participant: '/api/participant/<id>',
     participantbysession: '/api/session/participant',
     participantStepLog: '/api/participant/step_log/<id>',
+    password_requirements: '/api/password_requirements/<role>',
     questionnaire: '/api/q/<name>/<id>',
     questionnaireExport: '/api/q/<name>/export',
     questionnaireInfo: '/api/q',
@@ -522,7 +524,15 @@ export class ApiService {
   getZipCoords(zipCode: string): Observable<GeoLocation> {
     const url = this._endpointUrl('zip_code_coords')
       .replace('<id>', zipCode);
-    return this.httpClient.get<any>(url)
+    return this.httpClient.get<GeoLocation>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getPasswordRequirements */
+  getPasswordRequirements(role: string): Observable<PasswordRequirements> {
+    const url = this._endpointUrl('password_requirements')
+      .replace('<role>', role);
+    return this.httpClient.get<PasswordRequirements>(url)
       .pipe(catchError(this._handleError));
   }
 

@@ -14,7 +14,7 @@ describe('Participant (Guardian - Self)', () => {
   let enrollUseCases: EnrollUseCases;
   let randomEmail;
   const email = 'aaron@sartography.com';
-  const password = 'alouie3';
+  const password = 'Zarquon Disaster Area 78';
 
   beforeAll(async () => {
     page = new AppPage();
