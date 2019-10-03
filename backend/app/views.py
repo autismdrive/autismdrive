@@ -5,8 +5,8 @@ from flask import Blueprint, jsonify, url_for
 from flask_restful import reqparse
 
 from app import app
+from app.resources.ConfigEndpoint import ConfigEndpoint
 from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
-from app.resources.StatusEndpoint import StatusEndpoint
 from app.resources.Auth import auth_blueprint
 from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
@@ -111,6 +111,7 @@ from app.resources.ExportEndpoint import (
 )
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
+from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -200,7 +201,6 @@ endpoints = [
 
     # User Sessions
     (SessionEndpoint, "/session"),
-    (SessionStatusEndpoint, '/session/status'),
     (ParticipantBySessionEndpoint, "/session/participant"),
 
     # User Schema, Admin endpoints
@@ -240,12 +240,14 @@ endpoints = [
     (StepLogListEndpoint, "/step_log"),
     (AdminNoteListEndpoint, "/admin_note"),
     (AdminNoteEndpoint, "/admin_note/<string:id>"),
-    (StatusEndpoint, "/status"),
+    (ConfigEndpoint, "/config"),
     (DataTransferLogEndpoint, "/data_transfer_log"),
 
     # ZIP Code Endpoint
     (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
 
+    # Password Requirements Endpoint
+    (PasswordRequirementsEndpoint, "/password_requirements/<role>")
 ]
 
 # Add all endpoints to the API

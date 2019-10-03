@@ -1,6 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ApiService} from '../_services/api/api.service';
-import {Status} from '../_models/status';
+import {Component} from '@angular/core';
+import {ConfigService} from '../_services/config.service';
 
 @Component({
   selector: 'app-footer',
@@ -9,8 +8,6 @@ import {Status} from '../_models/status';
 })
 export class FooterComponent {
 
-  @Input() status: Status;
-
-  constructor(private api: ApiService) { }
+  constructor(public config: ConfigService) { }
 
 }

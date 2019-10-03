@@ -217,8 +217,8 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                user = User(id=row[0], email=row[1], password=row[2],
-                            role=row[3], email_verified=True)
+                user = User(id=row[0], email=row[1], role=row[3], email_verified=True)
+                user.password = row[2]
                 db.session.add(user)
             print("Users loaded.  There are now %i users in the database." % db.session.query(
                 User).count())

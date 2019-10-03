@@ -70,12 +70,14 @@ class EmailService:
         server.quit()
 
     def confirm_email(self, user):
+        user.token_url = ''
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
+        role = '' + user.role.name + '/'
         tracking_code = self.tracking_code()
 
         subject = "Autism DRIVE: Confirm Email"
-        confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + token
+        confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("confirm_email.txt",
                                     user=user, confirm_url=confirm_url,
@@ -89,15 +91,20 @@ class EmailService:
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
 
+        if self.app.config.get('TESTING') or self.app.config.get('DEVELOPMENT'):
+            user.token_url = confirm_url
+
         return tracking_code
 
     def reset_email(self, user):
+        user.token_url = ''
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
+        role = '' + user.role.name + '/'
         tracking_code = self.tracking_code()
 
         subject = "Autism DRIVE: Password Reset Email"
-        reset_url = self.app.config['FRONTEND_EMAIL_RESET'] + token
+        reset_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("reset_email.txt",
                                     user=user, reset_url=reset_url,
@@ -110,6 +117,9 @@ class EmailService:
 
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
+
+        if self.app.config.get('TESTING') or self.app.config.get('DEVELOPMENT'):
+            user.token_url = reset_url
 
         return tracking_code
 

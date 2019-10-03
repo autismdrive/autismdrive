@@ -1,6 +1,0 @@
-export const environment = {
-  production: true,
-  api: 'https://stardrive.virginia.edu',
-  gc_api_key: 'API_KEY_GOES_HERE',
-  googleAnalyticsKey: 'UA-145661791-1'
-};

@@ -4,9 +4,10 @@ import re
 import unittest
 
 from flask import json
+from nose.tools import raises
 
 from tests.base_test import BaseTest
-from app import db
+from app import db, RestException
 from app.email_service import TEST_MESSAGES
 from app.model.email_log import EmailLog
 from app.model.study_user import StudyUser, StudyUserStatus
@@ -123,7 +124,8 @@ class TestUser(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['role'], 'admin')
 
-    def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user, password="peterpass"):
+    @raises(RestException)
+    def test_create_user_with_bad_password(self, id=8, email="tyrion@got.com", role=Role.user):
         data = {
             "id": id,
             "email": email
@@ -136,8 +138,31 @@ class TestUser(BaseTest, unittest.TestCase):
             content_type="application/json")
         self.assert_success(rv)
         user = User.query.filter_by(id=id).first()
-        user.password = password
         user.role = role
+
+        # Should raise exception
+        user.password = "badpass"
+
+    def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user):
+        data = {
+            "id": id,
+            "email": email
+        }
+        rv = self.app.post(
+            '/api/user',
+            data=json.dumps(data),
+            follow_redirects=True,
+            headers=self.logged_in_headers(),
+            content_type="application/json")
+        self.assert_success(rv)
+        user = User.query.filter_by(id=id).first()
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(user.token_url)
+
+        user.role = role
+        password = "Wowbagger the Infinitely Prolonged !@#%$12354"
+        user.password = password
+
         db.session.add(user)
         db.session.commit()
 
@@ -145,6 +170,7 @@ class TestUser(BaseTest, unittest.TestCase):
             '/api/user/%i' % user.id,
             content_type="application/json",
             headers=self.logged_in_headers())
+        self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(email, response["email"])
         self.assertEqual(role.name, response["role"])
@@ -154,7 +180,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
     def test_login_user(self):
         user = self.test_create_user_with_password()
-        data = {"email": "tyrion@got.com", "password": "peterpass"}
+        data = {"email": "tyrion@got.com", "password": "Wowbagger the Infinitely Prolonged !@#%$12354"}
         # Login shouldn't work with email not yet verified
         rv = self.app.post(
             '/api/login_password',

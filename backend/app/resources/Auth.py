@@ -7,7 +7,7 @@ from sqlalchemy import func
 from app import app, RestException, db, auth, email_service
 from app.model.email_log import EmailLog
 from app.model.user import User
-from flask import g, request, Blueprint
+from flask import g, request, Blueprint, jsonify
 
 from app.schema.schema import UserSchema
 
@@ -67,10 +67,15 @@ def forgot_password():
 
     if user:
         tracking_code = email_service.reset_email(user)
+
         log = EmailLog(user_id=user.id, type="reset_email", tracking_code=tracking_code)
         db.session.add(log)
         db.session.commit()
-        return ''
+
+        if (app.config.get('TESTING') or app.config.get('DEVELOPMENT')) and user.token_url:
+            return jsonify(user.token_url)
+        else:
+            return ''
     else:
         raise RestException(RestException.EMAIL_NOT_REGISTERED)
 
@@ -87,6 +92,7 @@ def reset_password():
         raise RestException(RestException.TOKEN_INVALID)
 
     user = User.query.filter(func.lower(User.email) == email.lower()).first_or_404()
+    user.token_url = ''
     user.email_verified = True
     user.password = password
     db.session.add(user)
@@ -106,6 +112,7 @@ def verify_token(token):
         g.user = None
 
     if 'user' in g and g.user:
+        g.user.token_url = ''
         return True
     else:
         return False

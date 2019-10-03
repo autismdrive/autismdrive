@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {environment} from '../environments/environment';
+import {ConfigService} from './_services/config.service';
 
 declare var gtag: Function;
 
@@ -9,7 +9,7 @@ declare var gtag: Function;
 })
 export class GoogleAnalyticsService {
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private configService: ConfigService) {
   }
 
   public event(eventName: string, params: {}) {
@@ -24,10 +24,11 @@ export class GoogleAnalyticsService {
     this.listenForRouteChanges();
 
     try {
+      const analysticsKey = this.configService.googleAnalyticsKey;
 
       const script1 = document.createElement('script');
       script1.async = true;
-      script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + environment.googleAnalyticsKey;
+      script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + analysticsKey;
       document.head.appendChild(script1);
 
       const script2 = document.createElement('script');
@@ -35,7 +36,7 @@ export class GoogleAnalyticsService {
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '` + environment.googleAnalyticsKey + `', {'send_page_view': false});
+        gtag('config', '` + analysticsKey + `', {'send_page_view': false});
       `;
       document.head.appendChild(script2);
     } catch (ex) {
@@ -45,9 +46,10 @@ export class GoogleAnalyticsService {
   }
 
   private listenForRouteChanges() {
+    const analyticsKey = this.configService.googleAnalyticsKey;
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        gtag('config', environment.googleAnalyticsKey, {
+        gtag('config', analyticsKey, {
           'page_path': event.urlAfterRedirects,
         });
       }

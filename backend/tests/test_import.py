@@ -231,10 +231,11 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     @httpretty.activate
     def test_admin_accounts_should_be_requested_in_full_and_import_with_working_password(self):
+        password = "Tacos are good! 823497!#%$^&*"
         data_importer = self.get_data_importer_setup_auth()
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
                     role=Role.admin, email_verified=True)
-        user.password = "tacos are good"
+        user.password = password
         user_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
         httpretty.register_uri(
             httpretty.GET,
@@ -246,7 +247,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
 #        encoded = base64.encodestring(user._password)
 #        data = {'email': 'dan@test.com', 'password': encoded.decode()}
-        data = {'email': 'dan@test.com', 'password': 'tacos are good'}
+        data = {'email': 'dan@test.com', 'password': password}
         rv = self.app.post(
             '/api/login_password',
             data=json.dumps(data),
