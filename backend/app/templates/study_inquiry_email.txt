@@ -10,6 +10,6 @@ Phone: {{ user.get_contact()["contact"].phone }}
 Is it OK to leave a voicemail? {{ user.get_contact()["contact"].can_leave_voicemail }}
 Best time to call: {{ user.get_contact()["contact"].contact_times }}
 
-Please place the following url in your browser to view this user's details on Star DRIVE:
+Please place the following url in your browser to view this user's details on Autism DRIVE:
 {{user_detail_url}}.
 
