@@ -274,8 +274,8 @@ class DataLoader:
         lat = None
         lng = None
 
-        # Check that location has a street address
-        if '' not in address_dict.values():
+        # Check that location has at least a zip code
+        if address_dict['zip']:
 
             # Use stored latitude & longitude, if available
             if '' not in lat_long_dict.values():
