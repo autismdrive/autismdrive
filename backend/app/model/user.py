@@ -9,19 +9,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import app, db, RestException, bcrypt, password_requirements
 from app.model.participant import Participant
-
-
-def random_integer():
-    min_ = 100
-    max_ = 1000000000
-    rand = randint(min_, max_)
-
-    # possibility of same random number is very low.
-    # but if you want to make sure, here you can check id exists in database.
-    while db.session.query(User).filter(id == rand).limit(1).first() is not None:
-        rand = randint(min_, max_)
-
-    return rand
+from app.model.random_id_generator import random_integer
 
 
 class Role(enum.Enum):
