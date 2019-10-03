@@ -1,9 +1,9 @@
-import {AgmCoreModule} from '@agm/core';
+import {AgmCoreModule, LAZY_MAPS_API_CONFIG} from '@agm/core';
 import {AgmJsMarkerClustererModule} from '@agm/js-marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule} from '@angular/common';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {Injectable, NgModule} from '@angular/core';
+import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
+import {APP_INITIALIZER, Injectable, NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule} from '@angular/material';
@@ -33,12 +33,11 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyModule} from '@ngx-formly/core';
-import {FieldType, FormlyMaterialModule} from '@ngx-formly/material';
+import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {MarkdownModule} from 'ngx-markdown';
 import {NgProgressModule} from 'ngx-progressbar';
-import {environment} from 'src/environments/environment';
 import {AutocompleteSectionComponent} from './_forms/autocomplete-section/autocomplete-section.component';
 import {CardWrapperComponent} from './_forms/card-wrapper/card-wrapper.component';
 import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component';
@@ -125,6 +124,36 @@ import {EventDateComponent} from './event-date/event-date.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 import {RelatedItemsComponent} from './related-items/related-items.component';
 import {ContactItemComponent} from './contact-item/contact-item.component';
+import {catchError, map} from 'rxjs/operators';
+import {Observable, ObservableInput, of} from 'rxjs';
+import {environment} from '../environments/environment';
+import {ConfigService} from './_services/config.service';
+
+// Attempt to load the configuration from a file called config.json right next to
+// this index page, it if exists.  Otherwise assume we are connecting to port
+// 5000 on the local server.
+export function load(http: HttpClient, config: ConfigService): (() => Promise<boolean>) {
+  return (): Promise<boolean> => {
+    return new Promise<boolean>((resolve: (a: boolean) => void): void => {
+      let url = './api/config';
+      if ('override_config_url' in environment) {
+        url = environment['override_config_url'];
+      }
+      http.get(url)
+        .pipe(
+          map((fromServer) => {
+            config.fromProperties(fromServer);
+            resolve(true);
+          }),
+          catchError((x: { status: number }, caught: Observable<void>): ObservableInput<{}> => {
+            console.log('Failed to load configuration, unable to find ./api/config');
+            resolve(false);
+            return of({});
+          })
+        ).subscribe();
+    });
+  };
+}
 
 @Injectable()
 export class FormlyConfig {
@@ -236,7 +265,7 @@ export class FormlyConfig {
     ContactItemComponent,
   ],
   imports: [
-    AgmCoreModule.forRoot({apiKey: environment.gc_api_key}),
+    AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
     AgmJsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
@@ -280,6 +309,8 @@ export class FormlyConfig {
     RoutingModule,
   ],
   providers: [
+    {provide: APP_INITIALIZER,  useFactory: load, deps: [HttpClient, ConfigService], multi: true },
+    {provide: LAZY_MAPS_API_CONFIG,  useExisting: ConfigService},
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},

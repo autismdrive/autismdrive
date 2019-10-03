@@ -1,10 +1,7 @@
-<div *ngIf="systemStatus">
-<app-header [currentUser]="currentUser" [status]="systemStatus"></app-header>
-<div class="content">
-  <router-outlet></router-outlet>
-</div>
-<app-footer [status]="systemStatus"></app-footer>
-</div>
-<div *ngIf="!systemStatus">
-  <mat-spinner></mat-spinner>
+<div>
+  <app-header [currentUser]="currentUser"></app-header>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+  <app-footer></app-footer>
 </div>
