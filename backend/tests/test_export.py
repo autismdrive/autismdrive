@@ -119,7 +119,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         log = importer.log_for_export(exports, datetime.datetime.now())
         for export in exports:
             export.json_data = all_data[export.class_name]
-            importer.load_data(export,log)
+            importer.load_data(export, log)
 
     def test_insert_user_with_participant(self):
         u = self.construct_user()
@@ -169,8 +169,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertFalse(db_user.email_verified, msg="Email should start off unverified")
 
         # Modify the exported data slightly, and reload
-        data['User'][0]['email_verified'] = True
+        for user in data['User']:
+            user['email_verified'] = True
         self.load_database(data)
+
         db_user = db.session.query(User).filter_by(id=id).first()
         self.assertTrue(db_user.email_verified, msg="Email should now be verified.")
 
