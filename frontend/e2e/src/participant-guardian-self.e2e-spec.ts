@@ -13,8 +13,10 @@ describe('Participant (Guardian - Self)', () => {
   let profileUseCases: ProfileUseCases;
   let enrollUseCases: EnrollUseCases;
   let randomEmail;
+  const badPassword = 'abc123';
+  const goodPassword = 'Max Quordlepleen 90';
   const email = 'aaron@sartography.com';
-  const password = 'alouie3';
+  const password = 'Zarquon Disaster Area 78';
 
   beforeAll(async () => {
     page = new AppPage();
@@ -37,6 +39,15 @@ describe('Participant (Guardian - Self)', () => {
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
   it('should display register form', () => loginUseCases.displayRegisterForm());
   it('should display confirmation message on submit', () => loginUseCases.displayRegisterConfirmation(randomEmail));
+  it('should send registration email to user');
+  it('should navigate to reset password screen', () => loginUseCases.displayResetPasswordForm());
+  it('should display error if insecure password is entered', () => loginUseCases.displayErrorOnInsecurePassword(badPassword));
+  it('should not display error if secure password is entered', () => loginUseCases.fillOutPasswordForm(goodPassword));
+  it('should log user in after setting a new password', () => loginUseCases.submitResetPasswordForm(goodPassword));
+  it('should log out', () => loginUseCases.logout());
+  it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
+  it('should display register form', () => loginUseCases.displayRegisterForm());
+
   it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());

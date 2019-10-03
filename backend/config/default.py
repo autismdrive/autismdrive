@@ -47,3 +47,12 @@ GOOGLE_MAPS_API_KEY = "PRODUCTION_API_KEY_GOES_HERE"
 
 ADMIN_EMAIL = "admin@tester.com"
 PRINCIPAL_INVESTIGATOR_EMAIL = "pi@tester.com"  # Receives some high levl alerts per agreement with InfoSec.
+
+ADMIN_PASSWORD_REGEX = r"((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{25})"
+ADMIN_PASSWORD_INSTRUCTIONS = "Your password must be at least 25 characters long and contain at least one of each of " \
+                              "the following: uppercase letters, lowercase letters, numbers, and punctuation " \
+                              "characters. Don't use a password that you have used for any other purpose."
+USER_PASSWORD_REGEX = r"((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8})"
+USER_PASSWORD_INSTRUCTIONS = "Your password must be at least 8 characters long, but we recommend 20 characters. It " \
+                             "should include at least one of each of the following: uppercase letters, " \
+                             "lowercase letters, numbers, and punctuation characters."

@@ -58,6 +58,18 @@ auth = HTTPTokenAuth('Bearer')
 # Password Encryption
 bcrypt = Bcrypt(app)
 
+# Password Requirements
+password_requirements = {
+    'user': {
+        'regex': app.config['USER_PASSWORD_REGEX'],
+        'instructions': app.config['USER_PASSWORD_INSTRUCTIONS'],
+    },
+    'admin': {
+        'regex': app.config['ADMIN_PASSWORD_REGEX'],
+        'instructions': app.config['ADMIN_PASSWORD_INSTRUCTIONS'],
+    },
+}
+
 # Search System
 elastic_index = ElasticIndex(app)
 

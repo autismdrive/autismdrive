@@ -36,9 +36,13 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   submit() {
+    localStorage.removeItem('token_url');
     if (this.form.valid) {
       this.formStatus = 'submitting';
-      this.api.sendResetPasswordEmail(this.model['email']).subscribe(e => {
+      this.api.sendResetPasswordEmail(this.model['email']).subscribe(token_url => {
+        if (token_url) {
+          localStorage.setItem('token_url', token_url);
+        }
         this.formStatus = 'complete';
       }, error1 => {
         if (error1) {
