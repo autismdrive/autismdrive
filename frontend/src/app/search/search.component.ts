@@ -1,4 +1,4 @@
-import {LatLngLiteral} from '@agm/core';
+import {AgmInfoWindow, LatLngLiteral} from '@agm/core';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -57,6 +57,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
+        this.loadMapResults();
         this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
     });
@@ -79,6 +80,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     lat: 37.32248,
     lng: -78.36926
   };
+  hitsWithNoAddress: Hit[] = [];
+  hitsWithAddress: Hit[] = [];
+  infoWindow: AgmInfoWindow;
 
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
@@ -266,6 +270,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       .search(this.query)
       .subscribe(queryWithResults => {
         this.query = queryWithResults;
+        this.loadMapResults();
         this.loading = false;
       });
     this.googleAnalyticsService.event(this.query.words,
@@ -461,9 +466,18 @@ export class SearchComponent implements OnInit, OnDestroy {
     return this.query.hasFilters();
   }
 
-  getMapResults(): Hit[] {
+  loadMapResults() {
     if (this.query && this.query.hits && (this.query.hits.length > 0)) {
-      return this.query.hits.filter(h => h.hasCoords());
+      const hitsWithCoords = this.query.hits.filter(h => h.hasCoords());
+
+      if (hitsWithCoords && hitsWithCoords.length > 0) {
+        this.hitsWithAddress = hitsWithCoords.filter(h => !h.no_address);
+        this.hitsWithNoAddress = hitsWithCoords.filter(h => h.no_address);
+      } else {
+        this.hitsWithAddress = [];
+        this.hitsWithNoAddress = [];
+      }
+
     }
   }
 
@@ -537,5 +551,19 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     this.changeDetectorRef.detectChanges();
+  }
+
+  showInfoWindow(newInfoWindow) {
+    if (this.infoWindow) {
+      this.infoWindow.close().then(() => { this.infoWindow = newInfoWindow; });
+    } else {
+      this.infoWindow = newInfoWindow;
+    }
+  }
+
+  closeInfoWindow() {
+    if (this.infoWindow) {
+      this.infoWindow.close();
+    }
   }
 }
