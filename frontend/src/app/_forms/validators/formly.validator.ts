@@ -50,3 +50,13 @@ export function MinValidationMessage(err, field) {
 export function MaxValidationMessage(err, field) {
   return `This value should be less than ${field.templateOptions.max}`;
 }
+
+export function ShowError(field: FieldType) {
+  return field.formControl &&
+    field.formControl.invalid &&
+    (
+      field.formControl.dirty ||
+      (field.options.parentForm && field.options.parentForm.submitted) ||
+      (field.field.validation && field.field.validation.show)
+    );
+}

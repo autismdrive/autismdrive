@@ -43,7 +43,7 @@ const routes: Routes = [
   },
   {path: 'login', component: LoginComponent, data: {title: 'Log in to Autism DRIVE', hideHeader: true}},
   {
-    path: 'reset_password/:email_token', component: PasswordResetComponent,
+    path: 'reset_password/:role/:email_token', component: PasswordResetComponent,
     data: {title: 'Reset your Autism DRIVE password', hideHeader: true}
   },
   {

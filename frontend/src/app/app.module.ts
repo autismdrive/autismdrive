@@ -51,6 +51,7 @@ import {
   MulticheckboxValidatorMessage,
   PhoneValidator,
   PhoneValidatorMessage,
+  ShowError,
   UrlValidator,
   UrlValidatorMessage
 } from './_forms/validators/formly.validator';
@@ -121,8 +122,8 @@ import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.componen
 import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
 import {EventDateComponent} from './event-date/event-date.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
-import { RelatedItemsComponent } from './related-items/related-items.component';
-import { ContactItemComponent } from './contact-item/contact-item.component';
+import {RelatedItemsComponent} from './related-items/related-items.component';
+import {ContactItemComponent} from './contact-item/contact-item.component';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, ObservableInput, of} from 'rxjs';
 import {environment} from '../environments/environment';
@@ -157,6 +158,9 @@ export function load(http: HttpClient, config: ConfigService): (() => Promise<bo
 @Injectable()
 export class FormlyConfig {
   public static config = {
+    extras: {
+      showError: ShowError,
+    },
     types: [
       {name: 'repeat', component: RepeatSectionComponent},
       {

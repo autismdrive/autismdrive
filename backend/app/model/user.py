@@ -1,14 +1,14 @@
 import datetime
-import jwt
 import enum
+import re
+from random import randint
 
+import jwt
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from app import app, db, RestException, bcrypt
+from app import app, db, RestException, bcrypt, password_requirements
 from app.model.participant import Participant
-
-from random import randint
 
 
 def random_integer():
@@ -22,6 +22,7 @@ def random_integer():
         rand = randint(min_, max_)
 
     return rand
+
 
 class Role(enum.Enum):
     admin = 1
@@ -43,7 +44,7 @@ class User(db.Model):
     # user account. Please note that there is a separate participant model for tracking enrollment and participation in
     # studies.
     __tablename__ = 'stardrive_user'
-#    id = db.Column(db.Integer, primary_key=True)
+    #    id = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.Integer, primary_key=True, default=random_integer)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     email = db.Column(db.String, nullable=False, unique=True)
@@ -52,6 +53,7 @@ class User(db.Model):
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
     token = ''
+    token_url = ''
 
     def related_to_participant(self, participant_id):
         for p in self.participants:
@@ -65,7 +67,26 @@ class User(db.Model):
 
     @password.setter
     def password(self, plaintext):
-        self._password = bcrypt.generate_password_hash(plaintext)
+        role_name = self.role_name()
+        if self.password_meets_requirements(role_name, plaintext):
+            self._password = bcrypt.generate_password_hash(plaintext)
+        else:
+            message = "Please enter a valid password. " + password_requirements[role_name]['instructions']
+            raise RestException(RestException.INVALID_INPUT, details=message)
+
+    def role_name(self):
+        return self.role if isinstance(self.role, str) else self.role.name
+
+    @classmethod
+    def password_meets_requirements(cls, role_name, plaintext):
+        reqs = password_requirements[role_name]
+        regex = re.compile(reqs['regex'])
+
+        if plaintext and isinstance(plaintext, str):
+            match = regex.match(plaintext)
+            return bool(match)
+        else:
+            return False
 
     def is_correct_password(self, plaintext):
         if not self._password:

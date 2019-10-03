@@ -51,6 +51,7 @@ export class RegisterComponent implements OnInit {
   }
 
   submit() {
+    localStorage.removeItem('token_url');
     if (this.form.valid) {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();
@@ -59,6 +60,9 @@ export class RegisterComponent implements OnInit {
 
       this.api.addUser(this.user).subscribe(u => {
         this.user = u;
+        if (u.hasOwnProperty('token_url')) {
+          localStorage.setItem('token_url', u.token_url);
+        }
         this._stateSubject.next('wait_for_email');
         this.registerState = this._stateSubject.asObservable();
         this.changeDetectorRef.detectChanges();

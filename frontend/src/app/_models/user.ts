@@ -11,6 +11,7 @@ export class User {
   token?: string;
   role?: string;
   email_log?: EmailLog[];
+  token_url?: string;
 
   constructor(private _props) {
     for (const propName in this._props) {

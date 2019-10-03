@@ -22,6 +22,7 @@ import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
 import {ConfigService} from '../config.service';
+import {PasswordRequirements} from '../../_models/password_requirements';
 
 
 @Injectable({
@@ -61,6 +62,7 @@ export class ApiService {
     participant: '/api/participant/<id>',
     participantbysession: '/api/session/participant',
     participantStepLog: '/api/participant/step_log/<id>',
+    password_requirements: '/api/password_requirements/<role>',
     questionnaire: '/api/q/<name>/<id>',
     questionnaireExport: '/api/q/<name>/export',
     questionnaireInfo: '/api/q',
@@ -519,7 +521,15 @@ export class ApiService {
   getZipCoords(zipCode: string): Observable<GeoLocation> {
     const url = this._endpointUrl('zip_code_coords')
       .replace('<id>', zipCode);
-    return this.httpClient.get<any>(url)
+    return this.httpClient.get<GeoLocation>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getPasswordRequirements */
+  getPasswordRequirements(role: string): Observable<PasswordRequirements> {
+    const url = this._endpointUrl('password_requirements')
+      .replace('<role>', role);
+    return this.httpClient.get<PasswordRequirements>(url)
       .pipe(catchError(this._handleError));
   }
 

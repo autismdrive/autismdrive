@@ -111,6 +111,7 @@ from app.resources.ExportEndpoint import (
 )
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
+from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -245,6 +246,8 @@ endpoints = [
     # ZIP Code Endpoint
     (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
 
+    # Password Requirements Endpoint
+    (PasswordRequirementsEndpoint, "/password_requirements/<role>")
 ]
 
 # Add all endpoints to the API
