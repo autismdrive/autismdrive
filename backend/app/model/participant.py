@@ -10,6 +10,7 @@ from app.model.questionnaires.identification_questionnaire import Identification
 
 # Provides contact information for the participant
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+from app.model.random_id_generator import random_integer
 
 
 class Relationship(enum.Enum):
@@ -31,7 +32,7 @@ class Participant(db.Model):
     # The participant model is used to track enrollment and participation in studies. Participants are associated
     # with a user account; sometimes that of themselves and sometimes that of their guardian.
     __tablename__ = 'stardrive_participant'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, default=random_integer)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'))
     user = db.relationship("User", back_populates="participants")

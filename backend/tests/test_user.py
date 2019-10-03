@@ -1,6 +1,3 @@
-import base64
-import quopri
-import re
 import unittest
 
 from flask import json
