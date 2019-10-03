@@ -553,6 +553,7 @@ class SearchSchema(ma.Schema):
         longitude = fields.Float()
         date = fields.Date(missing=None)
         status = fields.Str(missing=None)
+        no_address = fields.Boolean(missing=None)
 
     class SortSchema(ma.Schema):
         field = fields.Str(allow_null=True)
