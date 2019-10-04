@@ -97,24 +97,24 @@ class DataLoader:
                 org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
 
                 geocode = self.get_geocode(
-                    address_dict={'street': row[7], 'city': row[9], 'state': row[10], 'zip': row[11]},
-                    lat_long_dict={'lat': row[16], 'lng': row[17]}
+                    address_dict={'street': row[8], 'city': row[10], 'state': row[11], 'zip': row[12]},
+                    lat_long_dict={'lat': row[17], 'lng': row[18]}
                 )
 
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
-                                    street_address1=row[7], street_address2=row[8], city=row[9], state=row[10],
-                                    zip=row[11], website=row[13], phone=row[15], email=row[14],
+                                    street_address1=row[8], street_address2=row[9], city=row[10], state=row[11],
+                                    zip=row[12], website=row[14], email=row[15], phone=row[16],
                                     latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
 
                 self.__increment_id_sequence(Resource)
 
-                for i in range(28, len(row)):
+                for i in range(29, len(row)):
                     if row[i]:
                         location.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
 
                 items.append(location)
 
-                for i in range(18, 27):
+                for i in range(19, 28):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
