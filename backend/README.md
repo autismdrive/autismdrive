@@ -1,5 +1,5 @@
 # Introduction
-This is the API for STAR DRIVE, a platform to support Autism studies and participants.
+This is the API for Autism DRIVE, a platform to support Autism studies and participants.
 ## Platform
 This is a Python3 / Flask based api. It relies on a Relational Database for storing and organizing resources.  It uses Elastic Search as a full text search engine for locating resources.
 

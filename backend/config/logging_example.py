@@ -53,7 +53,7 @@ logging_config = {
       "mailhost": ["smtp.mailtrap.io", 2525],
       "fromaddr": "alerts@star.virginia.edu",
       "toaddrs": ["admin@star.virginia.edu"],
-      "subject": "STAR Drive FAILURE",
+      "subject": "Autism DRIVE FAILURE",
     }
   }
 }

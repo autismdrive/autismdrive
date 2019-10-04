@@ -52,7 +52,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                     {"value": "irritability", "label": "Irritability"},
                     {"value": "pica", "label": "Pica (eating inedible objects)"},
                     {"value": "rectalDig", "label": "Rectal digging"},
-                    {"value": "repetitiveWords", "label": "Repetitive words, sounds, or sentences"},
+                    {"value": "repetitiveWords", "label": "Repetitive actions, sounds, or speech"},
                     {"value": "restrictEating", "label": "Restricted/picky eating"},
                     {"value": "selfInjury", "label": "Self-injury"},
                     {"value": "soiling", "label": "Soiling property (through urination or fecal smearing)"},
