@@ -21,6 +21,7 @@ export class ResourceDetailComponent implements OnInit {
   notes: AdminNote[];
   loading = true;
   contactItems: ContactItem[];
+  typeName: string;
 
   constructor(
     private api: ApiService,

@@ -1,28 +1,28 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {AdminNote} from '../../_models/admin_note';
 import {Category} from '../../_models/category';
 import {EmailLog} from '../../_models/email_log';
 import {Flow} from '../../_models/flow';
 import {Participant} from '../../_models/participant';
-import {Hit, Query} from '../../_models/query';
+import {Query} from '../../_models/query';
 import {Resource} from '../../_models/resource';
 import {ResourceCategory} from '../../_models/resource_category';
 import {Study} from '../../_models/study';
 import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
 import {UserSearchResults} from '../../_models/user_search_results';
-import {environment} from '../../../environments/environment';
 import {StudyUser} from '../../_models/study_user';
-import {Status} from '../../_models/status';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
 import {Organization} from '../../_models/organization';
 import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
+import {ConfigService} from '../config.service';
+import {PasswordRequirements} from '../../_models/password_requirements';
 
 
 @Injectable({
@@ -30,8 +30,8 @@ import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
 })
 export class ApiService {
 
-  apiRoot = environment.api;
-  public serverStatus: Observable<Status>;
+  private apiRoot: string;
+
   // REST endpoints
   public endpoints = {
     adminNote: '/api/admin_note/<id>',
@@ -62,6 +62,7 @@ export class ApiService {
     participant: '/api/participant/<id>',
     participantbysession: '/api/session/participant',
     participantStepLog: '/api/participant/step_log/<id>',
+    password_requirements: '/api/password_requirements/<role>',
     questionnaire: '/api/q/<name>/<id>',
     questionnaireExport: '/api/q/<name>/export',
     questionnaireInfo: '/api/q',
@@ -97,12 +98,10 @@ export class ApiService {
     userparticipant: '/api/user_participant/<id>',
     zip_code_coords: '/api/zip_code_coords/<id>',
   };
-  private statusSubject: BehaviorSubject<Status>;
 
-  constructor(private httpClient: HttpClient) {
-    this.statusSubject = new BehaviorSubject<Status>(null);
-    this.serverStatus = this.statusSubject.asObservable();
-    this.setServerStatus();
+  constructor(private httpClient: HttpClient,
+              private configService: ConfigService) {
+    this.apiRoot = configService.apiUrl;
   }
 
   /** sendResetPasswordEmail
@@ -522,7 +521,15 @@ export class ApiService {
   getZipCoords(zipCode: string): Observable<GeoLocation> {
     const url = this._endpointUrl('zip_code_coords')
       .replace('<id>', zipCode);
-    return this.httpClient.get<any>(url)
+    return this.httpClient.get<GeoLocation>(url)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getPasswordRequirements */
+  getPasswordRequirements(role: string): Observable<PasswordRequirements> {
+    const url = this._endpointUrl('password_requirements')
+      .replace('<role>', role);
+    return this.httpClient.get<PasswordRequirements>(url)
       .pipe(catchError(this._handleError));
   }
 
@@ -533,12 +540,7 @@ export class ApiService {
     return throwError(message);
   }
 
-  private setServerStatus() {
-    this.httpClient.get<Status>(this._endpointUrl('status')).subscribe
-    (status => {
-      this.statusSubject.next(status);
-    });
-  }
+
 
   private _endpointUrl(endpointName: string): string {
     const path = this.endpoints[endpointName];

@@ -2,7 +2,7 @@ import datetime
 
 from elasticsearch import RequestError
 from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
-    Search, A
+    Search, A, Boolean
 from elasticsearch_dsl.connections import connections
 import logging
 
@@ -39,6 +39,7 @@ class StarDocument(Document):
     longitude = Double()
     geo_point = GeoPoint()
     status = Keyword()
+    no_address = Boolean()
 
 
 class ElasticIndex:
@@ -148,6 +149,7 @@ class ElasticIndex:
             doc.latitude = latitude
             doc.longitude = longitude
             doc.geo_point = dict(lat=latitude, lon=longitude)
+            doc.no_address = not document.street_address1
 
         StarDocument.save(doc, index=self.index_name)
         if flush:

@@ -39,7 +39,7 @@ class SearchEndpoint(flask_restful.Resource):
             if "highlight" in hit.meta:
                 highlights = "... ".join(hit.meta.highlight.content)
             hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.date, hit.last_updated,
-                      highlights, hit.latitude, hit.longitude, hit.status)
+                      highlights, hit.latitude, hit.longitude, hit.status, hit.no_address)
             search.hits.append(hit)
 
         return SearchSchema().jsonify(search)

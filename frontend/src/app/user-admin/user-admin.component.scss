@@ -25,7 +25,10 @@ mat-row:hover {
   background-color: $brand-accent-light;
 }
 
-.mat-column-id, .mat-column-role {
-  flex: 0 0 100px;
+.mat-column-role {
+  flex: 0 0 75px;
 }
 
+.mat-column-id {
+  flex: 0 0 130px;
+}

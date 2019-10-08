@@ -156,3 +156,12 @@ class TestParticipant(BaseTest, unittest.TestCase):
         self.assertEqual(u.id, response['id'])
         self.assertEqual(1, len(response['participants']))
         self.assertEqual(p.relationship.name, response['participants'][0]["relationship"])
+
+    def test_participant_ids_are_not_sequential(self):
+        u = self.construct_user()
+        p1 = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p2 = self.construct_participant(user=u, relationship=Relationship.dependent)
+        p3 = self.construct_participant(user=u, relationship=Relationship.dependent)
+
+        self.assertNotEqual(p1.id + 1, p2.id)
+        self.assertNotEqual(p2.id + 1, p3.id)

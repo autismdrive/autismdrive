@@ -16,11 +16,6 @@
       fxLayoutGap="40px"
     >
       <h1>{{resource.title}}</h1>
-      <!--<img-->
-      <!--*ngIf="resource.image"-->
-      <!--[src]="resource.image"-->
-      <!--&gt;-->
-      <!--<caption *ngIf="resource.image && resource.imageCaption">{{resource.imageCaption}}</caption>-->
       <app-resource-edit-button *ngIf="currentUser && currentUser.role == 'admin'" [resource]="resource" [currentUser]="currentUser"></app-resource-edit-button>
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
@@ -29,6 +24,11 @@
       <mat-card id="resource-contact">
         <mat-card-title><h4>Contact</h4></mat-card-title>
         <mat-card-content>
+          <p *ngIf="mapLoc && !resource.street_address1" class="no-address-message">
+            {{resource.type === 'location' ? 'In-home therapy service.' : ''}}
+            Contact {{resource.organization.name}} for specific
+            {{resource.type === 'location' ? 'service area' : 'location'}}.
+          </p>
           <app-contact-item
             *ngFor="let c of contactItems"
             [contactItem]="c"
@@ -76,15 +76,39 @@
             *ngIf="resource.hasCoords()"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
+            [iconUrl]="'/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg'"
           >
             <agm-info-window *ngIf="mapLoc">
               <h5>{{resource.title}}</h5>
-              <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
-              <a
-                class="chevron-link"
-                href="{{getGoogleMapsUrl()}}"
-                target="_blank"
-              >Driving directions</a>
+              <ng-container *ngIf="resource.street_address1">
+                <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
+                <a
+                  class="chevron-link"
+                  href="{{getGoogleMapsUrl()}}"
+                  target="_blank"
+                >Driving directions</a>
+              </ng-container>
+              <ng-container *ngIf="!resource.street_address1">
+                <p *ngIf="mapLoc && !resource.street_address1" class="no-address-message">
+                  {{resource.type === 'location' ? 'In-home therapy service.' : ''}}
+                  Contact {{resource.organization.name}} for specific
+                  {{resource.type === 'location' ? 'service area' : 'location'}}.
+                </p>
+                <a
+                  *ngIf="resource.phone"
+                  class="chevron-link"
+                  target="_blank"
+                  href="tel://{{resource.phone}}"
+                >Call {{resource.phone}}</a>
+                <a
+                  *ngIf="!resource.phone && resource.website"
+                  class="chevron-link"
+                  target="_blank"
+                  href="{{resource.website}}"
+                >
+                  Visit website
+                </a>
+              </ng-container>
             </agm-info-window>
           </agm-marker>
         </agm-map>

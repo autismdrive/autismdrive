@@ -13,8 +13,10 @@ describe('Participant (Guardian - Self)', () => {
   let profileUseCases: ProfileUseCases;
   let enrollUseCases: EnrollUseCases;
   let randomEmail;
+  const badPassword = 'abc123';
+  const goodPassword = 'Max Quordlepleen 90';
   const email = 'aaron@sartography.com';
-  const password = 'alouie3';
+  const password = 'Zarquon Disaster Area 78';
 
   beforeAll(async () => {
     page = new AppPage();
@@ -37,6 +39,15 @@ describe('Participant (Guardian - Self)', () => {
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
   it('should display register form', () => loginUseCases.displayRegisterForm());
   it('should display confirmation message on submit', () => loginUseCases.displayRegisterConfirmation(randomEmail));
+  it('should send registration email to user');
+  it('should navigate to reset password screen', () => loginUseCases.displayResetPasswordForm());
+  it('should display error if insecure password is entered', () => loginUseCases.displayErrorOnInsecurePassword(badPassword));
+  it('should not display error if secure password is entered', () => loginUseCases.fillOutPasswordForm(goodPassword));
+  it('should log user in after setting a new password', () => loginUseCases.submitResetPasswordForm(goodPassword));
+  it('should log out', () => loginUseCases.logout());
+  it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
+  it('should display register form', () => loginUseCases.displayRegisterForm());
+
   it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
@@ -59,7 +70,14 @@ describe('Participant (Guardian - Self)', () => {
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
-  it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
+  it('should cancel out of the terms consent page', () => enrollUseCases.cancelTerms());
+  it('should navigate back to the Guardian flow', () => profileUseCases.startGuardianFlow());
+  it('should accept the terms', () => enrollUseCases.acceptTerms());
+  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should start the Dependent flow', () => profileUseCases.startDependentFlow());
+  it('should accept the terms', () => enrollUseCases.acceptTerms());
+  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display avatars for each participant', () => profileUseCases.displayAvatars());
   it('should display the avatar selection dialog', () => profileUseCases.displayAvatarDialog());
   it('should edit the avatar image', () => profileUseCases.editAvatarImg());
@@ -68,10 +86,6 @@ describe('Participant (Guardian - Self)', () => {
   it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
 
   // Enrollment Flow
-  it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
-  it('should cancel out of the terms consent page', () => enrollUseCases.cancelTerms());
-  it('should navigate back to the Guardian flow', () => profileUseCases.navigateToGuardianFlow());
-  it('should accept the terms', () => enrollUseCases.acceptTerms());
   it('should display a menu link to all steps of the flow', () => enrollUseCases.displayMenuLinks());
   it('should display completed status of each step', () => enrollUseCases.displayCompletedStatus());
   it('should cancel enrollment instructions', () => enrollUseCases.cancelIntro());
@@ -84,8 +98,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should complete Guardian Contact Information step', () => enrollUseCases.completeStep(1));
   it('should complete Guardian Demographics step', () => enrollUseCases.completeStep(2));
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
-  it('should start the Dependent flow', () => profileUseCases.startDependentFlow());
-  it('should accept the terms', () => enrollUseCases.acceptTerms());
+  it('should navigate back to the Dependent flow', () => profileUseCases.navigateToDependentFlow());
   it('should display instructions for the entire flow', () => enrollUseCases.displayInstructions());
   it('should complete Dependent Identification step', () => enrollUseCases.completeStep(0));
   it('should complete Dependent Demographics step', () => enrollUseCases.completeStep(1));
@@ -125,7 +138,6 @@ describe('Participant (Guardian - Self)', () => {
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
-
 
   // Log out
   it('should log out', () => loginUseCases.logout());

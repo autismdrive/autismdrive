@@ -1,6 +1,6 @@
 Dear Administrator,
 
-This address is configured to receive errors and alerts from STAR Drive.
+This address is configured to receive errors and alerts from Autism DRIVE.
 The following error occurred:
 
 {{ msg }}

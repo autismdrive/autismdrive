@@ -15,7 +15,6 @@ import {scrollToTop} from '../../util/scrollToTop';
 import {MatDrawer} from '@angular/material/sidenav';
 
 enum FlowState {
-  NO_CONSENT = 'no_consent',
   INTRO = 'intro',
   LOADING = 'loading',
   COMPLETE = 'complete',
@@ -94,9 +93,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       .getFlow(flowName, this.participant.id)
       .subscribe(f => {
         this.flow = new Flow(f);
-        if (!this.participant.has_consented) {
-          this.state = this.flowState.NO_CONSENT;
-        } else if (this.participant.has_consented && this.flow.percentComplete() === 0) {
+        if (this.flow.percentComplete() === 0) {
           this.state = this.flowState.INTRO;
         } else {
           this.goToNextAvailableStep();
@@ -141,14 +138,6 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.state = FlowState.COMPLETE;
       scrollToTop();
     }
-  }
-
-  markConsentAndGoToFlow(participant: Participant) {
-    participant.has_consented = true;
-    this.api.updateParticipant(participant).subscribe(_ => {
-      this.loadFlow(this.flow.name);
-      scrollToTop();
-    });
   }
 
   goToStep(step: Step) {

@@ -20,6 +20,7 @@ class RestException(Exception):
     UNRELATED_PARTICIPANT = {'code': 'unrelated_participant', 'message': 'You must be related to the participant.'}
     UNKNOWN_RELATIONSHIP = {'code': 'unknown_relationship', 'message': 'please use a pre-defined relationship'}
     STUDY_INQUIRY_ERROR = {'code': 'study_inquiry_error', 'message': 'Error in finding correct user and study to complete study inquiry'}
+    INVALID_INPUT = {'code': 'invalid_input', 'message': 'Invalid input'}
 
     def __init__(self, payload, status_code=None, details=None):
         Exception.__init__(self)

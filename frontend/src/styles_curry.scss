@@ -1,6 +1,8 @@
+@import './config';
+
 .border-box {
-  border: 11px solid #002f6c;
-  border-image: linear-gradient(to bottom, #e57200 0%, #002f6c 100%);
+  border: 11px solid $brand-primary;
+  border-image: linear-gradient(to bottom, #e57200 0%, $brand-primary 100%);
   border-image-slice: 1;
 }
 
@@ -764,7 +766,7 @@ screen and (min-width: 64em) {
 }
 
 p.intro {
-  color: #002f6c;
+  color: $brand-primary;
   font-style: italic;
   font-size: 1.25rem;
   line-height: 1.875rem;
@@ -776,7 +778,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #002f6c;
+  color: $brand-primary;
   font-family: "bodoni-urw", serif;
   font-style: italic;
   font-weight: 800;
@@ -1173,7 +1175,7 @@ table td {
   outline: 0;
   border: 0;
   background-color: transparent;
-  border-bottom: 1px solid #002f6c;
+  border-bottom: 1px solid $brand-primary;
   padding: 0 1.875rem .5rem 0;
   margin: 0;
   height: auto;
@@ -1210,7 +1212,7 @@ table td {
 }
 
 .header-search-submit:hover .icon {
-  color: #002f6c;
+  color: $brand-primary;
 }
 
 .header-search-submit .icon {
@@ -1302,13 +1304,13 @@ table td {
 
 .primary-nav-list-item .primary-nav-link,
 .primary-nav-list-item:hover .primary-nav-link {
-  color: #002f6c;
+  color: $brand-primary;
 }
 
 @media screen and (min-width: 65.625em) {
   .primary-nav-list-item .primary-nav-link,
   .primary-nav-list-item:hover .primary-nav-link {
-    color: #002f6c;
+    color: $brand-primary;
   }
 }
 
@@ -1322,7 +1324,7 @@ table td {
 @media screen and (min-width: 65.625em) {
   .home-page.sticky-header .primary-nav-list-item .primary-nav-link,
   .home-page.sticky-header .primary-nav-list-item:hover .primary-nav-link {
-    color: #002f6c;
+    color: $brand-primary;
   }
 }
 
@@ -1470,7 +1472,7 @@ table td {
 }
 
 .primary-child-nav-trigger [class*='minus'] {
-  color: #002f6c;
+  color: $brand-primary;
   display: none;
 }
 
@@ -1532,7 +1534,7 @@ table td {
 
 @media screen and (min-width: 65.625em) {
   .primary-child-nav-link {
-    color: #002f6c;
+    color: $brand-primary;
     white-space: nowrap;
     font-size: 1.125rem;
     padding: .6875rem 1.25rem .75rem;
@@ -1711,11 +1713,11 @@ table td {
 }
 
 .sidebar-nav h2 a {
-  color: #002f6c;
+  color: $brand-primary;
 }
 
 .sidebar-nav h2 a:hover {
-  color: #002f6c;
+  color: $brand-primary;
 }
 
 .sidebar-nav .chevron-link {
@@ -1750,7 +1752,7 @@ table td {
 }
 
 .social-media-icons a:hover {
-  color: #002f6c;
+  color: $brand-primary;
 }
 
 .ir {
@@ -2041,7 +2043,7 @@ div.more {
   line-height: 1;
   display: block;
   margin: 0.325em 0;
-  color: #002f6c;
+  color: $brand-primary;
   text-decoration: none;
   margin-bottom: 0;
   font-family: "franklin-gothic-urw", sans-serif;
@@ -2169,8 +2171,8 @@ div.more {
 }
 
 .jumbo-section-header {
-  border: 5px solid #002f6c;
-  border-image: linear-gradient(to right, #e57200 0%, #002f6c 100%);
+  border: 5px solid $brand-primary;
+  border-image: linear-gradient(to right, #e57200 0%, $brand-primary 100%);
   border-image-slice: 1;
   z-index: 2;
   min-width: 18.75rem;
@@ -2186,8 +2188,8 @@ div.more {
 
 @media print, screen and (min-width: 48em) {
   .jumbo-section-header {
-    border: 8px solid #002f6c;
-    border-image: linear-gradient(to right, #e57200 0%, #002f6c 100%);
+    border: 8px solid $brand-primary;
+    border-image: linear-gradient(to right, #e57200 0%, $brand-primary 100%);
     border-image-slice: 1;
     top: -11.875rem;
     min-width: 43.6875rem;
@@ -2197,8 +2199,8 @@ div.more {
 
 @media print, screen and (min-width: 64em) {
   .jumbo-section-header {
-    border: 11px solid #002f6c;
-    border-image: linear-gradient(to right, #e57200 0%, #002f6c 100%);
+    border: 11px solid $brand-primary;
+    border-image: linear-gradient(to right, #e57200 0%, $brand-primary 100%);
     border-image-slice: 1;
     top: -13.4375rem;
     min-width: 59.0625rem;
@@ -2257,7 +2259,7 @@ div.more {
 }
 
 .jumbo-section-header h2 {
-    color: #002f6c;
+    color: $brand-primary;
     text-align: center;
     line-height: 1.125;
     position: relative;

@@ -4,7 +4,7 @@
   ngClass.lt-md="margin-bottom-none"
 >
   <div class="hero-content">
-    <h1>Find Autism Support</h1>
+    <h1>Find Autism Resources</h1>
   </div>
   <div
     class="row escaping-tiles-1x"
@@ -207,6 +207,7 @@
           [zoom]="7"
           (mapReady)="mapLoad($event)"
           [scrollwheel]="null"
+          (mapClick)="closeInfoWindow()"
         >
           <agm-marker
             *ngIf="mapLoc"
@@ -214,28 +215,50 @@
             [longitude]="mapLoc.lng"
             iconUrl="/assets/map/your-location.svg"
           ></agm-marker>
-          <agm-marker-cluster imagePath="/assets/map/m">
-            <ng-container *ngFor="let hit of getMapResults()">
-              <agm-marker
-                *ngIf="hit.hasCoords()"
-                [latitude]="hit.latitude"
-                [longitude]="hit.longitude"
-              >
-                <agm-info-window>
-                  <a
-                    class="title mat-h2"
-                    href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
-                  >{{hit.title}}</a>
-                  <p>{{hit.description}}</p>
-                  <a
-                    class="chevron-link"
-                    [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
-                    routerLinkActive="router-link-active"
-                  >Resource Details - {{hit.milesFrom(mapLoc || defaultLoc)}}mi</a>
-                </agm-info-window>
-              </agm-marker>
-            </ng-container>
-          </agm-marker-cluster>
+          <ng-container *ngFor="let hit of hitsWithNoAddress">
+            <agm-marker
+              *ngIf="hit.hasCoords()"
+              [latitude]="hit.latitude"
+              [longitude]="hit.longitude"
+              [iconUrl]="'/assets/map/' + hit.type + '-no-address.svg'"
+              (markerClick)="showInfoWindow(infoWindowNoAddress)"
+            >
+              <agm-info-window #infoWindowNoAddress>
+                <a
+                  class="title mat-h2"
+                  href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+                >{{hit.title}}</a>
+                <p>{{hit.description}}</p>
+                <a
+                  class="chevron-link"
+                  [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
+                  routerLinkActive="router-link-active"
+                >In-Home Therapy Details</a>
+              </agm-info-window>
+            </agm-marker>
+          </ng-container>
+          <ng-container *ngFor="let hit of hitsWithAddress">
+            <agm-marker
+              *ngIf="hit.hasCoords()"
+              [latitude]="hit.latitude"
+              [longitude]="hit.longitude"
+              [iconUrl]="'/assets/map/' + hit.type + '.svg'"
+              (markerClick)="showInfoWindow(infoWindow)"
+            >
+              <agm-info-window #infoWindow>
+                <a
+                  class="title mat-h2"
+                  href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+                >{{hit.title}}</a>
+                <p>{{hit.description}}</p>
+                <a
+                  class="chevron-link"
+                  [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
+                  routerLinkActive="router-link-active"
+                >{{hit.type}} Details - {{hit.milesFrom(mapLoc || defaultLoc)}}mi</a>
+              </agm-info-window>
+            </agm-marker>
+          </ng-container>
         </agm-map>
         <div class="search-results margin-top-none">
           <div

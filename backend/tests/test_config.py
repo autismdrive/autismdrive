@@ -4,10 +4,10 @@ from flask import json
 from tests.base_test import BaseTest
 
 
-class TestStatus(BaseTest, unittest.TestCase):
+class TestConfig(BaseTest, unittest.TestCase):
 
-    def test_status(self):
-        rv = self.app.get('/api/status',
+    def test_config(self):
+        rv = self.app.get('/api/config',
                           follow_redirects=True,
                           content_type="application/json")
         self.assert_success(rv)
