@@ -42,6 +42,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private location: Location,
     private renderer: Renderer2,
     private searchService: SearchService,
+    private mapSearchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
@@ -57,6 +58,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
+        this.mapQuery = this._queryParamsToQuery(qParams);
+        this.mapQuery.size = 999;
         this.loadMapResults();
         this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
@@ -64,6 +67,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   query: Query;
+  mapQuery: Query;
   resourceTypes = HitType.all_resources();
   selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
@@ -266,11 +270,18 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
+
+    this.mapSearchService
+      .search(this.mapQuery)
+      .subscribe(mapQueryWithResults => {
+        this.mapQuery = mapQueryWithResults;
+        this.loadMapResults();
+        this.loading = false;
+      });
     this.searchService
       .search(this.query)
       .subscribe(queryWithResults => {
         this.query = queryWithResults;
-        this.loadMapResults();
         this.loading = false;
       });
     this.googleAnalyticsService.event(this.query.words,
@@ -467,8 +478,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapResults() {
-    if (this.query && this.query.hits && (this.query.hits.length > 0)) {
-      const hitsWithCoords = this.query.hits.filter(h => h.hasCoords());
+    if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
+      const hitsWithCoords = this.mapQuery.hits.filter(h => h.hasCoords());
 
       if (hitsWithCoords && hitsWithCoords.length > 0) {
         this.hitsWithAddress = hitsWithCoords.filter(h => !h.no_address);
@@ -482,11 +493,11 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   showMap() {
-    const is_location_or_event_type = this.query &&
-      this.query.types &&
-      this.query.types.length === 1 &&
-      (this.query.types.includes('location') ||
-      this.query.types.includes('event'));
+    const is_location_or_event_type = this.mapQuery &&
+      this.mapQuery.types &&
+      this.mapQuery.types.length === 1 &&
+      (this.mapQuery.types.includes('location') ||
+      this.mapQuery.types.includes('event'));
     const is_sort_by_distance = this.selectedSort && this.selectedSort.name === 'Distance';
     return is_location_or_event_type || is_sort_by_distance;
   }
