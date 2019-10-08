@@ -312,7 +312,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         ExportService.send_alert_if_exports_not_running()
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("Star Drive: Error - 45 minutes since last successful export",
+        self.assertEqual("Autism DRIVE: Error - 45 minutes since last successful export",
                          self.decode(TEST_MESSAGES[-1]['subject']))
         ExportService.send_alert_if_exports_not_running()
         ExportService.send_alert_if_exports_not_running()
@@ -330,7 +330,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("Star Drive: Error - 30 minutes since last successful export",
+        self.assertEqual("Autism DRIVE: Error - 30 minutes since last successful export",
                          self.decode(TEST_MESSAGES[-1]['subject']))
 
         log.last_updated = datetime.datetime.now() - datetime.timedelta(minutes=120)
@@ -338,7 +338,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
         self.assertGreater(len(TEST_MESSAGES), message_count + 1, "another email should have gone out")
-        self.assertEqual("Star Drive: Error - 2 hours since last successful export",
+        self.assertEqual("Autism DRIVE: Error - 2 hours since last successful export",
                          self.decode(TEST_MESSAGES[-1]['subject']))
 
     def test_exporter_sends_12_emails_over_first_24_hours(self):

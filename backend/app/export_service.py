@@ -256,7 +256,7 @@ class ExportService:
             db.session.commit()
         else:
             msg = None
-            subject = "Star Drive: Error - "
+            subject = "Autism DRIVE: Error - "
             time_difference = datetime.datetime.now(tz=UTC) - last_log.last_updated
             hours = int(time_difference.total_seconds()/3600)
             minutes = int(time_difference.total_seconds()/60)

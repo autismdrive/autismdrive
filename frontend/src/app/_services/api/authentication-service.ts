@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import {Observable, BehaviorSubject, Subject, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import { User } from '../../_models/user';
-import { environment } from '../../../environments/environment';
 import { GoogleAnalyticsService } from '../../google-analytics.service';
 import {StarError} from '../../star-error';
+import {ConfigService} from '../config.service';
 
 
 
@@ -15,13 +15,18 @@ export class AuthenticationService {
   private currentUserSubject: Subject<User>;
   public currentUser: Observable<User>;
 
-  login_url = `${environment.api}/api/login_password`;
-  reset_pass_url = `${environment.api}/api/reset_password`;
-  refresh_url = `${environment.api}/api/session`;
+  private login_url: string;
+  private reset_pass_url: string;
+  private refresh_url: string;
 
 
-  constructor(private http: HttpClient, private googleAnalyticsService: GoogleAnalyticsService) {
+  constructor(private http: HttpClient, private googleAnalyticsService: GoogleAnalyticsService, private configService: ConfigService) {
     const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
+    this.login_url = `${configService.apiUrl}/api/login_password`;
+    this.reset_pass_url = `${configService.apiUrl}/api/reset_password`;
+    this.refresh_url = `${configService.apiUrl}/api/session`;
+
+
     this.currentUserSubject = new BehaviorSubject<User>(null);
     this.currentUser = this.currentUserSubject.asObservable();
     if (token) {
