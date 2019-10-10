@@ -248,10 +248,10 @@ export class ResourceFormComponent implements OnInit {
 
   loadData() {
     this.route.params.subscribe(params => {
-      const resourceId = params['resourceId'];
-      const resourceType = params['resourceType'].charAt(0).toUpperCase() + params['resourceType'].slice(1);
 
-      if (resourceId && resourceType) {
+      if (params['resourceId'] && params['resourceType']) {
+        const resourceId = params['resourceId'];
+        const resourceType = params['resourceType'].charAt(0).toUpperCase() + params['resourceType'].slice(1);
         this.createNew = false;
         this.model.createNew = false;
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
