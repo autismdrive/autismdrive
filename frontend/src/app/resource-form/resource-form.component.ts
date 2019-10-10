@@ -197,6 +197,22 @@ export class ResourceFormComponent implements OnInit {
         },
         hideExpression: '!model.type',
       },
+      {
+        key: 'ages',
+        type: 'multicheckbox',
+        templateOptions: {
+          label: 'Age Ranges',
+          type: "array",
+          options: [
+            {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
+            {'value': 'school', 'label': 'School age (6 - 13 years)'},
+            {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
+            {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
+            {'value': 'aging', 'label': 'Aging (65+)'}
+          ],
+        },
+        hideExpression: '!model.type',
+      },
     ];
 
   options: FormlyFormOptions;
@@ -233,18 +249,16 @@ export class ResourceFormComponent implements OnInit {
   loadData() {
     this.route.params.subscribe(params => {
       const resourceId = params['resourceId'];
-      const resourceType = params['resourceType'];
+      const resourceType = params['resourceType'].charAt(0).toUpperCase() + params['resourceType'].slice(1);
 
-      if (resourceId) {
+      if (resourceId && resourceType) {
         this.createNew = false;
         this.model.createNew = false;
-          if (resourceType == 'resource') {
-            this.loadResource(this.api.getResource(resourceId));
-          } else if (resourceType == 'location') {
-            this.loadResource(this.api.getLocation(resourceId));
-          } else if (resourceType == 'event') {
-            this.loadResource(this.api.getEvent(resourceId));
-          }
+        this.api[`get${resourceType}`](resourceId).subscribe(resource => {
+          this.resource = new Resource(resource);
+          this.model = this.resource;
+          this.loadResourceCategories(resource, () => this.loadForm());
+        });
       } else {
         this.createNew = true;
         this.model.createNew = true;
@@ -252,15 +266,6 @@ export class ResourceFormComponent implements OnInit {
         this.loadForm();
       }
     });
-  }
-
-  loadResource(apiCall) {
-    apiCall.subscribe(
-      resource => {
-        this.resource = resource;
-        this.model = resource;
-        this.loadResourceCategories(resource, () => this.loadForm());
-      });
   }
 
   loadResourceCategories(resource: Resource, callback: Function) {
