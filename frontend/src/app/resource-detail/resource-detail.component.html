@@ -72,11 +72,19 @@
           [zoom]="7"
           [scrollwheel]="null"
         >
+          <agm-circle
+            *ngIf="resource.hasCoords() && !resource.street_address1"
+            [latitude]="resource.latitude"
+            [longitude]="resource.longitude"
+            [radius]="33000"
+          >
+
+          </agm-circle>
           <agm-marker
             *ngIf="resource.hasCoords()"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
-            [iconUrl]="'/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg'"
+            [iconUrl]="'/assets/map/' + resource.type + '.svg'"
           >
             <agm-info-window *ngIf="mapLoc">
               <h5>{{resource.title}}</h5>
