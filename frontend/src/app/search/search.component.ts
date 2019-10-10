@@ -1,4 +1,4 @@
-import {AgmInfoWindow, LatLngLiteral} from '@agm/core';
+import {LatLngLiteral} from '@agm/core';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -16,6 +16,7 @@ import {SetLocationDialogComponent} from '../set-location-dialog/set-location-di
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
 import {MatExpansionPanel} from '@angular/material/expansion';
+import {clone} from '../../util/clone';
 
 interface SortMethod {
   name: string;
@@ -58,7 +59,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
-        this.mapQuery = this._queryParamsToQuery(qParams);
+        this.mapQuery = clone(this.query);
         this.mapQuery.size = 999;
         this.loadMapResults();
         this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
@@ -86,7 +87,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
-  infoWindow: AgmInfoWindow;
+  openedWindowId: number;
+  mapZoomLevel: number;
 
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
@@ -270,6 +272,9 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
+
+    this.mapQuery = clone(this.query);
+    this.mapQuery.size = 999;
 
     this.mapSearchService
       .search(this.mapQuery)
@@ -564,17 +569,45 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
   }
 
-  showInfoWindow(newInfoWindow) {
-    if (this.infoWindow) {
-      this.infoWindow.close().then(() => { this.infoWindow = newInfoWindow; });
+  showInfoWindow(windowId: number) {
+    if (this.isInfoWindowOpen(windowId)) {
+      this.closeInfoWindow();
     } else {
-      this.infoWindow = newInfoWindow;
+      this.openedWindowId = windowId;
     }
   }
 
   closeInfoWindow() {
-    if (this.infoWindow) {
-      this.infoWindow.close();
-    }
+    this.openedWindowId = null;
+  }
+
+  isInfoWindowOpen(windowId: number): boolean {
+    return this.openedWindowId === windowId;
+  }
+
+  // Return a random number for the given seed
+  // https://stackoverflow.com/a/19303725/1791917
+  mapJitter(seed: number, isLat: boolean): number {
+    let m = seed % 2 === 0 ? 1 : -1;
+    if (isLat) { m = m * -1; }
+    const x = Math.sin(seed) * 10000;
+    return (x - Math.floor(x)) / 100 * m;
+  }
+
+  updateZoom(zoomLevel: number) {
+    this.mapZoomLevel = zoomLevel;
+  }
+
+  getCircleRadius(): number {
+    const maxMiles = 100;
+    const metersPerMi = 1609.34;
+    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
+  }
+
+  getMarkerIcon(hit: Hit) {
+    const url = `/assets/map/${hit.type}${hit.no_address ? '-no-address' : ''}.svg`;
+    const x = 16;
+    const y = hit.no_address ? 16 : 0;
+    return {url: url, anchor: {x: x, y: y}};
   }
 }

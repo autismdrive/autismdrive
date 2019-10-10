@@ -208,22 +208,35 @@
           (mapReady)="mapLoad($event)"
           [scrollwheel]="null"
           (mapClick)="closeInfoWindow()"
+          (zoomChange)="updateZoom($event)"
         >
           <agm-marker
             *ngIf="mapLoc"
             [latitude]="mapLoc.lat"
             [longitude]="mapLoc.lng"
-            iconUrl="/assets/map/your-location.svg"
+            [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
           ></agm-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
+            <agm-circle
+              [latitude]="hit.latitude + mapJitter(hit.id, true)"
+              [longitude]="hit.longitude + mapJitter(hit.id, false)"
+              [radius]="getCircleRadius()"
+              [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
+              fillOpacity="0.1"
+              [clickable]="true"
+              [visible]="isInfoWindowOpen(hit.id)"
+              (circleClick)="showInfoWindow(hit.id)"
+              zIndex="-1"
+            >
+            </agm-circle>
             <agm-marker
               *ngIf="hit.hasCoords()"
-              [latitude]="hit.latitude"
-              [longitude]="hit.longitude"
-              [iconUrl]="'/assets/map/' + hit.type + '-no-address.svg'"
-              (markerClick)="showInfoWindow(infoWindowNoAddress)"
+              [latitude]="hit.latitude + mapJitter(hit.id, true)"
+              [longitude]="hit.longitude + mapJitter(hit.id, false)"
+              [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: {x: 24, y: 24}}"
+              (markerClick)="showInfoWindow(hit.id)"
             >
-              <agm-info-window #infoWindowNoAddress>
+              <agm-info-window [isOpen]="isInfoWindowOpen(hit.id)">
                 <a
                   class="title mat-h2"
                   href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
@@ -233,7 +246,7 @@
                   class="chevron-link"
                   [routerLink]="['/' + hit.type.toLowerCase() + '/' + hit.id]"
                   routerLinkActive="router-link-active"
-                >In-Home Therapy Details</a>
+                >{{hit.type.toLowerCase() === 'location' ? 'In-home therapy' : hit.type}} Details</a>
               </agm-info-window>
             </agm-marker>
           </ng-container>
@@ -242,10 +255,10 @@
               *ngIf="hit.hasCoords()"
               [latitude]="hit.latitude"
               [longitude]="hit.longitude"
-              [iconUrl]="'/assets/map/' + hit.type + '.svg'"
-              (markerClick)="showInfoWindow(infoWindow)"
+              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
+              (markerClick)="showInfoWindow(hit.id)"
             >
-              <agm-info-window #infoWindow>
+              <agm-info-window [isOpen]="isInfoWindowOpen(hit.id)">
                 <a
                   class="title mat-h2"
                   href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
@@ -317,6 +330,3 @@
     </div>
   </div>
 </div>
-
-
-

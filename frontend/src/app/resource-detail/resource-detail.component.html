@@ -76,17 +76,25 @@
             *ngIf="resource.hasCoords() && !resource.street_address1"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
-            [radius]="33000"
+            [radius]="32186.9"
+            [fillColor]="resource.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
+            fillOpacity="0.1"
+            [clickable]="true"
+            (circleClick)="toggleInfoWindow($event)"
           >
-
           </agm-circle>
           <agm-marker
             *ngIf="resource.hasCoords()"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
-            [iconUrl]="'/assets/map/' + resource.type + '.svg'"
+            [iconUrl]="{url: '/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg', anchor: {x: 24, y: 24}}"
+            (markerClick)="toggleInfoWindow($event)"
           >
-            <agm-info-window *ngIf="mapLoc">
+            <agm-info-window
+              [isOpen]="showInfoWindow"
+              [latitude]="resource.latitude"
+              [latitude]="resource.longitude"
+            >
               <h5>{{resource.title}}</h5>
               <ng-container *ngIf="resource.street_address1">
                 <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
