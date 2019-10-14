@@ -16,6 +16,7 @@ import {SetLocationDialogComponent} from '../set-location-dialog/set-location-di
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
 import {MatExpansionPanel} from '@angular/material/expansion';
+import {clone} from '../../util/clone';
 
 interface SortMethod {
   name: string;
@@ -42,6 +43,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private location: Location,
     private renderer: Renderer2,
     private searchService: SearchService,
+    private mapSearchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
@@ -57,12 +59,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.loadMapLocation(() => {
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
+        this.mapQuery = clone(this.query);
+        this.mapQuery.size = 999;
+        this.loadMapResults();
         this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
     });
   }
 
   query: Query;
+  mapQuery: Query;
   resourceTypes = HitType.all_resources();
   selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
@@ -79,6 +85,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     lat: 37.32248,
     lng: -78.36926
   };
+  hitsWithNoAddress: Hit[] = [];
+  hitsWithAddress: Hit[] = [];
+  openedWindowId: number;
+  mapZoomLevel: number;
 
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
@@ -262,6 +272,17 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
+
+    this.mapQuery = clone(this.query);
+    this.mapQuery.size = 999;
+
+    this.mapSearchService
+      .search(this.mapQuery)
+      .subscribe(mapQueryWithResults => {
+        this.mapQuery = mapQueryWithResults;
+        this.loadMapResults();
+        this.loading = false;
+      });
     this.searchService
       .search(this.query)
       .subscribe(queryWithResults => {
@@ -461,18 +482,27 @@ export class SearchComponent implements OnInit, OnDestroy {
     return this.query.hasFilters();
   }
 
-  getMapResults(): Hit[] {
-    if (this.query && this.query.hits && (this.query.hits.length > 0)) {
-      return this.query.hits.filter(h => h.hasCoords());
+  loadMapResults() {
+    if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
+      const hitsWithCoords = this.mapQuery.hits.filter(h => h.hasCoords());
+
+      if (hitsWithCoords && hitsWithCoords.length > 0) {
+        this.hitsWithAddress = hitsWithCoords.filter(h => !h.no_address);
+        this.hitsWithNoAddress = hitsWithCoords.filter(h => h.no_address);
+      } else {
+        this.hitsWithAddress = [];
+        this.hitsWithNoAddress = [];
+      }
+
     }
   }
 
   showMap() {
-    const is_location_or_event_type = this.query &&
-      this.query.types &&
-      this.query.types.length === 1 &&
-      (this.query.types.includes('location') ||
-      this.query.types.includes('event'));
+    const is_location_or_event_type = this.mapQuery &&
+      this.mapQuery.types &&
+      this.mapQuery.types.length === 1 &&
+      (this.mapQuery.types.includes('location') ||
+      this.mapQuery.types.includes('event'));
     const is_sort_by_distance = this.selectedSort && this.selectedSort.name === 'Distance';
     return is_location_or_event_type || is_sort_by_distance;
   }
@@ -537,5 +567,47 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     this.changeDetectorRef.detectChanges();
+  }
+
+  showInfoWindow(windowId: number) {
+    if (this.isInfoWindowOpen(windowId)) {
+      this.closeInfoWindow();
+    } else {
+      this.openedWindowId = windowId;
+    }
+  }
+
+  closeInfoWindow() {
+    this.openedWindowId = null;
+  }
+
+  isInfoWindowOpen(windowId: number): boolean {
+    return this.openedWindowId === windowId;
+  }
+
+  // Return a random number for the given seed
+  // https://stackoverflow.com/a/19303725/1791917
+  mapJitter(seed: number, isLat: boolean): number {
+    let m = seed % 2 === 0 ? 1 : -1;
+    if (isLat) { m = m * -1; }
+    const x = Math.sin(seed) * 10000;
+    return (x - Math.floor(x)) / 100 * m;
+  }
+
+  updateZoom(zoomLevel: number) {
+    this.mapZoomLevel = zoomLevel;
+  }
+
+  getCircleRadius(): number {
+    const maxMiles = 100;
+    const metersPerMi = 1609.34;
+    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
+  }
+
+  getMarkerIcon(hit: Hit) {
+    const url = `/assets/map/${hit.type}${hit.no_address ? '-no-address' : ''}.svg`;
+    const x = 16;
+    const y = hit.no_address ? 16 : 0;
+    return {url: url, anchor: {x: x, y: y}};
   }
 }

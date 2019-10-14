@@ -7,6 +7,7 @@ export class GeoLocation {
   longitude?: number;
   zip_code?: number;
   id?: number;
+  no_address?: boolean;
 
   constructor(private _superprops) {
     for (const propName in this._superprops) {

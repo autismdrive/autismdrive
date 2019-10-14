@@ -84,7 +84,7 @@ class Sort:
 class Hit:
 
     def __init__(self, result_id, content, description, title, doc_type, label, date, last_updated, highlights, latitude,
-                 longitude, status):
+                 longitude, status, no_address):
         self.id = result_id
         self.content = content
         self.description = description
@@ -97,3 +97,4 @@ class Hit:
         self.latitude = latitude
         self.longitude = longitude
         self.status = status
+        self.no_address = no_address
