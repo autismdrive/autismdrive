@@ -2,7 +2,7 @@ import datetime
 
 from elasticsearch import RequestError
 from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
-    Search, A, Boolean
+    Search, A, Boolean, analysis
 from elasticsearch_dsl.connections import connections
 import logging
 
@@ -17,6 +17,11 @@ autocomplete_search = analyzer('autocomplete_search',
                                tokenizer=tokenizer('lowercase')
                                )
 
+english_stem_filter = analysis.token_filter('my_english_filter', name="minimal_english", type="stemmer")
+stem_analyzer = analyzer('stem_analyzer',
+                        tokenizer=tokenizer('standard'),
+                        filter=['lowercase', english_stem_filter])
+
 
 # Star Documents are ElasticSearch documents and can be used to index an Event,
 # Location, Resource, or Study
@@ -24,11 +29,11 @@ class StarDocument(Document):
     type = Keyword()
     label = Keyword()
     id = Integer()
-    title = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    title = Text()
     date = Date()
     last_updated = Date()
-    content = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
-    description = Text(analyzer=autocomplete, search_analyzer=autocomplete_search)
+    content = Text(analyzer=stem_analyzer)
+    description = Text()
     organization = Keyword()
     website = Keyword()
     location = Keyword()
@@ -173,13 +178,12 @@ class ElasticIndex:
         if not search.words:
             query = MatchAll()
         else:
-            query = MultiMatch(query=search.words, fields=['title^10', 'content^5', 'description^5', 'location^3',
-                                                           'category^2', 'organization', 'website'])
+            query = MultiMatch(query=search.words, fields=['content'])
 
         elastic_search = Search(index=self.index_name)\
             .doc_type(StarDocument)\
             .query(query)\
-            .highlight('content', fragment_size=50)
+            .highlight('content', type='unified', fragment_size=50)
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
