@@ -21,6 +21,8 @@ export class ResourceDetailComponent implements OnInit {
   notes: AdminNote[];
   loading = true;
   contactItems: ContactItem[];
+  typeName: string;
+  showInfoWindow = false;
 
   constructor(
     private api: ApiService,
@@ -136,6 +138,10 @@ export class ResourceDetailComponent implements OnInit {
         type: 'link',
       },
     ];
+  }
+
+  toggleInfoWindow($event) {
+    this.showInfoWindow = !this.showInfoWindow;
   }
 
 }
