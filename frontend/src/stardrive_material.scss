@@ -328,7 +328,7 @@
     }
 
     mat-dialog-container.mat-dialog-container {
-      width: 70vw;
+      width: 80vw;
     }
   }
 
@@ -337,6 +337,10 @@
     .cdk-overlay-wrapper .cdk-overlay-pane {
       width: 75%;
       height: 75%;
+    }
+
+    mat-dialog-container.mat-dialog-container {
+      width: 70vw;
     }
   }
 
