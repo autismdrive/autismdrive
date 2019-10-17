@@ -138,7 +138,7 @@ class ElasticIndex:
             doc.date = document.date
         if hasattr(document, 'website'):
             doc.website = document.website
-        if hasattr(document, 'status'):
+        if hasattr(document, 'status') and document.status is not None:
             doc.status = document.status.value
 
         doc.meta.id = self._get_id(document)
