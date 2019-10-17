@@ -136,19 +136,22 @@ class ElasticIndex:
 
         if hasattr(document, 'date'):
             doc.date = document.date
+        if hasattr(document, 'website'):
+            doc.website = document.website
+        if hasattr(document, 'status'):
+            doc.status = document.status.value
 
         doc.meta.id = self._get_id(document)
-
-        if document.__tablename__ is not 'study':
-            doc.website = document.website
-        elif document.status is not None:
-            doc.status = document.status.value
 
         if document.organization is not None:
             doc.organization = document.organization.name
 
         for cat in document.categories:
             doc.category.extend(cat.category.all_search_paths())
+
+        if document.__tablename__ is 'study':
+            doc.title = document.short_title
+            doc.description = document.short_description
 
         if (doc.type in ['location', 'event']) and None not in (latitude, longitude):
             doc.latitude = latitude
