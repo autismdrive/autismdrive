@@ -70,11 +70,17 @@ class DataLoader:
                 event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
                               organization=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
                               street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
-                              phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'])
+                              phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
                 items.append(event)
                 self.__increment_id_sequence(Resource)
 
-                for i in range(17, len(row)):
+                for i in range(26, len(row)):
+                    if row[i]:
+                        event.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
+
+                items.append(event)
+
+                for i in range(17, 25):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         event_id = event.id
