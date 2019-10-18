@@ -148,7 +148,8 @@ class EvaluationHistoryMixin(object):
             db.String,
             info={
                 "display_order": 6,
-                "type": "select",
+                "type": "radio",
+                "className": "vertical-radio-group",
                 "template_options": {
                     "label": "Diagnosed At",
                     "placeholder": "Please select from these options",

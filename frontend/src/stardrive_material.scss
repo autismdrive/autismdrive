@@ -131,9 +131,9 @@
     }
   }
 
-//  .mat-drawer .mat-nav-list .mat-list-item {
-//    min-width: 320px;
-  // }
+  .mat-drawer .mat-nav-list .mat-list-item {
+    min-width: 320px;
+  }
 
   .mat-drawer .mat-nav-list .mat-list-item.active {
     background-color: $brand-primary;
