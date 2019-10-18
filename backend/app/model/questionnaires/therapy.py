@@ -25,7 +25,8 @@ class Therapy(db.Model):
         db.String,
         info={
             "display_order": 1,
-            "type": "select",
+            "type": "radio",
+            "className": "vertical-radio-group",
             "template_options": {
                 "label": "Select type",
                 "placeholder": "Please select",
