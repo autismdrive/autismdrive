@@ -21,6 +21,7 @@ export class RepeatSectionComponent extends FieldArrayType {
     const dialogRef = this.dialog.open(RepeatSectionDialogComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',
+      minWidth: '70vw',
       data: {
         title: isEdit ? title.replace(/^Add an|^Add a|^Add/, 'Edit') : title,
         fields: [this.field.fieldArray],

@@ -30,8 +30,6 @@ class IdentificationQuestionnaire(db.Model):
             "RELATIONSHIP_REQUIRED": ['dependent'],
             "display_order": 1.1,
             "type": "radio",
-            "default": "self",
-            "class_name": "vertical-radio-group",
             "template_options": {
                 "required": False,
                 "label": "",

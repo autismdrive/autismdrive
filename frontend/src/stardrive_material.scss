@@ -302,6 +302,10 @@
       width: 90%;
       height: 90%;
     }
+
+    mat-dialog-container.mat-dialog-container {
+      width: 100vw;
+    }
   }
 
   // MD
@@ -309,6 +313,10 @@
     .cdk-overlay-wrapper .cdk-overlay-pane {
       width: 75%;
       height: 75%;
+    }
+
+    mat-dialog-container.mat-dialog-container {
+      width: 90vw;
     }
   }
 
@@ -318,6 +326,10 @@
       width: 75%;
       height: 75%;
     }
+
+    mat-dialog-container.mat-dialog-container {
+      width: 80vw;
+    }
   }
 
   // XL
@@ -325,6 +337,10 @@
     .cdk-overlay-wrapper .cdk-overlay-pane {
       width: 75%;
       height: 75%;
+    }
+
+    mat-dialog-container.mat-dialog-container {
+      width: 70vw;
     }
   }
 
