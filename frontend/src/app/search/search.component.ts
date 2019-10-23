@@ -53,7 +53,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this._mobileQueryListener = () => this._updateFilterPanelState();
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+
+    // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
+    //    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
 
     this.loadMapLocation(() => {
@@ -238,7 +241,9 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchService.reset();
-    this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    // removeEventListener fails on older versions of iOS / Safari / iPhone
+    // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
   }
 
