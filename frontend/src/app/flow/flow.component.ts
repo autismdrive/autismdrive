@@ -61,7 +61,9 @@ export class FlowComponent implements OnInit, OnDestroy {
   ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
+    // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    this.mobileQuery.addListener(this._mobileQueryListener);
     this._mobileQueryListener = () => this._updateSidenavState();
     window.addEventListener('resize', this._mobileQueryListener);
 
@@ -84,7 +86,9 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    // removeEventListener fails on older versions of iOS / Safari / iPhone
+    // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
   }
 
