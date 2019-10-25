@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Study } from '../_models/study';
 import { User } from '../_models/user';
 import { ParticipantRelationship } from '../_models/participantRelationship';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({
   selector: 'app-study-inquiry',
@@ -22,7 +23,8 @@ export class StudyInquiryComponent implements OnInit {
   constructor(
     private api: ApiService,
     private authenticationService: AuthenticationService,
-    private router: Router
+    private router: Router,
+    private googleAnalytics: GoogleAnalyticsService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     if (this.currentUser) {
@@ -64,6 +66,7 @@ export class StudyInquiryComponent implements OnInit {
 
   sendInquiry() {
     this.api.sendStudyInquiryEmail(this.currentUser, this.study).subscribe();
+    this.googleAnalytics.studyInquiryEvent(this.study);
     this.inquirySent = true;
   }
 

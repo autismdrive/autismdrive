@@ -140,6 +140,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.loadActiveStep();
     } else {
       this.state = FlowState.COMPLETE;
+      this.googleAnalyticsService.flowCompleteEvent(this.flow.name);
       scrollToTop();
     }
   }
@@ -204,22 +205,14 @@ export class FlowComponent implements OnInit, OnDestroy {
     if ((this.currentStep().questionnaire_id > 0) && (this.currentStep().type !== 'sensitive')) {
       this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
-          this.googleAnalyticsService.event('update', {
-            'event_category': 'flow progress',
-            'event_label': this.currentStep().name,
-            'value': this.flow.percentComplete()
-          });
+          this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
           scrollToTop();
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
         .subscribe(() => {
-          this.googleAnalyticsService.event('submit', {
-            'event_category': 'flow progress',
-            'event_label': this.currentStep().name,
-            'value': this.flow.percentComplete()
-          });
+          this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
           scrollToTop();
         });
