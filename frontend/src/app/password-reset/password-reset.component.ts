@@ -5,6 +5,7 @@ import {FormlyFieldConfig} from '@ngx-formly/core';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {PasswordRequirements} from '../_models/password_requirements';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({
   selector: 'app-password-reset',
@@ -72,6 +73,7 @@ export class PasswordResetComponent implements OnInit {
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef,
     private apiService: ApiService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {
     this.route.params.subscribe(params => {
       this.token = params['email_token'];
@@ -99,6 +101,7 @@ export class PasswordResetComponent implements OnInit {
       this.authenticationService.resetPassword(this.model['password']['password'], this.token).subscribe(
         data => {
           this.router.navigate(['profile']);
+          this.googleAnalyticsService.accountEvent('reset_password');
         }, error1 => {
           this.formState = 'form';
           this.errorMessage = error1;

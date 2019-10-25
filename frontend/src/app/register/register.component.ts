@@ -5,6 +5,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({
   selector: 'app-register',
@@ -36,7 +37,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private googleAnalytics: GoogleAnalyticsService
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
@@ -63,6 +65,7 @@ export class RegisterComponent implements OnInit {
         if (u.hasOwnProperty('token_url')) {
           localStorage.setItem('token_url', u.token_url);
         }
+        this.googleAnalytics.accountEvent('register');
         this._stateSubject.next('wait_for_email');
         this.registerState = this._stateSubject.asObservable();
         this.changeDetectorRef.detectChanges();

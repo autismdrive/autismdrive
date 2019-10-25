@@ -71,10 +71,10 @@ export class TermsComponent implements OnInit {
       has_consented: true
     });
 
-    let flow = this.getFlow(this.relationship);
+    const flow = this.getFlow(this.relationship);
 
     this.api.addParticipant(newParticipant).subscribe(participant => {
-      this.googleAnalyticsService.event(flow,  {'event_category': 'enrollment'});
+      this.googleAnalyticsService.flowStartEvent(flow);
       this.user.participants.push(participant);
       console.log('Navigating to flow/', flow, '/', participant.id);
       this.router.navigate(['flow', flow,  participant.id]);

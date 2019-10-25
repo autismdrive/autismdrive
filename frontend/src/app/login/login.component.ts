@@ -5,6 +5,7 @@ import {FormlyFieldConfig} from '@ngx-formly/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({
   selector: 'app-login',
@@ -43,7 +44,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private googleAnalytics: GoogleAnalyticsService
   ) {
     this.route.queryParams.subscribe(qParams => {
       if (qParams.hasOwnProperty('returnUrl')) {
@@ -72,9 +74,10 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     if (this.form.valid) {
-      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(u => this._goToReturnUrl(u),
-        // Will nagivate away from ths page as soon as the process completes successfully, so
-        // really just a noop here.
+      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(u => {
+        this._goToReturnUrl(u);
+        this.googleAnalytics.accountEvent('login');
+        },
         error => {
           if (error) {
             this.errorEmitter.emit(error);

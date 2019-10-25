@@ -294,10 +294,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.query = queryWithResults;
         this.loading = false;
       });
-    this.googleAnalyticsService.event(this.query.words,
-      {
-        'event_category': 'search',
-      });
+
+    this.googleAnalyticsService.searchEvent(this.query);
   }
 
   loadMapLocation(callback: Function) {
@@ -579,6 +577,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.closeInfoWindow();
     } else {
       this.openedWindowId = windowId;
+      this.googleAnalyticsService.mapEvent(windowId.toString());
     }
   }
 

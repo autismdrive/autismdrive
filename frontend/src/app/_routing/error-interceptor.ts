@@ -16,10 +16,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               private googleAnalyticsService: GoogleAnalyticsService) { }
 
   private logError(error: StarError) {
-    this.googleAnalyticsService.event(error.code, {
-      'event_category': 'error messages',
-      'event_label': error.message
-    });
+    this.googleAnalyticsService.errorEvent(error);
   }
 
 
