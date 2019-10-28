@@ -244,7 +244,7 @@ export class AppPage {
           e.clear();
           e.sendKeys(dateStr);
         } else if (/_radio_/.test(id)) {
-          e.$(`#${id}_0`).click();
+          e.$(`#${id}_0 .mat-radio-container`).click();
         } else if (/_checkbox_/.test(id)) {
           e.$(`#${id}_0`).click();
         } else if (/_select_/.test(id)) {
