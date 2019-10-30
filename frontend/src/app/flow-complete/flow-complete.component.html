@@ -39,13 +39,36 @@
     <h2>Thank you!</h2>
     <p>You have completed all the questions about yourself.  We will use this information
       to contact you about upcoming studies and emerging resources that will be of interest
-      based on the details you provided.  </p>
+      based on the details you provided.</p>
+    <p>If you have a son, daughter, or dependent you would like to enroll as well, please click the button below to
+      enter information about them.  Otherwise we recommend you check out our list of active studies, or search
+      through the available services and resources.</p>
+    <div
+      fxLayoutAlign="center center"
+    >
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="enrollDependent($event)"
+        id="enroll_self_dependent"
+      >Enroll a dependent</button>
+    </div>
   </div>
 
   <div *ngIf="flow.name === 'professional_intake'">
-    <p>Thank you for providing us with your information.</p>
-    <p>Now we recommend you check out our <a (click)="goStudies($event)">list of active studies</a>, or search through
-    the <a (click)="goResources($event)">available services and resources.</a></p>
+    <p>Thank you for providing us with your information. If you have a son, daughter, or dependent you would like to
+      enroll as well, please click the button below to enter information about them.  Otherwise we recommend you check
+      out our list of active studies, or search through the available services and resources.</p>
+    <div
+      fxLayoutAlign="center center"
+    >
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="enrollDependent($event)"
+        id="enroll_professional_dependent"
+      >Enroll a dependent</button>
+    </div>
   </div>
 
   <p>You can continue to edit any unlocked questionnaires by selecting them from the
