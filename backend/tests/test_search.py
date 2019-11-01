@@ -540,5 +540,32 @@ class TestSearch(BaseTest, unittest.TestCase):
 
 
 
+    def test_search_for_map_points_only(self):
+
+        # Add some locations with coordinates, and some with out.
+        location_near = self.construct_location(title='local unicorn',
+                                                description="delivering rainbows within the orbit of Uranus",
+                                                latitude=38.149595, longitude=-79.072557)
+        location_far = self.construct_location(title='distant unicorn',
+                                               description="delivering rainbows to the greater Trans-Neptunian Region",
+                                               latitude=-38.149595, longitude=100.927443)
+        location_mid = self.construct_location(title='middle unicorn',
+                                               description="delivering rainbows somewhere in between",
+                                               latitude=37.5246403, longitude=-77.5633015)
+        self.construct_resource(title="Rainbow with a bad hair day and no place to be.")
+        self.construct_resource(title="A non-rainbow blue sky that covers nearly all locations.")
+        self.construct_resource(title="A very very tiny rainbow in a sprinkler, that occurs in various places.")
+
+
+        query = {'words': 'rainbows'}
+        search_results = self.search(query)
+        self.assertEqual(6, len(search_results['hits']))
+
+        query = {'words': 'rainbows', 'map_data_only': True}
+        search_results = self.search(query)
+        self.assertEqual(3, len(search_results['hits']))
+        self.assertFalse('content' in search_results['hits'])
+        self.assertFalse('description' in search_results['hits'])
+        self.assertFalse('highlights' in search_results['hits'])
 
 
