@@ -334,6 +334,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         _callCallbackIfReady();
       });
     } else {
+      this.gpsEnabled = false;
       _callCallbackIfReady();
     }
   }
