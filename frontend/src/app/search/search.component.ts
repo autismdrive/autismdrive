@@ -59,9 +59,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
 
+    console.log('Calling load map location');
     this.loadMapLocation(() => {
+      console.log('Map Location callback started.');
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
+        console.log('locating Map Results.');
         this.loadMapResults();
         this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
@@ -294,10 +297,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
+    console.log('Loading map location');
     let numStepsComplete = 0;
     const minStepsNeeded = 2;
     const _callCallbackIfReady = () => {
       numStepsComplete++;
+      console.log('Call Call Back if Ready #', numStepsComplete);
       if (numStepsComplete >= minStepsNeeded) {
         this.mapLoc = this.zipLoc || this.gpsLoc;
         callback.call(this);
@@ -319,6 +324,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     if (navigator.geolocation) {
+      console.log("There is a geolocation available");
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
         this.noLocation = false;
@@ -334,6 +340,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         _callCallbackIfReady();
       });
     } else {
+      console.log("No geolocation available.");
       this.gpsEnabled = false;
       _callCallbackIfReady();
     }
@@ -482,6 +489,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapResults() {
+    console.log("Loading map results");
     if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
        this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
         this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
