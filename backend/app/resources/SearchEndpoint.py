@@ -56,7 +56,7 @@ class SearchEndpoint(flask_restful.Resource):
         search.hits = []
         for hit in results:
             if hit.longitude and hit.latitude:
-                search_hit = MapHit(hit.id, hit.latitude, hit.longitude, hit.type, hit.no_address)
+                search_hit = MapHit(hit.id,  hit.type, hit.latitude, hit.longitude, hit.no_address)
                 search.hits.append(search_hit)
         return SearchSchema().jsonify(search)
 

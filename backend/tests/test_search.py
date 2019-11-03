@@ -564,8 +564,10 @@ class TestSearch(BaseTest, unittest.TestCase):
         query = {'words': 'rainbows', 'map_data_only': True}
         search_results = self.search(query)
         self.assertEqual(3, len(search_results['hits']))
-        self.assertFalse('content' in search_results['hits'])
-        self.assertFalse('description' in search_results['hits'])
-        self.assertFalse('highlights' in search_results['hits'])
+        self.assertTrue('latitude' in search_results['hits'][0])
+        self.assertTrue('longitude' in search_results['hits'][0])
+        self.assertFalse('content' in search_results['hits'][0])
+        self.assertFalse('description' in search_results['hits'][0])
+        self.assertFalse('highlights' in search_results['hits'][0])
 
 
