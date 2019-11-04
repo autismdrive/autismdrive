@@ -49,6 +49,18 @@
       </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="last_updated">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Last Updated</mat-header-cell>
+      <mat-cell
+        class="role-cell"
+        *matCellDef="let user"
+      >{{user.last_updated | date:'long'}}
+      </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="email">
       <mat-header-cell
         *matHeaderCellDef
