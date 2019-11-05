@@ -21,6 +21,7 @@ export class Query {
   age_counts: Aggregation[] = [];
   date?: Date;
   status?: string;
+  map_data_only = false;
 
   constructor(private _props) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));

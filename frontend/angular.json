@@ -21,6 +21,7 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
+            "es5BrowserSupport": true,
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -108,6 +109,9 @@
                   "maximumError": "5mb"
                 }
               ]
+            },
+            "es5": {
+              "tsConfig": "./src/tsconfig-es5.app.json"
             }
           }
         },
@@ -122,6 +126,9 @@
             },
             "mirror": {
               "browserTarget": "star-drive:build:mirror"
+            },
+            "es5": {
+              "browserTarget": "star-drive:build:es5"
             }
           }
         },

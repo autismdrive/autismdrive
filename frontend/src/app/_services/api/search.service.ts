@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Query } from 'src/app/_models/query';
 import {ConfigService} from '../config.service';
+import {clone} from '../../../util/clone';
 
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +44,13 @@ export class SearchService {
       .pipe(map(queryDict => {
         return this._loadQuery(queryDict);
       }));
+  }
+
+  mapSearch(query: Query): Observable<Query> {
+    const mapQuery = clone(query);
+    mapQuery.size = 999;
+    mapQuery.map_data_only = true;
+    return this.search(mapQuery);
   }
 
   reset() {

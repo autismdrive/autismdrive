@@ -17,6 +17,7 @@ import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {clone} from '../../util/clone';
+import {Resource} from '../_models/resource';
 
 interface SortMethod {
   name: string;
@@ -43,7 +44,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     private location: Location,
     private renderer: Renderer2,
     private searchService: SearchService,
-    private mapSearchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
@@ -59,11 +59,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
 
+    console.log('Calling load map location');
     this.loadMapLocation(() => {
+      console.log('Map Location callback started.');
       this.route.queryParamMap.subscribe(qParams => {
         this.query = this._queryParamsToQuery(qParams);
-        this.mapQuery = clone(this.query);
-        this.mapQuery.size = 999;
+        console.log('locating Map Results.');
         this.loadMapResults();
         this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
@@ -73,6 +74,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   query: Query;
   mapQuery: Query;
   resourceTypes = HitType.all_resources();
+  selectedMapResource: Resource;
+  selectedMapHit: Hit;
   selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
   typeLabels = HitType.labels;
@@ -90,7 +93,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
-  openedWindowId: number;
   mapZoomLevel: number;
 
   mobileQuery: MediaQueryList;
@@ -277,12 +279,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
-
-    this.mapQuery = clone(this.query);
-    this.mapQuery.size = 999;
-
-    this.mapSearchService
-      .search(this.mapQuery)
+    this.searchService
+      .mapSearch(this.query)
       .subscribe(mapQueryWithResults => {
         this.mapQuery = mapQueryWithResults;
         this.loadMapResults();
@@ -299,10 +297,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
+    console.log('Loading map location');
     let numStepsComplete = 0;
     const minStepsNeeded = 2;
     const _callCallbackIfReady = () => {
       numStepsComplete++;
+      console.log('Call Call Back if Ready #', numStepsComplete);
       if (numStepsComplete >= minStepsNeeded) {
         this.mapLoc = this.zipLoc || this.gpsLoc;
         callback.call(this);
@@ -324,6 +324,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     if (navigator.geolocation) {
+      console.log("There is a geolocation available");
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
         this.noLocation = false;
@@ -339,6 +340,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         _callCallbackIfReady();
       });
     } else {
+      console.log("No geolocation available.");
+      this.gpsEnabled = false;
       _callCallbackIfReady();
     }
   }
@@ -486,17 +489,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapResults() {
+    console.log("Loading map results");
     if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
-      const hitsWithCoords = this.mapQuery.hits.filter(h => h.hasCoords());
-
-      if (hitsWithCoords && hitsWithCoords.length > 0) {
-        this.hitsWithAddress = hitsWithCoords.filter(h => !h.no_address);
-        this.hitsWithNoAddress = hitsWithCoords.filter(h => h.no_address);
-      } else {
-        this.hitsWithAddress = [];
-        this.hitsWithNoAddress = [];
-      }
-
+       this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
+        this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
+    } else {
+      this.hitsWithAddress = [];
+      this.hitsWithNoAddress = [];
     }
   }
 
@@ -572,21 +571,21 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
   }
 
-  showInfoWindow(windowId: number) {
-    if (this.isInfoWindowOpen(windowId)) {
-      this.closeInfoWindow();
-    } else {
-      this.openedWindowId = windowId;
-      this.googleAnalyticsService.mapEvent(windowId.toString());
-    }
+  showInfoWindow(hit: Hit) {
+    this.api.getResource(hit.id).subscribe(r => {
+      this.selectedMapResource = r;
+      this.selectedMapHit = hit;
+      this.googleAnalyticsService.mapEvent(hit.id.toString());
+    });
   }
 
   closeInfoWindow() {
-    this.openedWindowId = null;
+    this.selectedMapResource = null;
+    this.selectedMapHit = null;
   }
 
-  isInfoWindowOpen(windowId: number): boolean {
-    return this.openedWindowId === windowId;
+  isInfoWindowOpen(): boolean {
+    return this.selectedMapResource != null;
   }
 
   // Return a random number for the given seed
