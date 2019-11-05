@@ -59,16 +59,18 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
 
+    this.route.queryParamMap.subscribe(qParams => {
+      this.query = this._queryParamsToQuery(qParams);
+      console.log('locating Map Results.');
+      this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+    });
+
+    /**
     console.log('Calling load map location');
     this.loadMapLocation(() => {
       console.log('Map Location callback started.');
-      this.route.queryParamMap.subscribe(qParams => {
-        this.query = this._queryParamsToQuery(qParams);
-        console.log('locating Map Results.');
-        this.loadMapResults();
-        this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
-      });
     });
+    **/
   }
 
   query: Query;
@@ -297,17 +299,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
-    console.log('Loading map location');
-    let numStepsComplete = 0;
-    const minStepsNeeded = 2;
-    const _callCallbackIfReady = () => {
-      numStepsComplete++;
-      console.log('Call Call Back if Ready #', numStepsComplete);
-      if (numStepsComplete >= minStepsNeeded) {
-        this.mapLoc = this.zipLoc || this.gpsLoc;
-        callback.call(this);
-      }
-    };
 
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
@@ -317,14 +308,11 @@ export class SearchComponent implements OnInit, OnDestroy {
           lat: z.latitude,
           lng: z.longitude
         };
-        _callCallbackIfReady();
+        this.mapLoc = this.zipLoc;
       });
-    } else {
-      _callCallbackIfReady();
     }
 
     if (navigator.geolocation) {
-      console.log("There is a geolocation available");
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
         this.noLocation = false;
@@ -333,17 +321,14 @@ export class SearchComponent implements OnInit, OnDestroy {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
-
-        _callCallbackIfReady();
+        this.mapLoc = this.gpsLoc;
       }, error => {
         this.gpsEnabled = false;
-        _callCallbackIfReady();
       });
     } else {
-      console.log("No geolocation available.");
       this.gpsEnabled = false;
-      _callCallbackIfReady();
     }
+    callback.call(this);
   }
 
   isSortVisible(sort: SortMethod) {
