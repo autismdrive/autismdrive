@@ -310,6 +310,21 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   getGPSLocation(callback: Function) {
+    // If we already know the GPS location, then just return.
+    if (this.gpsEnabled && this.gpsLoc) {
+      this.noLocation = false;
+      this.gpsEnabled = true;
+      this.mapLoc = this.gpsLoc;
+      callback.call(this);
+      return;
+    } else {
+      this.noLocation = true;
+      this.gpsEnabled = false;
+      callback.call(this);
+      // But don't return, go ahead and ask in the following chunk of code.
+    }
+
+    // Now, try to get the position, and if we can get it, use it.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
@@ -322,12 +337,11 @@ export class SearchComponent implements OnInit, OnDestroy {
         callback.call(this);
       }, error => {
         this.gpsEnabled = false;
-        callback.call(this);
+        this.noLocation = true;
       });
     } else {
       this.noLocation = true;
       this.gpsEnabled = false;
-      callback.call(this);
     }
   }
 
