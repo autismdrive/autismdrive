@@ -73,35 +73,26 @@
 
           <div class="sort-order">
             <h3>Sort by</h3>
-            <mat-radio-group
-              *ngIf="selectedSort && selectedSort.name"
-              [(ngModel)]="selectedSort.name"
-              fxLayout="column"
-            >
-              <ng-container *ngFor="let s of sortMethods">
-                <mat-radio-button
-                  *ngIf="isSortVisible(s)"
-                  (click)="noLocation ? openLocationDialog() : sortBy(s.name)"
-                  [value]="s.name"
-                  [disabled]="isSortDisabled(s)"
-                >
-                  {{s.label}}
-                  <ng-container *ngIf="(s.name === 'Relevance' && query.words != '')">
-                    to "{{query.words}}"
-                  </ng-container>
-                  <ng-container *ngIf="(s.name === 'Distance')">
-                    <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
-                    <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
-                    <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
-                      <mat-icon>location_searching</mat-icon>
-                      <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
-                    </button>
-                  </ng-container>
-                  <button *ngIf="(s.name !== 'Distance')" mat-button class="ghost">
-                    <mat-icon>code</mat-icon>
-                  </button>
-                </mat-radio-button>
-              </ng-container>
+            <mat-radio-group [ngModel]="selectedSort.name" (change)="newSortSelection($event)" fxLayout="column">
+              <mat-radio-button value="Relevance" *ngIf="query.words != ''">
+                Relevance to "{{query.words}}"
+                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+              </mat-radio-button>
+              <mat-radio-button value="Distance">
+                Distance
+                <span *ngIf="isZipCode(storedZip)">({{storedZip}})</span>
+                <span *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</span>
+                <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
+                  <mat-icon>location_searching</mat-icon>
+                  <ng-container *ngIf="noLocation">Set location</ng-container>
+                </button>
+              </mat-radio-button>
+              <mat-radio-button value="Updated">Recently Updated
+                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+              </mat-radio-button>
+              <mat-radio-button value="Event Date">Happening Soon
+                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+              </mat-radio-button>
             </mat-radio-group>
           </div>
 

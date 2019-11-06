@@ -79,8 +79,8 @@ export class SearchUseCases {
     if (numDialogs === 0) {
       const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
       this.page.clickElement(`${distSelector} button`);
-      expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
       this.page.waitForVisible('mat-dialog-container');
+      expect(this.page.getElements('mat-dialog-container').count()).toEqual(1);
       this.page.waitFor(500);
     }
   }

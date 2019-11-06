@@ -58,19 +58,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     //    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
     this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
-
-    this.route.queryParamMap.subscribe(qParams => {
-      this.query = this._queryParamsToQuery(qParams);
-      console.log('locating Map Results.');
-      this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
-    });
-
-    /**
-    console.log('Calling load map location');
-    this.loadMapLocation(() => {
-      console.log('Map Location callback started.');
-    });
-    **/
   }
 
   query: Query;
@@ -241,6 +228,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.route.queryParamMap.subscribe(qParams => {
+      this.query = this._queryParamsToQuery(qParams);
+      console.log('locating Map Results.');
+      this.loadMapLocation(f => {
+        this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+      });
+    });
   }
 
   ngOnDestroy(): void {
@@ -299,7 +293,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
-
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
@@ -309,47 +302,40 @@ export class SearchComponent implements OnInit, OnDestroy {
           lng: z.longitude
         };
         this.mapLoc = this.zipLoc;
+        callback.call(this);
       });
+    } else {
+      this.getGPSLocation(callback);
     }
+  }
 
+  getGPSLocation(callback: Function) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
         this.noLocation = false;
-
         this.gpsLoc = {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
         this.mapLoc = this.gpsLoc;
+        callback.call(this);
       }, error => {
         this.gpsEnabled = false;
+        callback.call(this);
       });
     } else {
+      this.noLocation = true;
       this.gpsEnabled = false;
-    }
-    callback.call(this);
-  }
-
-  isSortVisible(sort: SortMethod) {
-    if (sort.name === 'Relevance' && this.query.words === '') {
-      return false;
-    } else {
-      return true;
+      callback.call(this);
     }
   }
 
-  isSortDisabled(sort: SortMethod) {
-    if (sort.name === 'Relevance' && this.query.words === '') {
-      return true;
-    } else if (sort.name === 'Distance' && this.noLocation) {
-      return true;
-    } else {
-      return false;
-    }
+  newSortSelection(event) {
+    this.reSort(event.value);
   }
 
-  sortBy(sortName: string) {
+  reSort(sortName: string) {
     this.loading = true;
     this.selectedSort = this.sortMethods.find(s => s.name === sortName);
     this.query.start = 0;
@@ -405,7 +391,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.selectedType = this.resourceTypes.find(t => t.name === HitType.ALL_RESOURCES.name);
       this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
-      this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
     this._goToFirstPage(true);
   }
@@ -454,10 +440,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
-      this.loadMapLocation(() => {
         mapUI.setCenter(this.mapLoc || this.defaultLoc);
         mapUI.setZoom(9);
-      });
     });
 
     controlDiv.index = 1;
@@ -495,6 +479,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   openLocationDialog() {
+    this.locationDialog.closeAll();
     const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
       width: '400px',
       data: {
@@ -504,13 +489,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(_ => {
-      this.loadMapLocation(() => {
-        if (this.mapLoc) {
-          this.selectedSort = this.sortMethods.find(s => s.name === 'Distance');
-        }
-
-        this._updateDistanceSort();
-      });
+        this.reSort('Distance');
     });
   }
 
