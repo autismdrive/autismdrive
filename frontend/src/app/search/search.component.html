@@ -73,40 +73,35 @@
 
           <div class="sort-order">
             <h3>Sort by</h3>
-            <mat-radio-group
-              *ngIf="selectedSort && selectedSort.name"
-              [(ngModel)]="selectedSort.name"
-              fxLayout="column"
-            >
-              <ng-container *ngFor="let s of sortMethods">
-                <mat-radio-button
-                  *ngIf="isSortVisible(s)"
-                  (click)="noLocation ? openLocationDialog() : sortBy(s.name)"
-                  [value]="s.name"
-                  [disabled]="isSortDisabled(s)"
-                >
-                  {{s.label}}
-                  <ng-container *ngIf="(s.name === 'Relevance' && query.words != '')">
-                    to "{{query.words}}"
-                  </ng-container>
-                  <ng-container *ngIf="(s.name === 'Distance')">
-                    <ng-container *ngIf="isZipCode(storedZip)">({{storedZip}})</ng-container>
-                    <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</ng-container>
-                    <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
-                      <mat-icon>location_searching</mat-icon>
-                      <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set location</ng-container>
-                    </button>
-                  </ng-container>
-                  <button *ngIf="(s.name !== 'Distance')" mat-button class="ghost"><mat-icon>code</mat-icon></button>
-                </mat-radio-button>
-              </ng-container>
+            <mat-radio-group [ngModel]="selectedSort.name" (change)="newSortSelection($event)" fxLayout="column">
+              <mat-radio-button value="Relevance" *ngIf="query.words != ''">
+                Relevance to "{{query.words}}"
+                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+              </mat-radio-button>
+              <mat-radio-button value="Distance">
+                Distance
+                <span *ngIf="isZipCode(storedZip)">({{storedZip}})</span>
+                <span *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</span>
+                <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
+                  <mat-icon>location_searching</mat-icon>
+                  <ng-container *ngIf="noLocation">Set location</ng-container>
+                </button>
+              </mat-radio-button>
+              <mat-radio-button value="Updated">Recently Updated
+                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+              </mat-radio-button>
+              <mat-radio-button value="Event Date">Happening Soon
+                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+              </mat-radio-button>
             </mat-radio-group>
           </div>
 
           <div class="filters-column">
             <h3>Narrow your results</h3>
             <h4 class="mat-subheader">By Age</h4>
-            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <div *ngIf="!query">
+              <mat-spinner></mat-spinner>
+            </div>
             <div *ngIf="query">
               <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
               <app-search-filter
@@ -117,7 +112,9 @@
               ></app-search-filter>
             </div>
             <h4 class="mat-subheader">By Type</h4>
-            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <div *ngIf="!query">
+              <mat-spinner></mat-spinner>
+            </div>
             <app-search-filter
               *ngIf="query"
               [aggregations]="query.type_counts"
@@ -126,7 +123,9 @@
               [ngClass]="'filter-by-type'"
             ></app-search-filter>
             <h4 class="mat-subheader">By Topic</h4>
-            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
+            <div *ngIf="!query">
+              <mat-spinner></mat-spinner>
+            </div>
             <app-search-topics
               *ngIf="query"
               [category]="query.category"
@@ -157,13 +156,13 @@
             </ng-container>
 
             <ng-container *ngFor="let age of query.ages let i = index">
-                <mat-chip
-                  (click)="selectAgeRange()"
-                  class="applied-filter applied-filter-age"
-                >
-                  <span class="applied-filter-label">{{ageLabels[age]}}</span>
-                  <mat-icon>close</mat-icon>
-                </mat-chip>
+              <mat-chip
+                (click)="selectAgeRange()"
+                class="applied-filter applied-filter-age"
+              >
+                <span class="applied-filter-label">{{ageLabels[age]}}</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
             </ng-container>
 
             <div *ngIf="query.types.length === 1">
@@ -196,7 +195,8 @@
             </ng-container>
 
           </mat-chip-list>
-          <p *ngIf="paginatorElement" [ngClass]="{'num-results': true, 'ghost': (!query || (query.total === 0))}">Page {{paginatorElement.pageIndex + 1}} of {{query.total}} results</p>
+          <p *ngIf="paginatorElement" [ngClass]="{'num-results': true, 'ghost': (!query || (query.total === 0))}">
+            Page {{paginatorElement.pageIndex + 1}} of {{query.total}} results</p>
         </div>
 
         <agm-map
@@ -212,56 +212,55 @@
           (zoomChange)="updateZoom($event)"
         >
           <agm-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
-          <agm-marker
-            *ngIf="mapLoc"
-            [latitude]="mapLoc.lat"
-            [longitude]="mapLoc.lng"
-            [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
-          ></agm-marker>
-          <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <agm-circle
-              [latitude]="hit.latitude + mapJitter(hit.id, true)"
-              [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [radius]="getCircleRadius()"
-              [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
-              fillOpacity="0.1"
-              [clickable]="true"
-              [visible]="isInfoWindowOpen() && selectedMapHit.id == hit.id"
-              (circleClick)="showInfoWindow(hit)"
-              zIndex="-1"
-            >
-            </agm-circle>
             <agm-marker
-              [latitude]="hit.latitude + mapJitter(hit.id, true)"
-              [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: {x: 24, y: 24}}"
-              (markerClick)="showInfoWindow(hit)"
-            >
-            </agm-marker>
-          </ng-container>
-          <ng-container *ngFor="let hit of hitsWithAddress">
-            <agm-marker
-              [latitude]="hit.latitude"
-              [longitude]="hit.longitude"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
-              (markerClick)="showInfoWindow(hit)">
-            </agm-marker>
-          </ng-container>
-            </agm-marker-cluster>
-          <ng-container  *ngIf="selectedMapResource">
-          <agm-info-window [isOpen]="isInfoWindowOpen()" [latitude]="selectedMapHit.latitude"
-                           [longitude]="selectedMapHit.longitude" (infoWindowClose)="closeInfoWindow()">
+              *ngIf="mapLoc"
+              [latitude]="mapLoc.lat"
+              [longitude]="mapLoc.lng"
+              [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
+            ></agm-marker>
+            <ng-container *ngFor="let hit of hitsWithNoAddress">
+              <agm-circle
+                [latitude]="hit.latitude + mapJitter(hit.id, true)"
+                [longitude]="hit.longitude + mapJitter(hit.id, false)"
+                [radius]="getCircleRadius()"
+                [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
+                fillOpacity="0.1"
+                [clickable]="true"
+                [visible]="isInfoWindowOpen() && selectedMapHit.id == hit.id"
+                (circleClick)="showInfoWindow(hit)"
+                zIndex="-1"
+              >
+              </agm-circle>
+              <agm-marker
+                [latitude]="hit.latitude + mapJitter(hit.id, true)"
+                [longitude]="hit.longitude + mapJitter(hit.id, false)"
+                [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: {x: 24, y: 24}}"
+                (markerClick)="showInfoWindow(hit)"
+              >
+              </agm-marker>
+            </ng-container>
+            <ng-container *ngFor="let hit of hitsWithAddress">
+              <agm-marker
+                [latitude]="hit.latitude"
+                [longitude]="hit.longitude"
+                [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
+                (markerClick)="showInfoWindow(hit)">
+              </agm-marker>
+            </ng-container>
+          </agm-marker-cluster>
+          <ng-container *ngIf="selectedMapResource">
+            <agm-info-window [isOpen]="isInfoWindowOpen()" [latitude]="selectedMapHit.latitude"
+                             [longitude]="selectedMapHit.longitude" (infoWindowClose)="closeInfoWindow()">
               <a
                 class="title mat-h2"
                 href="/#/{{selectedMapResource.type.toLowerCase()}}/{{selectedMapResource.id}}"
               >{{selectedMapResource.title}}</a>
-              <p>{{selectedMapResource.description}}</p>
               <a
                 class="chevron-link"
                 [routerLink]="['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]"
-                routerLinkActive="router-link-active"
-              >{{selectedMapResource.type}} Details</a>
-          </agm-info-window>
+                routerLinkActive="router-link-active">
+                {{selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type}} Details</a>
+            </agm-info-window>
           </ng-container>
         </agm-map>
 
@@ -271,13 +270,16 @@
             fxLayout="column"
             fxLayoutGap="40px"
           >
-            <div *ngIf="!query"><mat-spinner></mat-spinner></div>
-              <div *ngIf="query && query.hits.length === 0" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" class="pad-4">
-                <h2>No results currently available.</h2>
-                <p>We could not find any results for your search.  Please try removing some of the conditions
-                by clicking on the 'x' in the tiles above.  This will broaden the search and give you more results.</p>
-                <h3>Check back soon for more updates!</h3>
-              </div>
+            <div *ngIf="!query">
+              <mat-spinner></mat-spinner>
+            </div>
+            <div *ngIf="query && query.hits.length === 0" fxLayout="column" fxLayoutGap="20px"
+                 fxLayoutAlign="center center" class="pad-4">
+              <h2>No results currently available.</h2>
+              <p>We could not find any results for your search. Please try removing some of the conditions
+                by clicking on the 'x' in the tiles above. This will broaden the search and give you more results.</p>
+              <h3>Check back soon for more updates!</h3>
+            </div>
             <div *ngIf="query && query.hits.length > 0">
               <app-search-result
                 *ngFor="let hit of query.hits"
@@ -287,38 +289,40 @@
               </app-search-result>
             </div>
           </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<div class="container">
-  <div class="row margin-top-none">
-    <mat-paginator
-      #paginator
-      [length]="query ? query.total : 0"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
-      (page)="updatePage($event)"
-      [ngClass]="{'ghost': (!query || (query.total === 0))}"
-    >
-    </mat-paginator>
-
-    <h1>Resource partners</h1>
-    <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify resources that will improve
-      outcomes for individuals with autism and their families.</p>
-    <div fxLayout="row" fxLayoutAlign="space-between">
-      <a
-        *ngFor="let rg of resourceGatherers"
-        [href]="rg.url"
-        [title]="rg.name"
-        [matTooltip]="rg.shortName + ' - ' + rg.description"
-        class="resource-gatherer"
+  <div class="container">
+    <div class="row margin-top-none">
+      <mat-paginator
+        #paginator
+        [length]="query ? query.total : 0"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+        (page)="updatePage($event)"
+        [ngClass]="{'ghost': (!query || (query.total === 0))}"
       >
-        <img
-          [alt]="rg.shortName"
-          [src]="rg.image"
+      </mat-paginator>
+
+      <h1>Resource partners</h1>
+      <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify
+        resources that will improve
+        outcomes for individuals with autism and their families.</p>
+      <div fxLayout="row" fxLayoutAlign="space-between">
+        <a
+          *ngFor="let rg of resourceGatherers"
+          [href]="rg.url"
+          [title]="rg.name"
+          [matTooltip]="rg.shortName + ' - ' + rg.description"
+          class="resource-gatherer"
         >
-      </a>
+          <img
+            [alt]="rg.shortName"
+            [src]="rg.image"
+          >
+        </a>
+      </div>
     </div>
   </div>
 </div>
