@@ -98,6 +98,8 @@ import {SearchResultComponent} from './search-result/search-result.component';
 import {SearchComponent} from './search/search.component';
 import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
+import {StudyFormComponent} from './study-form/study-form.component';
+import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {TermsComponent} from './terms/terms.component';
 import {TimedoutComponent} from './timed-out/timed-out.component';
 import {TypeIconComponent} from './type-icon/type-icon.component';
@@ -110,7 +112,6 @@ import {AdminExportDetailsComponent} from './admin-export-details/admin-export-d
 import {DetailsLinkComponent} from './details-link/details-link.component';
 import {MatRadioModule} from '@angular/material/radio';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
-import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
 import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
@@ -249,6 +250,7 @@ export class FormlyConfig {
     SetLocationDialogComponent,
     StudiesComponent,
     StudyDetailComponent,
+    StudyFormComponent,
     StudyInquiryComponent,
     TermsComponent,
     TimedoutComponent,
