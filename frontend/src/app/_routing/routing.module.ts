@@ -79,7 +79,7 @@ const routes: Routes = [
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {path: 'studies/add', component: StudyFormComponent, data: {title: 'Create an Autism DRIVE Study'}, canActivate: [AdminGuard]},
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
-  {path: 'study/:studyId/edit', component: StudyFormComponent, data: {title: 'Edit Study'}, canActivate: [AdminGuard]},
+  {path: 'study/edit/:studyId', component: StudyFormComponent, data: {title: 'Edit Study'}, canActivate: [AdminGuard]},
   {
     path: 'terms/:relationship',
     component: TermsComponent,
