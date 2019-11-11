@@ -86,51 +86,6 @@ export class StudyFormComponent implements OnInit {
         },
       },
       {
-        key: 'investigators',
-        type: 'repeat',
-        wrappers: ["card"],
-        templateOptions: {
-          label: 'Investigators',
-            description: "Add an investigator",
-        },
-        fieldArray: {
-          fieldGroup: [
-            {
-              key: 'name',
-              type: 'input',
-              templateOptions: {
-                label: 'Full Name of Investigator',
-                required: true,
-              },
-            },
-            {
-              key: 'title',
-              type: 'input',
-              templateOptions: {
-                label: 'Title',
-              },
-            },
-            {
-              key: 'organization',
-              type: 'autocomplete',
-              templateOptions: {
-                label: 'Organization',
-                filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
-              },
-            },
-            {
-              key: 'bio_link',
-              type: 'input',
-              templateOptions: {
-                label: 'Bio Link',
-                placeholder: 'Please enter link to investigator bio',
-              },
-              validators: {"validation": ["url"]},
-            },
-          ],
-        },
-      },
-      {
         key: 'organization',
         type: 'autocomplete',
         templateOptions: {
@@ -230,20 +185,20 @@ export class StudyFormComponent implements OnInit {
   loadData() {
     this.route.params.subscribe(params => {
 
-      if (params['studyId'] && params['studyType']) {
+      if (params['studyId']) {
         const studyId = params['studyId'];
-        const studyType = params['studyType'].charAt(0).toUpperCase() + params['studyType'].slice(1);
         this.createNew = false;
         this.model.createNew = false;
-        this.api[`get${studyType}`](studyId).subscribe(study => {
-          // this.study = new Study(study);
+        this.api.getStudy(studyId).subscribe(study => {
+          this.study = study as Study;
           this.model = this.study;
           this.loadStudyCategories(study, () => this.loadForm());
         });
       } else {
         this.createNew = true;
         this.model.createNew = true;
-        // this.study = new Study({'title': '', 'description': '', 'participant_description': '', 'benefit_description': '',}) ;
+        this.study = {'title': '', 'description': '', 'participant_description': '', 'benefit_description': '',
+          'investigators': [], 'location': '', 'categories': [], 'status': '' } as Study;
         this.loadForm();
       }
     });
@@ -276,23 +231,20 @@ export class StudyFormComponent implements OnInit {
     // Add the new categories
     for (const cat in this.model.categories) {
       if (!scIds.includes(Number(cat))) {
-        console.log('we could add this category if it were hooked up:', this.model.categories[cat]);
-        // this.api.addStudyCategory({study_id: this.study.id, category_id: Number(cat), type: this.study.type}).subscribe();
+        this.api.addStudyCategory({study_id: this.study.id, category_id: Number(cat)}).subscribe();
       }
     }
     // Remove any deleted categories
     for (const sc in this.study.study_categories) {
       if (!this.model.categories[this.study.study_categories[sc].category_id]) {
-        console.log('we could delete this category if it were hooked up:', this.study.study_categories[sc]);
-        // this.api.deleteStudyCategory(this.study.study_categories[rc]).subscribe();
+        this.api.deleteStudyCategory(this.study.study_categories[sc]).subscribe();
       }
     }
   }
 
   addStudyCategories(study_id) {
     for (const cat in this.model.categories) {
-      console.log('we could add this category if it were hooked up:', this.model.categories[cat]);
-      // this.api.addStudyCategory({study_id: study_id, category_id: Number(cat), type: this.study.type}).subscribe();
+      this.api.addStudyCategory({study_id: study_id, category_id: Number(cat)}).subscribe();
     }
   }
 

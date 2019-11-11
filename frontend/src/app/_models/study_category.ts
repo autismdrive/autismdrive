@@ -1,8 +1,8 @@
 import { Category } from './category';
 
 export interface StudyCategory {
-  id: number;
+  id?: number;
   category_id: number;
   study_id: number;
-  category: Category;
+  category?: Category;
 }
