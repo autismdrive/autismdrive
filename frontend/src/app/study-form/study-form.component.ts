@@ -91,6 +91,7 @@ export class StudyFormComponent implements OnInit {
         templateOptions: {
           label: 'Organization',
           filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
+          required: true,
         },
       },
       {
@@ -113,6 +114,7 @@ export class StudyFormComponent implements OnInit {
             {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
             {'value': 'study_results_published', 'label': 'Study results published'}
           ],
+          required: true,
         },
       },
       {
