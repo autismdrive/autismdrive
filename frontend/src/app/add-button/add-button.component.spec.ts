@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResourceAddButtonComponent } from './resource-add-button.component';
+import { AddButtonComponent } from './add-button.component';
 
-describe('ResourceAddButtonComponent', () => {
-  let component: ResourceAddButtonComponent;
-  let fixture: ComponentFixture<ResourceAddButtonComponent>;
+describe('AddButtonComponent', () => {
+  let component: AddButtonComponent;
+  let fixture: ComponentFixture<AddButtonComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ResourceAddButtonComponent ]
+      declarations: [ AddButtonComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResourceAddButtonComponent);
+    fixture = TestBed.createComponent(AddButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

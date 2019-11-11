@@ -129,6 +129,7 @@ import {catchError, map} from 'rxjs/operators';
 import {Observable, ObservableInput, of} from 'rxjs';
 import {environment} from '../environments/environment';
 import {ConfigService} from './_services/config.service';
+import {AddButtonComponent} from './add-button/add-button.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -265,6 +266,7 @@ export class FormlyConfig {
     LastUpdatedDateComponent,
     RelatedItemsComponent,
     ContactItemComponent,
+    AddButtonComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
