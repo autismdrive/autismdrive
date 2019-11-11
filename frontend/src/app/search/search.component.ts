@@ -17,6 +17,7 @@ import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {clone} from '../../util/clone';
+import {Resource} from '../_models/resource';
 
 interface SortMethod {
   name: string;
@@ -43,7 +44,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     private location: Location,
     private renderer: Renderer2,
     private searchService: SearchService,
-    private mapSearchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
@@ -58,21 +58,13 @@ export class SearchComponent implements OnInit, OnDestroy {
     //    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
     this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
-
-    this.loadMapLocation(() => {
-      this.route.queryParamMap.subscribe(qParams => {
-        this.query = this._queryParamsToQuery(qParams);
-        this.mapQuery = clone(this.query);
-        this.mapQuery.size = 999;
-        this.loadMapResults();
-        this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
-      });
-    });
   }
 
   query: Query;
   mapQuery: Query;
   resourceTypes = HitType.all_resources();
+  selectedMapResource: Resource;
+  selectedMapHit: Hit;
   selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
   typeLabels = HitType.labels;
@@ -90,7 +82,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   };
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
-  openedWindowId: number;
   mapZoomLevel: number;
 
   mobileQuery: MediaQueryList;
@@ -237,6 +228,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.route.queryParamMap.subscribe(qParams => {
+      this.query = this._queryParamsToQuery(qParams);
+      console.log('locating Map Results.');
+      this.loadMapLocation(f => {
+        this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+      });
+    });
   }
 
   ngOnDestroy(): void {
@@ -277,12 +275,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
-
-    this.mapQuery = clone(this.query);
-    this.mapQuery.size = 999;
-
-    this.mapSearchService
-      .search(this.mapQuery)
+    this.searchService
+      .mapSearch(this.query)
       .subscribe(mapQueryWithResults => {
         this.mapQuery = mapQueryWithResults;
         this.loadMapResults();
@@ -299,16 +293,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapLocation(callback: Function) {
-    let numStepsComplete = 0;
-    const minStepsNeeded = 2;
-    const _callCallbackIfReady = () => {
-      numStepsComplete++;
-      if (numStepsComplete >= minStepsNeeded) {
-        this.mapLoc = this.zipLoc || this.gpsLoc;
-        callback.call(this);
-      }
-    };
-
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
@@ -317,51 +301,55 @@ export class SearchComponent implements OnInit, OnDestroy {
           lat: z.latitude,
           lng: z.longitude
         };
-        _callCallbackIfReady();
+        this.mapLoc = this.zipLoc;
+        callback.call(this);
       });
     } else {
-      _callCallbackIfReady();
+      this.getGPSLocation(callback);
+    }
+  }
+
+  getGPSLocation(callback: Function) {
+    // If we already know the GPS location, then just return.
+    if (this.gpsEnabled && this.gpsLoc) {
+      this.noLocation = false;
+      this.gpsEnabled = true;
+      this.mapLoc = this.gpsLoc;
+      callback.call(this);
+      return;
+    } else {
+      this.noLocation = true;
+      this.gpsEnabled = false;
+      callback.call(this);
+      // But don't return, go ahead and ask in the following chunk of code.
     }
 
+    // Now, try to get the position, and if we can get it, use it.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         this.gpsEnabled = true;
         this.noLocation = false;
-
         this.gpsLoc = {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
-
-        _callCallbackIfReady();
+        this.mapLoc = this.gpsLoc;
+        callback.call(this);
       }, error => {
         this.gpsEnabled = false;
-        _callCallbackIfReady();
+        this.noLocation = true;
       });
     } else {
-      _callCallbackIfReady();
+      this.noLocation = true;
+      this.gpsEnabled = false;
     }
   }
 
-  isSortVisible(sort: SortMethod) {
-    if (sort.name === 'Relevance' && this.query.words === '') {
-      return false;
-    } else {
-      return true;
-    }
+  newSortSelection(event) {
+    this.reSort(event.value);
   }
 
-  isSortDisabled(sort: SortMethod) {
-    if (sort.name === 'Relevance' && this.query.words === '') {
-      return true;
-    } else if (sort.name === 'Distance' && this.noLocation) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  sortBy(sortName: string) {
+  reSort(sortName: string) {
     this.loading = true;
     this.selectedSort = this.sortMethods.find(s => s.name === sortName);
     this.query.start = 0;
@@ -417,7 +405,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.selectedType = this.resourceTypes.find(t => t.name === HitType.ALL_RESOURCES.name);
       this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
-      this.sortBy(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
     this._goToFirstPage(true);
   }
@@ -466,10 +454,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
-      this.loadMapLocation(() => {
         mapUI.setCenter(this.mapLoc || this.defaultLoc);
         mapUI.setZoom(9);
-      });
     });
 
     controlDiv.index = 1;
@@ -486,17 +472,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   loadMapResults() {
+    console.log("Loading map results");
     if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
-      const hitsWithCoords = this.mapQuery.hits.filter(h => h.hasCoords());
-
-      if (hitsWithCoords && hitsWithCoords.length > 0) {
-        this.hitsWithAddress = hitsWithCoords.filter(h => !h.no_address);
-        this.hitsWithNoAddress = hitsWithCoords.filter(h => h.no_address);
-      } else {
-        this.hitsWithAddress = [];
-        this.hitsWithNoAddress = [];
-      }
-
+       this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
+        this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
+    } else {
+      this.hitsWithAddress = [];
+      this.hitsWithNoAddress = [];
     }
   }
 
@@ -511,6 +493,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   openLocationDialog() {
+    this.locationDialog.closeAll();
     const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
       width: '400px',
       data: {
@@ -520,13 +503,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(_ => {
-      this.loadMapLocation(() => {
-        if (this.mapLoc) {
-          this.selectedSort = this.sortMethods.find(s => s.name === 'Distance');
-        }
-
-        this._updateDistanceSort();
-      });
+        this.reSort('Distance');
     });
   }
 
@@ -572,21 +549,21 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
   }
 
-  showInfoWindow(windowId: number) {
-    if (this.isInfoWindowOpen(windowId)) {
-      this.closeInfoWindow();
-    } else {
-      this.openedWindowId = windowId;
-      this.googleAnalyticsService.mapEvent(windowId.toString());
-    }
+  showInfoWindow(hit: Hit) {
+    this.api.getResource(hit.id).subscribe(r => {
+      this.selectedMapResource = r;
+      this.selectedMapHit = hit;
+      this.googleAnalyticsService.mapEvent(hit.id.toString());
+    });
   }
 
   closeInfoWindow() {
-    this.openedWindowId = null;
+    this.selectedMapResource = null;
+    this.selectedMapHit = null;
   }
 
-  isInfoWindowOpen(windowId: number): boolean {
-    return this.openedWindowId === windowId;
+  isInfoWindowOpen(): boolean {
+    return this.selectedMapResource != null;
   }
 
   // Return a random number for the given seed

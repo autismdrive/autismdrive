@@ -18,7 +18,7 @@ class Search:
     def known_age_counts():
         return list(map(lambda age_name: (AggCount(age_name, 0, False)), AgeRange.ages))
 
-    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None, date=None):
+    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None, date=None, map_data_only=False):
         self.words = words
         self.total = 0
         self.hits = []
@@ -31,6 +31,7 @@ class Search:
         self.type_counts = []
         self.age_counts = Search.known_age_counts()
         self.date = date
+        self.map_data_only = map_data_only  # When we should return a limited set of details just for mapping.
 
     # Method called when updating a search with fresh results.
     # This should zero-out any existing data that should be overwritten.
@@ -97,4 +98,14 @@ class Hit:
         self.latitude = latitude
         self.longitude = longitude
         self.status = status
+        self.no_address = no_address
+
+
+class MapHit:
+
+    def __init__(self, result_id, doc_type, latitude, longitude, no_address):
+        self.id = result_id
+        self.latitude = latitude
+        self.longitude = longitude
+        self.type = doc_type
         self.no_address = no_address

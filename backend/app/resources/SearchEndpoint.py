@@ -4,7 +4,7 @@ from flask import request, json
 
 from app import elastic_index, RestException, db
 from app.model.category import Category
-from app.model.search import Hit
+from app.model.search import Hit, MapHit
 from app.schema.schema import SearchSchema
 
 
@@ -30,6 +30,13 @@ class SearchEndpoint(flask_restful.Resource):
 
         search.reset()  # zero out any existing counts or data on the search prior to populating.
         search.total = results.hits.total
+
+        if search.map_data_only:
+            return self.map_data_only_search_results(search, results)
+        else:
+            return self.full_search_results(search, results)
+
+    def full_search_results(self, search, results):
         search.category = self.update_category_counts(search.category, results)
         self.update_aggregations(search, results.aggregations)
 
@@ -38,10 +45,19 @@ class SearchEndpoint(flask_restful.Resource):
             highlights = ""
             if "highlight" in hit.meta:
                 highlights = "... ".join(hit.meta.highlight.content)
-            hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.date, hit.last_updated,
+            search_hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.date, hit.last_updated,
                       highlights, hit.latitude, hit.longitude, hit.status, hit.no_address)
-            search.hits.append(hit)
+            search.hits.append(search_hit)
 
+        return SearchSchema().jsonify(search)
+
+    def map_data_only_search_results(self, search, results):
+
+        search.hits = []
+        for hit in results:
+            if hit.longitude and hit.latitude:
+                search_hit = MapHit(hit.id,  hit.type, hit.latitude, hit.longitude, hit.no_address)
+                search.hits.append(search_hit)
         return SearchSchema().jsonify(search)
 
     def update_aggregations(self, search, aggregations):

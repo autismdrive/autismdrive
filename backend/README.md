@@ -311,10 +311,12 @@ You will need to install:
   * Postgres 
  
 I've tended to set up the website under /var/www/star or /var/www/autismdrive (the new name and url)
-In the /var/www/autismdrive/ I create a python virtual enviroment with the comnand:
+In the /var/www/autismdrive/ I create a python virtual enviroment with the command:
 ```
 python3 -m venv python-env
 ```
+When pushing to production please create a new 'Release' on gitHub describing the changes that were rolled out.
+
 
 
 

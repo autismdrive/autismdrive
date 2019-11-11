@@ -542,13 +542,13 @@ class SearchSchema(ma.Schema):
 
     class HitSchema(ma.Schema):
         id = fields.Integer()
-        content = fields.Str()
-        description = fields.Str()
-        title = fields.Str()
+        content = fields.Str(missing=None)
+        description = fields.Str(missing=None)
+        title = fields.Str(missing=None)
         type = fields.Str()
-        label = fields.Str()
-        last_updated = fields.Date()
-        highlights = fields.Str()
+        label = fields.Str(missing=None)
+        last_updated = fields.Date(missing=None)
+        highlights = fields.Str(missing=None)
         latitude = fields.Float()
         longitude = fields.Float()
         date = fields.Date(missing=None)
@@ -580,10 +580,11 @@ class SearchSchema(ma.Schema):
     age_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
     type_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
     total = fields.Integer(dump_only=True)
-    hits = fields.List(ma.Nested(HitSchema), dump_only=True)
+    hits = fields.Nested(HitSchema(), many=True, dump_only=True)
     category = ma.Nested(CategoryInSearchSchema)
     ordered = True
     date = fields.Date(allow_none=True)
+    map_data_only = fields.Boolean()
 
     @post_load
     def make_search(self, data):
