@@ -17,9 +17,6 @@ export class AddButtonComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('this is the addLabel', this.addLabel);
-    console.log('this is the addLink', this.addLink);
-    console.log('this is the currentUser', this.currentUser);
   }
 
   openAdd() {

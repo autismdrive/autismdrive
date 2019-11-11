@@ -90,7 +90,6 @@ import {QuestionnaireStepComponent} from './questionnaire-step/questionnaire-ste
 import {QuestionnaireStepsListComponent} from './questionnaire-steps-list/questionnaire-steps-list.component';
 import {RegisterComponent} from './register/register.component';
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
-import {ResourceEditButtonComponent} from './resource-edit-button/resource-edit-button.component';
 import {ResourceFormComponent} from './resource-form/resource-form.component';
 import {SearchBoxComponent} from './search-box/search-box.component';
 import {SearchResultComponent} from './search-result/search-result.component';
@@ -129,6 +128,7 @@ import {Observable, ObservableInput, of} from 'rxjs';
 import {environment} from '../environments/environment';
 import {ConfigService} from './_services/config.service';
 import {AddButtonComponent} from './add-button/add-button.component';
+import {EditButtonComponent} from './edit-button/edit-button.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -240,7 +240,6 @@ export class FormlyConfig {
     RepeatSectionComponent,
     RepeatSectionDialogComponent,
     ResourceDetailComponent,
-    ResourceEditButtonComponent,
     ResourceFormComponent,
     SearchBoxComponent,
     SearchComponent,
@@ -265,6 +264,7 @@ export class FormlyConfig {
     RelatedItemsComponent,
     ContactItemComponent,
     AddButtonComponent,
+    EditButtonComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
