@@ -1,5 +1,3 @@
-{{ user.first_name }},
-
 You recently requested a password reset for an account with Autism DRIVE.
 
 Please place the following url in your browser to reset your password and log in:
