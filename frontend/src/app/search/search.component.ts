@@ -164,18 +164,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
     },
     {
-      name: 'Autism Speaks Inc.',
-      shortName: 'Autism Speaks',
-      description: `
-        The largest autism advocacy organization in the United States. It sponsors autism research
-        and conducts awareness and outreach activities aimed at families, governments, and the public.
-      `,
-      image: '/assets/partners/autism_speaks.png',
-      url: 'https://www.autismspeaks.org/',
-    },
-    {
       name: 'Piedmont Regional Education Program',
       shortName: 'PREP',
+      attribution: 'Cheryl Ribando',
       description: `
         A public regional organization designed to meet the needs of special education students. Provides special
         education programming and related services to nine school districts under an umbrella of a regional program.

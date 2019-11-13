@@ -310,18 +310,25 @@
         resources that will improve
         outcomes for individuals with autism and their families.</p>
       <div fxLayout="row" fxLayoutAlign="space-between">
-        <a
+        <span
           *ngFor="let rg of resourceGatherers"
-          [href]="rg.url"
-          [title]="rg.name"
-          [matTooltip]="rg.shortName + ' - ' + rg.description"
-          class="resource-gatherer"
         >
-          <img
-            [alt]="rg.shortName"
-            [src]="rg.image"
+          <div *ngIf="rg.attribution" id="attribution">
+            <p><b>{{rg.attribution}}</b></p>
+            <p>in association with {{rg.shortName}}</p>
+          </div>
+          <a
+            [href]="rg.url"
+            [title]="rg.name"
+            [matTooltip]="rg.shortName + ' - ' + rg.description"
+            class="resource-gatherer"
           >
-        </a>
+            <img
+              [alt]="rg.shortName"
+              [src]="rg.image"
+            >
+          </a>
+        </span>
       </div>
     </div>
   </div>
