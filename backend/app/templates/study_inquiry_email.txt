@@ -11,5 +11,7 @@ Is it OK to leave a voicemail? {{ user.get_contact()["contact"].can_leave_voicem
 Best time to call: {{ user.get_contact()["contact"].contact_times }}
 
 Please place the following url in your browser to view this user's details on Autism DRIVE:
-{{user_detail_url}}.
+{{user_detail_url}}
 
+---------------------------------
+You received this email because you are listed as a study coordinator for a study on Autism DRIVE. Please note that email is not a secure form of communication and should not be used to discuss any confidential matters, including personal health information, given its confidentiality cannot be assured.

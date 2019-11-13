@@ -2,3 +2,6 @@ Someone recently created an account for you on the Autism DRIVE.
 
 To Complete your registration, please place the following url in your browser to confirm your Email Address:
 {{confirm_url}}
+
+---------------------------------
+You received this email because you registered an account with Autism DRIVE. Please note that email is not a secure form of communication and should not be used to discuss any confidential matters, including personal health information, given its confidentiality cannot be assured.
