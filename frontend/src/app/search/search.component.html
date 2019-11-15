@@ -82,11 +82,21 @@
                 Distance
                 <span *ngIf="isZipCode(storedZip)">({{storedZip}})</span>
                 <span *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</span>
-                <button mat-button (click)="openLocationDialog()" matTooltip="Set your location">
-                  <mat-icon>location_searching</mat-icon>
-                  <ng-container *ngIf="noLocation">Set location</ng-container>
+                <button *ngIf="!this.noLocation && !this.setLocOpen" mat-button (click)="openSetLocation()" matTooltip="Set your location">
+                  <mat-icon>keyboard_arrow_down</mat-icon>
                 </button>
               </mat-radio-button>
+              <div *ngIf="this.noLocation || this.setLocOpen" class="zipCodeSet" fxLayout="column">
+                Or Set Your Location (restricted to VA, WV)
+                <mat-form-field>
+                  <mat-label>ZIP Code</mat-label>
+                  <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit()">
+                </mat-form-field>
+                <div fxLayout="row" fxLayoutGap="1em">
+                    <button mat-flat-button color="primary" (click)="zipSubmit()" id="btn_save">Save</button>
+                    <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
+                </div>
+              </div>
               <mat-radio-button value="Updated">Recently Updated
                 <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
               </mat-radio-button>
@@ -310,18 +320,25 @@
         resources that will improve
         outcomes for individuals with autism and their families.</p>
       <div fxLayout="row" fxLayoutAlign="space-between">
-        <a
+        <span
           *ngFor="let rg of resourceGatherers"
-          [href]="rg.url"
-          [title]="rg.name"
-          [matTooltip]="rg.shortName + ' - ' + rg.description"
-          class="resource-gatherer"
         >
-          <img
-            [alt]="rg.shortName"
-            [src]="rg.image"
+          <div *ngIf="rg.attribution" id="attribution">
+            <p><b>{{rg.attribution}}</b></p>
+            <p>in association with {{rg.shortName}}</p>
+          </div>
+          <a
+            [href]="rg.url"
+            [title]="rg.name"
+            [matTooltip]="rg.shortName + ' - ' + rg.description"
+            class="resource-gatherer"
           >
-        </a>
+            <img
+              [alt]="rg.shortName"
+              [src]="rg.image"
+            >
+          </a>
+        </span>
       </div>
     </div>
   </div>

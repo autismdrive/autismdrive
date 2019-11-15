@@ -114,7 +114,6 @@ import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
 import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
-import {SetLocationDialogComponent} from './set-location-dialog/set-location-dialog.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
 import {SearchFilterComponent} from './search-filter/search-filter.component';
@@ -246,7 +245,6 @@ export class FormlyConfig {
     SearchComponent,
     SearchResultComponent,
     SearchResultComponent,
-    SetLocationDialogComponent,
     StudiesComponent,
     StudyDetailComponent,
     StudyInquiryComponent,
@@ -324,7 +322,6 @@ export class FormlyConfig {
     AdminExportDetailsComponent,
     AvatarDialogComponent,
     RepeatSectionDialogComponent,
-    SetLocationDialogComponent,
     AdminNoteFormComponent
   ]
 })

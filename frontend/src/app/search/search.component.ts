@@ -11,12 +11,9 @@ import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
-import {MatDialog} from '@angular/material/dialog';
-import {SetLocationDialogComponent} from '../set-location-dialog/set-location-dialog.component';
 import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
 import {MatExpansionPanel} from '@angular/material/expansion';
-import {clone} from '../../util/clone';
 import {Resource} from '../_models/resource';
 
 interface SortMethod {
@@ -47,7 +44,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
-    public locationDialog: MatDialog,
     private api: ApiService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
@@ -72,6 +68,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   pageSize = 20;
   noLocation = true;
   storedZip: string;
+  updatedZip: string;
+  setLocOpen = false;
   gpsEnabled = false;
   zipLoc: LatLngLiteral;
   gpsLoc: LatLngLiteral;
@@ -164,18 +162,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
     },
     {
-      name: 'Autism Speaks Inc.',
-      shortName: 'Autism Speaks',
-      description: `
-        The largest autism advocacy organization in the United States. It sponsors autism research
-        and conducts awareness and outreach activities aimed at families, governments, and the public.
-      `,
-      image: '/assets/partners/autism_speaks.png',
-      url: 'https://www.autismspeaks.org/',
-    },
-    {
       name: 'Piedmont Regional Education Program',
       shortName: 'PREP',
+      attribution: 'Cheryl Ribando',
       description: `
         A public regional organization designed to meet the needs of special education students. Provides special
         education programming and related services to nine school districts under an umbrella of a regional program.
@@ -231,6 +220,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.route.queryParamMap.subscribe(qParams => {
       this.query = this._queryParamsToQuery(qParams);
       console.log('locating Map Results.');
+      if (navigator.geolocation) {
+        this.gpsEnabled = true;
+      }
       this.loadMapLocation(f => {
         this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
       });
@@ -313,13 +305,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     // If we already know the GPS location, then just return.
     if (this.gpsEnabled && this.gpsLoc) {
       this.noLocation = false;
-      this.gpsEnabled = true;
       this.mapLoc = this.gpsLoc;
       callback.call(this);
       return;
     } else {
       this.noLocation = true;
-      this.gpsEnabled = false;
       callback.call(this);
       // But don't return, go ahead and ask in the following chunk of code.
     }
@@ -327,7 +317,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Now, try to get the position, and if we can get it, use it.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
-        this.gpsEnabled = true;
         this.noLocation = false;
         this.gpsLoc = {
           lat: p.coords.latitude,
@@ -492,19 +481,20 @@ export class SearchComponent implements OnInit, OnDestroy {
     return is_location_or_event_type || is_sort_by_distance;
   }
 
-  openLocationDialog() {
-    this.locationDialog.closeAll();
-    const dialogRef = this.locationDialog.open(SetLocationDialogComponent, {
-      width: '400px',
-      data: {
-        zipCode: localStorage.getItem('zipCode') || '',
-        gpsEnabled: this.gpsEnabled
-      }
-    });
+  openSetLocation() {
+    this.setLocOpen = true;
+  }
 
-    dialogRef.afterClosed().subscribe(_ => {
-        this.reSort('Distance');
-    });
+  zipSubmit(): void {
+    localStorage.setItem('zipCode', this.updatedZip || '');
+    this.setLocOpen = false;
+    this.reSort('Distance');
+  }
+
+  useGPSLocation(): void {
+    localStorage.removeItem('zipCode');
+    this.setLocOpen = false;
+    this.reSort('Distance');
   }
 
   isZipCode(zipCode: string): boolean {

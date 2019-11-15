@@ -1,6 +1,9 @@
-{{ user.first_name }},
-
 You recently requested a password reset for an account with Autism DRIVE.
 
 Please place the following url in your browser to reset your password and log in:
-{{reset_url}}.
+{{reset_url}}
+
+---------------------------------
+You received this email because you registered an account with Autism DRIVE.
+Please note that email is not a secure form of communication and should not be used to discuss any
+confidential matters, including personal health information, given its confidentiality cannot be assured.
