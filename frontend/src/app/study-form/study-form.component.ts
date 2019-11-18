@@ -249,7 +249,7 @@ export class StudyFormComponent implements OnInit {
     }
   }
 
-  updateOrganization() {
+  updateOrganization(callback: Function) {
     // If the user selects an existing Organization name from the list, it will be saved as an Organization object. If they write in their
     // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
     // updated model so that we don't accidentally save the old version before it's updated. When there is no Organization being saved, all
@@ -260,32 +260,33 @@ export class StudyFormComponent implements OnInit {
           this.model.organization_id = org.id;
           this.model.organization = org;
           this.updatedModel = this.model;
-          this.submit();
+          callback();
         })
       } else {
         this.model.organization_id = this.model.organization.id;
         this.updatedModel = this.model;
+        callback();
       }
     } else {
       this.updatedModel = this.model;
+      callback();
     }
   }
 
   submit() {
     // Post to the study endpoint, and then close
-    this.updateOrganization();
     if (this.form.valid) {
       if (this.createNew) {
-        this.addAndClose(this.api.addStudy(this.model));
+        this.updateOrganization(() => this.addAndClose());
       } else {
         this.updateStudyCategories();
-        this.updateAndClose(this.api.updateStudy(this.updatedModel));
+        this.updateOrganization(() => this.updateAndClose());
       }
     }
   }
 
-  addAndClose(apiCall) {
-    apiCall.subscribe(s =>
+  addAndClose() {
+    this.api.addStudy(this.model).subscribe(s =>
       {
         this.updatedStudy = s;
         this.addStudyCategories(s.id);
@@ -293,8 +294,8 @@ export class StudyFormComponent implements OnInit {
       });
   }
 
-  updateAndClose(apiCall) {
-    apiCall.subscribe( s =>
+  updateAndClose() {
+    this.api.updateStudy(this.updatedModel).subscribe( s =>
       {
         this.updatedStudy = s;
         this.close();
