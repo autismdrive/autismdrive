@@ -178,6 +178,15 @@ def resourcereset():
 
 
 @app.cli.command()
+def loadstudies():
+    """Used for loading new studies into the database"""
+    click.echo('Loading additional studies, not clearing out existing ones')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.load_studies()
+
+
+@app.cli.command()
 def run_full_export():
     """Remove all data and recreate it from the example data files"""
     if app.config["MIRRORING"]:

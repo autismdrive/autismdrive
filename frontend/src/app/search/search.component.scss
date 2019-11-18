@@ -195,3 +195,15 @@ agm-map {
   @media (min-width: 960px) { max-width: 40vw !important; }
   @media (min-width: 1200px) { max-width: 30vw !important; }
 }
+
+#attribution p {
+  margin: 0;
+}
+
+::ng-deep .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+.zipCodeSet {
+  margin-left: 2em;
+}
