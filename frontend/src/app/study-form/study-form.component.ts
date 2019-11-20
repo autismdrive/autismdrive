@@ -117,6 +117,15 @@ export class StudyFormComponent implements OnInit {
         },
       },
       {
+        key: 'coordinator_email',
+        type: 'input',
+        templateOptions: {
+          label: 'Coordinator Email',
+          placeholder: 'Please enter the email address to which study inquires will be sent',
+        },
+        validators: {"validation": ["email"]},
+      },
+      {
         key: 'eligibility_url',
         type: 'input',
         templateOptions: {
