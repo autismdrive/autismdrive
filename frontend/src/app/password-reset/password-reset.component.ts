@@ -104,7 +104,7 @@ export class PasswordResetComponent implements OnInit {
           this.googleAnalyticsService.accountEvent('reset_password');
         }, error1 => {
           this.formState = 'form';
-          this.errorMessage = error1;
+          this.errorMessage = error1.message;
           this.changeDetectorRef.detectChanges();
         });
     }
