@@ -2,7 +2,7 @@
 # *****************************
 from functools import wraps
 
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import func
 from app import app, RestException, db, auth, email_service
 from app.model.email_log import EmailLog
@@ -87,9 +87,11 @@ def reset_password():
     email_token = request_data['email_token']
     try:
         ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-        email = ts.loads(email_token, salt="email-reset-key", max_age=86400)
-    except:
+        email = ts.loads(email_token, salt="email-reset-key", max_age=86400) #24 hours
+    except BadSignature:
         raise RestException(RestException.TOKEN_INVALID)
+    except SignatureExpired:
+        raise RestException(RestException.TOKEN_EXPIRED)
 
     user = User.query.filter(func.lower(User.email) == email.lower()).first_or_404()
     user.token_url = ''
