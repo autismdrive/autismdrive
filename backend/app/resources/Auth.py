@@ -29,7 +29,7 @@ def confirm_email(email_token):
     db.session.commit()
 
     auth_token = user.encode_auth_token().decode()
-    user.token = auth_token;
+    user.token = auth_token
     return user
 
 
@@ -88,10 +88,10 @@ def reset_password():
     try:
         ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
         email = ts.loads(email_token, salt="email-reset-key", max_age=86400) #24 hours
-    except BadSignature:
-        raise RestException(RestException.TOKEN_INVALID)
     except SignatureExpired:
         raise RestException(RestException.TOKEN_EXPIRED)
+    except BadSignature:
+        raise RestException(RestException.TOKEN_INVALID)
 
     user = User.query.filter(func.lower(User.email) == email.lower()).first_or_404()
     user.token_url = ''
