@@ -81,10 +81,12 @@ class EmailService:
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("confirm_email.txt",
                                     user=user, confirm_url=confirm_url,
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
                                     tracking_code=tracking_code)
 
         html_body = render_template("confirm_email.html",
                                     user=user, confirm_url=confirm_url,
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
                                     logo_url=logo_url,
                                     tracking_code=tracking_code)
 
@@ -108,10 +110,12 @@ class EmailService:
         logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("reset_email.txt",
                                     user=user, reset_url=reset_url,
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
                                     tracking_code=tracking_code)
 
         html_body = render_template("reset_email.html",
                                     user=user, reset_url=reset_url,
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
                                     logo_url=logo_url,
                                     tracking_code=tracking_code)
 

@@ -103,8 +103,12 @@ export class PasswordResetComponent implements OnInit {
           this.router.navigate(['profile']);
           this.googleAnalyticsService.accountEvent('reset_password');
         }, error1 => {
+          if (error1.code == 'token_expired') {
+            this.errorMessage = 'The link for resetting your password has expired. Please return to the password reset page to generate a new email.';
+          } else {
+            this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
+          }
           this.formState = 'form';
-          this.errorMessage = error1;
           this.changeDetectorRef.detectChanges();
         });
     }

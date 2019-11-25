@@ -3,6 +3,9 @@ You recently requested a password reset for an account with Autism DRIVE.
 Please place the following url in your browser to reset your password and log in:
 {{reset_url}}
 
+Please note that this reset link will expire in 24 hours. If that happens you can request another
+password reset at: {{ forgot_pass_url }}
+
 ---------------------------------
 You received this email because you registered an account with Autism DRIVE.
 Please note that email is not a secure form of communication and should not be used to discuss any
