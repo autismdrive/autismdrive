@@ -32,6 +32,7 @@ SECRET_KEY = 'stardrive_impossibly_bad_key_stored_in_public_repo_dont_use_this_o
 
 FRONTEND_AUTH_CALLBACK = SITE_URL + "/#/session"
 FRONTEND_EMAIL_RESET = SITE_URL + "/#/reset_password/"
+FRONTEND_FORGOT_PASSWORD = SITE_URL + "/#/forgot-password"
 
 MAIL_SERVER = 'smtp.mailtrap.io'
 MAIL_PORT = 2525
