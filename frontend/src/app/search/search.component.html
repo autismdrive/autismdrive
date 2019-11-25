@@ -59,7 +59,7 @@
     <h1 *ngIf="!selectedType" fragment="filter-top">
       All Resources
     </h1>
-    <app-resource-add-button [currentUser]="currentUser"></app-resource-add-button>
+    <app-add-button *ngIf="currentUser && currentUser.role == 'admin'" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
     <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="80px" fxLayoutAlign="space-evenly start">
       <mat-accordion displayMode="flat">
         <mat-expansion-panel

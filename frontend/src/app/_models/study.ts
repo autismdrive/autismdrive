@@ -1,5 +1,6 @@
 import { StudyCategory } from './study_category';
 import { StudyInvestigator } from './study_investigator';
+import { Organization } from './organization';
 
 export enum StudyStatus {
   currently_enrolling = 'Currently enrolling',
@@ -9,7 +10,7 @@ export enum StudyStatus {
 }
 
 export interface Study {
-  id: number;
+  id?: number;
   title: string;
   short_title?: string;
   description: string;
@@ -17,10 +18,12 @@ export interface Study {
   participant_description: string;
   benefit_description: string;
   investigators: string[];
-  organization_id: number;
+  organization_id?: number;
+  organization?: Organization;
   location: string;
   categories: string[];
   status: string;
+  coordinator_email?: string;
   study_categories?: StudyCategory[];
   study_investigators?: StudyInvestigator[];
   image_url?: string;

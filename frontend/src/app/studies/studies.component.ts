@@ -3,6 +3,8 @@ import { ApiService } from '../_services/api/api.service';
 import {Hit, Query} from '../_models/query';
 import {HitType} from '../_models/hit_type';
 import {StudyStatus} from '../_models/study';
+import {AuthenticationService} from '../_services/api/authentication-service';
+import {User} from '../_models/user';
 
 interface StudyStatusObj {
   name: string;
@@ -19,8 +21,13 @@ export class StudiesComponent implements OnInit {
   studyStatuses: StudyStatusObj[];
   selectedStatus: StudyStatusObj;
   studyHits: Hit[];
+  currentUser: User;
 
-  constructor(private api: ApiService) {
+  constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
+  ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.studyStatuses = Object.keys(StudyStatus).map(k => {
       return {name: k, label: StudyStatus[k]};
     });

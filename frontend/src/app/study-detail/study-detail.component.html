@@ -16,6 +16,8 @@
       fxLayoutGap="40px"
     >
       <h1>{{study.title}}</h1>
+      <h4 *ngIf="study.organization">{{study.organization.name}}</h4>
+      <app-edit-button *ngIf="currentUser && currentUser.role == 'admin'" [editLabel]='"Edit Study"' [editLink]='"study/edit/" + study.id.toString()' [currentUser]="currentUser"></app-edit-button>
       <p class="status">Study Status: {{ snakeToUpperCase(study.status) }}</p>
       <p>{{study.description}}</p>
       <div *ngIf="study.participant_description">

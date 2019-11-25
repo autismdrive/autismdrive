@@ -73,6 +73,32 @@ export class SearchUseCases {
     expect(numChecked).toEqual(results.length - 1);
   }
 
+  async openZipCodeDialog() {
+    const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
+    this.page.clickElement(`${distSelector} button`);
+  }
+
+  enterZipCode(zipCode = '24401') {
+    this.page.inputText('mat-form-field [placeholder="ZIP Code"]', zipCode, true);
+    this.page.clickElement('#btn_save');
+  }
+
+  checkSavedZipCode(zipCode = '24401') {
+    const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
+    this.page.waitForText(distSelector, zipCode);
+    this.page.waitFor(500);
+    expect(this.page.getLocalStorageVar('zipCode')).toEqual(zipCode);
+    expect(this.page.getElement(distSelector).getText()).toContain(zipCode);
+  }
+
+  async clearZipCode(zipCode = '24401') {
+    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"] button');
+    this.page.clickElement('#btn_gps');
+
+    const newText = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
+    expect(newText.includes(zipCode)).toBeFalsy();
+  }
+
   displayResourceAndClickChip() {
     this.page.clickLinkTo('/search');
     this.page.waitForVisible('app-search-result');

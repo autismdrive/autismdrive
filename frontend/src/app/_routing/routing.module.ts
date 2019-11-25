@@ -17,6 +17,7 @@ import {ResourceFormComponent} from '../resource-form/resource-form.component';
 import {SearchComponent} from '../search/search.component';
 import {StudiesComponent} from '../studies/studies.component';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
+import {StudyFormComponent} from '../study-form/study-form.component';
 import {TermsComponent} from '../terms/terms.component';
 import {UserAdminComponent} from '../user-admin/user-admin.component';
 import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
@@ -75,8 +76,10 @@ const routes: Routes = [
     canActivate: [AdminGuard]
   },
   {path: 'resources/add', component: ResourceFormComponent, data: {title: 'Add Resource'}, canActivate: [AdminGuard]},
-  {path: 'studies', component: StudiesComponent, data: {title: 'Create an Autism DRIVE Account'}},
+  {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
+  {path: 'studies/add', component: StudyFormComponent, data: {title: 'Create an Autism DRIVE Study'}, canActivate: [AdminGuard]},
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
+  {path: 'study/edit/:studyId', component: StudyFormComponent, data: {title: 'Edit Study'}, canActivate: [AdminGuard]},
   {
     path: 'terms/:relationship',
     component: TermsComponent,

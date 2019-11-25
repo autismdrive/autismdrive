@@ -89,15 +89,15 @@ import {QuestionnaireDataViewComponent} from './questionnaire-data-view/question
 import {QuestionnaireStepComponent} from './questionnaire-step/questionnaire-step.component';
 import {QuestionnaireStepsListComponent} from './questionnaire-steps-list/questionnaire-steps-list.component';
 import {RegisterComponent} from './register/register.component';
-import {ResourceAddButtonComponent} from './resource-add-button/resource-add-button.component';
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
-import {ResourceEditButtonComponent} from './resource-edit-button/resource-edit-button.component';
 import {ResourceFormComponent} from './resource-form/resource-form.component';
 import {SearchBoxComponent} from './search-box/search-box.component';
 import {SearchResultComponent} from './search-result/search-result.component';
 import {SearchComponent} from './search/search.component';
 import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
+import {StudyFormComponent} from './study-form/study-form.component';
+import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {TermsComponent} from './terms/terms.component';
 import {TimedoutComponent} from './timed-out/timed-out.component';
 import {TypeIconComponent} from './type-icon/type-icon.component';
@@ -110,7 +110,6 @@ import {AdminExportDetailsComponent} from './admin-export-details/admin-export-d
 import {DetailsLinkComponent} from './details-link/details-link.component';
 import {MatRadioModule} from '@angular/material/radio';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
-import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
 import {GoogleAnalyticsService} from './google-analytics.service';
 import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {MatDialogModule} from '@angular/material/dialog';
@@ -127,6 +126,8 @@ import {catchError, map} from 'rxjs/operators';
 import {Observable, ObservableInput, of} from 'rxjs';
 import {environment} from '../environments/environment';
 import {ConfigService} from './_services/config.service';
+import {AddButtonComponent} from './add-button/add-button.component';
+import {EditButtonComponent} from './edit-button/edit-button.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -237,9 +238,7 @@ export class FormlyConfig {
     RegisterComponent,
     RepeatSectionComponent,
     RepeatSectionDialogComponent,
-    ResourceAddButtonComponent,
     ResourceDetailComponent,
-    ResourceEditButtonComponent,
     ResourceFormComponent,
     SearchBoxComponent,
     SearchComponent,
@@ -247,6 +246,7 @@ export class FormlyConfig {
     SearchResultComponent,
     StudiesComponent,
     StudyDetailComponent,
+    StudyFormComponent,
     StudyInquiryComponent,
     TermsComponent,
     TimedoutComponent,
@@ -261,6 +261,8 @@ export class FormlyConfig {
     LastUpdatedDateComponent,
     RelatedItemsComponent,
     ContactItemComponent,
+    AddButtonComponent,
+    EditButtonComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)

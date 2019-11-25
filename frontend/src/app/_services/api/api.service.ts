@@ -11,6 +11,7 @@ import {Query} from '../../_models/query';
 import {Resource} from '../../_models/resource';
 import {ResourceCategory} from '../../_models/resource_category';
 import {Study} from '../../_models/study';
+import {StudyCategory} from '../../_models/study_category';
 import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
 import {UserSearchResults} from '../../_models/user_search_results';
@@ -345,6 +346,18 @@ export class ApiService {
   /** Delete ResourceCategory */
   deleteResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
     return this.httpClient.delete<ResourceCategory>(this._endpointUrl('resourcecategory').replace('<id>', resourceCategory.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add StudyCategory */
+  addStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
+    return this.httpClient.post<StudyCategory>(this._endpointUrl('studycategorylist'), studyCategory)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete StudyCategory */
+  deleteStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
+    return this.httpClient.delete<StudyCategory>(this._endpointUrl('studycategory').replace('<id>', studyCategory.id.toString()))
       .pipe(catchError(this._handleError));
   }
 
