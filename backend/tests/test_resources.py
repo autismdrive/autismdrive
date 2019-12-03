@@ -3,7 +3,7 @@ import unittest
 from flask import json
 
 from tests.base_test import BaseTest
-from app import db
+from app import db, elastic_index
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 
@@ -52,6 +52,20 @@ class TestResources(BaseTest, unittest.TestCase):
         rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
 
+        rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json")
+        self.assert_success(rv)
+
+        rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_delete_resource_with_admin_note_and_no_elastic_record(self):
+        r = self.construct_resource()
+        r_id = r.id
+        rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
+        self.assert_success(rv)
+
+        self.construct_admin_note(user=self.construct_user(), resource=r)
+        elastic_index.remove_document(r, 'Resource')
         rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
 

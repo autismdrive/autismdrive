@@ -135,6 +135,14 @@ export class StudyFormComponent implements OnInit {
         validators: {"validation": ["url"]},
       },
       {
+        key: 'image_url',
+        type: 'input',
+        templateOptions: {
+          label: 'Image Url',
+          placeholder: 'This is the link to the image used for current study display',
+        },
+      },
+      {
         key: 'categories',
         type: 'multicheckbox',
         templateOptions: {

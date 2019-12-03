@@ -3,10 +3,12 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
+from elasticsearch import NotFoundError
 
 from app import RestException, db, elastic_index
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
+from app.model.admin_note import AdminNote
 from app.schema.schema import ResourceSchema
 
 
@@ -22,9 +24,12 @@ class ResourceEndpoint(flask_restful.Resource):
     def delete(self, id):
         resource = db.session.query(Resource).filter_by(id=id).first()
 
-        if resource is not None:
+        try:
             elastic_index.remove_document(resource, 'Resource')
+        except NotFoundError:
+            pass
 
+        db.session.query(AdminNote).filter_by(resource_id=id).delete()
         db.session.query(ResourceCategory).filter_by(resource_id=id).delete()
         db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
