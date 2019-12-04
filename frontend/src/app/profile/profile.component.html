@@ -69,11 +69,13 @@
             id="dependent_participant_{{participant.id}}"
           ></app-participant-profile>
 
+          <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own registration</p>
           <button
             *ngIf="user.getSelf() && user.getDependents().length === 0"
             mat-flat-button
             color="primary"
             (click)="enrollDependent($event)"
+            [disabled]="selfPercentComplete < 100"
             id="enroll_first_dependent"
           >Enroll a dependent</button>
 
@@ -81,6 +83,7 @@
             *ngIf="user.getDependents().length > 0"
             mat-flat-button
             color="primary"
+            [disabled]="selfPercentComplete < 100"
             (click)="enrollDependent($event)"
             id="enroll_another_dependent"
           >Enroll another dependent</button>
