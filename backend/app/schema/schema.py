@@ -76,6 +76,13 @@ class UserSchema(ModelSchema):
     role = EnumField(Role)
 
 
+class UserParticipantSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'participants')
+    participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
+
+
 class UsersOnStudySchema(ModelSchema):
     class Meta:
         model = StudyUser

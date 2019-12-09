@@ -1,12 +1,13 @@
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exc
+from sqlalchemy import exc, func
 
 from app import db, RestException, auth
 from app.model.participant import Participant, Relationship
-from app.model.user import User
-from app.schema.schema import ParticipantSchema
+from app.model.user import User, Role
+from app.schema.schema import ParticipantSchema, UserParticipantSchema
+from app.wrappers import requires_roles
 
 
 class ParticipantBySessionEndpoint(flask_restful.Resource):
@@ -50,3 +51,22 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
                                 details=load_result.errors)
 
 
+class UserParticipantListEndpoint(flask_restful.Resource):
+    def count_participants(self, relationship):
+        query = db.session.query(Participant).filter(Participant.relationship == relationship)
+        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        return query.session.execute(count_q).scalar()
+
+    @auth.login_required
+    @requires_roles(Role.admin)
+    def get(self):
+        participant_list = {
+            'user_participants': UserParticipantSchema(many=True).dump(db.session.query(User).order_by(User.id).all()),
+            'num_self_participants': self.count_participants('self_participant'),
+            'num_self_guardians': self.count_participants('self_guardian'),
+            'num_dependents': self.count_participants('dependent'),
+            'num_self_professionals': self.count_participants('self_professional'),
+            'all_participants': ParticipantSchema(many=True).dump(db.session.query(Participant)
+                                                                  .order_by(Participant.relationship).all(), many=True)
+        }
+        return participant_list

@@ -165,3 +165,23 @@ class TestParticipant(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(p1.id + 1, p2.id)
         self.assertNotEqual(p2.id + 1, p3.id)
+
+    def test_user_participant_list(self):
+        u1 = self.construct_user(email='test1@sartography.com')
+        u2 = self.construct_user(email='test2@sartography.com')
+        self.construct_participant(user=u1, relationship=Relationship.self_participant)
+        self.construct_participant(user=u2, relationship=Relationship.self_participant)
+        self.construct_participant(user=u1, relationship=Relationship.self_guardian)
+        self.construct_participant(user=u1, relationship=Relationship.dependent)
+        self.construct_participant(user=u2, relationship=Relationship.self_professional)
+        rv = self.app.get(
+            '/api/user_participant',
+            content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, response['num_self_participants'])
+        self.assertEqual(1, response['num_self_guardians'])
+        self.assertIsNotNone(response['user_participants'])
+        self.assertIsNotNone(response['num_dependents'])
+        self.assertIsNotNone(response['num_self_professionals'])
+        self.assertIsNotNone(response['all_participants'])
