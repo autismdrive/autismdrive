@@ -45,7 +45,9 @@ export class ResourceDetailComponent implements OnInit {
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;
-          this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(this.resource.video_link);
+          if (this.resource.video_link){
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(this.resource.video_link);
+          }
         });
         if (this.currentUser && this.currentUser.role === 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
