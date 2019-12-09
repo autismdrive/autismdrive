@@ -282,7 +282,7 @@ class ResourceSchema(ModelSchema):
     class Meta:
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
-                  'organization', 'resource_categories',  'ages', '_links')
+                  'video_link', 'organization', 'resource_categories',  'ages', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)

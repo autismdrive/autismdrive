@@ -22,6 +22,7 @@ export class Resource extends GeoLocation {
   zip?: string;
   phone?: string;
   website?: string;
+  video_link?: string;
   last_updated?: string;
   status?: string;
   resource_categories?: ResourceCategory[];
