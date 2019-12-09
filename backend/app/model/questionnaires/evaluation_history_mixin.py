@@ -195,9 +195,6 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 7,
             "type": "input",
-            "validation": {
-                "show": True
-            },
             "template_options": {
                 "label": "Where was this diagnosis made?",
                 "required": True,
