@@ -21,6 +21,20 @@
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
 
+      <div *ngIf="safeVideoLink">
+        <div *ngIf="currentUser">
+          <iframe fxFlex="100%" height="500px" [src]='safeVideoLink' frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div *ngIf="!currentUser">
+          <h2>Interested in watching this video?</h2>
+          <button
+            mat-flat-button
+            color="primary"
+            [routerLink]="[ '/register' ]"
+          >Join Autism DRIVE</button>
+        </div>
+      </div>
+
       <mat-card id="resource-contact">
         <mat-card-title><h4>Contact</h4></mat-card-title>
         <mat-card-content>
