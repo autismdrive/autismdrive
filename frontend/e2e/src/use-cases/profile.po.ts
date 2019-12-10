@@ -19,6 +19,10 @@ export class ProfileUseCases {
     this.page.clickAndExpectRoute('#enroll_first_dependent', '/terms/dependent');
   }
 
+  checkDependentButtonDisabled() {
+    return expect(this.page.getElements('#enroll_first_dependent').getAttribute('disabled')).toEqual([ 'true' ]);
+  }
+
   navigateToProfile() {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
   }
