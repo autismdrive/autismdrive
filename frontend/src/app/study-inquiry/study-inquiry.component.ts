@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Study } from '../_models/study';
 import { User } from '../_models/user';
 import { ParticipantRelationship } from '../_models/participantRelationship';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import { GoogleAnalyticsService } from '../google-analytics.service';
 
 @Component({
   selector: 'app-study-inquiry',
@@ -27,28 +27,37 @@ export class StudyInquiryComponent implements OnInit {
     private googleAnalytics: GoogleAnalyticsService
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    if (this.currentUser) {
-      this.haveUserContact = this.currentUser.checkContact();
-      this.api.getUserStudyInquiries(this.currentUser.id).subscribe(
-        userStudyInquiries => {
-          for ( let i in userStudyInquiries ) {
-            if (this.study.id == userStudyInquiries[i].study_id) {
-              this.alreadyInquired = true;
-            }
-          }
-        }
-      );
-      for (let i in this.currentUser.participants) {
-        this.api
-          .getFlow(this.currentUser.participants[i].getFlowName(), this.currentUser.participants[i].id)
-          .subscribe(f => {
-            this.currentUser.participants[i].percent_complete = f.percentComplete();
-          });
-      }
-    }
   }
 
   ngOnInit() {
+    this.refreshInquiriesAndParticipants();
+  }
+
+  refreshInquiriesAndParticipants() {
+    if (this.currentUser) {
+      this.api.getUser(this.currentUser.id).subscribe( u => {
+        let newU = new User(u);
+        this.currentUser = newU;
+        this.haveUserContact = newU.checkContact();
+        this.api.getUserStudyInquiries(newU.id).subscribe(
+          userStudyInquiries => {
+            for ( let i in userStudyInquiries ) {
+              if (this.study.id == userStudyInquiries[i].study_id) {
+                this.alreadyInquired = true;
+              }
+            }
+          }
+        );
+        for (let i in newU.participants) {
+          this.api
+            .getFlow(newU.participants[i].getFlowName(), newU.participants[i].id)
+            .subscribe(f => {
+              newU.participants[i].percent_complete = f.percentComplete();
+            });
+        }
+      });
+
+    }
   }
 
 
