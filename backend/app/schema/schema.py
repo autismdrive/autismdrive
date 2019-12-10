@@ -334,7 +334,7 @@ class EventSchema(ModelSchema):
         model = Event
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'organization', 'resource_categories', 'latitude', 'longitude',  'ages', '_links')
+                  'phone', 'website', 'video_link', 'organization', 'resource_categories', 'latitude', 'longitude',  'ages', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -387,7 +387,7 @@ class LocationSchema(ModelSchema):
         model = Location
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'organization', 'resource_categories', 'latitude', 'longitude', '_links', 'ages')
+                  'video_link', 'organization', 'resource_categories', 'latitude', 'longitude', '_links', 'ages')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
