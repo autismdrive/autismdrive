@@ -1,0 +1,73 @@
+<div class="participant-admin">
+  <div
+    class="spinner-container"
+    *ngIf="loading"
+  >
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading">
+    <h1>Participant Admin</h1>
+
+    <p>Total Self Participants: {{userParticipantList.num_self_participants}}</p>
+    <p>Total Self Professionals: {{userParticipantList.num_self_professionals}}</p>
+    <p>Total Self Guardians: {{userParticipantList.num_self_guardians}}</p>
+    <p>Total Dependents: {{userParticipantList.num_dependents}}</p>
+
+
+    <mat-table
+      [dataSource]="participantDataSource"
+      class="mat-elevation-z8"
+      matSort
+      matSortActive="id"
+      matSortDirection="asc"
+      matSortDisableClear
+    >
+
+      <!-- Id Column -->
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Id </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
+
+      <!-- User Id Column -->
+      <ng-container matColumnDef="user_id">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> User Id </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.user_id}} </mat-cell>
+      </ng-container>
+
+      <!-- Relationship Column -->
+      <ng-container matColumnDef="relationship">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Relationship </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.relationship}} </mat-cell>
+      </ng-container>
+
+      <!-- Percent Complete Column -->
+      <ng-container matColumnDef="percent_complete">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Percent Complete </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.percent_complete}} </mat-cell>
+      </ng-container>
+
+      <!-- Has Consented Column -->
+      <ng-container matColumnDef="has_consented">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Has Consented </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.has_consented}} </mat-cell>
+      </ng-container>
+
+      <!-- Last Updated Column -->
+      <ng-container matColumnDef="last_updated">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.last_updated}} </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </div>
+</div>

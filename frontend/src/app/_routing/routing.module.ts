@@ -21,6 +21,7 @@ import {StudyFormComponent} from '../study-form/study-form.component';
 import {TermsComponent} from '../terms/terms.component';
 import {UserAdminComponent} from '../user-admin/user-admin.component';
 import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
+import {ParticipantAdminComponent} from '../participant-admin/participant-admin.component';
 import {TimedoutComponent} from '../timed-out/timed-out.component';
 import {AdminGuard} from './admin-guard';
 import {AuthGuard} from './auth-guard';
@@ -94,6 +95,12 @@ const routes: Routes = [
     path: 'admin/data',
     component: QuestionnaireDataViewComponent,
     data: {title: 'Data Admin'},
+    canActivate: [AdminGuard]
+  },
+  {
+    path: 'admin/participant',
+    component: ParticipantAdminComponent,
+    data: {title: 'participant Admin'},
     canActivate: [AdminGuard]
   },
   {path: 'admin/user', component: UserAdminComponent, data: {title: 'User Admin'}, canActivate: [AdminGuard]},
