@@ -1,8 +1,9 @@
-import enum
-
 from sqlalchemy import func
 
 from app import db
+from app.model.step_log import StepLog
+from app.model.flows import Flows
+from app.model.participant_relationship import Relationship
 
 
 # Describes the relationship between the User model and the participant
@@ -11,21 +12,6 @@ from app.model.questionnaires.identification_questionnaire import Identification
 # Provides contact information for the participant
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.random_id_generator import random_integer
-
-
-class Relationship(enum.Enum):
-    self_participant = 1
-    self_guardian = 2
-    dependent = 3
-    self_professional = 4
-
-    @classmethod
-    def has_name(cls, name):
-        return any(name == item.name for item in cls)
-
-    @classmethod
-    def options(cls):
-        return [item.name for item in cls]
 
 
 class Participant(db.Model):
@@ -48,3 +34,16 @@ class Participant(db.Model):
             return self.identification.get_name()
         else:
             return ""
+
+    def get_percent_complete(self):
+        flow = Flows.get_flow_by_relationship(self.relationship)
+        step_logs = db.session.query(StepLog).filter_by(participant_id=self.id, flow=flow.name)
+        complete_steps = 0
+        for log in step_logs:
+            flow.update_step_progress(log)
+
+        for step in flow.steps:
+            if step.status is 'COMPLETE':
+                complete_steps += 1
+
+        return complete_steps / len(flow.steps)

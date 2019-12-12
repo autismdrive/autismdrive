@@ -4,84 +4,11 @@ import flask_restful
 from flask import request, g
 
 from app import RestException, db, auth
-from app.model.flow import Flow
-from app.model.participant import Participant, Relationship
+from app.model.participant import Participant
 from app.model.step_log import StepLog
 from app.schema.schema import FlowSchema
 from app.export_service import ExportService
-
-
-class Flows:
-    @staticmethod
-    def get_self_intake_flow():
-        flow = Flow(name="self_intake")
-        flow.relationship = Relationship.self_participant
-        flow.add_step('identification_questionnaire')
-        flow.add_step('contact_questionnaire')
-        flow.add_step('demographics_questionnaire')
-        flow.add_step('home_self_questionnaire')
-        flow.add_step('evaluation_history_self_questionnaire')
-        flow.add_step('clinical_diagnoses_questionnaire')
-        flow.add_step('current_behaviors_self_questionnaire')
-        flow.add_step('education_self_questionnaire')
-        flow.add_step('employment_questionnaire')
-        flow.add_step('supports_questionnaire')
-        return flow
-
-    @staticmethod
-    def get_dependent_intake_flow():
-        flow = Flow(name="dependent_intake")
-        flow.relationship = Relationship.dependent
-        flow.add_step('identification_questionnaire')
-        flow.add_step('demographics_questionnaire')
-        flow.add_step('home_dependent_questionnaire')
-        flow.add_step('evaluation_history_dependent_questionnaire')
-        flow.add_step('clinical_diagnoses_questionnaire')
-        flow.add_step('developmental_questionnaire')
-        flow.add_step('current_behaviors_dependent_questionnaire')
-        flow.add_step('education_dependent_questionnaire')
-        flow.add_step('supports_questionnaire')
-        return flow
-
-    @staticmethod
-    def get_guardian_intake_flow():
-        flow = Flow(name="guardian_intake")
-        flow.relationship = Relationship.self_guardian
-        flow.add_step('identification_questionnaire')
-        flow.add_step('contact_questionnaire')
-        flow.add_step('demographics_questionnaire')
-        return flow
-
-    @staticmethod
-    def get_professional_intake_flow():
-        flow = Flow(name="professional_intake")
-        flow.relationship = Relationship.self_professional
-        flow.add_step('identification_questionnaire')
-        flow.add_step('contact_questionnaire')
-        flow.add_step('demographics_questionnaire')
-        flow.add_step('professional_profile_questionnaire')
-        return flow
-
-    @staticmethod
-    def get_all_flows():
-        flows = [
-            Flows.get_self_intake_flow(),
-            Flows.get_dependent_intake_flow(),
-            Flows.get_guardian_intake_flow(),
-            Flows.get_professional_intake_flow()
-        ]
-        return flows
-
-    @staticmethod
-    def get_flow_by_name(name):
-        if name == 'self_intake':
-            return Flows.get_self_intake_flow()
-        if name == 'dependent_intake':
-            return Flows.get_dependent_intake_flow()
-        if name == 'guardian_intake':
-            return Flows.get_guardian_intake_flow()
-        if name == 'professional_intake':
-            return Flows.get_professional_intake_flow()
+from app.model.flows import Flows
 
 
 class FlowEndpoint(flask_restful.Resource):

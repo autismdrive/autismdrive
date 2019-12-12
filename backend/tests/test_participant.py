@@ -3,11 +3,11 @@ import unittest
 from flask import json
 
 from app.model.participant import Relationship, Participant
-from tests.base_test import BaseTest
+from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db
 
 
-class TestParticipant(BaseTest, unittest.TestCase):
+class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_participant_relationships(self):
         u = self.construct_user()
@@ -185,3 +185,53 @@ class TestParticipant(BaseTest, unittest.TestCase):
         self.assertIsNotNone(response['num_dependents'])
         self.assertIsNotNone(response['num_self_professionals'])
         self.assertIsNotNone(response['all_participants'])
+
+    def test_participant_percent_complete(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+
+        rv = self.app.get(
+            '/api/participant',
+            content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, response[0]['percent_complete'])
+
+        iq = {
+            'first_name': "Darah",
+            'middle_name': "Soo",
+            'last_name': "Ubway",
+            'is_first_name_preferred': True,
+            'birthdate': '02/02/2002',
+            'birth_city': 'Staunton',
+            'birth_state': 'VA',
+            'is_english_primary': True,
+            'participant_id': p.id
+        }
+        self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(iq),
+                           content_type="application/json",
+                           follow_redirects=True, headers=self.logged_in_headers(u))
+
+        rv = self.app.get(
+            '/api/participant',
+            content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertGreater(response[0]['percent_complete'], 0)
+
+    def test_participant_name(self):
+        p = self.construct_participant(user=self.construct_user(), relationship=Relationship.self_participant)
+        rv = self.app.get(
+            '/api/participant',
+            content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[0]['name'], '')
+
+        self.construct_identification_questionnaire(first_name='Felicity', nickname="City", participant=p)
+        rv = self.app.get(
+            '/api/participant',
+            content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[0]['name'], 'City')
