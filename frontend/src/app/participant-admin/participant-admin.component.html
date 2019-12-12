@@ -51,7 +51,7 @@
       <!-- Percent Complete Column -->
       <ng-container matColumnDef="percent_complete">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Percent Complete </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.percent_complete}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{element.percent_complete | percent}} </mat-cell>
       </ng-container>
 
       <!-- Has Consented Column -->
