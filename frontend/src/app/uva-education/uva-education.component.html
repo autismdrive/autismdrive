@@ -12,16 +12,29 @@
     </div>
   </div>
 </div>
-<div class="container uva-education">
-  <div
-    class="row"
-    fxFlex="50%"
-  >
-    <app-news-item
-      *ngFor="let item of newsItems; let i = index"
-      [item]="item"
-      [index]="i"
-    ></app-news-item>
+<div *ngIf="!loading">
+  <div class="container uva-education">
+    <div
+      *ngIf="newsItems.length > 0"
+      class="row"
+      fxFlex="50%"
+    >
+      <app-news-item
+        *ngFor="let item of newsItems; let i = index"
+        [item]="item"
+        [index]="i"
+      ></app-news-item>
+    </div>
+    <div class="pad-2" *ngIf="!newsItems || newsItems.length == 0">
+      <h4>Please check back for UVA Education content coming soon.</h4>
+    </div>
   </div>
 </div>
 
+<div
+  *ngIf="loading"
+  class="pad-2"
+  fxLayoutAlign="center center"
+>
+  <mat-spinner></mat-spinner>
+</div>

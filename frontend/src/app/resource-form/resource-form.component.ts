@@ -196,6 +196,19 @@ export class ResourceFormComponent implements OnInit {
         hideExpression: '!model.type',
       },
       {
+        key: 'is_uva_education_content',
+        type: 'radio',
+        templateOptions: {
+          label: 'UVA Education Content',
+          placeholder: 'Should this resource be displayed on the UVA Educaiton page?',
+          options: [
+            {value: true, label: 'Yes'},
+            {value: false, label: 'No'},
+          ]
+        },
+        hideExpression: '!model.type',
+      },
+      {
         key: 'categories',
         type: 'multicheckbox',
         templateOptions: {

@@ -16,13 +16,14 @@ export class UvaEducationComponent implements OnInit {
   edResources: Resource[];
   newsItems: NewsItem[];
   currentUser: User;
+  loading = true;
+
 
   constructor(
     private api: ApiService,
     private authenticationService: AuthenticationService,
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-
     this.loadResources();
   }
 
@@ -31,8 +32,9 @@ export class UvaEducationComponent implements OnInit {
 
   loadResources() {
     this.api.getResources().subscribe( resources => {
-      this.edResources = resources;
-      this.newsItems = this._resourcesToNewsItems(this.edResources);
+      this.edResources = resources.filter(r => r.is_uva_education_content === true);
+      this.newsItems = this._resourcesToNewsItems(this.edResources) || [];
+      this.loading = false
     })
   }
 
@@ -47,7 +49,7 @@ export class UvaEducationComponent implements OnInit {
             description: r.description.substr(0, 100) + '...',
             url: `/${r.type.toLowerCase()}/${r.id}`,
             type: HitType.RESOURCE,
-            img: 'https://img.youtube.com/vi/' + r.video_code +'/hqdefault.jpg',
+            img: this.get_image(r),
             imgClass: 'center-center',
           };
           return n;
@@ -55,4 +57,11 @@ export class UvaEducationComponent implements OnInit {
     }
   }
 
+  get_image(resource: Resource) {
+    if (resource.video_code) {
+      return 'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'
+    } else {
+      return '/assets/education/micah_presents.jpg'
+    }
+  }
 }

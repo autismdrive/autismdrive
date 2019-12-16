@@ -23,7 +23,7 @@ export class Resource extends GeoLocation {
   phone?: string;
   website?: string;
   video_code?: string;
-  is_uva_education_content?: string;
+  is_uva_education_content?: boolean;
   last_updated?: string;
   status?: string;
   resource_categories?: ResourceCategory[];
