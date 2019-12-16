@@ -1,0 +1,27 @@
+<div
+  id="hero"
+  class="center-center gradient-overlay container"
+>
+  <div
+    class="row"
+    fxFlex="50%"
+    fxLayoutAlign="center center"
+  >
+    <div class="hero-content">
+      <h1>UVA Education</h1>
+    </div>
+  </div>
+</div>
+<div class="container uva-education">
+  <div
+    class="row"
+    fxFlex="50%"
+  >
+    <app-news-item
+      *ngFor="let item of newsItems; let i = index"
+      [item]="item"
+      [index]="i"
+    ></app-news-item>
+  </div>
+</div>
+

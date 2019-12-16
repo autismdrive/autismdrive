@@ -27,10 +27,12 @@ import {AuthGuard} from './auth-guard';
 import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {AdminExportComponent} from '../admin-export/admin-export.component';
+import {UvaEducationComponent} from '../uva-education/uva-education.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
   {path: 'home', component: HomeComponent, data: {title: 'Welcome Autism DRIVE'}, canActivate: [NotMirroredGuard]},
+  {path: 'uva-education', component: UvaEducationComponent, data: {title: 'UVA Education'}, canActivate: [NotMirroredGuard]},
   {
     path: 'about',
     component: AboutComponent,
