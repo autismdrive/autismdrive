@@ -6,7 +6,7 @@
   }"
 >
   <div class="image">
-    <img src="{{item.img}}">
+    <a [routerLink]="[ item.url ]"><img src="{{item.img}}"></a>
   </div>
   <div class="content">
     <span class="item-type">{{item.type.label}}</span>
