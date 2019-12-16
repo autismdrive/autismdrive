@@ -187,14 +187,13 @@ export class ResourceFormComponent implements OnInit {
         validators: {"validation": ["url"]},
       },
       {
-        key: 'video_link',
+        key: 'video_code',
         type: 'input',
         templateOptions: {
-          label: 'Video Link',
-          placeholder: 'Please enter the link to a video of this content',
+          label: 'Video Code',
+          placeholder: 'Please enter the YouTube code for a video of this content',
         },
         hideExpression: '!model.type',
-        validators: {"validation": ["url"]},
       },
       {
         key: 'categories',

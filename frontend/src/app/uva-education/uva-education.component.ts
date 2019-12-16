@@ -47,7 +47,7 @@ export class UvaEducationComponent implements OnInit {
             description: r.description.substr(0, 100) + '...',
             url: `/${r.type.toLowerCase()}/${r.id}`,
             type: HitType.RESOURCE,
-            img: 'https://img.youtube.com/vi/' + r.video_link +'/hqdefault.jpg',
+            img: 'https://img.youtube.com/vi/' + r.video_code +'/hqdefault.jpg',
             imgClass: 'center-center',
           };
           return n;

@@ -45,8 +45,8 @@ export class ResourceDetailComponent implements OnInit {
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;
-          if (this.resource.video_link){
-            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(this.resource.video_link);
+          if (this.resource.video_code){
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
           }
         });
         if (this.currentUser && this.currentUser.role === 'Admin') {
