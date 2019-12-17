@@ -1,6 +1,6 @@
 import { Participant } from './participant';
 
-export interface UserParticipantList {
+export interface ParticipantAdminList {
   num_self_participants: number;
   num_self_guardians: number;
   num_dependents: number;

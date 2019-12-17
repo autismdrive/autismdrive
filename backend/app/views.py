@@ -47,7 +47,7 @@ from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint
 )
-from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint
+from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint, ParticipantAdminListEndpoint
 from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
     OrganizationListEndpoint
@@ -85,8 +85,7 @@ from app.resources.StudyInquiryEndpoint import (
     StudyInquiryEndpoint
 )
 from app.resources.UserAndParticipantEndpoint import (
-    ParticipantBySessionEndpoint,
-    UserParticipantListEndpoint
+    ParticipantBySessionEndpoint
 )
 from app.resources.EventAndCategoryEndpoint import (
     EventCategoryEndpoint,
@@ -215,7 +214,7 @@ endpoints = [
     # Participants
     (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
-    (UserParticipantListEndpoint, "/user_participant"),
+    (ParticipantAdminListEndpoint, "/participant_admin_list"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
     # Questionnaires
     (QuestionnaireInfoEndpoint, "/q"),

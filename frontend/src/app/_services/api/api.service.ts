@@ -14,7 +14,7 @@ import {Study} from '../../_models/study';
 import {StudyCategory} from '../../_models/study_category';
 import {StepLog} from '../../_models/step_log';
 import {User} from '../../_models/user';
-import {UserParticipantList} from '../../_models/user_participant_list';
+import {ParticipantAdminList} from '../../_models/participant_admin_list';
 import {UserSearchResults} from '../../_models/user_search_results';
 import {StudyUser} from '../../_models/study_user';
 import {TableInfo} from '../../_models/table_info';
@@ -62,6 +62,7 @@ export class ApiService {
     organization: '/api/organization/<id>',
     organizationlist: '/api/organization',
     participant: '/api/participant/<id>',
+    participantAdminList: '/api/participant_admin_list',
     participantbysession: '/api/session/participant',
     participantStepLog: '/api/participant/step_log/<id>',
     password_requirements: '/api/password_requirements/<role>',
@@ -95,7 +96,6 @@ export class ApiService {
     user: '/api/user/<id>',
     userAdminNoteList: '/api/user/<user_id>/admin_note',
     userEmailLog: '/api/user/email_log/<id>',
-    userParticipantList: '/api/user_participant',
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
@@ -146,8 +146,8 @@ export class ApiService {
   }
 
   /** Get User Participant Info List */
-  getUserParticipantList(): Observable<UserParticipantList> {
-    return this.httpClient.get<UserParticipantList>(this._endpointUrl('userParticipantList'))
+  getParticipantAdminList(): Observable<ParticipantAdminList> {
+    return this.httpClient.get<ParticipantAdminList>(this._endpointUrl('participantAdminList'))
       .pipe(catchError(this._handleError));
   }
 
