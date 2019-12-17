@@ -47,7 +47,7 @@ export class UvaEducationComponent implements OnInit {
           const n: NewsItem = {
             title: r.title,
             description: r.description.substr(0, 100) + '...',
-            url: `/${r.type.toLowerCase()}/${r.id}`,
+            url: `/${r.type.toLowerCase()}/${r.id}+video`,
             type: HitType.RESOURCE,
             img: this.get_image(r),
             imgClass: 'center-center',

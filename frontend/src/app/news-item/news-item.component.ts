@@ -18,4 +18,12 @@ export class NewsItemComponent implements OnInit {
   isEven(i: number) {
     return i % 2 === 0;
   }
+
+  itemLabel() {
+    if (this.item.url.substr(-6,6) == '+video') {
+      return "Watch this video"
+    } else {
+      return "Details"
+    }
+  }
 }
