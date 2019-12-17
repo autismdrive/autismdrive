@@ -181,7 +181,6 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(2, response['num_self_participants'])
         self.assertEqual(1, response['num_self_guardians'])
-        self.assertIsNotNone(response['user_participants'])
         self.assertIsNotNone(response['num_dependents'])
         self.assertIsNotNone(response['num_self_professionals'])
         self.assertIsNotNone(response['all_participants'])
