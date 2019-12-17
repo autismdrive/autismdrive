@@ -131,8 +131,8 @@ class EvaluationHistoryMixin(object):
             "display_order": 5,
             "type": "input",
             "template_options": {
-                "label": "First diagnosed by",
-                "appearance": "standard",
+                "label": "Diagnosed by other?",
+                "placeholder": "Please Describe",
                 "required": True,
             },
             "hide_expression": who_diagnosed_other_hide_expression,
@@ -197,7 +197,6 @@ class EvaluationHistoryMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Where was this diagnosis made?",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": where_diagnosed_other_hide_expression,
@@ -237,7 +236,6 @@ class EvaluationHistoryMixin(object):
                 "type": "radio",
                 "template_options": {
                     "label": "Permission to Link Data",
-                    "appearance": "standard",
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
@@ -285,7 +283,6 @@ class EvaluationHistoryMixin(object):
                     "type": "number",
                     "max": 200,
                     "min": 0,
-                    "appearance": "standard",
                 },
                 "hide_expression": "!(model.has_iq_test)",
             },

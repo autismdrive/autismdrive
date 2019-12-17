@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, SecurityContext} from '@angular/core';
 import {ApiService} from '../_services/api/api.service';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
@@ -8,6 +8,7 @@ import {AuthenticationService} from '../_services/api/authentication-service';
 import {AdminNote} from '../_models/admin_note';
 import {ContactItem} from '../_models/contact_item';
 import {formatDate} from '@angular/common';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-resource-detail',
@@ -23,11 +24,13 @@ export class ResourceDetailComponent implements OnInit {
   contactItems: ContactItem[];
   typeName: string;
   showInfoWindow = false;
+  safeVideoLink: SafeResourceUrl;
 
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
+    private _sanitizer: DomSanitizer
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
@@ -42,6 +45,9 @@ export class ResourceDetailComponent implements OnInit {
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;
+          if (this.resource.video_link){
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(this.resource.video_link);
+          }
         });
         if (this.currentUser && this.currentUser.role === 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {

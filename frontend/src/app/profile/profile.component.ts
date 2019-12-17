@@ -27,6 +27,7 @@ export class ProfileComponent implements OnInit {
   currentStudies: Study[];
   self: Participant;
   dependents: Participant[];
+  selfPercentComplete: number;
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
@@ -60,6 +61,11 @@ export class ProfileComponent implements OnInit {
         let newU = new User(u);
         this.self = newU.getSelf();
         this.dependents = newU.getDependents();
+        this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(
+          f => {
+            this.selfPercentComplete = f.percentComplete();
+          }
+        )
       })
     }
   }
