@@ -200,7 +200,7 @@ export class ResourceFormComponent implements OnInit {
         type: 'radio',
         templateOptions: {
           label: 'UVA Education Content',
-          placeholder: 'Should this resource be displayed on the UVA Educaiton page?',
+          placeholder: 'Should this resource be displayed on the UVA Education page?',
           options: [
             {value: true, label: 'Yes'},
             {value: false, label: 'No'},
