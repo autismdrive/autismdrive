@@ -2,7 +2,7 @@ import {Component, OnInit, SecurityContext} from '@angular/core';
 import {ApiService} from '../_services/api/api.service';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {LatLngLiteral} from '@agm/core';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {AdminNote} from '../_models/admin_note';
@@ -29,6 +29,7 @@ export class ResourceDetailComponent implements OnInit {
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
+    private router: Router,
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer
   ) {
