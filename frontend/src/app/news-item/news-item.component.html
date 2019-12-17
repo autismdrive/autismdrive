@@ -12,6 +12,6 @@
     <span class="item-type">{{item.type.label}}</span>
     <a class="item-title" [routerLink]="[ item.url ]">{{item.title}}</a>
     <p>{{item.description}}</p>
-    <app-details-link [url]="item.url" [label]="itemLabel()"></app-details-link>
+    <app-details-link [url]="item.url" [label]="item.label"></app-details-link>
   </div>
 </div>

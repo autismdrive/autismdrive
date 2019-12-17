@@ -44,13 +44,18 @@ export class UvaEducationComponent implements OnInit {
       return ed_resources
         .sort((a, b) => (a.id > b.id) ? 1 : -1)
         .map((r, i) => {
+          let label: string;
+          if (r.video_code) {
+            label = 'Watch this video'
+          }
           const n: NewsItem = {
             title: r.title,
             description: r.description.substr(0, 100) + '...',
-            url: `/${r.type.toLowerCase()}/${r.id}+video`,
+            url: `/${r.type.toLowerCase()}/${r.id}`,
             type: HitType.RESOURCE,
             img: this.get_image(r),
             imgClass: 'center-center',
+            label: label
           };
           return n;
         });

@@ -13,17 +13,13 @@ export class NewsItemComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    if (!this.item.label) {
+      this.item.label = 'Details'
+    }
   }
 
   isEven(i: number) {
     return i % 2 === 0;
   }
 
-  itemLabel() {
-    if (this.item.url.substr(-6,6) == '+video') {
-      return "Watch this video"
-    } else {
-      return "Details"
-    }
-  }
 }
