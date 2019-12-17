@@ -11,7 +11,7 @@ import { MatTableDataSource } from '@angular/material';
   styleUrls: ['./participant-admin.component.scss']
 })
 export class ParticipantAdminComponent implements OnInit {
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
   userParticipantList: UserParticipantList;
   participantDataSource: MatTableDataSource<Participant>;
   displayedColumns: string[] = ['id', 'name', 'user_id', 'relationship', 'percent_complete', 'has_consented', 'last_updated'];

@@ -6,14 +6,15 @@
     <mat-spinner></mat-spinner>
   </div>
 
-  <div *ngIf="!loading">
+  <div>
     <h1>Participant Admin</h1>
 
-    <p>Total Self Participants: {{userParticipantList.num_self_participants}}</p>
-    <p>Total Self Professionals: {{userParticipantList.num_self_professionals}}</p>
-    <p>Total Self Guardians: {{userParticipantList.num_self_guardians}}</p>
-    <p>Total Dependents: {{userParticipantList.num_dependents}}</p>
-
+    <ng-container *ngIf="userParticipantList">
+      <p>Total Self Participants: {{userParticipantList.num_self_participants}}</p>
+      <p>Total Self Professionals: {{userParticipantList.num_self_professionals}}</p>
+      <p>Total Self Guardians: {{userParticipantList.num_self_guardians}}</p>
+      <p>Total Dependents: {{userParticipantList.num_dependents}}</p>
+    </ng-container>
 
     <mat-table
       [dataSource]="participantDataSource"
