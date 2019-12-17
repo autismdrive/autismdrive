@@ -36,6 +36,7 @@ export class ResourceDetailComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
       this.loading = true;
+      this.safeVideoLink = null;
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
