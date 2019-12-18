@@ -6,13 +6,13 @@ export class ProfileUseCases {
 
   displayProfileScreen() {
     expect(this.page.getElements('app-profile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_self').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_guardian').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_professional').count()).toEqual(1);
+    expect(this.page.getElements('#enroll_self_tile').count()).toEqual(1);
+    expect(this.page.getElements('#enroll_guardian_tile').count()).toEqual(1);
+    expect(this.page.getElements('#enroll_professional_tile').count()).toEqual(1);
   }
 
   startGuardianFlow() {
-    this.page.clickAndExpectRoute('#enroll_guardian', '/terms/self_guardian');
+    this.page.clickAndExpectRoute('#enroll_guardian_tile', '/terms/self_guardian');
   }
 
   startDependentFlow() {
