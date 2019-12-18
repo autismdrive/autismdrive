@@ -35,6 +35,7 @@
             mat-flat-button
             color="primary"
             [routerLink]="[ '/register' ]"
+            [queryParams]="{ returnUrl: router.url }"
           >Join Autism DRIVE</button>
           <button
             mat-flat-button

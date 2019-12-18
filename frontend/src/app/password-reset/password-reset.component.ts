@@ -6,6 +6,8 @@ import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {PasswordRequirements} from '../_models/password_requirements';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {scrollToTop} from '../../util/scrollToTop';
+import {User} from '../_models/user';
 
 @Component({
   selector: 'app-password-reset',
@@ -22,6 +24,7 @@ export class PasswordResetComponent implements OnInit {
   role: string;
   passwordRequirements: PasswordRequirements;
   passwordRegex: RegExp;
+  returnUrl: string;
   fields: FormlyFieldConfig[] = [
     {
       key: 'password',
@@ -78,6 +81,7 @@ export class PasswordResetComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.token = params['email_token'];
       this.role = params['role'];
+      this.returnUrl = localStorage.getItem('returnUrl');
       this.apiService.getPasswordRequirements(this.role).subscribe(reqs => {
         this.passwordRequirements = reqs;
         this.passwordRegex = RegExp(reqs.regex);
@@ -100,7 +104,7 @@ export class PasswordResetComponent implements OnInit {
 
       this.authenticationService.resetPassword(this.model['password']['password'], this.token).subscribe(
         data => {
-          this.router.navigate(['profile']);
+          this._goToReturnUrl(data);
           this.googleAnalyticsService.accountEvent('reset_password');
         }, error1 => {
           if (error1.code == 'token_expired') {
@@ -116,5 +120,11 @@ export class PasswordResetComponent implements OnInit {
 
   updateValidationState() {
     this.form.updateValueAndValidity();
+  }
+
+  private _goToReturnUrl(user: User) {
+    if (user) {
+      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop());
+    }
   }
 }
