@@ -66,7 +66,7 @@ export class UvaEducationComponent implements OnInit {
     if (resource.video_code) {
       return 'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'
     } else {
-      return '/assets/education/micah_presents.jpg'
+      return '/assets/about/feature.jpg'
     }
   }
 }
