@@ -13,9 +13,13 @@ export class NewsItemComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    if (!this.item.label) {
+      this.item.label = 'Details'
+    }
   }
 
   isEven(i: number) {
     return i % 2 === 0;
   }
+
 }

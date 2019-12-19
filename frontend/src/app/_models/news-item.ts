@@ -7,4 +7,5 @@ export interface NewsItem {
   type?: HitType;
   img: string;
   imgClass?: string;
+  label?: string;
 }

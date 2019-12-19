@@ -109,6 +109,22 @@
             fxShow.gt-lg
           >Find Resources</span>
         </a></li>
+        <li><a
+          mat-button
+          [routerLink]="[ '/uva-education' ]"
+          routerLinkActive="selected"
+          id="uva-education-button"
+        >
+          <span
+            fxHide
+            fxShow.lt-lg
+          >Education</span>
+          <span
+            fxHide
+            fxShow.lg
+            fxShow.gt-lg
+          >UVA Education</span>
+        </a></li>
 
         <li *ngIf="!currentUser"><a
           mat-button
@@ -220,6 +236,13 @@
     id="resources-button-mobile"
     (click)="toggleMenu()"
   >Find Resources</a>
+  <a
+    mat-button
+    [routerLink]="[ '/uva-education' ]"
+    routerLinkActive="selected"
+    id="uva-education-button-mobile"
+    (click)="toggleMenu()"
+  >UVA Education</a>
   <a
     mat-button
     *ngIf="!currentUser"

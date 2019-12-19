@@ -5,33 +5,77 @@
 
   <div *ngIf="state === possibleStates.NO_PARTICIPANT">
     <h1>New Account Registration</h1>
-    <h2>Welcome!</h2>
-    <p>Thank you for creating an account on Autism DRIVE. To complete your registration, select the button below that
-      best describes <b>you.</b> You will have additional opportunities to enter information about your children or
-      dependents after completing your own registration.</p>
     <div
-      fxLayout="column"
-      fxLayoutAlign="start start"
+      fxLayout="row"
+      fxLayout.lt-lg="column"
       fxLayoutGap="2em"
     >
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="enrollSelf($event)"
-        id="enroll_self"
-      >I am an adult with autism and I am my own legal guardian</button>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="enrollGuardian($event)"
-        id="enroll_guardian"
-      >I am the parent/legal guardian of a child or adult with autism</button>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="enrollProfessional($event)"
-        id="enroll_professional"
-      >I am a student/professional with an interest in autism</button>
+      <div
+        fxFlex="100%"
+      >
+        <h2>Welcome!</h2>
+        <p>Thank you for creating an account on Autism DRIVE. To complete your registration, select the button below that
+          best describes <b>you.</b> You will have additional opportunities to enter information about your children or
+          dependents after completing your own registration.</p>
+
+        <div
+          fxLayout="column"
+          fxLayoutAlign="center auto"
+          fxLayoutGap="2em"
+          fxHide.gt-xs
+          fxShow.lt-sm
+        >
+          <button
+            mat-flat-button
+            color="accent"
+            (click)="enrollSelf($event)"
+            id="enroll_self"
+          >I am an adult with autism and I am my own legal guardian</button>
+          <button
+            mat-flat-button
+            color="accent"
+            (click)="enrollGuardian($event)"
+            id="enroll_guardian"
+          >I am the parent/legal guardian of a child or adult with autism</button>
+          <button
+            mat-flat-button
+            color="accent"
+            (click)="enrollProfessional($event)"
+            id="enroll_professional"
+          >I am a student/professional with an interest in autism</button>
+        </div>
+        <div
+          class="tiles"
+          fxLayout="row wrap"
+          fxLayoutAlign="center auto"
+          fxLayoutGap="20px"
+          fxHide.lt-sm
+          fxShow.gt-xs
+        >
+          <div fxFlex="100%"><h3>I am:</h3></div>
+          <app-border-box-tile
+            fxFlex="calc(33%-20px)"
+            (click)="enrollSelf($event)"
+            id="enroll_self_tile"
+            [subtitle]="'An adult with autism and my own legal guardian'"
+          ></app-border-box-tile>
+          <app-border-box-tile
+            fxFlex="calc(33%-20px)"
+            (click)="enrollGuardian($event)"
+            id="enroll_guardian_tile"
+            [subtitle]="'A parent / legal guardian of a child or adult with autism'"
+          ></app-border-box-tile>
+          <app-border-box-tile
+            fxFlex="calc(33%-20px)"
+            (click)="enrollProfessional($event)"
+            id="enroll_professional_tile"
+            [subtitle]="'A student / professional with an interest in autism'"
+          ></app-border-box-tile>
+        </div>
+      </div>
+    </div>
+    <div>
+
     </div>
   </div>
 
