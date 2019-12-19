@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Participant } from '../_models/participant';
 import { User } from '../_models/user';
 import { ParticipantRelationship } from '../_models/participantRelationship';
-import { Flow } from '../_models/flow';
 import { ApiService } from '../_services/api/api.service';
 import { AvatarDialogComponent } from '../avatar-dialog/avatar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,9 +15,6 @@ import { MatDialog } from '@angular/material/dialog';
 export class ParticipantProfileComponent implements OnInit {
   @Input() participant: Participant;
   @Input() user: User;
-  flow: Flow;
-  percentComplete: number;
-  numStudies: number;
 
   constructor(
     private api: ApiService,
@@ -28,22 +24,6 @@ export class ParticipantProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.participant) {
-      this.api
-        .getFlow(this.participant.getFlowName(), this.participant.id)
-        .subscribe(f => {
-          this.flow = new Flow(f);
-          console.log('this.flow', this.flow);
-          this.percentComplete = this.flow.percentComplete();
-          console.log('this.percentComplete', this.percentComplete);
-        });
-    }
-
-    if (isFinite(this.participant.num_studies_enrolled)) {
-      this.numStudies = this.participant.num_studies_enrolled;
-    } else {
-      this.numStudies = 0;
-    }
   }
 
   goEditEnroll($event) {

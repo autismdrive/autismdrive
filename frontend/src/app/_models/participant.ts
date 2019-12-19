@@ -8,7 +8,6 @@ export class Participant {
   relationship: string;
   last_updated?: Date;
   percent_complete?: number;
-  num_studies_enrolled?: number;
   name?: string;
   avatar_color?: string;
   avatar_icon?: string;

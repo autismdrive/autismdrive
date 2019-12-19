@@ -47,7 +47,7 @@ from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint
 )
-from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint
+from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint, ParticipantAdminListEndpoint
 from app.resources.OrganizationEndpoint import (
     OrganizationEndpoint,
     OrganizationListEndpoint
@@ -214,6 +214,7 @@ endpoints = [
     # Participants
     (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
+    (ParticipantAdminListEndpoint, "/participant_admin_list"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
     # Questionnaires
     (QuestionnaireInfoEndpoint, "/q"),

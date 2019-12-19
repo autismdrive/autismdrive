@@ -30,33 +30,26 @@ export class StudyInquiryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.refreshInquiriesAndParticipants();
+    this.refreshUserAndInquiries();
   }
 
-  refreshInquiriesAndParticipants() {
+  refreshUserAndInquiries() {
     if (this.currentUser) {
       this.api.getUser(this.currentUser.id).subscribe( u => {
         let newU = new User(u);
         this.currentUser = newU;
         this.haveUserContact = newU.checkContact();
-        this.api.getUserStudyInquiries(newU.id).subscribe(
-          userStudyInquiries => {
-            for ( let i in userStudyInquiries ) {
-              if (this.study.id == userStudyInquiries[i].study_id) {
-                this.alreadyInquired = true;
-              }
+
+      });
+      this.api.getUserStudyInquiries(this.currentUser.id).subscribe(
+        userStudyInquiries => {
+          for ( let i in userStudyInquiries ) {
+            if (this.study.id == userStudyInquiries[i].study_id) {
+              this.alreadyInquired = true;
             }
           }
-        );
-        for (let i in newU.participants) {
-          this.api
-            .getFlow(newU.participants[i].getFlowName(), newU.participants[i].id)
-            .subscribe(f => {
-              newU.participants[i].percent_complete = f.percentComplete();
-            });
         }
-      });
-
+      );
     }
   }
 

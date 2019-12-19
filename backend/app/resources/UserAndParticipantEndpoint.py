@@ -48,5 +48,3 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
         except exc.IntegrityError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
-
-

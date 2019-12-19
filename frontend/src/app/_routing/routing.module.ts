@@ -10,7 +10,6 @@ import {LoginComponent} from '../login/login.component';
 import {LogoutComponent} from '../logout/logout.component';
 import {PasswordResetComponent} from '../password-reset/password-reset.component';
 import {ProfileComponent} from '../profile/profile.component';
-import {QuestionnaireDataViewComponent} from '../questionnaire-data-view/questionnaire-data-view.component';
 import {RegisterComponent} from '../register/register.component';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
 import {ResourceFormComponent} from '../resource-form/resource-form.component';
@@ -19,14 +18,12 @@ import {StudiesComponent} from '../studies/studies.component';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
 import {StudyFormComponent} from '../study-form/study-form.component';
 import {TermsComponent} from '../terms/terms.component';
-import {UserAdminComponent} from '../user-admin/user-admin.component';
 import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
 import {TimedoutComponent} from '../timed-out/timed-out.component';
 import {AdminGuard} from './admin-guard';
 import {AuthGuard} from './auth-guard';
 import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
-import {AdminExportComponent} from '../admin-export/admin-export.component';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
 
 const routes: Routes = [
@@ -93,22 +90,9 @@ const routes: Routes = [
   {path: 'search/:query', component: SearchComponent, data: {title: 'Search Resources'}},
   {path: 'admin', component: AdminHomeComponent, data: {title: 'Admin Home'}, canActivate: [AdminGuard]},
   {
-    path: 'admin/data',
-    component: QuestionnaireDataViewComponent,
-    data: {title: 'Data Admin'},
-    canActivate: [AdminGuard]
-  },
-  {path: 'admin/user', component: UserAdminComponent, data: {title: 'User Admin'}, canActivate: [AdminGuard]},
-  {
     path: 'admin/user/:userId',
     component: UserAdminDetailsComponent,
     data: {title: 'User Admin Details'},
-    canActivate: [AdminGuard]
-  },
-  {
-    path: 'admin/export',
-    component: AdminExportComponent,
-    data: {title: 'Export/Import Status'},
     canActivate: [AdminGuard]
   },
   {path: 'mirrored', component: MirrorComponent, data: {title: 'Mirrored Server Details'}},
