@@ -27,9 +27,9 @@
         </div>
         <div *ngIf="!currentUser">
           <h2>Interested in watching this video?</h2>
-          <div style="position: relative">
-            <div style="width: 80%" class="gradient-overlay">
-              <img style="width: 100%" [src]="'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'">
+          <div class="video-image-box">
+            <div class="gradient-overlay image">
+              <img [src]="'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'">
             </div>
             <div
               fxLayout="column"

@@ -27,3 +27,15 @@ agm-map {
   width: 60%;
   z-index: 3;
 }
+
+.video-image-box {
+  position: relative;
+
+  .image {
+    width: 80%;
+  }
+
+  img {
+    width: 100%;
+  }
+}
