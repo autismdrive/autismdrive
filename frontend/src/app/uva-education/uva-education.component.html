@@ -1,0 +1,34 @@
+<div
+  id="hero"
+  class="gradient-overlay container"
+>
+  <div class="hero-content">
+    <h1>UVA Education</h1>
+  </div>
+</div>
+<div
+  *ngIf="loading"
+  class="pad-2"
+  fxLayoutAlign="center center"
+>
+  <mat-spinner></mat-spinner>
+</div>
+<div *ngIf="newsItems">
+  <div class="container uva-education">
+    <div
+      *ngIf="newsItems.length > 0"
+      class="row"
+      fxFlex="75%"
+    >
+      <app-news-item
+        *ngFor="let item of newsItems; let i = index"
+        [item]="item"
+        [index]="i"
+      ></app-news-item>
+    </div>
+    <div class="pad-2" *ngIf="!newsItems || newsItems.length == 0">
+      <h4>Please check back for UVA Education content coming soon.</h4>
+    </div>
+  </div>
+</div>
+

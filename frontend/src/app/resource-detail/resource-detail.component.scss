@@ -19,3 +19,23 @@ agm-map {
   font-weight: 700;
   color: $brand-accent;
 }
+
+.button-overlay {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 60%;
+  z-index: 3;
+}
+
+.video-image-box {
+  position: relative;
+
+  .image {
+    width: 80%;
+  }
+
+  img {
+    width: 100%;
+  }
+}

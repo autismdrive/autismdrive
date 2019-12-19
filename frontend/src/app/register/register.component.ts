@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user';
@@ -38,6 +38,7 @@ export class RegisterComponent implements OnInit {
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
+    private route: ActivatedRoute,
     private googleAnalytics: GoogleAnalyticsService
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
@@ -54,6 +55,7 @@ export class RegisterComponent implements OnInit {
 
   submit() {
     localStorage.removeItem('token_url');
+    localStorage.setItem('returnUrl', this.route.snapshot.queryParams['returnUrl']);
     if (this.form.valid) {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();

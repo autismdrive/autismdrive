@@ -22,7 +22,8 @@ export class Resource extends GeoLocation {
   zip?: string;
   phone?: string;
   website?: string;
-  video_link?: string;
+  video_code?: string;
+  is_uva_education_content?: boolean;
   last_updated?: string;
   status?: string;
   resource_categories?: ResourceCategory[];
