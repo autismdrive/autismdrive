@@ -55,12 +55,7 @@ export class RegisterComponent implements OnInit {
 
   submit() {
     localStorage.removeItem('token_url');
-    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-    if (returnUrl) {
-      localStorage.setItem('returnUrl', returnUrl)
-    } else {
-      localStorage.removeItem('returnUrl')
-    }
+    localStorage.setItem('returnUrl', this.route.snapshot.queryParams['returnUrl']);
     if (this.form.valid) {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();

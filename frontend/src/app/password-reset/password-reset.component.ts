@@ -24,7 +24,6 @@ export class PasswordResetComponent implements OnInit {
   role: string;
   passwordRequirements: PasswordRequirements;
   passwordRegex: RegExp;
-  returnUrl: string;
   fields: FormlyFieldConfig[] = [
     {
       key: 'password',
@@ -81,7 +80,6 @@ export class PasswordResetComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.token = params['email_token'];
       this.role = params['role'];
-      this.returnUrl = localStorage.getItem('returnUrl');
       this.apiService.getPasswordRequirements(this.role).subscribe(reqs => {
         this.passwordRequirements = reqs;
         this.passwordRegex = RegExp(reqs.regex);
@@ -123,8 +121,9 @@ export class PasswordResetComponent implements OnInit {
   }
 
   private _goToReturnUrl(user: User) {
+    const returnUrl = localStorage.getItem('returnUrl');
     if (user) {
-      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop());
+      this.router.navigateByUrl(returnUrl || '/profile').then(_ => scrollToTop());
     }
   }
 }
