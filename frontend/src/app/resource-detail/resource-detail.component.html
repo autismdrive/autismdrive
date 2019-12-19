@@ -25,29 +25,30 @@
         <div *ngIf="currentUser">
           <iframe fxFlex="100%" height="500px" [src]='safeVideoLink' frameborder="0" allowfullscreen></iframe>
         </div>
-        <h2>Interested in watching this video?</h2>
-        <div style="position: relative">
-          <div style="width: 80%" class="gradient-overlay">
-            <img style="width: 100%" [src]="'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'">
-          </div>
-          <div
-            *ngIf="!currentUser"
-            fxLayout="column"
-            fxLayoutGap="20px"
-            class="button-overlay"
-          >
-            <button
-              mat-flat-button
-              color="accent"
-              [routerLink]="[ '/register' ]"
-              [queryParams]="{ returnUrl: router.url }"
-            >Join Autism DRIVE</button>
-            <button
-              mat-flat-button
-              color="accent"
-              [routerLink]="[ '/login' ]"
-              [queryParams]="{ returnUrl: router.url }"
-            >Log In</button>
+        <div *ngIf="!currentUser">
+          <h2>Interested in watching this video?</h2>
+          <div style="position: relative">
+            <div style="width: 80%" class="gradient-overlay">
+              <img style="width: 100%" [src]="'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'">
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutGap="20px"
+              class="button-overlay"
+            >
+              <button
+                mat-flat-button
+                color="accent"
+                [routerLink]="[ '/register' ]"
+                [queryParams]="{ returnUrl: router.url }"
+              >Join Autism DRIVE</button>
+              <button
+                mat-flat-button
+                color="accent"
+                [routerLink]="[ '/login' ]"
+                [queryParams]="{ returnUrl: router.url }"
+              >Log In</button>
+            </div>
           </div>
         </div>
       </div>
