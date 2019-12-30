@@ -110,7 +110,6 @@ class IdentificationQuestionnaire(db.Model):
             "template_options": {
                 "label": "Nickname",
                 "required": False,
-                "appearance": "standard"
             },
             "hide_expression": "model.is_first_name_preferred",
         },
