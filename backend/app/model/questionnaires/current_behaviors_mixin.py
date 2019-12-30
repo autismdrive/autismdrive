@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -58,7 +55,6 @@ class CurrentBehaviorsMixin(object):
                 "template_options": {
                     "type": "array",
                     "label": "Area of difficulty",
-                    "appearance": "standard",
                     "required": True,
                     "options": [
                         {"value": "math", "label": "Math"},
@@ -83,7 +79,6 @@ class CurrentBehaviorsMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Enter area of academic difficulty",
-                "appearance": "standard",
                 "required": True
             },
             "hide_expression": academic_difficulty_other_hide_expression,

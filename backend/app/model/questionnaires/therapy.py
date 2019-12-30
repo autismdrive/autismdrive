@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 from sqlalchemy import func
@@ -90,7 +87,6 @@ class Therapy(db.Model):
             "type": "textarea",
             "template_options": {
                 "label": "Enter therapy or service",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": type_other_hide_expression,

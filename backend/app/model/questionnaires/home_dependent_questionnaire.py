@@ -2,7 +2,7 @@ from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import db
-from app.model.questionnaires.housemate import Housemate, HousemateSchema
+from app.model.questionnaires.housemate import HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
 
 
@@ -42,7 +42,6 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "type": "input",
             "template_options": {
                 "label": "",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": dependent_living_other_hide_expression,

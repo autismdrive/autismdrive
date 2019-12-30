@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
@@ -58,7 +55,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter developmental condition",
-                "appearance": "standard",
                 "required": True,
             },
 
@@ -99,7 +95,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter mental health condition",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": mental_health_other_hide_expression,
@@ -136,7 +131,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter medical condition",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": medical_other_hide_expression,
@@ -174,7 +168,6 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter genetic condition",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": genetic_other_hide_expression,

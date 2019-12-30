@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
@@ -94,7 +91,6 @@ class DemographicsQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter gender identity",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": gender_identity_other_hide_expression,
@@ -134,7 +130,6 @@ class DemographicsQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter race/ethnicity",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": race_ethnicity_other_hide_expression,

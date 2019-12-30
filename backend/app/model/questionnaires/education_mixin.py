@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -91,7 +88,6 @@ class EducationMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "Enter school placement",
-                    "appearance": "standard",
                     "required": True,
                 },
                 "hide_expression": cls.placement_other_hide_expression,
@@ -110,7 +106,6 @@ class EducationMixin(object):
                 "type": "input",
                 "template_options": {
                     "label": "School grade level",
-                    "appearance": "standard",
                     "required": True,
                 },
                 "hide_expression": cls.current_grade_hide_expression,
@@ -160,7 +155,6 @@ class EducationMixin(object):
             "type": "input",
             "template_options": {
                 "label": "Describe additional services",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": school_services_other_hide_expression,
