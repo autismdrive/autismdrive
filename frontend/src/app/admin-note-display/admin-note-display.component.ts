@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
-import {ApiService} from '../_services/api/api.service';
 import {AdminNote} from '../_models/admin_note';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
 
 @Component({
   selector: 'app-admin-note-display',
@@ -28,15 +28,21 @@ export class AdminNoteDisplayComponent implements OnInit {
   }
 
   getNotes() {
-    this.api.getResourceAdminNotes(this.currentResource.id).subscribe(notes =>{
+    this.api.getResourceAdminNotes(this.currentResource.id).subscribe(notes => {
       this.notes = notes;
-    })
+    });
   }
 
   openDialog(adminNote): void {
     const dialogRef = this.dialog.open(AdminNoteFormComponent, {
       width: `${window.innerWidth}px`,
-      data: { adminNote: adminNote || {"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": ''} }
+      data: {
+        adminNote: adminNote || {
+          'user_id': this.currentUser.id,
+          'resource_id': this.currentResource.id,
+          'note': ''
+        }
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -46,7 +52,11 @@ export class AdminNoteDisplayComponent implements OnInit {
           this.getNotes();
         });
       } else if (result && !adminNote) {
-        this.api.addAdminNote({"user_id": this.currentUser.id, "resource_id": this.currentResource.id, "note": result}).subscribe(x => {
+        this.api.addAdminNote({
+          'user_id': this.currentUser.id,
+          'resource_id': this.currentResource.id,
+          'note': result
+        }).subscribe(x => {
           this.getNotes();
         });
       }

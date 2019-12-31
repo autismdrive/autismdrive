@@ -2,7 +2,7 @@
 <p>Name: {{participant.name || '(None given)'}}</p>
 <p>Relationship: {{participant.relationship}}</p>
 <p>Last Updated: {{participant.last_updated | date:'long'}}</p>
-<p>Percent Complete: {{participant.percent_complete || '0'}}%</p>
+<p>Percent Complete: {{participant.percent_complete | percent}}</p>
 <div *ngIf="participant.step_log && participant.step_log.length > 0">
   <h5>Step Log:</h5>
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">

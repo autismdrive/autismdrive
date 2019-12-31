@@ -36,5 +36,5 @@ export class AgeRange {
       'transition': 'Transition Age (14 - 22 years)',
       'adult': 'Adulthood (23 - 64)',
       'aging': 'Aging (65+)'
-    }
+    };
 }

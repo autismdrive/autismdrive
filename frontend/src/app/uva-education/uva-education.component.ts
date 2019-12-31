@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {HitType} from '../_models/hit_type';
+import {NewsItem} from '../_models/news-item';
+import {Resource} from '../_models/resource';
+import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
-import {User} from '../_models/user';
-import {Resource} from '../_models/resource';
-import {NewsItem} from '../_models/news-item';
-import {HitType} from '../_models/hit_type';
-import {Hit} from '../_models/query';
 
 @Component({
   selector: 'app-uva-education',
@@ -31,22 +30,29 @@ export class UvaEducationComponent implements OnInit {
   }
 
   loadResources() {
-    this.api.getResources().subscribe( resources => {
+    this.api.getResources().subscribe(resources => {
       this.edResources = resources.filter(r => r.is_uva_education_content === true);
       this.newsItems = this._resourcesToNewsItems(this.edResources) || [];
-      this.loading = false
-    })
+      this.loading = false;
+    });
   }
 
+  get_image(resource: Resource) {
+    if (resource.video_code) {
+      return 'https://img.youtube.com/vi/' + resource.video_code + '/hqdefault.jpg';
+    } else {
+      return '/assets/about/feature.jpg';
+    }
+  }
 
   private _resourcesToNewsItems(ed_resources: Resource[]): NewsItem[] {
     if (this.edResources && this.edResources.length > 0) {
       return ed_resources
         .sort((a, b) => (a.id > b.id) ? 1 : -1)
-        .map((r, i) => {
+        .map(r => {
           let label: string;
           if (r.video_code) {
-            label = 'Watch this video'
+            label = 'Watch this video';
           }
           const n: NewsItem = {
             title: r.title,
@@ -59,14 +65,6 @@ export class UvaEducationComponent implements OnInit {
           };
           return n;
         });
-    }
-  }
-
-  get_image(resource: Resource) {
-    if (resource.video_code) {
-      return 'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'
-    } else {
-      return '/assets/about/feature.jpg'
     }
   }
 }

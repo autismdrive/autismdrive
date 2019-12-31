@@ -1,8 +1,8 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
-import { QuestionnaireDataSource } from '../_models/questionnaire_data_source';
-import { snakeToUpperCase } from '../../util/snakeToUpper';
+import {Component, Input, OnChanges} from '@angular/core';
+import {snakeToUpperCase} from '../../util/snakeToUpper';
+import {QuestionnaireDataSource} from '../_models/questionnaire_data_source';
 import {TableInfo} from '../_models/table_info';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-questionnaire-data-table',
@@ -21,7 +21,12 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
   constructor(
     private api: ApiService,
-  ) {}
+  ) {
+  }
+
+  get snakeToUpperCase() {
+    return snakeToUpperCase;
+  }
 
   ngOnChanges() {
     this.selected_info = this.questionnaire_info;
@@ -38,14 +43,15 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   load_columns() {
     this.displayedColumns = [];
     this.columnNames = [];
-    this.api.getQuestionnaireListMeta(this.selected_info.table_name).subscribe(
+    this.api
+      .getQuestionnaireListMeta(this.selected_info.table_name)
+      .subscribe(
       result => {
-        for (let fieldIndex in result['fields']) {
-          let column = result['fields'][fieldIndex];
-          if (!this.displayedColumns.includes(column.name)){
+        for (const column of result['fields']) {
+          if (!this.displayedColumns.includes(column.name)) {
             this.displayedColumns.push({'name': column.name, 'type': column.type});
           }
-          if (!this.columnNames.includes(column.name)){
+          if (!this.columnNames.includes(column.name)) {
             this.columnNames.push(column.name);
           }
         }
@@ -54,16 +60,15 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   }
 
   format_element(element, column) {
-    if (column.type == 'DATETIME') {
-      let date = new Date(element[column.name]);
-      return date.toUTCString();
+    if (column.type === 'DATETIME') {
+      return new Date(element[column.name]).toUTCString();
     } else {
       return element[column.name];
     }
   }
 
   exportQ(info) {
-    this.api.exportQuestionnaire(info.table_name).subscribe( response => {
+    this.api.exportQuestionnaire(info.table_name).subscribe(response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -79,6 +84,4 @@ export class QuestionnaireDataTableComponent implements OnChanges {
       URL.revokeObjectURL(url);
     });
   }
-
-  get snakeToUpperCase() { return snakeToUpperCase; }
 }

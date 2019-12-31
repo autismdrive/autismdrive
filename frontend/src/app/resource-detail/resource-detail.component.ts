@@ -1,14 +1,14 @@
-import {Component, OnInit, SecurityContext} from '@angular/core';
-import {ApiService} from '../_services/api/api.service';
-import {Resource} from '../_models/resource';
-import {User} from '../_models/user';
-import {ActivatedRoute, Router} from '@angular/router';
 import {LatLngLiteral} from '@agm/core';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {formatDate} from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {ActivatedRoute, Router} from '@angular/router';
 import {AdminNote} from '../_models/admin_note';
 import {ContactItem} from '../_models/contact_item';
-import {formatDate} from '@angular/common';
-import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {Resource} from '../_models/resource';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-resource-detail',
@@ -47,14 +47,15 @@ export class ResourceDetailComponent implements OnInit {
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;
-          if (this.resource.video_code){
-            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
+          if (this.resource.video_code) {
+            this.safeVideoLink = this._sanitizer
+              .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
           }
         });
         if (this.currentUser && this.currentUser.role === 'Admin') {
           this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
             this.notes = notes;
-          })
+          });
         }
       }
     });

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
-import { Study } from '../_models/study';
-import { User } from '../_models/user'
-import { ActivatedRoute, Router } from '@angular/router';
-import { snakeToUpperCase } from '../../util/snakeToUpper';
-import { AuthenticationService } from '../_services/api/authentication-service';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {snakeToUpperCase} from '../../util/snakeToUpper';
+import {Study} from '../_models/study';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-study-detail',
@@ -35,8 +35,10 @@ export class StudyDetailComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  get snakeToUpperCase() {
+    return snakeToUpperCase;
   }
 
-  get snakeToUpperCase() { return snakeToUpperCase; }
+  ngOnInit() {
+  }
 }

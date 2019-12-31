@@ -17,7 +17,7 @@ export class TermsComponent implements OnInit {
 
   user: User;
   relationship: ParticipantRelationship;
-  preview: boolean = false;
+  preview = false;
 
   constructor(
     private router: Router,
@@ -52,13 +52,13 @@ export class TermsComponent implements OnInit {
 
   getFlow(relationship: ParticipantRelationship) {
     if (relationship === ParticipantRelationship.SELF_PARTICIPANT) {
-      return 'self_intake'
+      return 'self_intake';
     } else if (relationship === ParticipantRelationship.SELF_GUARDIAN) {
-      return 'guardian_intake'
+      return 'guardian_intake';
     } else if (relationship === ParticipantRelationship.DEPENDENT) {
-      return 'dependent_intake'
+      return 'dependent_intake';
     } else if (relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
-      return 'professional_intake'
+      return 'professional_intake';
     }
   }
 

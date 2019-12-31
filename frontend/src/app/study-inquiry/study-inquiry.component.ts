@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
-import { AuthenticationService } from '../_services/api/authentication-service';
-import { Router } from '@angular/router';
-import { Study } from '../_models/study';
-import { User } from '../_models/user';
-import { ParticipantRelationship } from '../_models/participantRelationship';
-import { GoogleAnalyticsService } from '../google-analytics.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {ParticipantRelationship} from '../_models/participantRelationship';
+import {Study} from '../_models/study';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({
   selector: 'app-study-inquiry',
@@ -16,9 +16,9 @@ export class StudyInquiryComponent implements OnInit {
 
   currentUser: User;
   @Input() study: Study;
-  haveUserContact:boolean = false;
-  inquirySent: boolean = false;
-  alreadyInquired: boolean = false;
+  haveUserContact = false;
+  inquirySent = false;
+  alreadyInquired = false;
 
   constructor(
     private api: ApiService,
@@ -35,35 +35,29 @@ export class StudyInquiryComponent implements OnInit {
 
   refreshUserAndInquiries() {
     if (this.currentUser) {
-      this.api.getUser(this.currentUser.id).subscribe( u => {
-        let newU = new User(u);
+      this.api.getUser(this.currentUser.id).subscribe(u => {
+        const newU = new User(u);
         this.currentUser = newU;
         this.haveUserContact = newU.checkContact();
 
       });
-      this.api.getUserStudyInquiries(this.currentUser.id).subscribe(
-        userStudyInquiries => {
-          for ( let i in userStudyInquiries ) {
-            if (this.study.id == userStudyInquiries[i].study_id) {
-              this.alreadyInquired = true;
-            }
+      this.api.getUserStudyInquiries(this.currentUser.id).subscribe(userStudyInquiries => {
+        userStudyInquiries.forEach(studyUser => {
+          if (studyUser.study_id === this.study.id) {
+            this.alreadyInquired = true;
           }
-        }
-      );
+        });
+      });
     }
   }
 
 
   goLogin() {
-    this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+    this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});
   }
 
   goRegister() {
     this.router.navigateByUrl('/register');
-  }
-
-  goProfile() {
-    this.router.navigateByUrl('/profile');
   }
 
   sendInquiry() {
@@ -90,7 +84,7 @@ export class StudyInquiryComponent implements OnInit {
 
   goEligibility() {
     if (this.study && this.study.eligibility_url) {
-      window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank')
+      window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
     }
   }
 }

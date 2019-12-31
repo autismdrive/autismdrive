@@ -1,8 +1,8 @@
+import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import { MediaMatcher } from '@angular/cdk/layout';
-import { ApiService } from '../_services/api/api.service';
-import { snakeToUpperCase } from '../../util/snakeToUpper';
+import {snakeToUpperCase} from '../../util/snakeToUpper';
 import {TableInfo} from '../_models/table_info';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-questionnaire-data-view',
@@ -14,8 +14,8 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   currentQuestionnaire: TableInfo;
 
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: () => void;
   sidebarOpen = true;
+  private _mobileQueryListener: () => void;
 
   constructor(
     private api: ApiService,
@@ -26,10 +26,15 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
-    //this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
 
     window.addEventListener('resize', this._mobileQueryListener);
+  }
+
+  get snakeToUpperCase() {
+    return snakeToUpperCase;
   }
 
   ngOnInit() {
@@ -42,7 +47,8 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
-    //    this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
   }
@@ -55,7 +61,7 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
 
   exportAll() {
     console.log('clicking the button for export all');
-    this.api.exportQuestionnaire( 'all').subscribe( response => {
+    this.api.exportQuestionnaire('all').subscribe(response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -71,6 +77,4 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
       URL.revokeObjectURL(url);
     });
   }
-
-  get snakeToUpperCase() { return snakeToUpperCase; }
 }

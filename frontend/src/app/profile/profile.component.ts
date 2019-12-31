@@ -58,15 +58,15 @@ export class ProfileComponent implements OnInit {
   refreshParticipants() {
     if (this.user) {
       this.api.getUser(this.user.id).subscribe( u => {
-        let newU = new User(u);
+        const newU = new User(u);
         this.self = newU.getSelf();
         this.dependents = newU.getDependents();
         this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(
           f => {
             this.selfPercentComplete = f.percentComplete();
           }
-        )
-      })
+        );
+      });
     }
   }
 

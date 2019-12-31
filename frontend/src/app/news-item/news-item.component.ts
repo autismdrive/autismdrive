@@ -14,7 +14,7 @@ export class NewsItemComponent implements OnInit {
 
   ngOnInit() {
     if (!this.item.label) {
-      this.item.label = 'Details'
+      this.item.label = 'Details';
     }
   }
 

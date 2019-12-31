@@ -1,9 +1,9 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { Participant } from '../_models/participant';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ParticipantProfileComponent } from '../participant-profile/participant-profile.component';
-import { ApiService } from '../_services/api/api.service';
-import { ParticipantRelationship } from '../_models/participantRelationship';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {Participant} from '../_models/participant';
+import {ParticipantRelationship} from '../_models/participantRelationship';
+import {ApiService} from '../_services/api/api.service';
+import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
 @Component({
   selector: 'app-avatar-dialog',
@@ -19,10 +19,10 @@ export class AvatarDialogComponent implements OnInit {
   constructor(
     private api: ApiService,
     public dialogRef: MatDialogRef<ParticipantProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {participant: Participant}
+    @Inject(MAT_DIALOG_DATA) public data: { participant: Participant }
   ) {
     for (let i = 0; i < 104; i++) {
-      this.avatarImages[i] = (i + 1).toLocaleString('en', { minimumIntegerDigits: 3 });
+      this.avatarImages[i] = (i + 1).toLocaleString('en', {minimumIntegerDigits: 3});
     }
 
     for (let i = 0; i < 16; i++) {
@@ -30,19 +30,19 @@ export class AvatarDialogComponent implements OnInit {
     }
 
     this.selectedIcon = this.data.participant.avatar_icon || '001';
-    this.selectedColor = this.data.participant.avatar_color || `hsl(0,100%,80%)`;
+    this.selectedColor = this.data.participant.avatar_color || `hsl(0, 100%, 80%)`;
 
-    this.dialogRef.afterOpen().subscribe(() => {
+    this.dialogRef.afterOpened().subscribe(() => {
       const imageEl = document.getElementsByClassName('avatar-image-active')[0] as HTMLElement;
       const colorEl = document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
 
       if (imageEl) {
         const x = imageEl.offsetLeft - imageEl.clientWidth * 1.25 - imageEl.parentElement.clientWidth;
-        imageEl.parentElement.scrollTo({ left: x });
+        imageEl.parentElement.scrollTo({left: x});
       }
       if (colorEl) {
         const x = colorEl.offsetLeft - colorEl.clientWidth * 3 - colorEl.parentElement.clientWidth;
-        colorEl.parentElement.scrollTo({ left: x });
+        colorEl.parentElement.scrollTo({left: x});
       }
     });
   }
