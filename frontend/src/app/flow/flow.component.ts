@@ -1,18 +1,18 @@
+import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
+import {MatDrawer} from '@angular/material/sidenav';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {keysToCamel} from 'src/util/snakeToCamel';
-import {ApiService} from '../_services/api/api.service';
-import {User} from '../_models/user';
-import {Participant} from '../_models/participant';
+import {scrollToTop} from '../../util/scrollToTop';
 import {Flow} from '../_models/flow';
+import {Participant} from '../_models/participant';
 import {Step, StepStatus} from '../_models/step';
-import {MediaMatcher} from '@angular/cdk/layout';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {scrollToTop} from '../../util/scrollToTop';
-import {MatDrawer} from '@angular/material/sidenav';
 
 enum FlowState {
   INTRO = 'intro',
@@ -29,12 +29,9 @@ enum FlowState {
 export class FlowComponent implements OnInit, OnDestroy {
 
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: () => void;
-
   user: User;
   participant: Participant;
   flow: Flow;
-
   activeStep = 0;
   flowState = FlowState;
   state = FlowState.LOADING;
@@ -42,13 +39,12 @@ export class FlowComponent implements OnInit, OnDestroy {
   showResubmitMessage = false;
   hideForm = false;
   sidebarOpen = true;
-
   model: any = {};
   form: FormGroup;
   fields = [];
   options: FormlyFormOptions;
-
   sidenavElement: MatDrawer;
+  private _mobileQueryListener: () => void;
 
   constructor(
     private api: ApiService,
@@ -197,6 +193,11 @@ export class FlowComponent implements OnInit, OnDestroy {
       field.updateValueAndValidity();
       field.markAsDirty();
     }
+
+    const el = document.querySelector('.ng-invalid');
+    if (el) {
+      el.scrollIntoView({behavior: 'smooth'});
+    }
   }
 
   submit() {
@@ -255,6 +256,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     const fields = [];
     for (const field of info.fields) {
       if (field.fieldArray) {
+        // noinspection JSConstantReassignment
         field.fieldArray.model = this.model[field.name];
       }
       fields.push(keysToCamel(field));
