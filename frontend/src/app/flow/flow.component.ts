@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFormOptions} from '@ngx-formly/core';
+import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {keysToCamel} from 'src/util/snakeToCamel';
 import {ApiService} from '../_services/api/api.service';
 import {User} from '../_models/user';
@@ -18,7 +18,7 @@ enum FlowState {
   INTRO = 'intro',
   LOADING = 'loading',
   COMPLETE = 'complete',
-  SHOW_FORM = 'form'
+  SHOW_FORM = 'form',
 }
 
 @Component({
@@ -192,8 +192,11 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   highlightRequiredFields() {
-    this.form.updateValueAndValidity();
-    this.form.markAllAsTouched();
+    for (const fieldName of Object.keys(this.form.controls)) {
+      const field: AbstractControl = this.form.controls[fieldName];
+      field.updateValueAndValidity();
+      field.markAsDirty();
+    }
   }
 
   submit() {
@@ -248,14 +251,13 @@ export class FlowComponent implements OnInit, OnDestroy {
     scrollToTop();
   }
 
-  private infoToForm(info) {
+  private infoToForm(info: any): FormlyFieldConfig[] {
     const fields = [];
     for (const field of info.fields) {
       if (field.fieldArray) {
         field.fieldArray.model = this.model[field.name];
       }
       fields.push(keysToCamel(field));
-
     }
     fields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     return fields;

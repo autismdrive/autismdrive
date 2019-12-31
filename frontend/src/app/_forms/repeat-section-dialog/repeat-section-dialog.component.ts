@@ -45,8 +45,10 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
 
   highlightRequiredFields() {
     this.data.fields.forEach(f => {
-      f.formControl.updateValueAndValidity()
-      f.formControl.markAllAsTouched();
+      f.fieldGroup.forEach(fg => {
+        fg.formControl.updateValueAndValidity();
+        fg.formControl.markAsDirty();
+      });
     });
 
     this.updateDisableSave();

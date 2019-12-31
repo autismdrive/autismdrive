@@ -31,9 +31,12 @@ export class RepeatSectionComponent extends FieldArrayType {
 
     dialogRef.afterClosed().subscribe(data => {
       if (data && data.model) {
-        console.log('data.model', data.model);
-        super.remove(i);
+        if (super.formControl && super.formControl.controls.length > i) {
+          super.remove(i);
+        }
+
         super.add(i, data.model);
+
       }
     });
   }
