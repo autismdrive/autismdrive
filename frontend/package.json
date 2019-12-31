@@ -35,6 +35,7 @@
     "hammerjs": "^2.0.8",
     "js-marker-clusterer": "^1.0.0",
     "ng2-pdfjs-viewer": "^3.5.1",
+    "ngx-device-detector": "^1.3.20",
     "ngx-markdown": "^8.2.1",
     "ngx-progressbar": "^2.1.1",
     "npm": "^6.13.4",

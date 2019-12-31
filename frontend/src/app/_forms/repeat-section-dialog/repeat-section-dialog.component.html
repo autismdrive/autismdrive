@@ -13,7 +13,7 @@
     <button
       mat-flat-button
       color="primary"
-      (click)="disableSave ? highlightRequiredFields() : onSubmit()"
+      (click)="disableSave ? onInvalidFields() : onSubmit()"
       [ngClass]="{'repeat-section-dialog-save': true, 'disabled': !noErrors()}"
     >Save</button>
     <button
