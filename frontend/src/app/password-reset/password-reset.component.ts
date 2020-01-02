@@ -124,7 +124,10 @@ export class PasswordResetComponent implements OnInit {
   }
 
   private _goToReturnUrl(user: User) {
-    const returnUrl = localStorage.getItem('returnUrl');
+    let returnUrl = null;
+    if (localStorage.getItem('returnUrl') && localStorage.getItem('returnUrl') != 'undefined') {
+      returnUrl = localStorage.getItem('returnUrl');
+    }
     if (user) {
       this.router.navigateByUrl(returnUrl || '/profile').then(_ => scrollToTop(this.deviceDetectorService));
     }
