@@ -113,6 +113,16 @@ export class ResourceFormComponent implements OnInit {
         hideExpression: '!model.type || model.type == "resource"',
       },
       {
+        key: 'contact_email',
+        type: 'input',
+        templateOptions: {
+          label: 'Contact Email',
+          placeholder: 'This contact email will not be displayed on the site and is intended for admin use only',
+        },
+        validators: {'validation': ['email']},
+        hideExpression: '!model.type',
+      },
+      {
         key: 'location_name',
         type: 'input',
         templateOptions: {
