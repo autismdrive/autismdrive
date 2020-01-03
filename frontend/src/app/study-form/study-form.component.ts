@@ -101,6 +101,15 @@ export class StudyFormComponent implements OnInit {
       },
     },
     {
+      key: 'num_visits',
+      type: 'input',
+      templateOptions: {
+        label: 'Number of Visits',
+        type: 'number',
+        placeholder: 'Please list the number of visits required for participation in this study',
+      },
+    },
+    {
       key: 'status',
       type: 'select',
       templateOptions: {
@@ -121,6 +130,7 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Coordinator Email',
         placeholder: 'Please enter the email address to which study inquires will be sent',
+        required: true,
       },
       validators: {'validation': ['email']},
     },

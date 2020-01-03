@@ -40,6 +40,7 @@ class Study(db.Model):
     organization_id = db.Column('organization_id', db.Integer,
                                 db.ForeignKey('organization.id'))
     location = db.Column(db.String)
+    num_visits = db.Column(db.Integer)
     status = db.Column(db.Enum(Status))
     ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("StudyCategory", back_populates="study")

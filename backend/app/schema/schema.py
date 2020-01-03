@@ -441,7 +441,7 @@ class StudySchema(ModelSchema):
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
                   'participant_description', 'benefit_description', 'coordinator_email', 'organization_id',
                   'organization', 'location', 'status', 'study_categories', 'study_investigators', 'study_users',
-                  'eligibility_url', 'ages', '_links')
+                  'eligibility_url', 'ages', 'num_visits', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     status = EnumField(Status)

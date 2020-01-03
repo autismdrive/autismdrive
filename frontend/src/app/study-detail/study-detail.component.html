@@ -37,6 +37,7 @@
       <div *ngIf="study.location">
         <h2>Where does this study take place?</h2>
         <p>{{study.location}}</p>
+        <p *ngIf="study.num_visits">Number of visits required for participation: {{study.num_visits}}</p>
       </div>
       <div
         fxHide
