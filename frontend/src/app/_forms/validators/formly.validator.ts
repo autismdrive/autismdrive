@@ -5,7 +5,7 @@ import PHONE_REGEX from './phone.regex';
 import URL_REGEX from './url.regex';
 
 export function EmailValidator(control: FormControl): ValidationErrors {
-  return EMAIL_REGEX.test(control.value) ? null : { 'email': true };
+  return !control.value || EMAIL_REGEX.test(control.value) ? null : { 'email': true };
 }
 
 export function EmailValidatorMessage(err, field: FormlyFieldConfig) {
