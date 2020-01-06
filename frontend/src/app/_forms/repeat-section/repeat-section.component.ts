@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {FormArray} from '@angular/forms';
 import {FieldArrayType, FormlyFieldConfig} from '@ngx-formly/core';
 import {MatDialog} from '@angular/material/dialog';
 import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-section-dialog.component';
@@ -31,12 +32,11 @@ export class RepeatSectionComponent extends FieldArrayType {
 
     dialogRef.afterClosed().subscribe(data => {
       if (data && data.model) {
-        if (super.formControl && super.formControl.controls.length > i) {
+        if (this.field.fieldGroup.length > i) {
           super.remove(i);
         }
 
         super.add(i, data.model);
-
       }
     });
   }
