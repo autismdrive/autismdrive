@@ -1,5 +1,6 @@
 import math
 import unittest
+from datetime import datetime
 
 from app import db, data_loader, elastic_index
 from app.model.category import Category
@@ -105,7 +106,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
 
         # Get the number of items in the database
         num_db_resources = db.session.query(Resource).filter(Resource.type == 'resource').count()
-        num_db_events = db.session.query(Resource).filter(Resource.type == 'event').count()
+        num_db_events = db.session.query(Event).filter(Event.date >= datetime.now()).count()
         num_db_locations = db.session.query(Resource).filter(Resource.type == 'location').count()
         num_db_studies = db.session.query(Study).count()
 
