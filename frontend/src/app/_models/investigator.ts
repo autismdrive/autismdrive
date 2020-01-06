@@ -5,6 +5,6 @@ export interface Investigator {
   name: string;
   title: string;
   organization_id: number;
-  organization: Organization
+  organization: Organization;
   bio_link: string;
 }

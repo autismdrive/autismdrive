@@ -51,7 +51,7 @@ export class ResourceFormComponent implements OnInit {
           required: true,
         },
         expressionProperties: {
-          "templateOptions.placeholder": '"Please enter the title of your " + (model.type || "resource")',
+          'templateOptions.placeholder': '"Please enter the title of your " + (model.type || "resource")',
         },
         hideExpression: '!model.type',
       },
@@ -64,7 +64,7 @@ export class ResourceFormComponent implements OnInit {
           required: true,
         },
         expressionProperties: {
-          "templateOptions.placeholder": '"Please enter a description of your " + (model.type || "resource")',
+          'templateOptions.placeholder': '"Please enter a description of your " + (model.type || "resource")',
         },
         hideExpression: '!model.type',
       },
@@ -111,6 +111,16 @@ export class ResourceFormComponent implements OnInit {
           placeholder: 'Please enter the primary contact for your location or event',
         },
         hideExpression: '!model.type || model.type == "resource"',
+      },
+      {
+        key: 'contact_email',
+        type: 'input',
+        templateOptions: {
+          label: 'Contact Email',
+          placeholder: 'This contact email will not be displayed on the site and is intended for admin use only',
+        },
+        validators: {'validation': ['email']},
+        hideExpression: '!model.type',
       },
       {
         key: 'location_name',
@@ -174,7 +184,7 @@ export class ResourceFormComponent implements OnInit {
           placeholder: 'Please enter the phone number',
         },
         hideExpression: '!model.type',
-        validators: {"validation": ["phone"]},
+        validators: {'validation': ['phone']},
       },
       {
         key: 'website',
@@ -184,7 +194,7 @@ export class ResourceFormComponent implements OnInit {
           placeholder: 'Please enter the website',
         },
         hideExpression: '!model.type',
-        validators: {"validation": ["url"]},
+        validators: {'validation': ['url']},
       },
       {
         key: 'video_code',
@@ -224,7 +234,7 @@ export class ResourceFormComponent implements OnInit {
         type: 'multicheckbox',
         templateOptions: {
           label: 'Age Ranges',
-          type: "array",
+          type: 'array',
           options: [
             {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
             {'value': 'school', 'label': 'School age (6 - 13 years)'},
@@ -259,13 +269,13 @@ export class ResourceFormComponent implements OnInit {
     this.api.getOrganizations().subscribe( orgs => {
        return this.orgOptions = orgs;
       }
-    )
+    );
   }
 
   filterOrganizations(name: string): Organization[] {
     return this.orgOptions.filter(org =>
       org.name.toLowerCase().includes(name.toLowerCase())
-    )
+    );
   }
 
   loadData() {
@@ -293,8 +303,8 @@ export class ResourceFormComponent implements OnInit {
   loadResourceCategories(resource: Resource, callback: Function) {
     this.model.categories = [];
     if (resource.resource_categories.length > 0) {
-      for (const cat in resource.resource_categories) {
-        this.model.categories[resource.resource_categories[cat].category.id] = true;
+      for (const cat of resource.resource_categories) {
+        this.model.categories[cat.category.id] = true;
         callback();
       }
     } else {
@@ -315,9 +325,13 @@ export class ResourceFormComponent implements OnInit {
   updateResourceCategories() {
     const rcIds = this.resource.resource_categories.map(rc => rc.category.id);
     // Add the new categories
-    for (const cat in this.model.categories) {
-      if (!rcIds.includes(Number(cat))) {
-        this.api.addResourceCategory({resource_id: this.resource.id, category_id: Number(cat), type: this.resource.type}).subscribe();
+    for (const cat in Object.keys(this.model.categories)) {
+      if (!rcIds.includes(parseInt(cat, 10))) {
+        this.api.addResourceCategory({
+          resource_id: this.resource.id,
+          category_id: parseInt(cat, 10),
+          type: this.resource.type
+        }).subscribe();
       }
     }
     // Remove any deleted categories
@@ -329,8 +343,13 @@ export class ResourceFormComponent implements OnInit {
   }
 
   addResourceCategories(resource_id) {
-    for (const cat in this.model.categories) {
-      this.api.addResourceCategory({resource_id: resource_id, category_id: Number(cat), type: this.resource.type}).subscribe();
+    console.log(this.model.categories);
+    for (const cat of Object.keys(this.model.categories)) {
+      this.api.addResourceCategory({
+        resource_id: resource_id,
+        category_id: parseInt(cat, 10),
+        type: this.resource.type
+      }).subscribe();
     }
   }
 
@@ -339,14 +358,14 @@ export class ResourceFormComponent implements OnInit {
     // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
     // updated model so that we don't accidentally save the old version before it's updated. When there is no Organization being saved, all
     // we do is create the updated model.
-    if (this.model.organization){
-      if (this.model.organization.constructor.name == "String") {
+    if (this.model.organization) {
+      if (this.model.organization.constructor.name === 'String') {
         this.api.addOrganization({name: this.model.organization}).subscribe( org => {
           this.model.organization_id = org.id;
           this.model.organization = org;
           this.updatedModel = this.model;
           callback();
-        })
+        });
       } else {
         this.model.organization_id = this.model.organization.id;
         this.updatedModel = this.model;
@@ -373,8 +392,7 @@ export class ResourceFormComponent implements OnInit {
   }
 
   addAndClose(apiCall) {
-    apiCall.subscribe(r =>
-      {
+    apiCall.subscribe(r => {
         this.updatedResource = r;
         this.addResourceCategories(r.id);
         this.close();
@@ -382,8 +400,7 @@ export class ResourceFormComponent implements OnInit {
   }
 
   updateAndClose(apiCall) {
-    apiCall.subscribe( r =>
-      {
+    apiCall.subscribe( r => {
         this.updatedResource = r;
         this.close();
       });
@@ -396,7 +413,7 @@ export class ResourceFormComponent implements OnInit {
   onDelete() {
     this.api.deleteResource(this.resource).subscribe(r => {
       this.router.navigate(['search']);
-    })
+    });
   }
 
   // Go to resource screen

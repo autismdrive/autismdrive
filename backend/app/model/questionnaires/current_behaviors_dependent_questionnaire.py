@@ -78,7 +78,6 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
             "type": "input",
             "template_options": {
                 "label": "Enter concerning behavior",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": concerning_behaviors_other_hide_expression,

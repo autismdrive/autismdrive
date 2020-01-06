@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow import fields, pre_load
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
@@ -63,7 +60,6 @@ class SupportsQuestionnaire(db.Model):
             "type": "textarea",
             "template_options": {
                 "label": "Enter other alternative treatment",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": alternative_med_other_hide_expression,

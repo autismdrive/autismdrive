@@ -17,6 +17,7 @@ class Resource(db.Model):
                                db.ForeignKey('organization.id'))
     phone = db.Column(db.String)
     website = db.Column(db.String)
+    contact_email = db.Column(db.String)
     video_code = db.Column(db.String)
     is_uva_education_content = db.Column(db.Boolean)
     ages = db.Column(db.ARRAY(db.String), default=[])

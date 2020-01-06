@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
@@ -169,7 +166,6 @@ class ContactQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Please specify how you heard about us",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": marketing_other_hide_expression,

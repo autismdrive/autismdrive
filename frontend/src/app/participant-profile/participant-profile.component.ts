@@ -1,11 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Router } from '@angular/router';
-import { Participant } from '../_models/participant';
-import { User } from '../_models/user';
-import { ParticipantRelationship } from '../_models/participantRelationship';
-import { ApiService } from '../_services/api/api.service';
-import { AvatarDialogComponent } from '../avatar-dialog/avatar-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import {Component, Input, OnInit} from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
+import {Router} from '@angular/router';
+import {Participant} from '../_models/participant';
+import {ParticipantRelationship} from '../_models/participantRelationship';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
 
 @Component({
   selector: 'app-participant-profile',
@@ -44,14 +44,14 @@ export class ParticipantProfileComponent implements OnInit {
 
   goTerms($event) {
     $event.preventDefault();
-    this.router.navigate(['terms', this.participant.relationship, {preview:true}]);
+    this.router.navigate(['terms', this.participant.relationship, {preview: true}]);
   }
 
   chooseAvatar($event, participant): void {
     const dialogRef = this.dialog.open(AvatarDialogComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',
-      data: { participant: participant }
+      data: {participant: participant}
     });
 
     dialogRef.afterClosed().subscribe(result => {

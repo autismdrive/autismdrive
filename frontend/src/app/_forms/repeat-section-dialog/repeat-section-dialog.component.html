@@ -2,7 +2,17 @@
   class="mat-typography"
 >
   <div mat-dialog-content>
-    <h1 mat-dialog-title>{{data.title}}</h1>
+    <div fxLayout="row" fxLayout.lt-md="column">
+      <h1>{{ data.title }}</h1>
+      <span fxFlex></span>
+      <button
+        mat-button
+        id="highlight-required-fields-in-dialog"
+        (click)="highlightRequiredFields(data.fields)"
+        color="warn"
+      >*Required</button>
+    </div>
+<!--    <h1 mat-dialog-title>{{data.title}}</h1>-->
     <formly-form
       [fields]="data.fields"
       [model]="data.model"
@@ -13,7 +23,7 @@
     <button
       mat-flat-button
       color="primary"
-      (click)="disableSave ? highlightRequiredFields() : onSubmit()"
+      (click)="disableSave ? onInvalidFields() : onSubmit()"
       [ngClass]="{'repeat-section-dialog-save': true, 'disabled': !noErrors()}"
     >Save</button>
     <button

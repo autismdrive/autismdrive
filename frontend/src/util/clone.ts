@@ -1,16 +1,22 @@
-import {Observable} from 'rxjs';
 import {AbstractControl} from '@angular/forms';
+import {Observable} from 'rxjs';
 
 export const isNullOrUndefined = function (value: any) {
   return value === undefined || value === null;
-}
+};
 
 export const isObject = function (x: any) {
   return x != null && typeof x === 'object';
-}
+};
 
 export const clone = function (value: any): any {
-  if (!isObject(value) || value instanceof RegExp || value instanceof Observable || /* instanceof SafeHtmlImpl */ value.changingThisBreaksApplicationSecurity) {
+  if (
+    !isObject(value) ||
+    value instanceof RegExp ||
+    value instanceof Observable ||
+    /* instanceof SafeHtmlImpl */
+    value.changingThisBreaksApplicationSecurity
+  ) {
     return value;
   }
 
@@ -30,4 +36,4 @@ export const clone = function (value: any): any {
   Object.keys(value).forEach(k => value[k] = clone(value[k]));
 
   return value;
-}
+};

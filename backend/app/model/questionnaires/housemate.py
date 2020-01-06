@@ -1,12 +1,8 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 from sqlalchemy import func
 
 from app import db
-from app.export_service import ExportService
 
 
 class Housemate(db.Model):
@@ -81,7 +77,6 @@ class Housemate(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Please enter their relationship",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": relationship_other_hide_expression,

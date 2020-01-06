@@ -1,20 +1,20 @@
 import {LatLngLiteral} from '@agm/core';
 import {MediaMatcher} from '@angular/cdk/layout';
+import {Location} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Location} from '@angular/common';
-import {Hit, Query, Sort} from '../_models/query';
-import {SearchService} from '../_services/api/search.service';
-import {GoogleAnalyticsService} from '../google-analytics.service';
-import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/api/authentication-service';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
-import {ApiService} from '../_services/api/api.service';
 import {AgeRange, HitType} from '../_models/hit_type';
-import {MatExpansionPanel} from '@angular/material/expansion';
+import {Hit, Query, Sort} from '../_models/query';
 import {Resource} from '../_models/resource';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
+import {SearchService} from '../_services/api/search.service';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 interface SortMethod {
   name: string;
@@ -33,28 +33,6 @@ class MapControlDiv extends HTMLDivElement {
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit, OnDestroy {
-
-  constructor(
-    private changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute,
-    private router: Router,
-    private location: Location,
-    private renderer: Renderer2,
-    private searchService: SearchService,
-    private googleAnalyticsService: GoogleAnalyticsService,
-    private authenticationService: AuthenticationService,
-    media: MediaMatcher,
-    private api: ApiService
-  ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this._mobileQueryListener = () => this._updateFilterPanelState();
-    this.mobileQuery = media.matchMedia('(max-width: 959px)');
-
-    // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
-    //    this.mobileQuery.addEventListener('change', this._mobileQueryListener);
-    this.mobileQuery.addListener(this._mobileQueryListener);
-    window.addEventListener('resize', this._mobileQueryListener);
-  }
 
   query: Query;
   mapQuery: Query;
@@ -81,9 +59,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
   mapZoomLevel: number;
-
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: () => void;
   sortMethods: SortMethod[] = [
     {
       name: 'Relevance',
@@ -122,21 +98,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     },
   ];
   selectedSort: SortMethod;
-
   pageEvent: PageEvent;
   paginatorElement: MatPaginator;
-  @ViewChild(MatPaginator, {static: false})
-  set paginator(value: MatPaginator) {
-    this.paginatorElement = value;
-  }
-
   panelElement: MatExpansionPanel;
-  @ViewChild(MatExpansionPanel, {static: false})
-  set panel(value: MatExpansionPanel) {
-    this.panelElement = value;
-    this._updateFilterPanelState();
-  }
-
   currentUser: User;
   resourceGatherers: AccordionItem[] = [
     {
@@ -173,47 +137,40 @@ export class SearchComponent implements OnInit, OnDestroy {
       url: 'http://www.prepivycreek.com/',
     },
   ];
+  private _mobileQueryListener: () => void;
 
-  private _queryToQueryParams(query: Query): Params {
-    const queryParams: Params = {};
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
+    private location: Location,
+    private renderer: Renderer2,
+    private searchService: SearchService,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private authenticationService: AuthenticationService,
+    media: MediaMatcher,
+    private api: ApiService
+  ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this._mobileQueryListener = () => this._updateFilterPanelState();
+    this.mobileQuery = media.matchMedia('(max-width: 959px)');
 
-    if (query.hasOwnProperty('words') && query.words) {
-      queryParams.words = query.words;
-    } else {
-      queryParams.words = undefined;
-    }
-
-    queryParams.types = query.types;
-    queryParams.ages = query.ages;
-
-    if (query.hasOwnProperty('category') && query.category) {
-      queryParams.category = query.category.id;
-    }
-    return queryParams;
+    // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
+    // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    // tslint:disable-next-line:deprecation
+    this.mobileQuery.addListener(this._mobileQueryListener);
+    window.addEventListener('resize', this._mobileQueryListener);
   }
 
-  private _queryParamsToQuery(qParams: Params): Query {
+  @ViewChild(MatPaginator, {static: false})
+  set paginator(value: MatPaginator) {
+    this.paginatorElement = value;
+  }
 
-    const query = new Query({});
-    query.size = this.pageSize;
-    if (qParams && qParams.keys) {
-      for (const key of qParams.keys) {
-        switch (key) {
-          case ('words'):
-            query.words = qParams.get(key);
-            break;
-          case ('category'):
-            query.category = {'id' : qParams.get(key)};
-            break;
-          case('ages'):
-            query.ages = qParams.getAll(key);
-            break;
-          case('types'):
-            query.types = qParams.getAll(key);
-        }
-      }
-    }
-    return query;
+  @ViewChild(MatExpansionPanel, {static: false})
+  set panel(value: MatExpansionPanel) {
+    this.panelElement = value;
+    this._updateFilterPanelState();
   }
 
   ngOnInit() {
@@ -233,6 +190,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchService.reset();
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
   }
@@ -367,7 +325,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     this._goToFirstPage(true);
   }
 
-
   selectType(keepType: string = null) {
     if (keepType) {
       this.selectedType = this.resourceTypes.find(t => t.name === keepType);
@@ -443,28 +400,25 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
-        mapUI.setCenter(this.mapLoc || this.defaultLoc);
-        mapUI.setZoom(9);
+      mapUI.setCenter(this.mapLoc || this.defaultLoc);
+      mapUI.setZoom(9);
     });
 
     controlDiv.index = 1;
     mapUI.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
   }
 
-  protected mapLoad(map: google.maps.Map) {
-    this.addMyLocationControl(map);
-  }
-
   showBreadcrumbs() {
-    if (!this.query) { return false; }
+    if (!this.query) {
+      return false;
+    }
     return this.query.hasFilters();
   }
 
   loadMapResults() {
-    console.log("Loading map results");
     if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
-       this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
-        this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
+      this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
+      this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
     } else {
       this.hitsWithAddress = [];
       this.hitsWithNoAddress = [];
@@ -476,7 +430,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.mapQuery.types &&
       this.mapQuery.types.length === 1 &&
       (this.mapQuery.types.includes('location') ||
-      this.mapQuery.types.includes('event'));
+        this.mapQuery.types.includes('event'));
     const is_sort_by_distance = this.selectedSort && this.selectedSort.name === 'Distance';
     return is_location_or_event_type || is_sort_by_distance;
   }
@@ -499,6 +453,98 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   isZipCode(zipCode: string): boolean {
     return (zipCode && (zipCode !== '') && (/^\d{5}$/.test(zipCode)));
+  }
+
+  showInfoWindow(hit: Hit) {
+    this.api.getResource(hit.id).subscribe(r => {
+      this.selectedMapResource = r;
+      this.selectedMapHit = hit;
+      this.googleAnalyticsService.mapEvent(hit.id.toString());
+    });
+  }
+
+  closeInfoWindow() {
+    this.selectedMapResource = null;
+    this.selectedMapHit = null;
+  }
+
+  isInfoWindowOpen(): boolean {
+    return this.selectedMapResource != null;
+  }
+
+  // https://stackoverflow.com/a/19303725/1791917
+  mapJitter(seed: number, isLat: boolean): number {
+    let m = seed % 2 === 0 ? 1 : -1;
+    if (isLat) {
+      m = m * -1;
+    }
+    const x = Math.sin(seed) * 10000;
+    return (x - Math.floor(x)) / 100 * m;
+  }
+
+  updateZoom(zoomLevel: number) {
+    this.mapZoomLevel = zoomLevel;
+  }
+
+  getCircleRadius(): number {
+    const maxMiles = 100;
+    const metersPerMi = 1609.34;
+    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
+  }
+
+  getMarkerIcon(hit: Hit) {
+    const url = `/assets/map/${hit.type}${hit.no_address ? '-no-address' : ''}.svg`;
+    const x = 16;
+    const y = hit.no_address ? 16 : 0;
+    return {url: url, anchor: {x: x, y: y}};
+  }
+
+  protected mapLoad(map: google.maps.Map) {
+    this.addMyLocationControl(map);
+  }
+
+  private _queryToQueryParams(query: Query): Params {
+    const queryParams: Params = {};
+
+    if (query.hasOwnProperty('words') && query.words) {
+      queryParams.words = query.words;
+    } else {
+      queryParams.words = undefined;
+    }
+
+    queryParams.types = query.types;
+    queryParams.ages = query.ages;
+
+    if (query.hasOwnProperty('category') && query.category) {
+      queryParams.category = query.category.id;
+    }
+    return queryParams;
+  }
+
+  // Return a random number for the given seed
+
+  private _queryParamsToQuery(qParams: Params): Query {
+
+    const query = new Query({});
+    query.size = this.pageSize;
+    if (qParams && qParams.keys) {
+      for (const key of qParams.keys) {
+        switch (key) {
+          case ('words'):
+            query.words = qParams.get(key);
+            break;
+          case ('category'):
+            query.category = {'id': qParams.get(key)};
+            break;
+          case('ages'):
+            query.ages = qParams.getAll(key);
+            break;
+          case('types'):
+            query.types = qParams.getAll(key);
+        }
+      }
+    }
+    return query;
   }
 
   private _updateDistanceSort() {
@@ -537,48 +583,5 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
 
     this.changeDetectorRef.detectChanges();
-  }
-
-  showInfoWindow(hit: Hit) {
-    this.api.getResource(hit.id).subscribe(r => {
-      this.selectedMapResource = r;
-      this.selectedMapHit = hit;
-      this.googleAnalyticsService.mapEvent(hit.id.toString());
-    });
-  }
-
-  closeInfoWindow() {
-    this.selectedMapResource = null;
-    this.selectedMapHit = null;
-  }
-
-  isInfoWindowOpen(): boolean {
-    return this.selectedMapResource != null;
-  }
-
-  // Return a random number for the given seed
-  // https://stackoverflow.com/a/19303725/1791917
-  mapJitter(seed: number, isLat: boolean): number {
-    let m = seed % 2 === 0 ? 1 : -1;
-    if (isLat) { m = m * -1; }
-    const x = Math.sin(seed) * 10000;
-    return (x - Math.floor(x)) / 100 * m;
-  }
-
-  updateZoom(zoomLevel: number) {
-    this.mapZoomLevel = zoomLevel;
-  }
-
-  getCircleRadius(): number {
-    const maxMiles = 100;
-    const metersPerMi = 1609.34;
-    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
-  }
-
-  getMarkerIcon(hit: Hit) {
-    const url = `/assets/map/${hit.type}${hit.no_address ? '-no-address' : ''}.svg`;
-    const x = 16;
-    const y = hit.no_address ? 16 : 0;
-    return {url: url, anchor: {x: x, y: y}};
   }
 }

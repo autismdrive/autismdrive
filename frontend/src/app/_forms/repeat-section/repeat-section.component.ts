@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {FormArray} from '@angular/forms';
 import {FieldArrayType, FormlyFieldConfig} from '@ngx-formly/core';
 import {MatDialog} from '@angular/material/dialog';
 import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-section-dialog.component';
@@ -16,7 +17,7 @@ export class RepeatSectionComponent extends FieldArrayType {
   }
 
   openDialog(i: number, f?: FormlyFieldConfig) {
-    const isEdit = !!f
+    const isEdit = !!f;
     const title = this.field.templateOptions.description;
     const dialogRef = this.dialog.open(RepeatSectionDialogComponent, {
       maxWidth: '100vw',
@@ -31,8 +32,10 @@ export class RepeatSectionComponent extends FieldArrayType {
 
     dialogRef.afterClosed().subscribe(data => {
       if (data && data.model) {
-        console.log('data.model', data.model);
-        super.remove(i);
+        if (this.field.fieldGroup.length > i) {
+          super.remove(i);
+        }
+
         super.add(i, data.model);
       }
     });

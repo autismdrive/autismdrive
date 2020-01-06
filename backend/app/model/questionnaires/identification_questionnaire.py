@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
@@ -51,7 +48,6 @@ class IdentificationQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter your relationship",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": relationship_to_participant_other_hide_expression,
@@ -114,7 +110,6 @@ class IdentificationQuestionnaire(db.Model):
             "template_options": {
                 "label": "Nickname",
                 "required": False,
-                "appearance": "standard"
             },
             "hide_expression": "model.is_first_name_preferred",
         },

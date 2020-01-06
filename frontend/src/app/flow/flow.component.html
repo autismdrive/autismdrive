@@ -13,7 +13,7 @@
         <button mat-icon-button (click)="toggleSidenav()" fxHide.gt-sm>
           <mat-icon>toc</mat-icon>
         </button>
-        <h1 *ngIf="state !== flowState.NO_CONSENT" class="margin-bottom-none">
+        <h1 class="margin-bottom-none">
           <ng-container *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</ng-container>
           <ng-container *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment info</ng-container>
         </h1>
@@ -54,7 +54,16 @@
             [formGroup]="form"
             class="pad-2"
           >
-            <h1>{{ currentStep().label }}</h1>
+            <div fxLayout="row" fxLayout.lt-md="column">
+              <h1>{{ currentStep().label }}</h1>
+              <span fxFlex></span>
+              <button
+                mat-button
+                id="highlight-required-fields"
+                (click)="highlightRequiredFields()"
+                color="warn"
+              >*Required</button>
+            </div>
             <p>{{ currentStep().description }}</p>
 
             <div *ngIf="showResubmitMessage">

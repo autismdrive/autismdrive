@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
@@ -102,7 +99,6 @@ class ProfessionalProfileQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Describe professional identity",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": professional_identity_other_hide_expression,
@@ -158,7 +154,6 @@ class ProfessionalProfileQuestionnaire(db.Model):
             "type": "input",
             "template_options": {
                 "label": "Enter other interests",
-                "appearance": "standard",
                 "required": True,
             },
             "hide_expression": learning_interests_other_hide_expression,

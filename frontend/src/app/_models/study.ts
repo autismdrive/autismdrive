@@ -23,6 +23,7 @@ export interface Study {
   location: string;
   categories: string[];
   status: string;
+  num_visits?: number;
   coordinator_email?: string;
   study_categories?: StudyCategory[];
   study_investigators?: StudyInvestigator[];

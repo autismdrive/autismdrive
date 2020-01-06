@@ -1,9 +1,9 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {Subject, timer} from 'rxjs';
-import {SearchService} from "../_services/api/search.service";
+import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {SearchService} from '../_services/api/search.service';
 
 @Component({
   selector: 'app-search-box',
@@ -12,11 +12,6 @@ import {SearchService} from "../_services/api/search.service";
 })
 export class SearchBoxComponent implements OnInit {
   searchInputElement: MatInput;
-  @ViewChild('searchInput', {read: MatInput, static: false})
-  set searchInput(value: MatInput) {
-    this.searchInputElement = value;
-  }
-
   words = '';
   queryParams: Params;
   @Input() variant: string;
@@ -45,6 +40,11 @@ export class SearchBoxComponent implements OnInit {
         }
       }
     });
+  }
+
+  @ViewChild('searchInput', {read: MatInput, static: false})
+  set searchInput(value: MatInput) {
+    this.searchInputElement = value;
   }
 
   ngOnInit() {

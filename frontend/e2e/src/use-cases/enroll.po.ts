@@ -1,4 +1,4 @@
-import { AppPage } from '../app-page.po';
+  import { AppPage } from '../app-page.po';
 import {by, ElementFinder} from 'protractor';
 
 export class EnrollUseCases {
@@ -76,20 +76,22 @@ export class EnrollUseCases {
     expect(this.page.getElements('[id*="_input_"]').count()).toBeGreaterThanOrEqual(1);
   }
 
-  async fillOutRequiredFields(reqSelector: string, btnSelector: string, invalidSelector: string) {
-    const numRequired = await this.page.getElements(reqSelector).count();
-    if (numRequired === 0) {
-      await expect(this.page.getElements(btnSelector).count()).toEqual(0);
-    } else {
-      await expect(this.page.getElements(btnSelector).count()).toEqual(1);
-      await this.page.clickElement(btnSelector).then(async () => {
-        await expect(this.page.getElements(invalidSelector).count()).toBeGreaterThan(0);
-        await this.page.fillOutFields(invalidSelector);
-        await this.page.waitFor(500);
-      });
-    }
-
+  async fillOutRequiredFields(reqSelector: string, btnSelector: string, invalidSelector: string, highlightSelector: string) {
+    await this._fillOutRequiredFieldsRecursive(reqSelector, btnSelector, invalidSelector, highlightSelector);
     return expect(this.page.getElements(btnSelector).count()).toEqual(0);
+  }
+
+  async _fillOutRequiredFieldsRecursive(reqSelector: string, btnSelector: string, invalidSelector: string, highlightSelector: string) {
+    await this.page.clickElement(highlightSelector);
+    const numInvalidBefore = await this.page.getElements(invalidSelector).count();
+    if (numInvalidBefore > 0) {
+      await expect(this.page.getElements(btnSelector).count()).toEqual(1);
+      await this.page.fillOutFields(invalidSelector);
+      return this._fillOutRequiredFieldsRecursive(reqSelector, btnSelector, invalidSelector, highlightSelector);
+    } else {
+      await expect(this.page.getElements(invalidSelector).count()).toEqual(0);
+      await expect(this.page.getElements(btnSelector).count()).toEqual(0);
+    }
   }
 
   async saveStep(stepIndex: number) {
@@ -109,7 +111,8 @@ export class EnrollUseCases {
     await this.fillOutRequiredFields(
       '.mat-form-field-required-marker',
       '#save-next-button.disabled',
-      '.ng-invalid'
+      '.ng-invalid',
+      '#highlight-required-fields'
     );
     await this.fillOutRepeatSections();
     await this.page.waitFor(500);
@@ -141,7 +144,8 @@ export class EnrollUseCases {
         await this.fillOutRequiredFields(
           `${dialogSelector} .mat-form-field-required-marker`,
           `${saveBtnSelector}.disabled`,
-          `${dialogSelector} .ng-invalid`
+          `${dialogSelector} .ng-invalid`,
+          '#highlight-required-fields-in-dialog'
         );
         await this.page.waitFor(100).then(async () => {
           await this.page.waitForNotVisible(`${saveBtnSelector}.disabled`);

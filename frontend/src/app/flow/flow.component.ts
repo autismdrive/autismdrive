@@ -1,24 +1,25 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {FormGroup} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFormOptions} from '@ngx-formly/core';
-import {keysToCamel} from 'src/util/snakeToCamel';
-import {ApiService} from '../_services/api/api.service';
-import {User} from '../_models/user';
-import {Participant} from '../_models/participant';
-import {Flow} from '../_models/flow';
-import {Step, StepStatus} from '../_models/step';
 import {MediaMatcher} from '@angular/cdk/layout';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AbstractControl, FormGroup} from '@angular/forms';
+import {MatDrawer} from '@angular/material/sidenav';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {keysToCamel} from 'src/util/snakeToCamel';
+import {scrollToFirstInvalidField, scrollToTop} from '../../util/scrollToTop';
+import {Flow} from '../_models/flow';
+import {Participant} from '../_models/participant';
+import {Step, StepStatus} from '../_models/step';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {scrollToTop} from '../../util/scrollToTop';
-import {MatDrawer} from '@angular/material/sidenav';
 
 enum FlowState {
   INTRO = 'intro',
   LOADING = 'loading',
   COMPLETE = 'complete',
-  SHOW_FORM = 'form'
+  SHOW_FORM = 'form',
 }
 
 @Component({
@@ -29,12 +30,9 @@ enum FlowState {
 export class FlowComponent implements OnInit, OnDestroy {
 
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: () => void;
-
   user: User;
   participant: Participant;
   flow: Flow;
-
   activeStep = 0;
   flowState = FlowState;
   state = FlowState.LOADING;
@@ -42,13 +40,12 @@ export class FlowComponent implements OnInit, OnDestroy {
   showResubmitMessage = false;
   hideForm = false;
   sidebarOpen = true;
-
   model: any = {};
   form: FormGroup;
   fields = [];
   options: FormlyFormOptions;
-
   sidenavElement: MatDrawer;
+  private _mobileQueryListener: () => void;
 
   constructor(
     private api: ApiService,
@@ -57,12 +54,14 @@ export class FlowComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private googleAnalyticsService: GoogleAnalyticsService,
     private changeDetectorRef: ChangeDetectorRef,
+    private deviceDetectorService: DeviceDetectorService,
     media: MediaMatcher,
   ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
+    // Using addEventListener causes page failures for older Safari / webkit / iPhone
     // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
+    // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
     this._mobileQueryListener = () => this._updateSidenavState();
     window.addEventListener('resize', this._mobileQueryListener);
@@ -88,6 +87,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
+    // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
   }
@@ -102,7 +102,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         } else {
           this.goToNextAvailableStep();
         }
-        scrollToTop();
+        scrollToTop(this.deviceDetectorService);
       });
   }
 
@@ -141,7 +141,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     } else {
       this.state = FlowState.COMPLETE;
       this.googleAnalyticsService.flowCompleteEvent(this.flow.name);
-      scrollToTop();
+      scrollToTop(this.deviceDetectorService);
     }
   }
 
@@ -159,7 +159,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     if (this.mobileQuery.matches) {
       this.sidebarOpen = false;
     }
-    scrollToTop();
+    scrollToTop(this.deviceDetectorService);
   }
 
   currentStep(): Step {
@@ -186,14 +186,19 @@ export class FlowComponent implements OnInit, OnDestroy {
       } else {
         this.renderForm(step, q);
       }
-      scrollToTop();
+      scrollToTop(this.deviceDetectorService);
     });
-    scrollToTop();
+    scrollToTop(this.deviceDetectorService);
   }
 
   highlightRequiredFields() {
-    this.form.updateValueAndValidity();
-    this.form.markAllAsTouched();
+    for (const fieldName of Object.keys(this.form.controls)) {
+      const field: AbstractControl = this.form.controls[fieldName];
+      field.updateValueAndValidity();
+      field.markAsDirty();
+    }
+
+    scrollToFirstInvalidField(this.deviceDetectorService);
   }
 
   submit() {
@@ -207,14 +212,14 @@ export class FlowComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
-          scrollToTop();
+          scrollToTop(this.deviceDetectorService);
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
         .subscribe(() => {
           this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
-          scrollToTop();
+          scrollToTop(this.deviceDetectorService);
         });
     }
   }
@@ -230,7 +235,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   toggleSidenav() {
     this.sidebarOpen = !this.sidebarOpen;
     this.sidenavElement.toggle(this.sidebarOpen, 'mouse').then(() => {
-      scrollToTop();
+      scrollToTop(this.deviceDetectorService);
     });
   }
 
@@ -245,17 +250,17 @@ export class FlowComponent implements OnInit, OnDestroy {
       }
     };
     this.state = this.flowState.SHOW_FORM;
-    scrollToTop();
+    scrollToTop(this.deviceDetectorService);
   }
 
-  private infoToForm(info) {
+  private infoToForm(info: any): FormlyFieldConfig[] {
     const fields = [];
     for (const field of info.fields) {
       if (field.fieldArray) {
+        // noinspection JSConstantReassignment
         field.fieldArray.model = this.model[field.name];
       }
       fields.push(keysToCamel(field));
-
     }
     fields.sort((f1, f2) => f1.displayOrder - f2.displayOrder);
     return fields;

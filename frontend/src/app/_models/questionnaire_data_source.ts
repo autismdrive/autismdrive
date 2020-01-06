@@ -1,9 +1,9 @@
-import {Step} from './step';
+import {CollectionViewer} from '@angular/cdk/collections';
 import {DataSource} from '@angular/cdk/table';
 import {BehaviorSubject} from 'rxjs/internal/BehaviorSubject';
-import {ApiService} from '../_services/api/api.service';
-import {CollectionViewer} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/internal/Observable';
+import {ApiService} from '../_services/api/api.service';
+import {Step} from './step';
 
 export class QuestionnaireDataSource implements DataSource<Step> {
 
@@ -11,7 +11,8 @@ export class QuestionnaireDataSource implements DataSource<Step> {
   private countSubject = new BehaviorSubject<number>(0);
   private loadingSubject = new BehaviorSubject<boolean>(false);
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) {
+  }
 
   connect(collectionViewer: CollectionViewer): Observable<Step[]> {
     return this.stepSubject.asObservable();
@@ -27,8 +28,8 @@ export class QuestionnaireDataSource implements DataSource<Step> {
     this.loadingSubject.next(true);
     this.api.getQuestionnaireList(questionnaire_name).subscribe(
       results => {
-        this.stepSubject.next(results)
+        this.stepSubject.next(results);
       }
-    )
+    );
   }
 }

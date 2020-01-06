@@ -2,12 +2,13 @@ import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {scrollToTop} from '../../util/scrollToTop';
+import {PasswordRequirements} from '../_models/password_requirements';
+import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
-import {PasswordRequirements} from '../_models/password_requirements';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {scrollToTop} from '../../util/scrollToTop';
-import {User} from '../_models/user';
 
 @Component({
   selector: 'app-password-reset',
@@ -33,7 +34,7 @@ export class PasswordResetComponent implements OnInit {
             const value = control.value;
 
             // avoid displaying the message error when values are empty
-            return value.passwordConfirm === value.password  || (!value.passwordConfirm || !value.password);
+            return value.passwordConfirm === value.password || (!value.passwordConfirm || !value.password);
           },
           message: 'Password Not Matching',
           errorPath: 'passwordConfirm',
@@ -75,6 +76,7 @@ export class PasswordResetComponent implements OnInit {
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef,
     private apiService: ApiService,
+    private deviceDetectorService: DeviceDetectorService,
     private googleAnalyticsService: GoogleAnalyticsService
   ) {
     this.route.params.subscribe(params => {
@@ -105,8 +107,9 @@ export class PasswordResetComponent implements OnInit {
           this._goToReturnUrl(data);
           this.googleAnalyticsService.accountEvent('reset_password');
         }, error1 => {
-          if (error1.code == 'token_expired') {
-            this.errorMessage = 'The link for resetting your password has expired. Please return to the password reset page to generate a new email.';
+          if (error1.code === 'token_expired') {
+            this.errorMessage = 'The link for resetting your password has expired.' +
+              'Please return to the password reset page to generate a new email.';
           } else {
             this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
           }
@@ -121,9 +124,10 @@ export class PasswordResetComponent implements OnInit {
   }
 
   private _goToReturnUrl(user: User) {
-    const returnUrl = localStorage.getItem('returnUrl');
+    const storedUrl = localStorage.getItem('returnUrl');
+    const returnUrl = storedUrl && (storedUrl !== 'undefined') ? storedUrl : '/profile';
     if (user) {
-      this.router.navigateByUrl(returnUrl || '/profile').then(_ => scrollToTop());
+      this.router.navigateByUrl(returnUrl).then(_ => scrollToTop(this.deviceDetectorService));
     }
   }
 }

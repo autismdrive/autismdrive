@@ -1,5 +1,8 @@
 import {AfterContentInit, Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {scrollToFirstInvalidField} from '../../../util/scrollToTop';
 import {RepeatSectionDialogData} from '../../_models/repeat_section_dialog_data';
 import {clone} from '../../../util/clone';
 
@@ -14,6 +17,7 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
 
   constructor(
     public dialogRef: MatDialogRef<RepeatSectionDialogComponent>,
+    private deviceDetectorService: DeviceDetectorService,
     @Inject(MAT_DIALOG_DATA) public data: RepeatSectionDialogData
   ) {
   }
@@ -43,13 +47,22 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
     this.dialogRef.close(isEmpty ? undefined : this.data.model);
   }
 
-  highlightRequiredFields() {
-    this.data.fields.forEach(f => {
-      f.formControl.updateValueAndValidity()
-      f.formControl.markAllAsTouched();
+  highlightRequiredFields(fields: FormlyFieldConfig[]) {
+    fields.forEach(f => {
+      f.formControl.updateValueAndValidity();
+      f.formControl.markAsDirty();
+
+      if (f.fieldGroup) {
+        this.highlightRequiredFields(f.fieldGroup);
+      }
     });
 
     this.updateDisableSave();
+  }
+
+  onInvalidFields(): void {
+    this.highlightRequiredFields(this.data.fields);
+    scrollToFirstInvalidField(this.deviceDetectorService);
   }
 
   onSubmit(): void {

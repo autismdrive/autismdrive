@@ -1,7 +1,7 @@
+import {LatLngLiteral} from '@agm/core';
 import {Component, Input, OnInit} from '@angular/core';
 import {Hit} from '../_models/query';
-import {LatLngLiteral} from '@agm/core';
-import {StudyStatus} from "../_models/study";
+import {StudyStatus} from '../_models/study';
 
 @Component({
   selector: 'app-search-result',

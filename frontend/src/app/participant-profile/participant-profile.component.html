@@ -18,7 +18,7 @@
       <mat-card-subtitle>
         {{user.isSelf(participant)? 'You' : participant.relationship | titlecase}}
         <div
-          *ngIf="participant.percent_complete < 100"
+          *ngIf="participant.percent_complete < 1"
           class="mat-subheading-2"
         >
           <mat-progress-bar
@@ -27,7 +27,7 @@
           ></mat-progress-bar>
         </div>
         <div
-          *ngIf="participant.percent_complete >= 100"
+          *ngIf="participant.percent_complete >= 1"
           class="mat-subheading-2"
         >
           Profile Complete

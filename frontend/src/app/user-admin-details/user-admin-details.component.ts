@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Participant } from '../_models/participant';
-import { User } from '../_models/user';
-import { ApiService } from '../_services/api/api.service';
-import { MatTableDataSource } from '@angular/material';
-import { EmailLog } from '../_models/email_log';
+import {Component, OnInit} from '@angular/core';
+import {MatTableDataSource} from '@angular/material';
+import {ActivatedRoute} from '@angular/router';
 import {AdminNote} from '../_models/admin_note';
+import {EmailLog} from '../_models/email_log';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-user-admin-details',
@@ -15,7 +14,7 @@ import {AdminNote} from '../_models/admin_note';
 export class UserAdminDetailsComponent implements OnInit {
   user: User;
   dataSource: MatTableDataSource<EmailLog>;
-  displayedColumns:  string[] = ['id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed'];
+  displayedColumns: string[] = ['id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed'];
   adminNotes: AdminNote[];
 
   constructor(
@@ -28,26 +27,22 @@ export class UserAdminDetailsComponent implements OnInit {
         this.api.getUser(userId).subscribe(user => {
           this.user = user;
 
-          this.api.getUserEmailLog(this.user).subscribe( log => {
+          this.api.getUserEmailLog(this.user).subscribe(log => {
             this.user.email_log = log;
             this.dataSource = new MatTableDataSource<EmailLog>(log);
           });
 
-          this.api.getUserAdminNotes(this.user.id).subscribe( notes =>{
+          this.api.getUserAdminNotes(this.user.id).subscribe(notes => {
             this.adminNotes = notes;
           });
 
-          for (let pi in this.user.participants) {
-              let participant = new Participant(this.user.participants[pi]);
-              this.api.getFlow(participant.getFlowName(), participant.id)
-              .subscribe(f => {
-                participant.percent_complete = f.percentComplete();
+          this.user.participants.forEach(pi => {
+            this.api
+              .getParticipantStepLog(pi)
+              .subscribe(log => {
+                pi.step_log = log;
               });
-              this.api.getParticipantStepLog(participant).subscribe( log => {
-                participant.step_log = log;
-              });
-              this.user.participants[pi] = participant;
-          }
+          });
         });
       }
     });
@@ -58,7 +53,7 @@ export class UserAdminDetailsComponent implements OnInit {
 
   exportUserData() {
     console.log('clicking the button for export user data');
-    this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe( response => {
+    this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe(response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
