@@ -15,5 +15,5 @@ class StudyInvestigator(db.Model):
     study_id = db.Column(db.Integer, db.ForeignKey(Study.id), nullable=False)
     investigator_id = db.Column(db.Integer, db.ForeignKey(Investigator.id), nullable=False)
     study = db.relationship(Study, backref='study_investigators')
-    investigator = db.relationship(Investigator, backref='investigator_studiess')
+    investigator = db.relationship(Investigator, backref='investigator_studies')
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
