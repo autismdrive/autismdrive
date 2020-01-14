@@ -49,11 +49,23 @@
       </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="last_updated">
+    <ng-container matColumnDef="registration_date">
       <mat-header-cell
         *matHeaderCellDef
         mat-sort-header
       >Registration Date</mat-header-cell>
+      <mat-cell
+        class="role-cell"
+        *matCellDef="let user"
+      >{{user.registration_date | date:'long'}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="last_updated">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Last Updated</mat-header-cell>
       <mat-cell
         class="role-cell"
         *matCellDef="let user"
