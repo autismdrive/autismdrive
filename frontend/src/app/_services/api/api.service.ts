@@ -393,6 +393,12 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Update User */
+  updateUser(user: User): Observable<User> {
+    return this.httpClient.put<User>(this._endpointUrl('user').replace('<id>', user.id.toString()), user)
+      .pipe(catchError(this._handleError));
+  }
+
   /** addUser */
   addUser(user: User): Observable<User> {
     return this.httpClient.post<User>(this._endpointUrl('userlist'), user)

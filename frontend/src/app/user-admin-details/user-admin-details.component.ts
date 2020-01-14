@@ -69,4 +69,15 @@ export class UserAdminDetailsComponent implements OnInit {
       URL.revokeObjectURL(url);
     });
   }
+
+  makeAdmin() {
+    this.user.role = 'admin';
+    this.api.updateUser(this.user).subscribe();
+  }
+
+  removeAdmin() {
+    this.user.role = 'user';
+    this.api.updateUser(this.user).subscribe();
+  }
+
 }
