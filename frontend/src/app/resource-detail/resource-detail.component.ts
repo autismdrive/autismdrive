@@ -9,6 +9,7 @@ import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {ResourceChangeLog} from '../_models/resource_change_log';
 
 @Component({
   selector: 'app-resource-detail',
@@ -19,7 +20,7 @@ export class ResourceDetailComponent implements OnInit {
   resource: Resource;
   mapLoc: LatLngLiteral;
   currentUser: User;
-  notes: AdminNote[];
+  changeLog: ResourceChangeLog[];
   loading = true;
   contactItems: ContactItem[];
   typeName: string;
@@ -51,12 +52,12 @@ export class ResourceDetailComponent implements OnInit {
             this.safeVideoLink = this._sanitizer
               .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
           }
+          if (this.currentUser && this.currentUser.role === 'admin') {
+            this.api.getResourceChangeLog(this.resource.id).subscribe(log => {
+              this.changeLog = log;
+            });
+          }
         });
-        if (this.currentUser && this.currentUser.role === 'Admin') {
-          this.api.getResourceAdminNotes(resourceId).subscribe(notes => {
-            this.notes = notes;
-          });
-        }
       }
     });
 

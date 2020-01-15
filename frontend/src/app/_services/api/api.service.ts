@@ -25,6 +25,7 @@ import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
 import {ConfigService} from '../config.service';
 import {PasswordRequirements} from '../../_models/password_requirements';
+import {ResourceChangeLog} from '../../_models/resource_change_log';
 
 
 @Injectable({
@@ -76,6 +77,7 @@ export class ApiService {
     resource: '/api/resource/<id>',
     resourcebycategory: '/api/category/<category_id>/resource',
     resourcecategory: '/api/resource_category/<id>',
+    resourceChangeLog: '/api/resource/<resource_id>/change_log',
     resourceAdminNoteList: '/api/resource/<resource_id>/admin_note',
     relatedresults: '/api/related',
     resourcecategorylist: '/api/resource_category',
@@ -429,6 +431,12 @@ export class ApiService {
   /** Get User Email Log */
   getUserEmailLog(user: User): Observable<EmailLog[]> {
     return this.httpClient.get<EmailLog[]>(this._endpointUrl('userEmailLog').replace('<id>', user.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Resource Change Log */
+  getResourceChangeLog(resource_id: number): Observable<ResourceChangeLog[]> {
+    return this.httpClient.get<ResourceChangeLog[]>(this._endpointUrl('resourceChangeLog').replace('<resource_id>', resource_id.toString()))
       .pipe(catchError(this._handleError));
   }
 
