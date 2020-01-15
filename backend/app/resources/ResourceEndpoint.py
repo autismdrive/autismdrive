@@ -11,6 +11,8 @@ from app.model.resource_category import ResourceCategory
 from app.model.admin_note import AdminNote
 from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import ResourceSchema
+from app.model.event import Event
+from app.model.location import Location
 from app.model.user import Role
 from app.wrappers import requires_roles
 
@@ -35,7 +37,10 @@ class ResourceEndpoint(flask_restful.Resource):
             pass
 
         db.session.query(AdminNote).filter_by(resource_id=id).delete()
+        db.session.query(Event).filter_by(id=id).delete()
+        db.session.query(Location).filter_by(id=id).delete()
         db.session.query(ResourceCategory).filter_by(resource_id=id).delete()
+        db.session.query(ResourceChangeLog).filter_by(resource_id=id).delete()
         db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
         return None

@@ -5,6 +5,7 @@ from flask import request, g
 from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index, auth
+from app.model.event import Event
 from app.model.location import Location
 from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import LocationSchema
@@ -29,6 +30,7 @@ class LocationEndpoint(flask_restful.Resource):
         if location is not None:
             elastic_index.remove_document(location, 'Location')
 
+        db.session.query(Event).filter_by(id=id).delete()
         db.session.query(Location).filter_by(id=id).delete()
         db.session.commit()
         return None
