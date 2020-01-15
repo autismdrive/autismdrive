@@ -28,6 +28,7 @@ from app.model.location import Location
 from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.resource import Resource
+from app.model.resource_change_log import ResourceChangeLog
 from app.model.user import User, Role
 from app.model.zip_code import ZipCode
 
@@ -296,5 +297,6 @@ class BaseTest:
         db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))
         db.session.add(investigator)
         db.session.add(EmailLog())
+        db.session.add(ResourceChangeLog())
         db.session.add(StepLog())
         db.session.commit()

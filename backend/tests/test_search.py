@@ -1,12 +1,10 @@
 import unittest
-import time
 from datetime import datetime, timedelta
 
 from flask import json
 
 from app import elastic_index, db
 from app.model.category import Category
-from app.model.study_category import StudyCategory
 from tests.base_test import BaseTest
 
 
@@ -119,7 +117,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         o_id = self.construct_organization().id
         resource = {'title': "space unicorn", 'description': "delivering rainbows", 'organization_id': o_id}
         rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
-                           follow_redirects=True)
+                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
 
@@ -208,7 +206,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['description'] = 'all around the world'
         rv = self.app.put('/api/resource/%i' % resource.id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+                          follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
 
         search_results = self.search(rainbow_query)

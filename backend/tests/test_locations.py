@@ -2,10 +2,11 @@ import unittest
 
 from flask import json
 from tests.base_test import BaseTest
-from app import db, elastic_index
-from app.model.event import Event
+from app import db
 from app.model.location import Location
 from app.model.resource_category import ResourceCategory
+from app.model.resource_change_log import ResourceChangeLog
+from app.model.user import Role
 
 
 class TestLocations(BaseTest, unittest.TestCase):
@@ -40,7 +41,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         response['longitude'] = -98.7654
         orig_date = response['last_updated']
         rv = self.app.put('/api/location/%i' % r_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+                          follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/location/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
@@ -58,7 +59,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         rv = self.app.get('api/location/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
 
-        rv = self.app.delete('api/location/%i' % r_id, content_type="application/json")
+        rv = self.app.delete('api/location/%i' % r_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
         rv = self.app.get('api/location/%i' % r_id, content_type="application/json")
@@ -68,7 +69,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         o_id = self.construct_organization().id
         location = {'title': "location of locations", 'description': "You need this location in your life.", 'organization_id': o_id}
         rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
-                           follow_redirects=True)
+                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'location of locations')
@@ -196,3 +197,34 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(z.id, response["id"])
         self.assertEqual(z.latitude, response["latitude"])
         self.assertEqual(z.longitude, response["longitude"])
+
+    def test_resource_change_log(self):
+        l = self.construct_location(title='A Location that is Super and Great')
+        u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+
+        rv = self.app.get('api/location/%i' % l.id, content_type="application/json")
+        self.assert_success(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Super Great Location'
+        rv = self.app.put('/api/location/%i' % l.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assert_success(rv)
+        rv = self.app.get('/api/location/%i' % l.id, content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Super Great Location')
+
+        logs = ResourceChangeLog.query.all()
+        self.assertIsNotNone(logs[-1].resource_id)
+        self.assertIsNotNone(logs[-1].user_id)
+
+        rv = self.app.get('/api/resource/%i/change_log' % l.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[-1]['user_id'], u.id)
+
+        rv = self.app.get('/api/user/%i/resource_change_log' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[-1]['resource_id'], l.id)

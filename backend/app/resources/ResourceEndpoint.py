@@ -1,15 +1,18 @@
 import datetime
 
 import flask_restful
-from flask import request
+from flask import request, g
 from marshmallow import ValidationError
 from elasticsearch import NotFoundError
 
-from app import RestException, db, elastic_index
+from app import RestException, db, elastic_index, auth
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.admin_note import AdminNote
+from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import ResourceSchema
+from app.model.user import Role
+from app.wrappers import requires_roles
 
 
 class ResourceEndpoint(flask_restful.Resource):
@@ -21,6 +24,8 @@ class ResourceEndpoint(flask_restful.Resource):
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def delete(self, id):
         resource = db.session.query(Resource).filter_by(id=id).first()
 
@@ -35,6 +40,8 @@ class ResourceEndpoint(flask_restful.Resource):
         db.session.commit()
         return None
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Resource).filter_by(id=id).first()
@@ -44,7 +51,13 @@ class ResourceEndpoint(flask_restful.Resource):
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Resource')
+        self.log_update(updated)
         return self.schema.dump(updated)
+
+    def log_update(self, resource):
+        log = ResourceChangeLog(resource_id=resource.id, user_id=g.user.id)
+        db.session.add(log)
+        db.session.commit()
 
 
 class ResourceListEndpoint(flask_restful.Resource):
@@ -56,6 +69,8 @@ class ResourceListEndpoint(flask_restful.Resource):
         resources = db.session.query(Resource).all()
         return self.resourcesSchema.dump(resources)
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def post(self):
         request_data = request.get_json()
         try:

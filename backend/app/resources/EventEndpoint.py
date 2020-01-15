@@ -1,12 +1,15 @@
 import datetime
 
 import flask_restful
-from flask import request
+from flask import request, g
 from marshmallow import ValidationError
 
-from app import RestException, db, elastic_index
+from app import RestException, db, elastic_index, auth
 from app.model.event import Event
+from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import EventSchema
+from app.model.user import Role
+from app.wrappers import requires_roles
 
 
 class EventEndpoint(flask_restful.Resource):
@@ -18,6 +21,8 @@ class EventEndpoint(flask_restful.Resource):
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def delete(self, id):
         event = db.session.query(Event).filter_by(id=id).first()
 
@@ -28,6 +33,8 @@ class EventEndpoint(flask_restful.Resource):
         db.session.commit()
         return None
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Event).filter_by(id=id).first()
@@ -37,7 +44,13 @@ class EventEndpoint(flask_restful.Resource):
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Event', latitude=updated.latitude, longitude=updated.longitude)
+        self.log_update(updated)
         return self.schema.dump(updated)
+
+    def log_update(self, event):
+        log = ResourceChangeLog(resource_id=event.id, user_id=g.user.id)
+        db.session.add(log)
+        db.session.commit()
 
 
 class EventListEndpoint(flask_restful.Resource):
@@ -49,6 +62,8 @@ class EventListEndpoint(flask_restful.Resource):
         events = db.session.query(Event).all()
         return self.eventsSchema.dump(events)
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def post(self):
         request_data = request.get_json()
         try:

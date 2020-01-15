@@ -15,6 +15,7 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
+from app.model.resource_change_log import ResourceChangeLog
 from app.model.search import Search, Sort
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
@@ -618,6 +619,12 @@ class FlowSchema(Schema):
 class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog
+        include_fk = True
+
+
+class ResourceChangeLogSchema(ModelSchema):
+    class Meta:
+        model = ResourceChangeLog
         include_fk = True
 
 

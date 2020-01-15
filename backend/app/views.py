@@ -8,7 +8,6 @@ from app import app
 from app.resources.ConfigEndpoint import ConfigEndpoint
 from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
 from app.resources.Auth import auth_blueprint
-from app.resources.EmailLogEndpoint import EmailLogListEndpoint
 from app.resources.SearchEndpoint import SearchEndpoint
 from app.resources.SearchResourcesEndpoint import SearchResourcesEndpoint
 from app.resources.SearchStudiesEndpoint import SearchStudiesEndpoint
@@ -20,7 +19,8 @@ from app.resources.FlowEndpoint import (
     FlowQuestionnaireEndpoint,
     FlowQuestionnaireMetaEndpoint)
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
-from app.resources.EmailLogEndpoint import EmailLogEndpoint
+from app.resources.EmailLogEndpoint import EmailLogEndpoint, EmailLogListEndpoint
+from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByUserEndpoint, ResourceChangeLogByResourceEndpoint
 from app.resources.StepLogEndpoint import StepLogEndpoint
 from app.resources.AdminNoteEndpoint import (
     AdminNoteListByUserEndpoint,
@@ -178,6 +178,7 @@ endpoints = [
     (CategoryByResourceEndpoint, "/resource/<resource_id>/category"),
     (ResourceCategoryListEndpoint, "/resource_category"),
     (ResourceCategoryEndpoint, "/resource_category/<id>"),
+    (ResourceChangeLogByResourceEndpoint, "/resource/<resource_id>/change_log"),
     (AdminNoteListByResourceEndpoint, "/resource/<resource_id>/admin_note"),
 
     # Studies
@@ -210,6 +211,7 @@ endpoints = [
     (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),
     (StudyEnrolledByUserEndpoint, "/user/<user_id>/enrolled/study"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
+    (ResourceChangeLogByUserEndpoint, "/user/<user_id>/resource_change_log"),
     (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
     # Participants
     (ParticipantListEndpoint, "/participant"),
