@@ -1,4 +1,3 @@
-from app.model.email_log import EmailLogSchema
 import flask_restful
 from app import db, auth
 from app.model.resource_change_log import ResourceChangeLog
@@ -9,13 +8,13 @@ from app.wrappers import requires_roles
 
 class ResourceChangeLogListEndpoint(flask_restful.Resource):
 
-    emailLogsSchema = ResourceChangeLogSchema(many=True)
+    resourceChangeLogSchema = ResourceChangeLogSchema(many=True)
 
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self):
-        email_logs = db.session.query(ResourceChangeLog).all()
-        return self.emailLogsSchema.dump(email_logs)
+        resource_change_logs = db.session.query(ResourceChangeLog).all()
+        return self.resourceChangeLogSchema.dump(resource_change_logs)
 
 
 class ResourceChangeLogByUserEndpoint(flask_restful.Resource):
