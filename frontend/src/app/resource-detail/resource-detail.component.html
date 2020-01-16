@@ -96,7 +96,7 @@
             <div *ngFor="let l of changeLog">
               <p mat-line>
                 <a [href]="'/#/admin/user/' + l.user_id">
-                  User ID: {{l.user_id}}
+                  <b>User #{{l.user_id}} - {{l.user_email}}</b>
                 </a>
                 - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
               </p>

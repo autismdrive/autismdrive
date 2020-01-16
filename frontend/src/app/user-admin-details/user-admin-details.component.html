@@ -100,7 +100,7 @@
     <div *ngFor="let l of resourceChangeLog">
       <p mat-line>
         <a [href]="'/#/resource/' + l.resource_id">
-          Resource ID: {{l.resource_id}}
+          <b>Resource #{{l.resource_id}} - {{l.resource_title}}</b>
         </a>
         - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
       </p>
