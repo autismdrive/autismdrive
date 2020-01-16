@@ -25,12 +25,15 @@ class EventEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def delete(self, id):
         event = db.session.query(Event).filter_by(id=id).first()
+        event_id = event.id
+        event_title = event.title
 
         if event is not None:
             elastic_index.remove_document(event, 'Event')
 
         db.session.query(Event).filter_by(id=id).delete()
         db.session.commit()
+        self.log_update(event_id=event_id, event_title=event_title, change_type='delete')
         return None
 
     @auth.login_required
@@ -44,11 +47,12 @@ class EventEndpoint(flask_restful.Resource):
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Event', latitude=updated.latitude, longitude=updated.longitude)
-        self.log_update(updated)
+        self.log_update(event_id=updated.id, event_title=updated.title, change_type='edit')
         return self.schema.dump(updated)
 
-    def log_update(self, event):
-        log = ResourceChangeLog(resource_id=event.id, user_id=g.user.id)
+    def log_update(self, event_id, event_title, change_type):
+        log = ResourceChangeLog(resource_id=event_id, resource_title=event_title, user_id=g.user.id,
+                                user_email=g.user.email, type=change_type)
         db.session.add(log)
         db.session.commit()
 
@@ -71,7 +75,14 @@ class EventListEndpoint(flask_restful.Resource):
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Event', latitude=load_result.latitude, longitude=load_result.longitude)
+            self.log_update(event_id=load_result.id, event_title=load_result.title, change_type='create')
             return self.eventSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
+
+    def log_update(self, event_id, event_title, change_type):
+        log = ResourceChangeLog(resource_id=event_id, resource_title=event_title, user_id=g.user.id,
+                                user_email=g.user.email, type=change_type)
+        db.session.add(log)
+        db.session.commit()
