@@ -30,6 +30,7 @@ class ResourceEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def delete(self, id):
         resource = db.session.query(Resource).filter_by(id=id).first()
+        resource_id = resource.id
 
         try:
             elastic_index.remove_document(resource, 'Resource')
@@ -40,9 +41,9 @@ class ResourceEndpoint(flask_restful.Resource):
         db.session.query(Event).filter_by(id=id).delete()
         db.session.query(Location).filter_by(id=id).delete()
         db.session.query(ResourceCategory).filter_by(resource_id=id).delete()
-        db.session.query(ResourceChangeLog).filter_by(resource_id=id).delete()
         db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
+        self.log_update(resource_id=resource_id, change_type='delete')
         return None
 
     @auth.login_required
@@ -56,11 +57,11 @@ class ResourceEndpoint(flask_restful.Resource):
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Resource')
-        self.log_update(updated)
+        self.log_update(resource_id=updated.id, change_type='edit')
         return self.schema.dump(updated)
 
-    def log_update(self, resource):
-        log = ResourceChangeLog(resource_id=resource.id, user_id=g.user.id)
+    def log_update(self, resource_id, change_type):
+        log = ResourceChangeLog(resource_id=resource_id, user_id=g.user.id, type=change_type)
         db.session.add(log)
         db.session.commit()
 
@@ -83,7 +84,13 @@ class ResourceListEndpoint(flask_restful.Resource):
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Resource')
+            self.log_update(resource_id=load_result.id, change_type='create')
             return self.resourceSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
+
+    def log_update(self, resource_id, change_type):
+        log = ResourceChangeLog(resource_id=resource_id, user_id=g.user.id, type=change_type)
+        db.session.add(log)
+        db.session.commit()

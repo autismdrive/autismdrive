@@ -102,7 +102,7 @@
         <a [href]="'/#/resource/' + l.resource_id">
           Resource ID: {{l.resource_id}}
         </a>
-        - Update Date: {{l.last_updated | date: "long"}}
+        - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
       </p>
     </div>
   </mat-card>
