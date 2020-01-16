@@ -95,6 +95,17 @@
       <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>
   </div>
+  <mat-card *ngIf="resourceChangeLog && resourceChangeLog.length > 0">
+    <mat-card-title>Edit Log</mat-card-title>
+    <div *ngFor="let l of resourceChangeLog">
+      <p mat-line>
+        <a [href]="'/#/resource/' + l.resource_id">
+          Resource ID: {{l.resource_id}}
+        </a>
+        - Update Date: {{l.last_updated | date: "long"}}
+      </p>
+    </div>
+  </mat-card>
   <mat-card *ngIf="adminNotes && adminNotes.length > 0">
     <mat-card-title>Admin Notes</mat-card-title>
     <mat-card-content>

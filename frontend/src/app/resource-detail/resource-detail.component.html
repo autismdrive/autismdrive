@@ -90,7 +90,6 @@
         fxLayout="column"
         fxLayoutGap="2em"
       >
-        <app-admin-note-display [currentUser]="currentUser" [currentResource]="resource"></app-admin-note-display>
         <mat-card>
           <mat-card-title>Edit Log</mat-card-title>
           <div *ngIf="changeLog">
@@ -104,6 +103,7 @@
             </div>
           </div>
         </mat-card>
+        <app-admin-note-display [currentUser]="currentUser" [currentResource]="resource"></app-admin-note-display>
       </div>
     </div>
     <div

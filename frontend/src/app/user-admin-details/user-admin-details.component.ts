@@ -3,6 +3,7 @@ import {MatTableDataSource} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
 import {AdminNote} from '../_models/admin_note';
 import {EmailLog} from '../_models/email_log';
+import {ResourceChangeLog} from '../_models/resource_change_log';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 
@@ -16,6 +17,7 @@ export class UserAdminDetailsComponent implements OnInit {
   dataSource: MatTableDataSource<EmailLog>;
   displayedColumns: string[] = ['id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed'];
   adminNotes: AdminNote[];
+  resourceChangeLog: ResourceChangeLog[];
 
   constructor(
     private api: ApiService, private route: ActivatedRoute
@@ -34,6 +36,10 @@ export class UserAdminDetailsComponent implements OnInit {
 
           this.api.getUserAdminNotes(this.user.id).subscribe(notes => {
             this.adminNotes = notes;
+          });
+
+          this.api.getUserResourceChangeLog(this.user.id).subscribe(log => {
+            this.resourceChangeLog = log;
           });
 
           this.user.participants.forEach(pi => {

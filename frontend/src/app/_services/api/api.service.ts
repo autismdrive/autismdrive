@@ -98,6 +98,7 @@ export class ApiService {
     user: '/api/user/<id>',
     userAdminNoteList: '/api/user/<user_id>/admin_note',
     userEmailLog: '/api/user/email_log/<id>',
+    userResourceChangeLog: '/api/user/<user_id>/resource_change_log',
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
     userparticipant: '/api/user_participant/<id>',
@@ -437,6 +438,12 @@ export class ApiService {
   /** Get Resource Change Log */
   getResourceChangeLog(resource_id: number): Observable<ResourceChangeLog[]> {
     return this.httpClient.get<ResourceChangeLog[]>(this._endpointUrl('resourceChangeLog').replace('<resource_id>', resource_id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get User Resource Change Log */
+  getUserResourceChangeLog(user_id: number): Observable<ResourceChangeLog[]> {
+    return this.httpClient.get<ResourceChangeLog[]>(this._endpointUrl('userResourceChangeLog').replace('<user_id>', user_id.toString()))
       .pipe(catchError(this._handleError));
   }
 
