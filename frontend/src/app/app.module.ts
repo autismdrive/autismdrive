@@ -6,13 +6,15 @@ import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/h
 import {APP_INITIALIZER, Injectable, NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule} from '@angular/material';
+import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule, MatTabsModule} from '@angular/material';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatDialogModule} from '@angular/material/dialog';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatGridListModule} from '@angular/material/grid-list';
@@ -22,15 +24,16 @@ import {MatListModule} from '@angular/material/list';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatRadioModule} from '@angular/material/radio';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSortModule} from '@angular/material/sort';
 import {MatStepperModule} from '@angular/material/stepper';
-import {MatTabsModule} from '@angular/material';
 import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatTreeModule} from '@angular/material/tree';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyModule} from '@ngx-formly/core';
@@ -40,9 +43,15 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorModule} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
 import {NgProgressModule} from 'ngx-progressbar';
+import {Observable, ObservableInput, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
+import {environment} from '../environments/environment';
 import {AutocompleteSectionComponent} from './_forms/autocomplete-section/autocomplete-section.component';
 import {CardWrapperComponent} from './_forms/card-wrapper/card-wrapper.component';
+import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
 import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component';
+import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
+import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
 import {
   EmailValidator,
@@ -62,26 +71,42 @@ import {JwtInterceptor} from './_routing/jwt-interceptor';
 import {RoutingModule} from './_routing/routing.module';
 import {ApiService} from './_services/api/api.service';
 import {SearchService} from './_services/api/search.service';
+import {ConfigService} from './_services/config.service';
 import {IntervalService} from './_services/interval/interval.service';
+import {AboutComponent} from './about/about.component';
 import {AccordionComponent} from './accordion/accordion.component';
+import {AddButtonComponent} from './add-button/add-button.component';
+import {AdminExportDetailsComponent} from './admin-export-details/admin-export-details.component';
+import {AdminExportComponent} from './admin-export/admin-export.component';
 import {AdminHomeComponent} from './admin-home/admin-home.component';
+import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
+import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.component';
 import {AppComponent} from './app.component';
 import {AvatarDialogComponent} from './avatar-dialog/avatar-dialog.component';
+import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
+import {ContactItemComponent} from './contact-item/contact-item.component';
+import {DetailsLinkComponent} from './details-link/details-link.component';
+import {EditButtonComponent} from './edit-button/edit-button.component';
+import {EventDateComponent} from './event-date/event-date.component';
 import {FilterChipsComponent} from './filter-chips/filter-chips.component';
-import {AboutComponent} from './about/about.component';
 import {FiltersComponent} from './filters/filters.component';
 import {FlowCompleteComponent} from './flow-complete/flow-complete.component';
 import {FlowIntroComponent} from './flow-intro/flow-intro.component';
 import {FlowComponent} from './flow/flow.component';
+import {FooterComponent} from './footer/footer.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
+import {GoogleAnalyticsService} from './google-analytics.service';
 import {HeaderComponent} from './header/header.component';
 import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';
+import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 import {LoadingComponent} from './loading/loading.component';
 import {LoginComponent} from './login/login.component';
 import {LogoComponent} from './logo/logo.component';
 import {LogoutComponent} from './logout/logout.component';
+import {MirrorComponent} from './mirror/mirror.component';
 import {NewsItemComponent} from './news-item/news-item.component';
+import {ParticipantAdminComponent} from './participant-admin/participant-admin.component';
 import {ParticipantDetailComponent} from './participant-detail/participant-detail.component';
 import {ParticipantProfileComponent} from './participant-profile/participant-profile.component';
 import {PasswordResetComponent} from './password-reset/password-reset.component';
@@ -91,10 +116,13 @@ import {QuestionnaireDataViewComponent} from './questionnaire-data-view/question
 import {QuestionnaireStepComponent} from './questionnaire-step/questionnaire-step.component';
 import {QuestionnaireStepsListComponent} from './questionnaire-steps-list/questionnaire-steps-list.component';
 import {RegisterComponent} from './register/register.component';
+import {RelatedItemsComponent} from './related-items/related-items.component';
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
 import {ResourceFormComponent} from './resource-form/resource-form.component';
 import {SearchBoxComponent} from './search-box/search-box.component';
+import {SearchFilterComponent} from './search-filter/search-filter.component';
 import {SearchResultComponent} from './search-result/search-result.component';
+import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {SearchComponent} from './search/search.component';
 import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
@@ -105,34 +133,7 @@ import {TimedoutComponent} from './timed-out/timed-out.component';
 import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
-import {FooterComponent} from './footer/footer.component';
-import {MirrorComponent} from './mirror/mirror.component';
-import {AdminExportComponent} from './admin-export/admin-export.component';
-import {AdminExportDetailsComponent} from './admin-export-details/admin-export-details.component';
-import {DetailsLinkComponent} from './details-link/details-link.component';
-import {MatRadioModule} from '@angular/material/radio';
-import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
-import {GoogleAnalyticsService} from './google-analytics.service';
-import {SearchTopicsComponent} from './search-topics/search-topics.component';
-import {MatDialogModule} from '@angular/material/dialog';
-import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
-import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
-import {SearchFilterComponent} from './search-filter/search-filter.component';
-import {AdminNoteFormComponent} from './admin-note-form/admin-note-form.component';
-import {AdminNoteDisplayComponent} from './admin-note-display/admin-note-display.component';
-import {EventDateComponent} from './event-date/event-date.component';
-import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
-import {RelatedItemsComponent} from './related-items/related-items.component';
-import {ContactItemComponent} from './contact-item/contact-item.component';
-import {catchError, map} from 'rxjs/operators';
-import {Observable, ObservableInput, of} from 'rxjs';
-import {environment} from '../environments/environment';
-import {ConfigService} from './_services/config.service';
-import {AddButtonComponent} from './add-button/add-button.component';
-import {EditButtonComponent} from './edit-button/edit-button.component';
-import {ParticipantAdminComponent} from './participant-admin/participant-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
-import { MultiselectTreeComponent } from './_forms/multiselect-tree/multiselect-tree.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -168,6 +169,11 @@ export class FormlyConfig {
     },
     types: [
       {name: 'repeat', component: RepeatSectionComponent},
+      {
+        name: 'multiselecttree',
+        component: MultiselectTreeComponent,
+        wrappers: ['card'],
+      },
       {
         name: 'autocomplete',
         component: AutocompleteSectionComponent,
@@ -317,10 +323,12 @@ export class FormlyConfig {
     PdfJsViewerModule,
     ReactiveFormsModule,
     RoutingModule,
+    MatTreeModule,
+    MatBadgeModule,
   ],
   providers: [
-    {provide: APP_INITIALIZER,  useFactory: load, deps: [HttpClient, ConfigService], multi: true },
-    {provide: LAZY_MAPS_API_CONFIG,  useExisting: ConfigService},
+    {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
+    {provide: LAZY_MAPS_API_CONFIG, useExisting: ConfigService},
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},

@@ -152,10 +152,10 @@ export class StudyFormComponent implements OnInit {
     },
     {
       key: 'categories',
-      type: 'multicheckbox',
+      type: 'multiselecttree',
       templateOptions: {
         label: 'Topics',
-        options: this.api.getCategories(),
+        options: this.api.getCategoryTree(),
         valueProp: 'id',
         labelProp: 'name',
       },

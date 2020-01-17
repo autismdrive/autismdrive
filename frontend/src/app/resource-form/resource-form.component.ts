@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import {ResourceCategory} from '../_models/resource_category';
 import { ApiService } from '../_services/api/api.service';
 import { Resource } from '../_models/resource';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
@@ -220,10 +221,10 @@ export class ResourceFormComponent implements OnInit {
       },
       {
         key: 'categories',
-        type: 'multicheckbox',
+        type: 'multiselecttree',
         templateOptions: {
           label: 'Topics',
-          options: this.api.getCategories(),
+          options: this.api.getCategoryTree(),
           valueProp: 'id',
           labelProp: 'name',
         },
@@ -322,24 +323,18 @@ export class ResourceFormComponent implements OnInit {
     this.state = this.pageState.SHOW_FORM;
   }
 
-  updateResourceCategories() {
-    const rcIds = this.resource.resource_categories.map(rc => rc.category.id);
-    // Add the new categories
-    for (const cat in Object.keys(this.model.categories)) {
-      if (!rcIds.includes(parseInt(cat, 10))) {
-        this.api.addResourceCategory({
-          resource_id: this.resource.id,
-          category_id: parseInt(cat, 10),
-          type: this.resource.type
-        }).subscribe();
+  updateResourceCategories(resource_id) {
+    const selectedCategories: ResourceCategory[] = [];
+    this.model.categories.forEach((isSelected, i) => {
+      if (isSelected === true) {
+        selectedCategories.push({
+          resource_id: resource_id,
+          category_id: i,
+          type: this.model.type
+        });
       }
-    }
-    // Remove any deleted categories
-    for (const rc in this.resource.resource_categories) {
-      if (!this.model.categories[this.resource.resource_categories[rc].category_id]) {
-        this.api.deleteResourceCategory(this.resource.resource_categories[rc]).subscribe();
-      }
-    }
+    });
+    return this.api.updateResourceCategories(resource_id, selectedCategories);
   }
 
   addResourceCategories(resource_id) {
@@ -382,28 +377,15 @@ export class ResourceFormComponent implements OnInit {
     const resourceType = this.model.type.charAt(0).toUpperCase() + this.model.type.slice(1);
 
     if (this.form.valid) {
-      if (this.createNew) {
-        this.updateOrganization(() => this.addAndClose(this.api[`add${resourceType}`](this.model)));
-      } else {
-        this.updateResourceCategories();
-        this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
-      }
+      this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
     }
-  }
-
-  addAndClose(apiCall) {
-    apiCall.subscribe(r => {
-        this.updatedResource = r;
-        this.addResourceCategories(r.id);
-        this.close();
-      });
   }
 
   updateAndClose(apiCall) {
     apiCall.subscribe( r => {
-        this.updatedResource = r;
-        this.close();
-      });
+      this.updatedResource = r;
+      this.updateResourceCategories(r.id).subscribe(() => this.close());
+    });
   }
 
   showDelete() {
