@@ -144,7 +144,7 @@ class EmailService:
                                     tracking_code=tracking_code)
 
         self.send_email(subject,
-                        recipients=[study.coordinator_email], text_body=text_body, html_body=html_body)
+                        recipients=[study.coordinator_email, 'autismdrive@virginia.edu'], text_body=text_body, html_body=html_body)
 
         return tracking_code
 

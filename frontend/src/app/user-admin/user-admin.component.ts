@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 export class UserAdminComponent implements OnInit, AfterViewInit {
 
   dataSource: UserDataSource;
-  displayedColumns = ['id', 'role', 'last_updated', 'email', 'participants'];
+  displayedColumns = ['id', 'role', 'email', 'last_updated', 'registration_date', 'participants'];
   default_page_size = 10;
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;

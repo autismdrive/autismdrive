@@ -24,6 +24,22 @@
       <p>User Email: {{user.email}}</p>
       <p>User Role: {{user.role}}</p>
       <p>Last Updated: {{user.last_updated | date:'long'}}</p>
+      <button
+        *ngIf="user.role != 'admin'"
+        mat-flat-button
+        (click)="makeAdmin()"
+        color="accent"
+      >
+        Make Admin
+      </button>
+      <button
+        *ngIf="user.role === 'admin'"
+        mat-flat-button
+        (click)="removeAdmin()"
+        color="accent"
+      >
+        Remove Admin Status
+      </button>
     </div>
     <div
       class="email-log"
@@ -79,6 +95,17 @@
       <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>
   </div>
+  <mat-card *ngIf="resourceChangeLog && resourceChangeLog.length > 0">
+    <mat-card-title>Edit Log</mat-card-title>
+    <div *ngFor="let l of resourceChangeLog">
+      <p mat-line>
+        <a [href]="'/#/resource/' + l.resource_id">
+          <b>Resource #{{l.resource_id}} - {{l.resource_title}}</b>
+        </a>
+        - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
+      </p>
+    </div>
+  </mat-card>
   <mat-card *ngIf="adminNotes && adminNotes.length > 0">
     <mat-card-title>Admin Notes</mat-card-title>
     <mat-card-content>

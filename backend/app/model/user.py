@@ -35,6 +35,7 @@ class User(db.Model):
     #    id = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.Integer, primary_key=True, default=random_integer)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
+    registration_date = db.Column(db.DateTime(timezone=True), default=func.now())
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.Enum(Role))
     participants = db.relationship(Participant, back_populates="user")

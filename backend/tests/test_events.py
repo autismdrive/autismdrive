@@ -1,12 +1,13 @@
 import unittest
 
-from click import INT
 from flask import json
 
-from app import db, elastic_index
+from app import db
 from app.model.event import Event
 from tests.base_test import BaseTest
 from app.model.resource_category import ResourceCategory
+from app.model.resource_change_log import ResourceChangeLog
+from app.model.user import Role
 
 
 class TestEvents(BaseTest, unittest.TestCase):
@@ -38,7 +39,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         response['website'] = 'http://sartography.com'
         orig_date = response['last_updated']
         rv = self.app.put('/api/event/%i' % r_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+                          follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/event/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
@@ -54,7 +55,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         rv = self.app.get('api/event/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
 
-        rv = self.app.delete('api/event/%i' % r_id, content_type="application/json")
+        rv = self.app.delete('api/event/%i' % r_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
         rv = self.app.get('api/event/%i' % r_id, content_type="application/json")
@@ -65,7 +66,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
                  'ticket_cost': "$500 suggested donation", 'organization_id': o_id}
         rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
-                           follow_redirects=True)
+                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'event of events')
@@ -194,3 +195,34 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def test_resource_change_log(self):
+        ev = self.construct_event(title='An Event that is Super and Great')
+        u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+
+        rv = self.app.get('api/event/%i' % ev.id, content_type="application/json")
+        self.assert_success(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Super Great Event'
+        rv = self.app.put('/api/event/%i' % ev.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assert_success(rv)
+        rv = self.app.get('/api/event/%i' % ev.id, content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Super Great Event')
+
+        logs = ResourceChangeLog.query.all()
+        self.assertIsNotNone(logs[-1].resource_id)
+        self.assertIsNotNone(logs[-1].user_id)
+
+        rv = self.app.get('/api/resource/%i/change_log' % ev.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[-1]['user_id'], u.id)
+
+        rv = self.app.get('/api/user/%i/resource_change_log' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[-1]['resource_id'], ev.id)

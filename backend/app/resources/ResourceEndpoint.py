@@ -1,15 +1,20 @@
 import datetime
 
 import flask_restful
-from flask import request
+from flask import request, g
 from marshmallow import ValidationError
 from elasticsearch import NotFoundError
 
-from app import RestException, db, elastic_index
+from app import RestException, db, elastic_index, auth
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.admin_note import AdminNote
+from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import ResourceSchema
+from app.model.event import Event
+from app.model.location import Location
+from app.model.user import Role
+from app.wrappers import requires_roles
 
 
 class ResourceEndpoint(flask_restful.Resource):
@@ -21,8 +26,12 @@ class ResourceEndpoint(flask_restful.Resource):
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def delete(self, id):
         resource = db.session.query(Resource).filter_by(id=id).first()
+        resource_id = resource.id
+        resource_title = resource.title
 
         try:
             elastic_index.remove_document(resource, 'Resource')
@@ -30,11 +39,16 @@ class ResourceEndpoint(flask_restful.Resource):
             pass
 
         db.session.query(AdminNote).filter_by(resource_id=id).delete()
+        db.session.query(Event).filter_by(id=id).delete()
+        db.session.query(Location).filter_by(id=id).delete()
         db.session.query(ResourceCategory).filter_by(resource_id=id).delete()
         db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
+        self.log_update(resource_id=resource_id, resource_title=resource_title, change_type='delete')
         return None
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Resource).filter_by(id=id).first()
@@ -44,7 +58,14 @@ class ResourceEndpoint(flask_restful.Resource):
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Resource')
+        self.log_update(resource_id=updated.id, resource_title=updated.title, change_type='edit')
         return self.schema.dump(updated)
+
+    def log_update(self, resource_id, resource_title, change_type):
+        log = ResourceChangeLog(resource_id=resource_id, resource_title=resource_title, user_id=g.user.id,
+                                user_email=g.user.email, type=change_type)
+        db.session.add(log)
+        db.session.commit()
 
 
 class ResourceListEndpoint(flask_restful.Resource):
@@ -56,6 +77,8 @@ class ResourceListEndpoint(flask_restful.Resource):
         resources = db.session.query(Resource).all()
         return self.resourcesSchema.dump(resources)
 
+    @auth.login_required
+    @requires_roles(Role.admin)
     def post(self):
         request_data = request.get_json()
         try:
@@ -63,7 +86,14 @@ class ResourceListEndpoint(flask_restful.Resource):
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Resource')
+            self.log_update(resource_id=load_result.id, resource_title=load_result.title, change_type='create')
             return self.resourceSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
+
+    def log_update(self, resource_id, resource_title, change_type):
+        log = ResourceChangeLog(resource_id=resource_id, resource_title=resource_title, user_id=g.user.id,
+                                user_email=g.user.email, type=change_type)
+        db.session.add(log)
+        db.session.commit()

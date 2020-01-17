@@ -6,6 +6,8 @@ from tests.base_test import BaseTest
 from app import db, elastic_index
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
+from app.model.resource_change_log import ResourceChangeLog
+from app.model.user import Role
 
 
 class TestResources(BaseTest, unittest.TestCase):
@@ -36,7 +38,7 @@ class TestResources(BaseTest, unittest.TestCase):
         response['website'] = 'http://sartography.com'
         orig_date = response['last_updated']
         rv = self.app.put('/api/resource/%i' % r_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+                          follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/resource/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
@@ -52,7 +54,7 @@ class TestResources(BaseTest, unittest.TestCase):
         rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
         self.assert_success(rv)
 
-        rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json")
+        rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
         rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
@@ -66,7 +68,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
         self.construct_admin_note(user=self.construct_user(), resource=r)
         elastic_index.remove_document(r, 'Resource')
-        rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json")
+        rv = self.app.delete('api/resource/%i' % r_id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
         rv = self.app.get('api/resource/%i' % r_id, content_type="application/json")
@@ -76,7 +78,7 @@ class TestResources(BaseTest, unittest.TestCase):
         o_id = self.construct_organization().id
         resource = {'title': "Resource of Resources", 'description': "You need this resource in your life.", 'organization_id': o_id}
         rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
-                           follow_redirects=True)
+                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Resource of Resources')
@@ -205,3 +207,76 @@ class TestResources(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def test_resource_change_log_types(self):
+        u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+        r = {'id': 258, 'title': "A Resource that is Super and Great", 'description': "You need this resource in your life."}
+        rv = self.app.post('api/resource', data=json.dumps(r), content_type="application/json",
+                           follow_redirects=True, headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        logs = ResourceChangeLog.query.all()
+        self.assertIsNotNone(logs[-1].resource_id)
+        self.assertIsNotNone(logs[-1].user_id)
+        self.assertEqual(logs[-1].type, 'create')
+
+        rv = self.app.get('api/resource/%i' % r['id'], content_type="application/json")
+        self.assert_success(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Super Great Resource'
+        rv = self.app.put('/api/resource/%i' % r['id'], data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assert_success(rv)
+        rv = self.app.get('/api/resource/%i' % r['id'], content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['title'], 'Super Great Resource')
+
+        logs = ResourceChangeLog.query.all()
+        self.assertIsNotNone(logs[-1].resource_id)
+        self.assertIsNotNone(logs[-1].user_id)
+        self.assertEqual(logs[-1].type, 'edit')
+
+        rv = self.app.delete('api/resource/%i' % r['id'], content_type="application/json",
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        logs = ResourceChangeLog.query.all()
+        self.assertIsNotNone(logs[-1].resource_id)
+        self.assertIsNotNone(logs[-1].user_id)
+        self.assertEqual(logs[-1].type, 'delete')
+
+    def test_get_resource_change_log_by_resource(self):
+        r = self.construct_resource()
+        u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+        rv = self.app.get('api/resource/%i' % r.id, content_type="application/json")
+        self.assert_success(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Super Great Resource'
+        rv = self.app.put('/api/resource/%i' % r.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assert_success(rv)
+
+        rv = self.app.get('/api/resource/%i/change_log' % r.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[-1]['user_id'], u.id)
+
+    def test_get_resource_change_log_by_user(self):
+        r = self.construct_resource()
+        u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+        rv = self.app.get('api/resource/%i' % r.id, content_type="application/json")
+        self.assert_success(rv)
+
+        response = json.loads(rv.get_data(as_text=True))
+        response['title'] = 'Super Great Resource'
+        rv = self.app.put('/api/resource/%i' % r.id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers(user=u))
+        self.assert_success(rv)
+
+        rv = self.app.get('/api/user/%i/resource_change_log' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response[-1]['resource_id'], r.id)

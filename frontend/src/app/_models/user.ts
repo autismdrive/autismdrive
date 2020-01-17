@@ -8,6 +8,7 @@ export class User {
   email: string;
   participants?: Participant[];
   last_updated?: Date;
+  registration_date?: Date;
   token?: string;
   role?: string;
   email_log?: EmailLog[];

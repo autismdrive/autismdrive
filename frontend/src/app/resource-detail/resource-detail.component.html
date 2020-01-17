@@ -85,7 +85,24 @@
           (click)="goWebsite($event)"
         >Visit website</button>
       </div>
-      <div *ngIf="currentUser && currentUser.role == 'admin'">
+      <div
+        *ngIf="currentUser && currentUser.role == 'admin'"
+        fxLayout="column"
+        fxLayoutGap="2em"
+      >
+        <mat-card>
+          <mat-card-title>Edit Log</mat-card-title>
+          <div *ngIf="changeLog">
+            <div *ngFor="let l of changeLog">
+              <p mat-line>
+                <a [href]="'/#/admin/user/' + l.user_id">
+                  <b>User #{{l.user_id}} - {{l.user_email}}</b>
+                </a>
+                - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
+              </p>
+            </div>
+          </div>
+        </mat-card>
         <app-admin-note-display [currentUser]="currentUser" [currentResource]="resource"></app-admin-note-display>
       </div>
     </div>

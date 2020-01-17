@@ -1,5 +1,3 @@
-import datetime
-
 from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
