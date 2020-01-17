@@ -132,6 +132,7 @@ import {AddButtonComponent} from './add-button/add-button.component';
 import {EditButtonComponent} from './edit-button/edit-button.component';
 import {ParticipantAdminComponent} from './participant-admin/participant-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
+import { MultiselectTreeComponent } from './_forms/multiselect-tree/multiselect-tree.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -269,6 +270,7 @@ export class FormlyConfig {
     EditButtonComponent,
     ParticipantAdminComponent,
     UvaEducationComponent,
+    MultiselectTreeComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
