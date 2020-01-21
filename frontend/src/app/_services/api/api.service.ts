@@ -354,7 +354,7 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** Add ResourceCategory */
+  /** Update ResourceCategory */
   updateResourceCategories(resource_id: number, selectedCategories: ResourceCategory[]) {
     const url = this._endpointUrl('categorybyresource').replace('<resource_id>', resource_id.toString());
     return this.httpClient.post<ResourceCategory>(url, selectedCategories)
@@ -370,6 +370,13 @@ export class ApiService {
   /** Add StudyCategory */
   addStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
     return this.httpClient.post<StudyCategory>(this._endpointUrl('studycategorylist'), studyCategory)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update StudyCategory */
+  updateStudyCategories(study_id: number, selectedCategories: StudyCategory[]) {
+    const url = this._endpointUrl('categorybystudy').replace('<study_id>', study_id.toString());
+    return this.httpClient.post<StudyCategory>(url, selectedCategories)
       .pipe(catchError(this._handleError));
   }
 
