@@ -6,7 +6,7 @@ import { EnrollUseCases } from './use-cases/enroll.po';
 import { SearchUseCases } from './use-cases/search.po';
 import { AdminUseCases } from './use-cases/admin.po';
 
-fdescribe('Admin', () => {
+describe('Admin', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
