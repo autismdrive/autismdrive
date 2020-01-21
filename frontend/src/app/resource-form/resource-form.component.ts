@@ -303,7 +303,6 @@ export class ResourceFormComponent implements OnInit {
     this.model.categories = [];
     if (resource.resource_categories.length > 0) {
       for (const cat of resource.resource_categories) {
-        // this.model.categories[cat.category.id] = true;
         this.model.categories.push(cat.category);
         callback();
       }
@@ -334,17 +333,6 @@ export class ResourceFormComponent implements OnInit {
       }
     });
     return this.api.updateResourceCategories(resource_id, selectedCategories);
-  }
-
-  addResourceCategories(resource_id) {
-    console.log(this.model.categories);
-    for (const cat of Object.keys(this.model.categories)) {
-      this.api.addResourceCategory({
-        resource_id: resource_id,
-        category_id: parseInt(cat, 10),
-        type: this.resource.type
-      }).subscribe();
-    }
   }
 
   updateOrganization(callback: Function) {
