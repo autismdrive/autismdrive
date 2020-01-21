@@ -39,21 +39,34 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
 
   updateSelection() {
     if (this.isReady()) {
-      this.model.categories.forEach((isSelected, i) => {
-        if (isSelected === true) {
-          this.checklistSelection.select(i);
-        }
-      });
-
+      if (this.model.categories){
+        this.model.categories.forEach(cat => {
+          let node = this.findNode(cat);
+          if (node) {
+            this.checklistSelection.toggle(node);
+          }
+          this._updateModelCategories();
+        });
+      }
       this.dataLoaded = true;
     }
   }
 
-  hasNestedChild = (_: number, node: Category) => {
-    return (node.children && (node.children.length > 0));
+  findNode(cat: Category) {
+    let allNodes = [];
+
+    this.dataSource.data.forEach(dataCat => {
+      const descendants = this.treeControl.getDescendants(dataCat);
+      descendants.forEach(d => allNodes.push(d));
+      allNodes.push(dataCat);
+
+    });
+    return allNodes.find(i => i.id === cat.id);
   }
 
-  getChildren = (node: Category): Category[] => node.children;
+  hasNestedChild = (_: number, node: Category) => {
+    return (node.children && (node.children.length > 0));
+  };
 
   /** Whether all the descendants of the node are selected */
   descendantsAllSelected(node: Category): boolean {
@@ -93,8 +106,6 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
     );
   }
 
-  hasChild = (_: number, node: Category) => !!node.children && node.children.length > 0;
-
   /** Toggle the to-do item selection. Select/deselect all the descendants node */
   toggleParentNode(node: Category): void {
     this.checklistSelection.toggle(node);
@@ -112,6 +123,7 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
   }
 
   private _updateModelCategories() {
+    this.model.categories = [];
     this.checklistSelection.selected.forEach(c => this.model.categories[c.id] = true);
   }
 }

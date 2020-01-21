@@ -305,7 +305,8 @@ export class ResourceFormComponent implements OnInit {
     this.model.categories = [];
     if (resource.resource_categories.length > 0) {
       for (const cat of resource.resource_categories) {
-        this.model.categories[cat.category.id] = true;
+        // this.model.categories[cat.category.id] = true;
+        this.model.categories.push(cat.category);
         callback();
       }
     } else {
@@ -377,7 +378,11 @@ export class ResourceFormComponent implements OnInit {
     const resourceType = this.model.type.charAt(0).toUpperCase() + this.model.type.slice(1);
 
     if (this.form.valid) {
-      this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
+      if (this.createNew) {
+        this.updateOrganization(() => this.updateAndClose(this.api[`add${resourceType}`](this.model)));
+      } else {
+        this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
+      }
     }
   }
 
