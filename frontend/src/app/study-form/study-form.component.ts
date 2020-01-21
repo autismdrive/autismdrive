@@ -27,7 +27,6 @@ export class StudyFormComponent implements OnInit {
   showConfirmDelete = false;
 
   model: any = {};
-  updatedModel: any = {};
   form: FormGroup;
   fields: FormlyFieldConfig[] = [
     {
@@ -279,16 +278,13 @@ export class StudyFormComponent implements OnInit {
         this.api.addOrganization({name: this.model.organization}).subscribe(org => {
           this.model.organization_id = org.id;
           this.model.organization = org;
-          this.updatedModel = this.model;
           callback();
         });
       } else {
         this.model.organization_id = this.model.organization.id;
-        this.updatedModel = this.model;
         callback();
       }
     } else {
-      this.updatedModel = this.model;
       callback();
     }
   }
