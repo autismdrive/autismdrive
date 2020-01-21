@@ -94,4 +94,8 @@ export class GlobalHeaderUseCases {
     await expect(numDisplayed).toEqual(1);
     await this.page.maximize();
   }
+
+  displayAdminLink() {
+      expect(this.page.getElements('#admin-button').count()).toEqual(1);
+  }
 }

@@ -27,7 +27,7 @@
       <mat-drawer #sidenav
         [mode]='"over"'
         [(opened)]="sidebarOpen">
-          <mat-list *ngFor="let info of questionnaire_info" dense>
+          <mat-list class="data-list" *ngFor="let info of questionnaire_info" dense>
             <mat-list-item>
               <mat-icon matListIcon>{{info.getIcon()}}</mat-icon>
               ({{ info.size }})
