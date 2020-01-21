@@ -1,9 +1,9 @@
 <div class="alert alert-info">
-  <h1>Enrollment complete!</h1>
+  <h1>Profile complete!</h1>
 
   <div *ngIf="flow.name === 'guardian_intake'">
     <p>You have completed all the questions about your role as a Parent/Guardian.  Please
-    click the button below to begin entering information about your son, daughter, or dependent(s).</p>
+    click the button below to begin entering information about your children or dependent(s).</p>
     <div
       fxLayoutAlign="center center"
     >
@@ -12,15 +12,15 @@
         color="primary"
         (click)="enrollDependent($event)"
         id="enroll_first_dependent"
-      >Enroll a dependent</button>
+      >Create a profile</button>
     </div>
   </div>
 
   <div *ngIf="flow.name === 'dependent_intake'">
-    <p>You have completed all the questions about your son, daughter, or dependent.  We will use this information
+    <p>You have completed all the questions about your child or dependent.  We will use this information
       to contact you about upcoming studies and emerging resources that will be of interest
       based on the details you provided.  </p>
-    <p>If you have another dependent to enroll, please click the button below to enter information about them.  Otherwise
+    <p>If you have another dependent, please click the button below to create a profile for them.  Otherwise
       we recommend you check out our list of active studies, or search through
       the available services and resources.</p>
     <div
@@ -31,7 +31,7 @@
         color="primary"
         (click)="enrollDependent($event)"
         id="enroll_another_dependent"
-      >Enroll another dependent</button>
+      >Create another profile</button>
     </div>
   </div>
 
@@ -51,7 +51,7 @@
         color="primary"
         (click)="enrollDependent($event)"
         id="enroll_self_dependent"
-      >Enroll a dependent</button>
+      >Create a profile</button>
     </div>
   </div>
 
@@ -67,7 +67,7 @@
         color="primary"
         (click)="enrollDependent($event)"
         id="enroll_professional_dependent"
-      >Enroll a dependent</button>
+      >Create a profile</button>
     </div>
   </div>
 
