@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {Organization} from '../_models/organization';
 import {Study} from '../_models/study';
+import {StudyCategory} from '../_models/study_category';
 import {ApiService} from '../_services/api/api.service';
 
 
@@ -25,7 +26,6 @@ export class StudyFormComponent implements OnInit {
   showConfirmDelete = false;
 
   model: any = {};
-  updatedModel: any = {};
   form: FormGroup;
   fields: FormlyFieldConfig[] = [
     {
@@ -152,10 +152,10 @@ export class StudyFormComponent implements OnInit {
     },
     {
       key: 'categories',
-      type: 'multicheckbox',
+      type: 'multiselecttree',
       templateOptions: {
         label: 'Topics',
-        options: this.api.getCategories(),
+        options: this.api.getCategoryTree(),
         valueProp: 'id',
         labelProp: 'name',
       },
@@ -235,8 +235,8 @@ export class StudyFormComponent implements OnInit {
   loadStudyCategories(study: Study, callback: Function) {
     this.model.categories = [];
     if (study.study_categories.length > 0) {
-      for (const cat of Object.keys(study.study_categories)) {
-        this.model.categories[study.study_categories[cat].category.id] = true;
+      for (const cat of study.study_categories) {
+        this.model.categories.push(cat.category);
         callback();
       }
     } else {
@@ -254,29 +254,17 @@ export class StudyFormComponent implements OnInit {
     this.state = this.pageState.SHOW_FORM;
   }
 
-  updateStudyCategories() {
-    const scIds = this.study.study_categories.map(sc => sc.category.id);
-    // Add the new categories
-    for (const cat in this.model.categories) {
-      if (!scIds.includes(Number(cat))) {
-        this.api.addStudyCategory({study_id: this.study.id, category_id: Number(cat)}).subscribe();
+  updateStudyCategories(study_id) {
+    const selectedCategories: StudyCategory[] = [];
+    this.model.categories.forEach((isSelected, i) => {
+      if (isSelected === true) {
+        selectedCategories.push({
+          study_id: study_id,
+          category_id: i,
+        });
       }
-    }
-    // Remove any deleted categories
-    for (const sc in this.study.study_categories) {
-      if (!this.model.categories[this.study.study_categories[sc].category_id]) {
-        this.api.deleteStudyCategory(this.study.study_categories[sc]).subscribe();
-      }
-    }
-  }
-
-  addStudyCategories(study_id) {
-    for (const cat of Object.keys(this.model.categories)) {
-      this.api.addStudyCategory({
-        study_id: study_id,
-        category_id: parseInt(cat, 10)
-      }).subscribe();
-    }
+    });
+    return this.api.updateStudyCategories(study_id, selectedCategories);
   }
 
   updateOrganization(callback: Function) {
@@ -289,16 +277,13 @@ export class StudyFormComponent implements OnInit {
         this.api.addOrganization({name: this.model.organization}).subscribe(org => {
           this.model.organization_id = org.id;
           this.model.organization = org;
-          this.updatedModel = this.model;
           callback();
         });
       } else {
         this.model.organization_id = this.model.organization.id;
-        this.updatedModel = this.model;
         callback();
       }
     } else {
-      this.updatedModel = this.model;
       callback();
     }
   }
@@ -307,26 +292,17 @@ export class StudyFormComponent implements OnInit {
     // Post to the study endpoint, and then close
     if (this.form.valid) {
       if (this.createNew) {
-        this.updateOrganization(() => this.addAndClose());
+        this.updateOrganization(() => this.updateAndClose(this.api.addStudy(this.model)));
       } else {
-        this.updateStudyCategories();
-        this.updateOrganization(() => this.updateAndClose());
+        this.updateOrganization(() => this.updateAndClose(this.api.updateStudy(this.model)));
       }
     }
   }
 
-  addAndClose() {
-    this.api.addStudy(this.model).subscribe(s => {
+  updateAndClose(apiCall) {
+    apiCall.subscribe(s => {
       this.updatedStudy = s;
-      this.addStudyCategories(s.id);
-      this.close();
-    });
-  }
-
-  updateAndClose() {
-    this.api.updateStudy(this.updatedModel).subscribe(s => {
-      this.updatedStudy = s;
-      this.close();
+      this.updateStudyCategories(s.id).subscribe(() => this.close());
     });
   }
 

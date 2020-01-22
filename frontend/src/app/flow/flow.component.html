@@ -14,8 +14,8 @@
           <mat-icon>toc</mat-icon>
         </button>
         <h1 class="margin-bottom-none">
-          <ng-container *ngIf="participant && participant.name">{{participant.name}}'s enrollment info</ng-container>
-          <ng-container *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your child\'s'}} enrollment info</ng-container>
+          <ng-container *ngIf="participant && participant.name">{{participant.name}}'s Profile</ng-container>
+          <ng-container *ngIf="!(participant && participant.name)">{{user.isSelf(participant) ? 'Your' : 'Your dependent\'s'}} Profile</ng-container>
         </h1>
         <span fxFlex></span>
         <div class="mat-small" fxFlexAlign="end center">

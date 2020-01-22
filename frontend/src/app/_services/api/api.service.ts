@@ -82,7 +82,7 @@ export class ApiService {
     relatedresults: '/api/related',
     resourcecategorylist: '/api/resource_category',
     resourcelist: '/api/resource',
-    rootcategorylist: '/api/category/root',
+    categorytree: '/api/category/root',
     search: '/api/search',
     searchstudies: '/api/search/studies',
     session: '/api/session',
@@ -354,6 +354,13 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Update ResourceCategory */
+  updateResourceCategories(resource_id: number, selectedCategories: ResourceCategory[]) {
+    const url = this._endpointUrl('categorybyresource').replace('<resource_id>', resource_id.toString());
+    return this.httpClient.post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError));
+  }
+
   /** Delete ResourceCategory */
   deleteResourceCategory(resourceCategory: ResourceCategory): Observable<ResourceCategory> {
     return this.httpClient.delete<ResourceCategory>(this._endpointUrl('resourcecategory').replace('<id>', resourceCategory.id.toString()))
@@ -366,15 +373,22 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Update StudyCategory */
+  updateStudyCategories(study_id: number, selectedCategories: StudyCategory[]) {
+    const url = this._endpointUrl('categorybystudy').replace('<study_id>', study_id.toString());
+    return this.httpClient.post<StudyCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError));
+  }
+
   /** Delete StudyCategory */
   deleteStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
     return this.httpClient.delete<StudyCategory>(this._endpointUrl('studycategory').replace('<id>', studyCategory.id.toString()))
       .pipe(catchError(this._handleError));
   }
 
-  /** getCategories */
-  getCategories(): Observable<Category[]> {
-    return this.httpClient.get<Category[]>(this._endpointUrl('categorylist'))
+  /** getCategoryTree */
+  getCategoryTree(): Observable<Category[]> {
+    return this.httpClient.get<Category[]>(this._endpointUrl('categorytree'))
       .pipe(catchError(this._handleError));
   }
 
@@ -607,5 +621,4 @@ export class ApiService {
 
     return this.apiRoot + path;
   }
-
 }

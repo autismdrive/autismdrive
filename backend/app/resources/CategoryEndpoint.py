@@ -54,7 +54,7 @@ class CategoryListEndpoint(flask_restful.Resource):
 
 
 class RootCategoryListEndpoint(flask_restful.Resource):
-    categories_schema = ParentCategorySchema(many=True)
+    categories_schema = CategorySchema(many=True)
 
     def get(self):
         categories = db.session.query(Category)\

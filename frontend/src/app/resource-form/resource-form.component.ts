@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ApiService } from '../_services/api/api.service';
-import { Resource } from '../_models/resource';
-import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { FormGroup } from '@angular/forms';
-import { Organization } from '../_models/organization';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ResourceCategory} from '../_models/resource_category';
+import {ApiService} from '../_services/api/api.service';
+import {Resource} from '../_models/resource';
+import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
+import {FormGroup} from '@angular/forms';
+import {Organization} from '../_models/organization';
 
 
 enum PageState {
@@ -25,238 +26,235 @@ export class ResourceFormComponent implements OnInit {
   showConfirmDelete = false;
 
   model: any = {};
-  updatedModel: any = {};
   form: FormGroup;
   fields: FormlyFieldConfig[] = [
-      {
-        key: 'type',
-        type: 'select',
-        templateOptions: {
-          label: 'Type',
-          options: [
-            {'value': 'resource', 'label': 'Online Information'},
-            {'value': 'location', 'label': 'Local Services'},
-            {'value': 'event', 'label': 'Events and Training'}
-          ],
-          required: true,
-        },
-        hideExpression: '!model.createNew',
+    {
+      key: 'type',
+      type: 'select',
+      templateOptions: {
+        label: 'Type',
+        options: [
+          {'value': 'resource', 'label': 'Online Information'},
+          {'value': 'location', 'label': 'Local Services'},
+          {'value': 'event', 'label': 'Events and Training'}
+        ],
+        required: true,
       },
-      {
-        key: 'title',
-        type: 'input',
-        templateOptions: {
-          label: 'Title',
-          placeholder: 'Please enter the title',
-          required: true,
-        },
-        expressionProperties: {
-          'templateOptions.placeholder': '"Please enter the title of your " + (model.type || "resource")',
-        },
-        hideExpression: '!model.type',
+      hideExpression: '!model.createNew',
+    },
+    {
+      key: 'title',
+      type: 'input',
+      templateOptions: {
+        label: 'Title',
+        placeholder: 'Please enter the title',
+        required: true,
       },
-      {
-        key: 'description',
-        type: 'textarea',
-        templateOptions: {
-          label: 'Description',
-          placeholder: 'Please enter a description',
-          required: true,
-        },
-        expressionProperties: {
-          'templateOptions.placeholder': '"Please enter a description of your " + (model.type || "resource")',
-        },
-        hideExpression: '!model.type',
+      expressionProperties: {
+        'templateOptions.placeholder': '"Please enter the title of your " + (model.type || "resource")',
       },
-      {
-        key: 'date',
-        type: 'datepicker',
-        templateOptions: {
-          label: 'Event Date',
-        },
-        hideExpression: 'model.type != "event"',
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'description',
+      type: 'textarea',
+      templateOptions: {
+        label: 'Description',
+        placeholder: 'Please enter a description',
+        required: true,
       },
-      {
-        key: 'time',
-        type: 'input',
-        templateOptions: {
-          label: 'Event Time',
-          placeholder: 'Please enter the start time or time-frame for your event',
-        },
-        hideExpression: 'model.type != "event"',
+      expressionProperties: {
+        'templateOptions.placeholder': '"Please enter a description of your " + (model.type || "resource")',
       },
-      {
-        key: 'ticket_cost',
-        type: 'input',
-        templateOptions: {
-          label: 'Event Ticket Cost',
-          placeholder: 'Please enter the ticket cost for your event',
-        },
-        hideExpression: 'model.type != "event"',
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'date',
+      type: 'datepicker',
+      templateOptions: {
+        label: 'Event Date',
       },
-      {
-        key: 'organization',
-        type: 'autocomplete',
-        templateOptions: {
-          label: 'Organization',
-          filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
-        },
-        hideExpression: '!model.type',
+      hideExpression: 'model.type != "event"',
+    },
+    {
+      key: 'time',
+      type: 'input',
+      templateOptions: {
+        label: 'Event Time',
+        placeholder: 'Please enter the start time or time-frame for your event',
       },
-      {
-        key: 'primary_contact',
-        type: 'input',
-        templateOptions: {
-          label: 'Primary Contact',
-          placeholder: 'Please enter the primary contact for your location or event',
-        },
-        hideExpression: '!model.type || model.type == "resource"',
+      hideExpression: 'model.type != "event"',
+    },
+    {
+      key: 'ticket_cost',
+      type: 'input',
+      templateOptions: {
+        label: 'Event Ticket Cost',
+        placeholder: 'Please enter the ticket cost for your event',
       },
-      {
-        key: 'contact_email',
-        type: 'input',
-        templateOptions: {
-          label: 'Contact Email',
-          placeholder: 'This contact email will not be displayed on the site and is intended for admin use only',
-        },
-        validators: {'validation': ['email']},
-        hideExpression: '!model.type',
+      hideExpression: 'model.type != "event"',
+    },
+    {
+      key: 'organization',
+      type: 'autocomplete',
+      templateOptions: {
+        label: 'Organization',
+        filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
       },
-      {
-        key: 'location_name',
-        type: 'input',
-        templateOptions: {
-          label: 'Location Name',
-          placeholder: 'Please enter the name for your event venue',
-        },
-        hideExpression: 'model.type != "event"',
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'primary_contact',
+      type: 'input',
+      templateOptions: {
+        label: 'Primary Contact',
+        placeholder: 'Please enter the primary contact for your location or event',
       },
-      {
-        key: 'street_address1',
-        type: 'input',
-        templateOptions: {
-          label: 'Street Address',
-          placeholder: 'Please enter the street address',
-        },
-        hideExpression: '!model.type || model.type == "resource"',
+      hideExpression: '!model.type || model.type == "resource"',
+    },
+    {
+      key: 'contact_email',
+      type: 'input',
+      templateOptions: {
+        label: 'Contact Email',
+        placeholder: 'This contact email will not be displayed on the site and is intended for admin use only',
       },
-      {
-        key: 'street_address2',
-        type: 'input',
-        templateOptions: {
-          label: 'Street Address Details',
-          placeholder: 'Please enter any additional details for the street address',
-        },
-        hideExpression: '!model.type || model.type == "resource"',
+      validators: {'validation': ['email']},
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'location_name',
+      type: 'input',
+      templateOptions: {
+        label: 'Location Name',
+        placeholder: 'Please enter the name for your event venue',
       },
-      {
-        key: 'city',
-        type: 'input',
-        templateOptions: {
-          label: 'City',
-          placeholder: 'Please enter the city',
-        },
-        hideExpression: '!model.type || model.type == "resource"',
+      hideExpression: 'model.type != "event"',
+    },
+    {
+      key: 'street_address1',
+      type: 'input',
+      templateOptions: {
+        label: 'Street Address',
+        placeholder: 'Please enter the street address',
       },
-      {
-        key: 'state',
-        type: 'input',
-        templateOptions: {
-          label: 'State',
-          placeholder: 'Please enter the state',
-        },
-        hideExpression: '!model.type || model.type == "resource"',
+      hideExpression: '!model.type || model.type == "resource"',
+    },
+    {
+      key: 'street_address2',
+      type: 'input',
+      templateOptions: {
+        label: 'Street Address Details',
+        placeholder: 'Please enter any additional details for the street address',
       },
-      {
-        key: 'zip',
-        type: 'input',
-        templateOptions: {
-          label: 'Zip Code',
-          placeholder: 'Please enter the zip code',
-        },
-        hideExpression: '!model.type || model.type == "resource"',
+      hideExpression: '!model.type || model.type == "resource"',
+    },
+    {
+      key: 'city',
+      type: 'input',
+      templateOptions: {
+        label: 'City',
+        placeholder: 'Please enter the city',
       },
-      {
-        key: 'phone',
-        type: 'input',
-        templateOptions: {
-          label: 'Phone Number',
-          placeholder: 'Please enter the phone number',
-        },
-        hideExpression: '!model.type',
-        validators: {'validation': ['phone']},
+      hideExpression: '!model.type || model.type == "resource"',
+    },
+    {
+      key: 'state',
+      type: 'input',
+      templateOptions: {
+        label: 'State',
+        placeholder: 'Please enter the state',
       },
-      {
-        key: 'website',
-        type: 'input',
-        templateOptions: {
-          label: 'Website',
-          placeholder: 'Please enter the website',
-        },
-        hideExpression: '!model.type',
-        validators: {'validation': ['url']},
+      hideExpression: '!model.type || model.type == "resource"',
+    },
+    {
+      key: 'zip',
+      type: 'input',
+      templateOptions: {
+        label: 'Zip Code',
+        placeholder: 'Please enter the zip code',
       },
-      {
-        key: 'video_code',
-        type: 'input',
-        templateOptions: {
-          label: 'Video Code',
-          placeholder: 'Please enter the YouTube code for a video of this content',
-        },
-        hideExpression: '!model.type',
+      hideExpression: '!model.type || model.type == "resource"',
+    },
+    {
+      key: 'phone',
+      type: 'input',
+      templateOptions: {
+        label: 'Phone Number',
+        placeholder: 'Please enter the phone number',
       },
-      {
-        key: 'is_uva_education_content',
-        type: 'radio',
-        templateOptions: {
-          label: 'UVA Education Content',
-          placeholder: 'Should this resource be displayed on the UVA Education page?',
-          options: [
-            {value: true, label: 'Yes'},
-            {value: false, label: 'No'},
-          ]
-        },
-        hideExpression: '!model.type',
+      hideExpression: '!model.type',
+      validators: {'validation': ['phone']},
+    },
+    {
+      key: 'website',
+      type: 'input',
+      templateOptions: {
+        label: 'Website',
+        placeholder: 'Please enter the website',
       },
-      {
-        key: 'categories',
-        type: 'multicheckbox',
-        templateOptions: {
-          label: 'Topics',
-          options: this.api.getCategories(),
-          valueProp: 'id',
-          labelProp: 'name',
-        },
-        hideExpression: '!model.type',
+      hideExpression: '!model.type',
+      validators: {'validation': ['url']},
+    },
+    {
+      key: 'video_code',
+      type: 'input',
+      templateOptions: {
+        label: 'Video Code',
+        placeholder: 'Please enter the YouTube code for a video of this content',
       },
-      {
-        key: 'ages',
-        type: 'multicheckbox',
-        templateOptions: {
-          label: 'Age Ranges',
-          type: 'array',
-          options: [
-            {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
-            {'value': 'school', 'label': 'School age (6 - 13 years)'},
-            {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
-            {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
-            {'value': 'aging', 'label': 'Aging (65+)'}
-          ],
-        },
-        hideExpression: '!model.type',
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'is_uva_education_content',
+      type: 'radio',
+      templateOptions: {
+        label: 'UVA Education Content',
+        placeholder: 'Should this resource be displayed on the UVA Education page?',
+        options: [
+          {value: true, label: 'Yes'},
+          {value: false, label: 'No'},
+        ]
       },
-    ];
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'categories',
+      type: 'multiselecttree',
+      templateOptions: {
+        label: 'Topics',
+        options: this.api.getCategoryTree(),
+        valueProp: 'id',
+        labelProp: 'name',
+      },
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'ages',
+      type: 'multicheckbox',
+      templateOptions: {
+        label: 'Age Ranges',
+        type: 'array',
+        options: [
+          {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
+          {'value': 'school', 'label': 'School age (6 - 13 years)'},
+          {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
+          {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
+          {'value': 'aging', 'label': 'Aging (65+)'}
+        ],
+      },
+      hideExpression: '!model.type',
+    },
+  ];
 
   options: FormlyFormOptions;
   orgOptions: Organization[];
 
   createNew = false;
 
-  constructor(
-    private api: ApiService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor(private api: ApiService,
+              private route: ActivatedRoute,
+              private router: Router) {
     this.getOrganizations();
   }
 
@@ -266,8 +264,8 @@ export class ResourceFormComponent implements OnInit {
   }
 
   getOrganizations() {
-    this.api.getOrganizations().subscribe( orgs => {
-       return this.orgOptions = orgs;
+    this.api.getOrganizations().subscribe(orgs => {
+        return this.orgOptions = orgs;
       }
     );
   }
@@ -294,7 +292,7 @@ export class ResourceFormComponent implements OnInit {
       } else {
         this.createNew = true;
         this.model.createNew = true;
-        this.resource = new Resource({'type': '', 'title': '', 'description': '', 'phone': '', 'website': '' }) ;
+        this.resource = new Resource({'type': '', 'title': '', 'description': '', 'phone': '', 'website': ''});
         this.loadForm();
       }
     });
@@ -304,7 +302,7 @@ export class ResourceFormComponent implements OnInit {
     this.model.categories = [];
     if (resource.resource_categories.length > 0) {
       for (const cat of resource.resource_categories) {
-        this.model.categories[cat.category.id] = true;
+        this.model.categories.push(cat.category);
         callback();
       }
     } else {
@@ -322,35 +320,18 @@ export class ResourceFormComponent implements OnInit {
     this.state = this.pageState.SHOW_FORM;
   }
 
-  updateResourceCategories() {
-    const rcIds = this.resource.resource_categories.map(rc => rc.category.id);
-    // Add the new categories
-    for (const cat in Object.keys(this.model.categories)) {
-      if (!rcIds.includes(parseInt(cat, 10))) {
-        this.api.addResourceCategory({
-          resource_id: this.resource.id,
-          category_id: parseInt(cat, 10),
-          type: this.resource.type
-        }).subscribe();
+  updateResourceCategories(resource_id) {
+    const selectedCategories: ResourceCategory[] = [];
+    this.model.categories.forEach((isSelected, i) => {
+      if (isSelected === true) {
+        selectedCategories.push({
+          resource_id: resource_id,
+          category_id: i,
+          type: this.model.type
+        });
       }
-    }
-    // Remove any deleted categories
-    for (const rc in this.resource.resource_categories) {
-      if (!this.model.categories[this.resource.resource_categories[rc].category_id]) {
-        this.api.deleteResourceCategory(this.resource.resource_categories[rc]).subscribe();
-      }
-    }
-  }
-
-  addResourceCategories(resource_id) {
-    console.log(this.model.categories);
-    for (const cat of Object.keys(this.model.categories)) {
-      this.api.addResourceCategory({
-        resource_id: resource_id,
-        category_id: parseInt(cat, 10),
-        type: this.resource.type
-      }).subscribe();
-    }
+    });
+    return this.api.updateResourceCategories(resource_id, selectedCategories);
   }
 
   updateOrganization(callback: Function) {
@@ -360,19 +341,16 @@ export class ResourceFormComponent implements OnInit {
     // we do is create the updated model.
     if (this.model.organization) {
       if (this.model.organization.constructor.name === 'String') {
-        this.api.addOrganization({name: this.model.organization}).subscribe( org => {
+        this.api.addOrganization({name: this.model.organization}).subscribe(org => {
           this.model.organization_id = org.id;
           this.model.organization = org;
-          this.updatedModel = this.model;
           callback();
         });
       } else {
         this.model.organization_id = this.model.organization.id;
-        this.updatedModel = this.model;
         callback();
       }
     } else {
-      this.updatedModel = this.model;
       callback();
     }
   }
@@ -383,27 +361,18 @@ export class ResourceFormComponent implements OnInit {
 
     if (this.form.valid) {
       if (this.createNew) {
-        this.updateOrganization(() => this.addAndClose(this.api[`add${resourceType}`](this.model)));
+        this.updateOrganization(() => this.updateAndClose(this.api[`add${resourceType}`](this.model)));
       } else {
-        this.updateResourceCategories();
         this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
       }
     }
   }
 
-  addAndClose(apiCall) {
-    apiCall.subscribe(r => {
-        this.updatedResource = r;
-        this.addResourceCategories(r.id);
-        this.close();
-      });
-  }
-
   updateAndClose(apiCall) {
-    apiCall.subscribe( r => {
-        this.updatedResource = r;
-        this.close();
-      });
+    apiCall.subscribe(r => {
+      this.updatedResource = r;
+      this.updateResourceCategories(r.id).subscribe(() => this.close());
+    });
   }
 
   showDelete() {
