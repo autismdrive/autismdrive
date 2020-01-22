@@ -3,10 +3,9 @@ import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {Organization} from '../_models/organization';
-import {StudyCategory} from '../_models/study_category'
 import {Study} from '../_models/study';
+import {StudyCategory} from '../_models/study_category';
 import {ApiService} from '../_services/api/api.service';
-import {ResourceCategory} from '../_models/resource_category';
 
 
 enum PageState {

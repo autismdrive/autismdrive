@@ -6,7 +6,7 @@ export class AdminUseCases {
 
 
   navigateToAdmin() {
-    this.page.clickAndExpectRoute('#admin-button', '/admin')
+    this.page.clickAndExpectRoute('#admin-button', '/admin');
   }
 
   async navigateToTab(tabNumber: number, selector: string) {

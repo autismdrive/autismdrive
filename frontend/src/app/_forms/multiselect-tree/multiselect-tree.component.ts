@@ -39,9 +39,9 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
 
   updateSelection() {
     if (this.isReady()) {
-      if (this.model.categories){
+      if (this.model.categories) {
         this.model.categories.forEach(cat => {
-          let node = this.findNode(cat);
+          const node = this.findNode(cat);
           if (node) {
             this.checklistSelection.toggle(node);
           }
@@ -53,7 +53,7 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
   }
 
   findNode(cat: Category) {
-    let allNodes = [];
+    const allNodes = [];
 
     this.dataSource.data.forEach(dataCat => {
       const descendants = this.treeControl.getDescendants(dataCat);
@@ -66,7 +66,7 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
 
   hasNestedChild = (_: number, node: Category) => {
     return (node.children && (node.children.length > 0));
-  };
+  }
 
   /** Whether all the descendants of the node are selected */
   descendantsAllSelected(node: Category): boolean {

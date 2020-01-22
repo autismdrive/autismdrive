@@ -1,10 +1,10 @@
-import { AppPage } from './app-page.po';
-import { GlobalHeaderUseCases } from './use-cases/global-header.po';
-import { LoginUseCases } from './use-cases/login.po';
-import { ProfileUseCases } from './use-cases/profile.po';
-import { EnrollUseCases } from './use-cases/enroll.po';
-import { SearchUseCases } from './use-cases/search.po';
-import { AdminUseCases } from './use-cases/admin.po';
+import {AppPage} from './app-page.po';
+import {AdminUseCases} from './use-cases/admin.po';
+import {EnrollUseCases} from './use-cases/enroll.po';
+import {GlobalHeaderUseCases} from './use-cases/global-header.po';
+import {LoginUseCases} from './use-cases/login.po';
+import {ProfileUseCases} from './use-cases/profile.po';
+import {SearchUseCases} from './use-cases/search.po';
 
 describe('Admin', () => {
   let page: AppPage;
