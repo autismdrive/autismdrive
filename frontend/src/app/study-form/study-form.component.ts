@@ -5,6 +5,7 @@ import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {Organization} from '../_models/organization';
 import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';
+import {StudyInvestigator} from '../_models/study_investigator';
 import {ApiService} from '../_services/api/api.service';
 
 
@@ -82,6 +83,22 @@ export class StudyFormComponent implements OnInit {
         label: 'Benefit Description',
         placeholder: 'How will participants benefit from your study?',
         required: true,
+      },
+    },
+    {
+      key: 'investigators',
+      type: 'select',
+      templateOptions: {
+        label: 'Investigators',
+        options: [],
+        valueProp: 'id',
+        labelProp: 'name',
+        multiple: true,
+      },
+      hooks: {
+        onInit: field => {
+          field.templateOptions.options = this.api.getInvestigators();
+        },
       },
     },
     {
@@ -218,6 +235,7 @@ export class StudyFormComponent implements OnInit {
         this.api.getStudy(studyId).subscribe(study => {
           this.study = study as Study;
           this.model = this.study;
+          this.loadInvestigators(study);
           this.loadStudyCategories(study, () => this.loadForm());
         });
       } else {
@@ -230,6 +248,15 @@ export class StudyFormComponent implements OnInit {
         this.loadForm();
       }
     });
+  }
+
+  loadInvestigators(study: Study) {
+    this.model.investigators = [];
+    if (study.study_investigators.length > 0) {
+      study.study_investigators.forEach(inv => {
+        this.model.investigators.push(inv.investigator.id)
+      })
+    }
   }
 
   loadStudyCategories(study: Study, callback: Function) {
@@ -267,6 +294,17 @@ export class StudyFormComponent implements OnInit {
     return this.api.updateStudyCategories(study_id, selectedCategories);
   }
 
+  updateStudyInvestigators(study_id) {
+    const selectedInvestigators: StudyInvestigator[] = [];
+    this.model.investigators.forEach(i => {
+      selectedInvestigators.push({
+        study_id: study_id,
+        investigator_id: i,
+      });
+    });
+    return this.api.updateStudyInvestigators(study_id, selectedInvestigators);
+  }
+
   updateOrganization(callback: Function) {
     // If the user selects an existing Organization name from the list, it will be saved as an Organization object. If they write in their
     // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
@@ -302,7 +340,9 @@ export class StudyFormComponent implements OnInit {
   updateAndClose(apiCall) {
     apiCall.subscribe(s => {
       this.updatedStudy = s;
-      this.updateStudyCategories(s.id).subscribe(() => this.close());
+      this.updateStudyInvestigators(s.id).subscribe(() => {
+        this.updateStudyCategories(s.id).subscribe(() => this.close());
+      });
     });
   }
 

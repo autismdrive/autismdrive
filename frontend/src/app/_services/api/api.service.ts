@@ -26,6 +26,8 @@ import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
 import {ConfigService} from '../config.service';
 import {PasswordRequirements} from '../../_models/password_requirements';
 import {ResourceChangeLog} from '../../_models/resource_change_log';
+import {Investigator} from '../../_models/investigator';
+import {StudyInvestigator} from '../../_models/study_investigator';
 
 
 @Injectable({
@@ -55,6 +57,8 @@ export class ApiService {
     flowquestionnaire: '/api/flow/<flow>/<questionnaire_name>',
     flowquestionnairemeta: '/api/flow/<flow>/<questionnaire_name>/meta',
     forgot_password: '/api/forgot_password',
+    investigatorList: '/api/investigator',
+    investigatorbystudy: '/api/study/<study_id>/investigator',
     location: '/api/location/<id>',
     locationbycategory: '/api/category/<category_id>/location',
     locationcategory: '/api/location_category/<id>',
@@ -389,6 +393,19 @@ export class ApiService {
   /** getCategoryTree */
   getCategoryTree(): Observable<Category[]> {
     return this.httpClient.get<Category[]>(this._endpointUrl('categorytree'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getInvestigators */
+  getInvestigators(): Observable<Investigator[]> {
+    return this.httpClient.get<Investigator[]>(this._endpointUrl('investigatorList'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update StudyInvestigators */
+  updateStudyInvestigators(study_id: number, selectedInvestigators: StudyInvestigator[]) {
+    const url = this._endpointUrl('investigatorbystudy').replace('<study_id>', study_id.toString());
+    return this.httpClient.post<StudyInvestigator>(url, selectedInvestigators)
       .pipe(catchError(this._handleError));
   }
 
