@@ -31,7 +31,10 @@
       <div *ngIf="study.study_investigators.length > 0">
         <h2>About the researchers</h2>
         <div *ngFor="let si of study.study_investigators">
-          <p><a *ngIf="si.investigator.bio_link" target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a><b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>, {{si.investigator.title}}<span *ngIf="si.investigator.organization">, {{si.investigator.organization.name}}</span></p>
+          <p><a *ngIf="si.investigator.bio_link" target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>
+            <b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>
+            <span *ngIf="si.investigator.title">, {{si.investigator.title}}</span>
+            <span *ngIf="si.investigator.organization">, {{si.investigator.organization.name}}</span></p>
         </div>
       </div>
       <div *ngIf="study.location">
