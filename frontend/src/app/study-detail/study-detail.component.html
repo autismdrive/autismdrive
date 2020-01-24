@@ -20,6 +20,7 @@
       <app-edit-button *ngIf="currentUser && currentUser.role == 'admin'" [editLabel]='"Edit Study"' [editLink]='"study/edit/" + study.id.toString()' [currentUser]="currentUser"></app-edit-button>
       <p class="status">Study Status: {{ snakeToUpperCase(study.status) }}</p>
       <p>{{study.description}}</p>
+      <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
       <div *ngIf="study.participant_description">
         <h2>Who we're looking for</h2>
         <p>{{study.participant_description}}</p>

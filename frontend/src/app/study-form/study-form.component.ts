@@ -205,6 +205,15 @@ export class StudyFormComponent implements OnInit {
       validators: {'validation': ['url']},
     },
     {
+      key: 'results_url',
+      type: 'input',
+      templateOptions: {
+        label: 'Results Url',
+        placeholder: 'Link to published results of the study',
+      },
+      validators: {'validation': ['url']},
+    },
+    {
       key: 'image_url',
       type: 'input',
       templateOptions: {
