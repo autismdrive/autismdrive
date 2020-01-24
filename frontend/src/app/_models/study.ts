@@ -15,8 +15,8 @@ export interface Study {
   short_title?: string;
   description: string;
   short_description?: string;
-  participant_description: string;
-  benefit_description: string;
+  participant_description?: string;
+  benefit_description?: string;
   investigators: string[];
   organization_id?: number;
   organization?: Organization;

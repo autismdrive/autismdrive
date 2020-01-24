@@ -74,7 +74,6 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Participant Description',
         placeholder: 'Who are you looking for to participate in your study?',
-        required: true,
       },
     },
     {
@@ -83,7 +82,6 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Benefit Description',
         placeholder: 'How will participants benefit from your study?',
-        required: true,
       },
     },
     {
