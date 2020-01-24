@@ -115,7 +115,6 @@ export class StudyFormComponent implements OnInit {
           key: 'name',
           templateOptions: {
             label: 'Name',
-            required: true,
           },
         },
         {
@@ -399,12 +398,18 @@ export class StudyFormComponent implements OnInit {
   updateAndClose(apiCall) {
     apiCall.subscribe(s => {
       this.updatedStudy = s;
-      this.addStudyInvestigator().subscribe((i) => {
-        this.model.investigators.push(i.id);
+      if (this.model.additional_investigators.name) {
+        this.addStudyInvestigator().subscribe((i) => {
+          this.model.investigators.push(i.id);
+          this.updateStudyInvestigators(s.id).subscribe(() => {
+            this.updateStudyCategories(s.id).subscribe(() => this.close());
+          });
+        });
+      } else {
         this.updateStudyInvestigators(s.id).subscribe(() => {
           this.updateStudyCategories(s.id).subscribe(() => this.close());
         });
-      });
+      }
     });
   }
 
