@@ -244,7 +244,6 @@ export class StudyFormComponent implements OnInit {
 
   options: FormlyFormOptions;
   orgOptions: Organization[];
-  selectedInvestigators: StudyInvestigator[] = [];
 
   createNew = false;
 
