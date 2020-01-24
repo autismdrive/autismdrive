@@ -15,4 +15,12 @@ export class AdminUseCases {
     await this.page.waitForVisible(selector);
     await expect(tab.getAttribute('aria-selected')).toEqual('true');
   }
+
+  viewAddButton() {
+    expect(this.page.getElements('.add-button').count()).toBeGreaterThan(0);
+  }
+
+  openForm(buttonSelector, route) {
+    this.page.clickAndExpectRoute(buttonSelector, route);
+  }
 }
