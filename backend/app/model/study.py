@@ -37,6 +37,7 @@ class Study(db.Model):
     investigators = db.relationship("StudyInvestigator", back_populates="study")
     coordinator_email = db.Column(db.String)
     eligibility_url = db.Column(db.String)
+    results_url = db.Column(db.String)
     organization_id = db.Column('organization_id', db.Integer,
                                 db.ForeignKey('organization.id'))
     location = db.Column(db.String)
