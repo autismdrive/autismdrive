@@ -212,6 +212,7 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Image Url',
         placeholder: 'This is the link to the image used for current study display',
+        description: 'Something like: /assets/home/study7.jpg'
       },
     },
     {
