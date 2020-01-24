@@ -7,6 +7,7 @@ import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';
 import {StudyInvestigator} from '../_models/study_investigator';
 import {ApiService} from '../_services/api/api.service';
+import {Investigator} from '../_models/investigator';
 
 
 enum PageState {
@@ -100,6 +101,53 @@ export class StudyFormComponent implements OnInit {
           field.templateOptions.options = this.api.getInvestigators();
         },
       },
+    },
+    {
+      key: 'additional_investigators',
+      wrappers: ['card'],
+      templateOptions: {
+        label: 'Additional Investigator',
+        description: 'If your investigator does not appear in the list above, please add them here'
+      },
+      fieldGroup: [
+        {
+          type: 'input',
+          key: 'name',
+          templateOptions: {
+            label: 'Name',
+            required: true,
+          },
+        },
+        {
+          type: 'input',
+          key: 'title',
+          templateOptions: {
+            label: 'Title',
+          },
+        },
+        {
+          type: 'select',
+          key: 'organization',
+          templateOptions: {
+            label: 'Organization',
+            options: [],
+            valueProp: 'id',
+            labelProp: 'name',
+          },
+          hooks: {
+            onInit: field => {
+              field.templateOptions.options = this.api.getOrganizations();
+            },
+          },
+        },
+        {
+          type: 'input',
+          key: 'bio_link',
+          templateOptions: {
+            label: 'Bio Link',
+          },
+        },
+      ],
     },
     {
       key: 'organization',
@@ -196,6 +244,7 @@ export class StudyFormComponent implements OnInit {
 
   options: FormlyFormOptions;
   orgOptions: Organization[];
+  selectedInvestigators: StudyInvestigator[] = [];
 
   createNew = false;
 
@@ -294,6 +343,17 @@ export class StudyFormComponent implements OnInit {
     return this.api.updateStudyCategories(study_id, selectedCategories);
   }
 
+  addStudyInvestigator() {
+    let addInvest = this.model.additional_investigators;
+    let newInvest = {
+      name: addInvest.name,
+      title: addInvest.title,
+      organization_id: addInvest.organization,
+      bio_link: addInvest.bio_link,
+    };
+    return this.api.addInvestigator(newInvest);
+  }
+
   updateStudyInvestigators(study_id) {
     const selectedInvestigators: StudyInvestigator[] = [];
     this.model.investigators.forEach(i => {
@@ -340,8 +400,11 @@ export class StudyFormComponent implements OnInit {
   updateAndClose(apiCall) {
     apiCall.subscribe(s => {
       this.updatedStudy = s;
-      this.updateStudyInvestigators(s.id).subscribe(() => {
-        this.updateStudyCategories(s.id).subscribe(() => this.close());
+      this.addStudyInvestigator().subscribe((i) => {
+        this.model.investigators.push(i.id);
+        this.updateStudyInvestigators(s.id).subscribe(() => {
+          this.updateStudyCategories(s.id).subscribe(() => this.close());
+        });
       });
     });
   }

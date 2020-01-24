@@ -1,6 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
 from sqlalchemy import func
 
 from app import db

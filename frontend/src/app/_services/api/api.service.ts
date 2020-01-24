@@ -396,6 +396,12 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Add Investigator */
+  addInvestigator(investigator: Investigator): Observable<Investigator> {
+    return this.httpClient.post<Investigator>(this._endpointUrl('investigatorList'), investigator)
+      .pipe(catchError(this._handleError));
+  }
+
   /** getInvestigators */
   getInvestigators(): Observable<Investigator[]> {
     return this.httpClient.get<Investigator[]>(this._endpointUrl('investigatorList'))
