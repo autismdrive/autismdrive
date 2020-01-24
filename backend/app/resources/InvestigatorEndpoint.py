@@ -40,15 +40,19 @@ class InvestigatorListEndpoint(flask_restful.Resource):
     investigatorSchema = InvestigatorSchema()
 
     def get(self):
-        investigators = db.session.query(Investigator).all()
+        investigators = db.session.query(Investigator).order_by(Investigator.name).all()
         return self.investigatorsSchema.dump(investigators)
 
     def post(self):
         request_data = request.get_json()
         try:
             load_result = self.investigatorSchema.load(request_data).data
-            db.session.add(load_result)
-            db.session.commit()
+            model = db.session.query(Investigator).filter_by(name=load_result.name).first()
+            if model:
+                return self.investigatorSchema.dump(model)
+            else:
+                db.session.add(load_result)
+                db.session.commit()
             return self.investigatorSchema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
