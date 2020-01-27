@@ -309,8 +309,8 @@ export class StudyFormComponent implements OnInit {
     this.model.investigators = [];
     if (study.study_investigators.length > 0) {
       study.study_investigators.forEach(inv => {
-        this.model.investigators.push(inv.investigator.id)
-      })
+        this.model.investigators.push(inv.investigator.id);
+      });
     }
   }
 
@@ -350,8 +350,8 @@ export class StudyFormComponent implements OnInit {
   }
 
   addStudyInvestigator() {
-    let addInvest = this.model.additional_investigators;
-    let newInvest = {
+    const addInvest = this.model.additional_investigators;
+    const newInvest = {
       name: addInvest.name,
       title: addInvest.title,
       organization_id: addInvest.organization,
