@@ -60,6 +60,7 @@
         <mat-card *ngIf="study.status">
           <mat-card-title >Status: {{ snakeToUpperCase(study.status) }}</mat-card-title>
           <mat-card-content>
+            <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
             <div *ngIf="study.status === 'currently_enrolling'">
               <app-study-inquiry [study]="study"></app-study-inquiry>
             </div>
