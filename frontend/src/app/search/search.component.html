@@ -61,92 +61,101 @@
     </h1>
     <app-add-button *ngIf="currentUser && currentUser.role == 'admin'" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
     <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="80px" fxLayoutAlign="space-evenly start">
-      <mat-accordion displayMode="flat">
-        <mat-expansion-panel
-          fxFlex="100%"
-          fxFlex.gt-sm="calc(30% - 160px)"
-          class="filters"
-        >
-          <mat-expansion-panel-header>
-            {{(panelElement && panelElement.expanded && mobileQuery.matches) ? 'Hide' : ''}} Filter & Sort
-          </mat-expansion-panel-header>
+      <div fxLayout="column">
+        <mat-accordion displayMode="flat">
+          <mat-expansion-panel
+            fxFlex="100%"
+            fxFlex.gt-sm="calc(30% - 160px)"
+            class="filters"
+          >
+            <mat-expansion-panel-header>
+              {{(panelElement && panelElement.expanded && mobileQuery.matches) ? 'Hide' : ''}} Filter & Sort
+            </mat-expansion-panel-header>
 
-          <div class="sort-order">
-            <h3>Sort by</h3>
-            <mat-radio-group [ngModel]="selectedSort.name" (change)="newSortSelection($event)" fxLayout="column">
-              <mat-radio-button value="Relevance" *ngIf="query.words != ''">
-                Relevance to "{{query.words}}"
-                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
-              </mat-radio-button>
-              <mat-radio-button value="Distance">
-                Distance
-                <span *ngIf="isZipCode(storedZip)">({{storedZip}})</span>
-                <span *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</span>
-                <button *ngIf="!this.noLocation && !this.setLocOpen" mat-button (click)="openSetLocation()" matTooltip="Set your location">
-                  <mat-icon>keyboard_arrow_down</mat-icon>
-                </button>
-              </mat-radio-button>
-              <div *ngIf="this.noLocation || this.setLocOpen" class="zipCodeSet" fxLayout="column">
-                Or Set Your Location (restricted to VA, WV)
-                <mat-form-field>
-                  <mat-label>ZIP Code</mat-label>
-                  <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit()">
-                </mat-form-field>
-                <div fxLayout="row" fxLayoutGap="1em">
-                    <button mat-flat-button color="primary" (click)="zipSubmit()" id="btn_save">Save</button>
-                    <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
+            <div class="sort-order">
+              <h3>Sort by</h3>
+              <mat-radio-group [ngModel]="selectedSort.name" (change)="newSortSelection($event)" fxLayout="column">
+                <mat-radio-button value="Relevance" *ngIf="query.words != ''">
+                  Relevance to "{{query.words}}"
+                  <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
+                <mat-radio-button value="Distance">
+                  Distance
+                  <span *ngIf="isZipCode(storedZip)">({{storedZip}})</span>
+                  <span *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</span>
+                  <button *ngIf="!this.noLocation && !this.setLocOpen" mat-button (click)="openSetLocation()" matTooltip="Set your location">
+                    <mat-icon>keyboard_arrow_down</mat-icon>
+                  </button>
+                </mat-radio-button>
+                <div *ngIf="this.noLocation || this.setLocOpen" class="zipCodeSet" fxLayout="column">
+                  Or Set Your Location (restricted to VA, WV)
+                  <mat-form-field>
+                    <mat-label>ZIP Code</mat-label>
+                    <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit()">
+                  </mat-form-field>
+                  <div fxLayout="row" fxLayoutGap="1em">
+                      <button mat-flat-button color="primary" (click)="zipSubmit()" id="btn_save">Save</button>
+                      <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
+                  </div>
                 </div>
+                <mat-radio-button value="Updated">Recently Updated
+                  <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
+                <mat-radio-button value="Event Date">Happening Soon
+                  <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <div class="filters-column">
+              <h3>Narrow your results</h3>
+              <h4 class="mat-subheader">By Age</h4>
+              <div *ngIf="!query">
+                <mat-spinner></mat-spinner>
               </div>
-              <mat-radio-button value="Updated">Recently Updated
-                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
-              </mat-radio-button>
-              <mat-radio-button value="Event Date">Happening Soon
-                <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
-              </mat-radio-button>
-            </mat-radio-group>
-          </div>
-
-          <div class="filters-column">
-            <h3>Narrow your results</h3>
-            <h4 class="mat-subheader">By Age</h4>
-            <div *ngIf="!query">
-              <mat-spinner></mat-spinner>
-            </div>
-            <div *ngIf="query">
-              <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
+              <div *ngIf="query">
+                <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
+                <app-search-filter
+                  [aggregations]="query.age_counts"
+                  [label_map]="ageLabels"
+                  (filterSelected)="selectAgeRange($event)"
+                  [ngClass]="'filter-by-age'"
+                ></app-search-filter>
+              </div>
+              <h4 class="mat-subheader">By Type</h4>
+              <div *ngIf="!query">
+                <mat-spinner></mat-spinner>
+              </div>
               <app-search-filter
-                [aggregations]="query.age_counts"
-                [label_map]="ageLabels"
-                (filterSelected)="selectAgeRange($event)"
-                [ngClass]="'filter-by-age'"
+                *ngIf="query"
+                [aggregations]="query.type_counts"
+                [label_map]="typeLabels"
+                (filterSelected)="selectType($event)"
+                [ngClass]="'filter-by-type'"
               ></app-search-filter>
+              <h4 class="mat-subheader">By Topic</h4>
+              <div *ngIf="!query">
+                <mat-spinner></mat-spinner>
+              </div>
+              <app-search-topics
+                *ngIf="query"
+                [category]="query.category"
+                (categorySelected)="selectCategory($event)"
+                [ngClass]="'filter-by-topic'"
+              ></app-search-topics>
             </div>
-            <h4 class="mat-subheader">By Type</h4>
-            <div *ngIf="!query">
-              <mat-spinner></mat-spinner>
-            </div>
-            <app-search-filter
-              *ngIf="query"
-              [aggregations]="query.type_counts"
-              [label_map]="typeLabels"
-              (filterSelected)="selectType($event)"
-              [ngClass]="'filter-by-type'"
-            ></app-search-filter>
-            <h4 class="mat-subheader">By Topic</h4>
-            <div *ngIf="!query">
-              <mat-spinner></mat-spinner>
-            </div>
-            <app-search-topics
-              *ngIf="query"
-              [category]="query.category"
-              (categorySelected)="selectCategory($event)"
-              [ngClass]="'filter-by-topic'"
-            ></app-search-topics>
-          </div>
-        </mat-expansion-panel>
+          </mat-expansion-panel>
+        </mat-accordion>
 
-      </mat-accordion>
-
+        <app-border-box-tile
+          fxShow.md fxShow.lg fxShow.xl
+          fxHide.lt-md
+          [title]="'Can\'t find your resource on drive?'"
+          [subtitle]="'Submit Here'"
+          [linkSize]="1"
+          (click)="submitResource()"
+        ></app-border-box-tile>
+      </div>
       <div
         fxFlex.gt-sm="calc(70% - 160px)"
         fxLayout="column"
@@ -314,6 +323,15 @@
         [ngClass]="{'ghost': (!query || (query.total === 0))}"
       >
       </mat-paginator>
+
+      <app-border-box-tile
+        fxShow.sm fxShow.xs
+        fxHide.gt-sm
+        [title]="'Can\'t find your resource on drive?'"
+        [subtitle]="'Submit Here'"
+        [linkSize]="1"
+        (click)="submitResource()"
+      ></app-border-box-tile>
 
       <h1>Resource partners</h1>
       <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify
