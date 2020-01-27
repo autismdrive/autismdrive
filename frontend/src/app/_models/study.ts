@@ -15,8 +15,8 @@ export interface Study {
   short_title?: string;
   description: string;
   short_description?: string;
-  participant_description: string;
-  benefit_description: string;
+  participant_description?: string;
+  benefit_description?: string;
   investigators: string[];
   organization_id?: number;
   organization?: Organization;
@@ -29,5 +29,6 @@ export interface Study {
   study_investigators?: StudyInvestigator[];
   image_url?: string;
   eligibility_url?: string;
+  results_url?: string;
   ages?: string[];
 }

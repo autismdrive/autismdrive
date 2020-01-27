@@ -5,6 +5,7 @@ import {GlobalHeaderUseCases} from './use-cases/global-header.po';
 import {LoginUseCases} from './use-cases/login.po';
 import {ProfileUseCases} from './use-cases/profile.po';
 import {SearchUseCases} from './use-cases/search.po';
+import {StudiesUseCases} from './use-cases/studies.po';
 
 describe('Admin', () => {
   let page: AppPage;
@@ -14,6 +15,7 @@ describe('Admin', () => {
   let profileUseCases: ProfileUseCases;
   let enrollUseCases: EnrollUseCases;
   let adminUseCases: AdminUseCases;
+  let studiesUseCases: StudiesUseCases;
   const email = 'eleanorcjkgraham@gmail.com';
   const password = 'Random Frequent Flyer Dent 34';
 
@@ -25,6 +27,7 @@ describe('Admin', () => {
     profileUseCases = new ProfileUseCases(page);
     enrollUseCases = new EnrollUseCases(page);
     adminUseCases = new AdminUseCases(page);
+    studiesUseCases = new StudiesUseCases(page);
     await page.waitForAngularEnabled(true);
     await page.navigateToHome();
   });
@@ -62,6 +65,20 @@ describe('Admin', () => {
   it('should display related participants');
   it('should display edit log');
   it('should display email log');
+
+  // Study Form
+  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should navigate to the studies page', () => studiesUseCases.navigateToStudiesPage());
+  it('should display the study add button', () => adminUseCases.viewAddButton());
+  it('should click and open the study form', () => adminUseCases.openForm('.add-button', '/studies/add'));
+  it('should fill out the required fields');
+  it('should save and be directed to the study detail page');
+  it('should display the study edit button');
+  it('should click and open the study form');
+  it('should edit required fields');
+  it('should save and be directed to the study detail page');
+  it('should click and open the study form');
+  it('should delete and be directed to studies');
 
 
   // Log out

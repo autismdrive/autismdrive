@@ -356,6 +356,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this._goToFirstPage(true);
   }
 
+  submitResource() {
+    window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
+  }
+
   resourceTypesFiltered(): HitType[] {
     return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
   }

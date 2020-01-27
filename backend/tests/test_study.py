@@ -257,61 +257,6 @@ class TestStudy(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
 
-    def test_investigator_basics(self):
-        self.construct_investigator()
-        i = db.session.query(Investigator).first()
-        self.assertIsNotNone(i)
-        i_id = i.id
-        rv = self.app.get('/api/investigator/%i' % i_id,
-                          follow_redirects=True,
-                          content_type="application/json", headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response["id"], i_id)
-        self.assertEqual(response["name"], i.name)
-
-    def test_modify_investigator_basics(self):
-        self.construct_investigator()
-        i = db.session.query(Investigator).first()
-        self.assertIsNotNone(i)
-
-        rv = self.app.get('/api/investigator/%i' % i.id, content_type="application/json", headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        response['title'] = 'dungeon master'
-        orig_date = response['last_updated']
-        rv = self.app.put('/api/investigator/%i' % i.id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True, headers=self.logged_in_headers())
-        self.assert_success(rv)
-
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['title'], 'dungeon master')
-        self.assertNotEqual(orig_date, response['last_updated'])
-
-    def test_delete_investigator(self):
-        i = self.construct_investigator()
-        i_id = i.id
-
-        rv = self.app.get('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
-        self.assert_success(rv)
-
-        rv = self.app.delete('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
-        self.assert_success(rv)
-
-        rv = self.app.get('api/investigator/%i' % i_id, content_type="application/json", headers=self.logged_in_headers())
-        self.assertEqual(404, rv.status_code)
-
-    def test_create_investigator(self):
-        o_id = self.construct_organization().id
-        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology", 'organization_id': o_id}
-        rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
-                           headers=self.logged_in_headers(), follow_redirects=True)
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response['name'], 'Tara Tarantula')
-        self.assertEqual(response['title'], 'Assistant Professor of Arachnology')
-        self.assertIsNotNone(response['id'])
-
     def test_study_inquiry_sends_email(self):
         message_count = len(TEST_MESSAGES)
         s = self.construct_study(title="The Best Study")
