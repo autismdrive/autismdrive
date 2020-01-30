@@ -3,6 +3,7 @@ import unittest
 from flask import json
 from nose.tools import raises
 
+from app.model.role import Permission
 from tests.base_test import BaseTest
 from app import db, RestException
 from app.email_service import TEST_MESSAGES
@@ -395,3 +396,24 @@ class TestUser(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(u1.id + 1, u2.id)
         self.assertNotEqual(u2.id + 1, u3.id)
+
+    def test_get_user_permissions(self):
+        admin = self.construct_user(role=Role.admin, email='admin@sartography.com')
+        test = self.construct_user(role=Role.test, email='test@sartography.com')
+        researcher = self.construct_user(role=Role.researcher, email='researcher@sartography.com')
+        editor = self.construct_user(role=Role.editor, email='editor@sartography.com')
+        user = self.construct_user(role=Role.user, email='user@sartography.com')
+
+        self.assertEqual(admin.role.permissions(), list(Permission))
+        self.assertEqual(researcher.role.permissions(), [Permission.user_data_admin, ])
+        self.assertEqual(editor.role.permissions(), [Permission.create_resource, Permission.edit_resource,
+                                                     Permission.delete_resource])
+        self.assertEqual(user.role.permissions(), [])
+
+        self.assertTrue(Permission.user_roles in admin.role.permissions())
+        self.assertFalse(Permission.user_roles in test.role.permissions())
+        self.assertTrue(Permission.user_data_admin in researcher.role.permissions())
+        self.assertTrue(Permission.create_resource in editor.role.permissions())
+        self.assertTrue(Permission.user_roles not in user.role.permissions())
+        self.assertTrue(Permission.user_roles not in editor.role.permissions())
+        self.assertTrue(Permission.user_roles not in researcher.role.permissions())

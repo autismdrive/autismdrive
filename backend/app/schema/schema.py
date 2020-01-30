@@ -16,13 +16,14 @@ from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.resource_change_log import ResourceChangeLog
+from app.model.role import Role
 from app.model.search import Search, Sort
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser, StudyUserStatus
-from app.model.user import User, Role
+from app.model.user import User
 from app.model.zip_code import ZipCode
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to

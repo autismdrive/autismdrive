@@ -1,7 +1,5 @@
 import datetime
-import enum
 import re
-from random import randint
 
 import jwt
 from sqlalchemy import func
@@ -9,20 +7,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import app, db, RestException, bcrypt, password_requirements
 from app.model.participant import Participant
+from app.model.role import Role
 from app.model.random_id_generator import random_integer
-
-
-class Role(enum.Enum):
-    admin = 1
-    user = 2
-
-    @classmethod
-    def has_name(cls, name):
-        return any(name == item.name for item in cls)
-
-    @classmethod
-    def options(cls):
-        return [item.name for item in cls]
 
 
 class User(db.Model):

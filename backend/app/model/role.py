@@ -1,0 +1,39 @@
+import enum
+
+
+class Permission(enum.Enum):
+    create_resource = "Create Resources"
+    edit_resource = "Edit Resources"
+    delete_resource = "Delete Resources"
+    publish_resource = "Publish Resources"
+    create_study = "Create Studies"
+    edit_study = "Edit Studies"
+    delete_study = "Delete Studies"
+    user_admin = "Visit User Admin"
+    participant_admin = "Visit Participant Admin"
+    data_admin = "Visit Data Admin"
+    user_data_admin = "User Admin Data Details"
+    export_status = "View Export Status"
+
+    # keep user_roles last to keep off of test user permissions
+    user_roles = "Manage User Roles"
+
+
+class Role(enum.Enum):
+    admin = list(Permission)
+    test = list(Permission)[:-1]
+    researcher = [Permission.user_data_admin, ]
+    editor = [Permission.create_resource, Permission.edit_resource, Permission.delete_resource]
+    user = []
+
+    def permissions(self):
+        return self.value
+
+    @classmethod
+    def has_name(cls, name):
+        return any(name == item.name for item in cls)
+
+    @classmethod
+    def options(cls):
+        return [item.name for item in cls]
+
