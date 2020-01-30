@@ -568,4 +568,31 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertFalse('description' in search_results['hits'][0])
         self.assertFalse('highlights' in search_results['hits'][0])
 
+    def test_study_search_record_updates(self):
+        umbrella_query = {'words': 'umbrellas'}
 
+        # test that elastic resource is created with post
+        o_id = self.construct_organization().id
+        study = {'status': "currently_enrolling", 'title': "space platypus", 'description': "delivering umbrellas", 'organization_id': o_id}
+        rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
+                           follow_redirects=True)
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        s_id = response['id']
+
+        search_results = self.search(umbrella_query)
+        self.assertEqual(1, len(search_results['hits']))
+        self.assertEqual(search_results['hits'][0]['id'], s_id)
+        self.assertEqual(search_results['hits'][0]['status'], 'Currently enrolling')
+
+        response['status'] = "study_in_progress"
+        rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True)
+        self.assert_success(rv)
+        rv = self.app.get('/api/study/%i' % s_id, content_type="application/json")
+        self.assert_success(rv)
+
+        search_results = self.search(umbrella_query)
+        self.assertEqual(1, len(search_results['hits']))
+        self.assertEqual(search_results['hits'][0]['id'], s_id)
+        self.assertEqual(search_results['hits'][0]['status'], 'Study in progress')
