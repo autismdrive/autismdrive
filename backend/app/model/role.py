@@ -12,17 +12,18 @@ class Permission(enum.Enum):
     user_admin = "Visit User Admin"
     participant_admin = "Visit Participant Admin"
     data_admin = "Visit Data Admin"
-    user_data_admin = "User Admin Data Details"
+    user_detail_admin = "User Admin Data Details"
     export_status = "View Export Status"
 
     # keep user_roles last to keep off of test user permissions
+    delete_user = "Delete User"
     user_roles = "Manage User Roles"
 
 
 class Role(enum.Enum):
     admin = list(Permission)
-    test = list(Permission)[:-1]
-    researcher = [Permission.user_data_admin, ]
+    test = list(Permission)[:-2]
+    researcher = [Permission.user_detail_admin, ]
     editor = [Permission.create_resource, Permission.edit_resource, Permission.delete_resource]
     user = []
 

@@ -405,14 +405,15 @@ class TestUser(BaseTest, unittest.TestCase):
         user = self.construct_user(role=Role.user, email='user@sartography.com')
 
         self.assertEqual(admin.role.permissions(), list(Permission))
-        self.assertEqual(researcher.role.permissions(), [Permission.user_data_admin, ])
+        self.assertEqual(researcher.role.permissions(), [Permission.user_detail_admin, ])
         self.assertEqual(editor.role.permissions(), [Permission.create_resource, Permission.edit_resource,
                                                      Permission.delete_resource])
         self.assertEqual(user.role.permissions(), [])
 
         self.assertTrue(Permission.user_roles in admin.role.permissions())
         self.assertFalse(Permission.user_roles in test.role.permissions())
-        self.assertTrue(Permission.user_data_admin in researcher.role.permissions())
+        self.assertFalse(Permission.delete_user in test.role.permissions())
+        self.assertTrue(Permission.user_detail_admin in researcher.role.permissions())
         self.assertTrue(Permission.create_resource in editor.role.permissions())
         self.assertTrue(Permission.user_roles not in user.role.permissions())
         self.assertTrue(Permission.user_roles not in editor.role.permissions())
