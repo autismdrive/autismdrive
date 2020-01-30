@@ -30,8 +30,8 @@ export class UvaEducationComponent implements OnInit {
   }
 
   loadResources() {
-    this.api.getResources().subscribe(resources => {
-      this.edResources = resources.filter(r => r.is_uva_education_content === true);
+    this.api.getEducationResources().subscribe(resources => {
+      this.edResources = resources;
       this.newsItems = this._resourcesToNewsItems(this.edResources) || [];
       this.loading = false;
     });

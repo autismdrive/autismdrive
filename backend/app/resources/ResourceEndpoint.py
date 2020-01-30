@@ -97,3 +97,12 @@ class ResourceListEndpoint(flask_restful.Resource):
                                 user_email=g.user.email, type=change_type)
         db.session.add(log)
         db.session.commit()
+
+
+class EducationResourceListEndpoint(flask_restful.Resource):
+
+    resourcesSchema = ResourceSchema(many=True)
+
+    def get(self):
+        resources = db.session.query(Resource).filter_by(is_uva_education_content=True).all()
+        return self.resourcesSchema.dump(resources)

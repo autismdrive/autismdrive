@@ -86,6 +86,7 @@ export class ApiService {
     relatedresults: '/api/related',
     resourcecategorylist: '/api/resource_category',
     resourcelist: '/api/resource',
+    educationresourcelist: '/api/resource/education',
     categorytree: '/api/category/root',
     search: '/api/search',
     searchstudies: '/api/search/studies',
@@ -336,6 +337,12 @@ export class ApiService {
   /** Get Resources */
   getResources(): Observable<Resource[]> {
     return this.httpClient.get<Resource[]>(this._endpointUrl('resourcelist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Education Resources */
+  getEducationResources(): Observable<Resource[]> {
+    return this.httpClient.get<Resource[]>(this._endpointUrl('educationresourcelist'))
       .pipe(catchError(this._handleError));
   }
 
