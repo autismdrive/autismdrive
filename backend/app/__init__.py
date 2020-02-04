@@ -64,6 +64,18 @@ password_requirements = {
         'regex': app.config['USER_PASSWORD_REGEX'],
         'instructions': app.config['USER_PASSWORD_INSTRUCTIONS'],
     },
+    'editor': {
+        'regex': app.config['USER_PASSWORD_REGEX'],
+        'instructions': app.config['USER_PASSWORD_INSTRUCTIONS'],
+    },
+    'researcher': {
+        'regex': app.config['USER_PASSWORD_REGEX'],
+        'instructions': app.config['USER_PASSWORD_INSTRUCTIONS'],
+    },
+    'test': {
+        'regex': app.config['ADMIN_PASSWORD_REGEX'],
+        'instructions': app.config['ADMIN_PASSWORD_INSTRUCTIONS'],
+    },
     'admin': {
         'regex': app.config['ADMIN_PASSWORD_REGEX'],
         'instructions': app.config['ADMIN_PASSWORD_INSTRUCTIONS'],

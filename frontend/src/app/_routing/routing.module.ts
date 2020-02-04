@@ -20,7 +20,7 @@ import {StudyFormComponent} from '../study-form/study-form.component';
 import {TermsComponent} from '../terms/terms.component';
 import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
 import {TimedoutComponent} from '../timed-out/timed-out.component';
-import {AdminGuard} from './admin-guard';
+import {RoleGuard} from './role-guard';
 import {AuthGuard} from './auth-guard';
 import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
@@ -71,14 +71,29 @@ const routes: Routes = [
   {
     path: ':resourceType/:resourceId/edit',
     component: ResourceFormComponent,
-    data: {title: 'Edit Resource'},
-    canActivate: [AdminGuard]
+    data: {title: 'Edit Resource', roles: ['admin', 'editor']},
+    canActivate: [RoleGuard]
   },
-  {path: 'resources/add', component: ResourceFormComponent, data: {title: 'Add Resource'}, canActivate: [AdminGuard]},
+  {
+    path: 'resources/add',
+    component: ResourceFormComponent,
+    data: {title: 'Add Resource', roles: ['admin', 'editor']},
+    canActivate: [RoleGuard]
+  },
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
-  {path: 'studies/add', component: StudyFormComponent, data: {title: 'Create an Autism DRIVE Study'}, canActivate: [AdminGuard]},
+  {
+    path: 'studies/add',
+    component: StudyFormComponent,
+    data: {title: 'Create an Autism DRIVE Study', roles: ['admin',]},
+    canActivate: [RoleGuard]
+  },
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
-  {path: 'study/edit/:studyId', component: StudyFormComponent, data: {title: 'Edit Study'}, canActivate: [AdminGuard]},
+  {
+    path: 'study/edit/:studyId',
+    component: StudyFormComponent,
+    data: {title: 'Edit Study', roles: ['admin',]},
+    canActivate: [RoleGuard]
+  },
   {
     path: 'terms/:relationship',
     component: TermsComponent,
@@ -88,12 +103,17 @@ const routes: Routes = [
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
   {path: 'search', component: SearchComponent, data: {title: 'Search'}},
   {path: 'search/:query', component: SearchComponent, data: {title: 'Search Resources'}},
-  {path: 'admin', component: AdminHomeComponent, data: {title: 'Admin Home'}, canActivate: [AdminGuard]},
+  {
+    path: 'admin',
+    component: AdminHomeComponent,
+    data: {title: 'Admin Home', roles: ['admin',]},
+    canActivate: [RoleGuard]
+  },
   {
     path: 'admin/user/:userId',
     component: UserAdminDetailsComponent,
-    data: {title: 'User Admin Details'},
-    canActivate: [AdminGuard]
+    data: {title: 'User Admin Details', roles: ['admin', 'researcher']},
+    canActivate: [RoleGuard],
   },
   {path: 'mirrored', component: MirrorComponent, data: {title: 'Mirrored Server Details'}},
 ];
