@@ -15,7 +15,7 @@ class Permission(enum.Enum):
     user_detail_admin = "User Admin Data Details"
     export_status = "View Export Status"
 
-    # keep user_roles last to keep off of test user permissions
+    # keep user_roles and delete_user last to keep off of test user permissions
     delete_user = "Delete User"
     user_roles = "Manage User Roles"
 
@@ -38,3 +38,5 @@ class Role(enum.Enum):
     def options(cls):
         return [item.name for item in cls]
 
+
+# see migration version 15cfedb47914 for an example of an update to the Role enum

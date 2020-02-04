@@ -2,7 +2,8 @@ import flask_restful
 from flask import request
 
 from app import db, RestException, auth
-from app.model.user import User, Role
+from app.model.user import User
+from app.model.role import Role
 from app.model.study import Study
 from app.model.study_user import StudyUser, StudyUserStatus
 from app.schema.schema import StudyUserSchema, UserStudiesSchema, StudyUsersSchema

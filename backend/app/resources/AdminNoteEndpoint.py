@@ -4,8 +4,8 @@ from marshmallow import ValidationError
 from app import db, auth, RestException
 from app.model.admin_note import AdminNote
 from app.schema.schema import AdminNoteSchema
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Permission
+from app.wrappers import requires_permission
 import datetime
 
 
@@ -14,21 +14,21 @@ class AdminNoteEndpoint(flask_restful.Resource):
     schema = AdminNoteSchema()
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def get(self, id):
         model = db.session.query(AdminNote).filter_by(id=id).first()
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def delete(self, id):
         db.session.query(AdminNote).filter_by(id=id).delete()
         db.session.commit()
         return None
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(AdminNote).filter_by(id=id).first()
@@ -46,13 +46,13 @@ class AdminNoteListEndpoint(flask_restful.Resource):
     adminNoteSchema = AdminNoteSchema()
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def get(self):
         admin_notes = db.session.query(AdminNote).all()
         return self.adminNotesSchema.dump(admin_notes)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def post(self):
         request_data = request.get_json()
         try:
@@ -69,7 +69,7 @@ class AdminNoteListEndpoint(flask_restful.Resource):
 class AdminNoteListByUserEndpoint(flask_restful.Resource):
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
         schema = AdminNoteSchema(many=True)
         logs = db.session.query(AdminNote)\
@@ -81,7 +81,7 @@ class AdminNoteListByUserEndpoint(flask_restful.Resource):
 class AdminNoteListByResourceEndpoint(flask_restful.Resource):
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def get(self, resource_id):
         schema = AdminNoteSchema(many=True)
         logs = db.session.query(AdminNote)\

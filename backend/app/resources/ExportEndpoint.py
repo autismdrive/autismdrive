@@ -7,7 +7,8 @@ from sqlalchemy import desc
 from app import auth, db
 from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
 from app.model.export_info import ExportInfoSchema
-from app.model.user import Role, User
+from app.model.user import User
+from app.model.role import Role
 from app.schema.export_schema import AdminExportSchema
 from app.wrappers import requires_roles
 from app.export_service import ExportService

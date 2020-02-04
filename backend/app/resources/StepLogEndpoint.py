@@ -4,8 +4,8 @@ import flask_restful
 from app import db, auth
 from app.model.step_log import StepLog
 from app.schema.schema import StepLogSchema
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Role, Permission
+from app.wrappers import requires_roles, requires_permission
 
 
 class StepLogListEndpoint(flask_restful.Resource):
@@ -22,7 +22,7 @@ class StepLogListEndpoint(flask_restful.Resource):
 class StepLogEndpoint(flask_restful.Resource):
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.user_detail_admin)
     def get(self, participant_id):
         schema = StepLogSchema(many=True)
         logs = db.session.query(StepLog)\

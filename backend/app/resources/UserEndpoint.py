@@ -8,9 +8,10 @@ from sqlalchemy.exc import IntegrityError
 
 from app import RestException, db, email_service, auth
 from app.model.email_log import EmailLog
-from app.model.user import User, Role
+from app.model.role import Permission, Role
+from app.model.user import User
 from app.schema.schema import UserSchema, UserSearchSchema
-from app.wrappers import requires_roles
+from app.wrappers import requires_permission
 
 
 class UserEndpoint(flask_restful.Resource):
@@ -19,14 +20,14 @@ class UserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, id):
-        if g.user.id != eval(id) and g.user.role != Role.admin:
+        if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
         model = db.session.query(User).filter_by(id=id).first()
         if model is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.delete_user)
     def delete(self, id):
         db.session.query(User).filter_by(id=id).delete()
         db.session.commit()
@@ -34,7 +35,7 @@ class UserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def put(self, id):
-        if g.user.id != eval(id) and g.user.role != Role.admin:
+        if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
         request_data = request.get_json()
         if 'role' in request_data and request_data['role'] == 'admin' and g.user.role == Role.admin:
@@ -57,7 +58,7 @@ class UserListEndpoint(flask_restful.Resource):
     searchSchema = UserSearchSchema()
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.user_admin)
     def get(self):
         args = request.args
         pageNumber = eval(args["pageNumber"]) if ("pageNumber" in args) else 0

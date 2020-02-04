@@ -2,8 +2,8 @@ import flask_restful
 
 from app import db, auth
 from app.export_service import ExportService
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Permission
+from app.wrappers import requires_permission
 
 # The Questionnaire by Participant Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -17,7 +17,7 @@ from app.wrappers import requires_roles
 class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.user_detail_admin)
     def get(self, name, participant_id):
         class_ref = ExportService.get_class(name)
         schema = ExportService.get_schema(name, many=True)

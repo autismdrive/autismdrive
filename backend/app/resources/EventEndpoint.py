@@ -8,8 +8,8 @@ from app import RestException, db, elastic_index, auth
 from app.model.event import Event
 from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import EventSchema
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Permission
+from app.wrappers import requires_permission
 
 
 class EventEndpoint(flask_restful.Resource):
@@ -22,7 +22,7 @@ class EventEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.delete_resource)
     def delete(self, id):
         event = db.session.query(Event).filter_by(id=id).first()
         event_id = event.id
@@ -37,7 +37,7 @@ class EventEndpoint(flask_restful.Resource):
         return None
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Event).filter_by(id=id).first()
@@ -67,7 +67,7 @@ class EventListEndpoint(flask_restful.Resource):
         return self.eventsSchema.dump(events)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.create_resource)
     def post(self):
         request_data = request.get_json()
         try:
