@@ -31,6 +31,21 @@ export class StudyFormComponent implements OnInit {
   form: FormGroup;
   fields: FormlyFieldConfig[] = [
     {
+      key: 'status',
+      type: 'select',
+      templateOptions: {
+        label: 'Study Status',
+        placeholder: 'Please select the study status',
+        options: [
+          {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
+          {'value': 'study_in_progress', 'label': 'Study in progress'},
+          {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
+          {'value': 'study_results_published', 'label': 'Study results published'}
+        ],
+        required: true,
+      },
+    },
+    {
       key: 'title',
       type: 'input',
       templateOptions: {
@@ -169,21 +184,6 @@ export class StudyFormComponent implements OnInit {
         label: 'Number of Visits',
         type: 'number',
         placeholder: 'Please list the number of visits required for participation in this study',
-      },
-    },
-    {
-      key: 'status',
-      type: 'select',
-      templateOptions: {
-        label: 'Study Status',
-        placeholder: 'Please select the study status',
-        options: [
-          {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
-          {'value': 'study_in_progress', 'label': 'Study in progress'},
-          {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
-          {'value': 'study_results_published', 'label': 'Study results published'}
-        ],
-        required: true,
       },
     },
     {
