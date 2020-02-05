@@ -38,10 +38,11 @@ class UserEndpoint(flask_restful.Resource):
         if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
         request_data = request.get_json()
-        if 'role' in request_data and request_data['role'] == 'admin' and g.user.role == Role.admin:
-            request_data['role'] = 'admin'
-        else:
-            request_data['role'] = 'user'
+        if 'role' in request_data and request_data['role'] == 'admin':
+            if g.user.role == Role.admin:
+                request_data['role'] = 'admin'
+            else:
+                request_data['role'] = 'user'
         instance = db.session.query(User).filter_by(id=id).first()
         updated, errors = self.schema.load(request_data, instance=instance)
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)

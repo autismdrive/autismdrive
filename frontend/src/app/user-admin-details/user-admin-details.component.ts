@@ -6,6 +6,7 @@ import {EmailLog} from '../_models/email_log';
 import {ResourceChangeLog} from '../_models/resource_change_log';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-user-admin-details',
@@ -14,20 +15,26 @@ import {ApiService} from '../_services/api/api.service';
 })
 export class UserAdminDetailsComponent implements OnInit {
   user: User;
+  currentUser: User;
   dataSource: MatTableDataSource<EmailLog>;
   displayedColumns: string[] = ['id', 'user_id', 'type', 'tracking_code', 'viewed', 'date_viewed'];
   adminNotes: AdminNote[];
   resourceChangeLog: ResourceChangeLog[];
+  roleSelected: string;
 
   constructor(
-    private api: ApiService, private route: ActivatedRoute
+    private api: ApiService,
+    private route: ActivatedRoute,
+    private authenticationService: AuthenticationService,
   ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
       const userId = params.userId ? parseInt(params.userId, 10) : null;
 
       if (isFinite(userId)) {
         this.api.getUser(userId).subscribe(user => {
           this.user = user;
+          this.roleSelected = user.role;
 
           this.api.getUserEmailLog(this.user).subscribe(log => {
             this.user.email_log = log;
@@ -76,13 +83,8 @@ export class UserAdminDetailsComponent implements OnInit {
     });
   }
 
-  makeAdmin() {
-    this.user.role = 'admin';
-    this.api.updateUser(this.user).subscribe();
-  }
-
-  removeAdmin() {
-    this.user.role = 'user';
+  saveSelection() {
+    this.user.role = this.roleSelected;
     this.api.updateUser(this.user).subscribe();
   }
 

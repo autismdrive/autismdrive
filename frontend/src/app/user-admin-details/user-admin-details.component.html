@@ -24,22 +24,28 @@
       <p>User Email: {{user.email}}</p>
       <p>User Role: {{user.role}}</p>
       <p>Last Updated: {{user.last_updated | date:'long'}}</p>
-      <button
-        *ngIf="user.role != 'admin'"
-        mat-flat-button
-        (click)="makeAdmin()"
-        color="accent"
+      <div
+        *ngIf="currentUser && currentUser.permissions.includes('user_roles')"
+        fxLayout="column"
       >
-        Make Admin
-      </button>
-      <button
-        *ngIf="user.role === 'admin'"
-        mat-flat-button
-        (click)="removeAdmin()"
-        color="accent"
-      >
-        Remove Admin Status
-      </button>
+        <mat-form-field>
+          <mat-label>Select an option</mat-label>
+          <mat-select [(value)]="roleSelected">
+            <mat-option value="admin">Admin</mat-option>
+            <mat-option value="test">Test</mat-option>
+            <mat-option value="researcher">Researcher</mat-option>
+            <mat-option value="editor">Editor</mat-option>
+            <mat-option value="user">User</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          (click)="saveSelection()"
+          color="accent"
+        >
+          Save Selection
+        </button>
+      </div>
     </div>
     <div
       class="email-log"
