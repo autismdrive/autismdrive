@@ -72,11 +72,18 @@ class UserSchema(ModelSchema):
     class Meta:
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'email', 'password', 'role',
-                  'participants', 'token', 'token_url')
+                  'permissions', 'participants', 'token', 'token_url')
     password = fields.String(load_only=True)
     participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
+    permissions = fields.Method('get_permissions', dump_only=True)
+
+    def get_permissions(self, obj):
+        permissions = []
+        for p in obj.role.permissions():
+            permissions.append(p.name)
+        return permissions
 
 
 class UsersOnStudySchema(ModelSchema):
