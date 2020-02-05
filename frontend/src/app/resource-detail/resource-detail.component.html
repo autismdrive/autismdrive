@@ -16,7 +16,7 @@
       fxLayoutGap="40px"
     >
       <h1>{{resource.title}}</h1>
-      <app-edit-button *ngIf="currentUser && currentUser.role == 'admin'" [currentUser]="currentUser" [editLink]='resource.type + "/" + resource.id + "/edit"' [editLabel]='"Edit " + resource.type'></app-edit-button>
+      <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" [currentUser]="currentUser" [editLink]='resource.type + "/" + resource.id + "/edit"' [editLabel]='"Edit " + resource.type'></app-edit-button>
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p>{{resource.description}}</p>
@@ -86,7 +86,7 @@
         >Visit website</button>
       </div>
       <div
-        *ngIf="currentUser && currentUser.role == 'admin'"
+        *ngIf="currentUser && currentUser.permissions.includes('edit_resource')"
         fxLayout="column"
         fxLayoutGap="2em"
       >

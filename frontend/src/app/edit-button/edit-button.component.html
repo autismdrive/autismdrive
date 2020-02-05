@@ -1,4 +1,4 @@
-<div *ngIf="currentUser && currentUser.role == 'admin'">
+<div *ngIf="currentUser && currentUser.permissions.includes('edit_resource' || 'edit_study')">
   <button
     mat-mini-fab
     color="accent"

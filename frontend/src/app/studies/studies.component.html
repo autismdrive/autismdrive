@@ -56,7 +56,7 @@
   fxLayout="column"
   fxLayoutGap="40px"
 >
-  <app-add-button *ngIf="currentUser && currentUser.role == 'admin'" [addLabel]='"Add Study"' [addLink]='"studies/add"' [currentUser]=currentUser></app-add-button>
+  <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_study')" [addLabel]='"Add Study"' [addLink]='"studies/add"' [currentUser]=currentUser></app-add-button>
   <h2>{{selectedStatus.label}}</h2>
   <ng-container *ngIf="query && query.hits && studyHits && (studyHits.length > 0)">
     <app-search-result

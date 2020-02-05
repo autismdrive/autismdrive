@@ -52,7 +52,7 @@ export class ResourceDetailComponent implements OnInit {
             this.safeVideoLink = this._sanitizer
               .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
           }
-          if (this.currentUser && this.currentUser.role === 'admin') {
+          if (this.currentUser && this.currentUser.permissions.includes('edit_resource')) {
             this.api.getResourceChangeLog(this.resource.id).subscribe(log => {
               this.changeLog = log;
             });
