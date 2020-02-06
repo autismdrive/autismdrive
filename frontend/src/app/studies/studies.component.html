@@ -58,7 +58,7 @@
 >
   <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_study')" [addLabel]='"Add Study"' [addLink]='"studies/add"' [currentUser]=currentUser></app-add-button>
   <h2>{{selectedStatus.label}}</h2>
-  <ng-container *ngIf="query && query.hits && studyHits && (studyHits.length > 0)">
+  <ng-container *ngIf="studyHits && (studyHits.length > 0)">
     <app-search-result
       *ngFor="let hit of studyHits"
       [hit]="hit"
@@ -66,7 +66,7 @@
     ></app-search-result>
   </ng-container>
   <p
-    *ngIf="!query || !query.hits || !studyHits || (studyHits.length === 0)"
+    *ngIf="!studyHits || (studyHits.length === 0)"
     class="no-results"
     [attr.data-study-status]="selectedStatus.name"
   >

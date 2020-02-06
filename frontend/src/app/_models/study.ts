@@ -31,4 +31,5 @@ export interface Study {
   eligibility_url?: string;
   results_url?: string;
   ages?: string[];
+  last_updated?: Date;
 }
