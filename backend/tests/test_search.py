@@ -5,6 +5,7 @@ from flask import json
 
 from app import elastic_index, db
 from app.model.category import Category
+from app.model.role import Role
 from tests.base_test import BaseTest
 
 
@@ -596,3 +597,42 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(1, len(search_results['hits']))
         self.assertEqual(search_results['hits'][0]['id'], s_id)
         self.assertEqual(search_results['hits'][0]['status'], 'Study in progress')
+
+    def test_search_with_drafts(self):
+        resource_query = {'words': 'resource'}
+        password = 'Silly password 305 for all the pretend users'
+
+        self.construct_resource(title="Drafty Draft Draft Resource", is_draft=True)
+        self.construct_resource(title="Published Resource", is_draft=False)
+        self.construct_resource(title="Officially Published Resource", is_draft=False)
+        self.construct_resource(title="A Draft Resource for the ages", is_draft=True)
+        admin = self.construct_user(email='admin@sartography.com', role=Role.admin)
+        editor = self.construct_user(email='editor@sartography.com', role=Role.editor)
+        researcher = self.construct_user(email='researcher@sartography.com', role=Role.researcher)
+        user = self.construct_user(email='user@sartography.com', role=Role.user)
+
+        self.login_user(admin, password)
+        search_results = self.search(resource_query, user=admin)
+        self.assertEqual(4, len(search_results['hits']))
+        self.login_user(editor, password)
+        search_results = self.search(resource_query, user=editor)
+        self.assertEqual(4, len(search_results['hits']))
+        self.login_user(researcher, password)
+        search_results = self.search(resource_query, user=researcher)
+        self.assertEqual(2, len(search_results['hits']))
+        self.login_user(user, password)
+        search_results = self.search(resource_query, user=user)
+        self.assertEqual(2, len(search_results['hits']))
+
+    def login_user(self, user, password):
+        user.email_verified = True
+        user.password = password
+        db.session.add(user)
+        data = {'email': user.email, 'password': password}
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response["token"])

@@ -1,12 +1,13 @@
 import datetime
 
+from app.model.role import Permission
 from elasticsearch import RequestError
 from elasticsearch_dsl import Date, Keyword, Text, Index, analyzer, Integer, tokenizer, Document, Double, GeoPoint, \
-    Search, A, Boolean, analysis
+    Search, A, Q, Boolean, analysis
 from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
+from flask import g
 import logging
-
-from elasticsearch_dsl.query import MultiMatch, MatchAll, Query, MoreLikeThis
 
 autocomplete = analyzer('autocomplete',
                         tokenizer=tokenizer('ngram', 'edge_ngram', min_gram=2, max_gram=15,
@@ -45,6 +46,7 @@ class StarDocument(Document):
     geo_point = GeoPoint()
     status = Keyword()
     no_address = Boolean()
+    is_draft = Boolean()
 
 
 class ElasticIndex:
@@ -138,6 +140,8 @@ class ElasticIndex:
             doc.date = document.date
         if hasattr(document, 'website'):
             doc.website = document.website
+        if hasattr(document, 'is_draft'):
+            doc.is_draft = document.is_draft
         if hasattr(document, 'status') and document.status is not None:
             doc.status = document.status.value
 
@@ -208,14 +212,20 @@ class ElasticIndex:
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
 
+        if 'user' in g and g.user:
+            if Permission.edit_resource not in g.user.role.permissions():
+                elastic_search = elastic_search.filter(Q('bool', must_not=[Q('match', is_draft=True)]))
+        else:
+            elastic_search = elastic_search.filter(Q('bool', must_not=[Q('match', is_draft=True)]))
+
         if search.category and search.category.id:
             elastic_search = elastic_search.filter('terms', category=[str(search.category.search_path())])
             if search.category.calculate_level() == 0:
-                exclude = ".*\\,.*\\,.*";
+                exclude = ".*\\,.*\\,.*"
                 include = str(search.category.id) + "\\,.*"
                 aggregation = A("terms", field='category', exclude=exclude, include=include)
             elif search.category.calculate_level() == 1:
-                include = ".*\\,.*\\,.*";
+                include = ".*\\,.*\\,.*"
                 aggregation = A("terms", field='category', include=include)
             else:
                 aggregation = A("terms", field='category')
@@ -257,6 +267,5 @@ class ElasticIndex:
             .query(query)
 
         elastic_search = elastic_search[0:max_hits]
-
 
         return elastic_search.execute()

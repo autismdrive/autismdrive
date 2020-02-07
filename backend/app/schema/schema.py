@@ -293,7 +293,7 @@ class ResourceSchema(ModelSchema):
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'ages', '_links')
+                  'is_draft', 'ages', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
@@ -345,8 +345,8 @@ class EventSchema(ModelSchema):
         model = Event
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'organization',
-                  'resource_categories', 'latitude', 'longitude',  'ages', '_links')
+                  'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
+                  'organization', 'resource_categories', 'latitude', 'longitude',  'ages', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -567,6 +567,7 @@ class SearchSchema(ma.Schema):
         date = fields.Date(missing=None)
         status = fields.Str(missing=None)
         no_address = fields.Boolean(missing=None)
+        is_draft = fields.Boolean(missing=None)
 
     class SortSchema(ma.Schema):
         field = fields.Str(allow_null=True)

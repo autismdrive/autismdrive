@@ -77,16 +77,6 @@ class BaseTest:
         if existing_user.id in self.auths:
             return self.auths[existing_user.id]
 
-        data = {
-            'email': existing_user.email,
-            'password': existing_user.password
-        }
-
-        rv = self.app.post(
-            '/api/login_password',
-            data=json.dumps(data),
-            content_type="application/json")
-
         self.auths[existing_user.id] = dict(
             Authorization='Bearer ' + existing_user.encode_auth_token().decode())
 
@@ -169,9 +159,11 @@ class BaseTest:
         return db_category
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org", categories=[], ages=[]):
+                           phone="555-555-5555", website="http://stardrive.org", is_draft=False, categories=[],
+                           ages=[]):
 
-        resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages)
+        resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages,
+                            is_draft=is_draft)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
         db.session.commit()
@@ -186,12 +178,13 @@ class BaseTest:
         return db_resource
 
     def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
-                           street_address1="123 Some Pl", street_address2="Apt. 45",
+                           street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False,
                            city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
                            website="http://stardrive.org", latitude=38.98765, longitude=-93.12345):
 
-        location = Location(title=title, description=description, street_address1=street_address1, street_address2=street_address2, city=city,
-                                state=state, zip=zip,phone=phone, website=website, latitude=latitude, longitude=longitude)
+        location = Location(title=title, description=description, street_address1=street_address1,
+                            street_address2=street_address2, city=city, state=state, zip=zip,phone=phone,
+                            website=website, latitude=latitude, longitude=longitude, is_draft=is_draft)
         location.organization_id = self.construct_organization().id
         db.session.add(location)
         db.session.commit()
@@ -254,13 +247,13 @@ class BaseTest:
         return db_inv
 
     def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
-                           street_address1="123 Some Pl", street_address2="Apt. 45",
+                           street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False,
                            city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
                            website="http://stardrive.org", date=datetime.datetime.now() + datetime.timedelta(days=7)):
 
         event = Event(title=title, description=description, street_address1=street_address1,
                       street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
-                      date=date)
+                      date=date, is_draft=is_draft)
         event.organization_id = self.construct_organization().id
         db.session.add(event)
 

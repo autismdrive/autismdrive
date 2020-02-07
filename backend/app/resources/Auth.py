@@ -131,4 +131,4 @@ def login_optional(f):
 
         return f(*args, **kwargs)
 
-        return decorated
+    return decorated
