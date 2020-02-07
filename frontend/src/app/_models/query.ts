@@ -1,4 +1,4 @@
-import { GeoLocation } from './geolocation';
+import {GeoLocation} from './geolocation';
 import {Category} from './category';
 import {HitType} from './hit_type';
 
@@ -83,6 +83,7 @@ export class Hit extends GeoLocation {
   highlights: string;
   url?: string;
   status?: string;
+  is_draft?: boolean;
 
   constructor(private _props) {
     super(_props);

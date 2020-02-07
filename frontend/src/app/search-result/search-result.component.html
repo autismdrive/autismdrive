@@ -6,6 +6,7 @@
     fxLayout="row"
     fxLayoutAlign="space-between"
   >
+    <p *ngIf="hit.is_draft === true">[DRAFT]</p>
     <a
       class="title mat-h2"
       href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
