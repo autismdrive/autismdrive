@@ -400,7 +400,7 @@ class LocationSchema(ModelSchema):
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'latitude', 'longitude', '_links', 'ages')
+                  'latitude', 'longitude', '_links', 'ages', 'is_draft')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)

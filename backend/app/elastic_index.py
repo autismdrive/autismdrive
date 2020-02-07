@@ -142,6 +142,8 @@ class ElasticIndex:
             doc.website = document.website
         if hasattr(document, 'is_draft'):
             doc.is_draft = document.is_draft
+            if document.is_draft is True:
+                doc.content = doc.content + "This is a DRAFT"
         if hasattr(document, 'status') and document.status is not None:
             doc.status = document.status.value
 
