@@ -32,7 +32,6 @@
         type="button"
         (click)="saveDraft()"
         color="primary"
-        [disabled]="!form.valid"
         id="save-draft-button"
       >Save As Draft</button>
       <div *ngIf="currentUser && currentUser.permissions.includes('publish_resource')">
@@ -42,7 +41,6 @@
           type="button"
           (click)="savePublish()"
           color="primary"
-          [disabled]="!form.valid"
           id="save-publish-button"
         >Save & Publish</button>
       </div>

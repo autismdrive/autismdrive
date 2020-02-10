@@ -29,9 +29,8 @@
         *ngIf="form"
         mat-flat-button
         type="button"
-        (click)="submit()"
+        (click)="form.valid ? submit() : highlightRequiredFields()"
         color="primary"
-        [disabled]="!form.valid"
         id="save-next-button"
       >Save</button>
 

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {Organization} from '../_models/organization';
@@ -7,7 +7,8 @@ import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';
 import {StudyInvestigator} from '../_models/study_investigator';
 import {ApiService} from '../_services/api/api.service';
-import {Investigator} from '../_models/investigator';
+import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 
 enum PageState {
@@ -267,7 +268,8 @@ export class StudyFormComponent implements OnInit {
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private deviceDetectorService: DeviceDetectorService,
   ) {
     this.getOrganizations();
   }
@@ -452,5 +454,16 @@ export class StudyFormComponent implements OnInit {
 
   onCancel() {
     this.close();
+  }
+
+
+  highlightRequiredFields() {
+    for (const fieldName of Object.keys(this.form.controls)) {
+      const field: AbstractControl = this.form.controls[fieldName];
+      field.updateValueAndValidity();
+      field.markAsDirty();
+    }
+
+    scrollToFirstInvalidField(this.deviceDetectorService);
   }
 }
