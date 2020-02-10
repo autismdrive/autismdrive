@@ -104,6 +104,9 @@
                 <mat-radio-button value="Event Date">Happening Soon
                   <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
                 </mat-radio-button>
+                <mat-radio-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" value="Drafts">Drafts
+                  <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
               </mat-radio-group>
             </div>
 
