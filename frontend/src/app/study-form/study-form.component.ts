@@ -90,6 +90,9 @@ export class StudyFormComponent implements OnInit {
         label: 'Participant Description',
         placeholder: 'Who are you looking for to participate in your study?',
       },
+      expressionProperties: {
+        'templateOptions.required': 'model.status === "currently_enrolling"'
+      }
     },
     {
       key: 'benefit_description',
@@ -98,6 +101,9 @@ export class StudyFormComponent implements OnInit {
         label: 'Benefit Description',
         placeholder: 'How will participants benefit from your study?',
       },
+      expressionProperties: {
+        'templateOptions.required': 'model.status === "currently_enrolling"'
+      }
     },
     {
       key: 'investigators',
@@ -107,6 +113,7 @@ export class StudyFormComponent implements OnInit {
         options: [],
         valueProp: 'id',
         labelProp: 'name',
+        required: true,
         multiple: true,
       },
       hooks: {
@@ -192,6 +199,9 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Coordinator Email',
         placeholder: 'Please enter the email address to which study inquires will be sent',
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.status === "currently_enrolling"'
       },
       validators: {'validation': ['email']},
     },
