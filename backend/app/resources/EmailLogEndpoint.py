@@ -3,8 +3,8 @@ import flask_restful
 from app import db, auth
 from app.model.email_log import EmailLog
 from app.schema.schema import EmailLogSchema
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Role, Permission
+from app.wrappers import requires_roles, requires_permission
 
 
 class EmailLogListEndpoint(flask_restful.Resource):
@@ -21,7 +21,7 @@ class EmailLogListEndpoint(flask_restful.Resource):
 class EmailLogEndpoint(flask_restful.Resource):
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
         schema = EmailLogSchema(many=True)
         logs = db.session.query(EmailLog)\

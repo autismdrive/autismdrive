@@ -9,8 +9,8 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import LocationSchema
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Permission
+from app.wrappers import requires_permission
 
 
 class LocationEndpoint(flask_restful.Resource):
@@ -23,7 +23,7 @@ class LocationEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.delete_resource)
     def delete(self, id):
         location = db.session.query(Location).filter_by(id=id).first()
         location_id = location.id
@@ -39,7 +39,7 @@ class LocationEndpoint(flask_restful.Resource):
         return None
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Location).filter_by(id=id).first()
@@ -69,7 +69,7 @@ class LocationListEndpoint(flask_restful.Resource):
         return self.locationsSchema.dump(locations)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.create_resource)
     def post(self):
         request_data = request.get_json()
         try:

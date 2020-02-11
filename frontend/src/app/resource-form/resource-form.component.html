@@ -23,18 +23,27 @@
 
     <div
       class="button-row"
+      fxLayout="row"
       fxLayoutGap="2em"
     >
       <button
         *ngIf="form"
         mat-flat-button
         type="button"
-        (click)="submit()"
+        (click)="saveDraft()"
         color="primary"
-        [disabled]="!form.valid"
-        id="save-next-button"
-      >Save</button>
-
+        id="save-draft-button"
+      >Save As Draft</button>
+      <div *ngIf="currentUser && currentUser.permissions.includes('publish_resource')">
+        <button
+          *ngIf="form"
+          mat-flat-button
+          type="button"
+          (click)="savePublish()"
+          color="primary"
+          id="save-publish-button"
+        >Save & Publish</button>
+      </div>
       <button
         *ngIf="form"
         mat-flat-button

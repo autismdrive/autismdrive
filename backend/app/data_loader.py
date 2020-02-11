@@ -8,7 +8,6 @@ from app.model.event import Event
 from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
-from app.model.search import Search
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
@@ -70,7 +69,7 @@ class DataLoader:
                 event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
                               organization=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
                               street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
-                              phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
+                              phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[], is_draft=False)
                 items.append(event)
                 self.__increment_id_sequence(Resource)
 
@@ -110,7 +109,7 @@ class DataLoader:
                 location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
                                     street_address1=row[8], street_address2=row[9], city=row[10], state=row[11],
                                     zip=row[12], website=row[14], email=row[15], phone=row[16],
-                                    latitude=geocode['lat'], longitude=geocode['lng'], ages=[])
+                                    latitude=geocode['lat'], longitude=geocode['lng'], ages=[], is_draft=False)
 
                 self.__increment_id_sequence(Resource)
 
@@ -142,7 +141,7 @@ class DataLoader:
             for row in reader:
                 org = self.get_org_by_name(row[4]) if row[4] else None
                 resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
-                                    phone=row[6], ages=[])
+                                    phone=row[6], ages=[], is_draft=False)
 
                 for i in range(15, len(row)):
                     if row[i]:

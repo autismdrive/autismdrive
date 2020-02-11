@@ -5,7 +5,7 @@ import { User } from '../_models/user';
 
 
 @Injectable({ providedIn: 'root' })
-export class AdminGuard implements CanActivate {
+export class RoleGuard implements CanActivate {
 
   private currentUser: User;
 
@@ -17,14 +17,16 @@ export class AdminGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-      if (!this.currentUser) {
-        this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-        return false;
-      } else if (this.currentUser.role !== 'admin') {
-        this.router.navigate(['/profile']);
-        return false;
-      } else {
-        return true;
-      }
+    let roles = route.data["roles"] as Array<string>;
+
+    if (!this.currentUser) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+      return false;
+    } else if (!roles.includes(this.currentUser.role)) {
+      this.router.navigate(['/profile']);
+      return false;
+    } else {
+      return true;
+    }
   }
 }

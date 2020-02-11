@@ -59,7 +59,7 @@
     <h1 *ngIf="!selectedType" fragment="filter-top">
       All Resources
     </h1>
-    <app-add-button *ngIf="currentUser && currentUser.role == 'admin'" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
+    <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_resource')" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
     <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="80px" fxLayoutAlign="space-evenly start">
       <div fxLayout="column">
         <mat-accordion displayMode="flat">
@@ -102,6 +102,9 @@
                   <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
                 </mat-radio-button>
                 <mat-radio-button value="Event Date">Happening Soon
+                  <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
+                </mat-radio-button>
+                <mat-radio-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" value="Drafts">Drafts
                   <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
                 </mat-radio-button>
               </mat-radio-group>

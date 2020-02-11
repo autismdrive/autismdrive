@@ -20,6 +20,7 @@ class Resource(db.Model):
     contact_email = db.Column(db.String)
     video_code = db.Column(db.String)
     is_uva_education_content = db.Column(db.Boolean)
+    is_draft = db.Column(db.Boolean)
     ages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
 

@@ -85,7 +85,7 @@ class Sort:
 class Hit:
 
     def __init__(self, result_id, content, description, title, doc_type, label, date, last_updated, highlights, latitude,
-                 longitude, status, no_address):
+                 longitude, status, no_address, is_draft):
         self.id = result_id
         self.content = content
         self.description = description
@@ -99,6 +99,7 @@ class Hit:
         self.longitude = longitude
         self.status = status
         self.no_address = no_address
+        self.is_draft = is_draft
 
 
 class MapHit:

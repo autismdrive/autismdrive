@@ -11,6 +11,7 @@ export class User {
   registration_date?: Date;
   token?: string;
   role?: string;
+  permissions?: string[];
   email_log?: EmailLog[];
   token_url?: string;
 

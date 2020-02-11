@@ -4,8 +4,12 @@ import {ResourceCategory} from '../_models/resource_category';
 import {ApiService} from '../_services/api/api.service';
 import {Resource} from '../_models/resource';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup} from '@angular/forms';
 import {Organization} from '../_models/organization';
+import {User} from '../_models/user';
+import {AuthenticationService} from '../_services/api/authentication-service';
+import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 
 enum PageState {
@@ -24,6 +28,7 @@ export class ResourceFormComponent implements OnInit {
   pageState = PageState;
   state = PageState.LOADING;
   showConfirmDelete = false;
+  currentUser: User;
 
   model: any = {};
   form: FormGroup;
@@ -254,8 +259,13 @@ export class ResourceFormComponent implements OnInit {
 
   constructor(private api: ApiService,
               private route: ActivatedRoute,
-              private router: Router) {
+              private router: Router,
+              private authenticationService: AuthenticationService,
+              private deviceDetectorService: DeviceDetectorService,
+              ) {
     this.getOrganizations();
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+
   }
 
   ngOnInit() {
@@ -396,5 +406,26 @@ export class ResourceFormComponent implements OnInit {
 
   onCancel() {
     this.close();
+  }
+
+  saveDraft() {
+    this.model.is_draft = true;
+    this.form.valid ? this.submit() : this.highlightRequiredFields();
+  }
+
+  savePublish() {
+    this.model.is_draft = false;
+    this.form.valid ? this.submit() : this.highlightRequiredFields();
+  }
+
+
+  highlightRequiredFields() {
+    for (const fieldName of Object.keys(this.form.controls)) {
+      const field: AbstractControl = this.form.controls[fieldName];
+      field.updateValueAndValidity();
+      field.markAsDirty();
+    }
+
+    scrollToFirstInvalidField(this.deviceDetectorService);
   }
 }

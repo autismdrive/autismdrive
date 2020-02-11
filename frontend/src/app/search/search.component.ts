@@ -96,6 +96,14 @@ export class SearchComponent implements OnInit, OnDestroy {
         order: 'asc'
       }
     },
+    {
+      name: 'Drafts',
+      label: 'Drafts',
+      sortQuery: {
+        field: 'is_draft',
+        order: 'desc'
+      }
+    },
   ];
   selectedSort: SortMethod;
   pageEvent: PageEvent;

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {Organization} from '../_models/organization';
@@ -7,7 +7,8 @@ import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';
 import {StudyInvestigator} from '../_models/study_investigator';
 import {ApiService} from '../_services/api/api.service';
-import {Investigator} from '../_models/investigator';
+import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 
 enum PageState {
@@ -30,6 +31,21 @@ export class StudyFormComponent implements OnInit {
   model: any = {};
   form: FormGroup;
   fields: FormlyFieldConfig[] = [
+    {
+      key: 'status',
+      type: 'select',
+      templateOptions: {
+        label: 'Study Status',
+        placeholder: 'Please select the study status',
+        options: [
+          {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
+          {'value': 'study_in_progress', 'label': 'Study in progress'},
+          {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
+          {'value': 'study_results_published', 'label': 'Study results published'}
+        ],
+        required: true,
+      },
+    },
     {
       key: 'title',
       type: 'input',
@@ -75,6 +91,9 @@ export class StudyFormComponent implements OnInit {
         label: 'Participant Description',
         placeholder: 'Who are you looking for to participate in your study?',
       },
+      expressionProperties: {
+        'templateOptions.required': 'model.status === "currently_enrolling"'
+      }
     },
     {
       key: 'benefit_description',
@@ -83,6 +102,9 @@ export class StudyFormComponent implements OnInit {
         label: 'Benefit Description',
         placeholder: 'How will participants benefit from your study?',
       },
+      expressionProperties: {
+        'templateOptions.required': 'model.status === "currently_enrolling"'
+      }
     },
     {
       key: 'investigators',
@@ -92,6 +114,7 @@ export class StudyFormComponent implements OnInit {
         options: [],
         valueProp: 'id',
         labelProp: 'name',
+        required: true,
         multiple: true,
       },
       hooks: {
@@ -172,26 +195,14 @@ export class StudyFormComponent implements OnInit {
       },
     },
     {
-      key: 'status',
-      type: 'select',
-      templateOptions: {
-        label: 'Study Status',
-        placeholder: 'Please select the study status',
-        options: [
-          {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
-          {'value': 'study_in_progress', 'label': 'Study in progress'},
-          {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
-          {'value': 'study_results_published', 'label': 'Study results published'}
-        ],
-        required: true,
-      },
-    },
-    {
       key: 'coordinator_email',
       type: 'input',
       templateOptions: {
         label: 'Coordinator Email',
         placeholder: 'Please enter the email address to which study inquires will be sent',
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.status === "currently_enrolling"'
       },
       validators: {'validation': ['email']},
     },
@@ -257,7 +268,8 @@ export class StudyFormComponent implements OnInit {
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private deviceDetectorService: DeviceDetectorService,
   ) {
     this.getOrganizations();
   }
@@ -442,5 +454,16 @@ export class StudyFormComponent implements OnInit {
 
   onCancel() {
     this.close();
+  }
+
+
+  highlightRequiredFields() {
+    for (const fieldName of Object.keys(this.form.controls)) {
+      const field: AbstractControl = this.form.controls[fieldName];
+      field.updateValueAndValidity();
+      field.markAsDirty();
+    }
+
+    scrollToFirstInvalidField(this.deviceDetectorService);
   }
 }

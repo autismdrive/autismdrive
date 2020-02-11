@@ -16,13 +16,14 @@ from app.model.location import Location
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.resource_change_log import ResourceChangeLog
+from app.model.role import Role
 from app.model.search import Search, Sort
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser, StudyUserStatus
-from app.model.user import User, Role
+from app.model.user import User
 from app.model.zip_code import ZipCode
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
@@ -71,11 +72,18 @@ class UserSchema(ModelSchema):
     class Meta:
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'email', 'password', 'role',
-                  'participants', 'token', 'token_url')
+                  'permissions', 'participants', 'token', 'token_url')
     password = fields.String(load_only=True)
     participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
+    permissions = fields.Method('get_permissions', dump_only=True)
+
+    def get_permissions(self, obj):
+        permissions = []
+        for p in obj.role.permissions():
+            permissions.append(p.name)
+        return permissions
 
 
 class UsersOnStudySchema(ModelSchema):
@@ -285,7 +293,7 @@ class ResourceSchema(ModelSchema):
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'ages', '_links')
+                  'is_draft', 'ages', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
@@ -337,8 +345,8 @@ class EventSchema(ModelSchema):
         model = Event
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'organization',
-                  'resource_categories', 'latitude', 'longitude',  'ages', '_links')
+                  'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
+                  'organization', 'resource_categories', 'latitude', 'longitude',  'ages', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -392,7 +400,7 @@ class LocationSchema(ModelSchema):
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'latitude', 'longitude', '_links', 'ages')
+                  'latitude', 'longitude', '_links', 'ages', 'is_draft')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -559,6 +567,7 @@ class SearchSchema(ma.Schema):
         date = fields.Date(missing=None)
         status = fields.Str(missing=None)
         no_address = fields.Boolean(missing=None)
+        is_draft = fields.Boolean(missing=None)
 
     class SortSchema(ma.Schema):
         field = fields.Str(allow_null=True)

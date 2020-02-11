@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from '../_services/api/api.service';
 import {Hit, Query} from '../_models/query';
-import {HitType} from '../_models/hit_type';
-import {StudyStatus} from '../_models/study';
+import {Study, StudyStatus} from '../_models/study';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {User} from '../_models/user';
 
@@ -40,18 +39,34 @@ export class StudiesComponent implements OnInit {
   }
 
   loadStudies() {
-    const query = new Query({
-      status: this.selectedStatus.name
-    });
-    this.api.searchStudies(query).subscribe(q => {
-      this.query = new Query(q);
-      this.studyHits = this.query.hits.filter(h => h.status === this.selectedStatus.label);
-    });
+    this.api.getStudies().subscribe(studies => {
+      this.studyHits = this._studiesToHits(studies.filter(s => s.status === this.selectedStatus.name))
+    })
   }
 
   selectStatus(status: StudyStatusObj) {
     this.selectedStatus = status;
     this.loadStudies();
+  }
+
+   private _studiesToHits(studies: Study[]): Hit[] {
+      return studies
+        .sort((a, b) => (a.id > b.id) ? 1 : -1)
+        .map(s => {
+          return new Hit({
+            id: s.id,
+            type: 'study',
+            ages: s.ages,
+            title: s.short_title,
+            content: s.description,
+            description: s.short_description,
+            last_updated: s.last_updated,
+            highlights: null,
+            url: `/study/${s.id}`,
+            label: 'Research Studies',
+            status: this.studyStatuses.find(stat => stat.name === s.status).label
+          });
+        });
   }
 
 }

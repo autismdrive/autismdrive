@@ -4,7 +4,7 @@ from sqlalchemy import desc
 
 from app import db, auth
 from app.model.data_transfer_log import DataTransferLogPageSchema, DataTransferLog
-from app.model.user import Role
+from app.model.role import Role
 from app.wrappers import requires_roles
 
 

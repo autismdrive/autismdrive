@@ -13,8 +13,8 @@ from app.model.resource_change_log import ResourceChangeLog
 from app.schema.schema import ResourceSchema
 from app.model.event import Event
 from app.model.location import Location
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Permission
+from app.wrappers import requires_permission
 
 
 class ResourceEndpoint(flask_restful.Resource):
@@ -27,7 +27,7 @@ class ResourceEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.delete_resource)
     def delete(self, id):
         resource = db.session.query(Resource).filter_by(id=id).first()
         resource_id = resource.id
@@ -48,7 +48,7 @@ class ResourceEndpoint(flask_restful.Resource):
         return None
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Resource).filter_by(id=id).first()
@@ -78,7 +78,7 @@ class ResourceListEndpoint(flask_restful.Resource):
         return self.resourcesSchema.dump(resources)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.create_resource)
     def post(self):
         request_data = request.get_json()
         try:
@@ -97,3 +97,12 @@ class ResourceListEndpoint(flask_restful.Resource):
                                 user_email=g.user.email, type=change_type)
         db.session.add(log)
         db.session.commit()
+
+
+class EducationResourceListEndpoint(flask_restful.Resource):
+
+    resourcesSchema = ResourceSchema(many=True)
+
+    def get(self):
+        resources = db.session.query(Resource).filter_by(is_uva_education_content=True).all()
+        return self.resourcesSchema.dump(resources)

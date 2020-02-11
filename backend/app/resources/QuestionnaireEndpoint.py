@@ -9,8 +9,8 @@ from app import app, db, RestException, auth
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
 from app.model.export_info import ExportInfoSchema
-from app.model.user import Role
-from app.wrappers import requires_roles
+from app.model.role import Permission
+from app.wrappers import requires_permission
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -68,7 +68,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 class QuestionnaireListEndpoint(flask_restful.Resource):
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.data_admin)
     def get(self, name):
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
@@ -130,7 +130,7 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
                request.accept_mimetypes['text/html']
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.data_admin)
     def get(self, name):
         name = ExportService.camel_case_it(name)
         if self.request_wants_json():
@@ -151,7 +151,7 @@ class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
                request.accept_mimetypes['text/html']
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.user_detail_admin)
     def get(self, name, user_id):
         name = ExportService.camel_case_it(name)
         if self.request_wants_json():

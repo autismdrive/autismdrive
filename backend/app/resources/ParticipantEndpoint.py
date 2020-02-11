@@ -6,9 +6,9 @@ from sqlalchemy import func
 
 from app import RestException, db, auth
 from app.model.participant import Participant
-from app.model.user import Role
+from app.model.role import Role, Permission
 from app.schema.schema import ParticipantSchema
-from app.wrappers import requires_roles
+from app.wrappers import requires_roles, requires_permission
 
 
 class ParticipantEndpoint(flask_restful.Resource):
@@ -49,7 +49,7 @@ class ParticipantListEndpoint(flask_restful.Resource):
     schema = ParticipantSchema(many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.participant_admin)
     def get(self):
         participants = db.session.query(Participant).all()
         return self.schema.dump(participants)
@@ -62,7 +62,7 @@ class ParticipantAdminListEndpoint(flask_restful.Resource):
         return query.session.execute(count_q).scalar()
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_permission(Permission.participant_admin)
     def get(self):
         participant_list = {
             'num_self_participants': self.count_participants('self_participant'),
