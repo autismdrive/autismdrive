@@ -79,6 +79,9 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Event Date',
       },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
+      },
       hideExpression: 'model.type != "event"',
     },
     {
@@ -87,6 +90,9 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Event Time',
         placeholder: 'Please enter the start time or time-frame for your event',
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
       },
       hideExpression: 'model.type != "event"',
     },
@@ -228,6 +234,7 @@ export class ResourceFormComponent implements OnInit {
       type: 'multiselecttree',
       templateOptions: {
         label: 'Topics',
+        description: 'This field is required',
         options: this.api.getCategoryTree(),
         valueProp: 'id',
         labelProp: 'name',
