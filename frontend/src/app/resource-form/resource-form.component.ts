@@ -379,10 +379,22 @@ export class ResourceFormComponent implements OnInit {
   }
 
   updateAndClose(apiCall) {
+    this.setDateTime();
     apiCall.subscribe(r => {
       this.updatedResource = r;
       this.updateResourceCategories(r.id).subscribe(() => this.close());
     });
+  }
+
+  setDateTime() {
+    if (this.model.date) {
+      if (this.model.date instanceof Date) {
+          this.model.date.setHours(12);
+      } else {
+        this.model.date = new Date(this.model.date);
+        this.model.date.setHours(12);
+      }
+    }
   }
 
   showDelete() {

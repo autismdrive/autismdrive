@@ -1,8 +1,3 @@
-import datetime
-
-from dateutil.tz import tzutc
-from sqlalchemy import func
-
 from app import db
 from app.model.location import Location
 
