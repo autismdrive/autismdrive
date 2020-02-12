@@ -403,6 +403,18 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Add Category */
+  addCategory(category: Category): Observable<Category> {
+    return this.httpClient.post<Category>(this._endpointUrl('categoryList'), category)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update Category */
+  updateCategory(category: Category): Observable<Category> {
+    return this.httpClient.put<Category>(this._endpointUrl('category').replace('<id>', category.id.toString()), category)
+      .pipe(catchError(this._handleError));
+  }
+
   /** Add Investigator */
   addInvestigator(investigator: Investigator): Observable<Investigator> {
     return this.httpClient.post<Investigator>(this._endpointUrl('investigatorList'), investigator)
