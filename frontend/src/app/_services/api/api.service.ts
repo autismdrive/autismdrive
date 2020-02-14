@@ -409,12 +409,6 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
-  /** Update Category */
-  updateCategory(category: Category): Observable<Category> {
-    return this.httpClient.put<Category>(this._endpointUrl('category').replace('<id>', category.id.toString()), category)
-      .pipe(catchError(this._handleError));
-  }
-
   /** Delete Category */
   deleteCategory(category_id: number): Observable<Category> {
     return this.httpClient.delete<Category>(this._endpointUrl('category').replace('<id>', category_id.toString()))
