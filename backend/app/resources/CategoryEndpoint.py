@@ -3,11 +3,13 @@ from flask import request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app import db, RestException
+from app import auth, db, RestException
 from app.model.category import Category
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
 from app.schema.schema import CategorySchema, ParentCategorySchema
+from app.model.role import Permission
+from app.wrappers import requires_permission
 
 
 class CategoryEndpoint(flask_restful.Resource):
@@ -18,6 +20,8 @@ class CategoryEndpoint(flask_restful.Resource):
         if category is None: raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(category)
 
+    @auth.login_required
+    @requires_permission(Permission.taxonomy_admin)
     def delete(self, id):
         try:
             db.session.query(StudyCategory).filter_by(category_id=id).delete()
@@ -29,6 +33,8 @@ class CategoryEndpoint(flask_restful.Resource):
             raise RestException(RestException.CAN_NOT_DELETE)
         return
 
+    @auth.login_required
+    @requires_permission(Permission.taxonomy_admin)
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Category).filter_by(id=id).first()
@@ -51,6 +57,8 @@ class CategoryListEndpoint(flask_restful.Resource):
             .all()
         return self.categories_schema.dump(categories)
 
+    @auth.login_required
+    @requires_permission(Permission.taxonomy_admin)
     def post(self):
         request_data = request.get_json()
         new_cat, errors = self.category_schema.load(request_data)

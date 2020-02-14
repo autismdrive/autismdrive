@@ -5,6 +5,8 @@ import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {of} from 'rxjs';
 import {Category} from '../_models/category';
 import {ApiService} from '../_services/api/api.service';
+import {User} from '../_models/user';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-taxonomy-admin',
@@ -18,15 +20,18 @@ export class TaxonomyAdminComponent implements OnInit {
   dataLoaded = false;
   nodes = {};
   showConfirmDelete = false;
+  currentUser: User;
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
 
   constructor(
-    private api: ApiService
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
   ) {
     this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
     this.dataSource = new MatTreeNestedDataSource();
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.getCategoryTree();
   }
 

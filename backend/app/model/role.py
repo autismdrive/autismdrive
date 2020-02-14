@@ -14,6 +14,7 @@ class Permission(enum.Enum):
     data_admin = "Visit Data Admin"
     user_detail_admin = "User Admin Data Details"
     export_status = "View Export Status"
+    taxonomy_admin = "Visit Taxonomy Admin"
 
     # keep user_roles and delete_user last to keep off of test user permissions
     delete_user = "Delete User"
