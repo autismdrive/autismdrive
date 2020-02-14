@@ -27,10 +27,10 @@ export class TaxonomyAdminComponent implements OnInit {
   ) {
     this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
     this.dataSource = new MatTreeNestedDataSource();
+    this.getCategoryTree();
   }
 
   ngOnInit() {
-    this.getCategoryTree();
   }
 
   getCategoryTree() {
@@ -74,24 +74,28 @@ export class TaxonomyAdminComponent implements OnInit {
   saveNode(node: Category, itemValue: string) {
     node.name = itemValue;
     this.api.addCategory(node).subscribe(cat => {
+      this.treeControl.collapseAll();
       this.getCategoryTree();
       window.scroll(0, 0);
     });
   }
-
 
   showDelete() {
     this.showConfirmDelete = true;
   }
 
   onDelete() {
-    this.checklistSelection.selected.forEach(cat => {
-      console.log('cat', cat);
-      this.api.deleteCategory(cat.id).subscribe();
+    let itemsProcessed = 0;
+    this.checklistSelection.selected.forEach((cat, index, array) => {
+      this.api.deleteCategory(cat.id).subscribe(cat => {
+        itemsProcessed++;
+        if (itemsProcessed === array.length) {
+          this.treeControl.collapseAll();
+          this.getCategoryTree();
+          window.scroll(0, 0);
+        }
+      });
     });
-
-    this.getCategoryTree();
-    window.scroll(0, 0);
   }
 
 }
