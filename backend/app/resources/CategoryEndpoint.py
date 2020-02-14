@@ -5,6 +5,8 @@ from sqlalchemy.orm import joinedload
 
 from app import db, RestException
 from app.model.category import Category
+from app.model.study_category import StudyCategory
+from app.model.resource_category import ResourceCategory
 from app.schema.schema import CategorySchema, ParentCategorySchema
 
 
@@ -18,7 +20,11 @@ class CategoryEndpoint(flask_restful.Resource):
 
     def delete(self, id):
         try:
-            db.session.query(Category).filter(Category.id == id).delete()
+            db.session.query(StudyCategory).filter_by(category_id=id).delete()
+            db.session.query(ResourceCategory).filter_by(category_id=id).delete()
+            db.session.query(Category).filter_by(parent_id=id).delete()
+            db.session.query(Category).filter_by(id=id).delete()
+            db.session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)
         return
@@ -30,6 +36,7 @@ class CategoryEndpoint(flask_restful.Resource):
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         db.session.add(updated)
+        db.session.commit()
         return self.schema.dump(updated)
 
 

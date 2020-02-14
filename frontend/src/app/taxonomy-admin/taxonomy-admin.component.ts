@@ -2,7 +2,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {Component, OnInit} from '@angular/core';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {Observable, of} from 'rxjs';
+import {of} from 'rxjs';
 import {Category} from '../_models/category';
 import {ApiService} from '../_services/api/api.service';
 
@@ -17,6 +17,7 @@ export class TaxonomyAdminComponent implements OnInit {
   dataSource: MatTreeNestedDataSource<Category>;
   dataLoaded = false;
   nodes = {};
+  showConfirmDelete = false;
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
@@ -29,43 +30,18 @@ export class TaxonomyAdminComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getCategoryTree();
+  }
+
+  getCategoryTree() {
     this.api.getCategoryTree().subscribe((categories: Category[]) => {
       this.dataSource.data = categories;
-      this.categories = categories;
-      this.updateSelection();
     });
-  }
-
-  updateSelection() {
-    // if (this.isReady()) {
-      // if (this.model.categories) {
-      //   this.model.categories.forEach(cat => {
-      //     const node = this.findNode(cat);
-      //     if (node) {
-      //       this.checklistSelection.toggle(node);
-      //     }
-      //     this._updateModelCategories();
-      //   });
-      // }
-      this.dataLoaded = true;
-    // }
-  }
-
-  findNode(cat: Category) {
-    const allNodes = [];
-
-    this.dataSource.data.forEach(dataCat => {
-      const descendants = this.treeControl.getDescendants(dataCat);
-      descendants.forEach(d => allNodes.push(d));
-      allNodes.push(dataCat);
-
-    });
-    return allNodes.find(i => i.id === cat.id);
   }
 
   hasNestedChild = (_: number, node: Category) => {
     return (node.children && (node.children.length > 0));
-  }
+  };
 
   /** Whether all the descendants of the node are selected */
   descendantsAllSelected(node: Category): boolean {
@@ -93,55 +69,42 @@ export class TaxonomyAdminComponent implements OnInit {
     this.checklistSelection.isSelected(node)
       ? this.checklistSelection.select(...descendants)
       : this.checklistSelection.deselect(...descendants);
-
-    this._updateModelCategories();
-  }
-
-  // isReady(): boolean {
-  //   return !!(
-  //     this.field &&
-  //     this.field.form &&
-  //     this.field.form.controls
-  //   );
-  // }
-
-  /** Toggle the to-do item selection. Select/deselect all the descendants node */
-  toggleParentNode(node: Category): void {
-    this.checklistSelection.toggle(node);
-    const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
-
-    // Force update for the parent
-    descendants.every(child =>
-      this.checklistSelection.isSelected(child)
-    );
-
-    this._updateModelCategories();
-  }
-
-  private _updateModelCategories() {
-    // this.model.categories = [];
-    // this.checklistSelection.selected.forEach(c => this.model.categories[c.id] = true);
   }
 
   hasNoContent = (_: number, _nodeData: Category) => _nodeData.name === '';
 
   /** Select the category so we can insert the new item. */
   addNewItem(node: Category) {
-    this.api.addCategory({'name': '', 'parent': node}).subscribe();
-    // const data = this.dataSource.data;
-    // data.push({'name': '', 'parent': node});
-    // this.dataSource.data = data;
+    const data = this.dataSource.data;
+    data.push({'name': '', 'parent': node, 'parent_id': node.id});
+    this.dataSource.data = data;
     this.treeControl.expand(node);
+    const el: HTMLElement = document.querySelector('.global-footer');
+    window.scroll(0, el.offsetTop);
   }
 
   /** Save the node to database */
   saveNode(node: Category, itemValue: string) {
-    // const nestedNode = this.flatNodeMap.get(node);
-    // this._database.updateItem(nestedNode!, itemValue);
     node.name = itemValue;
-    this.api.updateCategory(node).subscribe();
+    this.api.addCategory(node).subscribe(cat => {
+      this.getCategoryTree();
+      window.scroll(0, 0);
+    });
   }
+
+
+  showDelete() {
+    this.showConfirmDelete = true;
+  }
+
+  onDelete() {
+    this.checklistSelection.selected.forEach(cat => {
+      console.log('cat', cat);
+      this.api.deleteCategory(cat.id).subscribe();
+    });
+
+    this.getCategoryTree();
+    window.scroll(0, 0);
+  }
+
 }

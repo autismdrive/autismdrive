@@ -405,13 +405,19 @@ export class ApiService {
 
   /** Add Category */
   addCategory(category: Category): Observable<Category> {
-    return this.httpClient.post<Category>(this._endpointUrl('categoryList'), category)
+    return this.httpClient.post<Category>(this._endpointUrl('categorylist'), category)
       .pipe(catchError(this._handleError));
   }
 
   /** Update Category */
   updateCategory(category: Category): Observable<Category> {
     return this.httpClient.put<Category>(this._endpointUrl('category').replace('<id>', category.id.toString()), category)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete Category */
+  deleteCategory(category_id: number): Observable<Category> {
+    return this.httpClient.delete<Category>(this._endpointUrl('category').replace('<id>', category_id.toString()))
       .pipe(catchError(this._handleError));
   }
 

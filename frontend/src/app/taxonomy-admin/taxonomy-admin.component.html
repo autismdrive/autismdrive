@@ -1,4 +1,6 @@
 <h1>Topics Taxonomy</h1>
+<p>To add a topic, click the plus sign next to the parent topic and fill in the name</p>
+<p>To delete topics, select the check boxes next to the ones you wish to delete and click the delete button</p>
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="tree-select">
   <!-- Child node-->
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
@@ -6,7 +8,7 @@
       <!-- use a disabled button to provide padding for tree leaf -->
       <button disabled mat-icon-button></button>
       <mat-checkbox (change)="toggleNode(node)" [checked]="checklistSelection.isSelected(node)"
-                    [indeterminate]="descendantsPartiallySelected(node)">{{node.name}}</mat-checkbox>
+                    >{{node.name}}</mat-checkbox>
     </li>
   </mat-tree-node>
 
@@ -36,9 +38,8 @@
         </button>
 
         <mat-checkbox
-          (change)="toggleParentNode(node)"
+          (change)="toggleNode(node)"
           [checked]="checklistSelection.isSelected(node)"
-          [indeterminate]="descendantsPartiallySelected(node)"
         >
             <span
               *ngIf="numSelectedDescendants(node)"
@@ -56,3 +57,28 @@
     </li>
   </mat-nested-tree-node>
 </mat-tree>
+
+<div
+  class="button-row"
+  fxLayout="row"
+  fxLayoutGap="2em"
+>
+  <button
+    type="button"
+    mat-flat-button
+    *ngIf="!showConfirmDelete"
+    (click)="showDelete()"
+    color="warn"
+    id="delete-button"
+  >Delete Selected Topics</button>
+
+  <button
+    *ngIf="showConfirmDelete"
+    id="confirm_delete"
+    type="button"
+    mat-flat-button
+    (click)="onDelete()"
+    color="warn"
+  >Permanently Delete Selected Topics!!!
+  </button>
+</div>

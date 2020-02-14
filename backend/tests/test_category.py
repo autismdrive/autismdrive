@@ -44,16 +44,26 @@ class TestCategory(BaseTest, unittest.TestCase):
         self.assertEqual(response['parent']['name'], 'Strange Kitchen Gadgets')
 
     def test_delete_category(self):
-        c = self.construct_category()
+        self.construct_category(name="Unicorns")
+        self.construct_category(name="Typewriters")
+        c = self.construct_category(name="Pianos")
         c_id = c.id
         rv = self.app.get('api/category/%i' % c_id, content_type="application/json")
         self.assert_success(rv)
+        rv = self.app.get('api/category', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
 
         rv = self.app.delete('api/category/%i' % c_id, content_type="application/json")
         self.assert_success(rv)
 
         rv = self.app.get('api/category/%i' % c_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
+        rv = self.app.get('api/category', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, len(response))
 
     def test_create_category(self):
         category = {'name': "My Favorite Things"}
