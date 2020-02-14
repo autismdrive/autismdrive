@@ -43,26 +43,13 @@ export class TaxonomyAdminComponent implements OnInit {
     return (node.children && (node.children.length > 0));
   };
 
-  /** Whether all the descendants of the node are selected */
-  descendantsAllSelected(node: Category): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    return descendants.every(child => this.checklistSelection.isSelected(child));
-  }
-
-  /** Whether part of the descendants are selected */
-  descendantsPartiallySelected(node: Category): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    const result = descendants.some(child => this.checklistSelection.isSelected(child));
-    return result && !this.descendantsAllSelected(node);
-  }
-
   numSelectedDescendants(node: Category): number {
     const descendants: Category[] = this.treeControl.getDescendants(node);
     const selectedDescendants = descendants.filter(d => this.checklistSelection.isSelected(d));
     return selectedDescendants.length;
   }
 
-  /** Toggle the to-do item selection. Select/deselect all the descendants node */
+  /** Toggle the category item selection. Select/deselect all the descendants node */
   toggleNode(node: Category): void {
     this.checklistSelection.toggle(node);
     const descendants = this.treeControl.getDescendants(node);
