@@ -33,8 +33,9 @@ class TestCategory(BaseTest, unittest.TestCase):
         response['name'] = 'JellyBoxes'
         new_parent = self.construct_category(name="Strange Kitchen Gadgets")
         response['parent_id'] = new_parent.id
-        rv = self.app.put('/api/category/%i' % c_id, data=json.dumps(response), content_type="application/json",
-                          follow_redirects=True)
+        rv = self.app.put('/api/category/%i' % c_id, data=json.dumps(response),
+                          content_type="application/json", follow_redirects=True,
+                          headers=self.logged_in_headers())
         self.assert_success(rv)
         db.session.commit()
         rv = self.app.get('/api/category/%i' % c_id, content_type="application/json")
@@ -55,7 +56,9 @@ class TestCategory(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(3, len(response))
 
-        rv = self.app.delete('api/category/%i' % c_id, content_type="application/json")
+        rv = self.app.delete('api/category/%i' % c_id,
+                             content_type="application/json",
+                             headers=self.logged_in_headers())
         self.assert_success(rv)
 
         rv = self.app.get('api/category/%i' % c_id, content_type="application/json")
@@ -65,10 +68,40 @@ class TestCategory(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(2, len(response))
 
+    def test_delete_category_deletes_descendants(self):
+        wool = self.construct_category(name='wool')
+        yarn = self.construct_category(name='yarn', parent=wool)
+        self.construct_category(name='roving', parent=wool)
+        self.construct_category(name='worsted weight', parent=yarn)
+        self.construct_category(name='sport weight', parent=yarn)
+
+        rv = self.app.get('api/category/root', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(2, len(response[0]['children']))
+
+        rv = self.app.get('api/category', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(5, len(response))
+
+        rv = self.app.delete('api/category/%i' % wool.id,
+                             content_type="application/json",
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/category', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
     def test_create_category(self):
         category = {'name': "My Favorite Things"}
-        rv = self.app.post('api/category', data=json.dumps(category), content_type="application/json",
-                           follow_redirects=True)
+        rv = self.app.post('api/category', data=json.dumps(category),
+                           content_type="application/json",
+                           follow_redirects=True,
+                           headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['name'], 'My Favorite Things')

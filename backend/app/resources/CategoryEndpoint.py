@@ -24,14 +24,21 @@ class CategoryEndpoint(flask_restful.Resource):
     @requires_permission(Permission.taxonomy_admin)
     def delete(self, id):
         try:
+            cat = db.session.query(Category).filter_by(id=id).first()
+            self.delete_descendants(cat)
             db.session.query(StudyCategory).filter_by(category_id=id).delete()
             db.session.query(ResourceCategory).filter_by(category_id=id).delete()
-            db.session.query(Category).filter_by(parent_id=id).delete()
             db.session.query(Category).filter_by(id=id).delete()
             db.session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)
         return
+
+    def delete_descendants(self, category):
+        if category.children:
+            for cat in category.children:
+                self.delete_descendants(cat)
+                db.session.query(Category).filter_by(id=cat.id).delete()
 
     @auth.login_required
     @requires_permission(Permission.taxonomy_admin)
