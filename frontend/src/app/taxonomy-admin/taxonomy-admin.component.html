@@ -11,7 +11,7 @@
         <mat-checkbox
           (change)="toggleNode(node)"
           [checked]="checklistSelection.isSelected(node)"
-        >{{node.name}}</mat-checkbox>
+        >{{node.name}} ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)</mat-checkbox>
         <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
       </li>
     </mat-tree-node>
@@ -50,8 +50,8 @@
                 matBadge="{{numSelectedDescendants(node)}}"
                 matBadgeColor="accent"
                 matBadgeOverlap="false"
-              >{{node.name}}</span>
-            <span *ngIf="!numSelectedDescendants(node)">{{node.name}}</span>
+              >{{node.name}} ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)</span>
+            <span *ngIf="!numSelectedDescendants(node)">{{node.name}} ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)</span>
           </mat-checkbox>
           <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
         </div>
