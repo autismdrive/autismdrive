@@ -35,7 +35,7 @@ class CategoryEndpoint(flask_restful.Resource):
         return
 
     def delete_descendants(self, category):
-        if category.children:
+        if category and category.children:
             for cat in category.children:
                 self.delete_descendants(cat)
                 db.session.query(Category).filter_by(id=cat.id).delete()

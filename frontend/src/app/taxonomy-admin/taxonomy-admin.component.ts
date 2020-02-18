@@ -98,6 +98,7 @@ export class TaxonomyAdminComponent implements OnInit {
           this.treeControl.collapseAll();
           this.getCategoryTree();
           window.scroll(0, 0);
+          this.showConfirmDelete = false;
         }
       });
     });
