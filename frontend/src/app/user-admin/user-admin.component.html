@@ -57,7 +57,7 @@
       <mat-cell
         class="role-cell"
         *matCellDef="let user"
-      >{{user.registration_date | date:'long'}}
+      >{{user.registration_date | date:'short'}}
       </mat-cell>
     </ng-container>
 
@@ -69,7 +69,19 @@
       <mat-cell
         class="role-cell"
         *matCellDef="let user"
-      >{{user.last_updated | date:'long'}}
+      >{{user.last_updated | date:'short'}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="last_login">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Last Login</mat-header-cell>
+      <mat-cell
+        class="role-cell"
+        *matCellDef="let user"
+      >{{user.last_login | date:'short'}}
       </mat-cell>
     </ng-container>
 

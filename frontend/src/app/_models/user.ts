@@ -9,6 +9,7 @@ export class User {
   participants?: Participant[];
   last_updated?: Date;
   registration_date?: Date;
+  last_login?: Date;
   token?: string;
   role?: string;
   permissions?: string[];
