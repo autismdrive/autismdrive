@@ -382,6 +382,7 @@ export class ResourceFormComponent implements OnInit {
   updateAndClose(apiCall) {
     apiCall.subscribe(r => {
       this.updatedResource = r;
+      this.model.id = r.id;
       this.updateResourceCategories(r.id).subscribe(() => this.close());
     });
   }

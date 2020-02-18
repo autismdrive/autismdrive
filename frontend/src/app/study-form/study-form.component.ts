@@ -408,6 +408,7 @@ export class StudyFormComponent implements OnInit {
     // Post to the study endpoint, and then close
     if (this.form.valid) {
       if (this.createNew) {
+        this.createNew = false;
         this.updateOrganization(() => this.updateAndClose(this.api.addStudy(this.model)));
       } else {
         this.updateOrganization(() => this.updateAndClose(this.api.updateStudy(this.model)));
@@ -418,6 +419,7 @@ export class StudyFormComponent implements OnInit {
   updateAndClose(apiCall) {
     apiCall.subscribe(s => {
       this.updatedStudy = s;
+      this.model.id = s.id;
       if (this.model.additional_investigators.name) {
         this.addStudyInvestigator().subscribe((i) => {
           this.model.investigators.push(i.id);
