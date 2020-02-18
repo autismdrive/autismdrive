@@ -371,6 +371,7 @@ export class ResourceFormComponent implements OnInit {
 
     if (this.form.valid) {
       if (this.createNew) {
+        this.createNew = false;
         this.updateOrganization(() => this.updateAndClose(this.api[`add${resourceType}`](this.model)));
       } else {
         this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
