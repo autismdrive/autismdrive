@@ -17,9 +17,9 @@ export const scrollToFirstInvalidField = function (deviceDetectorService: Device
   const el: HTMLElement = document.querySelector('mat-form-field.ng-invalid');
   if (el) {
     if (deviceDetectorService.browser === 'Safari') {
-      window.scroll(0, el.offsetTop-200);
+      window.scroll(0, el.offsetTop - 200);
     } else {
-      window.scroll({behavior: 'smooth', top: el.offsetTop-200});
+      window.scroll({behavior: 'smooth', top: el.offsetTop - 200});
     }
   }
 };

@@ -3,7 +3,6 @@ import {formatDate} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AdminNote} from '../_models/admin_note';
 import {ContactItem} from '../_models/contact_item';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
@@ -122,7 +121,7 @@ export class ResourceDetailComponent implements OnInit {
       {
         condition: !!r.date,
         icon: 'access_time',
-        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US')}: ${r.time}`]
+        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US', '-0')}: ${r.time}`]
       },
       {
         condition: !!(r.location_name || r.street_address1 || r.street_address2 || r.city || r.state || r.zip),

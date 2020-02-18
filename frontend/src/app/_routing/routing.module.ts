@@ -84,14 +84,14 @@ const routes: Routes = [
   {
     path: 'studies/add',
     component: StudyFormComponent,
-    data: {title: 'Create an Autism DRIVE Study', roles: ['admin',]},
+    data: {title: 'Create an Autism DRIVE Study', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
   {
     path: 'study/edit/:studyId',
     component: StudyFormComponent,
-    data: {title: 'Edit Study', roles: ['admin',]},
+    data: {title: 'Edit Study', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
   {
@@ -106,7 +106,7 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminHomeComponent,
-    data: {title: 'Admin Home', roles: ['admin',]},
+    data: {title: 'Admin Home', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
   {

@@ -79,6 +79,9 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Event Date',
       },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
+      },
       hideExpression: 'model.type != "event"',
     },
     {
@@ -87,6 +90,9 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Event Time',
         placeholder: 'Please enter the start time or time-frame for your event',
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
       },
       hideExpression: 'model.type != "event"',
     },
@@ -228,6 +234,7 @@ export class ResourceFormComponent implements OnInit {
       type: 'multiselecttree',
       templateOptions: {
         label: 'Topics',
+        description: 'This field is required',
         options: this.api.getCategoryTree(),
         valueProp: 'id',
         labelProp: 'name',
@@ -371,6 +378,7 @@ export class ResourceFormComponent implements OnInit {
 
     if (this.form.valid) {
       if (this.createNew) {
+        this.createNew = false;
         this.updateOrganization(() => this.updateAndClose(this.api[`add${resourceType}`](this.model)));
       } else {
         this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
@@ -379,10 +387,23 @@ export class ResourceFormComponent implements OnInit {
   }
 
   updateAndClose(apiCall) {
+    this.setDateTime();
     apiCall.subscribe(r => {
       this.updatedResource = r;
+      this.model.id = r.id;
       this.updateResourceCategories(r.id).subscribe(() => this.close());
     });
+  }
+
+  setDateTime() {
+    if (this.model.date) {
+      if (this.model.date instanceof Date) {
+          this.model.date.setHours(12);
+      } else {
+        this.model.date = new Date(this.model.date);
+        this.model.date.setHours(12);
+      }
+    }
   }
 
   showDelete() {

@@ -17,7 +17,7 @@ export class RoleGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    let roles = route.data["roles"] as Array<string>;
+    const roles = route.data['roles'] as Array<string>;
 
     if (!this.currentUser) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });

@@ -128,6 +128,7 @@ import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
 import {StudyFormComponent} from './study-form/study-form.component';
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
+import {TaxonomyAdminComponent} from './taxonomy-admin/taxonomy-admin.component';
 import {TermsComponent} from './terms/terms.component';
 import {TimedoutComponent} from './timed-out/timed-out.component';
 import {TypeIconComponent} from './type-icon/type-icon.component';
@@ -277,6 +278,7 @@ export class FormlyConfig {
     ParticipantAdminComponent,
     UvaEducationComponent,
     MultiselectTreeComponent,
+    TaxonomyAdminComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
