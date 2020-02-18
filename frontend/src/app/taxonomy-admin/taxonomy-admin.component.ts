@@ -46,7 +46,7 @@ export class TaxonomyAdminComponent implements OnInit {
 
   hasNestedChild = (_: number, node: Category) => {
     return (node.children && (node.children.length > 0));
-  };
+  }
 
   numSelectedDescendants(node: Category): number {
     const descendants: Category[] = this.treeControl.getDescendants(node);
@@ -92,7 +92,7 @@ export class TaxonomyAdminComponent implements OnInit {
   onDelete() {
     let itemsProcessed = 0;
     this.checklistSelection.selected.forEach((cat, index, array) => {
-      this.api.deleteCategory(cat.id).subscribe(cat => {
+      this.api.deleteCategory(cat.id).subscribe(c => {
         itemsProcessed++;
         if (itemsProcessed === array.length) {
           this.treeControl.collapseAll();

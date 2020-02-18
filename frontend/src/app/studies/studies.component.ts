@@ -40,8 +40,8 @@ export class StudiesComponent implements OnInit {
 
   loadStudies() {
     this.api.getStudies().subscribe(studies => {
-      this.studyHits = this._studiesToHits(studies.filter(s => s.status === this.selectedStatus.name))
-    })
+      this.studyHits = this._studiesToHits(studies.filter(s => s.status === this.selectedStatus.name));
+    });
   }
 
   selectStatus(status: StudyStatusObj) {
