@@ -338,6 +338,8 @@ export class ResourceFormComponent implements OnInit {
   }
 
   updateResourceCategories(resource_id) {
+    const resourceType = this.model.type.charAt(0).toUpperCase() + this.model.type.slice(1);
+
     const selectedCategories: ResourceCategory[] = [];
     this.model.categories.forEach((isSelected, i) => {
       if (isSelected === true) {
@@ -348,7 +350,7 @@ export class ResourceFormComponent implements OnInit {
         });
       }
     });
-    return this.api.updateResourceCategories(resource_id, selectedCategories);
+    return this.api[`update${resourceType}Categories`](resource_id, selectedCategories);
   }
 
   updateOrganization(callback: Function) {
