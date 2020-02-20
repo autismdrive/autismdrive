@@ -418,3 +418,26 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assertTrue(Permission.user_roles not in user.role.permissions())
         self.assertTrue(Permission.user_roles not in editor.role.permissions())
         self.assertTrue(Permission.user_roles not in researcher.role.permissions())
+
+    def test_login_tracks_login_date(self):
+        user = self.test_create_user_with_password()
+        self.assertIsNone(user.last_login)
+        data = {"email": "tyrion@got.com", "password": "Wowbagger the Infinitely Prolonged !@#%$12354"}
+
+        user.email_verified = True
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response["last_login"])
+        first_login = response["last_login"]
+
+        rv = self.app.post(
+            '/api/login_password',
+            data=json.dumps(data),
+            content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertNotEqual(response["last_login"], first_login)
