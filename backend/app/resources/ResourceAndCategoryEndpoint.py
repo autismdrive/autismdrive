@@ -39,7 +39,7 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
         db.session.query(ResourceCategory).filter_by(resource_id=resource_id).delete()
         for c in resource_categories:
             db.session.add(ResourceCategory(resource_id=resource_id,
-                           category_id=c.category_id))
+                           category_id=c.category_id, type='resource'))
         db.session.commit()
         instance = db.session.query(Resource).filter_by(id=resource_id).first()
         elastic_index.update_document(instance, 'Resource')
