@@ -14,7 +14,6 @@ import {Category} from '../../_models/category';
 })
 export class MultiselectTreeComponent extends FieldType implements OnInit {
   @Input() to: FormlyTemplateOptions;
-  categories: Category[] = [];
   treeControl: NestedTreeControl<Category>;
   dataSource: MatTreeNestedDataSource<Category>;
   dataLoaded = false;
@@ -32,18 +31,18 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
   ngOnInit() {
     (this.to.options as Observable<any>).subscribe((categories: Category[]) => {
       this.dataSource.data = categories;
-      this.categories = categories;
       this.updateSelection();
     });
   }
+
 
   updateSelection() {
     if (this.isReady()) {
       if (this.model.categories) {
         this.model.categories.forEach(cat => {
-          const node = this.findNode(cat);
+          const node = this.findNode(cat.id);
           if (node) {
-            this.checklistSelection.toggle(node);
+            this.toggleNode(node);
           }
           this._updateModelCategories();
         });
@@ -52,7 +51,7 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
     }
   }
 
-  findNode(cat: Category) {
+  findNode(cat_id: number) {
     const allNodes = [];
 
     this.dataSource.data.forEach(dataCat => {
@@ -61,24 +60,11 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
       allNodes.push(dataCat);
 
     });
-    return allNodes.find(i => i.id === cat.id);
+    return allNodes.find(i => i.id === cat_id);
   }
 
   hasNestedChild = (_: number, node: Category) => {
     return (node.children && (node.children.length > 0));
-  }
-
-  /** Whether all the descendants of the node are selected */
-  descendantsAllSelected(node: Category): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    return descendants.every(child => this.checklistSelection.isSelected(child));
-  }
-
-  /** Whether part of the descendants are selected */
-  descendantsPartiallySelected(node: Category): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    const result = descendants.some(child => this.checklistSelection.isSelected(child));
-    return result && !this.descendantsAllSelected(node);
   }
 
   numSelectedDescendants(node: Category): number {
@@ -87,13 +73,29 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
     return selectedDescendants.length;
   }
 
-  /** Toggle the to-do item selection. Select/deselect all the descendants node */
+  /** Toggle the category item selection. Select/deselect all the parent/grandparent nodes */
   toggleNode(node: Category): void {
     this.checklistSelection.toggle(node);
-    const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
+    let ancestors = [];
+    let parent = this.findNode(node.parent_id);
+    while (parent != null) {
+      ancestors.push(parent);
+      parent = this.findNode(parent.parent_id)
+    }
+
+    if (this.checklistSelection.isSelected(node)) {
+      ancestors.forEach(anc => {
+        const parentNode = this.findNode(anc.id);
+        this.checklistSelection.select(parentNode)
+      });
+    } else {
+      ancestors.forEach(anc => {
+        const parentNode = this.findNode(anc.id);
+        if (this.numSelectedDescendants(parentNode) < 1) {
+          this.checklistSelection.deselect(parentNode)
+        }
+      })
+    }
 
     this._updateModelCategories();
   }
@@ -104,22 +106,6 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
       this.field.form &&
       this.field.form.controls
     );
-  }
-
-  /** Toggle the to-do item selection. Select/deselect all the descendants node */
-  toggleParentNode(node: Category): void {
-    this.checklistSelection.toggle(node);
-    const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
-
-    // Force update for the parent
-    descendants.every(child =>
-      this.checklistSelection.isSelected(child)
-    );
-
-    this._updateModelCategories();
   }
 
   private _updateModelCategories() {
