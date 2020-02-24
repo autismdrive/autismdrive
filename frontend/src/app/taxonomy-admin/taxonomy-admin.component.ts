@@ -71,12 +71,12 @@ export class TaxonomyAdminComponent implements OnInit {
     });
   }
 
-  showDelete(node:Category) {
+  showDelete(node: Category) {
     this.showConfirmDelete = true;
     this.nodeToDelete = node;
   }
 
-  deleteNode(node:Category) {
+  deleteNode(node: Category) {
     this.api.deleteCategory(node.id).subscribe(cat => {
       this.showConfirmDelete = false;
       this.nodeToDelete = null;

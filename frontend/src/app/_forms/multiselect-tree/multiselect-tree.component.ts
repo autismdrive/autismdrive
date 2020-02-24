@@ -76,25 +76,25 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
   /** Toggle the category item selection. Select/deselect all the parent/grandparent nodes */
   toggleNode(node: Category): void {
     this.checklistSelection.toggle(node);
-    let ancestors = [];
+    const ancestors = [];
     let parent = this.findNode(node.parent_id);
     while (parent != null) {
       ancestors.push(parent);
-      parent = this.findNode(parent.parent_id)
+      parent = this.findNode(parent.parent_id);
     }
 
     if (this.checklistSelection.isSelected(node)) {
       ancestors.forEach(anc => {
         const parentNode = this.findNode(anc.id);
-        this.checklistSelection.select(parentNode)
+        this.checklistSelection.select(parentNode);
       });
     } else {
       ancestors.forEach(anc => {
         const parentNode = this.findNode(anc.id);
         if (this.numSelectedDescendants(parentNode) < 1) {
-          this.checklistSelection.deselect(parentNode)
+          this.checklistSelection.deselect(parentNode);
         }
-      })
+      });
     }
 
     this._updateModelCategories();
