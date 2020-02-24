@@ -379,8 +379,7 @@ export class ResourceFormComponent implements OnInit {
     const resourceType = this.model.type.charAt(0).toUpperCase() + this.model.type.slice(1);
 
     if (this.form.valid) {
-      if (this.createNew) {
-        this.createNew = false;
+      if (this.createNew && !this.model.id) {
         this.updateOrganization(() => this.updateAndClose(this.api[`add${resourceType}`](this.model)));
       } else {
         this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
