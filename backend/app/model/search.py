@@ -18,12 +18,13 @@ class Search:
     def known_age_counts():
         return list(map(lambda age_name: (AggCount(age_name, 0, False)), AgeRange.ages))
 
-    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None, date=None, map_data_only=False):
+    def __init__(self, words="", types=[], ages=[], languages=[], start=0, size=10, sort=None, category=None, date=None, map_data_only=False):
         self.words = words
         self.total = 0
         self.hits = []
         self.types = types
         self.ages = ages
+        self.languages = languages
         self.start = start
         self.size = size
         self.sort = sort
