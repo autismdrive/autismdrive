@@ -74,6 +74,15 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: '!model.type',
     },
     {
+      key: 'insurance',
+      type: 'textarea',
+      templateOptions: {
+        label: 'Insurance',
+        placeholder: 'Please enter the type of insurance if applicable (e.g., private, medicaid, Tricare)',
+      },
+      hideExpression: '!model.type',
+    },
+    {
       key: 'date',
       type: 'datepicker',
       templateOptions: {
@@ -198,6 +207,15 @@ export class ResourceFormComponent implements OnInit {
       validators: {'validation': ['phone']},
     },
     {
+      key: 'phone_extension',
+      type: 'input',
+      templateOptions: {
+        label: 'Phone Number Extension',
+        placeholder: 'Please enter any extension to the phone number',
+      },
+      hideExpression: '!model.type',
+    },
+    {
       key: 'website',
       type: 'input',
       templateOptions: {
@@ -257,7 +275,27 @@ export class ResourceFormComponent implements OnInit {
       },
       hideExpression: '!model.type',
     },
+    {
+      key: 'languages',
+      type: 'multicheckbox',
+      templateOptions: {
+        label: 'Languages',
+        type: 'array',
+        options: [
+          {'value': 'english', 'label': 'English'},
+          {'value': 'spanish', 'label': 'Spanish'},
+          {'value': 'chinese', 'label': 'Chinese'},
+          {'value': 'korean', 'label': 'Korean'},
+          {'value': 'vietnamese', 'label': 'Vietnamese'},
+          {'value': 'arabic', 'label': 'Arabic'},
+          {'value': 'tagalog', 'label': 'Tagalog'}
+        ],
+      },
+      hideExpression: '!model.type',
+    },
   ];
+
+
 
   options: FormlyFormOptions;
   orgOptions: Organization[];

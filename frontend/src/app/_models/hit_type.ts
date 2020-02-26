@@ -38,3 +38,16 @@ export class AgeRange {
       'aging': 'Aging (65+)'
     };
 }
+
+export class Language {
+  static labels =
+    {
+      'english': 'English',
+      'spanish': 'Spanish',
+      'chinese': 'Chinese',
+      'korean': 'Korean',
+      'vietnamese': 'Vietnamese',
+      'arabic': 'Arabic',
+      'tagalog' : 'Tagalog'
+    };
+}
