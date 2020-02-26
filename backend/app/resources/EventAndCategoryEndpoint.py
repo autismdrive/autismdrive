@@ -1,7 +1,7 @@
 import flask_restful
 from flask import request
 
-from app import db, RestException
+from app import db, RestException, elastic_index
 from app.model.category import Category
 from app.model.event import Event
 from app.model.resource_category import ResourceCategory
@@ -41,6 +41,8 @@ class CategoryByEventEndpoint(flask_restful.Resource):
             db.session.add(ResourceCategory(resource_id=event_id,
                            category_id=c.category_id, type='event'))
         db.session.commit()
+        instance = db.session.query(Event).filter_by(id=event_id).first()
+        elastic_index.update_document(instance, 'Event', latitude=instance.latitude, longitude=instance.longitude)
         return self.get(event_id)
 
 

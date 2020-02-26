@@ -19,7 +19,7 @@
   </div>
   <div class="contact-item-detail" *ngIf="contactItem.type && (contactItem.type === 'link')">
     <ng-container *ngFor="let d of contactItem.details">
-      <a *ngIf="isNotEmpty(d)" href="{{d}}">{{d}}</a>
+      <a *ngIf="isNotEmpty(d)" target="_blank" href="{{d}}">{{d}}</a>
     </ng-container>
   </div>
 </div>

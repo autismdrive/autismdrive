@@ -4,8 +4,10 @@
     <li class="mat-tree-node">
       <!-- use a disabled button to provide padding for tree leaf -->
       <button disabled mat-icon-button></button>
-      <mat-checkbox (change)="toggleNode(node)" [checked]="checklistSelection.isSelected(node)"
-                    [indeterminate]="descendantsPartiallySelected(node)">{{node.name}}</mat-checkbox>
+      <mat-checkbox
+        (change)="toggleNode(node)"
+        [checked]="checklistSelection.isSelected(node)"
+      >{{node.name}}</mat-checkbox>
     </li>
   </mat-tree-node>
 
@@ -25,16 +27,15 @@
         </button>
 
         <mat-checkbox
-          (change)="toggleParentNode(node)"
+          disabled="true"
           [checked]="checklistSelection.isSelected(node)"
-          [indeterminate]="descendantsPartiallySelected(node)"
         >
-            <span
-              *ngIf="numSelectedDescendants(node)"
-              matBadge="{{numSelectedDescendants(node)}}"
-              matBadgeColor="accent"
-              matBadgeOverlap="false"
-            >{{node.name}}</span>
+          <span
+            *ngIf="numSelectedDescendants(node)"
+            matBadge="{{numSelectedDescendants(node)}}"
+            matBadgeColor="accent"
+            matBadgeOverlap="false"
+          >{{node.name}}</span>
           <span *ngIf="!numSelectedDescendants(node)">{{node.name}}</span>
         </mat-checkbox>
       </div>
