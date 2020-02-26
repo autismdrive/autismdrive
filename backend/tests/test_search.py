@@ -84,6 +84,31 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(1, young_folks["count"])
         self.assertEqual(1, old_folks["count"])
 
+    def test_search_has_counts_by_languages(self):
+
+        basic_query = {'words': ''}
+        search_results = self.search(basic_query)
+        self.assertEqual(0, len(search_results['hits']))
+
+        # test that elastic resource is created with post
+        res = self.construct_resource(title="Bart", description="free lovin young fella", languages=['english', 'spanish'])
+        res2 = self.construct_resource(title="Abe", description="delightful grandpop.", languages=['english', 'tagalog'])
+        rv = self.app.get('api/resource/%i' % res.id, content_type="application/json", follow_redirects=True)
+        self.assert_success(rv)
+        rv = self.app.get('api/resource/%i' % res2.id, content_type="application/json", follow_redirects=True)
+        self.assert_success(rv)
+
+        search_results = self.search(basic_query)
+        self.assertEqual(2, len(search_results['hits']))
+
+        english = next(x for x in search_results['language_counts'] if x['value'] == "english")
+        spanish = next(x for x in search_results['language_counts'] if x['value'] == "spanish")
+        tagalog = next(x for x in search_results['language_counts'] if x['value'] == "tagalog")
+
+        self.assertEqual(2, english["count"])
+        self.assertEqual(1, spanish["count"])
+        self.assertEqual(1, tagalog["count"])
+
     def test_study_search_basics(self):
         umbrella_query = {'words': 'umbrellas'}
         universe_query = {'words': 'universe'}
