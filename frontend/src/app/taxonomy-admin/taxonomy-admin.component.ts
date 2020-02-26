@@ -49,13 +49,19 @@ export class TaxonomyAdminComponent implements OnInit {
     return (node.children && (node.children.length > 0));
   }
 
-  hasNoContent = (_: number, _nodeData: Category) => _nodeData.name === '';
+  hasNoContent = (_: number, _nodeData: Category) => {
+    const noContent = _nodeData.name === '' && _nodeData.id === undefined;
+    if (_nodeData.name === '') {
+      console.log({_nodeData});
+    }
+
+    return noContent;
+  }
 
   /** Select the category so we can insert the new item. */
   addNewItem(node: Category) {
-    const data = this.dataSource.data;
-    data.push({'name': '', 'parent': node, 'parent_id': node.id});
-    this.dataSource.data = data;
+    this.dataSource.data = this.insertNewChildNode(node, this.dataSource.data);
+    this.refreshTree();
     this.treeControl.expand(node);
     const el: HTMLElement = document.querySelector('.global-footer');
     window.scroll(0, el.offsetTop);
@@ -84,4 +90,46 @@ export class TaxonomyAdminComponent implements OnInit {
     });
   }
 
+  cancelDelete() {
+    this.showConfirmDelete = false;
+    this.nodeToDelete = undefined;
+  }
+
+  cancelAdd() {
+    this.dataSource.data = this.removeEmpty(this.dataSource.data);
+    this.refreshTree();
+  }
+
+  private removeEmpty(cats: Category[]): Category[] {
+    if (cats && cats.length > 0) {
+      cats = cats.filter(c => c.name !== '');
+      return cats.map(cat => {
+        cat.children = this.removeEmpty(cat.children);
+        return cat;
+      });
+    } else {
+      return cats;
+    }
+  }
+
+  private insertNewChildNode(parentNode: Category, cats: Category[]): Category[] {
+    if (cats && cats.length > 0) {
+      const parentIndex = cats.findIndex(c => c.id === parentNode.id);
+      if (parentIndex !== - 1) {
+        cats[parentIndex].children.push({name: '', parent: parentNode, parent_id: parentNode.id});
+        return cats;
+      } else {
+        return cats.map(cat => {
+          cat.children = this.insertNewChildNode(parentNode, cat.children);
+          return cat;
+        });
+      }
+    }
+  }
+
+  private refreshTree() {
+    const _data = this.dataSource.data;
+    this.dataSource.data = null;
+    this.dataSource.data = _data;
+  }
 }
