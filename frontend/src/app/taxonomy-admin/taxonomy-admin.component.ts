@@ -63,15 +63,12 @@ export class TaxonomyAdminComponent implements OnInit {
     this.dataSource.data = this.insertNewChildNode(node, this.dataSource.data);
     this.refreshTree();
     this.treeControl.expand(node);
-    const el: HTMLElement = document.querySelector('.global-footer');
-    window.scroll(0, el.offsetTop);
   }
 
   /** Save the node to database */
   saveNode(node: Category, itemValue: string) {
     node.name = itemValue;
     this.api.addCategory(node).subscribe(cat => {
-      this.treeControl.collapseAll();
       this.getCategoryTree();
       window.scroll(0, 0);
     });
@@ -116,7 +113,7 @@ export class TaxonomyAdminComponent implements OnInit {
     if (cats && cats.length > 0) {
       const parentIndex = cats.findIndex(c => c.id === parentNode.id);
       if (parentIndex !== - 1) {
-        cats[parentIndex].children.push({name: '', parent: parentNode, parent_id: parentNode.id});
+        cats[parentIndex].children.push({name: '', parent_id: parentNode.id});
         return cats;
       } else {
         return cats.map(cat => {
