@@ -21,6 +21,7 @@ def upgrade():
     op.add_column('resource', sa.Column('insurance', sa.String(), nullable=True))
     op.add_column('resource', sa.Column('languages', sa.ARRAY(sa.String()), nullable=True))
     op.add_column('resource', sa.Column('phone_extension', sa.String(), nullable=True))
+    op.execute('UPDATE resource SET languages=\'{"english"}\'')
     # ### end Alembic commands ###
 
 
