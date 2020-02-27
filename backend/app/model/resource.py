@@ -43,4 +43,4 @@ class Resource(db.Model):
         for cat in self.categories:
             cat_text = cat_text + ' ' + cat.category.indexable_content()
 
-        return cat_text + ' ' + ' '.join(self.ages)
+        return cat_text + ' ' + ' '.join(self.ages) + ' ' + ' '.join(self.languages)
