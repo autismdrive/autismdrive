@@ -1,33 +1,64 @@
 <div *ngIf="currentUser && currentUser.permissions.includes('publish_resource')">
   <h1>Topics Taxonomy</h1>
   <p>To add a topic, click the plus sign next to the parent topic and fill in the name</p>
-  <p>To delete topics, select the check boxes next to the ones you wish to delete and click the delete button</p>
+  <p>To delete a topic, use the button directly next to the topic; it is only possible to delete one topic at a time and
+    only possible to delete topics with no associated children topics.</p>
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="tree-select taxonomy-admin">
     <!-- Child node-->
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
       <li class="mat-tree-node">
         <!-- use a disabled button to provide padding for tree leaf -->
         <button disabled mat-icon-button></button>
-        <mat-checkbox
-          (change)="toggleNode(node)"
-          [checked]="checklistSelection.isSelected(node)"
-        >{{node.name}} ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)</mat-checkbox>
-        <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
+        <button matTreeNodeToggle mat-button>{{node.name}}</button>
+        <a [queryParams]="{'category': node.id}" [routerLink]="[ '/search' ]" class="associated-records">
+          ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)
+        </a>
+        <button (click)="addNewItem(node)" mat-icon-button color="primary" [matTooltip]="'Add sub-category to ' + node.name">
+          <mat-icon>add_circle</mat-icon>
+        </button>
+        <button
+          (click)="showDelete(node)"
+          *ngIf="!showConfirmDelete"
+          color="warn"
+          mat-icon-button
+          type="button"
+          [matTooltip]="'Delete ' + node.name"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+
+        <ng-container *ngIf="showConfirmDelete && (node.id===nodeToDelete.id)">
+          <button
+            (click)="deleteNode(node)"
+            color="warn"
+            mat-flat-button
+            type="button"
+          >Permanently Delete {{node.name}}!!!
+          </button>
+          <button
+            (click)="cancelDelete()"
+            mat-flat-button
+            type="button"
+          >Cancel
+          </button>
+        </ng-container>
+
       </li>
     </mat-tree-node>
 
     <!--New Item Node-->
     <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
-      <button mat-icon-button disabled></button>
+      <button disabled mat-icon-button></button>
       <mat-form-field>
         <mat-label>New item...</mat-label>
-        <input matInput #itemValue placeholder="Ex. Lettuce">
+        <input #itemValue matInput placeholder="Ex. Topic Name">
       </mat-form-field>
-      <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
+      <button (click)="saveNode(node, itemValue.value)" mat-button color="primary">Save</button>
+      <button (click)="cancelAdd()" mat-button>Cancel</button>
     </mat-tree-node>
 
     <!-- Parent node -->
-    <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+    <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild" matTreeNodePadding>
       <li>
         <div class="mat-tree-node">
           <button
@@ -40,20 +71,13 @@
               {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
           </button>
-
-          <mat-checkbox
-            (change)="toggleNode(node)"
-            [checked]="checklistSelection.isSelected(node)"
-          >
-              <span
-                *ngIf="numSelectedDescendants(node)"
-                matBadge="{{numSelectedDescendants(node)}}"
-                matBadgeColor="accent"
-                matBadgeOverlap="false"
-              >{{node.name}} ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)</span>
-            <span *ngIf="!numSelectedDescendants(node)">{{node.name}} ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)</span>
-          </mat-checkbox>
-          <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
+          <button matTreeNodeToggle mat-button>{{node.name}}</button>
+          <a [queryParams]="{'category': node.id}" [routerLink]="[ '/search' ]" class="associated-records">
+            ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)
+          </a>
+          <button (click)="addNewItem(node)" mat-icon-button [matTooltip]="'Add sub-category to ' + node.name">
+            <mat-icon>add_circle</mat-icon>
+          </button>
         </div>
         <ul [class.tree-select-invisible]="!treeControl.isExpanded(node)">
           <ng-container matTreeNodeOutlet></ng-container>
@@ -61,29 +85,4 @@
       </li>
     </mat-nested-tree-node>
   </mat-tree>
-
-  <div
-    class="button-row"
-    fxLayout="row"
-    fxLayoutGap="2em"
-  >
-    <button
-      type="button"
-      mat-flat-button
-      *ngIf="!showConfirmDelete"
-      (click)="showDelete()"
-      color="warn"
-      id="delete-button"
-    >Delete Selected Topics</button>
-
-    <button
-      *ngIf="showConfirmDelete"
-      id="confirm_delete"
-      type="button"
-      mat-flat-button
-      (click)="onDelete()"
-      color="warn"
-    >Permanently Delete Selected Topics!!!
-    </button>
-  </div>
 </div>

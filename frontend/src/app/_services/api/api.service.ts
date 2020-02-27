@@ -43,6 +43,8 @@ export class ApiService {
     adminNoteList: '/api/admin_note',
     category: '/api/category/<id>',
     categorybyresource: '/api/resource/<resource_id>/category',
+    categorybylocation: '/api/location/<location_id>/category',
+    categorybyevent: '/api/event/<event_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
     categorylist: '/api/category',
     data_transfer_log: '/api/data_transfer_log',
@@ -368,6 +370,20 @@ export class ApiService {
   /** Update ResourceCategory */
   updateResourceCategories(resource_id: number, selectedCategories: ResourceCategory[]) {
     const url = this._endpointUrl('categorybyresource').replace('<resource_id>', resource_id.toString());
+    return this.httpClient.post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update LocationCategory */
+  updateLocationCategories(location_id: number, selectedCategories: ResourceCategory[]) {
+    const url = this._endpointUrl('categorybylocation').replace('<location_id>', location_id.toString());
+    return this.httpClient.post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update EventCategory */
+  updateEventCategories(event_id: number, selectedCategories: ResourceCategory[]) {
+    const url = this._endpointUrl('categorybyevent').replace('<event_id>', event_id.toString());
     return this.httpClient.post<ResourceCategory>(url, selectedCategories)
       .pipe(catchError(this._handleError));
   }

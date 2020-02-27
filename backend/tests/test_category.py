@@ -68,7 +68,7 @@ class TestCategory(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(2, len(response))
 
-    def test_delete_category_deletes_descendants(self):
+    def test_delete_category_will_not_delete_descendants(self):
         wool = self.construct_category(name='wool')
         yarn = self.construct_category(name='yarn', parent=wool)
         self.construct_category(name='roving', parent=wool)
@@ -89,12 +89,11 @@ class TestCategory(BaseTest, unittest.TestCase):
         rv = self.app.delete('api/category/%i' % wool.id,
                              content_type="application/json",
                              headers=self.logged_in_headers())
-        self.assert_success(rv)
-
-        rv = self.app.get('api/category', content_type="application/json")
-        self.assert_success(rv)
+        self.assertEqual(400, rv.status_code)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(0, len(response))
+        self.assertIsNotNone(response)
+        self.assertEqual("can_not_delete", response["code"])
+        self.assertEqual("You must delete all dependent records first.", response["message"])
 
     def test_create_category(self):
         category = {'name': "My Favorite Things"}
