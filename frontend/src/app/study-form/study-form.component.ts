@@ -9,6 +9,7 @@ import {StudyInvestigator} from '../_models/study_investigator';
 import {ApiService} from '../_services/api/api.service';
 import {scrollToFirstInvalidField} from '../../util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
+import {AgeRange, Language} from '../_models/hit_type';
 
 
 enum PageState {
@@ -249,13 +250,7 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Age Ranges',
         type: 'array',
-        options: [
-          {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
-          {'value': 'school', 'label': 'School age (6 - 13 years)'},
-          {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
-          {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
-          {'value': 'aging', 'label': 'Aging (65+)'}
-        ],
+        options: this.getOptions(AgeRange.labels),
       },
     },
     {
@@ -264,15 +259,7 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Languages',
         type: 'array',
-        options: [
-          {'value': 'english', 'label': 'English'},
-          {'value': 'spanish', 'label': 'Spanish'},
-          {'value': 'chinese', 'label': 'Chinese'},
-          {'value': 'korean', 'label': 'Korean'},
-          {'value': 'vietnamese', 'label': 'Vietnamese'},
-          {'value': 'arabic', 'label': 'Arabic'},
-          {'value': 'tagalog', 'label': 'Tagalog'}
-        ],
+        options: this.getOptions(Language.labels),
       },
     },
   ];
@@ -307,6 +294,16 @@ export class StudyFormComponent implements OnInit {
     return this.orgOptions.filter(org =>
       org.name.toLowerCase().includes(name.toLowerCase())
     );
+  }
+
+  getOptions(modelLabels) {
+    let opts = [];
+    for (let key in modelLabels) {
+      if (modelLabels.hasOwnProperty(key)) {
+        opts.push({"value": key, "label": modelLabels[key]})
+      }
+    }
+    return opts;
   }
 
   loadData() {
