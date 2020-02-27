@@ -5,6 +5,7 @@ export interface Category {
   parent_id?: number;
   parent?: Category;
   level?: number;
+  all_resource_count?: number;
   resource_count?: number;
   event_count?: number;
   location_count?: number;

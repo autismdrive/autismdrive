@@ -188,7 +188,7 @@ class CategorySchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count', 'location_count',
-                  'resource_count', 'study_count', '_links')
+                  'resource_count', 'all_resource_count', 'study_count', '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -197,6 +197,7 @@ class CategorySchema(ModelSchema):
     event_count = fields.Method('get_event_count', dump_only=True)
     location_count = fields.Method('get_location_count', dump_only=True)
     resource_count = fields.Method('get_resource_count', dump_only=True)
+    all_resource_count = fields.Method('get_all_resource_count', dump_only=True)
     study_count = fields.Method('get_study_count', dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
@@ -217,6 +218,12 @@ class CategorySchema(ModelSchema):
 
     def get_resource_count(self, obj):
         query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource')\
+            .filter(ResourceCategory.category_id == obj.id)
+        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        return query.session.execute(count_q).scalar()
+
+    def get_all_resource_count(self, obj):
+        query = db.session.query(ResourceCategory).join(ResourceCategory.resource)\
             .filter(ResourceCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
