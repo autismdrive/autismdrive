@@ -258,6 +258,23 @@ export class StudyFormComponent implements OnInit {
         ],
       },
     },
+    {
+      key: 'languages',
+      type: 'multicheckbox',
+      templateOptions: {
+        label: 'Languages',
+        type: 'array',
+        options: [
+          {'value': 'english', 'label': 'English'},
+          {'value': 'spanish', 'label': 'Spanish'},
+          {'value': 'chinese', 'label': 'Chinese'},
+          {'value': 'korean', 'label': 'Korean'},
+          {'value': 'vietnamese', 'label': 'Vietnamese'},
+          {'value': 'arabic', 'label': 'Arabic'},
+          {'value': 'tagalog', 'label': 'Tagalog'}
+        ],
+      },
+    },
   ];
 
   options: FormlyFormOptions;
