@@ -297,10 +297,10 @@ export class StudyFormComponent implements OnInit {
   }
 
   getOptions(modelLabels) {
-    let opts = [];
-    for (let key in modelLabels) {
+    const opts = [];
+    for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {
-        opts.push({"value": key, "label": modelLabels[key]})
+        opts.push({'value': key, 'label': modelLabels[key]});
       }
     }
     return opts;

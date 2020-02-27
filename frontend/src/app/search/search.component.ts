@@ -149,7 +149,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       name: 'Virginia Institute of Autism',
       shortName: 'VIA',
       description: `
-        The Virginia Institute of Autism is dedicated to helping people overcome the challenges of autism through innovative, 
+        The Virginia Institute of Autism is dedicated to helping people overcome the challenges of autism through innovative,
         evidence-based programs in education, outreach and adult services.
       `,
       image: '/assets/partners/via.png',
