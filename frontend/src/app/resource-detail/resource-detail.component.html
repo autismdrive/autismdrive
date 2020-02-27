@@ -22,6 +22,7 @@
       <h2>About this resource</h2>
       <p *ngIf="resource.is_draft === true && (!currentUser || currentUser && !currentUser.permissions.includes('edit_resource'))">This resource is being edited and is under review. Please check back for more up-to-date information soon.</p>
       <p>{{resource.description}}</p>
+      <p *ngIf="resource.insurance">Insurance accepted: {{resource.insurance}}</p>
 
       <div *ngIf="safeVideoLink">
         <div *ngIf="currentUser">
@@ -181,7 +182,7 @@
         </agm-map>
       </div>
       <div id="resource-categories">
-        <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages"></app-filter-chips>
+        <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages" [languages]="resource.languages"></app-filter-chips>
       </div>
       <div id="resource-related">
         <app-related-items [resource]="resource" [loading]="loading"></app-related-items>

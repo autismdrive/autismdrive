@@ -13,15 +13,18 @@ class Resource(db.Model):
     title = db.Column(db.String)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     description = db.Column(db.String)
+    insurance = db.Column(db.String)
     organization_id = db.Column('organization_id', db.Integer,
                                db.ForeignKey('organization.id'))
     phone = db.Column(db.String)
+    phone_extension = db.Column(db.String)
     website = db.Column(db.String)
     contact_email = db.Column(db.String)
     video_code = db.Column(db.String)
     is_uva_education_content = db.Column(db.Boolean)
     is_draft = db.Column(db.Boolean)
     ages = db.Column(db.ARRAY(db.String), default=[])
+    languages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
 
     __mapper_args__ = {
@@ -32,11 +35,12 @@ class Resource(db.Model):
     def indexable_content(self):
         return ' '.join(filter(None, (self.category_names(),
                                       self.title,
-                                      self.description)))
+                                      self.description,
+                                      self.insurance)))
 
     def category_names(self):
         cat_text = ''
         for cat in self.categories:
             cat_text = cat_text + ' ' + cat.category.indexable_content()
 
-        return cat_text + ' ' + ' '.join(self.ages)
+        return cat_text + ' ' + ' '.join(self.ages) + ' ' + ' '.join(self.languages)

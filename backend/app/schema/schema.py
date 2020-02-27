@@ -188,7 +188,7 @@ class CategorySchema(ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count', 'location_count',
-                  'resource_count', 'study_count', '_links')
+                  'resource_count', 'all_resource_count', 'study_count', '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -197,6 +197,7 @@ class CategorySchema(ModelSchema):
     event_count = fields.Method('get_event_count', dump_only=True)
     location_count = fields.Method('get_location_count', dump_only=True)
     resource_count = fields.Method('get_resource_count', dump_only=True)
+    all_resource_count = fields.Method('get_all_resource_count', dump_only=True)
     study_count = fields.Method('get_study_count', dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
@@ -217,6 +218,12 @@ class CategorySchema(ModelSchema):
 
     def get_resource_count(self, obj):
         query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'resource')\
+            .filter(ResourceCategory.category_id == obj.id)
+        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        return query.session.execute(count_q).scalar()
+
+    def get_all_resource_count(self, obj):
+        query = db.session.query(ResourceCategory).join(ResourceCategory.resource)\
             .filter(ResourceCategory.category_id == obj.id)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
@@ -293,7 +300,7 @@ class ResourceSchema(ModelSchema):
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'is_draft', 'ages', '_links')
+                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
@@ -346,7 +353,8 @@ class EventSchema(ModelSchema):
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
-                  'organization', 'resource_categories', 'latitude', 'longitude',  'ages', '_links')
+                  'organization', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
+                  'phone_extension', 'languages', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -400,7 +408,7 @@ class LocationSchema(ModelSchema):
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'latitude', 'longitude', '_links', 'ages', 'is_draft')
+                  'latitude', 'longitude', '_links', 'ages', 'insurance', 'phone_extension', 'languages', 'is_draft')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -453,7 +461,7 @@ class StudySchema(ModelSchema):
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
                   'participant_description', 'benefit_description', 'coordinator_email', 'organization_id',
                   'organization', 'location', 'status', 'study_categories', 'study_investigators', 'study_users',
-                  'eligibility_url', 'results_url', 'ages', 'num_visits', '_links')
+                  'eligibility_url', 'results_url', 'ages', 'languages', 'num_visits', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     status = EnumField(Status)
@@ -591,7 +599,9 @@ class SearchSchema(ma.Schema):
     sort = ma.Nested(SortSchema, allow_none=True, default=None)
     types = fields.List(fields.Str())
     ages = fields.List(fields.Str())
+    languages = fields.List(fields.Str())
     age_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
+    language_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
     type_counts = fields.List(ma.Nested(AggCountSchema), dump_only=True)
     total = fields.Integer(dump_only=True)
     hits = fields.Nested(HitSchema(), many=True, dump_only=True)

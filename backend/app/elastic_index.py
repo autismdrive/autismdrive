@@ -39,6 +39,7 @@ class StarDocument(Document):
     website = Keyword()
     location = Keyword()
     ages = Keyword(multi=True)
+    languages = Keyword(multi=True)
     status = Keyword()
     category = Keyword(multi=True)
     latitude = Double()
@@ -138,6 +139,8 @@ class ElasticIndex:
 
         if hasattr(document, 'date'):
             doc.date = document.date
+        if hasattr(document, 'languages'):
+            doc.languages = document.languages
         if hasattr(document, 'website'):
             doc.website = document.website
         if hasattr(document, 'is_draft'):
@@ -194,11 +197,13 @@ class ElasticIndex:
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
-        # Filter results for type and ages
+        # Filter results for type, ages, and languages
         if search.types:
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
         if search.ages:
             elastic_search = elastic_search.filter('terms', **{"ages": search.ages})
+        if search.languages:
+            elastic_search = elastic_search.filter('terms', **{"languages": search.languages})
 
         # Filter results by date
         if search.date:
@@ -235,6 +240,7 @@ class ElasticIndex:
         elastic_search.aggs.bucket('terms', aggregation)
         elastic_search.aggs.bucket('type', A("terms", field='type'))
         elastic_search.aggs.bucket('ages', A("terms", field='ages'))
+        elastic_search.aggs.bucket('languages', A("terms", field='languages'))
 
         # KEEPING FOR NOW - THESE WERE THE ORIGINAL FACETS WE HAD SET UP.  WILL NEED TO CONVERT TO AGGREGATIONS
         # IF WE WANT TO KEEP ANY OF THESE.

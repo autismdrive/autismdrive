@@ -141,6 +141,12 @@ export class ResourceDetailComponent implements OnInit {
         type: 'phone',
       },
       {
+        condition: !!r.phone_extension,
+        icon: 'dialpad',
+        details: [r.phone_extension ],
+        type: 'phone_extension',
+      },
+      {
         condition: !!r.website,
         icon: 'link',
         details: [r.website],
