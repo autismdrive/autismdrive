@@ -145,6 +145,16 @@ export class SearchComponent implements OnInit, OnDestroy {
       image: '/assets/partners/prep.png',
       url: 'http://www.prepivycreek.com/',
     },
+    {
+      name: 'Virginia Institute of Autism',
+      shortName: 'VIA',
+      description: `
+        The Virginia Institute of Autism is dedicated to helping people overcome the challenges of autism through innovative, 
+        evidence-based programs in education, outreach and adult services.
+      `,
+      image: '/assets/partners/via.png',
+      url: 'https://www.viaschool.org/',
+    },
   ];
   private _mobileQueryListener: () => void;
 
