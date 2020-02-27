@@ -146,6 +146,19 @@
                 (categorySelected)="selectCategory($event)"
                 [ngClass]="'filter-by-topic'"
               ></app-search-topics>
+              <h4 class="mat-subheader">By Language</h4>
+              <div *ngIf="!query">
+                <mat-spinner></mat-spinner>
+              </div>
+              <div *ngIf="query">
+                <div *ngIf="query && !query.hasLanguageCounts()">No language restrictions available for these search results.</div>
+                <app-search-filter
+                  [aggregations]="query.language_counts"
+                  [label_map]="languageLabels"
+                  (filterSelected)="selectLanguage($event)"
+                  [ngClass]="'filter-by-language'"
+                ></app-search-filter>
+              </div>
             </div>
           </mat-expansion-panel>
         </mat-accordion>
@@ -183,6 +196,16 @@
                 class="applied-filter applied-filter-age"
               >
                 <span class="applied-filter-label">{{ageLabels[age]}}</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *ngFor="let language of query.languages let i = index">
+              <mat-chip
+                (click)="selectLanguage()"
+                class="applied-filter applied-filter-language"
+              >
+                <span class="applied-filter-label">{{languageLabels[language]}}</span>
                 <mat-icon>close</mat-icon>
               </mat-chip>
             </ng-container>
@@ -340,7 +363,7 @@
       <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify
         resources that will improve
         outcomes for individuals with autism and their families.</p>
-      <div fxLayout="row" fxLayoutAlign="space-between">
+      <div fxLayoutAlign.gt-xs="row" fxLayout.lt-sm="column" fxLayoutAlign="space-between">
         <span
           *ngFor="let rg of resourceGatherers"
         >

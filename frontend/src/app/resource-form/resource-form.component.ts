@@ -10,6 +10,7 @@ import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {scrollToFirstInvalidField} from '../../util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
+import {AgeRange, Language} from '../_models/hit_type';
 
 
 enum PageState {
@@ -70,6 +71,15 @@ export class ResourceFormComponent implements OnInit {
       },
       expressionProperties: {
         'templateOptions.placeholder': '"Please enter a description of your " + (model.type || "resource")',
+      },
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'insurance',
+      type: 'textarea',
+      templateOptions: {
+        label: 'Insurance',
+        placeholder: 'Please enter the type of insurance if applicable (e.g., private, medicaid, Tricare)',
       },
       hideExpression: '!model.type',
     },
@@ -198,6 +208,15 @@ export class ResourceFormComponent implements OnInit {
       validators: {'validation': ['phone']},
     },
     {
+      key: 'phone_extension',
+      type: 'input',
+      templateOptions: {
+        label: 'Phone Number Extension',
+        placeholder: 'Please enter any extension to the phone number',
+      },
+      hideExpression: '!model.type',
+    },
+    {
       key: 'website',
       type: 'input',
       templateOptions: {
@@ -219,9 +238,10 @@ export class ResourceFormComponent implements OnInit {
     {
       key: 'is_uva_education_content',
       type: 'radio',
+      defaultValue: false,
       templateOptions: {
         label: 'UVA Education Content',
-        placeholder: 'Should this resource be displayed on the UVA Education page?',
+        description: 'Should this resource be displayed on the UVA Education page?',
         options: [
           {value: true, label: 'Yes'},
           {value: false, label: 'No'},
@@ -247,17 +267,23 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Age Ranges',
         type: 'array',
-        options: [
-          {'value': 'pre-k', 'label': 'Pre-K (0 - 5 years)'},
-          {'value': 'school', 'label': 'School age (6 - 13 years)'},
-          {'value': 'transition', 'label': 'Transition age (14 - 22 years)'},
-          {'value': 'adult', 'label': 'Adulthood (23 - 64)'},
-          {'value': 'aging', 'label': 'Aging (65+)'}
-        ],
+        options: this.getOptions(AgeRange.labels),
+      },
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'languages',
+      type: 'multicheckbox',
+      templateOptions: {
+        label: 'Languages',
+        type: 'array',
+        options: this.getOptions(Language.labels),
       },
       hideExpression: '!model.type',
     },
   ];
+
+
 
   options: FormlyFormOptions;
   orgOptions: Organization[];
@@ -291,6 +317,16 @@ export class ResourceFormComponent implements OnInit {
     return this.orgOptions.filter(org =>
       org.name.toLowerCase().includes(name.toLowerCase())
     );
+  }
+
+  getOptions(modelLabels) {
+    const opts = [];
+    for (const key in modelLabels) {
+      if (modelLabels.hasOwnProperty(key)) {
+        opts.push({'value': key, 'label': modelLabels[key]});
+      }
+    }
+    return opts;
   }
 
   loadData() {

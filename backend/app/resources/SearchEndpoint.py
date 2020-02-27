@@ -64,6 +64,8 @@ class SearchEndpoint(flask_restful.Resource):
     def update_aggregations(self, search, aggregations):
         for bucket in aggregations.ages.buckets:
             search.add_aggregation("ages", bucket.key, bucket.doc_count, bucket.key in search.ages)
+        for bucket in aggregations.languages.buckets:
+            search.add_aggregation("languages", bucket.key, bucket.doc_count, bucket.key in search.languages)
         for bucket in aggregations.type.buckets:
             search.add_aggregation("types", bucket.key, bucket.doc_count, bucket.key in search.types)
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { StudyCategory } from '../_models/study_category';
 import { ResourceCategory } from '../_models/resource_category';
-import {AgeRange} from '../_models/hit_type';
+import {AgeRange, Language} from '../_models/hit_type';
 
 @Component({
   selector: 'app-filter-chips',
@@ -11,8 +11,10 @@ import {AgeRange} from '../_models/hit_type';
 export class FilterChipsComponent implements OnInit {
   @Input() categories: StudyCategory[] | ResourceCategory[] = [];
   @Input() ages: string[] = [];
+  @Input() languages: string[] = [];
 
   ageLabels = AgeRange.labels;
+  languageLabels = Language.labels;
 
   constructor() {
 

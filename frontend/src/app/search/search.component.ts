@@ -7,7 +7,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
-import {AgeRange, HitType} from '../_models/hit_type';
+import {AgeRange, HitType, Language} from '../_models/hit_type';
 import {Hit, Query, Sort} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
@@ -41,6 +41,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   selectedMapHit: Hit;
   selectedType: HitType = HitType.ALL_RESOURCES;
   ageLabels = AgeRange.labels;
+  languageLabels = Language.labels;
   typeLabels = HitType.labels;
   loading = true;
   pageSize = 20;
@@ -143,6 +144,16 @@ export class SearchComponent implements OnInit, OnDestroy {
       `,
       image: '/assets/partners/prep.png',
       url: 'http://www.prepivycreek.com/',
+    },
+    {
+      name: 'Virginia Institute of Autism',
+      shortName: 'VIA',
+      description: `
+        The Virginia Institute of Autism is dedicated to helping people overcome the challenges of autism through innovative,
+        evidence-based programs in education, outreach and adult services.
+      `,
+      image: '/assets/partners/via.png',
+      url: 'https://www.viaschool.org/',
     },
   ];
   private _mobileQueryListener: () => void;
@@ -324,6 +335,15 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.query.ages = [age];
     } else {
       this.query.ages = [];
+    }
+    this._goToFirstPage(true);
+  }
+
+  selectLanguage(language: string = null) {
+    if (language) {
+      this.query.languages = [language];
+    } else {
+      this.query.languages = [];
     }
     this._goToFirstPage(true);
   }
@@ -526,6 +546,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     queryParams.types = query.types;
     queryParams.ages = query.ages;
+    queryParams.languages = query.languages;
 
     if (query.hasOwnProperty('category') && query.category) {
       queryParams.category = query.category.id;
@@ -550,6 +571,9 @@ export class SearchComponent implements OnInit, OnDestroy {
             break;
           case('ages'):
             query.ages = qParams.getAll(key);
+            break;
+          case('languages'):
+            query.languages = qParams.getAll(key);
             break;
           case('types'):
             query.types = qParams.getAll(key);

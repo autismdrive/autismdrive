@@ -18,18 +18,26 @@ class Search:
     def known_age_counts():
         return list(map(lambda age_name: (AggCount(age_name, 0, False)), AgeRange.ages))
 
-    def __init__(self, words="", types=[], ages=[], start=0, size=10, sort=None, category=None, date=None, map_data_only=False):
+    @staticmethod
+    def known_language_counts():
+        return list(map(lambda age_name: (AggCount(age_name, 0, False)),
+                        ['english', 'spanish', 'chinese', 'korean', 'vietnamese', 'arabic', 'tagalog']))
+
+    def __init__(self, words="", types=[], ages=[], languages=[], start=0, size=10, sort=None, category=None, date=None,
+                 map_data_only=False):
         self.words = words
         self.total = 0
         self.hits = []
         self.types = types
         self.ages = ages
+        self.languages = languages
         self.start = start
         self.size = size
         self.sort = sort
         self.category = category
         self.type_counts = []
         self.age_counts = Search.known_age_counts()
+        self.language_counts = Search.known_language_counts()
         self.date = date
         self.map_data_only = map_data_only  # When we should return a limited set of details just for mapping.
 
@@ -38,6 +46,7 @@ class Search:
     def reset(self):
         self.type_counts = []
         self.age_counts = Search.known_age_counts()
+        self.language_counts = Search.known_language_counts()
         self.hits = []
         self.total = 0
 
@@ -47,8 +56,15 @@ class Search:
                 ac = next(ac for ac in self.age_counts if ac.value == value)
                 ac.count = count
                 ac.is_selected = is_selected
-            except StopIteration:  # Go ahead and add it so it show up, but this is bad data..
+            except StopIteration:  # Go ahead and add it so it shows up, but this is bad data..
                 self.age_counts.append(AggCount(value, count, is_selected))
+        if field == 'languages':
+            try:
+                lc = next(lc for lc in self.language_counts if lc.value == value)
+                lc.count = count
+                lc.is_selected = is_selected
+            except StopIteration:  # Go ahead and add it so it shows up, but this is bad data..
+                self.language_counts.append(AggCount(value, count, is_selected))
         if field == 'types':
             self.type_counts.append(AggCount(value, count, is_selected))
 
@@ -56,6 +72,11 @@ class Search:
     @staticmethod
     def has_age_range():
         return next((ac for ac in Search.known_age_counts if ac.value == 'value'), None) is not None
+
+    # can be used to verify that a given language is supported.
+    @staticmethod
+    def has_language():
+        return next((ac for ac in Search.known_language_counts() if ac.value == 'value'), None) is not None
 
 
 class Sort:

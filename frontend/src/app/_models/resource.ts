@@ -8,6 +8,7 @@ export class Resource extends GeoLocation {
   type: string;
   title: string;
   description: string;
+  insurance: string;
   date?: string;
   time?: string;
   ticket_cost?: string;
@@ -21,6 +22,7 @@ export class Resource extends GeoLocation {
   state?: string;
   zip?: string;
   phone?: string;
+  phone_extension?: string;
   website?: string;
   contact_email?: string;
   video_code?: string;
@@ -31,6 +33,7 @@ export class Resource extends GeoLocation {
   resource_categories?: ResourceCategory[];
   categories?: Category[];
   ages?: string[];
+  languages?: string[];
 
   constructor(private _props) {
     super(_props);

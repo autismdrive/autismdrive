@@ -44,6 +44,7 @@ class Study(db.Model):
     num_visits = db.Column(db.Integer)
     status = db.Column(db.Enum(Status))
     ages = db.Column(db.ARRAY(db.String), default=[])
+    languages = db.Column(db.ARRAY(db.String), default=[])
     categories = db.relationship("StudyCategory", back_populates="study")
 
     def indexable_content(self):
@@ -61,4 +62,4 @@ class Study(db.Model):
         for cat in self.categories:
             cat_text = cat_text + ' ' + cat.category.indexable_content()
 
-        return cat_text + ' ' + ' '.join(self.ages)
+        return cat_text + ' ' + ' '.join(self.ages) + ' ' + ' '.join(self.languages)

@@ -11,8 +11,8 @@
         <button disabled mat-icon-button></button>
         <button matTreeNodeToggle mat-button>{{node.name}}</button>
         <a [queryParams]="{'category': node.id}" [routerLink]="[ '/search' ]" class="associated-records">
-          ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)
-        </a>
+          {{node.all_resource_count}} associated resources
+        </a> & {{node.study_count}} associated studies
         <button (click)="addNewItem(node)" mat-icon-button color="primary" [matTooltip]="'Add sub-category to ' + node.name">
           <mat-icon>add_circle</mat-icon>
         </button>
@@ -73,8 +73,8 @@
           </button>
           <button matTreeNodeToggle mat-button>{{node.name}}</button>
           <a [queryParams]="{'category': node.id}" [routerLink]="[ '/search' ]" class="associated-records">
-            ({{node.study_count + node.event_count + node.location_count + node.resource_count}} associated records)
-          </a>
+            {{node.all_resource_count}} associated resources
+          </a> & {{node.study_count}} associated studies
           <button (click)="addNewItem(node)" mat-icon-button [matTooltip]="'Add sub-category to ' + node.name">
             <mat-icon>add_circle</mat-icon>
           </button>
