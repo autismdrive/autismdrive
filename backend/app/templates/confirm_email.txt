@@ -14,6 +14,7 @@ Currently Enrolling Studies:
 {{ study.short_title }}: {{ study.link }}
 {{ study.short_description }}
 {% endfor %}
+All Studies: {{ studies_url }}
 
 ---------------------------------
 You received this email because you registered an account with Autism DRIVE.
