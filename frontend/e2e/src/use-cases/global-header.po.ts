@@ -57,7 +57,7 @@ export class GlobalHeaderUseCases {
   }
 
   visitStudiesPage() {
-    this.page.clickLinkTo('/studies');
+    this.page.clickLinkTo('/studies/currently_enrolling');
     expect(this.page.getElements('.studies').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
