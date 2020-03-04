@@ -69,7 +69,7 @@ class EmailService:
         server.sendmail(sender, recipients, msgRoot.as_bytes())
         server.quit()
 
-    def confirm_email(self, user):
+    def confirm_email(self, user, current_studies):
         user.token_url = ''
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
@@ -82,13 +82,17 @@ class EmailService:
         text_body = render_template("confirm_email.txt",
                                     user=user, confirm_url=confirm_url,
                                     forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
-                                    tracking_code=tracking_code)
+                                    tracking_code=tracking_code,
+                                    current_studies=current_studies,
+                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
 
         html_body = render_template("confirm_email.html",
                                     user=user, confirm_url=confirm_url,
                                     forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
                                     logo_url=logo_url,
-                                    tracking_code=tracking_code)
+                                    tracking_code=tracking_code,
+                                    current_studies=current_studies,
+                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
 
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)

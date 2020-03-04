@@ -155,6 +155,17 @@ export class SearchComponent implements OnInit, OnDestroy {
       image: '/assets/partners/via.png',
       url: 'https://www.viaschool.org/',
     },
+    {
+      name: 'University of Virginia Health System',
+      shortName: 'UVA Health',
+      description: `
+        UVA Health includes a hospital, level I trauma center, nationally recognized cancer and heart centers and primary and specialty
+        clinics throughout Central Virginia. Through research and clinical trials, UVA Health stays at the leading edge of the
+        treatments offered.
+      `,
+      image: '/assets/partners/uva_health.png',
+      url: 'https://uvahealth.com',
+    },
   ];
   private _mobileQueryListener: () => void;
 

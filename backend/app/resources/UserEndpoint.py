@@ -6,9 +6,10 @@ from marshmallow import ValidationError
 from sqlalchemy import exists, desc
 from sqlalchemy.exc import IntegrityError
 
-from app import RestException, db, email_service, auth
+from app import app, RestException, db, email_service, auth
 from app.model.email_log import EmailLog
 from app.model.role import Permission, Role
+from app.model.study import Study
 from app.model.user import User
 from app.schema.schema import UserSchema, UserSearchSchema
 from app.wrappers import requires_permission
@@ -103,7 +104,10 @@ class UserListEndpoint(flask_restful.Resource):
                                 details=new_user.errors)
 
     def send_confirm_email(self, user):
-        tracking_code = email_service.confirm_email(user)
+        current_studies = db.session.query(Study).filter_by(status='currently_enrolling').all()
+        for study in current_studies:
+            study.link = app.config['SITE_URL'] + '/#/study/' + str(study.id)
+        tracking_code = email_service.confirm_email(user, current_studies)
         log = EmailLog(user_id=user.id, type="confirm_email", tracking_code=tracking_code)
         db.session.add(log)
         db.session.commit()

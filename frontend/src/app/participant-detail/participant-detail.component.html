@@ -1,7 +1,7 @@
 <p><b>Participant ID: {{participant.id}}</b></p>
 <p>Name: {{participant.name || '(None given)'}}</p>
 <p>Relationship: {{participant.relationship}}</p>
-<p>Last Updated: {{participant.last_updated | date:'long'}}</p>
+<p>Last Updated: {{participant.last_updated | date:'short'}}</p>
 <p>Percent Complete: {{participant.percent_complete | percent}}</p>
 <div *ngIf="participant.step_log && participant.step_log.length > 0">
   <h5>Step Log:</h5>
@@ -39,7 +39,7 @@
 
   <ng-container matColumnDef="date_completed">
     <th mat-header-cell *matHeaderCellDef> Date Completed </th>
-    <td mat-cell *matCellDef="let element"> {{element.date_completed | date:'longDate'}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.date_completed | date:'short'}} </td>
   </ng-container>
 
   <ng-container matColumnDef="time_on_task_ms">

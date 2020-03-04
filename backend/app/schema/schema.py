@@ -71,7 +71,7 @@ class ParticipantSchema(ModelSchema):
 class UserSchema(ModelSchema):
     class Meta:
         model = User
-        fields = ('id', 'last_updated', 'registration_date', 'email', 'password', 'role',
+        fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
                   'permissions', 'participants', 'token', 'token_url')
     password = fields.String(load_only=True)
     participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
