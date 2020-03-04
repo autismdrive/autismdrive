@@ -206,12 +206,15 @@ export class SearchComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.queryParamMap.subscribe(qParams => {
       this.query = this._queryParamsToQuery(qParams);
-      console.log('locating Map Results.');
       if (navigator.geolocation) {
         this.gpsEnabled = true;
       }
       this.loadMapLocation(f => {
-        this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+        if (qParams.get('sort')) {
+          this.reSort(qParams.get('sort'));
+        } else {
+          this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+        }
       });
     });
   }
@@ -337,7 +340,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     } else if (this.selectedSort.name === 'Distance') {
       this.loadMapLocation(() => this._updateDistanceSort());
     } else {
-      this.doSearch();
+      this.updateUrlAndDoSearch(this.query)
     }
   }
 
@@ -558,6 +561,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     queryParams.types = query.types;
     queryParams.ages = query.ages;
     queryParams.languages = query.languages;
+    queryParams.sort = this.selectedSort.name;
 
     if (query.hasOwnProperty('category') && query.category) {
       queryParams.category = query.category.id;
@@ -586,6 +590,9 @@ export class SearchComponent implements OnInit, OnDestroy {
           case('languages'):
             query.languages = qParams.getAll(key);
             break;
+          case('sort'):
+            query.sort = this.sortMethods.find(m => m.name===qParams.get(key)).sortQuery;
+            break;
           case('types'):
             query.types = qParams.getAll(key);
         }
@@ -601,7 +608,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     if (this.selectedSort.name === 'Distance') {
       this.selectedSort = distance_sort;
       this.query.sort = this.selectedSort.sortQuery;
-      this.doSearch();
+      this.updateUrlAndDoSearch(this.query);
     }
   }
 
