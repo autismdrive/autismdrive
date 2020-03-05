@@ -401,6 +401,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       } else if (keepType === HitType.EVENT.name) {
         this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
       }
+      this.query.sort = this.selectedSort.sortQuery;
     } else {
       this.selectedType = this.resourceTypes.find(t => t.name === HitType.ALL_RESOURCES.name);
       this.query.types = this.resourceTypesFilteredNames();
