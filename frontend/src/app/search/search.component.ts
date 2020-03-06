@@ -106,7 +106,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     },
   ];
-  updateUrl: boolean = false;
+  updateUrl = false;
   selectedSort: SortMethod;
   selectedPageStart = 0;
   pageEvent: PageEvent;
@@ -348,7 +348,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (this.selectedSort.name === 'Distance') {
       this.loadMapLocation(() => this._updateDistanceSort());
     } else {
-      if (this.updateUrl===true) {
+      if (this.updateUrl === true) {
         this.updateUrlAndDoSearch(this.query);
       } else {
         this.doSearch();
@@ -605,7 +605,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
             query.languages = qParams.getAll(key);
             break;
           case('sort'):
-            query.sort = this.sortMethods.find(m => m.name===qParams.get(key)).sortQuery;
+            query.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery;
             break;
           case('pageStart'):
             this.selectedPageStart = Number(qParams.get(key));
@@ -626,7 +626,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedSort.name === 'Distance') {
       this.selectedSort = distance_sort;
       this.query.sort = this.selectedSort.sortQuery;
-      if (this.updateUrl===true) {
+      if (this.updateUrl === true) {
         this.updateUrlAndDoSearch(this.query);
       } else {
         this.doSearch();
@@ -638,7 +638,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.query.start = 0;
     this.paginatorElement.firstPage();
 
-    if (this.updateUrl===true) {
+    if (this.updateUrl === true) {
       this.updateUrlAndDoSearch(this.query);
     } else {
       this.doSearch();
