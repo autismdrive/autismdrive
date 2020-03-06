@@ -100,7 +100,7 @@ export class SearchUseCases {
   }
 
   displayResourceAndClickChip() {
-    this.page.clickLinkTo('/search');
+    this.page.clickLinkToVariation('/search');
     this.page.waitForVisible('app-search-result');
     this.page.getElements('.result-item div a').first().click();
     this.page.waitForVisible('app-resource-detail');
