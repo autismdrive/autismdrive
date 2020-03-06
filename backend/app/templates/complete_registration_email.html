@@ -1,0 +1,39 @@
+{% extends "base_email.html" %}
+{% block content %}
+    <p style="font-family: sans-serif; font-size: 24px; font-weight: bold; margin: 0; Margin-bottom: 15px;">
+        Welcome to Autism DRIVE.
+    </p>
+
+    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
+        There are few more steps to complete your profile. Once you provide more information about yourself,
+        we will use this information to contact you about upcoming studies and emerging resources that may be of
+        interest based on details you provided. You will have additional opportunities to create profiles for your
+        children or dependents.
+    </p>
+    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
+        To complete your profile, continue <a href="{{ profile_url }}">here.</a>.
+        If you do not remember your password, click <a href="{{ forgot_pass_url }}">here.</a>
+    </p>
+    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
+        If you have any questions about the Autism DRIVE, contact the Autism DRIVE team at
+        434-297-8178 or email us at autismdrive@virginia.edu.
+    </p>
+
+    <table border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+             <tr>
+             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #002359; border-radius: 5px; text-align: center;">
+                 <a href="{{ confirm_url }}" target="_blank" style="display: inline-block; width: 180px; color: #ffffff; background-color: #002359; border: solid 1px #002359; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #002359;">
+                     <span style="font-size: 1.4em; font-weight: bold">Continue to Autism DRIVE</span></a>
+             </td>
+             </tr>
+        </tbody>
+    </table>
+        <p></p>
+    <hr>
+    <h2><a href="{{studies_url}}">Currently Enrolling Studies:</a></h2>
+    {% for study in current_studies %}
+        <h4><a href="{{study.link}}">{{study.short_title}}</a></h4>
+        <p>{{study.short_description}}</p>
+    {% endfor %}
+{% endblock %}

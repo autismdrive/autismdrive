@@ -1,0 +1,25 @@
+Welcome to Autism DRIVE. There are few more steps to complete your profile.
+Once you provide more information about yourself, we will use this information to
+contact you about upcoming studies and emerging resources that may be of interest based
+on details you provided. You will have additional opportunities to create profiles for
+your children or dependents.
+
+To complete your profile, visit {{ profile_url }}
+If you do not remember your password, visit {{ forgot_pass_url }}
+
+If you have any questions about the Autism DRIVE, contact the Autism DRIVE team at
+434-297-8178 or email us at autismdrive@virginia.edu.
+
+---------------------------------
+
+Currently Enrolling Studies:
+{% for study in current_studies %}
+{{ study.short_title }}: {{ study.link }}
+{{ study.short_description }}
+{% endfor %}
+All Studies: {{ studies_url }}
+
+---------------------------------
+You received this email because you registered an account with Autism DRIVE.
+Please note that email is not a secure form of communication and should not be used to discuss any
+confidential matters, including personal health information, given its confidentiality cannot be assured.

@@ -163,3 +163,49 @@ class EmailService:
 
             self.send_email(subject,
                             recipients=recipients, text_body=text_body, html_body=html_body)
+
+    def complete_registration_prompt_email(self, user, current_studies):
+        tracking_code = self.tracking_code()
+
+        subject = "Autism DRIVE: Complete Your Registration"
+        logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
+        text_body = render_template("complete_registration_email.txt",
+                                    profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                    current_studies=current_studies,
+                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+        html_body = render_template("complete_registration_email.html",
+                                    profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                    logo_url=logo_url,
+                                    tracking_code=tracking_code,
+                                    current_studies=current_studies,
+                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+        self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
+
+        return tracking_code
+
+    def complete_dependent_profile_prompt_email(self, user, current_studies):
+        tracking_code = self.tracking_code()
+
+        subject = "Autism DRIVE: Complete Your Dependent's Profile"
+        logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
+        text_body = render_template("complete_dependent_profile_email.txt",
+                                    profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                    current_studies=current_studies,
+                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+        html_body = render_template("complete_dependent_profile_email.html",
+                                    profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                    forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                    logo_url=logo_url,
+                                    tracking_code=tracking_code,
+                                    current_studies=current_studies,
+                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+        self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
+
+        return tracking_code
