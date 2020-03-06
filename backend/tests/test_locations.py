@@ -2,7 +2,7 @@ import unittest
 
 from flask import json
 from tests.base_test import BaseTest
-from app import db
+from app import db, data_loader
 from app.model.location import Location
 from app.model.resource_category import ResourceCategory
 from app.model.resource_change_log import ResourceChangeLog
@@ -66,6 +66,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_location(self):
+        data_loader.DataLoader().load_partial_zip_codes()
         o_id = self.construct_organization().id
         location = {'title': "location of locations", 'description': "You need this location in your life.", 'organization_id': o_id}
         rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
@@ -228,3 +229,34 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response[-1]['resource_id'], l.id)
+
+    def test_geocode_setting(self):
+        data_loader.DataLoader().load_partial_zip_codes()
+        location = {'title': "Some super place", 'description': "You should go here every day."}
+        rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
+                           follow_redirects=True, headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertIsNotNone(response['latitude'])
+        self.assertIsNotNone(response['longitude'])
+        location_id = response['id']
+        initial_lat_lng = str(response['latitude']) + str(response['longitude'])
+
+        # lat and lng shouldn't change on edit unless the street_address1 or zip fields are edited.
+        response['description'] = "Something different"
+        rv = self.app.put('/api/location/%i' % location_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers())
+        self.assert_success(rv)
+        rv = self.app.get('/api/location/%i' % location_id, content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(initial_lat_lng, str(response['latitude']) + str(response['longitude']))
+
+        response['zip'] = '24401'
+        rv = self.app.put('/api/location/%i' % location_id, data=json.dumps(response), content_type="application/json",
+                          follow_redirects=True, headers=self.logged_in_headers())
+        self.assert_success(rv)
+        rv = self.app.get('/api/location/%i' % location_id, content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertNotEqual(initial_lat_lng, str(response['latitude']) + str(response['longitude']))
