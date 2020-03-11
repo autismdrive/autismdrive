@@ -332,26 +332,29 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+
   newSortSelection(event) {
     this.reSort(event.value);
   }
 
   reSort(sortName: string) {
-    this.loading = true;
-    this.selectedSort = this.sortMethods.find(s => s.name === sortName);
-    this.query.start = this.selectedPageStart;
-    this.selectedPageStart = 0;
-    this.query.sort = this.selectedSort.sortQuery;
+    if (sortName) {
+      this.loading = true;
+      this.selectedSort = this.sortMethods.find(s => s.name === sortName);
+      this.query.start = this.selectedPageStart;
+      this.selectedPageStart = 0;
+      this.query.sort = this.selectedSort.sortQuery;
 
-    if (this.selectedSort.name === 'Event Date') {
-      this.selectType(HitType.EVENT.name);
-    } else if (this.selectedSort.name === 'Distance') {
-      this.loadMapLocation(() => this._updateDistanceSort());
-    } else {
-      if (this.updateUrl === true) {
-        this.updateUrlAndDoSearch(this.query);
+      if (this.selectedSort.name === 'Event Date') {
+        this.selectType(HitType.EVENT.name);
+      } else if (this.selectedSort.name === 'Distance') {
+        this.loadMapLocation(() => this._updateDistanceSort());
       } else {
-        this.doSearch();
+        if (this.updateUrl === true) {
+          this.updateUrlAndDoSearch(this.query);
+        } else {
+          this.doSearch();
+        }
       }
     }
   }
@@ -498,13 +501,15 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setLocOpen = true;
   }
 
-  zipSubmit(): void {
+  zipSubmit($event: MouseEvent|KeyboardEvent): void {
+    $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');
     this.setLocOpen = false;
     this.reSort('Distance');
   }
 
-  useGPSLocation(): void {
+  useGPSLocation($event: MouseEvent|KeyboardEvent): void {
+    $event.stopPropagation();
     localStorage.removeItem('zipCode');
     this.setLocOpen = false;
     this.reSort('Distance');

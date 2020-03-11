@@ -206,4 +206,25 @@ agm-map {
 
 .zipCodeSet {
   margin-left: 2em;
+  display: none;
+
+  ::ng-deep * {
+    display: none;
+  }
+
+  &.show {
+    display: inherit;
+
+    ::ng-deep * {
+      display: inherit;
+    }
+  }
+}
+
+.zipCodeSetButton {
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+  }
 }
