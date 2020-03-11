@@ -254,6 +254,18 @@ class DataLoader:
         db.session.commit()
         print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(ZipCode).count())
 
+    def load_partial_zip_codes(self):
+        items = []
+        with open(self.zip_code_coords_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            for _ in range(43000):  # skip the first 43000 rows
+                next(reader)
+            for row in reader:
+                items.append(ZipCode(id=row[0], latitude=row[1], longitude=row[2]))
+
+        db.session.bulk_save_objects(items)
+        db.session.commit()
+        print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(ZipCode).count())
 
     def get_org_by_name(self, org_name):
         organization = db.session.query(Organization).filter(Organization.name == org_name).first()

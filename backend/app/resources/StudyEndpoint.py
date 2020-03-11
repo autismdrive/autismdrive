@@ -64,3 +64,11 @@ class StudyListEndpoint(flask_restful.Resource):
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
+
+
+class StudyByStatusListEndpoint(flask_restful.Resource):
+    studiesSchema = StudySchema(many=True)
+
+    def get(self, status):
+        studies = db.session.query(Study).filter_by(status=status)
+        return self.studiesSchema.dump(studies)

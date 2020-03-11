@@ -102,6 +102,7 @@ export class ApiService {
     studycategorylist: '/api/study_category',
     studyinquiry: '/api/study_inquiry',
     studylist: '/api/study',
+    studybystatuslist: '/api/study/status/<status>',
     user: '/api/user/<id>',
     userAdminNoteList: '/api/user/<user_id>/admin_note',
     userEmailLog: '/api/user/email_log/<id>',
@@ -207,6 +208,12 @@ export class ApiService {
   /** Get Studies */
   getStudies(): Observable<Study[]> {
     return this.httpClient.get<Study[]>(this._endpointUrl('studylist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Studies by Status */
+  getStudiesByStatus(status: string): Observable<Study[]> {
+    return this.httpClient.get<Study[]>(this._endpointUrl('studybystatuslist').replace('<status>', status))
       .pipe(catchError(this._handleError));
   }
 

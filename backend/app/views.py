@@ -27,7 +27,7 @@ from app.resources.AdminNoteEndpoint import (
     AdminNoteListByResourceEndpoint,
     AdminNoteListEndpoint,
     AdminNoteEndpoint)
-from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint
+from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint, StudyByStatusListEndpoint
 from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
 from app.resources.CategoryEndpoint import (
@@ -185,6 +185,7 @@ endpoints = [
 
     # Studies
     (StudyListEndpoint, "/study"),
+    (StudyByStatusListEndpoint, "/study/status/<status>"),
     (StudyEndpoint, "/study/<id>"),
     (CategoryByStudyEndpoint, "/study/<study_id>/category"),
     (StudyCategoryListEndpoint, "/study_category"),

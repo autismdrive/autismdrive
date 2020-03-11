@@ -2,7 +2,7 @@ import unittest
 
 from flask import json
 
-from app import db
+from app import db, data_loader
 from app.model.event import Event
 from tests.base_test import BaseTest
 from app.model.resource_category import ResourceCategory
@@ -11,7 +11,6 @@ from app.model.user import Role
 
 
 class TestEvents(BaseTest, unittest.TestCase):
-
 
     def test_event_basics(self):
         self.construct_event()
@@ -28,6 +27,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertEqual(response["description"], 'A delightful event destined to create rejoicing')
 
     def test_modify_event_basics(self):
+        data_loader.DataLoader().load_partial_zip_codes()
         self.construct_event()
         r = db.session.query(Event).first()
         self.assertIsNotNone(r)
@@ -62,6 +62,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_event(self):
+        data_loader.DataLoader().load_partial_zip_codes()
         o_id = self.construct_organization().id
         event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
                  'ticket_cost': "$500 suggested donation", 'organization_id': o_id}
@@ -197,6 +198,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertEqual(0, len(response))
 
     def test_resource_change_log(self):
+        data_loader.DataLoader().load_partial_zip_codes()
         ev = self.construct_event(title='An Event that is Super and Great')
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
 
@@ -217,12 +219,14 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertIsNotNone(logs[-1].resource_id)
         self.assertIsNotNone(logs[-1].user_id)
 
-        rv = self.app.get('/api/resource/%i/change_log' % ev.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.app.get('/api/resource/%i/change_log' % ev.id, content_type="application/json",
+                          headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response[-1]['user_id'], u.id)
 
-        rv = self.app.get('/api/user/%i/resource_change_log' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.app.get('/api/user/%i/resource_change_log' % u.id, content_type="application/json",
+                          headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response[-1]['resource_id'], ev.id)
