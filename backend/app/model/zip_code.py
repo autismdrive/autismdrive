@@ -1,4 +1,3 @@
-from flask_marshmallow import Schema
 from sqlalchemy import func
 
 from app import db

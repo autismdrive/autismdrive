@@ -7,6 +7,7 @@ from marshmallow import ValidationError
 from app import RestException, db, elastic_index, auth
 from app.model.event import Event
 from app.model.resource_change_log import ResourceChangeLog
+from app.model.geocode import Geocode
 from app.schema.schema import EventSchema
 from app.model.role import Permission
 from app.wrappers import requires_permission
@@ -41,6 +42,14 @@ class EventEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Event).filter_by(id=id).first()
+        if instance.zip != request_data['zip'] \
+                or instance.street_address1 != request_data['street_address1']\
+                or instance.latitude is None:
+            address_dict = {'street': request_data['street_address1'], 'city': request_data['city'],
+                            'state': request_data['state'], 'zip': request_data['zip']}
+            geocode = Geocode.get_geocode(address_dict=address_dict)
+            request_data['latitude'] = geocode['lat']
+            request_data['longitude'] = geocode['lng']
         updated, errors = self.schema.load(request_data, instance=instance)
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.now()
@@ -50,7 +59,8 @@ class EventEndpoint(flask_restful.Resource):
         self.log_update(event_id=updated.id, event_title=updated.title, change_type='edit')
         return self.schema.dump(updated)
 
-    def log_update(self, event_id, event_title, change_type):
+    @staticmethod
+    def log_update(event_id, event_title, change_type):
         log = ResourceChangeLog(resource_id=event_id, resource_title=event_title, user_id=g.user.id,
                                 user_email=g.user.email, type=change_type)
         db.session.add(log)
@@ -72,6 +82,11 @@ class EventListEndpoint(flask_restful.Resource):
         request_data = request.get_json()
         try:
             load_result = self.eventSchema.load(request_data).data
+            address_dict = {'street': load_result.street_address1, 'city': load_result.city,
+                            'state': load_result.state, 'zip': load_result.zip}
+            geocode = Geocode.get_geocode(address_dict=address_dict)
+            load_result.latitude = geocode['lat']
+            load_result.longitude = geocode['lng']
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Event', latitude=load_result.latitude, longitude=load_result.longitude)
@@ -81,7 +96,8 @@ class EventListEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)
 
-    def log_update(self, event_id, event_title, change_type):
+    @staticmethod
+    def log_update(event_id, event_title, change_type):
         log = ResourceChangeLog(resource_id=event_id, resource_title=event_title, user_id=g.user.id,
                                 user_email=g.user.email, type=change_type)
         db.session.add(log)

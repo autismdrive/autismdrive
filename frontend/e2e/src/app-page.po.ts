@@ -80,6 +80,15 @@ export class AppPage {
     expect(actualRoute).toEqual(route);
   }
 
+  async clickLinkToVariation(route: string) {
+    const selector = `[href="#${route}"]`;
+    this.waitForClickable(selector);
+    this.clickElement(selector);
+    const actualRoute = await this.getRoute();
+    const routeLength = route.length;
+    expect(actualRoute.substr(0, routeLength)).toEqual(route);
+  }
+
   getParagraphText() {
     return this.getElement('app-root h1').getText();
   }

@@ -5,7 +5,7 @@ export class StudiesUseCases {
   }
 
   navigateToStudiesPage() {
-    this.page.clickLinkTo('/studies/currently_enrolling');
+    this.page.clickLinkToVariation('/studies');
     expect(this.page.getElements('.studies').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
   }

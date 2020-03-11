@@ -57,14 +57,14 @@ export class GlobalHeaderUseCases {
   }
 
   visitStudiesPage() {
-    this.page.clickLinkTo('/studies/currently_enrolling');
+    this.page.clickLinkToVariation('/studies');
     expect(this.page.getElements('.studies').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     this.page.clickLinkTo('/home');
   }
 
   visitResourcesPage() {
-    this.page.clickLinkTo('/search');
+    this.page.clickLinkToVariation('/search');
     this.page.waitForVisible('app-search-result');
 
     ['resource', 'location', 'event'].forEach(t => {

@@ -74,7 +74,7 @@
 
             <div class="sort-order">
               <h3>Sort by</h3>
-              <mat-radio-group [ngModel]="selectedSort.name" (change)="newSortSelection($event)" fxLayout="column">
+              <mat-radio-group [ngModel]="selectedSort && selectedSort.name" (change)="newSortSelection($event)" fxLayout="column">
                 <mat-radio-button value="Relevance" *ngIf="query.words != ''">
                   Relevance to "{{query.words}}"
                   <button mat-button class="ghost"><mat-icon>code</mat-icon></button>
@@ -83,19 +83,19 @@
                   Distance
                   <span *ngIf="isZipCode(storedZip)">({{storedZip}})</span>
                   <span *ngIf="gpsEnabled && !isZipCode(storedZip)">(using GPS)</span>
-                  <button *ngIf="!this.noLocation && !this.setLocOpen" mat-button (click)="openSetLocation()" matTooltip="Set your location">
+                  <button [ngClass]="{'zipCodeSetButton': true, 'show': !this.noLocation && !this.setLocOpen}" mat-button (click)="openSetLocation()" matTooltip="Set your location">
                     <mat-icon>keyboard_arrow_down</mat-icon>
                   </button>
                 </mat-radio-button>
-                <div *ngIf="this.noLocation || this.setLocOpen" class="zipCodeSet" fxLayout="column">
-                  Or Set Your Location (restricted to VA, WV)
+                <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="column">
+                  <p>Or Set Your Location (restricted to VA, WV)</p>
                   <mat-form-field>
                     <mat-label>ZIP Code</mat-label>
-                    <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit()">
+                    <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit($event)">
                   </mat-form-field>
                   <div fxLayout="row" fxLayoutGap="1em">
-                      <button mat-flat-button color="primary" (click)="zipSubmit()" id="btn_save">Save</button>
-                      <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation()" id="btn_gps">Use GPS instead</button>
+                      <button mat-flat-button color="primary" (click)="zipSubmit($event)" id="btn_save">Save</button>
+                      <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation($event)" id="btn_gps">Use GPS instead</button>
                   </div>
                 </div>
                 <mat-radio-button value="Updated">Recently Updated
