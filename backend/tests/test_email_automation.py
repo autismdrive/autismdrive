@@ -182,8 +182,6 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        self.create_email_log_records(1, 8, 'complete_registration_prompt', user=u2)
-
         PromptingEmails().send_complete_registration_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Complete Your Registration", self.decode(TEST_MESSAGES[-1]['subject']))
@@ -194,7 +192,25 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        self.create_email_log_records(1, 8, 'dependent_profile_prompt', user=u1)
+        PromptingEmails().send_dependent_profile_prompting_emails()
+        self.assertEqual(len(TEST_MESSAGES), message_count + 1)
+        self.assertEqual("Autism DRIVE: Complete Your Dependent's Profile", self.decode(TEST_MESSAGES[-1]['subject']))
+        self.assertEqual(u1.email, TEST_MESSAGES[-1]['To'])
+
+    def test_dependent_profile_sends_scheduled_prompt_with_no_dependent(self):
+        u1 = self.create_complete_guardian()
+        message_count = len(TEST_MESSAGES)
+
+        self.create_email_log_records(5, 28, 'dependent_profile_prompt', user=u1)
+
+        # Prompting email should not be sent between 60 and 90 days.
+
+        PromptingEmails().send_dependent_profile_prompting_emails()
+        self.assertEqual(len(TEST_MESSAGES), message_count)
+        db.session.query(EmailLog).delete()
+        db.session.commit()
+
+        self.create_email_log_records(5, 31, 'dependent_profile_prompt', user=u1)
 
         PromptingEmails().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
@@ -214,8 +230,6 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assert_success(rv)
 
         message_count = len(TEST_MESSAGES)
-
-        self.create_email_log_records(1, 8, 'dependent_profile_prompt', user=u1)
 
         PromptingEmails().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
@@ -267,8 +281,6 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assert_success(rv)
 
         message_count = len(TEST_MESSAGES)
-
-        self.create_email_log_records(1, 8, 'dependent_profile_prompt', user=u1)
 
         PromptingEmails().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)

@@ -17,7 +17,9 @@ class PromptingEmails:
                 .filter_by(user_id=rec.id)\
                 .filter_by(type=log_type) \
                 .order_by(EmailLog.last_updated).all()
-            if 0 < len(email_logs) <= 2:
+            if (len(email_logs) is 0) and (log_type is not 'confirm_email'):
+                self.send_prompting_email(rec, send_method, log_type)
+            elif 0 < len(email_logs) <= 2:
                 most_recent = email_logs[-1]
                 if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 604800:
                     self.send_prompting_email(rec, send_method, log_type)
@@ -45,15 +47,15 @@ class PromptingEmails:
         self.send_prompts(recipients, EmailService(app).confirm_email, 'confirm_email')
 
     def send_complete_registration_prompting_emails(self):
-        all_users = db.session.query(User).all()
-        recipients = [u for u in all_users if u.self_registration_complete() is False]
+        confirmed_users = db.session.query(User).filter(User.password is not None).all()
+        recipients = [u for u in confirmed_users if u.self_registration_complete() is False]
         self.send_prompts(recipients, EmailService(app).complete_registration_prompt_email,
                           'complete_registration_prompt')
 
     def send_dependent_profile_prompting_emails(self):
-        all_users = db.session.query(User).all()
+        confirmed_users = db.session.query(User).filter(User.password is not None).all()
         recipients = []
-        for u in all_users:
+        for u in confirmed_users:
             if (u.get_self_participant().relationship.name == 'self_guardian') \
                     and (u.self_registration_complete() is True):
                 dependents = [p for p in u.participants if p.relationship.name == 'dependent']
