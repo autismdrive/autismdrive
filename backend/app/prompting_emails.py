@@ -51,6 +51,14 @@ class PromptingEmails:
                           'complete_registration_prompt')
 
     def send_dependent_profile_prompting_emails(self):
-        recipients = db.session.query(User).filter_by(password=None).all()
+        all_users = db.session.query(User).all()
+        recipients = []
+        for u in all_users:
+            if (u.get_self_participant().relationship.name == 'self_guardian') \
+                    and (u.self_registration_complete() is True):
+                dependents = [p for p in u.participants if p.relationship.name == 'dependent']
+                incomplete_dependents = [p for p in dependents if p.get_percent_complete() < 1]
+                if (len(dependents) == 0) or (len(incomplete_dependents) > 0):
+                    recipients.append(u)
         self.send_prompts(recipients, EmailService(app).complete_dependent_profile_prompt_email,
                           'dependent_profile_prompt')
