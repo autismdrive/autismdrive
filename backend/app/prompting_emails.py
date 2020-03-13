@@ -18,7 +18,8 @@ class PromptingEmails:
                 .filter_by(type=log_type) \
                 .order_by(EmailLog.last_updated).all()
             if (len(email_logs) is 0) and (log_type is not 'confirm_email'):
-                self.send_prompting_email(rec, send_method, log_type)
+                if (datetime.datetime.now(tz=UTC) - rec.last_login).total_seconds() > 172800:
+                    self.send_prompting_email(rec, send_method, log_type)
             elif 0 < len(email_logs) <= 2:
                 most_recent = email_logs[-1]
                 if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 604800:

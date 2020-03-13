@@ -26,7 +26,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             days_removed += 2
 
     def create_complete_guardian(self):
-        u1 = self.construct_user(email='test1@sartography.com')
+        u1 = self.construct_user(email='test1@sartography.com', last_login='12/4/19 10:00')
         p1 = self.construct_participant(user=u1, relationship=Relationship.self_guardian)
         q1 = {
             'user_id': u1.id,
@@ -164,7 +164,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         self.assertTrue(u1.self_registration_complete())
 
-        u2 = self.construct_user(email='test2@sartography.com')
+        u2 = self.construct_user(email='test2@sartography.com', last_login="12/4/19 10:00")
         p2 = self.construct_participant(user=u2, relationship=Relationship.self_guardian)
         q2 = {
             'user_id': u2.id,
