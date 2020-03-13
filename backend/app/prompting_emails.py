@@ -13,20 +13,20 @@ class PromptingEmails:
 
     def send_prompts(self, recipients, send_method, log_type):
         for rec in recipients:
-            confirm_logs = db.session.query(EmailLog)\
+            email_logs = db.session.query(EmailLog)\
                 .filter_by(user_id=rec.id)\
                 .filter_by(type=log_type) \
                 .order_by(EmailLog.last_updated).all()
-            if len(confirm_logs) <= 2:
-                most_recent = confirm_logs[-1]
+            if 0 < len(email_logs) <= 2:
+                most_recent = email_logs[-1]
                 if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 604800:
                     self.send_prompting_email(rec, send_method, log_type)
-            elif len(confirm_logs) is 3:
-                most_recent = confirm_logs[-1]
+            elif len(email_logs) is 3:
+                most_recent = email_logs[-1]
                 if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 1314900:
                     self.send_prompting_email(rec, send_method, log_type)
-            elif 3 < len(confirm_logs) < 6:
-                most_recent = confirm_logs[-1]
+            elif 3 < len(email_logs) < 6:
+                most_recent = email_logs[-1]
                 if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 2629800:
                     self.send_prompting_email(rec, send_method, log_type)
 
@@ -45,9 +45,12 @@ class PromptingEmails:
         self.send_prompts(recipients, EmailService(app).confirm_email, 'confirm_email')
 
     def send_complete_registration_prompting_emails(self):
-        recipients = db.session.query(User).filter_by(password=None).all()
-        self.send_prompts(recipients, EmailService(app).complete_registration_prompt_email, 'complete_registration_prompt')
+        all_users = db.session.query(User).all()
+        recipients = [u for u in all_users if u.self_registration_complete() is False]
+        self.send_prompts(recipients, EmailService(app).complete_registration_prompt_email,
+                          'complete_registration_prompt')
 
     def send_dependent_profile_prompting_emails(self):
         recipients = db.session.query(User).filter_by(password=None).all()
-        self.send_prompts(recipients, EmailService(app).complete_dependent_profile_prompt_email, 'dependent_profile_prompt')
+        self.send_prompts(recipients, EmailService(app).complete_dependent_profile_prompt_email,
+                          'dependent_profile_prompt')

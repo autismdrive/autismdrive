@@ -37,6 +37,14 @@ class User(db.Model):
                 return True
         return False
 
+    def get_self_participant(self):
+        if len(self.participants) > 0:
+            return next(p for p in self.participants if "self" in p.relationship.name)
+
+    def self_registration_complete(self):
+        if self.get_self_participant() is not None:
+            return self.get_self_participant().get_percent_complete() == 1
+
     @hybrid_property
     def password(self):
         return self._password
