@@ -10,7 +10,7 @@ from app import db
 from app.model.email_log import EmailLog
 from app.model.participant import Relationship
 from app.email_service import TEST_MESSAGES
-from app.prompting_emails import PromptingEmails
+from app.email_prompt_service import EmailPromptService
 
 
 class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
@@ -53,14 +53,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.create_email_log_records(1, 6, 'confirm_email')
 
         # Prompting email should not be sent before 7 days.
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
         db.session.query(EmailLog).delete()
         db.session.commit()
 
         self.create_email_log_records(1, 8, 'confirm_email')
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Confirm Email", self.decode(TEST_MESSAGES[-1]['subject']))
 
@@ -70,14 +70,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.create_email_log_records(2, 6, 'confirm_email')
 
         # Prompting email should not be sent between 7 and 14 days.
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
         db.session.query(EmailLog).delete()
         db.session.commit()
 
         self.create_email_log_records(2, 8, 'confirm_email')
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Confirm Email", self.decode(TEST_MESSAGES[-1]['subject']))
 
@@ -88,14 +88,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         # Prompting email should not be sent between 14 and 30 days.
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
         db.session.query(EmailLog).delete()
         db.session.commit()
 
         self.create_email_log_records(3, 16, 'confirm_email')
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Confirm Email", self.decode(TEST_MESSAGES[-1]['subject']))
 
@@ -106,14 +106,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         # Prompting email should not be sent between 30 and 60 days.
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
         db.session.query(EmailLog).delete()
         db.session.commit()
 
         self.create_email_log_records(4, 31, 'confirm_email')
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Confirm Email", self.decode(TEST_MESSAGES[-1]['subject']))
 
@@ -124,14 +124,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         # Prompting email should not be sent between 60 and 90 days.
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
         db.session.query(EmailLog).delete()
         db.session.commit()
 
         self.create_email_log_records(5, 31, 'confirm_email')
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Confirm Email", self.decode(TEST_MESSAGES[-1]['subject']))
 
@@ -140,7 +140,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         self.create_email_log_records(6, 31, 'confirm_email')
 
-        PromptingEmails().send_confirm_prompting_emails()
+        EmailPromptService().send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
 
     def test_self_registration_prompting_email(self):
@@ -182,7 +182,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        PromptingEmails().send_complete_registration_prompting_emails()
+        EmailPromptService().send_complete_registration_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Complete Your Registration", self.decode(TEST_MESSAGES[-1]['subject']))
         self.assertEqual("test2@sartography.com", TEST_MESSAGES[-1]['To'])
@@ -192,7 +192,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        PromptingEmails().send_dependent_profile_prompting_emails()
+        EmailPromptService().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Complete Your Dependent's Profile", self.decode(TEST_MESSAGES[-1]['subject']))
         self.assertEqual(u1.email, TEST_MESSAGES[-1]['To'])
@@ -205,14 +205,14 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         # Prompting email should not be sent between 60 and 90 days.
 
-        PromptingEmails().send_dependent_profile_prompting_emails()
+        EmailPromptService().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
         db.session.query(EmailLog).delete()
         db.session.commit()
 
         self.create_email_log_records(5, 31, 'dependent_profile_prompt', user=u1)
 
-        PromptingEmails().send_dependent_profile_prompting_emails()
+        EmailPromptService().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Complete Your Dependent's Profile", self.decode(TEST_MESSAGES[-1]['subject']))
         self.assertEqual(u1.email, TEST_MESSAGES[-1]['To'])
@@ -231,7 +231,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        PromptingEmails().send_dependent_profile_prompting_emails()
+        EmailPromptService().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
         self.assertEqual("Autism DRIVE: Complete Your Dependent's Profile", self.decode(TEST_MESSAGES[-1]['subject']))
         self.assertEqual(u1.email, TEST_MESSAGES[-1]['To'])
@@ -282,5 +282,5 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        PromptingEmails().send_dependent_profile_prompting_emails()
+        EmailPromptService().send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)

@@ -9,7 +9,7 @@ from app.model.user import User
 from app.email_service import EmailService
 
 
-class PromptingEmails:
+class EmailPromptService:
 
     def send_prompts(self, recipients, send_method, log_type):
         for rec in recipients:
