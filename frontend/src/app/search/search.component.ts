@@ -641,7 +641,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private _goToFirstPage() {
     this.query.start = 0;
-    this.paginatorElement.firstPage();
+    if (this.paginatorElement) {
+      this.paginatorElement.firstPage();
+    }
 
     if (this.updateUrl === true) {
       this.updateUrlAndDoSearch(this.query);
