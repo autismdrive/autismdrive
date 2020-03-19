@@ -16,6 +16,7 @@ from flask_marshmallow import Marshmallow
 
 from app.elastic_index import ElasticIndex
 from app.email_service import EmailService
+from app.email_prompt_service import EmailPromptService
 from app.rest_exception import RestException
 
 logging.config.dictConfig(logging_config)
@@ -211,6 +212,9 @@ def run_full_export():
 
 
 from app import views
+from app.model.email_log import EmailLog
+from app.model.study import Study
+from app.model.user import User
 
 
 def schedule_tasks():
@@ -227,6 +231,9 @@ def schedule_tasks():
     else:
         scheduler.add_job(ExportService.send_alert_if_exports_not_running, 'interval',
                           minutes=app.config['EXPORT_CHECK_INTERNAL_MINUTES'])
+        scheduler.add_job(EmailPromptService(app, db, EmailLog, Study, User).send_confirm_prompting_emails, 'interval', days=1)
+        scheduler.add_job(EmailPromptService(app, db, EmailLog, Study, User).send_complete_registration_prompting_emails, 'interval', days=1)
+        scheduler.add_job(EmailPromptService(app, db, EmailLog, Study, User).send_dependent_profile_prompting_emails, 'interval', days=1)
 
 
 # Cron scheduler
