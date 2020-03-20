@@ -43,20 +43,20 @@ class EmailPromptService:
                 .filter_by(user_id=rec.id)\
                 .filter_by(type=log_type) \
                 .order_by(self.email_log_model.last_updated).all()
+            if len(email_logs) > 0:
+                most_recent = email_logs[-1]
+                days_since_most_recent = (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() / 86400
             if (len(email_logs) is 0) and (log_type is not 'confirm_email'):
-                if (rec.last_login is not None) and ((datetime.datetime.now(tz=UTC) - rec.last_login).total_seconds() > 172800):
+                if (rec.last_login is not None) and ((datetime.datetime.now(tz=UTC) - rec.last_login).total_seconds() > (2 * 86400)):
                     self.__send_prompting_email(rec, send_method, log_type)
             elif 0 < len(email_logs) <= 2:
-                most_recent = email_logs[-1]
-                if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 604800:
+                if days_since_most_recent > 7:
                     self.__send_prompting_email(rec, send_method, log_type)
             elif len(email_logs) is 3:
-                most_recent = email_logs[-1]
-                if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 1314900:
+                if days_since_most_recent > 16:
                     self.__send_prompting_email(rec, send_method, log_type)
             elif 3 < len(email_logs) < 6:
-                most_recent = email_logs[-1]
-                if (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() > 2629800:
+                if days_since_most_recent > 30:
                     self.__send_prompting_email(rec, send_method, log_type)
 
     def __send_prompting_email(self, user, send_method, log_type):

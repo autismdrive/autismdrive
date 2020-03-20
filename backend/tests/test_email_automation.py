@@ -95,7 +95,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         db.session.query(EmailLog).delete()
         db.session.commit()
 
-        self.create_email_log_records(3, 16, 'confirm_email')
+        self.create_email_log_records(3, 17, 'confirm_email')
 
         EmailPromptService(app, db, EmailLog, Study, User).send_confirm_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count + 1)
