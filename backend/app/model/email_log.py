@@ -15,7 +15,6 @@ class EmailLog(db.Model):
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
 
 
-
 class EmailLogSchema(ModelSchema):
     class Meta:
         model = EmailLog

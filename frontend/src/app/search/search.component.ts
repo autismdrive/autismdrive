@@ -90,7 +90,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     },
     {
-      name: 'Event Date',
+      name: 'Date',
       label: 'Happening Soon',
       sortQuery: {
         field: 'date',
@@ -212,7 +212,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gpsEnabled = true;
       }
       this.loadMapLocation(f => {
-        if (qParams.get('sort')) {
+        if (qParams.get('sort') && this.sortMethods.find(m => m.name === qParams.get('sort')) != undefined) {
           this.reSort(qParams.get('sort'));
         } else {
           this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
@@ -345,7 +345,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedPageStart = 0;
       this.query.sort = this.selectedSort.sortQuery;
 
-      if (this.selectedSort.name === 'Event Date') {
+      if (this.selectedSort.name === 'Date') {
         this.selectType(HitType.EVENT.name);
       } else if (this.selectedSort.name === 'Distance') {
         this.loadMapLocation(() => this._updateDistanceSort());
@@ -394,15 +394,15 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
 
       if (keepType === HitType.LOCATION.name) {
-        this.selectedSort = this.sortMethods.filter(s => s.name === 'Distance')[0];
+        this.selectedSort = this.sortMethods.find(s => s.name === 'Distance');
       } else if (keepType === HitType.RESOURCE.name) {
         if (this.query.words !== '') {
-          this.selectedSort = this.sortMethods.filter(s => s.name === 'Relevance')[0];
+          this.selectedSort = this.sortMethods.find(s => s.name === 'Relevance');
         } else {
-          this.selectedSort = this.sortMethods.filter(s => s.name === 'Updated')[0];
+          this.selectedSort = this.sortMethods.find(s => s.name === 'Updated');
         }
       } else if (keepType === HitType.EVENT.name) {
-        this.selectedSort = this.sortMethods.filter(s => s.name === 'Event Date')[0];
+        this.selectedSort = this.sortMethods.find(s => s.name === 'Date');
       }
       this.query.sort = this.selectedSort.sortQuery;
     } else {
@@ -610,7 +610,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
             query.languages = qParams.getAll(key);
             break;
           case('sort'):
-            query.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery;
+            if (this.sortMethods.find(m => m.name === qParams.get(key)) != undefined) {
+              query.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery
+            }
             break;
           case('pageStart'):
             this.selectedPageStart = Number(qParams.get(key));
@@ -641,7 +643,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private _goToFirstPage() {
     this.query.start = 0;
-    this.paginatorElement.firstPage();
+    if (this.paginatorElement) {
+      this.paginatorElement.firstPage();
+    }
 
     if (this.updateUrl === true) {
       this.updateUrlAndDoSearch(this.query);

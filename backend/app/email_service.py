@@ -37,7 +37,7 @@ class EmailService:
         msgRoot = MIMEMultipart('related')
         msgRoot.set_charset('utf8')
 
-        if (sender == None):
+        if sender is None:
             sender = self.app.config['MAIL_DEFAULT_SENDER']
 
         msgRoot['Subject'] = Header(subject.encode('utf-8'), 'utf-8').encode()
@@ -69,22 +69,23 @@ class EmailService:
         server.sendmail(sender, recipients, msgRoot.as_bytes())
         server.quit()
 
-    def confirm_email(self, user, current_studies):
+    def confirm_email(self, user, current_studies, tracking_code=None, logo_url=None):
+        if tracking_code is None and logo_url is None:
+            tracking_code = self.tracking_code()
+            logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         user.token_url = ''
         ts = URLSafeTimedSerializer(self.app.config["SECRET_KEY"])
         token = ts.dumps(user.email, salt='email-reset-key')
         role = '' + user.role.name + '/'
-        tracking_code = self.tracking_code()
 
         subject = "Autism DRIVE: Confirm Email"
         confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token
-        logo_url = url_for('track.logo', user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template("confirm_email.txt",
                                     user=user, confirm_url=confirm_url,
                                     forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
                                     tracking_code=tracking_code,
                                     current_studies=current_studies,
-                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
+                                    studies_url=self.site_url + '/#/studies')
 
         html_body = render_template("confirm_email.html",
                                     user=user, confirm_url=confirm_url,
@@ -92,7 +93,7 @@ class EmailService:
                                     logo_url=logo_url,
                                     tracking_code=tracking_code,
                                     current_studies=current_studies,
-                                    studies_url=self.app.config['SITE_URL'] + '/#/studies')
+                                    studies_url=self.site_url + '/#/studies')
 
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
@@ -101,6 +102,13 @@ class EmailService:
             user.token_url = confirm_url
 
         return tracking_code
+
+    def async_confirm_email(self, user, current_studies):
+        with self.app.app_context(), self.app.test_request_context():
+            tracking_code = self.tracking_code()
+            logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
+
+            self.confirm_email(user, current_studies, tracking_code, logo_url)
 
     def reset_email(self, user):
         user.token_url = ''
@@ -163,3 +171,51 @@ class EmailService:
 
             self.send_email(subject,
                             recipients=recipients, text_body=text_body, html_body=html_body)
+
+    def complete_registration_prompt_email(self, user, current_studies):
+        with self.app.app_context(), self.app.test_request_context():
+            tracking_code = self.tracking_code()
+
+            subject = "Autism DRIVE: Complete Your Registration"
+            logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
+            text_body = render_template("complete_registration_email.txt",
+                                        profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                        forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                        current_studies=current_studies,
+                                        studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+            html_body = render_template("complete_registration_email.html",
+                                        profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                        forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                        logo_url=logo_url,
+                                        tracking_code=tracking_code,
+                                        current_studies=current_studies,
+                                        studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+            self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
+
+            return tracking_code
+
+    def complete_dependent_profile_prompt_email(self, user, current_studies):
+        with self.app.app_context(), self.app.test_request_context():
+            tracking_code = self.tracking_code()
+
+            subject = "Autism DRIVE: Complete Your Dependent's Profile"
+            logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
+            text_body = render_template("complete_dependent_profile_email.txt",
+                                        profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                        forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                        current_studies=current_studies,
+                                        studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+            html_body = render_template("complete_dependent_profile_email.html",
+                                        profile_url=self.app.config['SITE_URL'] + '/#/profile',
+                                        forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'],
+                                        logo_url=logo_url,
+                                        tracking_code=tracking_code,
+                                        current_studies=current_studies,
+                                        studies_url=self.app.config['SITE_URL'] + '/#/studies')
+
+            self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
+
+            return tracking_code

@@ -108,12 +108,12 @@ class BaseTest:
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
                             "BAD Response: %i." % rv.status_code + ". " + msg)
 
-    def construct_user(self, email="stan@staunton.com", role=Role.user):
+    def construct_user(self, email="stan@staunton.com", role=Role.user, last_login=datetime.datetime.now()):
 
         db_user = db.session.query(User).filter_by(email=email).first()
         if db_user:
             return db_user
-        user = User(email=email, role=role)
+        user = User(email=email, role=role, last_login=last_login)
         db.session.add(user)
         db_user = db.session.query(User).filter_by(email=user.email).first()
         self.assertEqual(db_user.email, user.email)

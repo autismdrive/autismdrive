@@ -111,7 +111,7 @@ export class SearchUseCases {
   }
 
   sortByEventDate() {
-    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Event Date"]');
+    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Date"]');
     this.page.waitFor(1000);
     return this.checkResultsDates('.hit-event-date', 'asc');
   }
