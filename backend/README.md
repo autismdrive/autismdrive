@@ -89,12 +89,6 @@ Each time you modify your data models you will need to create new migrations. Th
 flask db migrate
 ```
 
-### Set up your connection to S3
-Create a .aws directory in your home direction
-create a file called "credentials"
-Place your s3 credentials in this file (will need to get a copy from someone else)
-
-
 ### Load in the seed data
 This will pull in initial values into the database.
 ```BASH
