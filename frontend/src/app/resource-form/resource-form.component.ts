@@ -10,7 +10,7 @@ import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {scrollToFirstInvalidField} from '../../util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AgeRange, Language} from '../_models/hit_type';
+import {AgeRange, Language, Covid19Categories} from '../_models/hit_type';
 
 
 enum PageState {
@@ -278,6 +278,16 @@ export class ResourceFormComponent implements OnInit {
         label: 'Languages',
         type: 'array',
         options: this.getOptions(Language.labels),
+      },
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'covid19_categories',
+      type: 'multicheckbox',
+      templateOptions: {
+        label: 'COVID-19 Topics',
+        type: 'array',
+        options: this.getOptions(Covid19Categories.labels),
       },
       hideExpression: '!model.type',
     },
