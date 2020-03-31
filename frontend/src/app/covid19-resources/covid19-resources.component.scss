@@ -1,0 +1,31 @@
+@import '../../config';
+
+.covid19-resources {
+  margin: 2em;
+}
+
+.category-buttons {
+  width: 250px;
+
+}
+
+.covid19-hero {
+  background: $brand-primary;
+  color: white;
+  padding: 1em;
+  margin-top: 0;
+  text-align: center;
+
+  h1 {
+    color: white;
+  }
+
+  hr {
+    border-top-width: 4px;
+    margin: 1em auto;
+  }
+}
+
+.covid19-title {
+  margin-bottom: 0 !important;
+}
