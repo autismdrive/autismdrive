@@ -160,10 +160,10 @@ class BaseTest:
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            phone="555-555-5555", website="http://stardrive.org", is_draft=False, categories=[],
-                           ages=[], languages=[]):
+                           ages=[], languages=[], covid19_categories=[]):
 
         resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages,
-                            is_draft=is_draft, languages=languages)
+                            is_draft=is_draft, languages=languages, covid19_categories=covid19_categories)
         resource.organization_id = self.construct_organization().id
         db.session.add(resource)
         db.session.commit()
