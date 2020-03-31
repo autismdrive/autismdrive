@@ -25,7 +25,7 @@ import {AuthGuard} from './auth-guard';
 import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
-import {Covid19ResourcesComponent} from "../covid19-resources/covid19-resources.component";
+import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},

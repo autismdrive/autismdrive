@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {ApiService} from "../_services/api/api.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Covid19Categories} from "../_models/hit_type";
-import {Hit, Query} from "../_models/query";
-import {Resource} from "../_models/resource"
+import {ApiService} from '../_services/api/api.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Covid19Categories} from '../_models/hit_type';
+import {Hit, Query} from '../_models/query';
+import {Resource} from '../_models/resource';
 
 interface C19ResourceCategoryObj {
   name: string;
@@ -34,7 +34,6 @@ export class Covid19ResourcesComponent implements OnInit {
         description: Covid19Categories.labels[k].split(': ')[1]
       };
     });
-    console.log('c19categories', this.C19Categories)
     this.route.params.subscribe(params => {
       if ('category' in params) {
         this.selectedCategory = this.C19Categories.find(x => x.name === params['category']);
