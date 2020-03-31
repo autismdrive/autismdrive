@@ -1,6 +1,6 @@
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.dialects.postgresql import ARRAY
 from app import db
 
 Base = declarative_base()
@@ -26,7 +26,7 @@ class Resource(db.Model):
     is_draft = db.Column(db.Boolean)
     ages = db.Column(db.ARRAY(db.String), default=[])
     languages = db.Column(db.ARRAY(db.String), default=[])
-    covid19_categories = db.Column(db.ARRAY(db.String), default=[])
+    covid19_categories = db.Column(ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
 
     __mapper_args__ = {
