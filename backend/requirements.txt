@@ -4,6 +4,7 @@ marshmallow==2.15.1
 Flask-Marshmallow==0.7.0
 marshmallow_sqlalchemy==0.13.2
 Flask-Migrate==2.1.1
+Werkzeug==0.16.1
 # DO NOT use pyscopg2-binary, it will seg fault in the worst possible way in production.
 psycopg2==2.7.5
 flask-bcrypt==0.7.1

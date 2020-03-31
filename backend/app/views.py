@@ -46,7 +46,8 @@ from app.resources.LocationEndpoint import (
 from app.resources.ResourceEndpoint import (
     ResourceEndpoint,
     ResourceListEndpoint,
-    EducationResourceListEndpoint
+    EducationResourceListEndpoint,
+    Covid19ResourceListEndpoint
 )
 from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint, ParticipantAdminListEndpoint
 from app.resources.OrganizationEndpoint import (
@@ -177,6 +178,7 @@ endpoints = [
     (ResourceListEndpoint, "/resource"),
     (ResourceEndpoint, "/resource/<id>"),
     (EducationResourceListEndpoint, "/resource/education"),
+    (Covid19ResourceListEndpoint, "/resource/covid19/<category>"),
     (CategoryByResourceEndpoint, "/resource/<resource_id>/category"),
     (ResourceCategoryListEndpoint, "/resource_category"),
     (ResourceCategoryEndpoint, "/resource_category/<id>"),

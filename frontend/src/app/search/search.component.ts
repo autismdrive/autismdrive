@@ -212,7 +212,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gpsEnabled = true;
       }
       this.loadMapLocation(f => {
-        if (qParams.get('sort') && this.sortMethods.find(m => m.name === qParams.get('sort')) != undefined) {
+        if (qParams.get('sort') && this.sortMethods.find(m => m.name === qParams.get('sort')) !== undefined) {
           this.reSort(qParams.get('sort'));
         } else {
           this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
@@ -610,8 +610,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
             query.languages = qParams.getAll(key);
             break;
           case('sort'):
-            if (this.sortMethods.find(m => m.name === qParams.get(key)) != undefined) {
-              query.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery
+            if (this.sortMethods.find(m => m.name === qParams.get(key)) !== undefined) {
+              query.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery;
             }
             break;
           case('pageStart'):

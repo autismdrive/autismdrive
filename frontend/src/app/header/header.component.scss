@@ -134,6 +134,12 @@
     }
   }
 
+  mat-toolbar-row.covid19 {
+    background-color: $brand-accent;
+    color: white;
+    height: $covid19-header-height;
+  }
+
   #primary-nav {
 
     ul {

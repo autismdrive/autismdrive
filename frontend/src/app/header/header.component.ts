@@ -64,12 +64,12 @@ export enum Direction {
       transition('* => *', animate('500ms ease-in'))
     ]),
     trigger('toggleDock', [
-      state(VisibilityState.Hidden + '-' + ViewportWidth.Small, style({ top: '32px' })),
-      state(VisibilityState.Visible + '-' + ViewportWidth.Small, style({ top: '72px' })),
-      state(VisibilityState.Hidden + '-' + ViewportWidth.Medium, style({ top: '64px' })),
-      state(VisibilityState.Visible + '-' + ViewportWidth.Medium, style({ top: '104px' })),
-      state(VisibilityState.Hidden + '-' + ViewportWidth.Large, style({ top: '32px' })),
-      state(VisibilityState.Visible + '-' + ViewportWidth.Large, style({ top: '72px' })),
+      state(VisibilityState.Hidden + '-' + ViewportWidth.Small, style({ top: '52px' })),
+      state(VisibilityState.Visible + '-' + ViewportWidth.Small, style({ top: '92px' })),
+      state(VisibilityState.Hidden + '-' + ViewportWidth.Medium, style({ top: '84px' })),
+      state(VisibilityState.Visible + '-' + ViewportWidth.Medium, style({ top: '124px' })),
+      state(VisibilityState.Hidden + '-' + ViewportWidth.Large, style({ top: '52px' })),
+      state(VisibilityState.Visible + '-' + ViewportWidth.Large, style({ top: '92px' })),
       transition('* => *', animate('500ms ease-in'))
     ]),
     trigger('toggleBackground', [

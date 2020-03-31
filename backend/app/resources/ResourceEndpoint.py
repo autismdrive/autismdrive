@@ -106,3 +106,12 @@ class EducationResourceListEndpoint(flask_restful.Resource):
     def get(self):
         resources = db.session.query(Resource).filter_by(is_uva_education_content=True).all()
         return self.resourcesSchema.dump(resources)
+
+
+class Covid19ResourceListEndpoint(flask_restful.Resource):
+
+    resourcesSchema = ResourceSchema(many=True)
+
+    def get(self, category):
+        resources = db.session.query(Resource).filter(Resource.covid19_categories.any(category)).all()
+        return self.resourcesSchema.dump(resources)

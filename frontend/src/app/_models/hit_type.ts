@@ -51,3 +51,17 @@ export class Language {
       'tagalog' : 'Tagalog'
     };
 }
+
+export class Covid19Categories {
+  static labels =
+    {
+      'COVID-19_for_Autism': 'COVID-19 for Autism: Information explaining COVID-19 for people with ASD, families and professionals',
+      'Health_and_Telehealth': 'Health and Telehealth: Online supports to help support the community\'s mental, behavioral, and ' +
+        'physical health.',
+      'Visual_Aids': 'Visual Aids: Resources to develop visual schedules, social stories, communication aids explaining COVID-19',
+      'Edu-tainment': 'Edu-tainment: Fun educational games, experiences, virtual tours, videos, interactive tools, apps, etc',
+      'Supports_with_Living': 'Supports with Living: Supports and information related to daily living needs and supporting daily ' +
+        'living needs at home (e.g., with family, group care, residential supports).',
+      'Free_educational_resources': 'Free educational resources: Curriculum based courses, classes, and textbooks; subscriptions'
+    };
+}

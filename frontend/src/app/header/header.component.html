@@ -187,6 +187,27 @@
         fxShow.gt-sm
       ></app-search-box>
     </mat-toolbar-row>
+    <mat-toolbar-row
+      class="covid19"
+      fxHide.lt-md
+    >
+      <button
+        mat-button
+        [routerLink]="[ '/studies' ]"
+        routerLinkActive="selected"
+        id="covid19-studies-button"
+      >
+        COVID-19 STUDY UPDATES
+      </button>
+      <button
+        mat-button
+        [routerLink]="[ '/covid19-resources' ]"
+        routerLinkActive="selected"
+        id="covid19-resources-button"
+      >
+        COVID-19 RESOURCES
+      </button>
+    </mat-toolbar-row>
   </mat-toolbar>
 
 </div>
@@ -227,6 +248,14 @@
     id="uva-education-button-mobile"
     (click)="toggleMenu()"
   >UVA Education</a>
+  <a
+    mat-button
+    [routerLink]="[ '/covid19-resources' ]"
+    routerLinkActive="selected"
+    id="covid19-resources-button-mobile"
+    (click)="toggleMenu()"
+    color="accent"
+  >COVID-19 Resources</a>
   <a
     mat-button
     *ngIf="!currentUser"

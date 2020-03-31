@@ -1,0 +1,60 @@
+<div class="covid19-hero">
+  <h1>COVID-19 RESOURCES</h1>
+  <hr/>
+  <p class="h4">The COVID-19 virus and resulting social distancing, school closures and general panic are taking a unique toll on autism families.</p>
+  <p class="h4">We have compiled this list of resources and will update it frequently.</p>
+</div>
+<div
+  class="covid19-resources"
+>
+
+  <div
+    fxLayout.gt-sm="row"
+    fxLayout.lt-md="column"
+    fxLayoutGap="2em grid"
+  >
+    <div
+      fxLayout.gt-sm="column"
+      fxLayout.lt-md="row wrap"
+      fxLayoutAlign="start space-between"
+      fxLayoutGap="1em grid"
+    >
+      <div
+        *ngFor="let cat of C19Categories"
+      >
+       <button
+          class="category-buttons"
+          mat-flat-button
+          color="primary"
+          (click)="selectCategory(cat)"
+          id="select_{{cat.name}}"
+       >
+         {{cat.label}}
+       </button>
+      </div>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayoutGap="40px"
+      fxFlex.gt-sm="70%"
+    >
+      <h2 class="covid19-title">{{selectedCategory.label}}</h2>
+      <p>{{selectedCategory.description}}</p>
+      <ng-container *ngIf="resourceHits && (resourceHits.length > 0)">
+        <app-search-result
+          *ngFor="let hit of resourceHits"
+          [hit]="hit"
+          [attr.data-study-status]="selectedCategory.name"
+        ></app-search-result>
+      </ng-container>
+      <p
+        *ngIf="!resourceHits || (resourceHits.length === 0)"
+        class="no-results"
+        [attr.data-study-status]="selectedCategory.name"
+      >
+        We don't have any Autism DRIVE COVID-19 resources in that category at this time, but we're working on it.
+        Check back soon, as we are updating our content rapidly!
+      </p>
+    </div>
+  </div>
+</div>

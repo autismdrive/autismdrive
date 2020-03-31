@@ -300,7 +300,7 @@ class ResourceSchema(ModelSchema):
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_id', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', '_links')
+                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories', '_links')
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
@@ -354,7 +354,7 @@ class EventSchema(ModelSchema):
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
                   'organization', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
-                  'phone_extension', 'languages', '_links')
+                  'phone_extension', 'languages', 'covid19_categories', '_links')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
@@ -408,7 +408,8 @@ class LocationSchema(ModelSchema):
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
-                  'latitude', 'longitude', '_links', 'ages', 'insurance', 'phone_extension', 'languages', 'is_draft')
+                  'latitude', 'longitude', '_links', 'ages', 'insurance', 'phone_extension', 'languages',
+                  'covid19_categories', 'is_draft')
     id = fields.Integer(required=False, allow_none=True)
     organization_id = fields.Integer(required=False, allow_none=True)
     organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)

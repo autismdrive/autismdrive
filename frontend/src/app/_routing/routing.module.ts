@@ -25,6 +25,7 @@ import {AuthGuard} from './auth-guard';
 import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
+import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
@@ -80,6 +81,8 @@ const routes: Routes = [
     data: {title: 'Add Resource', roles: ['admin', 'editor']},
     canActivate: [RoleGuard]
   },
+  {path: 'covid19-resources', component: Covid19ResourcesComponent, data: {title: 'COVID-19 Resources'}},
+  {path: 'covid19-resources/:category', component: Covid19ResourcesComponent, data: {title: 'COVID-19 Resources'}},
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},  {
     path: 'studies/add',

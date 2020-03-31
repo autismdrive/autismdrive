@@ -89,6 +89,7 @@ export class ApiService {
     resourcecategorylist: '/api/resource_category',
     resourcelist: '/api/resource',
     educationresourcelist: '/api/resource/education',
+    covid19resourcelist: '/api/resource/covid19/<category>',
     categorytree: '/api/category/root',
     search: '/api/search',
     searchstudies: '/api/search/studies',
@@ -352,6 +353,11 @@ export class ApiService {
   /** Get Education Resources */
   getEducationResources(): Observable<Resource[]> {
     return this.httpClient.get<Resource[]>(this._endpointUrl('educationresourcelist'))
+      .pipe(catchError(this._handleError));
+  }
+
+  getCovid19ResourcesByCategory(category: string) {
+    return this.httpClient.get<Resource[]>(this._endpointUrl('covid19resourcelist').replace('<category>', category))
       .pipe(catchError(this._handleError));
   }
 

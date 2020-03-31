@@ -34,6 +34,7 @@ export class Resource extends GeoLocation {
   categories?: Category[];
   ages?: string[];
   languages?: string[];
+  covid19_categories?: string[];
 
   constructor(private _props) {
     super(_props);
