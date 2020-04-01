@@ -115,17 +115,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   currentUser: User;
   resourceGatherers: AccordionItem[] = [
     {
-      name: 'UVA Supporting Transformative Autism Research',
-      shortName: 'UVA STAR',
-      description: `
-        The STAR initiative, led by the Curry School in partnership with colleagues across the University,
-        aims to improve the lives of individuals with autism through groundbreaking research and innovative
-        models for intervention and training.
-      `,
-      image: '/assets/partners/uva_star.png',
-      url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star',
-    },
-    {
       name: 'Charlottesville Region Autism Action Group',
       shortName: 'CRAAG',
       description: `
@@ -139,7 +128,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     {
       name: 'Piedmont Regional Education Program',
       shortName: 'PREP',
-      attribution: 'Cheryl Ribando',
       description: `
         A public regional organization designed to meet the needs of special education students. Provides special
         education programming and related services to nine school districts under an umbrella of a regional program.
@@ -156,17 +144,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       `,
       image: '/assets/partners/via.png',
       url: 'https://www.viaschool.org/',
-    },
-    {
-      name: 'University of Virginia Health System',
-      shortName: 'UVA Health',
-      description: `
-        UVA Health includes a hospital, level I trauma center, nationally recognized cancer and heart centers and primary and specialty
-        clinics throughout Central Virginia. Through research and clinical trials, UVA Health stays at the leading edge of the
-        treatments offered.
-      `,
-      image: '/assets/partners/uva_health.png',
-      url: 'https://uvahealth.com',
     },
   ];
   private _mobileQueryListener: () => void;

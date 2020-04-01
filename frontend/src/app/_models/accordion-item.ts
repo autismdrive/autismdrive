@@ -5,5 +5,4 @@ export interface AccordionItem {
   url: string;
   expanded?: boolean;
   image?: string;
-  attribution?: string;
 }
