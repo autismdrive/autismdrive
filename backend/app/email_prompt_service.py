@@ -48,22 +48,26 @@ class EmailPromptService:
                 days_since_most_recent = (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() / 86400
             if (len(email_logs) is 0) and (log_type is not 'confirm_email'):
                 if (rec.last_login is not None) and ((datetime.datetime.now(tz=UTC) - rec.last_login).total_seconds() > (2 * 86400)):
-                    self.__send_prompting_email(rec, send_method, log_type)
+                    self.__send_prompting_email(rec, send_method, log_type, '0days')
             elif 0 < len(email_logs) <= 2:
+                days = '7days' if len(email_logs) is 1 else '14days'
                 if days_since_most_recent > 7:
-                    self.__send_prompting_email(rec, send_method, log_type)
+                    self.__send_prompting_email(rec, send_method, log_type, days)
             elif len(email_logs) is 3:
                 if days_since_most_recent > 16:
-                    self.__send_prompting_email(rec, send_method, log_type)
+                    self.__send_prompting_email(rec, send_method, log_type, '30days')
             elif 3 < len(email_logs) < 6:
                 if days_since_most_recent > 30:
-                    self.__send_prompting_email(rec, send_method, log_type)
+                    days = str((len(email_logs) - 2) * 30) + 'days'
+                    self.__send_prompting_email(rec, send_method, log_type, days)
 
-    def __send_prompting_email(self, user, send_method, log_type):
+    def __send_prompting_email(self, user, send_method, log_type, days):
         current_studies = self.db.session.query(self.study_model).filter_by(status='currently_enrolling').all()
+        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content=' \
+                  + days + '&utm_term=' + str(datetime.date.today())
         for study in current_studies:
-            study.link = self.app.config['SITE_URL'] + '/#/study/' + str(study.id)
-        tracking_code = send_method(user, current_studies)
+            study.link = self.app.config['SITE_URL'] + '/#/study/' + str(study.id) + ga_link
+        tracking_code = send_method(user, current_studies, days)
         log = self.email_log_model(user_id=user.id, type=log_type, tracking_code=tracking_code)
         self.db.session.add(log)
         self.db.session.commit()
