@@ -62,6 +62,6 @@ export class Covid19Categories {
       'Edu-tainment': 'Edu-tainment: Fun educational games, experiences, virtual tours, videos, interactive tools, apps, etc',
       'Supports_with_Living': 'Supports with Living: Supports and information related to daily living needs and supporting daily ' +
         'living needs at home (e.g., with family, group care, residential supports).',
-      'Free_educational_resources': 'Free educational resources: Curriculum based courses, classes, and textbooks; subscriptions'
+      'Free_educational_resources': 'Free Educational Resources: Curriculum based courses, classes, and textbooks; subscriptions'
     };
 }
