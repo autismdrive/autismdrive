@@ -48,7 +48,6 @@ export class UvaEducationComponent implements OnInit {
   private _resourcesToNewsItems(ed_resources: Resource[]): NewsItem[] {
     if (this.edResources && this.edResources.length > 0) {
       return ed_resources
-        .sort((a, b) => (a.id > b.id) ? 1 : -1)
         .map(r => {
           let label: string;
           if (r.video_code) {

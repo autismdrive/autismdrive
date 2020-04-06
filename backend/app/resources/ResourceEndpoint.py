@@ -104,7 +104,10 @@ class EducationResourceListEndpoint(flask_restful.Resource):
     resourcesSchema = ResourceSchema(many=True)
 
     def get(self):
-        resources = db.session.query(Resource).filter_by(is_uva_education_content=True, is_draft=False).all()
+        resources = db.session.query(Resource)\
+            .filter_by(is_uva_education_content=True, is_draft=False)\
+            .order_by(Resource.last_updated.desc())\
+            .all()
         return self.resourcesSchema.dump(resources)
 
 
