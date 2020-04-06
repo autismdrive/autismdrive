@@ -60,6 +60,6 @@ class Study(db.Model):
     def category_names(self):
         cat_text = ''
         for cat in self.categories:
-            cat_text = cat_text + ' ' + cat.category.indexable_content()
+            cat_text = cat_text + ' ' + cat.category.name
 
         return cat_text + ' ' + ' '.join(self.ages) + ' ' + ' '.join(self.languages)
