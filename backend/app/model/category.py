@@ -44,11 +44,3 @@ class Category(db.Model):
             cat = cat.parent
             path = str(cat.id) + "," + path
         return path
-
-    def indexable_content(self):
-        content = self.name
-
-        for child in self.children:
-            content = content + ' ' + child.indexable_content()
-
-        return content

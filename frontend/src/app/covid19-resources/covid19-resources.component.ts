@@ -63,7 +63,6 @@ export class Covid19ResourcesComponent implements OnInit {
 
    private _resourcesToHits(resources: Resource[]): Hit[] {
       return resources
-        .sort((a, b) => (a.id > b.id) ? 1 : -1)
         .map(r => {
           return new Hit({
             id: r.id,

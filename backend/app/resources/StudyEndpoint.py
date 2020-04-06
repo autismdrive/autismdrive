@@ -70,5 +70,5 @@ class StudyByStatusListEndpoint(flask_restful.Resource):
     studiesSchema = StudySchema(many=True)
 
     def get(self, status):
-        studies = db.session.query(Study).filter_by(status=status)
+        studies = db.session.query(Study).filter_by(status=status).order_by(Study.last_updated.desc())
         return self.studiesSchema.dump(studies)

@@ -62,7 +62,6 @@ export class StudiesComponent implements OnInit {
 
    private _studiesToHits(studies: Study[]): Hit[] {
       return studies
-        .sort((a, b) => (a.id > b.id) ? 1 : -1)
         .map(s => {
           return new Hit({
             id: s.id,

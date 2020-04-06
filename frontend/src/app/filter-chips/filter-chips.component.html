@@ -12,7 +12,7 @@
   </mat-chip-list>
 </div>
 
-<div id="ages" *ngIf="ages && ages.length > 0">
+<div id="ages" class="margin-top" *ngIf="ages && ages.length > 0">
   <mat-card-title>Related Age Ranges</mat-card-title>
   <mat-chip-list>
     <mat-chip
@@ -25,7 +25,7 @@
   </mat-chip-list>
 </div>
 
-<div id="languages" *ngIf="languages && languages.length > 0">
+<div id="languages" class="margin-top" *ngIf="languages && languages.length > 0">
   <mat-card-title>Related Languages</mat-card-title>
   <mat-chip-list>
     <mat-chip
@@ -35,6 +35,18 @@
       color="primary"
       selected
     >{{languageLabels[language]}}</mat-chip>
+  </mat-chip-list>
+</div>
+
+<div id="covid19_categories" class="margin-top" *ngIf="covid19_categories && covid19_categories.length > 0">
+  <mat-card-title>COVID-19 Topics</mat-card-title>
+  <mat-chip-list>
+    <mat-chip
+      *ngFor="let cat of covid19_categories"
+      [routerLink]="['/covid19-resources/', {'category': cat}]"
+      color="accent"
+      selected
+    >{{covid19Labels[cat].split(': ')[0]}}</mat-chip>
   </mat-chip-list>
 </div>
 </mat-card>

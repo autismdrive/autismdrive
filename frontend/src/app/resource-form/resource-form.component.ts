@@ -355,6 +355,7 @@ export class ResourceFormComponent implements OnInit {
       } else {
         this.createNew = true;
         this.model.createNew = true;
+        this.model.categories = [];
         this.resource = new Resource({'type': '', 'title': '', 'description': '', 'phone': '', 'website': ''});
         this.loadForm();
       }

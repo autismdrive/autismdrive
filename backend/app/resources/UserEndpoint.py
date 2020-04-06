@@ -105,8 +105,10 @@ class UserListEndpoint(flask_restful.Resource):
 
     def send_confirm_email(self, user):
         current_studies = db.session.query(Study).filter_by(status='currently_enrolling').all()
+        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content=0days&utm_term=' \
+                  + str(datetime.date.today())
         for study in current_studies:
-            study.link = app.config['SITE_URL'] + '/#/study/' + str(study.id)
+            study.link = app.config['SITE_URL'] + '/#/study/' + str(study.id) + ga_link
         tracking_code = email_service.confirm_email(user, current_studies)
         log = EmailLog(user_id=user.id, type="confirm_email", tracking_code=tracking_code)
         db.session.add(log)

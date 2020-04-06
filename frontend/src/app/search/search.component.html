@@ -367,10 +367,6 @@
         <span
           *ngFor="let rg of resourceGatherers"
         >
-          <div *ngIf="rg.attribution" id="attribution">
-            <p><b>{{rg.attribution}}</b></p>
-            <p>in association with {{rg.shortName}}</p>
-          </div>
           <a
             [href]="rg.url"
             [title]="rg.name"
