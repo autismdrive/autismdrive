@@ -45,5 +45,11 @@ class Resource(db.Model):
         for cat in self.categories:
             cat_text = cat_text + ' ' + cat.category.name
 
-        return cat_text + ' ' + ' '.join(self.ages) + ' ' + ' '.join(self.languages) + ' ' \
-            + ' '.join(self.covid19_categories)
+        if self.ages is not None and len(self.ages) > 0:
+            cat_text = cat_text + ' ' + ' '.join(self.ages)
+        if self.languages is not None and len(self.languages) > 0:
+            cat_text = cat_text + ' ' + ' '.join(self.languages)
+        if self.covid19_categories is not None and len(self.covid19_categories) > 0:
+            cat_text = cat_text + ' ' + ' '.join(self.covid19_categories)
+
+        return cat_text
