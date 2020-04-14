@@ -38,6 +38,7 @@ class Study(db.Model):
     coordinator_email = db.Column(db.String)
     eligibility_url = db.Column(db.String)
     results_url = db.Column(db.String)
+    organization_name = db.Column(db.String)
     organization_id = db.Column('organization_id', db.Integer,
                                 db.ForeignKey('organization.id'))
     location = db.Column(db.String)

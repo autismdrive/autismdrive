@@ -349,3 +349,24 @@ class DataLoader:
 
     def __increment_id_sequence(self, model):
         db.session.execute(Sequence(model.__tablename__ + '_id_seq'))
+
+    def copy_org_names(self):
+        resources = db.session.query(Resource).all()
+        for resource in resources:
+            if resource.organization_id is not None:
+                resource.organization_name = resource.organization.name
+                db.session.add(resource)
+
+        studies = db.session.query(Study).all()
+        for study in studies:
+            if study.organization_id is not None:
+                study.organization_name = study.organization.name
+                db.session.add(study)
+
+        investigators = db.session.query(Investigator).all()
+        for investigator in investigators:
+            if investigator.organization_id is not None:
+                investigator.organization_name = investigator.organization.name
+                db.session.add(investigator)
+
+        db.session.commit()
