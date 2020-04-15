@@ -16,7 +16,7 @@
       fxLayoutGap="40px"
     >
       <h1>{{study.title}}</h1>
-      <h4 *ngIf="study.organization">{{study.organization.name}}</h4>
+      <h4 *ngIf="study.organization_name">{{study.organization_name}}</h4>
       <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_study')" [editLabel]='"Edit Study"' [editLink]='"study/edit/" + study.id.toString()' [currentUser]="currentUser"></app-edit-button>
       <p class="status">Study Status: {{ snakeToUpperCase(study.status) }}</p>
       <p>{{study.description}}</p>
@@ -35,7 +35,7 @@
           <p><a *ngIf="si.investigator.bio_link" target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>
             <b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>
             <span *ngIf="si.investigator.title">, {{si.investigator.title}}</span>
-            <span *ngIf="si.investigator.organization">, {{si.investigator.organization.name}}</span></p>
+            <span *ngIf="si.investigator.organization_name">, {{si.investigator.organization_name}}</span></p>
         </div>
       </div>
       <div *ngIf="study.location">
