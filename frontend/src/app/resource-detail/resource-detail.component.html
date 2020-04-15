@@ -61,7 +61,7 @@
         <mat-card-content>
           <p *ngIf="mapLoc && !resource.street_address1" class="no-address-message">
             {{resource.type === 'location' ? 'In-home therapy service.' : ''}}
-            Contact {{resource.organization.name}} for specific
+            Contact {{resource.organization_name}} for specific
             {{resource.type === 'location' ? 'service area' : 'location'}}.
           </p>
           <app-contact-item
@@ -159,7 +159,7 @@
               <ng-container *ngIf="!resource.street_address1">
                 <p *ngIf="mapLoc && !resource.street_address1" class="no-address-message">
                   {{resource.type === 'location' ? 'In-home therapy service.' : ''}}
-                  Contact {{resource.organization.name}} for specific
+                  Contact {{resource.organization_name}} for specific
                   {{resource.type === 'location' ? 'service area' : 'location'}}.
                 </p>
                 <a
