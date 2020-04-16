@@ -1,5 +1,4 @@
 import { ResourceCategory } from './resource_category';
-import { Organization } from './organization';
 import { GeoLocation } from './geolocation';
 import { Category } from './category';
 
@@ -11,8 +10,6 @@ export class Resource extends GeoLocation {
   insurance: string;
   date?: string;
   time?: string;
-  ticket_cost?: string;
-  organization?: Organization;
   organization_id?: number;
   organization_name?: string;
   primary_contact?: string;
