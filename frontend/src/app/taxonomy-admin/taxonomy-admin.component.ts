@@ -22,6 +22,7 @@ export class TaxonomyAdminComponent implements OnInit {
   showConfirmDelete = false;
   nodeToDelete: Category;
   currentUser: User;
+  rootValue = '';
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
@@ -69,6 +70,7 @@ export class TaxonomyAdminComponent implements OnInit {
   saveNode(node: Category, itemValue: string) {
     node.name = itemValue;
     this.api.addCategory(node).subscribe(cat => {
+      this.rootValue = '';
       this.getCategoryTree();
       window.scroll(0, 0);
     });
