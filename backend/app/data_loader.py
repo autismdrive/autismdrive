@@ -2,7 +2,6 @@ from app.model.admin_note import AdminNote
 from app.model.age_range import AgeRange
 from app.model.category import Category
 from app.model.investigator import Investigator
-from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.event import Event
 from app.model.location import Location
@@ -61,32 +60,31 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[5]) if row[5] else None
+                org = row[5] if row[5] else None
                 geocode = self.get_geocode(
                     address_dict={'street': row[8], 'city': row[10], 'state': row[11], 'zip': row[12]},
                     lat_long_dict={'lat': row[15], 'lng': row[16]}
                 )
                 event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
-                              organization=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
+                              organization_name=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
                               street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
                               phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[], is_draft=False)
-                items.append(event)
                 self.__increment_id_sequence(Resource)
 
                 for i in range(26, len(row)):
                     if row[i]:
                         event.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
 
-                items.append(event)
+                db.session.add(event)
+                db.session.commit()
 
                 for i in range(17, 25):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         event_id = event.id
                         category_id = category.id
-                        items.append(ResourceCategory(resource_id=event_id, category_id=category_id, type='event'))
+                        db.session.add(ResourceCategory(resource_id=event_id, category_id=category_id, type='event'))
 
-        db.session.bulk_save_objects(items)
         db.session.commit()
         print("Events loaded.  There are now %i events in the database." % db.session.query(Event).count())
         print("There are now %i links between events and categories in the database." %
@@ -99,14 +97,14 @@ class DataLoader:
             next(reader, None)  # skip the headers
 
             for row in reader:
-                org = self.get_org_by_name(row[5]) if row[5] else self.get_org_by_name(row[1])
+                org = row[5] if row[5] else row[1]
 
                 geocode = self.get_geocode(
                     address_dict={'street': row[8], 'city': row[10], 'state': row[11], 'zip': row[12]},
                     lat_long_dict={'lat': row[17], 'lng': row[18]}
                 )
 
-                location = Location(title=row[1], description=row[2], primary_contact=row[6], organization=org,
+                location = Location(title=row[1], description=row[2], primary_contact=row[6], organization_name=org,
                                     street_address1=row[8], street_address2=row[9], city=row[10], state=row[11],
                                     zip=row[12], website=row[14], email=row[15], phone=row[16],
                                     latitude=geocode['lat'], longitude=geocode['lng'], ages=[], is_draft=False)
@@ -117,16 +115,16 @@ class DataLoader:
                     if row[i]:
                         location.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
 
-                items.append(location)
+                db.session.add(location)
+                db.session.commit()
 
                 for i in range(19, 28):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
                         category_id = category.id
-                        items.append(ResourceCategory(resource_id=location_id, category_id=category_id, type='location'))
+                        db.session.add(ResourceCategory(resource_id=location_id, category_id=category_id, type='location'))
 
-        db.session.bulk_save_objects(items)
         db.session.commit()
         print("Locations loaded.  There are now %i locations in the database." % db.session.query(
             Location).filter(Location.type == 'location').count())
@@ -139,25 +137,26 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[4]) if row[4] else None
-                resource = Resource(title=row[0], description=row[1], organization=org, website=row[5],
+                org = row[4] if row[4] else None
+                resource = Resource(title=row[0], description=row[1], organization_name=org, website=row[5],
                                     phone=row[6], ages=[], is_draft=False)
+
+                self.__increment_id_sequence(Resource)
 
                 for i in range(15, len(row)):
                     if row[i]:
                         resource.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
 
-                items.append(resource)
-                self.__increment_id_sequence(Resource)
+                db.session.add(resource)
+                db.session.commit()
 
                 for i in range(7, 14):
                     if row[i] and row[i] is not '':
                         category = self.get_category_by_name(row[i].strip())
                         resource_id = resource.id
                         category_id = category.id
-                        items.append(ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource'))
+                        db.session.add(ResourceCategory(resource_id=resource_id, category_id=category_id, type='resource'))
 
-        db.session.bulk_save_objects(items)
         db.session.commit()
         print("Resources loaded.  There are now %i resources in the database." % db.session.query(
             Resource).filter(Resource.type == 'resource').count())
@@ -169,9 +168,9 @@ class DataLoader:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
             for row in reader:
-                org = self.get_org_by_name(row[4]) if row[4] else None
+                org = row[4] if row[4] else None
                 study = Study(title=row[0], description=row[1], participant_description=row[2],
-                              benefit_description=row[3], organization=org, location=row[5],
+                              benefit_description=row[3], organization_name=org, location=row[5],
                               short_title=row[6], short_description=row[7], image_url=row[8], coordinator_email=row[22],
                               eligibility_url=row[23], ages=[])
 
@@ -204,7 +203,7 @@ class DataLoader:
                         investigator = db.session.query(Investigator).filter(Investigator.name == row[i]).first()
                         if investigator is None:
                             investigator = Investigator(name=row[i], title=row[i+1],
-                                                        organization_id=self.get_org_by_name(row[i+2]).id, bio_link=row[i+3])
+                                                        organization_name=row[i+2], bio_link=row[i+3])
                         db.session.add(investigator)
                         db.session.commit()
                         study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
@@ -266,14 +265,6 @@ class DataLoader:
         db.session.bulk_save_objects(items)
         db.session.commit()
         print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(ZipCode).count())
-
-    def get_org_by_name(self, org_name):
-        organization = db.session.query(Organization).filter(Organization.name == org_name).first()
-        if organization is None:
-            organization = Organization(name=org_name)
-            db.session.add(organization)
-            db.session.commit()
-        return organization
 
     def get_category_by_name(self, category_name, parent=None, create_missing=False):
         category = db.session.query(Category).filter(Category.name == category_name).first()
@@ -343,30 +334,8 @@ class DataLoader:
         db.session.query(Location).delete()
         db.session.query(Resource).delete()
         db.session.query(Study).delete()
-        db.session.query(Organization).delete()
         db.session.query(ZipCode).delete()
         db.session.commit()
 
     def __increment_id_sequence(self, model):
         db.session.execute(Sequence(model.__tablename__ + '_id_seq'))
-
-    def copy_org_names(self):
-        resources = db.session.query(Resource).all()
-        for resource in resources:
-            if resource.organization_id is not None:
-                resource.organization_name = resource.organization.name
-                db.session.add(resource)
-
-        studies = db.session.query(Study).all()
-        for study in studies:
-            if study.organization_id is not None:
-                study.organization_name = study.organization.name
-                db.session.add(study)
-
-        investigators = db.session.query(Investigator).all()
-        for investigator in investigators:
-            if investigator.organization_id is not None:
-                investigator.organization_name = investigator.organization.name
-                db.session.add(investigator)
-
-        db.session.commit()

@@ -211,16 +211,6 @@ def run_full_export():
         click.echo('This system is not configured to run exports. Ingoring.')
 
 
-@app.cli.command()
-def copyorgnames():
-    """Used for copying organization names on resources, studies, and investigators from the related organization
-    model over to a text field"""
-    click.echo('Copying Org Names')
-    from app import data_loader
-    data_loader = data_loader.DataLoader()
-    data_loader.copy_org_names()
-
-
 from app import views
 from app.model.email_log import EmailLog
 from app.model.study import Study
