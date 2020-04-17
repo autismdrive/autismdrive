@@ -67,8 +67,8 @@ class TestLocations(BaseTest, unittest.TestCase):
 
     def test_create_location(self):
         data_loader.DataLoader().load_partial_zip_codes()
-        o_id = self.construct_organization().id
-        location = {'title': "location of locations", 'description': "You need this location in your life.", 'organization_id': o_id}
+        location = {'title': "location of locations", 'description': "You need this location in your life.",
+                    'organization_name': "Location Org"}
         rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
