@@ -10,6 +10,7 @@ export class Resource extends GeoLocation {
   insurance: string;
   date?: string;
   time?: string;
+  ticket_cost?: string;
   organization_name?: string;
   primary_contact?: string;
   location_name?: string;
