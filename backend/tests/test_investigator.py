@@ -53,8 +53,8 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_investigator(self):
-        o_id = self.construct_organization().id
-        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology", 'organization_id': o_id}
+        investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology",
+                        'organization_name': "Spider University"}
         rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
                            headers=self.logged_in_headers(), follow_redirects=True)
         self.assert_success(rv)

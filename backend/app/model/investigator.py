@@ -9,5 +9,5 @@ class Investigator(db.Model):
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     name = db.Column(db.String)
     title = db.Column(db.String)
-    organization_id = db.Column('organization_id', db.Integer, db.ForeignKey('organization.id'))
+    organization_name = db.Column(db.String)
     bio_link = db.Column(db.String)

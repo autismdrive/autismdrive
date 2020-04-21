@@ -77,13 +77,6 @@ class TestDataLoader(BaseTest, unittest.TestCase):
     def test_load_zip_codes(self):
         self._load_and_assert_success(ZipCode, 'load_zip_codes')
 
-    def test_get_org_by_name(self):
-        expected_name = 'The Graham Institute for Magical Misfits'
-        loader = data_loader.DataLoader()
-        org = loader.get_org_by_name(expected_name)
-        self.assertIsNotNone(org)
-        self.assertEqual(org.name, expected_name)
-
     def test_get_category_by_name(self):
         expected_name = 'Schools of Witchcraft and Wizardry'
         loader = data_loader.DataLoader()

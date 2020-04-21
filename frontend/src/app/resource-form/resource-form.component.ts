@@ -5,7 +5,6 @@ import {ApiService} from '../_services/api/api.service';
 import {Resource} from '../_models/resource';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
-import {Organization} from '../_models/organization';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {scrollToFirstInvalidField} from '../../util/scrollToTop';
@@ -116,11 +115,11 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: 'model.type != "event"',
     },
     {
-      key: 'organization',
-      type: 'autocomplete',
+      key: 'organization_name',
+      type: 'input',
       templateOptions: {
-        label: 'Organization',
-        filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
+        label: 'Organization Name',
+        placeholder: 'Please enter the name of the organization for your resource',
       },
       hideExpression: '!model.type',
     },
@@ -296,7 +295,6 @@ export class ResourceFormComponent implements OnInit {
 
 
   options: FormlyFormOptions;
-  orgOptions: Organization[];
 
   createNew = false;
 
@@ -306,7 +304,6 @@ export class ResourceFormComponent implements OnInit {
               private authenticationService: AuthenticationService,
               private deviceDetectorService: DeviceDetectorService,
               ) {
-    this.getOrganizations();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
 
   }
@@ -314,19 +311,6 @@ export class ResourceFormComponent implements OnInit {
   ngOnInit() {
     this.model.createNew = false;
     this.loadData();
-  }
-
-  getOrganizations() {
-    this.api.getOrganizations().subscribe(orgs => {
-        return this.orgOptions = orgs;
-      }
-    );
-  }
-
-  filterOrganizations(name: string): Organization[] {
-    return this.orgOptions.filter(org =>
-      org.name.toLowerCase().includes(name.toLowerCase())
-    );
   }
 
   getOptions(modelLabels) {
@@ -400,36 +384,15 @@ export class ResourceFormComponent implements OnInit {
     return this.api[`update${resourceType}Categories`](resource_id, selectedCategories);
   }
 
-  updateOrganization(callback: Function) {
-    // If the user selects an existing Organization name from the list, it will be saved as an Organization object. If they write in their
-    // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
-    // updated model so that we don't accidentally save the old version before it's updated. When there is no Organization being saved, all
-    // we do is create the updated model.
-    if (this.model.organization) {
-      if (this.model.organization.constructor.name === 'String') {
-        this.api.addOrganization({name: this.model.organization}).subscribe(org => {
-          this.model.organization_id = org.id;
-          this.model.organization = org;
-          callback();
-        });
-      } else {
-        this.model.organization_id = this.model.organization.id;
-        callback();
-      }
-    } else {
-      callback();
-    }
-  }
-
   submit() {
     // Post to the resource endpoint, and then close
     const resourceType = this.model.type.charAt(0).toUpperCase() + this.model.type.slice(1);
 
     if (this.form.valid) {
       if (this.createNew && !this.model.id) {
-        this.updateOrganization(() => this.updateAndClose(this.api[`add${resourceType}`](this.model)));
+        this.updateAndClose(this.api[`add${resourceType}`](this.model));
       } else {
-        this.updateOrganization(() => this.updateAndClose(this.api[`update${resourceType}`](this.model)));
+        this.updateAndClose(this.api[`update${resourceType}`](this.model));
       }
     }
   }

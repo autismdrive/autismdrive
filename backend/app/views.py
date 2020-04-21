@@ -50,10 +50,6 @@ from app.resources.ResourceEndpoint import (
     Covid19ResourceListEndpoint
 )
 from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint, ParticipantAdminListEndpoint
-from app.resources.OrganizationEndpoint import (
-    OrganizationEndpoint,
-    OrganizationListEndpoint
-)
 from app.resources.QuestionnaireAndParticipantEndpoint import QuestionnaireByParticipantEndpoint
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
@@ -159,9 +155,6 @@ endpoints = [
     (LocationByCategoryEndpoint, "/category/<category_id>/location"),
     (ResourceByCategoryEndpoint, "/category/<category_id>/resource"),
     (StudyByCategoryEndpoint, "/category/<category_id>/study"),
-    # Organizations
-    (OrganizationListEndpoint, "/organization"),
-    (OrganizationEndpoint, "/organization/<id>"),
     # Events
     (EventListEndpoint, "/event"),
     (EventEndpoint, "/event/<id>"),

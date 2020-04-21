@@ -114,9 +114,9 @@ export class ResourceDetailComponent implements OnInit {
         details: [r.primary_contact]
       },
       {
-        condition: !!r.organization,
+        condition: !!r.organization_name,
         icon: 'business',
-        details: [r.organization && r.organization.name]
+        details: [r.organization_name]
       },
       {
         condition: !!r.date,

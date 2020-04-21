@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FieldType } from '@ngx-formly/material';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
-import { Organization } from '../../_models/organization';
 
 @Component({
   selector: 'app-autocomplete-section',
@@ -11,7 +10,7 @@ import { Organization } from '../../_models/organization';
 })
 export class AutocompleteSectionComponent extends FieldType implements OnInit {
 
-  filteredOptions: Observable<Organization[]>;
+  filteredOptions: Observable<any>;
 
   ngOnInit() {
     this.filteredOptions = this.formControl.valueChanges
@@ -22,7 +21,7 @@ export class AutocompleteSectionComponent extends FieldType implements OnInit {
       );
   }
 
-  displayFn(organization?: Organization): string | undefined {
-    return organization ? organization.name : undefined;
+  displayFn(option?: any): string | undefined {
+    return option ? option.name : undefined;
   }
 }

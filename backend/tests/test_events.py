@@ -63,9 +63,8 @@ class TestEvents(BaseTest, unittest.TestCase):
 
     def test_create_event(self):
         data_loader.DataLoader().load_partial_zip_codes()
-        o_id = self.construct_organization().id
         event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
-                 'ticket_cost': "$500 suggested donation", 'organization_id': o_id}
+                 'ticket_cost': "$500 suggested donation", 'organization_name': "Event Org"}
         rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
