@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {Organization} from '../_models/organization';
 import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';
 import {StudyInvestigator} from '../_models/study_investigator';
@@ -147,18 +146,10 @@ export class StudyFormComponent implements OnInit {
           },
         },
         {
-          type: 'select',
-          key: 'organization',
+          type: 'input',
+          key: 'organization_name',
           templateOptions: {
-            label: 'Organization',
-            options: [],
-            valueProp: 'id',
-            labelProp: 'name',
-          },
-          hooks: {
-            onInit: field => {
-              field.templateOptions.options = this.api.getOrganizations();
-            },
+            label: 'Organization Name',
           },
         },
         {
@@ -171,11 +162,11 @@ export class StudyFormComponent implements OnInit {
       ],
     },
     {
-      key: 'organization',
-      type: 'autocomplete',
+      key: 'organization_name',
+      type: 'input',
       templateOptions: {
         label: 'Organization',
-        filter: (term) => term ? this.filterOrganizations(term) : this.getOrganizations(),
+        placeholder: 'Please enter the name of the hosting organization',
       },
     },
     {
@@ -265,7 +256,6 @@ export class StudyFormComponent implements OnInit {
   ];
 
   options: FormlyFormOptions;
-  orgOptions: Organization[];
 
   createNew = false;
 
@@ -275,25 +265,11 @@ export class StudyFormComponent implements OnInit {
     private router: Router,
     private deviceDetectorService: DeviceDetectorService,
   ) {
-    this.getOrganizations();
   }
 
   ngOnInit() {
     this.model.createNew = false;
     this.loadData();
-  }
-
-  getOrganizations() {
-    this.api.getOrganizations().subscribe(orgs => {
-        return this.orgOptions = orgs;
-      }
-    );
-  }
-
-  filterOrganizations(name: string): Organization[] {
-    return this.orgOptions.filter(org =>
-      org.name.toLowerCase().includes(name.toLowerCase())
-    );
   }
 
   getOptions(modelLabels) {
@@ -380,7 +356,7 @@ export class StudyFormComponent implements OnInit {
     const newInvest = {
       name: addInvest.name,
       title: addInvest.title,
-      organization_id: addInvest.organization,
+      organization_name: addInvest.organization_name,
       bio_link: addInvest.bio_link,
     };
     return this.api.addInvestigator(newInvest);
@@ -397,35 +373,14 @@ export class StudyFormComponent implements OnInit {
     return this.api.updateStudyInvestigators(study_id, selectedInvestigators);
   }
 
-  updateOrganization(callback: Function) {
-    // If the user selects an existing Organization name from the list, it will be saved as an Organization object. If they write in their
-    // own Organization name, it will be saved as a new organization with that name. When saving a new organization, we also create an
-    // updated model so that we don't accidentally save the old version before it's updated. When there is no Organization being saved, all
-    // we do is create the updated model.
-    if (this.model.organization) {
-      if (this.model.organization.constructor.name === 'String') {
-        this.api.addOrganization({name: this.model.organization}).subscribe(org => {
-          this.model.organization_id = org.id;
-          this.model.organization = org;
-          callback();
-        });
-      } else {
-        this.model.organization_id = this.model.organization.id;
-        callback();
-      }
-    } else {
-      callback();
-    }
-  }
-
   submit() {
     // Post to the study endpoint, and then close
     if (this.form.valid) {
       if (this.createNew) {
         this.createNew = false;
-        this.updateOrganization(() => this.updateAndClose(this.api.addStudy(this.model)));
+        this.updateAndClose(this.api.addStudy(this.model));
       } else {
-        this.updateOrganization(() => this.updateAndClose(this.api.updateStudy(this.model)));
+        this.updateAndClose(this.api.updateStudy(this.model));
       }
     }
   }

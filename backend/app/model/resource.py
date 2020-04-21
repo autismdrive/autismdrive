@@ -15,6 +15,7 @@ class Resource(db.Model):
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     description = db.Column(db.String)
     insurance = db.Column(db.String)
+    organization_name = db.Column(db.String)
     organization_id = db.Column('organization_id', db.Integer,
                                 db.ForeignKey('organization.id'))
     phone = db.Column(db.String)

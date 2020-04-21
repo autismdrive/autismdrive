@@ -18,6 +18,7 @@ export interface Study {
   participant_description?: string;
   benefit_description?: string;
   investigators: string[];
+  organization_name?: string;
   organization_id?: number;
   organization?: Organization;
   location: string;

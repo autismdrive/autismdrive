@@ -14,6 +14,7 @@ export class Resource extends GeoLocation {
   ticket_cost?: string;
   organization?: Organization;
   organization_id?: number;
+  organization_name?: string;
   primary_contact?: string;
   location_name?: string;
   street_address1?: string;
