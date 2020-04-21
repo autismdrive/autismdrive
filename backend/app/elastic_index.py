@@ -35,7 +35,7 @@ class StarDocument(Document):
     last_updated = Date()
     content = Text(analyzer=stem_analyzer)
     description = Text()
-    organization = Keyword()
+    organization_name = Keyword()
     website = Keyword()
     location = Keyword()
     ages = Keyword(multi=True)
@@ -128,6 +128,7 @@ class ElasticIndex:
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
                            description=document.description,
+                           organization_name=document.organization_name,
                            location=None,
                            ages=document.ages,
                            status=None,
@@ -149,9 +150,6 @@ class ElasticIndex:
             doc.status = document.status.value
 
         doc.meta.id = self._get_id(document)
-
-        if document.organization is not None:
-            doc.organization = document.organization.name
 
         for cat in document.categories:
             doc.category.extend(cat.category.all_search_paths())
@@ -266,7 +264,7 @@ class ElasticIndex:
             min_term_freq=1,
             min_doc_freq=2,
             max_query_terms=12,
-            fields=['title', 'content', 'description', 'location', 'category', 'organization', 'website'])
+            fields=['title', 'content', 'description', 'location', 'category', 'organization_name', 'website'])
 
         elastic_search = Search(index=self.index_name)\
             .doc_type(StarDocument)\

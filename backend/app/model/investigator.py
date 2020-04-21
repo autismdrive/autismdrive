@@ -10,5 +10,4 @@ class Investigator(db.Model):
     name = db.Column(db.String)
     title = db.Column(db.String)
     organization_name = db.Column(db.String)
-    organization_id = db.Column('organization_id', db.Integer, db.ForeignKey('organization.id'))
     bio_link = db.Column(db.String)

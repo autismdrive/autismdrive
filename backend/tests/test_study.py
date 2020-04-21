@@ -71,8 +71,8 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(404, rv.status_code)
 
     def test_create_study(self):
-        o_id = self.construct_organization().id
-        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life.", 'organization_id': o_id}
+        study = {'title': "Study of Studies", 'benefit_description': "This study will change your life.",
+                 'organization_name': "Study Org"}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)

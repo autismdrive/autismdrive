@@ -118,8 +118,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(0, len(search_results['hits']))
 
         # test that elastic resource is created with post
-        o_id = self.construct_organization().id
-        study = {'title': "space platypus", 'description': "delivering umbrellas", 'organization_id': o_id}
+        study = {'title': "space platypus", 'description': "delivering umbrellas", 'organization_name': "Study Org"}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
@@ -140,8 +139,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(0, len(search_results['hits']))
 
         # test that elastic resource is created with post
-        o_id = self.construct_organization().id
-        resource = {'title': "space unicorn", 'description': "delivering rainbows", 'organization_id': o_id}
+        resource = {'title': "space unicorn", 'description': "delivering rainbows", 'organization_name': "Resource Org"}
         rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -598,8 +596,8 @@ class TestSearch(BaseTest, unittest.TestCase):
         umbrella_query = {'words': 'umbrellas'}
 
         # test that elastic resource is created with post
-        o_id = self.construct_organization().id
-        study = {'status': "currently_enrolling", 'title': "space platypus", 'description': "delivering umbrellas", 'organization_id': o_id}
+        study = {'status': "currently_enrolling", 'title': "space platypus", 'description': "delivering umbrellas",
+                 'organization_name': "Study Org"}
         rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)

@@ -16,8 +16,6 @@ class Resource(db.Model):
     description = db.Column(db.String)
     insurance = db.Column(db.String)
     organization_name = db.Column(db.String)
-    organization_id = db.Column('organization_id', db.Integer,
-                                db.ForeignKey('organization.id'))
     phone = db.Column(db.String)
     phone_extension = db.Column(db.String)
     website = db.Column(db.String)

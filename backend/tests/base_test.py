@@ -25,7 +25,6 @@ from app.model.admin_note import AdminNote
 from app.model.category import Category
 from app.model.resource_category import ResourceCategory
 from app.model.location import Location
-from app.model.organization import Organization
 from app.model.participant import Participant
 from app.model.resource import Resource
 from app.model.resource_change_log import ResourceChangeLog
@@ -136,17 +135,6 @@ class BaseTest:
         self.assertEqual(db_admin_note.note, admin_note.note)
         return db_admin_note
 
-    def construct_organization(self, name="Staunton Makerspace",
-                               description="A place full of surprise, delight, and amazing people. And tools. Lots of exciting tools."):
-
-        organization = Organization(name=name, description=description)
-        db.session.add(organization)
-
-        db_org = db.session.query(Organization).filter_by(name=organization.name).first()
-        self.assertEqual(db_org.description, organization.description)
-        self.assertIsNotNone(db_org.id)
-        return db_org
-
     def construct_category(self, name="Ultimakers", parent=None):
 
         category = Category(name=name)
@@ -159,12 +147,12 @@ class BaseTest:
         return db_category
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org", is_draft=False, categories=[],
-                           ages=[], languages=[], covid19_categories=[]):
+                           phone="555-555-5555", website="http://stardrive.org", is_draft=False,
+                           organization_name="Some Org", categories=[], ages=[], languages=[], covid19_categories=[]):
 
         resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages,
-                            is_draft=is_draft, languages=languages, covid19_categories=covid19_categories)
-        resource.organization_id = self.construct_organization().id
+                            organization_name=organization_name, is_draft=is_draft, languages=languages,
+                            covid19_categories=covid19_categories)
         db.session.add(resource)
         db.session.commit()
         for category in categories:
@@ -180,12 +168,13 @@ class BaseTest:
     def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
                            street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False,
                            city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org", latitude=38.98765, longitude=-93.12345):
+                           website="http://stardrive.org", latitude=38.98765, longitude=-93.12345,
+                           organization_name="Location Org"):
 
         location = Location(title=title, description=description, street_address1=street_address1,
                             street_address2=street_address2, city=city, state=state, zip=zip,phone=phone,
-                            website=website, latitude=latitude, longitude=longitude, is_draft=is_draft)
-        location.organization_id = self.construct_organization().id
+                            website=website, latitude=latitude, longitude=longitude, is_draft=is_draft,
+                            organization_name=organization_name)
         db.session.add(location)
         db.session.commit()
 
@@ -211,13 +200,12 @@ class BaseTest:
     def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
                         participant_description="Even your pet hamster could benefit from participating in this study",
                         benefit_description="You can expect to have your own rainbow following you around afterwards",
-                        coordinator_email="hello@study.com", categories=[]):
+                        coordinator_email="hello@study.com", categories=[], organization_name="Study Org"):
 
         study = Study(title=title, description=description, participant_description=participant_description,
                       benefit_description=benefit_description, status=Status.currently_enrolling,
-                      coordinator_email=coordinator_email)
+                      coordinator_email=coordinator_email, organization_name=organization_name)
 
-        study.organization_id = self.construct_organization().id
         db.session.add(study)
         db.session.commit()
         db_study = db.session.query(Study).filter_by(title=study.title).first()
@@ -238,7 +226,7 @@ class BaseTest:
     def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
 
         investigator = Investigator(name=name, title=title)
-        investigator.organization_id = self.construct_organization().id
+        investigator.organization_name = "Investigator Org"
         db.session.add(investigator)
         db.session.commit()
 
@@ -247,14 +235,13 @@ class BaseTest:
         return db_inv
 
     def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
-                           street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False,
-                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org", date=datetime.datetime.now() + datetime.timedelta(days=7)):
+                        street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False, city="Stauntonville",
+                        state="QX", zip="99775", phone="555-555-5555", website="http://stardrive.org",
+                        date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org"):
 
         event = Event(title=title, description=description, street_address1=street_address1,
                       street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
-                      date=date, is_draft=is_draft)
-        event.organization_id = self.construct_organization().id
+                      date=date, is_draft=is_draft, organization_name=organization_name)
         db.session.add(event)
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
@@ -276,7 +263,6 @@ class BaseTest:
     def construct_everything(self):
         self.construct_all_questionnaires()
         cat = self.construct_category()
-        org = self.construct_organization()
         self.construct_resource()
         study = self.construct_study()
         location = self.construct_location()
@@ -284,7 +270,7 @@ class BaseTest:
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
-        investigator = Investigator(name="Sam I am", organization_id=org.id)
+        investigator = Investigator(name="Sam I am")
         db.session.add(StudyInvestigator(study = study, investigator = investigator))
         db.session.add(StudyUser(study=study, user=self.construct_user()))
         db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))

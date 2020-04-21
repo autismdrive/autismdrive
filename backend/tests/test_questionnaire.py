@@ -42,8 +42,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
             ('api.categoryendpoint', '/api/category/<id>'),
             ('api.categorylistendpoint', '/api/category'),
             ('api.questionnaireendpoint', '/api/q/<name>/<id>'),
-            ('api.organizationendpoint', '/api/organization/<id>'),
-            ('api.organizationlistendpoint', '/api/organization'),
             ('api.resourcebycategoryendpoint', '/api/category/<category_id>/resource'),
             ('api.resourcecategoryendpoint', '/api/resource_category/<id>'),
             ('api.resourcecategorylistendpoint', '/api/resource_category'),

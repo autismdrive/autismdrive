@@ -3,7 +3,6 @@ from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelSchema
 
 from app import ma
-from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.user import User, Role
 
@@ -54,14 +53,4 @@ class ParticipantExportSchema(ModelSchema):
     relationship = EnumField(Relationship)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.participantendpoint', id='<id>'),
-    })
-
-
-class OrganizationExportSchema(ModelSchema):
-    """Don't include sub relationships for Organization when dumping."""
-    class Meta:
-        model = Organization
-        fields = ('id', 'name', 'last_updated', 'description', '_links')
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.organizationendpoint', id='<id>'),
     })

@@ -19,7 +19,6 @@ import {UserSearchResults} from '../../_models/user_search_results';
 import {StudyUser} from '../../_models/study_user';
 import {TableInfo} from '../../_models/table_info';
 import {DataTransferPageResults} from '../../_models/data_transfer_log';
-import {Organization} from '../../_models/organization';
 import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
@@ -460,18 +459,6 @@ export class ApiService {
   updateStudyInvestigators(study_id: number, selectedInvestigators: StudyInvestigator[]) {
     const url = this._endpointUrl('investigatorbystudy').replace('<study_id>', study_id.toString());
     return this.httpClient.post<StudyInvestigator>(url, selectedInvestigators)
-      .pipe(catchError(this._handleError));
-  }
-
-  /** getOrganizations */
-  getOrganizations(): Observable<Organization[]> {
-    return this.httpClient.get<Organization[]>(this._endpointUrl('organizationlist'))
-      .pipe(catchError(this._handleError));
-  }
-
-  /** Add Organization */
-  addOrganization(organization: Organization): Observable<Organization> {
-    return this.httpClient.post<Organization>(this._endpointUrl('organizationlist'), organization)
       .pipe(catchError(this._handleError));
   }
 

@@ -7,7 +7,6 @@ from sqlalchemy import func
 from app import ma, db
 from app.model.admin_note import AdminNote
 from app.model.category import Category
-from app.model.organization import Organization
 from app.model.participant import Participant, Relationship
 from app.model.investigator import Investigator
 from app.model.email_log import EmailLog
@@ -124,27 +123,14 @@ class StudyUserSchema(ModelSchema):
     })
 
 
-class OrganizationSchema(ModelSchema):
-    class Meta:
-        model = Organization
-        fields = ('id', 'name', 'last_updated', 'description', 'resources', 'studies',
-                  'investigators', '_links')
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.organizationendpoint', id='<id>'),
-    })
-
-
 class InvestigatorSchema(ModelSchema):
     class Meta:
         model = Investigator
-        fields = ('id', 'last_updated', 'name', 'title', 'organization_name', 'organization_id', 'organization', 'bio_link',
+        fields = ('id', 'last_updated', 'name', 'title', 'organization_name', 'bio_link',
                   '_links')
-    organization_id = fields.Integer(required=False, allow_none=True)
-    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.investigatorendpoint', id='<id>'),
         'collection': ma.URLFor('api.investigatorlistendpoint'),
-        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>')
     })
 
 
@@ -298,16 +284,13 @@ class InvestigatorsOnStudySchema(ModelSchema):
 class ResourceSchema(ModelSchema):
     class Meta:
         model = Resource
-        fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_name', 'organization_id', 'phone', 'website',
-                  'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'resource_categories',
+        fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_name', 'phone', 'website',
+                  'contact_email', 'video_code', 'is_uva_education_content', 'resource_categories',
                   'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories', '_links')
-    organization_id = fields.Integer(required=False, allow_none=True)
-    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourceendpoint', id='<id>'),
         'collection': ma.URLFor('api.resourcelistendpoint'),
-        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
         'categories': ma.UrlFor('api.categorybyresourceendpoint', resource_id='<id>')
     })
 
@@ -350,19 +333,16 @@ class ResourceCategorySchema(ModelSchema):
 class EventSchema(ModelSchema):
     class Meta:
         model = Event
-        fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost', 'organization_id',
+        fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
-                  'organization', 'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
+                  'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
                   'phone_extension', 'languages', 'covid19_categories', '_links')
     id = fields.Integer(required=False, allow_none=True)
-    organization_id = fields.Integer(required=False, allow_none=True)
-    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventendpoint', id='<id>'),
         'collection': ma.URLFor('api.eventlistendpoint'),
-        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
         'categories': ma.UrlFor('api.categorybyeventendpoint', event_id='<id>')
     })
 
@@ -405,19 +385,16 @@ class EventCategorySchema(ModelSchema):
 class LocationSchema(ModelSchema):
     class Meta:
         model = Location
-        fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact', 'organization_id',
+        fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
-                  'contact_email', 'video_code', 'is_uva_education_content', 'organization', 'organization_name', 'resource_categories',
+                  'contact_email', 'video_code', 'is_uva_education_content', 'organization_name', 'resource_categories',
                   'latitude', 'longitude', '_links', 'ages', 'insurance', 'phone_extension', 'languages',
                   'covid19_categories', 'is_draft')
     id = fields.Integer(required=False, allow_none=True)
-    organization_id = fields.Integer(required=False, allow_none=True)
-    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnLocationSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationendpoint', id='<id>'),
         'collection': ma.URLFor('api.locationlistendpoint'),
-        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
     })
 
 
@@ -460,11 +437,9 @@ class StudySchema(ModelSchema):
     class Meta:
         model = Study
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
-                  'participant_description', 'benefit_description', 'coordinator_email', 'organization_id', 'organization_name',
-                  'organization', 'location', 'status', 'study_categories', 'study_investigators', 'study_users',
+                  'participant_description', 'benefit_description', 'coordinator_email', 'organization_name',
+                  'location', 'status', 'study_categories', 'study_investigators', 'study_users',
                   'eligibility_url', 'results_url', 'ages', 'languages', 'num_visits', '_links')
-    organization_id = fields.Integer(required=False, allow_none=True)
-    organization = fields.Nested(OrganizationSchema(), dump_only=True, allow_none=True)
     status = EnumField(Status)
     study_categories = fields.Nested(CategoriesOnStudySchema(), many=True, dump_only=True)
     study_investigators = fields.Nested(InvestigatorsOnStudySchema(), many=True, dump_only=True)
@@ -472,7 +447,6 @@ class StudySchema(ModelSchema):
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyendpoint', id='<id>'),
         'collection': ma.URLFor('api.studylistendpoint'),
-        'organization': ma.UrlFor('api.organizationendpoint', id='<organization_id>'),
         'categories': ma.UrlFor('api.categorybystudyendpoint', study_id='<id>')
     })
 
