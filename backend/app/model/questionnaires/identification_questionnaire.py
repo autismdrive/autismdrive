@@ -69,7 +69,23 @@ class IdentificationQuestionnaire(db.Model):
         info={
             "display_order": 3,
             "type": "input",
-            "template_options": {"label": "Middle name", "required": False},
+            "template_options": {"label": "Middle name"},
+            "hide_expression": 'model.no_middle_name',
+            "expression_properties": {
+                "template_options.required": '!model.no_middle_name'
+            }
+        },
+    )
+    no_middle_name = db.Column(
+        db.Boolean,
+        info={
+            "display_order": 3.5,
+            "type": "checkbox",
+            "defaultValue": False,
+            "template_options": {
+                "label": "If NO Middle Name click here",
+                "required": False,
+            },
         },
     )
     last_name = db.Column(
