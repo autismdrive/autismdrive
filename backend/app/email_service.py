@@ -79,8 +79,7 @@ class EmailService:
         token = ts.dumps(user.email, salt='email-reset-key')
         role = '' + user.role.name + '/'
 
-        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content='\
-                  + days + '&utm_term=' + str(datetime.date.today())
+        ga_link = self.generate_prompting_ga_link('reset_password', days)
         subject = "Autism DRIVE: Confirm Email"
         confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token + ga_link
         text_body = render_template("confirm_email.txt",
@@ -179,8 +178,7 @@ class EmailService:
         with self.app.app_context(), self.app.test_request_context():
             tracking_code = self.tracking_code()
 
-            ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=create_yourprofile&utm_content=' \
-                      + days + '&utm_term=' + str(datetime.date.today())
+            ga_link = self.generate_prompting_ga_link('create_yourprofile', days)
             subject = "Autism DRIVE: Complete Your Registration"
             logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
             text_body = render_template("complete_registration_email.txt",
@@ -205,8 +203,8 @@ class EmailService:
         with self.app.app_context(), self.app.test_request_context():
             tracking_code = self.tracking_code()
 
-            ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=create_dependentprofile&utm_content=' \
-                      + days + '&utm_term=' + str(datetime.date.today())
+            ga_link = self.generate_prompting_ga_link('create_dependentprofile', days)
+
             subject = "Autism DRIVE: Complete Your Dependent's Profile"
             logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
             text_body = render_template("complete_dependent_profile_email.txt",
@@ -226,3 +224,8 @@ class EmailService:
             self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
 
             return tracking_code
+
+    @staticmethod
+    def generate_prompting_ga_link(campaign, days):
+        return '?utm_source=email&utm_medium=referral&utm_campaign=' + campaign + '&utm_content=' \
+               + days + '&utm_term=' + str(datetime.date.today())

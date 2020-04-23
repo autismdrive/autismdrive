@@ -63,8 +63,7 @@ class EmailPromptService:
 
     def __send_prompting_email(self, user, send_method, log_type, days):
         current_studies = self.db.session.query(self.study_model).filter_by(status='currently_enrolling').all()
-        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content=' \
-                  + days + '&utm_term=' + str(datetime.date.today())
+        ga_link = EmailService.generate_prompting_ga_link('prompting_study', days)
         for study in current_studies:
             study.link = self.app.config['SITE_URL'] + '/#/study/' + str(study.id) + ga_link
         tracking_code = send_method(user, current_studies, days)
