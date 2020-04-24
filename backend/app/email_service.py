@@ -80,7 +80,7 @@ class EmailService:
         role = '' + user.role.name + '/'
 
         ga_link = self.generate_google_analytics_link_content('reset_password', days)
-        studies_ga_link = self.generate_google_analytics_link_content('currentstudies', days)
+        studies_ga_link = self.generate_google_analytics_link_content('reset_password_studies', days)
         subject = "Autism DRIVE: Confirm Email"
         confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token + ga_link
         text_body = render_template("confirm_email.txt",
@@ -182,7 +182,7 @@ class EmailService:
             tracking_code = self.tracking_code()
 
             ga_link = self.generate_google_analytics_link_content('create_yourprofile', days)
-            studies_ga_link = self.generate_google_analytics_link_content('currentstudies', days)
+            studies_ga_link = self.generate_google_analytics_link_content('create_yourprofile_studies', days)
             subject = "Autism DRIVE: Complete Your Registration"
             logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
             text_body = render_template("complete_registration_email.txt",
@@ -208,7 +208,7 @@ class EmailService:
             tracking_code = self.tracking_code()
 
             ga_link = self.generate_google_analytics_link_content('create_dependentprofile', days)
-            studies_ga_link = self.generate_google_analytics_link_content('currentstudies', days)
+            studies_ga_link = self.generate_google_analytics_link_content('create_dependentprofile_studies', days)
             subject = "Autism DRIVE: Complete Your Dependent's Profile"
             logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
             text_body = render_template("complete_dependent_profile_email.txt",

@@ -7,6 +7,7 @@ from sqlalchemy import exists, desc
 from sqlalchemy.exc import IntegrityError
 
 from app import app, RestException, db, email_service, auth
+from app.email_service import EmailService
 from app.model.email_log import EmailLog
 from app.model.role import Permission, Role
 from app.model.study import Study
@@ -103,12 +104,13 @@ class UserListEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT,
                                 details=new_user.errors)
 
-    def send_confirm_email(self, user):
+    @staticmethod
+    def send_confirm_email(user):
         current_studies = db.session.query(Study).filter_by(status='currently_enrolling').all()
-        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content=0days&utm_term=' \
-                  + str(datetime.date.today())
         for study in current_studies:
-            study.link = app.config['SITE_URL'] + '/#/study/' + str(study.id) + ga_link
+            study.link = app.config['SITE_URL'] + '/#/study/' + str(study.id) + \
+                         EmailService.generate_google_analytics_link_content('reset_password_study' + str(study.id),
+                                                                             '0days')
         tracking_code = email_service.confirm_email(user, current_studies)
         log = EmailLog(user_id=user.id, type="confirm_email", tracking_code=tracking_code)
         db.session.add(log)
