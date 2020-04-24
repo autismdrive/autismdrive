@@ -88,7 +88,7 @@ class EmailService:
                                     forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'] + ga_link,
                                     tracking_code=tracking_code,
                                     current_studies=current_studies,
-                                    studies_url=self.site_url + '/#/studies' + studies_ga_link)
+                                    studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
         html_body = render_template("confirm_email.html",
                                     user=user, confirm_url=confirm_url,
@@ -96,7 +96,7 @@ class EmailService:
                                     logo_url=logo_url,
                                     tracking_code=tracking_code,
                                     current_studies=current_studies,
-                                    studies_url=self.site_url + '/#/studies' + studies_ga_link)
+                                    studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
@@ -159,7 +159,9 @@ class EmailService:
                                     tracking_code=tracking_code)
 
         self.send_email(subject,
-                        recipients=[study.coordinator_email, 'autismdrive@virginia.edu'], text_body=text_body, html_body=html_body)
+                        recipients=[study.coordinator_email, 'autismdrive@virginia.edu'],
+                        text_body=text_body,
+                        html_body=html_body)
 
         return tracking_code
 
@@ -187,7 +189,7 @@ class EmailService:
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
                                         forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'] + ga_link,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + studies_ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             html_body = render_template("complete_registration_email.html",
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
@@ -195,7 +197,7 @@ class EmailService:
                                         logo_url=logo_url,
                                         tracking_code=tracking_code,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + studies_ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
 
@@ -213,7 +215,7 @@ class EmailService:
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
                                         forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'] + ga_link,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + studies_ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             html_body = render_template("complete_dependent_profile_email.html",
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
@@ -221,7 +223,7 @@ class EmailService:
                                         logo_url=logo_url,
                                         tracking_code=tracking_code,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + studies_ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
 
