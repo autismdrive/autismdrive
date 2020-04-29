@@ -79,8 +79,8 @@ class EmailService:
         token = ts.dumps(user.email, salt='email-reset-key')
         role = '' + user.role.name + '/'
 
-        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content='\
-                  + days + '&utm_term=' + str(datetime.date.today())
+        ga_link = self.generate_google_analytics_link_content('reset_password', days)
+        studies_ga_link = self.generate_google_analytics_link_content('reset_password_studies', days)
         subject = "Autism DRIVE: Confirm Email"
         confirm_url = self.app.config['FRONTEND_EMAIL_RESET'] + role + token + ga_link
         text_body = render_template("confirm_email.txt",
@@ -88,7 +88,7 @@ class EmailService:
                                     forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'] + ga_link,
                                     tracking_code=tracking_code,
                                     current_studies=current_studies,
-                                    studies_url=self.site_url + '/#/studies' + ga_link)
+                                    studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
         html_body = render_template("confirm_email.html",
                                     user=user, confirm_url=confirm_url,
@@ -96,7 +96,7 @@ class EmailService:
                                     logo_url=logo_url,
                                     tracking_code=tracking_code,
                                     current_studies=current_studies,
-                                    studies_url=self.site_url + '/#/studies' + ga_link)
+                                    studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
         self.send_email(subject,
                         recipients=[user.email], text_body=text_body, html_body=html_body)
@@ -159,7 +159,9 @@ class EmailService:
                                     tracking_code=tracking_code)
 
         self.send_email(subject,
-                        recipients=[study.coordinator_email, 'autismdrive@virginia.edu'], text_body=text_body, html_body=html_body)
+                        recipients=[study.coordinator_email, 'autismdrive@virginia.edu'],
+                        text_body=text_body,
+                        html_body=html_body)
 
         return tracking_code
 
@@ -179,15 +181,15 @@ class EmailService:
         with self.app.app_context(), self.app.test_request_context():
             tracking_code = self.tracking_code()
 
-            ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=create_yourprofile&utm_content=' \
-                      + days + '&utm_term=' + str(datetime.date.today())
+            ga_link = self.generate_google_analytics_link_content('create_yourprofile', days)
+            studies_ga_link = self.generate_google_analytics_link_content('create_yourprofile_studies', days)
             subject = "Autism DRIVE: Complete Your Registration"
             logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
             text_body = render_template("complete_registration_email.txt",
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
                                         forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'] + ga_link,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             html_body = render_template("complete_registration_email.html",
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
@@ -195,7 +197,7 @@ class EmailService:
                                         logo_url=logo_url,
                                         tracking_code=tracking_code,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
 
@@ -205,15 +207,15 @@ class EmailService:
         with self.app.app_context(), self.app.test_request_context():
             tracking_code = self.tracking_code()
 
-            ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=create_dependentprofile&utm_content=' \
-                      + days + '&utm_term=' + str(datetime.date.today())
+            ga_link = self.generate_google_analytics_link_content('create_dependentprofile', days)
+            studies_ga_link = self.generate_google_analytics_link_content('create_dependentprofile_studies', days)
             subject = "Autism DRIVE: Complete Your Dependent's Profile"
             logo_url = self.api_url + '/api/track/' + str(user.id) + '/' + tracking_code + '/UVA_STAR-logo.png'
             text_body = render_template("complete_dependent_profile_email.txt",
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
                                         forgot_pass_url=self.app.config['FRONTEND_FORGOT_PASSWORD'] + ga_link,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             html_body = render_template("complete_dependent_profile_email.html",
                                         profile_url=self.app.config['SITE_URL'] + '/#/profile' + ga_link,
@@ -221,8 +223,13 @@ class EmailService:
                                         logo_url=logo_url,
                                         tracking_code=tracking_code,
                                         current_studies=current_studies,
-                                        studies_url=self.app.config['SITE_URL'] + '/#/studies' + ga_link)
+                                        studies_url=self.site_url + '/#/studies/currently_enrolling' + studies_ga_link)
 
             self.send_email(subject, recipients=[user.email], text_body=text_body, html_body=html_body)
 
             return tracking_code
+
+    @staticmethod
+    def generate_google_analytics_link_content(campaign, days):
+        return '?utm_source=email&utm_medium=referral&utm_campaign=' + campaign + '&utm_content=' \
+               + days + '&utm_term=' + str(datetime.date.today())

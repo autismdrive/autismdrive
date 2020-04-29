@@ -6,6 +6,7 @@ import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {Meta} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-register',
@@ -39,7 +40,8 @@ export class RegisterComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private route: ActivatedRoute,
-    private googleAnalytics: GoogleAnalyticsService
+    private googleAnalytics: GoogleAnalyticsService,
+    private meta: Meta,
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
@@ -48,6 +50,15 @@ export class RegisterComponent implements OnInit {
       email: this.model['email'],
       role: 'User'
     });
+    this.meta.updateTag(
+        { property: 'og:image', content: location.origin + '/assets/join/hero.jpg' },
+        `property='og:image'`);
+    this.meta.updateTag(
+      { property: 'og:image:secure_url', content: location.origin + '/assets/join/hero.jpg' },
+      `property='og:image:secure_url'`);
+    this.meta.updateTag(
+      { name: 'twitter:image', content: location.origin + '/assets/join/hero.jpg' },
+      `name='twitter:image'`);
   }
 
   ngOnInit() {

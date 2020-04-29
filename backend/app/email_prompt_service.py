@@ -62,11 +62,17 @@ class EmailPromptService:
                     self.__send_prompting_email(rec, send_method, log_type, days)
 
     def __send_prompting_email(self, user, send_method, log_type, days):
+        campaign = 'prompting'
+        if log_type is 'confirm_email':
+            campaign = 'reset_password'
+        elif log_type is 'complete_registration_prompt':
+            campaign = 'create_yourprofile'
+        elif log_type is 'dependent_profile_prompt':
+            campaign = 'create_dependentprofile'
         current_studies = self.db.session.query(self.study_model).filter_by(status='currently_enrolling').all()
-        ga_link = '?utm_source=email&utm_medium=referral&utm_campaign=reset_password&utm_content=' \
-                  + days + '&utm_term=' + str(datetime.date.today())
         for study in current_studies:
-            study.link = self.app.config['SITE_URL'] + '/#/study/' + str(study.id) + ga_link
+            study.link = self.app.config['SITE_URL'] + '/#/study/' + str(study.id) + \
+                         EmailService.generate_google_analytics_link_content(campaign + '_study' + str(study.id), days)
         tracking_code = send_method(user, current_studies, days)
         log = self.email_log_model(user_id=user.id, type=log_type, tracking_code=tracking_code)
         self.db.session.add(log)
