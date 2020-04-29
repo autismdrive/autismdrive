@@ -16,6 +16,7 @@ from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
+from app.model.user_favorite import UserFavorite
 
 
 from flask import json
@@ -271,9 +272,10 @@ class BaseTest:
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
         investigator = Investigator(name="Sam I am")
-        db.session.add(StudyInvestigator(study = study, investigator = investigator))
+        db.session.add(StudyInvestigator(study=study, investigator=investigator))
         db.session.add(StudyUser(study=study, user=self.construct_user()))
         db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))
+        db.session.add(UserFavorite(user_id=self.construct_user().id))
         db.session.add(investigator)
         db.session.add(EmailLog())
         db.session.add(ResourceChangeLog())

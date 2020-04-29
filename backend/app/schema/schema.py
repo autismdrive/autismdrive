@@ -23,6 +23,7 @@ from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User
+from app.model.user_favorite import UserFavorite
 from app.model.zip_code import ZipCode
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
@@ -121,6 +122,14 @@ class StudyUserSchema(ModelSchema):
         'user': ma.URLFor('api.userendpoint', id='<user_id>'),
         'study': ma.URLFor('api.studyendpoint', id='<study_id>')
     })
+
+
+class UserFavoriteSchema(ModelSchema):
+    class Meta:
+        model = UserFavorite
+        fields = ('id', 'last_updated', 'type', 'user_id', 'resource_id', 'category_id',
+                  'age_range', 'language', 'covid19_category', 'user')
+    user = fields.Nested(UserSchema, dump_only=True)
 
 
 class InvestigatorSchema(ModelSchema):
