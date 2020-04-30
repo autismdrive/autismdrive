@@ -14,6 +14,7 @@ from app.schema.schema import ResourceSchema
 from app.model.event import Event
 from app.model.location import Location
 from app.model.role import Permission
+from app.model.user_favorite import UserFavorite
 from app.wrappers import requires_permission
 
 
@@ -42,6 +43,7 @@ class ResourceEndpoint(flask_restful.Resource):
         db.session.query(Event).filter_by(id=id).delete()
         db.session.query(Location).filter_by(id=id).delete()
         db.session.query(ResourceCategory).filter_by(resource_id=id).delete()
+        db.session.query(UserFavorite).filter_by(resource_id=id).delete()
         db.session.query(Resource).filter_by(id=id).delete()
         db.session.commit()
         self.log_update(resource_id=resource_id, resource_title=resource_title, change_type='delete')

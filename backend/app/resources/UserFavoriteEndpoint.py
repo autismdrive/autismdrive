@@ -51,12 +51,17 @@ class UserFavoriteEndpoint(flask_restful.Resource):
 
 
 class UserFavoriteListEndpoint(flask_restful.Resource):
-    schema = UserFavoriteSchema()
+    schema = UserFavoriteSchema(many=True)
+
+    @auth.login_required
+    def get(self):
+        resources = db.session.query(UserFavorite).all()
+        return self.schema.dump(resources)
 
     @auth.login_required
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
-        db.session.add(load_result)
+        load_result = self.schema.load(request_data, many=True).data
+        db.session.add_all(load_result)
         db.session.commit()
         return self.schema.dump(load_result)

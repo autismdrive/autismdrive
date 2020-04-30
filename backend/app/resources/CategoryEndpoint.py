@@ -7,6 +7,7 @@ from app import auth, db, RestException
 from app.model.category import Category
 from app.model.study_category import StudyCategory
 from app.model.resource_category import ResourceCategory
+from app.model.user_favorite import UserFavorite
 from app.schema.schema import CategorySchema, ParentCategorySchema
 from app.model.role import Permission
 from app.wrappers import requires_permission
@@ -26,6 +27,7 @@ class CategoryEndpoint(flask_restful.Resource):
         try:
             db.session.query(StudyCategory).filter_by(category_id=id).delete()
             db.session.query(ResourceCategory).filter_by(category_id=id).delete()
+            db.session.query(UserFavorite).filter_by(category_id=id).delete()
             db.session.query(Category).filter_by(id=id).delete()
             db.session.commit()
         except IntegrityError as error:
