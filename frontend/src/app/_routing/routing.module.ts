@@ -29,12 +29,12 @@ import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
-  {path: 'home', component: HomeComponent, data: {title: 'Welcome Autism DRIVE'}, canActivate: [NotMirroredGuard]},
-  {path: 'uva-education', component: UvaEducationComponent, data: {title: 'UVA Education'}, canActivate: [NotMirroredGuard]},
+  {path: 'home', component: HomeComponent, data: {title: 'Welcome to Autism DRIVE'}, canActivate: [NotMirroredGuard]},
+  {path: 'uva-education', component: UvaEducationComponent, data: {title: 'Autism DRIVE UVA Education'}, canActivate: [NotMirroredGuard]},
   {
     path: 'about',
     component: AboutComponent,
-    data: {title: 'Enroll in an Autism DRIVE Study'},
+    data: {title: 'About Autism DRIVE'},
     canActivate: [NotMirroredGuard]
   },
   {
@@ -66,9 +66,9 @@ const routes: Routes = [
     canActivate: [AuthGuard, NotMirroredGuard]
   },
   {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account', hideHeader: true}},
-  {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Event Details'}},
-  {path: 'location/:resourceId', component: ResourceDetailComponent, data: {title: 'Location Details'}},
-  {path: 'resource/:resourceId', component: ResourceDetailComponent, data: {title: 'Resource Details'}},
+  {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Event Details'}},
+  {path: 'location/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Location Details'}},
+  {path: 'resource/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Resource Details'}},
   {
     path: ':resourceType/:resourceId/edit',
     component: ResourceFormComponent,
@@ -81,8 +81,8 @@ const routes: Routes = [
     data: {title: 'Add Resource', roles: ['admin', 'editor']},
     canActivate: [RoleGuard]
   },
-  {path: 'covid19-resources', component: Covid19ResourcesComponent, data: {title: 'COVID-19 Resources'}},
-  {path: 'covid19-resources/:category', component: Covid19ResourcesComponent, data: {title: 'COVID-19 Resources'}},
+  {path: 'covid19-resources', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
+  {path: 'covid19-resources/:category', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},  {
     path: 'studies/add',
@@ -90,7 +90,7 @@ const routes: Routes = [
     data: {title: 'Create an Autism DRIVE Study', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
-  {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Study Details'}},
+  {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Autism DRIVE Study Details'}},
   {
     path: 'study/edit/:studyId',
     component: StudyFormComponent,
@@ -104,12 +104,12 @@ const routes: Routes = [
   },
   {path: 'logout', component: LogoutComponent, data: {title: 'You have been logged out.', hideHeader: true}},
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
-  {path: 'search', component: SearchComponent, data: {title: 'Search'}},
-  {path: 'search/:query', component: SearchComponent, data: {title: 'Search Resources'}},
+  {path: 'search', component: SearchComponent, data: {title: 'Search Autism DRIVE'}},
+  {path: 'search/:query', component: SearchComponent, data: {title: 'Search Autism DRIVE Resources'}},
   {
     path: 'admin',
     component: AdminHomeComponent,
-    data: {title: 'Admin Home', roles: ['admin', ]},
+    data: {title: 'Autism DRIVE Admin Home', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
   {

@@ -5,6 +5,7 @@ import {ApiService} from '../_services/api/api.service';
 import {NewsItem} from '../_models/news-item';
 import {HitType} from '../_models/hit_type';
 import {ConfigService} from '../_services/config.service';
+import {Meta} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private api: ApiService,
     private router: Router,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private meta: Meta,
   ) {
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
@@ -27,6 +29,15 @@ export class HomeComponent implements OnInit {
     if (this.configService.mirroring) {
       router.navigate(['mirrored']);
     }
+    this.meta.updateTag(
+        { property: 'og:image', content: location.origin + '/assets/home/hero-family.jpg' },
+        `property='og:image'`);
+    this.meta.updateTag(
+      { property: 'og:image:secure_url', content: location.origin + '/assets/home/hero-family.jpg' },
+      `property='og:image:secure_url'`);
+    this.meta.updateTag(
+      { name: 'twitter:image', content: location.origin + '/assets/home/hero-family.jpg' },
+      `name='twitter:image'`);
   }
 
   ngOnInit() {

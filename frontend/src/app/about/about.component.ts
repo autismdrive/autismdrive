@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Meta } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-about',
@@ -9,8 +10,19 @@ import { Router } from '@angular/router';
 export class AboutComponent implements OnInit {
 
   constructor(
-    private router: Router
-  ) { }
+    private router: Router,
+    private meta: Meta,
+  ) {
+    this.meta.updateTag(
+      { property: 'og:image', content: location.origin + '/assets/about/hero.jpg' },
+      `property='og:image'`);
+    this.meta.updateTag(
+      { property: 'og:image:secure_url', content: location.origin + '/assets/about/hero.jpg' },
+      `property='og:image:secure_url'`);
+    this.meta.updateTag(
+      { name: 'twitter:image', content: location.origin + '/assets/about/hero.jpg' },
+      `name='twitter:image'`);
+  }
 
   ngOnInit() {
   }

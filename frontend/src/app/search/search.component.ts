@@ -15,6 +15,7 @@ import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {Meta} from '@angular/platform-browser';
 
 interface SortMethod {
   name: string;
@@ -158,7 +159,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     media: MediaMatcher,
-    private api: ApiService
+    private api: ApiService,
+    private meta: Meta,
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this._mobileQueryListener = () => this._updateFilterPanelState();
@@ -169,6 +171,15 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
     window.addEventListener('resize', this._mobileQueryListener);
+    this.meta.updateTag(
+        { property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
+        `property='og:image'`);
+    this.meta.updateTag(
+      { property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
+      `property='og:image:secure_url'`);
+    this.meta.updateTag(
+      { name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
+      `name='twitter:image'`);
   }
 
   @ViewChild(MatPaginator, {static: false})
