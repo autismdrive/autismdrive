@@ -91,80 +91,91 @@
 
       <div
         *ngIf="!loading"
-        fxLayout="row"
-        fxLayout.lt-md="column"
-        fxLayoutGap="40px"
+        fxLayout="column"
+        fxLayoutGap="40px grid"
       >
         <div
-          fxFlex="60%"
           fxLayout="column"
-          fxLayoutGap="40px"
+          fxLayoutGap="40px grid"
         >
-          <app-participant-profile
-            [participant]="self"
-            [user]="user"
-            id="self_participant_{{self.id}}"
-          ></app-participant-profile>
+          <div
+            fxLayout="row wrap"
+            fxLayoutGap="40px grid"
+          >
+            <app-participant-profile
+              [participant]="self"
+              [user]="user"
+              id="self_participant_{{self.id}}"
+            ></app-participant-profile>
 
-          <app-participant-profile
-            *ngFor="let participant of dependents"
-            [participant]="participant"
-            [user]="user"
-            id="dependent_participant_{{participant.id}}"
-          ></app-participant-profile>
+            <app-participant-profile
+              *ngFor="let participant of dependents"
+              [participant]="participant"
+              [user]="user"
+              id="dependent_participant_{{participant.id}}"
+            ></app-participant-profile>
+          </div>
+          <div fxFlex="60%">
+            <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile first</p>
+            <button
+              *ngIf="user.getSelf() && user.getDependents().length === 0"
+              mat-flat-button
+              color="primary"
+              (click)="enrollDependent($event)"
+              [disabled]="selfPercentComplete < 100"
+              id="enroll_first_dependent"
+            >Create a profile</button>
 
-          <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile first</p>
-          <button
-            *ngIf="user.getSelf() && user.getDependents().length === 0"
-            mat-flat-button
-            color="primary"
-            (click)="enrollDependent($event)"
-            [disabled]="selfPercentComplete < 100"
-            id="enroll_first_dependent"
-          >Create a profile</button>
-
-          <button
-            *ngIf="user.getDependents().length > 0"
-            mat-flat-button
-            color="primary"
-            [disabled]="selfPercentComplete < 100"
-            (click)="enrollDependent($event)"
-            id="enroll_another_dependent"
-          >Create another profile</button>
+            <button
+              *ngIf="user.getDependents().length > 0"
+              mat-flat-button
+              color="primary"
+              [disabled]="selfPercentComplete < 100"
+              (click)="enrollDependent($event)"
+              id="enroll_another_dependent"
+            >Create another profile</button>
+          </div>
         </div>
-        <div fxFlex="40%">
+        <div>
           <mat-card>
-            <mat-card-title>Research Studies</mat-card-title>
-            <mat-card-content>
-              <mat-list>
-                <div
-                  *ngIf="studyInquiries && studyInquiries.length > 0"
-                  id="study-inquiries"
-                >
-                  <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
-                  <mat-list-item *ngFor="let s of studyInquiries">
-                    <a
-                      mat-line
-                      href="/#/study/{{s.study.id}}"
-                    >{{ s.study.short_title }}</a>
-                    <p mat-line>{{ s.study.short_description }}</p>
-                  </mat-list-item>
-                </div>
-                <div
-                  *ngIf="currentStudies && currentStudies.length > 0"
-                  id="current-studies"
-                >
-                  <mat-card-subtitle>All currently-enrolling studies</mat-card-subtitle>
-                  <mat-list-item *ngFor="let s of currentStudies">
-                    <a
-                      mat-line
-                      href="/#/study/{{s.id}}"
-                    >{{ s.short_title }}</a>
-                    <p mat-line>{{ s.short_description }}</p>
-                  </mat-list-item>
-                </div>
-              </mat-list>
-            </mat-card-content>
+            <mat-tab-group>
+
+            <mat-tab label="My Studies">
+              <mat-card-title>Research Studies</mat-card-title>
+              <mat-card-content>
+                <mat-list>
+                  <div
+                    *ngIf="studyInquiries && studyInquiries.length > 0"
+                    id="study-inquiries"
+                  >
+                    <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
+                    <mat-list-item *ngFor="let s of studyInquiries">
+                      <a
+                        mat-line
+                        href="/#/study/{{s.study.id}}"
+                      >{{ s.study.short_title }}</a>
+                      <p mat-line>{{ s.study.short_description }}</p>
+                    </mat-list-item>
+                  </div>
+                  <div
+                    *ngIf="currentStudies && currentStudies.length > 0"
+                    id="current-studies"
+                  >
+                    <mat-card-subtitle>All currently-enrolling studies</mat-card-subtitle>
+                    <mat-list-item *ngFor="let s of currentStudies">
+                      <a
+                        mat-line
+                        href="/#/study/{{s.id}}"
+                      >{{ s.short_title }}</a>
+                      <p mat-line>{{ s.short_description }}</p>
+                    </mat-list-item>
+                  </div>
+                </mat-list>
+              </mat-card-content>
+              </mat-tab>
+              <mat-tab label="My Resources"></mat-tab>
+              <mat-tab label="My Topics"></mat-tab>
+            </mat-tab-group>
           </mat-card>
         </div>
       </div>
