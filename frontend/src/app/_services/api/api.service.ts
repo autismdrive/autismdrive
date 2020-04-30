@@ -27,6 +27,7 @@ import {PasswordRequirements} from '../../_models/password_requirements';
 import {ResourceChangeLog} from '../../_models/resource_change_log';
 import {Investigator} from '../../_models/investigator';
 import {StudyInvestigator} from '../../_models/study_investigator';
+import {UserFavorite} from '../../_models/user_favorite';
 
 
 @Injectable({
@@ -52,6 +53,8 @@ export class ApiService {
     eventcategory: '/api/event_category/<id>',
     eventcategorylist: '/api/event_category',
     eventlist: '/api/event',
+    favoritesbyuserlist: '/api/user/<user_id>/favorite',
+    favoritesbyuserandtypelist: '/api/user/<user_id>/favorite/<favorite_type>',
     flow: '/api/flow/<name>/<participant_id>',
     flowAnonymous: '/api/flow/<name>',
     flowlist: '/api/flow',
@@ -106,6 +109,8 @@ export class ApiService {
     user: '/api/user/<id>',
     userAdminNoteList: '/api/user/<user_id>/admin_note',
     userEmailLog: '/api/user/email_log/<id>',
+    userfavoritelist: '/api/user_favorite',
+    userfavorite: '/api/user_favorite/<id>',
     userResourceChangeLog: '/api/user/<user_id>/resource_change_log',
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
@@ -524,6 +529,33 @@ export class ApiService {
     return this.httpClient.get<StepLog[]>(this._endpointUrl('participantStepLog').replace('<id>', participant.id.toString()))
       .pipe(catchError(this._handleError));
   }
+
+  /** Add UserFavorites */
+  addUserFavorites(favorites: UserFavorite[]): Observable<UserFavorite[]> {
+    return this.httpClient.post<UserFavorite[]>(this._endpointUrl('userfavoritelist'), favorites)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** delete UserFavorite */
+  deleteUserFavorite(favorite: UserFavorite): Observable<UserFavorite> {
+    return this.httpClient.delete<UserFavorite>(this._endpointUrl('userfavorite').replace('<id>', favorite.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Favorites By User */
+  getFavoritesByUser(user: User): Observable<UserFavorite[]> {
+    return this.httpClient.get<UserFavorite[]>(this._endpointUrl('favoritesbyuserlist').replace('<user_id>', user.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get Favorites By User and Type */
+  getFavoritesByUserAndType(user: User, type: string): Observable<UserFavorite[]> {
+    return this.httpClient.get<UserFavorite[]>(this._endpointUrl('favoritesbyuserandtypelist')
+      .replace('<user_id>', user.id.toString())
+      .replace('<type>', type))
+      .pipe(catchError(this._handleError));
+  }
+
 
   /** getQuestionnaireNames */
   getQuestionnaireInfoList() {
