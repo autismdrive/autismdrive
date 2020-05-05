@@ -2,11 +2,8 @@ import flask_restful
 from flask import request
 
 from app import db, RestException, auth
-from app.model.user import User
-from app.model.role import Role
 from app.model.user_favorite import UserFavorite
 from app.schema.schema import UserFavoriteSchema
-from app.wrappers import requires_roles
 
 
 class FavoritesByUserEndpoint(flask_restful.Resource):

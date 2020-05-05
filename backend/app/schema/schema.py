@@ -52,84 +52,9 @@ import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
 
 
-class ParticipantSchema(ModelSchema):
-    class Meta:
-        model = Participant
-        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
-                  'has_consented', 'contact', 'percent_complete')
-    id = fields.Integer(required=False, allow_none=True)
-    name = fields.Function(lambda obj: obj.get_name())
-    relationship = EnumField(Relationship)
-    user_id = fields.Integer(required=False, allow_none=True)
-    percent_complete = fields.Function(lambda obj: obj.get_percent_complete())
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.participantendpoint', id='<id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>')
-    })
 
 
-class UserSchema(ModelSchema):
-    class Meta:
-        model = User
-        fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
-                  'permissions', 'participants', 'token', 'token_url')
-    password = fields.String(load_only=True)
-    participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
-    id = fields.Integer(required=False, allow_none=True)
-    role = EnumField(Role)
-    permissions = fields.Method('get_permissions', dump_only=True)
 
-    def get_permissions(self, obj):
-        permissions = []
-        for p in obj.role.permissions():
-            permissions.append(p.name)
-        return permissions
-
-
-class UsersOnStudySchema(ModelSchema):
-    class Meta:
-        model = StudyUser
-        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
-    user = fields.Nested(UserSchema, dump_only=True)
-    status = EnumField(StudyUserStatus, allow_none=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
-        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
-    })
-
-
-class StudyUsersSchema(ModelSchema):
-    class Meta:
-        model = StudyUser
-        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
-    user = fields.Nested(UserSchema, dump_only=True)
-    status = EnumField(StudyUserStatus, allow_none=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
-        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
-    })
-
-
-class StudyUserSchema(ModelSchema):
-    class Meta:
-        model = StudyUser
-        fields = ('id', '_links', 'status', 'study_id', 'user_id')
-    status = EnumField(StudyUserStatus, allow_none=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
-        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
-        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
-    })
-
-
-class UserFavoriteSchema(ModelSchema):
-    class Meta:
-        model = UserFavorite
-        fields = ('id', 'last_updated', 'type', 'user_id', 'resource_id', 'category_id',
-                  'age_range', 'language', 'covid19_category', 'user')
-    user = fields.Nested(UserSchema, dump_only=True)
 
 
 class InvestigatorSchema(ModelSchema):
@@ -439,6 +364,91 @@ class LocationCategorySchema(ModelSchema):
         'self': ma.URLFor('api.locationcategoryendpoint', id='<id>'),
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
         'location': ma.URLFor('api.locationendpoint', id='<resource_id>')
+    })
+
+
+class ParticipantSchema(ModelSchema):
+    class Meta:
+        model = Participant
+        fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
+                  'has_consented', 'contact', 'percent_complete')
+    id = fields.Integer(required=False, allow_none=True)
+    name = fields.Function(lambda obj: obj.get_name())
+    relationship = EnumField(Relationship)
+    user_id = fields.Integer(required=False, allow_none=True)
+    percent_complete = fields.Function(lambda obj: obj.get_percent_complete())
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.participantendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>')
+    })
+
+
+class UserFavoriteSchema(ModelSchema):
+    class Meta:
+        model = UserFavorite
+        fields = ('id', 'last_updated', 'type', 'user_id', 'resource_id', 'resource', 'category_id', 'category',
+                  'age_range', 'language', 'covid19_category')
+    resource = fields.Nested(ResourceSchema, dump_only=True)
+    category = fields.Nested(CategorySchema, dump_only=True)
+
+
+class UserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
+                  'permissions', 'participants', 'token', 'token_url', 'user_favorites')
+    password = fields.String(load_only=True)
+    participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
+    user_favorites = fields.Nested(UserFavoriteSchema, dump_only=True, many=True)
+    id = fields.Integer(required=False, allow_none=True)
+    role = EnumField(Role)
+    permissions = fields.Method('get_permissions', dump_only=True)
+
+    def get_permissions(self, obj):
+        permissions = []
+        for p in obj.role.permissions():
+            permissions.append(p.name)
+        return permissions
+
+
+class UsersOnStudySchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
+
+    user = fields.Nested(UserSchema, dump_only=True)
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class StudyUsersSchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
+
+    user = fields.Nested(UserSchema, dump_only=True)
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
+    })
+
+
+class StudyUserSchema(ModelSchema):
+    class Meta:
+        model = StudyUser
+        fields = ('id', '_links', 'status', 'study_id', 'user_id')
+
+    status = EnumField(StudyUserStatus, allow_none=True)
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.studyuserendpoint', id='<id>'),
+        'user': ma.URLFor('api.userendpoint', id='<user_id>'),
+        'study': ma.URLFor('api.studyendpoint', id='<study_id>')
     })
 
 

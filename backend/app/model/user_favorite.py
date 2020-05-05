@@ -21,3 +21,5 @@ class UserFavorite(db.Model):
     language = db.Column(db.String)
     covid19_category = db.Column(db.String)
     user = db.relationship(User, backref='user_favorites')
+    resource = db.relationship(Resource, backref='user_favorites')
+    category = db.relationship(Category, backref='user_favorites')
