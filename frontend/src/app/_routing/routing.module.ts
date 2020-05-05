@@ -84,12 +84,13 @@ const routes: Routes = [
   {path: 'covid19-resources', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
   {path: 'covid19-resources/:category', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
-  {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},  {
+  {
     path: 'studies/add',
     component: StudyFormComponent,
     data: {title: 'Create an Autism DRIVE Study', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
+  {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Autism DRIVE Study Details'}},
   {
     path: 'study/edit/:studyId',
