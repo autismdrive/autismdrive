@@ -1,0 +1,4 @@
+<mat-list-item class="pad-2" *ngFor="let f of favoriteResources">
+  <a  mat-line [routerLink]="['/resource', f.id]">{{f.title}}</a>
+  <p mat-line>{{f.description}}</p>
+</mat-list-item>

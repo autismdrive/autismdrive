@@ -1,0 +1,22 @@
+@import '../../material';
+
+button.mat-mini-fab.mat-accent {
+  background-color: transparent;
+  box-shadow: none;
+  @include mat-elevation(0);
+
+  mat-icon {
+   -webkit-text-stroke: 1px $brand-accent;
+   color: white;
+   text-shadow:
+     -1px -1px 0 $brand-accent,
+      1px -1px 0 $brand-accent,
+      -1px 1px 0 $brand-accent,
+       1px 1px 0 $brand-accent;
+
+    &.active {
+      color: $brand-accent;
+      text-shadow: none;
+    }
+  }
+}

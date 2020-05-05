@@ -7,6 +7,7 @@ import { Participant } from '../_models/participant';
 import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
 import { AuthenticationService } from '../_services/api/authentication-service';
+import { Resource } from '../_models/resource';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -27,6 +28,7 @@ export class ProfileComponent implements OnInit {
   currentStudies: Study[];
   self: Participant;
   dependents: Participant[];
+  favoriteResources: Resource[];
   selfPercentComplete: number;
 
   constructor(private authenticationService: AuthenticationService,
@@ -53,6 +55,10 @@ export class ProfileComponent implements OnInit {
     this.api.getStudies().subscribe(all => {
       this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
     });
+    this.favoriteResources = this.user.user_favorites
+      .filter(f => f.type === 'resource')
+      .map(f => f.resource)
+      .sort(a => a.id);
   }
 
   refreshParticipants() {
