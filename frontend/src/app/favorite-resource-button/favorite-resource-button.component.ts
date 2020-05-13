@@ -60,9 +60,9 @@ export class FavoriteResourceButtonComponent implements OnInit {
 
   instructions(): string {
     if (this.userFavorite()) {
-      return 'Delete Resource from Favorites';
+      return 'Remove Resource from Profile';
     } else {
-      return 'Add Resource to Favorites';
+      return 'Save Resource to Profile';
     }
   }
 }

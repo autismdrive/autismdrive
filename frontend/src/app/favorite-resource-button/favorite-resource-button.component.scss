@@ -3,19 +3,19 @@
 button.mat-mini-fab.mat-accent {
   background-color: transparent;
   box-shadow: none;
-  @include mat-elevation(0);
+  @include mat-elevation(1);
 
   mat-icon {
-   -webkit-text-stroke: 1px $brand-accent;
+   -webkit-text-stroke: 1px $brand-primary;
    color: white;
    text-shadow:
-     -1px -1px 0 $brand-accent,
-      1px -1px 0 $brand-accent,
-      -1px 1px 0 $brand-accent,
-       1px 1px 0 $brand-accent;
+     -1px -1px 0 $brand-primary,
+      1px -1px 0 $brand-primary,
+      -1px 1px 0 $brand-primary,
+       1px 1px 0 $brand-primary;
 
     &.active {
-      color: $brand-accent;
+      color: $brand-primary;
       text-shadow: none;
     }
   }
