@@ -10,7 +10,7 @@ import {Resource} from '../_models/resource';
   styleUrls: ['./favorite-resource-button.component.scss']
 })
 export class FavoriteResourceButtonComponent implements OnInit {
-  @Input() resource: Resource;
+  @Input() resource_id: number;
   favorite: UserFavorite;
   @Input() user: User;
 
@@ -23,7 +23,7 @@ export class FavoriteResourceButtonComponent implements OnInit {
 
   userFavorite() {
     for (const f of this.user.user_favorites) {
-      if (f.resource_id === this.resource.id) {
+      if (f.resource_id === this.resource_id) {
         return true;
       }
     }
@@ -31,7 +31,7 @@ export class FavoriteResourceButtonComponent implements OnInit {
   }
 
   addFavorite() {
-    const favorite: UserFavorite[] = [new UserFavorite({'user_id': this.user.id, 'resource_id': this.resource.id, 'type': 'resource' })];
+    const favorite: UserFavorite[] = [new UserFavorite({'user_id': this.user.id, 'resource_id': this.resource_id, 'type': 'resource' })];
     this.api.addUserFavorites(favorite).subscribe(f => {
       this.user.user_favorites.push(f[0]);
     });
@@ -39,7 +39,7 @@ export class FavoriteResourceButtonComponent implements OnInit {
 
   deleteFavorite() {
     for (const f of this.user.user_favorites) {
-      if (f.resource_id === this.resource.id) {
+      if (f.resource_id === this.resource_id) {
         this.favorite = f;
       }
     }
