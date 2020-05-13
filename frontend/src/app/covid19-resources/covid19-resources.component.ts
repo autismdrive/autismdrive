@@ -4,6 +4,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Covid19Categories} from '../_models/hit_type';
 import {Hit, Query} from '../_models/query';
 import {Resource} from '../_models/resource';
+import {User} from "../_models/user";
+import {AuthenticationService} from "../_services/api/authentication-service";
 
 interface C19ResourceCategoryObj {
   name: string;
@@ -21,11 +23,13 @@ export class Covid19ResourcesComponent implements OnInit {
   C19Categories: C19ResourceCategoryObj[];
   selectedCategory: C19ResourceCategoryObj;
   resourceHits: Hit[];
+  currentUser: User;
 
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router,
+    private authenticationService: AuthenticationService
   ) {
     this.C19Categories = Object.keys(Covid19Categories.labels).map(k => {
       return {
@@ -44,6 +48,7 @@ export class Covid19ResourcesComponent implements OnInit {
       }
     });
     this.loadResources();
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
   }
 
   ngOnInit() {

@@ -6,13 +6,20 @@
     fxLayout="row"
     fxLayoutAlign="space-between"
   >
-    <p *ngIf="hit.is_draft === true">[DRAFT]</p>
-    <a
-      class="title mat-h2"
-      href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+    <div
+      fxLayout="row"
+      fxLayoutGap=".5em"
+      fxLayoutAlign="start center"
     >
-      {{hit.title}}
-    </a>
+      <p *ngIf="hit.is_draft === true">[DRAFT]</p>
+      <a
+        class="title mat-h2"
+        href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+      >
+        {{hit.title}}
+      </a>
+      <app-favorite-resource-button [resource_id]="hit.id" [user]="currentUser"></app-favorite-resource-button>
+    </div>
     <button mat-button
         [routerLink]="[ '/search' ]"
         [queryParams]="{'Type': hit.label}"
