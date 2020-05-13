@@ -191,7 +191,7 @@ class ElasticIndex:
         elastic_search = Search(index=self.index_name)\
             .doc_type(StarDocument)\
             .query(query)\
-            .highlight('content', type='unified', fragment_size=50)
+            .highlight('content', type='unified', fragment_size=150)
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
