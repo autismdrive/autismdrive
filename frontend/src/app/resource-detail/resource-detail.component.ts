@@ -9,6 +9,8 @@ import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {ResourceChangeLog} from '../_models/resource_change_log';
+import {MatDialog} from '@angular/material/dialog';
+import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
 
 @Component({
   selector: 'app-resource-detail',
@@ -31,7 +33,8 @@ export class ResourceDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private _sanitizer: DomSanitizer
+    private _sanitizer: DomSanitizer,
+    public dialog: MatDialog
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
@@ -159,4 +162,21 @@ export class ResourceDetailComponent implements OnInit {
     this.showInfoWindow = !this.showInfoWindow;
   }
 
+  openFavoriteTopicsDialog(): void {
+    const dialogRef = this.dialog.open(FavoriteTopicsDialogComponent, {
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      data: {
+        user: this.currentUser,
+        topics: this.resource.resource_categories,
+        ages: this.resource.ages,
+        languages: this.resource.languages,
+        covid19_categories: this.resource.covid19_categories
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
 }

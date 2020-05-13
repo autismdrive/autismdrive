@@ -1,0 +1,50 @@
+<div *ngIf="favoriteTopics.length > 0">
+  <mat-card-title>Favorite Topics</mat-card-title>
+  <mat-chip-list>
+    <mat-chip
+      *ngFor="let c of favoriteTopics"
+      [routerLink]="[ '/search' ]"
+      [queryParams]="{'category': c.id}"
+      color="primary"
+      selected
+    >{{c.name}}</mat-chip>
+  </mat-chip-list>
+</div>
+
+<div id="ages" class="margin-top" *ngIf="favoriteAges && favoriteAges.length > 0">
+  <mat-card-title>Favorite Age Ranges</mat-card-title>
+  <mat-chip-list>
+    <mat-chip
+      *ngFor="let age of favoriteAges"
+      [routerLink]="[ '/search' ]"
+      [queryParams]="{'ages': age}"
+      color="primary"
+      selected
+    >{{ageLabels[age]}}</mat-chip>
+  </mat-chip-list>
+</div>
+
+<div id="languages" class="margin-top" *ngIf="favoriteLanguages && favoriteLanguages.length > 0">
+  <mat-card-title>Favorite Languages</mat-card-title>
+  <mat-chip-list>
+    <mat-chip
+      *ngFor="let language of favoriteLanguages"
+      [routerLink]="[ '/search' ]"
+      [queryParams]="{'languages': language}"
+      color="primary"
+      selected
+    >{{languageLabels[language]}}</mat-chip>
+  </mat-chip-list>
+</div>
+
+<div id="covid19_categories" class="margin-top" *ngIf="favoriteCovid19Topics && favoriteCovid19Topics.length > 0">
+  <mat-card-title>COVID-19 Topics</mat-card-title>
+  <mat-chip-list>
+    <mat-chip
+      *ngFor="let cat of favoriteCovid19Topics"
+      [routerLink]="['/covid19-resources/', {'category': cat}]"
+      color="accent"
+      selected
+    >{{covid19Labels[cat].split(': ')[0]}}</mat-chip>
+  </mat-chip-list>
+</div>

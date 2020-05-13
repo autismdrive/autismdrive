@@ -138,6 +138,8 @@ import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { Covid19ResourcesComponent } from './covid19-resources/covid19-resources.component';
 import { FavoriteResourceButtonComponent } from './favorite-resource-button/favorite-resource-button.component';
 import { FavoriteResourcesComponent } from './favorite-resources/favorite-resources.component';
+import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite-topics-dialog.component';
+import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -285,6 +287,8 @@ export class FormlyConfig {
     Covid19ResourcesComponent,
     FavoriteResourceButtonComponent,
     FavoriteResourcesComponent,
+    FavoriteTopicsDialogComponent,
+    FavoriteTopicsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -350,7 +354,8 @@ export class FormlyConfig {
     AdminExportDetailsComponent,
     AvatarDialogComponent,
     RepeatSectionDialogComponent,
-    AdminNoteFormComponent
+    AdminNoteFormComponent,
+    FavoriteTopicsDialogComponent
   ]
 })
 export class AppModule {

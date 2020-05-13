@@ -1,0 +1,56 @@
+<div mat-dialog-content>
+  <div *ngIf="data.topics.length > 0">
+    <mat-card-title>Select Topics</mat-card-title>
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let c of data.topics"
+        (click)="addTopic('category_id', c.category.id, 'category')"
+        color="primary"
+        selected
+      ><mat-icon>grade</mat-icon> {{c.category.name}}</mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <div id="ages" class="margin-top" *ngIf="data.ages && data.ages.length > 0">
+    <mat-card-title>Related Age Ranges</mat-card-title>
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let age of data.ages"
+        (click)="addTopic('age_range', age, 'age_range')"
+        color="primary"
+        selected
+      ><mat-icon>grade</mat-icon> {{ageLabels[age]}}</mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <div id="languages" class="margin-top" *ngIf="data.languages && data.languages.length > 0">
+    <mat-card-title>Related Languages</mat-card-title>
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let language of data.languages"
+        (click)="addTopic('language', language, 'language')"
+        color="primary"
+        selected
+      ><mat-icon>grade</mat-icon> {{languageLabels[language]}}</mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <div id="covid19_categories" class="margin-top" *ngIf="data.covid19_categories && data.covid19_categories.length > 0">
+    <mat-card-title>COVID-19 Topics</mat-card-title>
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let cat of data.covid19_categories"
+        (click)="addTopic('covid19_category', cat, 'covid19_category')"
+        color="accent"
+        selected
+      ><mat-icon>grade</mat-icon> {{covid19Labels[cat].split(': ')[0]}}</mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <div mat-dialog-actions>
+    <button
+      mat-button
+      (click)="onNoClick()"
+    >Exit</button>
+  </div>
+</div>
