@@ -61,10 +61,6 @@ export class ProfileComponent implements OnInit {
       .sort(a => a.id);
   }
 
-  getFavoriteTopics(type) {
-    return this.user.user_favorites.filter(f => f.type === type).map(f => f[type]);
-  }
-
   refreshParticipants() {
     if (this.user) {
       this.api.getUser(this.user.id).subscribe( u => {

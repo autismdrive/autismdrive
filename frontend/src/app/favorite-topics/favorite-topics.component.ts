@@ -57,20 +57,26 @@ export class FavoriteTopicsComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      const favorites: UserFavorite[] = [];
-      result.ages.forEach(age => {
-        favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'age_range', 'age_range': age }));
-      });
-      result.languages.forEach(language => {
-        favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'language', 'language': language }));
-      });
-      result.covid19_categories.forEach(c19 => {
-        favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'covid19_category', 'covid19_category': c19 }));
-      });
-      this.api.addUserFavorites(favorites).subscribe();
-      this.favoriteAges = result.ages;
-      this.favoriteLanguages = result.languages;
-      this.favoriteCovid19Topics = result.covid19_categories;
+      if (result) {
+        const favorites: UserFavorite[] = [];
+        result.topics.forEach(topic => {
+          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'category', 'category_id': topic.id }));
+        });
+        result.ages.forEach(age => {
+          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'age_range', 'age_range': age }));
+        });
+        result.languages.forEach(language => {
+          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'language', 'language': language }));
+        });
+        result.covid19_categories.forEach(c19 => {
+          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'covid19_category', 'covid19_category': c19 }));
+        });
+        this.api.addUserFavorites(favorites).subscribe();
+        this.favoriteTopics = result.topics;
+        this.favoriteAges = result.ages;
+        this.favoriteLanguages = result.languages;
+        this.favoriteCovid19Topics = result.covid19_categories;
+      }
     });
   }
 

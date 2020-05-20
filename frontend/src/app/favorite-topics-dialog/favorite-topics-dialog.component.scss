@@ -1,20 +1,20 @@
-@import '../../material';
 
-  mat-icon {
-   -webkit-text-stroke: 1px $brand-primary;
-   color: white;
-   text-shadow:
-     -1px -1px 0 $brand-primary,
-      1px -1px 0 $brand-primary,
-      -1px 1px 0 $brand-primary,
-       1px 1px 0 $brand-primary;
+mat-form-field {
+  width: 100%;
+}
 
-    &.active {
-      color: $brand-accent;
-      text-shadow: none;
-    }
+.tree-select-invisible {
+  display: none;
+}
+
+.tree-select ul,
+.tree-select li {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 1rem;
+  list-style-type: none;
+
+  button.toggle-node-button {
+    outline: none !important;
   }
-
-  mat-form-field {
-    width: 100%;
-  }
+}
