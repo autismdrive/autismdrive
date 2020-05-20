@@ -2,3 +2,10 @@
   <a  mat-line [routerLink]="['/resource', f.id]">{{f.title}}</a>
   <p mat-line>{{f.description}}</p>
 </mat-list-item>
+<p>To add or remove resources, click on the star button found on the resource pages or on search results</p>
+<button
+  mat-flat-button
+  type="button"
+  color="primary"
+  routerLink="/search"
+>Search Resources</button>
