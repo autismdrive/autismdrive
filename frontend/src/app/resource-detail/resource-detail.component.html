@@ -183,7 +183,6 @@
         </agm-map>
       </div>
       <div id="resource-categories">
-        <button *ngIf="currentUser" mat-flat-button (click)="openFavoriteTopicsDialog()"><mat-icon>grade</mat-icon> Save Topics to Profile</button>
         <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages" [languages]="resource.languages" [covid19_categories]="resource.covid19_categories"></app-filter-chips>
       </div>
       <div id="resource-related">

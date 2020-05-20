@@ -4,7 +4,6 @@ import {ResourceDetailComponent} from '../resource-detail/resource-detail.compon
 import {ResourceCategory} from '../_models/resource_category';
 import {User} from '../_models/user';
 import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
-import {UserFavorite} from '../_models/user_favorite';
 import {ApiService} from '../_services/api/api.service';
 
 @Component({
@@ -16,6 +15,9 @@ export class FavoriteTopicsDialogComponent implements OnInit {
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
   covid19Labels = Covid19Categories.labels;
+  ageOptions = this.getOptions(this.ageLabels);
+  languageOptions = this.getOptions(this.languageLabels);
+  covid19Options = this.getOptions(this.covid19Labels);
 
   constructor(
     private api: ApiService,
@@ -32,23 +34,14 @@ export class FavoriteTopicsDialogComponent implements OnInit {
   ngOnInit() {
   }
 
-  userFavorite(favorite, field) {
-    for (const f of this.data.user.user_favorites) {
-      if (field === 'category_id' && favorite === f[field]) {
-        return true;
-      } else if (f[field] && favorite in f[field]) {
-        return true;
+  getOptions(modelLabels) {
+    const opts = [];
+    for (const key in modelLabels) {
+      if (modelLabels.hasOwnProperty(key)) {
+        opts.push({'value': key, 'label': modelLabels[key]});
       }
     }
-    return false;
-  }
-
-  addTopic(field, value, type) {
-    const favorite: UserFavorite[] = [new UserFavorite({'user_id': this.data.user.id, 'type': type })];
-    favorite[0][field] = value;
-    this.api.addUserFavorites(favorite).subscribe(f => {
-      this.data.user.user_favorites.push(f[0]);
-    });
+    return opts;
   }
 
   onNoClick(): void {
