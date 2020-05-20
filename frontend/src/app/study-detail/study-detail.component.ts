@@ -56,8 +56,10 @@ export class StudyDetailComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      si.investigator = result;
-      this.api.updateInvestigator(si.investigator).subscribe();
+      if (result) {
+        si.investigator = result;
+        this.api.updateInvestigator(si.investigator).subscribe();
+      }
     });
   }
 }
