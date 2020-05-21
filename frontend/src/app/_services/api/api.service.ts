@@ -552,7 +552,7 @@ export class ApiService {
   getFavoritesByUserAndType(user: User, type: string): Observable<UserFavorite[]> {
     return this.httpClient.get<UserFavorite[]>(this._endpointUrl('favoritesbyuserandtypelist')
       .replace('<user_id>', user.id.toString())
-      .replace('<type>', type))
+      .replace('<favorite_type>', type))
       .pipe(catchError(this._handleError));
   }
 
