@@ -38,7 +38,7 @@
             <span
               *ngIf="numSelectedDescendants(node)"
               matBadge="{{numSelectedDescendants(node)}}"
-              matBadgeColor="accent"
+              matBadgeColor="primary"
               matBadgeOverlap="false"
             >{{node.name}}</span>
             <span *ngIf="!numSelectedDescendants(node)">{{node.name}}</span>
