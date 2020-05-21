@@ -33,15 +33,20 @@ export class FavoriteTopicsComponent implements OnInit {
   }
 
   loadFavorites() {
-    this.favoriteTopics = this.getFavoriteTopics('category');
-    this.favoriteAges = this.getFavoriteTopics('age_range');
-    this.favoriteLanguages = this.getFavoriteTopics('language');
-    this.favoriteCovid19Topics = this.getFavoriteTopics('covid19_category');
+    this.api.getFavoritesByUserAndType(this.currentUser, 'category').subscribe(favorites => {
+      this.favoriteTopics = favorites.map(f => f['category']);
+    });
+    this.api.getFavoritesByUserAndType(this.currentUser, 'age_range').subscribe(favorites => {
+      this.favoriteAges = favorites.map(f => f['age_range']);
+    });
+    this.api.getFavoritesByUserAndType(this.currentUser, 'language').subscribe(favorites => {
+      this.favoriteLanguages = favorites.map(f => f['language']);
+    });
+    this.api.getFavoritesByUserAndType(this.currentUser, 'covid19_category').subscribe(favorites => {
+      this.favoriteCovid19Topics = favorites.map(f => f['covid19_category']);
+    });
   }
 
-  getFavoriteTopics(type) {
-    return this.currentUser.user_favorites.filter(f => f.type === type).map(f => f[type]);
-  }
 
   openFavoriteTopicsDialog(): void {
     const dialogRef = this.dialog.open(FavoriteTopicsDialogComponent, {
