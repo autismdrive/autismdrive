@@ -73,7 +73,10 @@ export class GoogleAnalyticsService {
     this.event(stepName, 'step_completed', '');
   }
 
-
+  public relatedContentEvent(eventName: string, parentComponent: string) {
+    console.log('eventName, parentComponent', eventName + parentComponent);
+    this.event(eventName, 'related_content', parentComponent);
+  }
 
   public set_user(user_id) {
     gtag('set', {'user_id': user_id}); // Set the user ID using signed-in user_id.
