@@ -74,7 +74,6 @@ export class GoogleAnalyticsService {
   }
 
   public relatedContentEvent(eventName: string, parentComponent: string) {
-    console.log('eventName, parentComponent', eventName + parentComponent);
     this.event(eventName, 'related_content', parentComponent);
   }
 
