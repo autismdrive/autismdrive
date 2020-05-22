@@ -272,4 +272,10 @@ class ElasticIndex:
 
         elastic_search = elastic_search[0:max_hits]
 
+        # Filter out past events
+        elastic_search = elastic_search.filter('bool', **{"should": [
+            {"range": {"date": {"gte": datetime.datetime.now()}}},  # Future events OR
+            {"bool": {"must_not": {"exists": {"field": "date"}}}}  # Date field is empty
+        ]})
+
         return elastic_search.execute()
