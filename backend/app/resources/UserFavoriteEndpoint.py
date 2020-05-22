@@ -59,7 +59,8 @@ class UserFavoriteListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         load_result = self.schema.load(request_data, many=True).data
-        db.session.query(UserFavorite).filter_by(user_id=load_result[0].user_id, resource_id=None).delete()
+        if load_result[0].type != 'resource':
+            db.session.query(UserFavorite).filter_by(user_id=load_result[0].user_id, resource_id=None).delete()
         db.session.add_all(load_result)
         db.session.commit()
         return self.schema.dump(load_result)
