@@ -388,6 +388,8 @@ class UserFavoriteSchema(ModelSchema):
         model = UserFavorite
         fields = ('id', 'last_updated', 'type', 'user_id', 'resource_id', 'resource', 'category_id', 'category',
                   'age_range', 'language', 'covid19_category')
+    resource_id = fields.Integer(required=False, allow_none=True)
+    category_id = fields.Integer(required=False, allow_none=True)
     resource = fields.Nested(ResourceSchema, dump_only=True)
     category = fields.Nested(CategorySchema, dump_only=True)
 
