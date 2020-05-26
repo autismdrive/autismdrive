@@ -46,8 +46,9 @@ export class HomeComponent implements OnInit {
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
     if (this.currentStudies && this.currentStudies.length > 0) {
       return studies
-        .sort((a, b) => (a.id > b.id) ? 1 : -1)
-        .map((s, i) => {
+        .sort((a, b) => (a.id < b.id) ? 1 : -1)
+        .map((s,
+              i) => {
           const n: NewsItem = {
             title: s.short_title || s.title,
             description: s.short_description || s.description,
