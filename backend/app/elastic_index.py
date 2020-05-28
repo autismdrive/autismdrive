@@ -148,6 +148,9 @@ class ElasticIndex:
             doc.is_draft = document.is_draft
         if hasattr(document, 'status') and document.status is not None:
             doc.status = document.status.value
+        if hasattr(document, 'city') and document.city is not None:
+            doc.content = doc.content + " " + document.city
+
 
         doc.meta.id = self._get_id(document)
 

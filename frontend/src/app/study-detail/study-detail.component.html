@@ -3,17 +3,13 @@
   class="container"
   id="study"
 >
-  <div
-    class="row"
-    fxLayout="row"
-    fxLayout.lt-lg="column"
-    fxLayoutGap="40px"
-  >
-    <div
+   <div
       id="study-details"
-      fxFlex.gt-md="60%"
+      fxFlex.gt-md="80%"
       fxLayout="column"
       fxLayoutGap="40px"
+      class="row"
+
     >
       <h1>{{study.title}}</h1>
       <h4 *ngIf="study.organization_name">{{study.organization_name}}</h4>
@@ -51,32 +47,7 @@
         <app-study-inquiry [study]="study"></app-study-inquiry>
       </div>
     </div>
-    <div
-      id="study-meta"
-      fxFlex.gt-md="40%"
-      fxLayout="column"
-      fxLayoutGap="20px"
-    >
-      <div id="study-contact">
-        <mat-card *ngIf="study.status">
-          <mat-card-title >Status: {{ snakeToUpperCase(study.status) }}</mat-card-title>
-          <mat-card-content>
-            <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
-            <div *ngIf="study.status === 'currently_enrolling'">
-              <app-study-inquiry [study]="study"></app-study-inquiry>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-      <div id="study-categories">
-        <app-filter-chips [categories]="study.study_categories" [ages]="study.ages" [languages]="study.languages"></app-filter-chips>
-      </div>
-      <div id="study-related">
-        <app-related-items [study]="study" [loading]="loading"></app-related-items>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <app-loading
   *ngIf="!study"
