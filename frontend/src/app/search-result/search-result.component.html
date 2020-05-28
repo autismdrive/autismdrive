@@ -6,20 +6,28 @@
     fxLayout="row"
     fxLayoutAlign="space-between"
   >
-    <p *ngIf="hit.is_draft === true">[DRAFT]</p>
-    <a
-      class="title mat-h2"
-      href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+    <div
+      fxLayout="row"
+      fxLayoutGap=".5em"
+      fxLayoutAlign="start center"
     >
-      {{hit.title}}
-    </a>
-    <button mat-button
+      <p *ngIf="hit.is_draft === true">[DRAFT]</p>
+      <a
+        class="title mat-h2"
+        href="/#/{{hit.type.toLowerCase()}}/{{hit.id}}"
+      >
+        {{hit.title}}
+      </a>
+      <app-favorite-resource-button [resource_id]="hit.id" [user]="currentUser"></app-favorite-resource-button>
+    </div>
+    <button mat-button *ngIf="hit.type != 'study'"
         [routerLink]="[ '/search' ]"
         [queryParams]="{'Type': hit.label}"
         class="type"
         [disableRipple]="true"
         matTooltip="{{ hit.label }}"
       ><app-type-icon [iconType]="hit.type.toLowerCase()" [size]="1"></app-type-icon></button>
+    <app-type-icon *ngIf="hit.type == 'study'" [iconType]="hit.type.toLowerCase()" [size]="3"></app-type-icon>
   </div>
   <ng-container *ngIf="hit && hit.status && isEnrolling(hit.status)">
     <em [ngClass]="'status-badge status-' + statusKey()">

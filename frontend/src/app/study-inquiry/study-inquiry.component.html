@@ -1,4 +1,7 @@
-<div *ngIf="!inquirySent">
+<div
+  *ngIf="!inquirySent"
+  fxFlex.gt-md="60%"
+>
   <h2>Interested in enrolling?</h2>
   <div
     *ngIf="!currentUser"
@@ -9,13 +12,13 @@
     <button
       mat-flat-button
       color="primary"
-      (click)="goRegister($event)"
+      (click)="goRegister()"
     >Join Autism DRIVE</button>
     <p>Already a user? Sign in</p>
     <button
       mat-flat-button
       color="accent"
-      (click)="goLogin($event)"
+      (click)="goLogin()"
     >Sign In</button>
   </div>
   <div
@@ -71,7 +74,10 @@
     </div>
   </div>
 </div>
-<div *ngIf="inquirySent">
+<div
+  *ngIf="inquirySent"
+  fxFlex.gt-md="60%"
+>
   <h2>Thank You</h2>
   <p>We’ve let the researchers know that you are interested in the study.</p>
   <div *ngIf="study.eligibility_url">

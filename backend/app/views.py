@@ -103,6 +103,12 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
+from app.resources.UserFavoriteEndpoint import (
+    UserFavoriteEndpoint,
+    UserFavoriteListEndpoint,
+    FavoritesByUserEndpoint,
+    FavoritesByUserAndTypeEndpoint
+)
 from app.resources.ExportEndpoint import (
     ExportEndpoint,
     ExportListEndpoint
@@ -208,6 +214,10 @@ endpoints = [
     (StudyByUserEndpoint, "/user/<user_id>/study"),
     (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),
     (StudyEnrolledByUserEndpoint, "/user/<user_id>/enrolled/study"),
+    (FavoritesByUserEndpoint, "/user/<user_id>/favorite"),
+    (FavoritesByUserAndTypeEndpoint, "/user/<user_id>/favorite/<favorite_type>"),
+    (UserFavoriteListEndpoint, "/user_favorite"),
+    (UserFavoriteEndpoint, "/user_favorite/<id>"),
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     (ResourceChangeLogByUserEndpoint, "/user/<user_id>/resource_change_log"),
     (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),

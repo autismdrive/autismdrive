@@ -1,0 +1,34 @@
+<div
+  fxFlex.gt-md="60%"
+>
+  <h2>Interested in Participating?</h2>
+  <div
+    *ngIf="!currentUser"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <p>Joining Autism DRIVE is the first step toward participating in our clinical research. Once you join you will be able to see the link to participate.</p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="goRegister()"
+    >Join Autism DRIVE</button>
+    <p>Already a user? Sign in to see the link to participate.</p>
+    <button
+      mat-flat-button
+      color="accent"
+      (click)="goLogin()"
+    >Sign In</button>
+  </div>
+  <div
+    *ngIf="currentUser"
+  >
+    <button
+      *ngIf="surveyLink"
+      mat-flat-button
+      color="primary"
+      (click)="goSurvey()"
+      id="survey-button"
+    >Start Survey</button>
+  </div>
+</div>

@@ -208,6 +208,15 @@ export class StudyFormComponent implements OnInit {
       validators: {'validation': ['url']},
     },
     {
+      key: 'survey_url',
+      type: 'input',
+      templateOptions: {
+        label: 'Survey Link',
+        placeholder: 'If this is an online survey study, please enter the link',
+      },
+      validators: {'validation': ['url']},
+    },
+    {
       key: 'results_url',
       type: 'input',
       templateOptions: {

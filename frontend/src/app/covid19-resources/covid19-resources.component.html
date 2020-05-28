@@ -44,6 +44,7 @@
         <app-search-result
           *ngFor="let hit of resourceHits"
           [hit]="hit"
+          [currentUser]="currentUser"
           [attr.data-study-status]="selectedCategory.name"
         ></app-search-result>
       </ng-container>

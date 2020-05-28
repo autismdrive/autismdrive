@@ -1,12 +1,14 @@
 import { Participant } from './participant';
 import { ParticipantRelationship } from './participantRelationship';
 import { EmailLog } from './email_log';
+import { UserFavorite } from './user_favorite';
 
 export class User {
 
   id: number;
   email: string;
   participants?: Participant[];
+  user_favorites?: UserFavorite[];
   last_updated?: Date;
   registration_date?: Date;
   last_login?: Date;

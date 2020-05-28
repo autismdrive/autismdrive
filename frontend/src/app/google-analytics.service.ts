@@ -61,6 +61,10 @@ export class GoogleAnalyticsService {
     this.event(study.id.toString(), 'study_inquiry', study.title);
   }
 
+  public studySurveyEvent(study: Study) {
+    this.event(study.id.toString(), 'study_survey', study.title);
+  }
+
   public flowStartEvent(flowName: string) {
     this.event(flowName, 'flow_started', '');
   }
@@ -73,7 +77,9 @@ export class GoogleAnalyticsService {
     this.event(stepName, 'step_completed', '');
   }
 
-
+  public relatedContentEvent(eventName: string, parentComponent: string) {
+    this.event(eventName, 'related_content', parentComponent);
+  }
 
   public set_user(user_id) {
     gtag('set', {'user_id': user_id}); // Set the user ID using signed-in user_id.

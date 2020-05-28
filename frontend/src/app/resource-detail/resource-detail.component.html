@@ -18,6 +18,7 @@
       <h1>{{resource.title}}</h1>
       <p *ngIf="resource.is_draft === true">[DRAFT]</p>
       <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" [currentUser]="currentUser" [editLink]='resource.type + "/" + resource.id + "/edit"' [editLabel]='"Edit " + resource.type'></app-edit-button>
+      <app-favorite-resource-button [resource_id]="resource.id" [user]="currentUser"></app-favorite-resource-button>
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p *ngIf="resource.is_draft === true && (!currentUser || currentUser && !currentUser.permissions.includes('edit_resource'))">This resource is being edited and is under review. Please check back for more up-to-date information soon.</p>
@@ -182,10 +183,10 @@
         </agm-map>
       </div>
       <div id="resource-categories">
-        <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages" [languages]="resource.languages" [covid19_categories]="resource.covid19_categories"></app-filter-chips>
+        <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages" [languages]="resource.languages" [covid19_categories]="resource.covid19_categories" [parentComponent]="'resource_detail'"></app-filter-chips>
       </div>
       <div id="resource-related">
-        <app-related-items [resource]="resource" [loading]="loading"></app-related-items>
+        <app-related-items [resource]="resource" [loading]="loading" [parentComponent]="'resource-detail'"></app-related-items>
       </div>
     </div>
   </div>

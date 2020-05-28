@@ -4,8 +4,7 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let c of categories"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'category': c.category.id}"
+      (click)="goFilter([ '/search' ], 'related_topic', {queryParams: {'category': c.category.id}})"
       color="primary"
       selected
     >{{c.category.name}}</mat-chip>
@@ -17,8 +16,7 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let age of ages"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'ages': age}"
+      (click)="goFilter([ '/search' ], 'related_age', {queryParams: {'ages': age}})"
       color="primary"
       selected
     >{{ageLabels[age]}}</mat-chip>
@@ -30,8 +28,7 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let language of languages"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'languages': language}"
+      (click)="goFilter([ '/search' ], 'related_language', {queryParams: {'languages': language}})"
       color="primary"
       selected
     >{{languageLabels[language]}}</mat-chip>
@@ -43,7 +40,7 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let cat of covid19_categories"
-      [routerLink]="['/covid19-resources/', {'category': cat}]"
+      (click)="goFilter(['/covid19-resources/', {'category': cat}], 'related_covid19_topic', {queryParams: {'covid19_categories': cat}})"
       color="accent"
       selected
     >{{covid19Labels[cat].split(': ')[0]}}</mat-chip>

@@ -194,7 +194,7 @@ class ElasticIndex:
         elastic_search = Search(index=self.index_name)\
             .doc_type(StarDocument)\
             .query(query)\
-            .highlight('content', type='unified', fragment_size=50)
+            .highlight('content', type='unified', fragment_size=150)
 
         elastic_search = elastic_search[search.start:search.start + search.size]
 
@@ -274,5 +274,11 @@ class ElasticIndex:
             .query(query)
 
         elastic_search = elastic_search[0:max_hits]
+
+        # Filter out past events
+        elastic_search = elastic_search.filter('bool', **{"should": [
+            {"range": {"date": {"gte": datetime.datetime.now()}}},  # Future events OR
+            {"bool": {"must_not": {"exists": {"field": "date"}}}}  # Date field is empty
+        ]})
 
         return elastic_search.execute()

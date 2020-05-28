@@ -136,7 +136,12 @@ import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { Covid19ResourcesComponent } from './covid19-resources/covid19-resources.component';
+import { FavoriteResourceButtonComponent } from './favorite-resource-button/favorite-resource-button.component';
+import { FavoriteResourcesComponent } from './favorite-resources/favorite-resources.component';
+import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite-topics-dialog.component';
+import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
 import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
+import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -282,7 +287,12 @@ export class FormlyConfig {
     MultiselectTreeComponent,
     TaxonomyAdminComponent,
     Covid19ResourcesComponent,
+    FavoriteResourceButtonComponent,
+    FavoriteResourcesComponent,
+    FavoriteTopicsDialogComponent,
+    FavoriteTopicsComponent,
     InvestigatorFormComponent,
+    StudySurveyEntryComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -349,6 +359,7 @@ export class FormlyConfig {
     AvatarDialogComponent,
     RepeatSectionDialogComponent,
     AdminNoteFormComponent,
+    FavoriteTopicsDialogComponent,
     InvestigatorFormComponent
   ]
 })

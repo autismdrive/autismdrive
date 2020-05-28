@@ -34,10 +34,10 @@ class Resource(db.Model):
     }
 
     def indexable_content(self):
-        return ' '.join(filter(None, (self.category_names(),
-                                      self.title,
+        return ' '.join(filter(None, (self.title,
                                       self.description,
-                                      self.insurance)))
+                                      self.insurance,
+                                      self.category_names(),)))
 
     def category_names(self):
         cat_text = ''

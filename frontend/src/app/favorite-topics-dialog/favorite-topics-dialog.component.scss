@@ -1,0 +1,20 @@
+
+mat-form-field {
+  width: 100%;
+}
+
+.tree-select-invisible {
+  display: none;
+}
+
+.tree-select ul,
+.tree-select li {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 1rem;
+  list-style-type: none;
+
+  button.toggle-node-button {
+    outline: none !important;
+  }
+}

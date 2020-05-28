@@ -4,6 +4,7 @@ from flask import json
 from nose.tools import raises
 
 from app.model.role import Permission
+from app.model.user_favorite import UserFavorite
 from tests.base_test import BaseTest
 from app import db, RestException
 from app.email_service import TEST_MESSAGES
@@ -441,3 +442,142 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertNotEqual(response["last_login"], first_login)
+
+    def test_get_favorites_by_user(self):
+        u = self.construct_user()
+        r = self.construct_resource()
+        c = self.construct_category()
+        fav1 = UserFavorite(resource_id=r.id, user=u, type='resource')
+        fav2 = UserFavorite(category_id=c.id, user=u, type='category')
+        db.session.add_all([fav1, fav2])
+        db.session.commit()
+        rv = self.app.get(
+            '/api/user/%i/favorite' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, len(response))
+        self.assertEqual(r.id, response[0]["resource_id"])
+        self.assertEqual('resource', response[0]["type"])
+        self.assertEqual(c.id, response[1]["category_id"])
+        self.assertEqual('category', response[1]["type"])
+
+    def test_user_favorite_types(self):
+        u = self.construct_user(email="u1@sartography.com")
+        r = self.construct_resource()
+        c = self.construct_category(name='cat1')
+        c2 = self.construct_category(name='cat2')
+        fav1 = UserFavorite(resource_id=r.id, user=u, type='resource')
+        fav2 = UserFavorite(category_id=c.id, user=u, type='category')
+        fav3 = UserFavorite(category_id=c2.id, user=u, type='category')
+        fav4 = UserFavorite(age_range='adult', user=u, type='age_range')
+        fav5 = UserFavorite(age_range='aging', user=u, type='age_range')
+        fav6 = UserFavorite(age_range='transition', user=u, type='age_range')
+        fav7 = UserFavorite(language='arabic', user=u, type='language')
+        fav8 = UserFavorite(covid19_category='edu-tainment', user=u, type='covid19_category')
+        db.session.add_all([fav1, fav2, fav3, fav4, fav5, fav6, fav7, fav8])
+        rv = self.app.get(
+            '/api/user/%i/favorite' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(8, len(response))
+        rv = self.app.get(
+            '/api/user/%i/favorite/resource' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(fav1.id, response[0]["id"])
+        rv = self.app.get(
+            '/api/user/%i/favorite/category' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, len(response))
+        self.assertEqual(fav2.id, response[0]["id"])
+        rv = self.app.get(
+            '/api/user/%i/favorite/age_range' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(3, len(response))
+        self.assertEqual(fav4.id, response[0]["id"])
+        rv = self.app.get(
+            '/api/user/%i/favorite/language' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(fav7.id, response[0]["id"])
+        rv = self.app.get(
+            '/api/user/%i/favorite/covid19_category' % u.id,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, len(response))
+        self.assertEqual(fav8.id, response[0]["id"])
+
+    def test_add_favorite_to_user(self):
+        u = self.construct_user()
+        r = self.construct_resource()
+
+        fav_data = [{"resource_id": r.id, "user_id": u.id, "type": 'resource'}]
+
+        rv = self.app.post(
+            '/api/user_favorite',
+            data=json.dumps(fav_data),
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(u.id, response[0]["user_id"])
+        self.assertEqual(r.id, response[0]["resource_id"])
+
+    def test_remove_favorite_from_user(self):
+        self.test_add_favorite_to_user()
+        rv = self.app.delete('/api/user_favorite/%i' % 1,
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+        rv = self.app.get(
+            '/api/user/%i/favorite' % 1,
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))
+
+    def test_delete_user_deletes_favorites(self):
+        u = self.construct_user()
+        r = self.construct_resource()
+
+        fav_data = [{"resource_id": r.id, "user_id": u.id, "type": 'resource'},
+                    {"age_range": 'adult', "user_id": u.id, "type": 'age_range'},]
+
+        rv = self.app.post(
+            '/api/user_favorite',
+            data=json.dumps(fav_data),
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, len(response))
+        self.assertEqual(u.id, response[0]["user_id"])
+
+        rv = self.app.delete('api/user/%i' % u.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get(
+            '/api/user_favorite',
+            content_type="application/json",
+            headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, len(response))

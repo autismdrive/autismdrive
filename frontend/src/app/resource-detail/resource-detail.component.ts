@@ -31,7 +31,7 @@ export class ResourceDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
-    private _sanitizer: DomSanitizer
+    private _sanitizer: DomSanitizer,
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
