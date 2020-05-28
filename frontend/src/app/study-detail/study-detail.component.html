@@ -6,6 +6,7 @@
   <div
     id="study-details"
     fxFlex.gt-md="80%"
+    fxFlex.gt-lg="60%"
     fxLayout="column"
     fxLayoutGap="40px"
     class="row"
@@ -57,8 +58,6 @@
       <p *ngIf="study.num_visits">Number of visits required for participation: {{study.num_visits}}</p>
     </div>
     <div
-      fxHide
-      fxShow.gt-md
       *ngIf="study.status === 'currently_enrolling'">
       <app-study-inquiry [study]="study"></app-study-inquiry>
     </div>
