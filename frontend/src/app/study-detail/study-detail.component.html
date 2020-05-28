@@ -4,77 +4,63 @@
   id="study"
 >
   <div
-    class="row"
-    fxLayout="row"
-    fxLayout.lt-lg="column"
+    id="study-details"
+    fxFlex.gt-md="80%"
+    fxLayout="column"
     fxLayoutGap="40px"
+    class="row"
   >
-    <div
-      id="study-details"
-      fxFlex.gt-md="60%"
-      fxLayout="column"
-      fxLayoutGap="40px"
-    >
-      <h1>{{study.title}}</h1>
-      <h4 *ngIf="study.organization_name">{{study.organization_name}}</h4>
-      <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_study')" [editLabel]='"Edit Study"' [editLink]='"study/edit/" + study.id.toString()' [currentUser]="currentUser"></app-edit-button>
-      <p class="status">Study Status: {{ snakeToUpperCase(study.status) }}</p>
-      <p>{{study.description}}</p>
-      <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
-      <div *ngIf="study.status === 'currently_enrolling' && study.participant_description">
-        <h2>Who we're looking for</h2>
-        <p>{{study.participant_description}}</p>
-      </div>
-      <div *ngIf="study.status === 'currently_enrolling' && study.benefit_description">
-        <h2>Why Participate?</h2>
-        <p>{{study.benefit_description}}</p>
-      </div>
-      <div *ngIf="study.study_investigators.length > 0">
-        <h2>About the researchers</h2>
-        <div *ngFor="let si of study.study_investigators">
-          <p><a *ngIf="si.investigator.bio_link" target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>
-            <b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>
-            <span *ngIf="si.investigator.title">, {{si.investigator.title}}</span>
-            <span *ngIf="si.investigator.organization_name">, {{si.investigator.organization_name}}</span></p>
-        </div>
-      </div>
-      <div *ngIf="study.location">
-        <h2 *ngIf="study.status === 'currently_enrolling' || study.status === 'study_in_progress'">Where does this study take place?</h2>
-        <h2 *ngIf="study.status === 'results_being_analyzed' || study.status === 'study_results_published'">Where did this study take place?</h2>
-        <p>{{study.location}}</p>
-        <p *ngIf="study.survey_url"><b>Click <a target="_blank" href={{study.survey_url}}>here</a> to begin the survey.</b></p>
-        <p *ngIf="study.num_visits">Number of visits required for participation: {{study.num_visits}}</p>
-      </div>
+    <h1>{{study.title}}</h1>
+    <h4 *ngIf="study.organization_name">{{study.organization_name}}</h4>
+    <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_study')" [editLabel]='"Edit Study"' [editLink]='"study/edit/" + study.id.toString()' [currentUser]="currentUser"></app-edit-button>
+    <p class="status">Study Status: {{ snakeToUpperCase(study.status) }}</p>
+    <p>{{study.description}}</p>
+    <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
+    <div *ngIf="study.status === 'currently_enrolling' && study.participant_description">
+      <h2>Who we're looking for</h2>
+      <p>{{study.participant_description}}</p>
+    </div>
+    <div *ngIf="study.status === 'currently_enrolling' && study.benefit_description">
+      <h2>Why Participate?</h2>
+      <p>{{study.benefit_description}}</p>
+    </div>
+    <div *ngIf="study.study_investigators.length > 0">
+      <h2>About the researchers</h2>
       <div
-        fxHide
-        fxShow.gt-md
-        *ngIf="study.status === 'currently_enrolling'">
-        <app-study-inquiry [study]="study"></app-study-inquiry>
+        fxLayout="row"
+        fxLayoutGap="40px"
+        fxLayoutAlign="start center"
+        *ngFor="let si of study.study_investigators"
+      >
+        <div class="investigator">
+        <p><a *ngIf="si.investigator.bio_link" target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>
+        <b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>
+        <span *ngIf="si.investigator.title">, {{si.investigator.title}}</span>
+        <span *ngIf="si.investigator.organization_name">, {{si.investigator.organization_name}}</span></p>
+        </div>
+        <button
+          mat-mini-fab
+          type="button"
+          color="primary"
+          (click)="openDialog(si)"
+          matTooltip="Edit Investigator"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
       </div>
     </div>
+    <div *ngIf="study.location">
+      <h2 *ngIf="study.status === 'currently_enrolling' || study.status === 'study_in_progress'">Where does this study take place?</h2>
+      <h2 *ngIf="study.status === 'results_being_analyzed' || study.status === 'study_results_published'">Where did this study take place?</h2>
+      <p>{{study.location}}</p>
+      <p *ngIf="study.survey_url"><b>Click <a target="_blank" href={{study.survey_url}}>here</a> to begin the survey.</b></p>
+      <p *ngIf="study.num_visits">Number of visits required for participation: {{study.num_visits}}</p>
+    </div>
     <div
-      id="study-meta"
-      fxFlex.gt-md="40%"
-      fxLayout="column"
-      fxLayoutGap="20px"
-    >
-      <div id="study-contact">
-        <mat-card *ngIf="study.status">
-          <mat-card-title >Status: {{ snakeToUpperCase(study.status) }}</mat-card-title>
-          <mat-card-content>
-            <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
-            <div *ngIf="study.status === 'currently_enrolling'">
-              <app-study-inquiry [study]="study"></app-study-inquiry>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-      <div id="study-categories">
-        <app-filter-chips [categories]="study.study_categories" [ages]="study.ages" [languages]="study.languages" [parentComponent]="'study_detail'"></app-filter-chips>
-      </div>
-      <div id="study-related">
-        <app-related-items [study]="study" [loading]="loading" [parentComponent]="'study-detail'"></app-related-items>
-      </div>
+      fxHide
+      fxShow.gt-md
+      *ngIf="study.status === 'currently_enrolling'">
+      <app-study-inquiry [study]="study"></app-study-inquiry>
     </div>
   </div>
 </div>

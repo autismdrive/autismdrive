@@ -63,6 +63,7 @@ export class ApiService {
     forgot_password: '/api/forgot_password',
     investigatorList: '/api/investigator',
     investigatorbystudy: '/api/study/<study_id>/investigator',
+    investigator: '/api/investigator/<id>',
     location: '/api/location/<id>',
     locationbycategory: '/api/category/<category_id>/location',
     locationcategory: '/api/location_category/<id>',
@@ -451,6 +452,12 @@ export class ApiService {
   /** Add Investigator */
   addInvestigator(investigator: Investigator): Observable<Investigator> {
     return this.httpClient.post<Investigator>(this._endpointUrl('investigatorList'), investigator)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update Investigator */
+  updateInvestigator(investigator: Investigator): Observable<Investigator> {
+    return this.httpClient.put<Investigator>(this._endpointUrl('investigator').replace('<id>', investigator.id.toString()), investigator)
       .pipe(catchError(this._handleError));
   }
 

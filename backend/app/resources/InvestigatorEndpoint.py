@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db
 from app.model.investigator import Investigator
+from app.model.study_investigator import StudyInvestigator
 from app.schema.schema import InvestigatorSchema
 
 
@@ -19,6 +20,7 @@ class InvestigatorEndpoint(flask_restful.Resource):
         return self.schema.dump(model)
 
     def delete(self, id):
+        db.session.query(StudyInvestigator).filter_by(investigator_id=id).delete()
         db.session.query(Investigator).filter_by(id=id).delete()
         db.session.commit()
         return None
