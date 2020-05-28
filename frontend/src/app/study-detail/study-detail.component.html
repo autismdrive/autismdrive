@@ -40,6 +40,7 @@
         <span *ngIf="si.investigator.organization_name">, {{si.investigator.organization_name}}</span></p>
         </div>
         <button
+          *ngIf="currentUser && currentUser.permissions.includes('edit_resource' || 'edit_study')"
           mat-mini-fab
           type="button"
           color="primary"
