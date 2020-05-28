@@ -22,9 +22,9 @@ export class HomeComponent implements OnInit {
     private configService: ConfigService,
     private meta: Meta,
   ) {
-    this.api.getStudies().subscribe(all => {
-      this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
-      this.newsItems = this._studiesToNewsItems(this.currentStudies);
+    this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
+      this.currentStudies = studies;
+      this.newsItems = this._studiesToNewsItems(studies);
     });
     if (this.configService.mirroring) {
       router.navigate(['mirrored']);
@@ -46,7 +46,6 @@ export class HomeComponent implements OnInit {
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
     if (this.currentStudies && this.currentStudies.length > 0) {
       return studies
-        .sort((a, b) => (a.id < b.id) ? 1 : -1)
         .map((s, i) => {
           const n: NewsItem = {
             title: s.short_title || s.title,
