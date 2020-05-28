@@ -5,6 +5,8 @@ import {Study} from '../_models/study';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
+import {MatDialog} from '@angular/material/dialog';
+import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
 @Component({
   selector: 'app-study-detail',
@@ -18,8 +20,11 @@ export class StudyDetailComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    private route: ActivatedRoute, private router: Router,
+    private route: ActivatedRoute,
+    private router: Router,
     private authenticationService: AuthenticationService,
+    public dialog: MatDialog
+
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.route.params.subscribe(params => {
@@ -40,5 +45,21 @@ export class StudyDetailComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  openDialog(si): void {
+    const dialogRef = this.dialog.open(InvestigatorFormComponent, {
+      width: `${window.innerWidth}px`,
+      data: {
+        si: si
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        si.investigator = result;
+        this.api.updateInvestigator(si.investigator).subscribe();
+      }
+    });
   }
 }

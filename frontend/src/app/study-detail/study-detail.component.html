@@ -27,11 +27,27 @@
       </div>
       <div *ngIf="study.study_investigators.length > 0">
         <h2>About the researchers</h2>
-        <div *ngFor="let si of study.study_investigators">
+        <div
+          fxLayout="row"
+          fxLayoutGap="40px"
+          fxLayoutAlign="start center"
+          *ngFor="let si of study.study_investigators"
+        >
+          <div class="investigator">
           <p><a *ngIf="si.investigator.bio_link" target="_blank" href={{si.investigator.bio_link}}>{{si.investigator.name}}</a>
-            <b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>
-            <span *ngIf="si.investigator.title">, {{si.investigator.title}}</span>
-            <span *ngIf="si.investigator.organization_name">, {{si.investigator.organization_name}}</span></p>
+          <b *ngIf="!si.investigator.bio_link">{{si.investigator.name}}</b>
+          <span *ngIf="si.investigator.title">, {{si.investigator.title}}</span>
+          <span *ngIf="si.investigator.organization_name">, {{si.investigator.organization_name}}</span></p>
+          </div>
+          <button
+            mat-mini-fab
+            type="button"
+            color="primary"
+            (click)="openDialog(si)"
+            matTooltip="Edit Investigator"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
         </div>
       </div>
       <div *ngIf="study.location">
