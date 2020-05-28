@@ -58,7 +58,7 @@
       <p *ngIf="study.num_visits">Number of visits required for participation: {{study.num_visits}}</p>
     </div>
     <div *ngIf="study.status === 'currently_enrolling' && study.survey_url">
-      <app-study-survey-entry [currentUser]="currentUser" [surveyLink]="study.survey_url"></app-study-survey-entry>
+      <app-study-survey-entry [study]="study" [currentUser]="currentUser" [surveyLink]="study.survey_url"></app-study-survey-entry>
     </div>
     <div
       *ngIf="study.status === 'currently_enrolling' && !study.survey_url"

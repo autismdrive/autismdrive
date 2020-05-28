@@ -61,6 +61,10 @@ export class GoogleAnalyticsService {
     this.event(study.id.toString(), 'study_inquiry', study.title);
   }
 
+  public studySurveyEvent(study: Study) {
+    this.event(study.id.toString(), 'study_survey', study.title);
+  }
+
   public flowStartEvent(flowName: string) {
     this.event(flowName, 'flow_started', '');
   }

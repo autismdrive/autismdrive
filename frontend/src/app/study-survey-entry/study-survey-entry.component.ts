@@ -1,5 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import {Study} from '../_models/study';
+import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({
   selector: 'app-study-survey-entry',
@@ -7,11 +9,13 @@ import {Router} from '@angular/router';
   styleUrls: ['./study-survey-entry.component.scss']
 })
 export class StudySurveyEntryComponent implements OnInit {
+  @Input() study: Study;
   @Input() currentUser = false;
   @Input() surveyLink: string;
 
   constructor(
     private router: Router,
+    private googleAnalytics: GoogleAnalyticsService
   ) { }
 
   ngOnInit() {
@@ -27,6 +31,7 @@ export class StudySurveyEntryComponent implements OnInit {
 
   goSurvey() {
     if (this.surveyLink) {
+      this.googleAnalytics.studySurveyEvent(this.study);
       window.open(this.surveyLink, '_blank');
     }
   }
