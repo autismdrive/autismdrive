@@ -79,7 +79,7 @@ class DataLoader:
                 db.session.commit()
 
                 for i in range(17, 25):
-                    if row[i] and row[i] is not '':
+                    if row[i] and row[i] != '':
                         category = self.get_category_by_name(row[i].strip())
                         event_id = event.id
                         category_id = category.id
@@ -119,7 +119,7 @@ class DataLoader:
                 db.session.commit()
 
                 for i in range(19, 28):
-                    if row[i] and row[i] is not '':
+                    if row[i] and row[i] != '':
                         category = self.get_category_by_name(row[i].strip())
                         location_id = location.id
                         category_id = category.id
@@ -151,7 +151,7 @@ class DataLoader:
                 db.session.commit()
 
                 for i in range(7, 14):
-                    if row[i] and row[i] is not '':
+                    if row[i] and row[i] != '':
                         category = self.get_category_by_name(row[i].strip())
                         resource_id = resource.id
                         category_id = category.id
@@ -191,7 +191,7 @@ class DataLoader:
                 self.__increment_id_sequence(Study)
 
                 for i in range(24, 31):
-                    if row[i] and row[i] is not '':
+                    if row[i] and row[i] != '':
                         category = self.get_category_by_name(row[i].strip())
                         study_id = study.id
                         category_id = category.id
