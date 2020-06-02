@@ -142,6 +142,7 @@ import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite
 import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
 import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
 import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
+import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -293,6 +294,7 @@ export class FormlyConfig {
     FavoriteTopicsComponent,
     InvestigatorFormComponent,
     StudySurveyEntryComponent,
+    RegisterDialogComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -360,7 +362,8 @@ export class FormlyConfig {
     RepeatSectionDialogComponent,
     AdminNoteFormComponent,
     FavoriteTopicsDialogComponent,
-    InvestigatorFormComponent
+    InvestigatorFormComponent,
+    RegisterDialogComponent
   ]
 })
 export class AppModule {

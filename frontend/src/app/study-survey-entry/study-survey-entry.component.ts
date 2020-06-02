@@ -2,6 +2,8 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {Study} from '../_models/study';
 import {GoogleAnalyticsService} from '../google-analytics.service';
+import {MatDialog} from '@angular/material/dialog';
+import {RegisterDialogComponent} from '../register-dialog/register-dialog.component';
 
 @Component({
   selector: 'app-study-survey-entry',
@@ -15,7 +17,8 @@ export class StudySurveyEntryComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private googleAnalytics: GoogleAnalyticsService
+    private googleAnalytics: GoogleAnalyticsService,
+    public dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -25,14 +28,25 @@ export class StudySurveyEntryComponent implements OnInit {
     this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});
   }
 
-  goRegister() {
-    this.router.navigateByUrl('/register');
-  }
-
   goSurvey() {
     if (this.surveyLink) {
       this.googleAnalytics.studySurveyEvent(this.study);
       window.open(this.surveyLink, '_blank');
     }
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(RegisterDialogComponent, {
+      width: `${window.innerWidth}px`,
+      data: {
+        'displaySurvey': false
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.currentUser = true;
+      }
+    });
   }
 }
