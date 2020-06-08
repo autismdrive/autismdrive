@@ -3,6 +3,7 @@ from flask import json
 from tests.base_test import BaseTest
 from app import db
 from app.model.investigator import Investigator
+from app.model.study_investigator import StudyInvestigator
 
 
 class TestStudy(BaseTest, unittest.TestCase):
@@ -92,3 +93,21 @@ class TestStudy(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['name'], 'Tara Tarantula')
         self.assertEqual(response['title'], 'Assistant Professor of Arachnology')
+
+    def test_delete_investigator_deletes_relationship(self):
+        i = self.construct_investigator()
+        s = self.construct_study()
+        si = StudyInvestigator(investigator_id=i.id, study_id=s.id)
+        db.session.add(si)
+        db.session.commit()
+        si_id = si.id
+
+        rv = self.app.get('api/study_investigator/%i' % si_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.delete('api/investigator/%i' % i.id, content_type="application/json",
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/study_investigator/%i' % si_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code)

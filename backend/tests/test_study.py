@@ -10,6 +10,8 @@ from app.model.questionnaires.identification_questionnaire import Identification
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
+from app.model.study_investigator import StudyInvestigator
+
 
 
 class TestStudy(BaseTest, unittest.TestCase):
@@ -381,3 +383,21 @@ class TestStudy(BaseTest, unittest.TestCase):
         db_cq = db.session.query(ContactQuestionnaire).filter_by(zip=cq.zip).first()
         self.assertEqual(db_cq.phone, cq.phone)
         return db_cq
+
+    def test_delete_study_deletes_relationship(self):
+        i = self.construct_investigator()
+        s = self.construct_study()
+        si = StudyInvestigator(investigator_id=i.id, study_id=s.id)
+        db.session.add(si)
+        db.session.commit()
+        si_id = si.id
+
+        rv = self.app.get('api/study_investigator/%i' % si_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.delete('api/study/%i' % s.id, content_type="application/json",
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/study_investigator/%i' % si_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code)
