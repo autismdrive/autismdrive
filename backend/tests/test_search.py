@@ -560,7 +560,21 @@ class TestSearch(BaseTest, unittest.TestCase):
             else:
                 self.assertTrue(hit['date'] is None)
 
+    def test_search_webinars_included_with_events(self):
+        rainbow_query = {'words': 'rainbows', 'types': ['event']}
 
+        r = self.construct_resource(title='space unicorn online resource',
+                                    description="Electronically-delivered rainbows through the internets")
+        l = self.construct_location(title='space unicorn main office',
+                                    description="Where rainbows are manufactured for galactic distribution")
+        e = self.construct_event(title='space unicorn workshop',
+                                 description="Learn how to deliver sparkling rainbows in this interactive workshop")
+        w = self.construct_webinar(title='space unicorn research webinar',
+                                   description="Discussing the long-term outcomes of interstellar unicorn-based "
+                                               "delivery of rainbows")
+
+        search_results = self.search_resources(rainbow_query)
+        self.assertEqual(2, len(search_results['hits']), 'should only return 2 results')
 
     def test_search_for_map_points_only(self):
 

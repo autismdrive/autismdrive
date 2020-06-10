@@ -151,6 +151,9 @@ class ElasticIndex:
         if hasattr(document, 'city') and document.city is not None:
             doc.content = doc.content + " " + document.city
 
+        if document.__tablename__ == 'webinar':
+            doc.type = 'event'
+
 
         doc.meta.id = self._get_id(document)
 
@@ -171,10 +174,12 @@ class ElasticIndex:
         if flush:
             self.index.flush()
 
-    def load_documents(self, resources, events, locations, studies):
+    def load_documents(self, resources, webinars, events, locations, studies):
         print("Loading search records of events, locations, resources, and studies into Elasticsearch index: %s" % self.index_prefix)
         for r in resources:
             self.add_document(r, flush=False)
+        for w in webinars:
+            self.add_document(w, flush=False, latitude=w.latitude, longitude=w.longitude)
         for e in events:
             self.add_document(e, flush=False, latitude=e.latitude, longitude=e.longitude)
         for l in locations:

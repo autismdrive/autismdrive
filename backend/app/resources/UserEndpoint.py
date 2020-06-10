@@ -13,6 +13,7 @@ from app.model.role import Permission, Role
 from app.model.study import Study
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
+from app.model.webinar_user import WebinarUser
 from app.schema.schema import UserSchema, UserSearchSchema
 from app.wrappers import requires_permission
 
@@ -32,6 +33,7 @@ class UserEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.delete_user)
     def delete(self, id):
+        db.session.query(WebinarUser).filter_by(user_id=id).delete()
         db.session.query(UserFavorite).filter_by(user_id=id).delete()
         db.session.query(User).filter_by(id=id).delete()
         db.session.commit()

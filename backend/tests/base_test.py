@@ -17,7 +17,8 @@ from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
 from app.model.user_favorite import UserFavorite
-
+from app.model.webinar import Webinar
+from app.model.webinar_user import WebinarUser
 
 from flask import json
 
@@ -250,6 +251,32 @@ class BaseTest:
         elastic_index.add_document(db_event, 'Event')
         return db_event
 
+    def construct_webinar(self, title="A+ Webinar", description="A delightful webinar destined to create rejoicing",
+                          street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False, city="Stauntonville",
+                          state="QX", zip="99775", phone="555-555-5555", website="http://stardrive.org",
+                          date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Webinar Org",
+                          survey_link="http://stardrive.org/survey", webinar_link="http://stardrive.org/webinar",
+                          max_users=35, registered_users=None):
+
+        if registered_users is None:
+            registered_users = [self.construct_user(email="w1@sartography.com"),
+                                self.construct_user("w2@sartography.com")]
+        webinar = Webinar(title=title, description=description, street_address1=street_address1,
+                          street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
+                          date=date, is_draft=is_draft, organization_name=organization_name, webinar_link=webinar_link,
+                          survey_link=survey_link, max_users=max_users)
+        db.session.add(webinar)
+
+        db_webinar = db.session.query(Webinar).filter_by(title=webinar.title).first()
+        self.assertEqual(db_webinar.website, webinar.website)
+
+        for user in registered_users:
+            wu = WebinarUser(webinar_id=db_webinar.id, user_id=user.id)
+            db.session.add(wu)
+
+        elastic_index.add_document(db_webinar, 'Event')
+        return db_webinar
+
     def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):
         z = ZipCode(id=id, latitude=latitude, longitude=longitude)
         db.session.add(z)
@@ -268,6 +295,7 @@ class BaseTest:
         study = self.construct_study()
         location = self.construct_location()
         event = self.construct_event()
+        self.construct_webinar()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
