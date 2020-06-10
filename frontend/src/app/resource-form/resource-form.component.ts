@@ -41,7 +41,8 @@ export class ResourceFormComponent implements OnInit {
         options: [
           {'value': 'resource', 'label': 'Online Information'},
           {'value': 'location', 'label': 'Local Services'},
-          {'value': 'event', 'label': 'Events and Training'}
+          {'value': 'event', 'label': 'Events and Training'},
+          {'value': 'webinar', 'label': 'Webinar'}
         ],
         required: true,
       },
@@ -91,7 +92,7 @@ export class ResourceFormComponent implements OnInit {
       expressionProperties: {
         'templateOptions.required': 'model.type === "event"'
       },
-      hideExpression: 'model.type != "event"',
+      hideExpression: 'model.type != "event" && model.type != "webinar"',
     },
     {
       key: 'time',
@@ -103,7 +104,7 @@ export class ResourceFormComponent implements OnInit {
       expressionProperties: {
         'templateOptions.required': 'model.type === "event"'
       },
-      hideExpression: 'model.type != "event"',
+      hideExpression: 'model.type != "event" && model.type != "webinar"',
     },
     {
       key: 'ticket_cost',
@@ -112,7 +113,37 @@ export class ResourceFormComponent implements OnInit {
         label: 'Event Ticket Cost',
         placeholder: 'Please enter the ticket cost for your event',
       },
-      hideExpression: 'model.type != "event"',
+      hideExpression: 'model.type != "event" && model.type != "webinar"',
+    },
+    {
+      key: 'webinar_link',
+      type: 'input',
+      templateOptions: {
+        label: 'Webinar Link',
+        placeholder: 'Please enter the link to attend the webinar',
+      },
+      hideExpression: 'model.type != "webinar"',
+      validators: {'validation': ['url']},
+    },
+    {
+      key: 'survey_link',
+      type: 'input',
+      templateOptions: {
+        label: 'Survey Link',
+        placeholder: 'Please enter the link to the post-webinar survey',
+      },
+      hideExpression: 'model.type != "webinar"',
+      validators: {'validation': ['url']},
+    },
+    {
+      key: 'max_users',
+      type: 'input',
+      templateOptions: {
+        label: 'Maximum attendees',
+        placeholder: 'Please enter the maximum number of users allowed to register',
+        type: 'number'
+      },
+      hideExpression: 'model.type != "webinar"',
     },
     {
       key: 'organization_name',
@@ -149,7 +180,7 @@ export class ResourceFormComponent implements OnInit {
         label: 'Location Name',
         placeholder: 'Please enter the name for your event venue',
       },
-      hideExpression: 'model.type != "event"',
+      hideExpression: 'model.type != "event" && model.type != "webinar"',
     },
     {
       key: 'street_address1',

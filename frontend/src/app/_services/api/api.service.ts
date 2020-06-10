@@ -45,9 +45,12 @@ export class ApiService {
     categorybyresource: '/api/resource/<resource_id>/category',
     categorybylocation: '/api/location/<location_id>/category',
     categorybyevent: '/api/event/<event_id>/category',
+    categorybywebinar: '/api/resource/<webinar_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
     categorylist: '/api/category',
     data_transfer_log: '/api/data_transfer_log',
+    webinar: '/api/webinar/<id>',
+    webinarlist: '/api/webinar',
     event: '/api/event/<id>',
     eventbycategory: '/api/category/<category_id>/event',
     eventcategory: '/api/event_category/<id>',
@@ -265,6 +268,30 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** Get Webinar */
+  getWebinar(id: number): Observable<Resource> {
+    return this.httpClient.get<Resource>(this._endpointUrl('webinar').replace('<id>', id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Add Webinar */
+  addWebinar(webinar: Resource): Observable<Resource> {
+    return this.httpClient.post<Resource>(this._endpointUrl('webinarlist'), webinar)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update Webinar */
+  updateWebinar(webinar: Resource): Observable<Resource> {
+    return this.httpClient.put<Resource>(this._endpointUrl('webinar').replace('<id>', webinar.id.toString()), webinar)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Delete Webinar */
+  deleteWebinar(webinar: Resource): Observable<Resource> {
+    return this.httpClient.delete<Resource>(this._endpointUrl('webinar').replace('<id>', webinar.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
   /** Add Event */
   addEvent(event: Resource): Observable<Resource> {
     return this.httpClient.post<Resource>(this._endpointUrl('eventlist'), event)
@@ -402,6 +429,13 @@ export class ApiService {
   /** Update EventCategory */
   updateEventCategories(event_id: number, selectedCategories: ResourceCategory[]) {
     const url = this._endpointUrl('categorybyevent').replace('<event_id>', event_id.toString());
+    return this.httpClient.post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Update WebinarCategory */
+  updateWebinarCategories(webinar_id: number, selectedCategories: ResourceCategory[]) {
+    const url = this._endpointUrl('categorybywebinar').replace('<webinar_id>', webinar_id.toString());
     return this.httpClient.post<ResourceCategory>(url, selectedCategories)
       .pipe(catchError(this._handleError));
   }

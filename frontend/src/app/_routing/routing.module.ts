@@ -66,6 +66,7 @@ const routes: Routes = [
     canActivate: [AuthGuard, NotMirroredGuard]
   },
   {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account', hideHeader: true}},
+  {path: 'webinar/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Webinar Details'}},
   {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Event Details'}},
   {path: 'location/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Location Details'}},
   {path: 'resource/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Resource Details'}},
