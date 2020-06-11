@@ -69,19 +69,18 @@ class DataLoader:
                               organization_name=org, primary_contact=row[6], location_name=row[7],
                               street_address1=row[8], street_address2=row[9], city=row[10], state=row[11], zip=row[12],
                               website=row[13], phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[],
-                              covid19_categories=[], languages=[], is_draft=False, is_uva_education_content=True)
+                              languages=[], covid19_categories=[], is_draft=False, is_uva_education_content=True)
                 self.__increment_id_sequence(Resource)
 
-                for i in range(26, len(row)):
+                for i in range(26, 28):
                     if row[i]:
                         event.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
-                for i in range(29, len(row)):
+                for i in range(29, 35):
                     if row[i]:
                         event.languages.extend(row[i])
                 for i in range(36, len(row)):
                     if row[i]:
                         event.covid19_categories.extend(row[i])
-
                 db.session.add(event)
                 db.session.commit()
 
