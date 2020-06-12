@@ -97,15 +97,16 @@
       </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="participants">
+    <ng-container matColumnDef="participant_count">
       <mat-header-cell
         *matHeaderCellDef
+        mat-sort-header
       >Number of Participants</mat-header-cell>
       <mat-cell
         class="participants-cell"
         *matCellDef="let user"
       >
-        {{user.participants.length}}
+        {{user.participant_count}}
       </mat-cell>
     </ng-container>
 

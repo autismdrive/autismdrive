@@ -398,9 +398,10 @@ class UserSchema(ModelSchema):
     class Meta:
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
-                  'permissions', 'participants', 'token', 'token_url', 'user_favorites')
+                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count')
     password = fields.String(load_only=True)
     participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
+    participant_count = fields.Integer(required=False, allow_none=True)
     user_favorites = fields.Nested(UserFavoriteSchema, dump_only=True, many=True)
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
