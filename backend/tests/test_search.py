@@ -333,9 +333,9 @@ class TestSearch(BaseTest, unittest.TestCase):
                          msg="The two true Top level categories are returned as children")
         maker_cat = search_results['category']['children'][0]
         talker_cat = search_results['category']['children'][1]
-        self.assertEquals("Makers", maker_cat['name'], "The first category returned is 'makers'")
-        self.assertEquals("Talkers", talker_cat['name'], "The second category returned is 'talkers'")
-        self.assertEquals(3, maker_cat['hit_count'], "There are three makers present.")
+        self.assertEqual("Makers", maker_cat['name'], "The first category returned is 'makers'")
+        self.assertEqual("Talkers", talker_cat['name'], "The second category returned is 'talkers'")
+        self.assertEqual(3, maker_cat['hit_count'], "There are three makers present.")
 
     def test_top_level_category_repost_does_not_create_error(self):
         self.setup_category_aggregations()
@@ -358,7 +358,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(1, len(list(filter(lambda cat: cat['name'] == 'Woodworkers', children))))
         self.assertEqual(1, len(list(filter(lambda cat: cat['name'] == 'Potters', children))))
         woodworkers = next(x for x in children if x['name'] == "Woodworkers")
-        self.assertEquals(1, woodworkers['hit_count'], "There is one wood worker.")
+        self.assertEqual(1, woodworkers['hit_count'], "There is one wood worker.")
 
     def test_third_level_filtered_category_counts(self):
         self.setup_category_aggregations()
@@ -371,15 +371,15 @@ class TestSearch(BaseTest, unittest.TestCase):
                          msg="Selected Category Id should be the category returned")
         self.assertEqual(1, len(search_results['category']['children']), msg="Woodworkers has only one child")
         cabinet_maker = search_results['category']['children'][0]
-        self.assertEquals(1, cabinet_maker['hit_count'], "There is one cabinet maker.")
+        self.assertEqual(1, cabinet_maker['hit_count'], "There is one cabinet maker.")
 
     def test_that_top_level_category_is_always_present(self):
         self.setup_category_aggregations()
         maker_wood_cat = db.session.query(Category).filter(Category.name == 'Woodworkers').first()
         query = {'words': '', 'category': {'id': maker_wood_cat.id}}
         search_results = self.search(query)
-        self.assertEquals("Makers", search_results['category']['parent']['name'])
-        self.assertEquals("Topics", search_results['category']['parent']['parent']['name'])
+        self.assertEqual("Makers", search_results['category']['parent']['name'])
+        self.assertEqual("Topics", search_results['category']['parent']['parent']['name'])
 
     def test_find_related_resource(self):
         # You have to build a lot of documents for this to start working ....  And I liked 1985.
