@@ -17,6 +17,7 @@ export class User {
   permissions?: string[];
   email_log?: EmailLog[];
   token_url?: string;
+  participant_count?: number;
 
   constructor(private _props) {
     for (const propName in this._props) {
