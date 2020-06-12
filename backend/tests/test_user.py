@@ -11,6 +11,7 @@ from app.email_service import TEST_MESSAGES
 from app.model.email_log import EmailLog
 from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User, Role
+from app.model.participant import Relationship
 
 
 class TestUser(BaseTest, unittest.TestCase):
@@ -581,3 +582,26 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
+
+    def test_user_participant_count(self):
+        u1 = self.construct_user(email='1@sartography.com')
+        u2 = self.construct_user(email='2@sartography.com')
+        u3 = self.construct_user(email='3@sartography.com')
+        self.construct_participant(user=u1, relationship=Relationship.self_guardian)
+        self.construct_participant(user=u1, relationship=Relationship.dependent)
+        self.construct_participant(user=u2, relationship=Relationship.self_participant)
+
+        rv = self.app.get('api/user/%i' % u1.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(2, response['participant_count'])
+
+        rv = self.app.get('api/user/%i' % u2.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response['participant_count'])
+
+        rv = self.app.get('api/user/%i' % u3.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(0, response['participant_count'])

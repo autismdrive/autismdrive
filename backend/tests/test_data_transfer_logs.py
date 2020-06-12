@@ -23,8 +23,8 @@ class TestDataTransferLogs(BaseTest, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEquals(20, response['total'])
-        self.assertEquals(2, response['pages'])
-        self.assertEquals(10, len(response['items']))
+        self.assertEqual(20, response['total'])
+        self.assertEqual(2, response['pages'])
+        self.assertEqual(10, len(response['items']))
         results = DataTransferLogSchema(many=True, session=db.session).load(response['items']).data
-        self.assertEquals(10, len(results))
+        self.assertEqual(10, len(results))

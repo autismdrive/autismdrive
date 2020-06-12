@@ -40,9 +40,9 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         rv = response.json()
         self.assertTrue("origin" in rv)
         self.assertTrue(rv["origin"] == "127.0.0.1")
-        self.assertEquals(1, len(httpretty.httpretty.latest_requests))
+        self.assertEqual(1, len(httpretty.httpretty.latest_requests))
         self.assertIsNotNone(httpretty.last_request())
-        self.assertEquals(httpretty.last_request().body, b'')
+        self.assertEqual(httpretty.last_request().body, b'')
 
     @httpretty.activate
     def test_login(self):
@@ -170,12 +170,12 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         log = logs[0]
         self.assertIsNotNone(log.date_started)
         self.assertIsNotNone(log.last_updated)
-        self.assertEquals(1, len(logs[0].details))
+        self.assertEqual(1, len(logs[0].details))
         detail = logs[0].details[0]
-        self.assertEquals("User", detail.class_name)
+        self.assertEqual("User", detail.class_name)
         self.assertTrue(detail.successful)
-        self.assertEquals(1, detail.success_count)
-        self.assertEquals(0, detail.failure_count)
+        self.assertEqual(1, detail.success_count)
+        self.assertEqual(0, detail.failure_count)
 
     @httpretty.activate
     def test_import_logs_schema_error(self):
@@ -211,10 +211,10 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(log.date_started)
         self.assertIsNotNone(log.last_updated)
         details = log.details
-        self.assertEquals("User", log.details[0].class_name)
+        self.assertEqual("User", log.details[0].class_name)
         self.assertFalse(log.details[0].successful)
-        self.assertEquals(0, log.details[0].success_count)
-        self.assertEquals(1, log.details[0].failure_count)
+        self.assertEqual(0, log.details[0].success_count)
+        self.assertEqual(1, log.details[0].failure_count)
 
     @httpretty.activate
     def test_request_includes_date_param_if_log_exists(self):

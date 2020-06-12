@@ -26,11 +26,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_get_list_of_exportables_requires_admin(self):
         rv = self.app.get('/api/export')
-        self.assertEquals(401, rv.status_code)
+        self.assertEqual(401, rv.status_code)
 
         headers = self.logged_in_headers(self.construct_user(email="joe@smoe.com", role=Role.user))
         rv = self.app.get('/api/export', headers=headers)
-        self.assertEquals(403, rv.status_code)
+        self.assertEqual(403, rv.status_code)
 
     def test_get_list_of_exportables_contains_common_tables(self):
         rv = self.app.get('/api/export',
@@ -53,9 +53,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         user_data = list(filter(lambda field: field['class_name'] == 'User', response))
         self.assertTrue(len(user_data) > 0)
-        self.assertEquals("/api/export/user", user_data[0]['url'])
-        self.assertEquals("User", user_data[0]['class_name'])
-        self.assertEquals("stardrive_user", user_data[0]['table_name'])
+        self.assertEqual("/api/export/user", user_data[0]['url'])
+        self.assertEqual("User", user_data[0]['class_name'])
+        self.assertEqual("stardrive_user", user_data[0]['table_name'])
 
     def test_get_list_of_exportables_has_url_for_all_endpoints(self):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
@@ -232,7 +232,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             rv = self.app.get(export.url + params, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
             data = json.loads(rv.get_data(as_text=True))
-            self.assertEquals(0, len(data), msg=export.url + " does not respect 'after' param in get request.")
+            self.assertEqual(0, len(data), msg=export.url + " does not respect 'after' param in get request.")
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
@@ -284,11 +284,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(export_logs[0].last_updated)
         self.assertTrue(export_logs[0].total_records > 0, msg="The act of setting up this test harness should mean "
                                                                   "at least one user record is avialable for export")
-        self.assertEquals(1, len(export_logs[0].details))
+        self.assertEqual(1, len(export_logs[0].details))
         detail = export_logs[0].details[0]
-        self.assertEquals("User", detail.class_name)
-        self.assertEquals(True, detail.successful)
-        self.assertEquals(1, detail.success_count)
+        self.assertEqual("User", detail.class_name)
+        self.assertEqual(True, detail.successful)
+        self.assertEqual(1, detail.success_count)
 
     def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
 
