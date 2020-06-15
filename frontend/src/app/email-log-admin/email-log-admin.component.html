@@ -1,4 +1,4 @@
-<div class="email-log-admin">
+<div class="email-log-admin" *ngIf="currentUser && currentUser.role == 'admin'">
   <div
     class="spinner-container"
     *ngIf="loading"
