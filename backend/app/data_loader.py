@@ -72,15 +72,15 @@ class DataLoader:
                               languages=[], covid19_categories=[], is_draft=False, is_uva_education_content=True)
                 self.__increment_id_sequence(Resource)
 
-                for i in range(26, 28):
+                for i in range(26, 29):
                     if row[i]:
                         event.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
-                for i in range(29, 35):
+                for i in range(29, 36):
                     if row[i]:
-                        event.languages.extend(row[i])
+                        event.languages.append(row[i])
                 for i in range(36, len(row)):
                     if row[i]:
-                        event.covid19_categories.extend(row[i])
+                        event.covid19_categories.append(row[i])
                 db.session.add(event)
                 db.session.commit()
 
