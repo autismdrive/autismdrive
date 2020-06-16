@@ -110,6 +110,7 @@ export class ApiService {
     user: '/api/user/<id>',
     userAdminNoteList: '/api/user/<user_id>/admin_note',
     userEmailLog: '/api/user/email_log/<id>',
+    emailloglist: '/api/email_log',
     userfavoritelist: '/api/user_favorite',
     userfavorite: '/api/user_favorite/<id>',
     userResourceChangeLog: '/api/user/<user_id>/resource_change_log',
@@ -516,6 +517,12 @@ export class ApiService {
   /** Get User Email Log */
   getUserEmailLog(user: User): Observable<EmailLog[]> {
     return this.httpClient.get<EmailLog[]>(this._endpointUrl('userEmailLog').replace('<id>', user.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** Get All Email Log */
+  getAllEmailLog(): Observable<EmailLog[]> {
+    return this.httpClient.get<EmailLog[]>(this._endpointUrl('emailloglist'))
       .pipe(catchError(this._handleError));
   }
 

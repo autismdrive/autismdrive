@@ -16,6 +16,11 @@
       <p>Total Dependents: {{userParticipantList.num_dependents}}</p>
     </ng-container>
 
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" >
+    </mat-form-field>
+
     <mat-table
       [dataSource]="participantDataSource"
       class="mat-elevation-z8"
