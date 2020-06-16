@@ -31,4 +31,8 @@ export class ParticipantAdminComponent implements OnInit {
     });
   }
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.participantDataSource.filter = filterValue.trim().toLowerCase();
+  }
 }
