@@ -7,6 +7,7 @@ from sqlalchemy import func
 from app import RestException, db, auth
 from app.model.participant import Participant
 from app.model.role import Role, Permission
+from app.model.user import User
 from app.schema.schema import ParticipantSchema
 from app.wrappers import requires_roles, requires_permission
 
@@ -56,8 +57,12 @@ class ParticipantListEndpoint(flask_restful.Resource):
 
 
 class ParticipantAdminListEndpoint(flask_restful.Resource):
-    def count_participants(self, relationship):
-        query = db.session.query(Participant).filter(Participant.relationship == relationship)
+    def count_participants(self, relationship, filter_out_test=False):
+        if filter_out_test:
+            query = db.session.query(Participant).filter(Participant.relationship == relationship,
+                                                         Participant.user.has(User.role != Role.admin), Participant.user.has(User.role != Role.test))
+        else:
+            query = db.session.query(Participant).filter(Participant.relationship == relationship)
         count_q = query.statement.with_only_columns([func.count()]).order_by(None)
         return query.session.execute(count_q).scalar()
 
@@ -69,6 +74,10 @@ class ParticipantAdminListEndpoint(flask_restful.Resource):
             'num_self_guardians': self.count_participants('self_guardian'),
             'num_dependents': self.count_participants('dependent'),
             'num_self_professionals': self.count_participants('self_professional'),
+            'filtered_self_participants': self.count_participants('self_participant', filter_out_test=True),
+            'filtered_self_guardians': self.count_participants('self_guardian', filter_out_test=True),
+            'filtered_dependents': self.count_participants('dependent', filter_out_test=True),
+            'filtered_self_professionals': self.count_participants('self_professional', filter_out_test=True),
             'all_participants': ParticipantSchema(many=True).dump(db.session.query(Participant)
                                                                   .order_by(Participant.relationship).all(), many=True)
         }

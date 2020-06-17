@@ -1417,7 +1417,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("Employment", response[8]["display_name"])
         self.assertEqual("Professional Profile", response[14]["display_name"])
         self.assertEqual("Supports", response[15]["display_name"])
-        self.assertEquals(4, len(response[15]["sub_tables"]))
+        self.assertEqual(4, len(response[15]["sub_tables"]))
         self.assertEqual(16, len(response))
 
     def test_questionnaire_list_meta_basics(self):
@@ -1462,8 +1462,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
-        ws = wb.get_active_sheet()
-        self.assertEqual(ws, wb.active)
+        ws = wb.active
         self.assertEqual('id', ws['A1'].value)
         self.assertEqual('last_updated', ws['B1'].value)
         self.assertEqual('participant_id', ws['C1'].value)
@@ -1487,8 +1486,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
-        ws = wb.get_active_sheet()
-        self.assertEqual(ws, wb.active)
+        ws = wb.active
         self.assertEqual(2, ws.max_row)
         self.assertEqual(21, len(wb.worksheets))
         self.assertEqual('Alternative Augmentative', wb.worksheets[0].title)
@@ -1524,8 +1522,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
-        ws = wb.get_active_sheet()
-        self.assertEqual(ws, wb.active)
+        ws = wb.active
         self.assertEqual(21, len(wb.worksheets))
         self.assertEqual(2, wb['Contact'].max_row)
         self.assertEqual('user_id', wb['Contact']['E1'].value)

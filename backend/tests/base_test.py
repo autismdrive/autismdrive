@@ -90,9 +90,9 @@ class BaseTest:
         encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
         charset, encoding, encoded_text = re.match(encoded_word_regex,
                                                    encoded_words).groups()
-        if encoding is 'b':
+        if encoding == 'b':
             byte_string = base64.b64decode(encoded_text)
-        elif encoding is 'q':
+        elif encoding == 'q':
             byte_string = quopri.decodestring(encoded_text)
         text = byte_string.decode(charset)
         text = text.replace("_", " ")

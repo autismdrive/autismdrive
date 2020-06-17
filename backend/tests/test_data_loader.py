@@ -42,7 +42,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
             self.assertGreater(num_rc_after, num_rc_before)
 
     def _count(self, class_to_query, type_to_filter=''):
-        if type_to_filter is not '':
+        if type_to_filter != '':
             return db.session.query(class_to_query).filter(class_to_query.type == type_to_filter).count()
         else:
             return db.session.query(class_to_query).count()
