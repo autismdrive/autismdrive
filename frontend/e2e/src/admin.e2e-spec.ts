@@ -52,6 +52,7 @@ describe('Admin', () => {
   it('should navigate to participant admin tab', () => adminUseCases.navigateToTab(3, '.participant-admin'));
   it('should navigate to taxonomy admin tab', () => adminUseCases.navigateToTab(4, '.taxonomy-admin'));
   it('should navigate to import/export status tab', () => adminUseCases.navigateToTab(5, '.logs'));
+  it('should navigate to email log tab', () => adminUseCases.navigateToTab(6, '.email-log-admin'));
   it('should navigate to data admin tab', () => adminUseCases.navigateToTab(1, '.data-list'));
   it('should export all questionnaire data');
   it('should hide sensitive data');
