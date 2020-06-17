@@ -9,12 +9,31 @@
   <div>
     <h1>Participant Admin</h1>
 
-    <ng-container *ngIf="userParticipantList">
-      <p>Total Self Participants: {{userParticipantList.num_self_participants}}</p>
-      <p>Total Self Professionals: {{userParticipantList.num_self_professionals}}</p>
-      <p>Total Self Guardians: {{userParticipantList.num_self_guardians}}</p>
-      <p>Total Dependents: {{userParticipantList.num_dependents}}</p>
-    </ng-container>
+    <mat-card *ngIf="userParticipantList">
+      <p>The filtered totals filter out all participants associated with Admin and Test User Accounts:</p>
+      <div
+        fxLayout="row"
+        fxLayout.lt-sm="column"
+        fxLayoutGap="2em"
+      >
+        <div>
+          <p><i>Total Self Participants:</i> {{userParticipantList.num_self_participants}}</p>
+          <p><i>Total Self Professionals:</i> {{userParticipantList.num_self_professionals}}</p>
+          <p><i>Total Self Guardians:</i> {{userParticipantList.num_self_guardians}}</p>
+          <p><i>Total Dependents:</i> {{userParticipantList.num_dependents}}</p>
+          <p><b>Total: {{userParticipantList.num_self_participants + userParticipantList.num_self_professionals
+          + userParticipantList.num_self_guardians + userParticipantList.num_dependents}}</b></p>
+        </div>
+        <div>
+          <p><i>Filtered Self Participants:</i> {{userParticipantList.filtered_self_participants}}</p>
+          <p><i>Filtered Self Professionals:</i> {{userParticipantList.filtered_self_professionals}}</p>
+          <p><i>Filtered Self Guardians:</i> {{userParticipantList.filtered_self_guardians}}</p>
+          <p><i>Filtered Dependents:</i> {{userParticipantList.filtered_dependents}}</p>
+          <p><b>Filtered Total: {{userParticipantList.filtered_self_participants + userParticipantList.filtered_self_professionals
+          + userParticipantList.filtered_self_guardians + userParticipantList.filtered_dependents}}</b></p>
+        </div>
+      </div>
+    </mat-card>
 
     <mat-form-field>
       <mat-label>Filter</mat-label>
