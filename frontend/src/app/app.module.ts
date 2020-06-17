@@ -143,6 +143,8 @@ import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.compo
 import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
 import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
 import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
+import { EventRegistrationComponent } from './event-registration/event-registration.component';
+import { EventRegistrationFormComponent } from './event-registration-form/event-registration-form.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -295,6 +297,8 @@ export class FormlyConfig {
     InvestigatorFormComponent,
     StudySurveyEntryComponent,
     RegisterDialogComponent,
+    EventRegistrationComponent,
+    EventRegistrationFormComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -363,7 +367,8 @@ export class FormlyConfig {
     AdminNoteFormComponent,
     FavoriteTopicsDialogComponent,
     InvestigatorFormComponent,
-    RegisterDialogComponent
+    RegisterDialogComponent,
+    EventRegistrationFormComponent,
   ]
 })
 export class AppModule {

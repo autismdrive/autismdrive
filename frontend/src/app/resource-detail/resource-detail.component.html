@@ -89,6 +89,9 @@
           (click)="goWebsite($event)"
         >Visit website</button>
       </div>
+
+      <app-event-registration *ngIf="resource.max_users" [currentUser]="currentUser" [resource]="resource"></app-event-registration>
+
       <div
         *ngIf="currentUser && currentUser.permissions.includes('edit_resource')"
         fxLayout="column"
