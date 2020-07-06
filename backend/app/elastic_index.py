@@ -236,7 +236,7 @@ class ElasticIndex:
             else:
                 aggregation = A("terms", field='category')
         else:
-            aggregation = A("terms", field='category', exclude=".*\\,.*")
+            aggregation = A("terms", field='category', exclude=".*\\,.*", size=15)
 
         elastic_search.aggs.bucket('terms', aggregation)
         elastic_search.aggs.bucket('type', A("terms", field='type'))
