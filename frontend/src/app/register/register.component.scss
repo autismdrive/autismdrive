@@ -1,14 +1,19 @@
 #hero {
   background-image: url('/assets/join/hero.jpg');
-  background-position: 0% 18%;
+  background-position: 0 18%;
   padding-top: 8rem;
   padding-bottom: 8rem;
+  background-size: 100% auto;
+  @media (max-width: 768px) {
+    background-position: 0 0;
+  }
 
   .hero-content {
     display: grid;
     @media (min-width: 768px) { grid-template-columns: 2fr 1fr; }
     @media (min-width: 992px) { grid-template-columns: 1fr 1fr; }
     @media (min-width: 1200px) { grid-template-columns: 1fr 1fr; }
+
   }
 
   .form.border-box {
@@ -16,5 +21,16 @@
     background-color: #FFFFFF;
     color: black;
     padding: 2em;
+
+    h1 {
+      text-transform: uppercase;
+    }
   }
+
 }
+
+  .bold-title {
+    text-transform: uppercase;
+    font-size: 2.5em;
+    font-weight: bold;
+  }

@@ -779,12 +779,11 @@ h4,
 h5,
 h6 {
   color: $brand-primary;
-  font-family: "bodoni-urw", serif;
+  font-family: "franklin-gothic-urw", serif;
   font-style: italic;
   font-weight: 800;
   line-height: 1;
   text-rendering: optimizeLegibility;
-  text-transform: uppercase;
 
   & small {
     line-height: 0;
@@ -2127,7 +2126,7 @@ div.more {
   width: 18.75rem;
   height: 9.375rem;
   top: -7.375rem;
-  padding: 0
+  padding: 0;
 }
 
 @media print, screen and (min-width: 48em) {
@@ -2155,7 +2154,8 @@ div.more {
 }
 
 .jumbo-section-header .line-1, .jumbo-section-header .line-2 {
-  font-size: 2rem
+  font-size: 2rem;
+  text-transform: uppercase;
 }
 
 @media print, screen and (min-width: 48em) {

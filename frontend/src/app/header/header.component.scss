@@ -16,7 +16,7 @@
         border-bottom-right-radius: 0px;
         border-bottom-width: 4px;
         border-bottom-style: solid;
-        border-bottom-color: white;
+        border-bottom-color: $brand-primary;
       }
     }
   }
@@ -58,13 +58,13 @@
   top: 0;
   width: 100%;
   height: $uva-header-height;
-  background-color: $brand-primary;;
+  background-color: white;
   z-index: 101;
   padding-left: 20px;
 
   .uva-logo a {
     @include mat-typography-level-to-styles($custom-typography, button);
-    color: white;
+    color: $brand-primary;
     text-transform: uppercase;
   }
 
@@ -75,13 +75,13 @@
   top: 0;
   width: 100%;
   height: $site-header-height;
-  background-color: white;
+  background-color: $brand-primary;
   box-shadow: 0px 10px rgba(0, 0, 0, 0.3);
   z-index: 100;
 
   mat-toolbar {
-    background-color: white;
-    color: $brand-primary;
+    background-color: $brand-primary;
+    color: white
   }
 
   mat-toolbar-row.search {
@@ -172,7 +172,7 @@
         font-weight: 700;
         font-style: italic;
         font-size: 1rem;
-        color: $brand-primary;
+        color: white;
         text-transform: uppercase;
         position: relative;
         display: flex;
@@ -196,7 +196,7 @@
       }
 
       &:hover {
-        background-color: white;
+        background-color: $brand-primary;
 
         a {
           text-decoration: none;
