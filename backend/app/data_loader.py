@@ -114,15 +114,22 @@ class DataLoader:
                     lat_long_dict={'lat': row[15], 'lng': row[16]}
                 )
                 event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
-                              organization_name=org, primary_contact=row[6], location_name=row[7], street_address1=row[8],
-                              street_address2=row[9], city=row[10], state=row[11], zip=row[12], website=row[13],
-                              phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[], is_draft=False)
+                              organization_name=org, primary_contact=row[6], location_name=row[7],
+                              street_address1=row[8], street_address2=row[9], city=row[10], state=row[11], zip=row[12],
+                              website=row[13], phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'],
+                              ages=[], languages=[], covid19_categories=[], is_draft=False,
+                              is_uva_education_content=True)
                 self.__increment_id_sequence(Resource)
 
-                for i in range(26, len(row)):
+                for i in range(26, 29):
                     if row[i]:
                         event.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
-
+                for i in range(29, 36):
+                    if row[i]:
+                        event.languages.append(row[i])
+                for i in range(36, len(row)):
+                    if row[i]:
+                        event.covid19_categories.append(row[i])
                 db.session.add(event)
                 db.session.commit()
 

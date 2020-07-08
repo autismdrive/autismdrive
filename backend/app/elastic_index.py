@@ -234,14 +234,14 @@ class ElasticIndex:
             if search.category.calculate_level() == 0:
                 exclude = ".*\\,.*\\,.*"
                 include = str(search.category.id) + "\\,.*"
-                aggregation = A("terms", field='category', exclude=exclude, include=include)
+                aggregation = A("terms", field='category', exclude=exclude, include=include, size=25)
             elif search.category.calculate_level() == 1:
                 include = ".*\\,.*\\,.*"
-                aggregation = A("terms", field='category', include=include)
+                aggregation = A("terms", field='category', include=include, size=25)
             else:
-                aggregation = A("terms", field='category')
+                aggregation = A("terms", field='category', size=25)
         else:
-            aggregation = A("terms", field='category', exclude=".*\\,.*")
+            aggregation = A("terms", field='category', exclude=".*\\,.*", size=25)
 
         elastic_search.aggs.bucket('terms', aggregation)
         elastic_search.aggs.bucket('type', A("terms", field='type'))

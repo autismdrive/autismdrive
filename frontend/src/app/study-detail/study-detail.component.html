@@ -8,7 +8,7 @@
     fxFlex.gt-md="80%"
     fxFlex.gt-lg="60%"
     fxLayout="column"
-    fxLayoutGap="40px"
+    fxLayoutGap="15px"
     class="row"
   >
     <h1>{{study.title}}</h1>
@@ -18,7 +18,7 @@
     <p>{{study.description}}</p>
     <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
     <div *ngIf="study.status === 'currently_enrolling' && study.participant_description">
-      <h2>Who we're looking for</h2>
+      <h2>Who We're Looking For</h2>
       <p>{{study.participant_description}}</p>
     </div>
     <div *ngIf="study.status === 'currently_enrolling' && study.benefit_description">
@@ -26,7 +26,7 @@
       <p>{{study.benefit_description}}</p>
     </div>
     <div *ngIf="study.study_investigators.length > 0">
-      <h2>About the researchers</h2>
+      <h2>About the Researchers</h2>
       <div
         fxLayout="row"
         fxLayoutGap="40px"
@@ -55,7 +55,7 @@
       <h2 *ngIf="study.status === 'currently_enrolling' || study.status === 'study_in_progress'">Where does this study take place?</h2>
       <h2 *ngIf="study.status === 'results_being_analyzed' || study.status === 'study_results_published'">Where did this study take place?</h2>
       <p>{{study.location}}</p>
-      <p *ngIf="study.num_visits">Number of visits required for participation: {{study.num_visits}}</p>
+      <p *ngIf="study.num_visits">Number of Visits Required For Participation: {{study.num_visits}}</p>
     </div>
     <div *ngIf="study.status === 'currently_enrolling' && study.survey_url">
       <app-study-survey-entry [study]="study" [currentUser]="currentUser" [surveyLink]="study.survey_url"></app-study-survey-entry>

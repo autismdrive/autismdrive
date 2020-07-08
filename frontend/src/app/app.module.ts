@@ -147,6 +147,7 @@ import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-ent
 import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 import { EventRegistrationComponent } from './event-registration/event-registration.component';
 import { EventRegistrationFormComponent } from './event-registration-form/event-registration-form.component';
+import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -303,6 +304,7 @@ export class FormlyConfig {
     RegisterDialogComponent,
     EventRegistrationComponent,
     EventRegistrationFormComponent,
+    EmailLogAdminComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
