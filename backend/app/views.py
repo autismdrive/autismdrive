@@ -35,10 +35,6 @@ from app.resources.CategoryEndpoint import (
     CategoryListEndpoint,
     RootCategoryListEndpoint
 )
-from app.resources.WebinarEndpoint import (
-    WebinarEndpoint,
-    WebinarListEndpoint
-)
 from app.resources.EventEndpoint import (
     EventEndpoint,
     EventListEndpoint
@@ -107,11 +103,11 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
-from app.resources.WebinarAndUserEndpoint import (
-    WebinarByUserEndpoint,
-    WebinarUserEndpoint,
-    UserByWebinarEndpoint,
-    WebinarUserListEndpoint
+from app.resources.EventAndUserEndpoint import (
+    EventByUserEndpoint,
+    EventUserEndpoint,
+    UserByEventEndpoint,
+    EventUserListEndpoint
 )
 from app.resources.UserFavoriteEndpoint import (
     UserFavoriteEndpoint,
@@ -171,19 +167,16 @@ endpoints = [
     (LocationByCategoryEndpoint, "/category/<category_id>/location"),
     (ResourceByCategoryEndpoint, "/category/<category_id>/resource"),
     (StudyByCategoryEndpoint, "/category/<category_id>/study"),
-    # Webinars
-    (WebinarListEndpoint, "/webinar"),
-    (WebinarEndpoint, "/webinar/<id>"),
-    (WebinarByUserEndpoint, "/user/<user_id>/webinar"),
-    (UserByWebinarEndpoint, "/webinar/<webinar_id>/user"),
-    (WebinarUserEndpoint, "/webinar_user/<id>"),
-    (WebinarUserListEndpoint, "/webinar_user"),
     # Events
     (EventListEndpoint, "/event"),
     (EventEndpoint, "/event/<id>"),
     (CategoryByEventEndpoint, "/event/<event_id>/category"),
     (EventCategoryListEndpoint, "/event_category"),
     (EventCategoryEndpoint, "/event_category/<id>"),
+    (EventByUserEndpoint, "/user/<user_id>/event"),
+    (UserByEventEndpoint, "/event/<event_id>/user"),
+    (EventUserEndpoint, "/event_user/<id>"),
+    (EventUserListEndpoint, "/event_user"),
     # Locations
     (LocationListEndpoint, "/location"),
     (LocationEndpoint, "/location/<id>"),

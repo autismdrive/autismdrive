@@ -77,33 +77,33 @@ class TestEvents(BaseTest, unittest.TestCase):
 
     def test_get_event_by_category(self):
         c = self.construct_category()
-        ev = self.construct_event()
-        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        event = self.construct_event()
+        rc = ResourceCategory(resource_id=event.id, category=c, type='event')
         db.session.add(rc)
         rv = self.app.get(
-            '/api/category/%i/event' % c.id,
+            '/api/category/%i/resource' % c.id,
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(1, len(response))
-        self.assertEqual(ev.id, response[0]["resource_id"])
-        self.assertEqual(ev.description, response[0]["resource"]["description"])
+        self.assertEqual(event.id, response[0]["resource_id"])
+        self.assertEqual(event.description, response[0]["resource"]["description"])
 
     def test_get_event_by_category_includes_category_details(self):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
-        ev = self.construct_event()
-        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
-        rc2 = ResourceCategory(resource_id=ev.id, category=c2, type='event')
+        event = self.construct_event()
+        rc = ResourceCategory(resource_id=event.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=event.id, category=c2, type='event')
         db.session.add_all([rc, rc2])
         rv = self.app.get(
-            '/api/category/%i/event' % c.id,
+            '/api/category/%i/resource' % c.id,
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(ev.id, response[0]["resource_id"])
+        self.assertEqual(event.id, response[0]["resource_id"])
         self.assertEqual(2,
                          len(response[0]["resource"]["resource_categories"]))
         self.assertEqual(
@@ -112,10 +112,10 @@ class TestEvents(BaseTest, unittest.TestCase):
 
     def test_category_event_count(self):
         c = self.construct_category()
-        ev = self.construct_event()
-        rec = self.construct_resource()
-        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
-        rc2 = ResourceCategory(resource_id=rec.id, category=c, type='resource')
+        event = self.construct_event()
+        revcat = self.construct_resource()
+        rc = ResourceCategory(resource_id=event.id, category=c, type='event')
+        rc2 = ResourceCategory(resource_id=revcat.id, category=c, type='resource')
         db.session.add_all([rc, rc2])
         rv = self.app.get(
             '/api/category/%i' % c.id, content_type="application/json")
@@ -125,11 +125,11 @@ class TestEvents(BaseTest, unittest.TestCase):
 
     def test_get_category_by_event(self):
         c = self.construct_category()
-        ev = self.construct_event()
-        rc = ResourceCategory(resource_id=ev.id, category=c, type='event')
+        event = self.construct_event()
+        rc = ResourceCategory(resource_id=event.id, category=c, type='event')
         db.session.add(rc)
         rv = self.app.get(
-            '/api/event/%i/category' % ev.id,
+            '/api/resource/%i/category' % event.id,
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -139,26 +139,26 @@ class TestEvents(BaseTest, unittest.TestCase):
 
     def test_add_category_to_event(self):
         c = self.construct_category()
-        ev = self.construct_event()
+        event = self.construct_event()
 
-        ec_data = {"resource_id": ev.id, "category_id": c.id}
+        evcat_data = {"resource_id": event.id, "category_id": c.id}
 
         rv = self.app.post(
             '/api/resource_category',
-            data=json.dumps(ec_data),
+            data=json.dumps(evcat_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(c.id, response["category_id"])
-        self.assertEqual(ev.id, response["resource_id"])
+        self.assertEqual(event.id, response["resource_id"])
 
     def test_set_all_categories_on_event(self):
         c1 = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         c3 = self.construct_category(name="c3")
-        ev = self.construct_event()
+        event = self.construct_event()
 
-        ec_data = [
+        evcat_data = [
             {
                 "category_id": c1.id
             },
@@ -170,17 +170,17 @@ class TestEvents(BaseTest, unittest.TestCase):
             },
         ]
         rv = self.app.post(
-            '/api/event/%i/category' % ev.id,
-            data=json.dumps(ec_data),
+            '/api/resource/%i/category' % event.id,
+            data=json.dumps(evcat_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(3, len(response))
 
-        ec_data = [{"category_id": c1.id}]
+        evcat_data = [{"category_id": c1.id}]
         rv = self.app.post(
-            '/api/event/%i/category' % ev.id,
-            data=json.dumps(ec_data),
+            '/api/resource/%i/category' % event.id,
+            data=json.dumps(evcat_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -191,25 +191,25 @@ class TestEvents(BaseTest, unittest.TestCase):
         rv = self.app.delete('/api/resource_category/%i' % 1)
         self.assert_success(rv)
         rv = self.app.get(
-            '/api/event/%i/category' % 1, content_type="application/json")
+            '/api/resource/%i/category' % 1, content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, len(response))
 
     def test_resource_change_log(self):
         data_loader.DataLoader().load_partial_zip_codes()
-        ev = self.construct_event(title='An Event that is Super and Great')
+        event = self.construct_event(title='A Event that is Super and Great')
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
 
-        rv = self.app.get('api/event/%i' % ev.id, content_type="application/json")
+        rv = self.app.get('api/event/%i' % event.id, content_type="application/json")
         self.assert_success(rv)
 
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Super Great Event'
-        rv = self.app.put('/api/event/%i' % ev.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/event/%i' % event.id, data=json.dumps(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
-        rv = self.app.get('/api/event/%i' % ev.id, content_type="application/json")
+        rv = self.app.get('/api/event/%i' % event.id, content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['title'], 'Super Great Event')
@@ -218,7 +218,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         self.assertIsNotNone(logs[-1].resource_id)
         self.assertIsNotNone(logs[-1].user_id)
 
-        rv = self.app.get('/api/resource/%i/change_log' % ev.id, content_type="application/json",
+        rv = self.app.get('/api/resource/%i/change_log' % event.id, content_type="application/json",
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -228,4 +228,4 @@ class TestEvents(BaseTest, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(response[-1]['resource_id'], ev.id)
+        self.assertEqual(response[-1]['resource_id'], event.id)

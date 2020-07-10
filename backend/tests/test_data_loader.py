@@ -52,6 +52,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
 
     def test_load_events(self):
         self.test_load_categories()
+        self.test_load_users()
         self._load_and_assert_success(Event, 'load_events', ResourceCategory, 'event')
 
     def test_load_locations(self):
@@ -88,6 +89,7 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         elastic_index.clear()
 
         # Populate the database
+        self._load_and_assert_success(User, 'load_users')
         self._load_and_assert_success(Category, 'load_categories')
         self._load_and_assert_success(Resource, 'load_resources', ResourceCategory, 'resource')
         self._load_and_assert_success(Event, 'load_events', ResourceCategory, 'event')

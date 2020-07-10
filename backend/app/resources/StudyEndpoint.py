@@ -8,6 +8,7 @@ from app import RestException, db, elastic_index
 from app.model.study import Study
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
+from app.model.study_user import StudyUser
 from app.schema.schema import StudySchema
 
 
@@ -26,6 +27,7 @@ class StudyEndpoint(flask_restful.Resource):
         if study is not None:
             elastic_index.remove_document(study, 'Study')
 
+        db.session.query(StudyUser).filter_by(study_id=id).delete()
         db.session.query(StudyInvestigator).filter_by(study_id=id).delete()
         db.session.query(StudyCategory).filter_by(study_id=id).delete()
         db.session.query(Study).filter_by(id=id).delete()

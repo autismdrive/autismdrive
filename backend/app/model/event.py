@@ -10,6 +10,11 @@ class Event(Location):
     time = db.Column(db.String)
     ticket_cost = db.Column(db.String)
     location_name = db.Column(db.String)
+    includes_registration = db.Column(db.Boolean)
+    webinar_link = db.Column(db.String)
+    post_survey_link = db.Column(db.String)
+    max_users = db.Column(db.Integer)
+    registered_users = db.relationship("EventUser", back_populates='event')
 
     __mapper_args__ = {
         'polymorphic_identity': 'event',

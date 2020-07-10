@@ -6,6 +6,7 @@ from marshmallow import ValidationError
 
 from app import RestException, db, elastic_index, auth
 from app.model.event import Event
+from app.model.event_user import EventUser
 from app.model.resource_change_log import ResourceChangeLog
 from app.model.geocode import Geocode
 from app.schema.schema import EventSchema
@@ -32,6 +33,7 @@ class EventEndpoint(flask_restful.Resource):
         if event is not None:
             elastic_index.remove_document(event, 'Event')
 
+        db.session.query(EventUser).filter_by(event_id=id).delete()
         db.session.query(Event).filter_by(id=id).delete()
         db.session.commit()
         self.log_update(event_id=event_id, event_title=event_title, change_type='delete')

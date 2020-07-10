@@ -118,7 +118,6 @@ def _load_data(data_loader):
     data_loader.load_users()
     data_loader.load_participants()
     data_loader.load_categories()
-    data_loader.load_webinars()
     data_loader.load_events()
     data_loader.load_locations()
     data_loader.load_resources()

@@ -24,8 +24,7 @@ from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
-from app.model.webinar import Webinar
-from app.model.webinar_user import WebinarUser
+from app.model.event_user import EventUser
 from app.model.zip_code import ZipCode
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
@@ -109,14 +108,13 @@ class CategorySchema(ModelSchema):
     """Provides detailed information about a category, including all the children"""
     class Meta:
         model = Category
-        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'webinar_count', 'event_count', 'location_count',
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count', 'location_count',
                   'resource_count', 'all_resource_count', 'study_count', '_links')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
     parent = fields.Nested(ParentCategorySchema, dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
-    webinar_count = fields.Method('get_webinar_count', dump_only=True)
     event_count = fields.Method('get_event_count', dump_only=True)
     location_count = fields.Method('get_location_count', dump_only=True)
     resource_count = fields.Method('get_resource_count', dump_only=True)
@@ -126,12 +124,6 @@ class CategorySchema(ModelSchema):
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
     })
-
-    def get_webinar_count(self, obj):
-        query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'webinar')\
-            .filter(ResourceCategory.category_id == obj.id)
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
-        return query.session.execute(count_q).scalar()
 
     def get_event_count(self, obj):
         query = db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event')\
@@ -273,6 +265,16 @@ class ResourceCategorySchema(ModelSchema):
     })
 
 
+class EventUserSchema(ModelSchema):
+    class Meta:
+        model = EventUser
+        fields = ('id', 'last_updated', 'event_id', 'event', 'user_id', 'user')
+    event_id = fields.Integer(required=False, allow_none=True)
+    user_id = fields.Integer(required=False, allow_none=True)
+    event = fields.Nested(ResourceSchema, dump_only=True)
+    user = fields.Nested(CategorySchema, dump_only=True)
+
+
 class EventSchema(ModelSchema):
     class Meta:
         model = Event
@@ -280,9 +282,11 @@ class EventSchema(ModelSchema):
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
                   'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
-                  'phone_extension', 'languages', 'covid19_categories', '_links')
+                  'phone_extension', 'languages', 'covid19_categories', 'includes_registration', 'webinar_link',
+                  'post_survey_link', 'max_users', 'registered_users', '_links')
     id = fields.Integer(required=False, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
+    registered_users = fields.Nested(EventUserSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventendpoint', id='<id>'),
         'collection': ma.URLFor('api.eventlistendpoint'),
@@ -374,34 +378,6 @@ class LocationCategorySchema(ModelSchema):
         'category': ma.URLFor('api.categoryendpoint', id='<category_id>'),
         'location': ma.URLFor('api.locationendpoint', id='<resource_id>')
     })
-
-
-class WebinarSchema(ModelSchema):
-    class Meta:
-        model = Webinar
-        fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost',
-                  'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
-                  'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
-                  'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
-                  'phone_extension', 'languages', 'covid19_categories', 'webinar_link', 'survey_link', 'max_users',
-                  '_links')
-    id = fields.Integer(required=False, allow_none=True)
-    resource_categories = fields.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.eventendpoint', id='<id>'),
-        'collection': ma.URLFor('api.eventlistendpoint'),
-        'categories': ma.UrlFor('api.categorybyeventendpoint', event_id='<id>')
-    })
-
-
-class WebinarUserSchema(ModelSchema):
-    class Meta:
-        model = WebinarUser
-        fields = ('id', 'last_updated', 'webinar_id', 'webinar', 'user_id', 'user')
-    webinar_id = fields.Integer(required=False, allow_none=True)
-    user_id = fields.Integer(required=False, allow_none=True)
-    webinar = fields.Nested(ResourceSchema, dump_only=True)
-    user = fields.Nested(CategorySchema, dump_only=True)
 
 
 class ParticipantSchema(ModelSchema):
