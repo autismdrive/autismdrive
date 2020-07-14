@@ -42,7 +42,6 @@ export class ResourceFormComponent implements OnInit {
           {'value': 'resource', 'label': 'Online Information'},
           {'value': 'location', 'label': 'Local Services'},
           {'value': 'event', 'label': 'Events and Training'},
-          {'value': 'webinar', 'label': 'Webinar'}
         ],
         required: true,
       },
@@ -84,6 +83,23 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: '!model.type',
     },
     {
+      key: 'includes_registration',
+      type: 'radio',
+      defaultValue: false,
+      templateOptions: {
+        label: 'Allow Registration',
+        description: 'Should users be able to register for this event through Autism DRIVE?',
+        options: [
+          {value: true, label: 'Yes'},
+          {value: false, label: 'No'},
+        ]
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
+      },
+      hideExpression: 'model.type != "event"',
+    },
+    {
       key: 'date',
       type: 'datepicker',
       templateOptions: {
@@ -92,7 +108,7 @@ export class ResourceFormComponent implements OnInit {
       expressionProperties: {
         'templateOptions.required': 'model.type === "event"'
       },
-      hideExpression: 'model.type != "event" && model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
     },
     {
       key: 'time',
@@ -104,7 +120,7 @@ export class ResourceFormComponent implements OnInit {
       expressionProperties: {
         'templateOptions.required': 'model.type === "event"'
       },
-      hideExpression: 'model.type != "event" && model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
     },
     {
       key: 'ticket_cost',
@@ -113,7 +129,7 @@ export class ResourceFormComponent implements OnInit {
         label: 'Event Ticket Cost',
         placeholder: 'Please enter the ticket cost for your event',
       },
-      hideExpression: 'model.type != "event" && model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
     },
     {
       key: 'webinar_link',
@@ -122,17 +138,17 @@ export class ResourceFormComponent implements OnInit {
         label: 'Webinar Link',
         placeholder: 'Please enter the link to attend the webinar',
       },
-      hideExpression: 'model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
       validators: {'validation': ['url']},
     },
     {
-      key: 'survey_link',
+      key: 'post_survey_link',
       type: 'input',
       templateOptions: {
         label: 'Survey Link',
-        placeholder: 'Please enter the link to the post-webinar survey',
+        placeholder: 'Please enter the link to the post-event survey',
       },
-      hideExpression: 'model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
       validators: {'validation': ['url']},
     },
     {
@@ -143,7 +159,7 @@ export class ResourceFormComponent implements OnInit {
         placeholder: 'Please enter the maximum number of users allowed to register',
         type: 'number'
       },
-      hideExpression: 'model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
     },
     {
       key: 'organization_name',
@@ -180,7 +196,7 @@ export class ResourceFormComponent implements OnInit {
         label: 'Location Name',
         placeholder: 'Please enter the name for your event venue',
       },
-      hideExpression: 'model.type != "event" && model.type != "webinar"',
+      hideExpression: 'model.type != "event"',
     },
     {
       key: 'street_address1',

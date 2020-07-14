@@ -90,7 +90,7 @@
         >Visit website</button>
       </div>
 
-      <app-event-registration *ngIf="resource.max_users" [currentUser]="currentUser" [resource]="resource"></app-event-registration>
+      <app-event-registration *ngIf="resource.includes_registration" [currentUser]="currentUser" [resource]="resource"></app-event-registration>
 
       <div
         *ngIf="currentUser && currentUser.permissions.includes('edit_resource')"
