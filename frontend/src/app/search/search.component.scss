@@ -1,10 +1,20 @@
 @import '../../config';
 
 #hero {
-  background-image: url('/assets/home/hero-parent-child.jpg');
+  background-color: $brand-primary-muted;
+  display: grid;
 
   h1 {
     color: white;
+    text-align: start;
+    font-size: 2.5rem;
+    margin: 1em;
+  }
+
+  app-search-box {
+    color: white;
+    margin: 0 2em;
+    max-width: 60%;
   }
 }
 
@@ -92,14 +102,7 @@ mat-expansion-panel, mat-accordion {
   width: 100%;
   padding-right: 0;
   padding-left: 0;
-  margin: 0;
-  margin-bottom: 0.5em;
-
-
-
-  .num-results {
-    text-align: right;
-  }
+  margin: 1em;
 }
 
 .applied-filters {
@@ -223,4 +226,34 @@ agm-map {
   &.show {
     opacity: 1;
   }
+}
+
+.type-buttons {
+  color: white;
+  margin: .25em 1em;
+
+  button.selected:after {
+    background-color: $brand-accent;
+    bottom: 0px;
+  }
+}
+
+::ng-deep #set-location {
+  color: white;
+  .mat-form-field-appearance-outline, .mat-form-field-outline, .mat-form-field-label {
+    color: white;
+  }
+  mat-form-field{
+    ::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+  }
+}
+
+#sort-and-status, #map, #partners {
+  margin: 2em;
+}
+
+.search-result-status {
+  justify-content: flex-end;
 }

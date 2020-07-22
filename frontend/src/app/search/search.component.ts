@@ -321,8 +321,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-  newSortSelection(event) {
-    this.reSort(event.value);
+  newSortSelection(value) {
+    this.reSort(value);
   }
 
   reSort(sortName: string) {
@@ -499,6 +499,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   useGPSLocation($event: MouseEvent|KeyboardEvent): void {
     $event.stopPropagation();
     localStorage.removeItem('zipCode');
+    this.storedZip = null;
     this.setLocOpen = false;
     this.reSort('Distance');
   }
