@@ -203,6 +203,7 @@
         individuals, families & professionals.
       </p>
       <app-search-box
+        *ngIf="!router.url.includes('/search')"
         variant="dark-bg"
         fxHide
         fxShow.gt-sm
