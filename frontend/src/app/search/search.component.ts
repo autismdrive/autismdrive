@@ -210,7 +210,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.paginatorElement.pageIndex = (this.query.start - 1) / this.paginatorElement.pageSize;
+    this.paginatorElement.pageIndex = (this.selectedPageStart - 1) / this.pageSize;
   }
 
   ngOnDestroy(): void {

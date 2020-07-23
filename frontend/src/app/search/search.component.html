@@ -8,7 +8,7 @@
     <div fxLayout="row" fxLayoutGap="2em">
       <app-search-box
         variant="dark-bg"
-        fxFlex.gt-sm="60%"
+        fxFlex.gt-sm="80%"
       ></app-search-box>
       <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_resource')" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
     </div>
@@ -157,29 +157,6 @@
   </div>
 </div>
 <mat-divider></mat-divider>
-<div id="sort-and-status" fxLayout="row" fxLayoutAlign="space-between end">
-  <div class="search-result-status">
-    <p *ngIf="(query.start + pageSize) < query.total">Showing {{query.start}}-{{query.start + pageSize - 1}} of {{query.total}} results</p>
-    <p *ngIf="(query.start + pageSize) > query.total">Showing {{query.start}}-{{query.total}} of {{query.total}} results</p>
-  </div>
-  <div class="sort-order">
-    <h3>Sort by:</h3>
-    <mat-form-field>
-      <mat-select [(value)]="selectedSort">
-        <mat-select-trigger>
-          <span class="type-label" *ngIf="selectedSort">{{selectedSort.label}}</span>
-        </mat-select-trigger>
-        <mat-option
-          *ngFor="let sort of sortMethods"
-          [value]="sort"
-          (click)="newSortSelection(sort.name)"
-        >
-          <span class="sort-label">{{sort.label}}</span>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-</div>
 <div id="results-and-map" fxLayout="row" fxLayoutGap="2em">
   <div
     class="search-results"
@@ -196,6 +173,29 @@
       <p>We could not find any results for your search. Please try removing some of the conditions
         by clicking on the 'x' in the filter tiles above. This will broaden the search and give you more results.</p>
       <h3>Check back soon for more updates!</h3>
+    </div>
+    <div id="sort-and-status" fxLayout="row" fxLayoutAlign="space-between end">
+      <div class="search-result-status">
+        <h4 *ngIf="(query.start + pageSize) < query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{(paginatorElement.pageIndex + 1) * pageSize}} of {{query.total}} results</h4>
+        <h4 *ngIf="(query.start + pageSize) > query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{query.total}} of {{query.total}} results</h4>
+      </div>
+      <div class="sort-order">
+        <mat-form-field>
+          <mat-label>Sort By:</mat-label>
+          <mat-select [(value)]="selectedSort">
+            <mat-select-trigger>
+              <span class="type-label" *ngIf="selectedSort">{{selectedSort.label}}</span>
+            </mat-select-trigger>
+            <mat-option
+              *ngFor="let sort of sortMethods"
+              [value]="sort"
+              (click)="newSortSelection(sort.name)"
+            >
+              <span class="sort-label">{{sort.label}}</span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
     <div *ngIf="query && query.hits.length > 0">
       <app-search-result
@@ -216,7 +216,7 @@
     >
     </mat-paginator>
   </div>
-  <div id="map" fxFlex="30%">
+  <div id="map" fxFlex="30%" fxLayout="column" fxLayoutGap="2em">
     <agm-map
       *ngIf="showMap()"
       [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
@@ -281,17 +281,23 @@
         </agm-info-window>
       </ng-container>
     </agm-map>
+
+    <div id="studies-highlight">
+      <mat-card>
+        <mat-card-content>
+          <h3>Highlighted Study: Study Title</h3>
+          <p>Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. </p>
+          <a
+            class="chevron-link"
+            [routerLink]="['/studies']"
+            routerLinkActive="router-link-active">
+            Explore other studies</a>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </div>
 <div id="partners" fxLayout="row" fxLayoutGap="3em" fxLayoutAlign="auto center">
-  <app-border-box-tile
-    fxShow.md fxShow.lg fxShow.xl
-    fxHide.lt-md
-    [title]="'Can\'t find your resource on drive?'"
-    [subtitle]="'Submit Here'"
-    [linkSize]="1"
-    (click)="submitResource()"
-  ></app-border-box-tile>
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>
     <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify
@@ -315,4 +321,12 @@
       </span>
     </div>
   </div>
+  <app-border-box-tile
+    fxShow.md fxShow.lg fxShow.xl
+    fxHide.lt-md
+    [title]="'Can\'t find your resource on drive?'"
+    [subtitle]="'Click Here To Submit'"
+    [linkSize]="2"
+    (click)="submitResource()"
+  ></app-border-box-tile>
 </div>
