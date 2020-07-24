@@ -1,18 +1,18 @@
 @import '../../config';
 
 #hero {
-  background-color: $brand-primary-muted;
+  background-color: $brand-gray-tint-2;
   display: grid;
 
   h1 {
-    color: white;
+    color: $brand-primary;
     text-align: start;
     font-size: 2.5rem;
     margin: 1em;
   }
 
   app-search-box {
-    color: white;
+    color: black;
     margin: 0 2em;
     max-width: 60%;
   }
@@ -61,7 +61,6 @@ mat-expansion-panel, mat-accordion {
   margin-bottom: 1em;
 }
 
-
 .filters {
 
   #reset-filters {
@@ -91,7 +90,6 @@ mat-expansion-panel, mat-accordion {
     }
   }
 }
-
 
 .filter-facet-item, .sort-order {
   font-size: 1em;
@@ -176,7 +174,6 @@ mat-expansion-panel, mat-accordion {
   }
 }
 
-
 ::ng-deep .mat-option, ::ng-deep .mat-select-trigger {
   app-type-icon  {
     [class*="icofont-"] { margin-right: 0.5em; }
@@ -232,6 +229,10 @@ agm-map {
   color: white;
   margin: .25em 1em;
 
+  button {
+    background-color: $brand-primary;
+    margin: .5em;
+  }
   button.selected:after {
     background-color: $brand-accent;
     bottom: 0px;
@@ -239,10 +240,11 @@ agm-map {
 }
 
 ::ng-deep #set-location {
-  color: white;
+  color:black;
   .mat-form-field-appearance-outline, .mat-form-field-outline, .mat-form-field-label {
-    color: white;
+    color: black;
   }
+
   mat-form-field{
     ::placeholder {
       color: rgba(255,255,255,0.7);
