@@ -489,6 +489,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setLocOpen = true;
   }
 
+  closeSetLocation() {
+    this.setLocOpen = false;
+  }
+
   zipSubmit($event: MouseEvent|KeyboardEvent): void {
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');

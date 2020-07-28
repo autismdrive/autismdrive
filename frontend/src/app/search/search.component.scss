@@ -221,6 +221,7 @@ agm-map {
   opacity: 0;
 
   &.show {
+    color: $brand-primary;
     opacity: 1;
   }
 }

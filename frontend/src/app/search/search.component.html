@@ -24,18 +24,21 @@
           </button>
         </div>
       </div>
-      <div id="set-location">
-        <span *ngIf="isZipCode(storedZip)">Location: ({{storedZip}})</span>
-        <span *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: (using GPS)</span>
-        <button [ngClass]="{'zipCodeSetButton': true, 'show': !this.noLocation && !this.setLocOpen}" mat-button (click)="openSetLocation()" matTooltip="Set your location">
-          <mat-icon>keyboard_arrow_down</mat-icon>
+      <div id="set-location" fxLayout="row" fxLayoutAlign="start center">
+        <h4 *ngIf="isZipCode(storedZip)">Location: ({{storedZip}})</h4>
+        <h4 *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: (using GPS)</h4>
+        <button *ngIf="!this.noLocation && !this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': !this.noLocation && !this.setLocOpen}" mat-button (click)="openSetLocation()" matTooltip="Set your location">
+          <mat-icon>keyboard_arrow_right</mat-icon>
         </button>
-        <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="column">
+        <button *ngIf="this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': this.setLocOpen}" mat-button (click)="closeSetLocation()" matTooltip="Close location form">
+          <mat-icon>keyboard_arrow_left</mat-icon>
+        </button>
+        <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="row">
           <mat-form-field>
             <mat-label>Set Location:</mat-label>
             <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit($event)">
           </mat-form-field>
-          <div fxLayout="row" fxLayoutGap="1em">
+          <div fxLayout="row" fxLayoutGap="1em" fxLayoutAlign="start center">
               <button mat-flat-button color="primary" (click)="zipSubmit($event)" id="btn_save">Save</button>
               <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation($event)" id="btn_gps">Use GPS instead</button>
           </div>
