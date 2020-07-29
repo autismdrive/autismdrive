@@ -11,14 +11,19 @@
         </span>
         </mat-list-item>
     </ng-container>
-  <div [ngClass]="{'sub-level' : category.level > 0}">
-  <div class="current-facet-label">{{category.name}}</div>
-  <ng-container *ngFor="let child of category.children">
-    <mat-list-item *ngIf="child.hit_count > 0" (click)="selectCategory(child)" [classList]="" >
-      <span class="filter-facet-label">{{child.name}}</span>
-      <div fxFlex></div>
-      <span class="hit-count">{{child.hit_count}}</span>
-    </mat-list-item>
-  </ng-container>
-  </div>
 </mat-list>
+
+
+<mat-form-field *ngIf="category && category.children && category.children.length > 0">
+  <mat-label *ngIf="category.level == 0">By Topic</mat-label>
+  <mat-label *ngIf="category.level > 0">Select Subtopic</mat-label>
+  <mat-select>
+    <mat-option
+      *ngFor="let child of category.children"
+      (click)="selectCategory(child)"
+    >
+      <span class="child-label" *ngIf="child.hit_count == 1">{{child.name}} - {{child.hit_count}} result</span>
+      <span class="child-label" *ngIf="child.hit_count != 1">{{child.name}} - {{child.hit_count}} results</span>
+    </mat-option>
+  </mat-select>
+</mat-form-field>

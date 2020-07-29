@@ -44,6 +44,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
   typeLabels = HitType.labels;
+  ageOptions = [];
+  languageOptions = [];
   loading = true;
   pageSize = 20;
   noLocation = true;
@@ -165,6 +167,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this._mobileQueryListener = () => this._updateFilterPanelState();
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
+    this.languageOptions = this.getOptions(Language.labels);
+    this.ageOptions = this.getOptions(AgeRange.labels);
 
     // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
     // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
@@ -220,6 +224,16 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
+  }
+
+  getOptions(modelLabels) {
+    const opts = [];
+    for (const key in modelLabels) {
+      if (modelLabels.hasOwnProperty(key)) {
+        opts.push({'value': key, 'label': modelLabels[key]});
+      }
+    }
+    return opts;
   }
 
   removeCategory() {

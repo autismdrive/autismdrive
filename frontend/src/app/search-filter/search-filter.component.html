@@ -1,22 +1,15 @@
 <mat-spinner *ngIf="!aggregations"></mat-spinner>
-<mat-list dense *ngIf="aggregations">
-  <ng-container *ngIf="hasSelection()">
-    <mat-list-item (click)="select('')" class="show-all">
-      <mat-icon>chevron_left</mat-icon> Show All
-    </mat-list-item>
-    <mat-list-item>
-      <span class="filter-facet-label">{{label_map[selectedAgg().value]}}</span>
-      <div fxFlex></div>
-      <span class="hit-count">{{selectedAgg().count}}</span>
-    </mat-list-item>
-  </ng-container>
-  <ng-container *ngIf="!hasSelection()">
-    <ng-container *ngFor="let agg of aggregations">
-      <mat-list-item *ngIf="agg.count > 0" (click)="select(agg.value)" [classList]="" [id]="'filter_' + agg.value" >
-        <span class="filter-facet-label">{{label_map[agg.value]}}</span>
-        <div fxFlex></div>
-        <span class="hit-count">{{agg.count}}</span>
-      </mat-list-item>
-    </ng-container>
-  </ng-container>
-</mat-list>
+
+<mat-form-field *ngIf="aggregations">
+  <mat-label>{{label_title}}</mat-label>
+  <mat-select>
+    <mat-option
+      *ngFor="let agg of aggregations"
+      [value]="agg.value"
+      (click)="select(agg.value)"
+    >
+      <span class="agg-label" *ngIf="agg.count == 1">{{label_map[agg.value]}} - {{agg.count}} result</span>
+      <span class="agg-label" *ngIf="agg.count != 1">{{label_map[agg.value]}} - {{agg.count}} results</span>
+    </mat-option>
+  </mat-select>
+</mat-form-field>

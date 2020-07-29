@@ -9,6 +9,7 @@ import {Aggregation} from '../_models/query';
 })
 export class SearchFilterComponent implements OnInit {
 
+  @Input() label_title: string;
   @Input() label_map: {};
   @Input() aggregations: Aggregation[];
   @Output() filterSelected = new EventEmitter<String>();

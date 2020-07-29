@@ -48,10 +48,10 @@
   </div>
 </div>
 <div id="filters">
+  <h2>Filter Results:</h2>
   <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayoutGap="2em">
-    <div class="filter-select" fxLayout="row" fxLayoutAlign="space-around" fxFlex="60%">
-      <div id="age-filter">
-        <h4 class="mat-subheader">Ages</h4>
+    <div class="filter-select" fxLayout="row" fxLayoutGap="2em" fxFlex="60%">
+      <div id="age-filter" fxFlex="30%">
         <div *ngIf="!query">
           <mat-spinner></mat-spinner>
         </div>
@@ -59,14 +59,31 @@
           <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
           <app-search-filter
             [aggregations]="query.age_counts"
+            [label_title]="'By Age'"
             [label_map]="ageLabels"
             (filterSelected)="selectAgeRange($event)"
             [ngClass]="'filter-by-age'"
           ></app-search-filter>
         </div>
       </div>
-      <div id="topic-filter">
-        <h4 class="mat-subheader">Topics</h4>
+
+      <div id="language-filter" fxFlex="30%">
+        <div *ngIf="!query">
+          <mat-spinner></mat-spinner>
+        </div>
+        <div *ngIf="query">
+          <div *ngIf="query && !query.hasLanguageCounts()">No language restrictions available for these search results.</div>
+          <app-search-filter
+            [aggregations]="query.language_counts"
+            [label_title]="'By Language'"
+            [label_map]="languageLabels"
+            (filterSelected)="selectLanguage($event)"
+            [ngClass]="'filter-by-language'"
+          ></app-search-filter>
+        </div>
+      </div>
+
+      <div id="topic-filter" fxFlex="30%">
         <div *ngIf="!query">
           <mat-spinner></mat-spinner>
         </div>
@@ -76,21 +93,6 @@
           (categorySelected)="selectCategory($event)"
           [ngClass]="'filter-by-topic'"
         ></app-search-topics>
-      </div>
-      <div id="language-filter">
-        <h4 class="mat-subheader">Languages</h4>
-        <div *ngIf="!query">
-          <mat-spinner></mat-spinner>
-        </div>
-        <div *ngIf="query">
-          <div *ngIf="query && !query.hasLanguageCounts()">No language restrictions available for these search results.</div>
-          <app-search-filter
-            [aggregations]="query.language_counts"
-            [label_map]="languageLabels"
-            (filterSelected)="selectLanguage($event)"
-            [ngClass]="'filter-by-language'"
-          ></app-search-filter>
-        </div>
       </div>
     </div>
     <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container" fxLayout="column" fxFlex="30%">
