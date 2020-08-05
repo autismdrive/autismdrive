@@ -78,3 +78,15 @@ class RootCategoryListEndpoint(flask_restful.Resource):
             .order_by(Category.name)\
             .all()
         return self.categories_schema.dump(categories)
+
+
+class CategoryNamesListEndpoint(flask_restful.Resource):
+    def get(self):
+        categories = db.session.query(Category)\
+            .options(joinedload(Category.children))\
+            .order_by(Category.name)\
+            .all()
+        cat_names_list = []
+        for cat in categories:
+            cat_names_list.append(cat.name)
+        return cat_names_list

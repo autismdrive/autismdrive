@@ -33,7 +33,8 @@ from app.resources.SessionEndpoint import SessionEndpoint
 from app.resources.CategoryEndpoint import (
     CategoryEndpoint,
     CategoryListEndpoint,
-    RootCategoryListEndpoint
+    RootCategoryListEndpoint,
+    CategoryNamesListEndpoint
 )
 from app.resources.EventEndpoint import (
     EventEndpoint,
@@ -155,6 +156,7 @@ def root():
 endpoints = [
     # Categories
     (CategoryListEndpoint, "/category"),
+    (CategoryNamesListEndpoint, "/category/names_list"),
     (RootCategoryListEndpoint, "/category/root"),
     (CategoryEndpoint, "/category/<id>"),
     (EventByCategoryEndpoint, "/category/<category_id>/event"),
