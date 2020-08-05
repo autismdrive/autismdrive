@@ -47,6 +47,7 @@ export class ApiService {
     categorybyevent: '/api/event/<event_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
     categorylist: '/api/category',
+    categorynameslist: '/api/category/names_list',
     data_transfer_log: '/api/data_transfer_log',
     event: '/api/event/<id>',
     eventbycategory: '/api/category/<category_id>/event',
@@ -429,6 +430,12 @@ export class ApiService {
   /** Delete StudyCategory */
   deleteStudyCategory(studyCategory: StudyCategory): Observable<StudyCategory> {
     return this.httpClient.delete<StudyCategory>(this._endpointUrl('studycategory').replace('<id>', studyCategory.id.toString()))
+      .pipe(catchError(this._handleError));
+  }
+
+  /** getCategoryNamesList */
+  getCategoryNamesList(): Observable<any> {
+    return this.httpClient.get<any>(this._endpointUrl('categorynameslist'))
       .pipe(catchError(this._handleError));
   }
 

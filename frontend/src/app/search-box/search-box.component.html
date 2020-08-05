@@ -9,7 +9,14 @@
       (keyup.escape)="updateSearch(true)"
       placeholder="Search for Autism Resources"
       type="text"
+      [formControl]="searchBoxControl"
+      [matAutocomplete]="auto"
     >
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
     <div
        matSuffix
       fxLayout="row"

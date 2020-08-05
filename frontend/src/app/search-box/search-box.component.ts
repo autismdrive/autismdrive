@@ -1,9 +1,11 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subject, timer} from 'rxjs';
-import {debounce, debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {Observable, Subject, timer} from 'rxjs';
+import {debounce, debounceTime, distinctUntilChanged, startWith, map} from 'rxjs/operators';
 import {SearchService} from '../_services/api/search.service';
+import {FormControl} from '@angular/forms';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-search-box',
@@ -16,11 +18,15 @@ export class SearchBoxComponent implements OnInit {
   queryParams: Params;
   @Input() variant: string;
   searchUpdate = new Subject<String>();
+  searchBoxControl = new FormControl();
+  options: string[] = [];
+  filteredOptions: Observable<string[]>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private api: ApiService
   ) {
     this.route
       .queryParams
@@ -40,6 +46,10 @@ export class SearchBoxComponent implements OnInit {
         }
       }
     });
+
+    this.api.getCategoryNamesList().subscribe(categories => {
+      this.options = categories;
+    });
   }
 
   @ViewChild('searchInput', {read: MatInput, static: false})
@@ -48,8 +58,18 @@ export class SearchBoxComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.filteredOptions = this.searchBoxControl.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this._filter(value))
+      );
   }
 
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+  }
   updateSearch(removeWords: boolean): Promise<boolean> {
     if (removeWords) {
       this.words = '';
