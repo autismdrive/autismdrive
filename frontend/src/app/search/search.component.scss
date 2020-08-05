@@ -231,26 +231,13 @@ agm-map {
   margin: .25em 1em;
 
   button {
-    background-color: $brand-primary;
-    margin: .5em;
-  }
-  button.selected:after {
     background-color: $brand-accent;
-    bottom: 0px;
+    margin: .5em;
   }
 }
 
 ::ng-deep #set-location {
-  color:black;
-  .mat-form-field-appearance-outline, .mat-form-field-outline, .mat-form-field-label {
-    color: black;
-  }
-
-  mat-form-field{
-    ::placeholder {
-      color: rgba(255,255,255,0.7);
-    }
-  }
+  margin: auto 1em;
 }
 
 #sort-and-status, #map, #partners, #filters, #type-buttons {
@@ -259,4 +246,32 @@ agm-map {
 
 .search-result-status {
   justify-content: flex-end;
+}
+
+::ng-deep .type-location-bar {
+  padding: 1em;
+  background-color: $brand-primary-shade-5;
+  color: white;
+
+  h4 {
+    color: white;
+  }
+  button {
+    background-color: $brand-accent;
+    color: white;
+  }
+
+  .mat-form-field-appearance-outline, .mat-form-field-outline, .mat-form-field-label {
+    color: white;
+  }
+
+  .mat-select-value, .mat-select-arrow {
+    color: white;
+  }
+
+  mat-form-field{
+    ::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+  }
 }

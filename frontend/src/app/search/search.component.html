@@ -3,6 +3,7 @@
 >
   <div
     fxLayout="column"
+    fxLayoutGap="1em"
   >
     <h1>Find Autism Resources</h1>
     <div fxLayout="row" fxLayoutGap="2em">
@@ -12,8 +13,31 @@
       ></app-search-box>
       <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_resource')" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
     </div>
-    <div fxLayout="row" fxLayoutGap="3em">
-      <div class="type-buttons" fxLayout="row">
+    <div class="type-location-bar" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutGap.gt-sm="3em" fxLayoutGap.lt-md="1em">
+      <div fxFlex="30%" fxHide fxShow.lt-md>
+        <mat-form-field class="type-buttons">
+          <mat-label>Resource types</mat-label>
+          <mat-select [(value)]="selectedType">
+            <mat-select-trigger>
+              <app-type-icon
+                *ngIf="selectedType"
+                [iconType]="selectedType && selectedType.name"
+                [size]="1"
+              ></app-type-icon>
+              <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
+            </mat-select-trigger>
+            <mat-option
+              *ngFor="let type of resourceTypes"
+              [value]="type"
+              (click)="selectType(type.name)"
+            >
+              <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+              <span class="type-label">{{type.label}}</span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="type-buttons" fxLayout="row" fxHide.lt-md>
         <div *ngFor="let type of resourceTypesFiltered()">
           <button
             mat-button
@@ -24,23 +48,25 @@
           </button>
         </div>
       </div>
-      <div id="set-location" fxLayout="row" fxLayoutAlign="start center">
+      <div *ngIf="selectedType && (selectedType.name === 'event' || selectedType.name === 'location')" id="set-location" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutAlign.gt-sm="start center" fxLayoutGap=".5em">
         <h4 *ngIf="isZipCode(storedZip)">Location: ({{storedZip}})</h4>
         <h4 *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: (using GPS)</h4>
-        <button *ngIf="!this.noLocation && !this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': !this.noLocation && !this.setLocOpen}" mat-button (click)="openSetLocation()" matTooltip="Set your location">
-          <mat-icon>keyboard_arrow_right</mat-icon>
-        </button>
-        <button *ngIf="this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': this.setLocOpen}" mat-button (click)="closeSetLocation()" matTooltip="Close location form">
-          <mat-icon>keyboard_arrow_left</mat-icon>
-        </button>
-        <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="row">
+        <div fxFlex.lt-md="30%">
+          <button *ngIf="!this.noLocation && !this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': !this.noLocation && !this.setLocOpen}" mat-button (click)="openSetLocation()" matTooltip="Set your location">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+          </button>
+          <button *ngIf="this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': this.setLocOpen}" mat-button (click)="closeSetLocation()" matTooltip="Close location form">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+          </button>
+        </div>
+        <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="row" fxLayout.lt-md="column" >
           <mat-form-field>
             <mat-label>Set Location:</mat-label>
             <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit($event)">
           </mat-form-field>
           <div fxLayout="row" fxLayoutGap="1em" fxLayoutAlign="start center">
-              <button mat-flat-button color="primary" (click)="zipSubmit($event)" id="btn_save">Save</button>
-              <button *ngIf="gpsEnabled" mat-flat-button color="primary" (click)="useGPSLocation($event)" id="btn_gps">Use GPS instead</button>
+              <button mat-flat-button (click)="zipSubmit($event)" id="btn_save">Save</button>
+              <button *ngIf="gpsEnabled" mat-flat-button (click)="useGPSLocation($event)" id="btn_gps">Use GPS instead</button>
           </div>
         </div>
       </div>
@@ -49,8 +75,8 @@
 </div>
 <div id="filters">
   <h2>Filter Results:</h2>
-  <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayoutGap="2em">
-    <div class="filter-select" fxLayout="row" fxLayoutGap="2em" fxFlex="60%">
+  <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
+    <div class="filter-select" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em" fxFlex="60%">
       <div id="age-filter" fxFlex="30%">
         <div *ngIf="!query">
           <mat-spinner></mat-spinner>
@@ -95,7 +121,7 @@
         ></app-search-topics>
       </div>
     </div>
-    <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container" fxLayout="column" fxFlex="30%">
+    <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container" fxLayout="column" fxFlex.gt-sm="30%">
       <h4>Selected Filters:</h4>
       <mat-chip-list class="applied-filters">
 
@@ -162,7 +188,7 @@
   </div>
 </div>
 <mat-divider></mat-divider>
-<div id="results-and-map" fxLayout="row" fxLayoutGap="2em">
+<div id="results-and-map" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
   <div
     class="search-results"
     id="results"
@@ -179,8 +205,8 @@
         by clicking on the 'x' in the filter tiles above. This will broaden the search and give you more results.</p>
       <h3>Check back soon for more updates!</h3>
     </div>
-    <div id="sort-and-status" fxLayout="row" fxLayoutAlign="space-between end">
-      <div class="search-result-status">
+    <div *ngIf="query.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
+      <div class="search-result-status">]
         <h4 *ngIf="(query.start + pageSize) < query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{(paginatorElement.pageIndex + 1) * pageSize}} of {{query.total}} results</h4>
         <h4 *ngIf="(query.start + pageSize) > query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{query.total}} of {{query.total}} results</h4>
       </div>
@@ -302,7 +328,7 @@
     </div>
   </div>
 </div>
-<div id="partners" fxLayout="row" fxLayoutGap="3em" fxLayoutAlign="auto center">
+<div id="partners" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="3em" fxLayoutAlign="auto center">
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>
     <p class="pad-0 margin-bottom-none">We are partnering with the following initiatives and organizations to identify
@@ -327,8 +353,6 @@
     </div>
   </div>
   <app-border-box-tile
-    fxShow.md fxShow.lg fxShow.xl
-    fxHide.lt-md
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"
