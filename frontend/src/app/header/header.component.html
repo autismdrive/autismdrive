@@ -202,12 +202,12 @@
         Autism research & resources for <br fxHide fxShow.xs/>
         individuals, families & professionals.
       </p>
-<!--      <app-search-box-->
-<!--        *ngIf="!router.url.includes('/search')"-->
-<!--        variant="dark-bg"-->
-<!--        fxHide-->
-<!--        fxShow.gt-sm-->
-<!--      ></app-search-box>-->
+      <app-search-box
+        *ngIf="!currentPath.includes('/search')"
+        variant="dark-bg"
+        fxHide
+        fxShow.gt-sm
+      ></app-search-box>
     </mat-toolbar-row>
 
   </mat-toolbar>
