@@ -206,7 +206,7 @@
       <h3>Check back soon for more updates!</h3>
     </div>
     <div *ngIf="query.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
-      <div class="search-result-status">]
+      <div class="search-result-status">
         <h4 *ngIf="(query.start + pageSize) < query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{(paginatorElement.pageIndex + 1) * pageSize}} of {{query.total}} results</h4>
         <h4 *ngIf="(query.start + pageSize) > query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{query.total}} of {{query.total}} results</h4>
       </div>
@@ -313,11 +313,11 @@
       </ng-container>
     </agm-map>
 
-    <div id="studies-highlight">
+    <div *ngIf="highlightedStudy" id="studies-highlight">
       <mat-card>
         <mat-card-content>
-          <h3>Highlighted Study: Study Title</h3>
-          <p>Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. Study description. </p>
+          <h3>Highlighted Study: <a href="/#/study/{{highlightedStudy.id}}">{{highlightedStudy.short_title}}</a></h3>
+          <p>{{highlightedStudy.short_description}}</p>
           <a
             class="chevron-link"
             [routerLink]="['/studies']"

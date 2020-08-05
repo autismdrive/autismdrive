@@ -16,6 +16,7 @@ import {AuthenticationService} from '../_services/api/authentication-service';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 import {Meta} from '@angular/platform-browser';
+import {Study} from '../_models/study';
 
 interface SortMethod {
   name: string;
@@ -116,6 +117,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   paginatorElement: MatPaginator;
   panelElement: MatExpansionPanel;
   currentUser: User;
+  highlightedStudy: Study;
   resourceGatherers: AccordionItem[] = [
     {
       name: 'Charlottesville Region Autism Action Group',
@@ -210,6 +212,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
           this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
         }
       });
+    });
+
+    this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
+      this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
     });
   }
 
