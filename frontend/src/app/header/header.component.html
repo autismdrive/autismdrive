@@ -194,20 +194,14 @@
         COVID-19 RESOURCES
       </button>
     </mat-toolbar-row>
-    <mat-toolbar-row class="search">
-      <p class="tagline" fxShow fxHide.lt-md>
+    <mat-toolbar-row class="tagline">
+      <p fxShow fxHide.lt-md>
         A centralized system for autism research & resources for individuals, families & professionals.
       </p>
-      <p class="tagline" fxHide fxShow.lt-md>
+      <p fxHide fxShow.lt-md>
         Autism research & resources for <br fxHide fxShow.xs/>
         individuals, families & professionals.
       </p>
-      <app-search-box
-        *ngIf="!currentPath.includes('/search')"
-        variant="dark-bg"
-        fxHide
-        fxShow.gt-sm
-      ></app-search-box>
     </mat-toolbar-row>
 
   </mat-toolbar>
@@ -221,7 +215,6 @@
   [ngClass]="{'mirroring': config.mirroring}"
   class="mat-typography"
 >
-  <app-search-box variant="dark-bg"></app-search-box>
   <a
     mat-button
     [routerLink]="[ '/about' ]"

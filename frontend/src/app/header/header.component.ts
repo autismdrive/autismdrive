@@ -6,7 +6,6 @@ import {
   trigger
 } from '@angular/animations';
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Location } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -87,7 +86,6 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   mobileQuery: MediaQueryList;
   mdMediaQuery: MediaQueryList;
   lgMediaQuery: MediaQueryList;
-  currentPath = '';
 
   private _mobileQueryListener: () => void;
   private _mdMediaQueryListener: () => void;
@@ -114,7 +112,6 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     private router: Router,
     private api: ApiService,
     public config: ConfigService,
-    location: Location,
     media: MediaMatcher
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
@@ -123,11 +120,6 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this._mdMediaQueryListener = () => changeDetectorRef.detectChanges();
     this._lgMediaQueryListener = () => changeDetectorRef.detectChanges();
-    router.events.subscribe(val => {
-      if (location.path() !== '') {
-        this.currentPath = location.path();
-      }
-    });
 
     // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);

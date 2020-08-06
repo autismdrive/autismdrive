@@ -42,8 +42,8 @@
 
   // MD
   @media (min-width: 960px) {
-    top: (($site-header-height + $search-bar-height-md) * -1);
-    height: ($site-header-height + $search-bar-height-md);
+    top: (($site-header-height + $search-bar-height-sm) * -1);
+    height: ($site-header-height + $search-bar-height-sm);
   }
 
   // XL
@@ -81,56 +81,24 @@
 
   mat-toolbar {
     background-color: $brand-primary;
-    color: white
+    color: white;
   }
 
-  mat-toolbar-row.search {
-    background-color: $brand-primary;
-    color: white;
-    display: grid;
+  mat-toolbar-row.tagline {
 
     // SM
     @media (max-width: 959px) {
-      grid-template-rows: 1fr;
-      align-content: center;
       height: $search-bar-height-sm;
     }
 
     // MD
     @media (min-width: 960px) {
-      grid-template-rows: 1fr 1fr;
-      align-content: center;
-      height: $search-bar-height-md;
-    }
-
-    // XL
-    @media (min-width: 1280px) {
-      grid-template-columns: 1fr 1fr;
       height: $search-bar-height-lg;
     }
 
-    p.tagline {
+    p {
       font-style: italic;
-
-      // SM
-      @media (max-width: 959px) {
-        justify-self: center;
-        margin: 0px;
-        padding: 0px;
-      }
-
-      // MD
-      @media (min-width: 960px) {
-        justify-self: center;
-        margin-top: 16px;
-        margin-bottom: 0px;
-      }
-
-      // XL
-      @media (min-width: 1280px) {
-        margin: 4px 20px 4px 0px;
-        justify-self: start;
-      }
+      margin: 0;
     }
   }
 
@@ -236,5 +204,4 @@ div.mirror-message {
   justify-content: stretch;
 
   .mat-button { text-align: left; }
-  app-search-box { text-align: center; }
 }
