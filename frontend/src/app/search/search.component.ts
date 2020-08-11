@@ -214,9 +214,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     });
 
-    this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
-      this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
-    });
   }
 
   ngAfterViewInit() {
@@ -286,6 +283,19 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
       });
 
+    const studyQuery = this.query;
+    studyQuery.types = ['study'];
+    this.api.searchStudies(studyQuery).subscribe(results => {
+      if (results.hits.length > 0) {
+        this.api.getStudy(results.hits[0].id).subscribe(study => {
+          this.highlightedStudy = study;
+        });
+      } else {
+        this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
+          this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
+        });
+      }
+    });
     this.googleAnalyticsService.searchEvent(this.query);
     this.updateUrl = true;
   }
