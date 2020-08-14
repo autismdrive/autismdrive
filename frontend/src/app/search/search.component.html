@@ -10,8 +10,15 @@
       <app-search-box
         variant="light-bg"
         fxFlex.gt-sm="80%"
+        (searchUpdated)="updateUrlAndDoSearch()"
+        [words]="query.words"
       ></app-search-box>
-      <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_resource')" [addLabel]='"Add Resource"' [addLink]='"resources/add"' [currentUser]=currentUser></app-add-button>
+      <app-add-button
+        *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
+        [addLabel]='"Add Resource"'
+        [addLink]='"resources/add"'
+        [currentUser]=currentUser
+      ></app-add-button>
     </div>
     <div class="type-location-bar" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutGap.gt-sm="3em" fxLayoutGap.lt-md="1em">
       <div fxFlex="30%" fxHide fxShow.lt-md>
@@ -37,26 +44,48 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div class="type-buttons" fxLayout="row" fxHide.lt-md>
-        <div *ngFor="let type of resourceTypesFiltered()">
-          <button
-            mat-button
-            (click)="selectType(type.name)"
-          >
-            <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-            <span class="type-label">{{type.label}}</span>
-          </button>
-        </div>
-      </div>
-      <div *ngIf="selectedType && (selectedType.name === 'event' || selectedType.name === 'location')" id="set-location" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutAlign.gt-sm="start center" fxLayoutGap=".5em">
+      <mat-tab-group
+        mat-align-tabs="start"
+        fxHide.lt-md
+        [ngClass]="'type-tabs'"
+        (selectedTabChange)="selectTypeTab($event)"
+        [(selectedIndex)]="selectedTypeTabIndex"
+        color="accent"
+      >
+        <mat-tab>
+          <ng-template mat-tab-label><div class="type-buttons">All Resources</div></ng-template>
+        </mat-tab>
+        <mat-tab
+          *ngFor="let type of resourceTypesFiltered()"
+        >
+          <ng-template mat-tab-label>
+            <div class="type-buttons">
+              <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+              {{type.label}}
+            </div>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+      <div
+        *ngIf="selectedType && (selectedType.name === 'event' || selectedType.name === 'location')"
+        id="set-location"
+        fxLayout.gt-sm="row"
+        fxLayout.lt-md="column"
+        fxLayoutAlign.gt-sm="start center"
+        fxLayoutGap=".5em"
+      >
         <h4 *ngIf="isZipCode(storedZip)">Location: ({{storedZip}})</h4>
         <h4 *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: (using GPS)</h4>
         <div fxFlex.lt-md="30%">
-          <button *ngIf="!this.noLocation && !this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': !this.noLocation && !this.setLocOpen}" mat-button (click)="openSetLocation()" matTooltip="Set your location">
-            <mat-icon>keyboard_arrow_right</mat-icon>
-          </button>
-          <button *ngIf="this.setLocOpen" [ngClass]="{'zipCodeSetButton': true, 'show': this.setLocOpen}" mat-button (click)="closeSetLocation()" matTooltip="Close location form">
-            <mat-icon>keyboard_arrow_left</mat-icon>
+          <button
+            [ngClass]="'zipCodeSetButton show mat-elevation-z0'"
+            mat-flat-button
+            color="accent"
+            (click)="showLocationForm ? openSetLocation() : closeSetLocation()"
+            [matTooltip]="showLocationForm ? 'Set your location' : 'Close location form'"
+          >
+            <mat-icon *ngIf="showLocationForm">keyboard_arrow_right</mat-icon>
+            <mat-icon *ngIf="!showLocationForm">keyboard_arrow_left</mat-icon>
           </button>
         </div>
         <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="row" fxLayout.lt-md="column" >
@@ -65,8 +94,19 @@
             <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit($event)">
           </mat-form-field>
           <div fxLayout="row" fxLayoutGap="1em" fxLayoutAlign="start center">
-              <button mat-flat-button (click)="zipSubmit($event)" id="btn_save">Save</button>
-              <button *ngIf="gpsEnabled" mat-flat-button (click)="useGPSLocation($event)" id="btn_gps">Use GPS instead</button>
+              <button
+                mat-flat-button
+                color="accent"
+                (click)="zipSubmit($event)"
+                id="btn_save"
+              >Save</button>
+              <button
+                *ngIf="gpsEnabled"
+                mat-flat-button
+                color="accent"
+                (click)="useGPSLocation($event)"
+                id="btn_gps"
+              >Use GPS instead</button>
           </div>
         </div>
       </div>

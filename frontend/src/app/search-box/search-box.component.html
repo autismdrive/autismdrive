@@ -12,7 +12,7 @@
       [formControl]="searchBoxControl"
       [matAutocomplete]="auto"
     >
-    <mat-autocomplete #auto="matAutocomplete">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="updateSearch(false)">
       <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
         {{option}}
       </mat-option>
@@ -24,6 +24,7 @@
       <button
         mat-icon-button
         matSuffix
+        *ngIf="hasWords()"
         [ngClass]="{'btn-cancel': true, 'hidden': !hasWords()}"
         (click)="updateSearch(true)"
       ><mat-icon>cancel</mat-icon>

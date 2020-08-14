@@ -1,7 +1,7 @@
 @import '../../config';
 
 #hero {
-  background-color: $brand-gray-tint-2;
+  background-color: $brand-gray-tint-4;
   display: grid;
 
   h1 {
@@ -226,8 +226,15 @@ agm-map {
   }
 }
 
+::ng-deep .type-tabs .mat-tab-label {
+  margin: 5px;
+  &:focus {
+    outline: none;
+  }
+}
+
 .type-buttons {
-  color: white;
+  text-transform: uppercase;
   margin: .25em 1em;
 
   button {
@@ -248,30 +255,26 @@ agm-map {
   justify-content: flex-end;
 }
 
-::ng-deep .type-location-bar {
-  padding: 1em;
-  background-color: $brand-primary-shade-5;
-  color: white;
+.type-location-bar {
+  padding: 1em 1em 0 1em;
+  background-color: $brand-gray-tint-4;
+  //color: white;
 
   h4 {
-    color: white;
-  }
-  button {
-    background-color: $brand-accent;
-    color: white;
+    //color: white;
   }
 
   .mat-form-field-appearance-outline, .mat-form-field-outline, .mat-form-field-label {
-    color: white;
+    //color: white;
   }
 
   .mat-select-value, .mat-select-arrow {
-    color: white;
+    //color: white;
   }
 
   mat-form-field{
     ::placeholder {
-      color: rgba(255,255,255,0.7);
+      //color: rgba(255,255,255,0.7);
     }
   }
 }

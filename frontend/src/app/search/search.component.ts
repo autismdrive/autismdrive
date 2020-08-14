@@ -4,6 +4,7 @@ import {Location} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild, AfterViewInit} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatTabChangeEvent} from '@angular/material/tabs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
@@ -17,6 +18,7 @@ import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 import {Meta} from '@angular/platform-browser';
 import {Study} from '../_models/study';
+import createClone from 'rfdc';
 
 interface SortMethod {
   name: string;
@@ -35,13 +37,13 @@ class MapControlDiv extends HTMLDivElement {
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
-
   query: Query;
   mapQuery: Query;
   resourceTypes = HitType.all_resources();
   selectedMapResource: Resource;
   selectedMapHit: Hit;
   selectedType: HitType = HitType.ALL_RESOURCES;
+  selectedTypeTabIndex = 0;
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
   typeLabels = HitType.labels;
@@ -110,8 +112,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     },
   ];
-  updateUrl = false;
-  selectedSort: SortMethod;
+  selectedSort: SortMethod = this.sortMethods[0];
   selectedPageStart = 0;
   pageEvent: PageEvent;
   paginatorElement: MatPaginator;
@@ -199,6 +200,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this._updateFilterPanelState();
   }
 
+  get showLocationForm(): boolean {
+    return !this.noLocation && !this.setLocOpen;
+  }
+
   ngOnInit() {
     this.route.queryParamMap.subscribe(qParams => {
       this.query = this._queryParamsToQuery(qParams);
@@ -249,18 +254,14 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this._goToFirstPage();
   }
 
-  updateUrlAndDoSearch(query: Query) {
-    const qParams = this._queryToQueryParams(query);
-    const urlTree = this.router.parseUrl(this.router.url);
-    const urlWithoutParams = urlTree.root.children['primary'].segments.map(it => it.path).join('/');
-
-    this.location.go(
-      this.router.createUrlTree(
-        [urlWithoutParams],
-        {queryParams: qParams}
-      ).toString()
-    );
-    this.doSearch();
+  updateUrlAndDoSearch() {
+    const qParams = this._queryToQueryParams(this.query);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: qParams,
+    }).finally(() => {
+      this.doSearch();
+    });
   }
 
   scrollToTopOfSearch() {
@@ -283,7 +284,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
       });
 
-    const studyQuery = this.query;
+    const studyQuery = createClone()(this.query);
     studyQuery.types = ['study'];
     this.api.searchStudies(studyQuery).subscribe(results => {
       if (results.hits.length > 0) {
@@ -297,7 +298,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.googleAnalyticsService.searchEvent(this.query);
-    this.updateUrl = true;
   }
 
   loadMapLocation(callback: Function) {
@@ -356,7 +356,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   reSort(sortName: string) {
-    if (sortName) {
+    // Don't re-sort if it's already selected.
+    if (sortName && (sortName !== this.selectedSort.name)) {
       this.loading = true;
       this.selectedSort = this.sortMethods.find(s => s.name === sortName);
       this.query.start = this.selectedPageStart;
@@ -368,11 +369,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       } else if (this.selectedSort.name === 'Distance') {
         this.loadMapLocation(() => this._updateDistanceSort());
       } else {
-        if (this.updateUrl === true) {
-          this.updateUrlAndDoSearch(this.query);
-        } else {
-          this.doSearch();
-        }
+        this.updateUrlAndDoSearch();
       }
     }
   }
@@ -402,7 +399,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectType(keepType: string = null) {
     if (keepType) {
-      this.selectedType = this.resourceTypes.find(t => t.name === keepType);
+      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === keepType);
+      this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
 
       if (keepType === HitType.ALL_RESOURCES.name) {
         this.query.types = this.resourceTypesFilteredNames();
@@ -424,7 +422,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.query.sort = this.selectedSort.sortQuery;
     } else {
-      this.selectedType = this.resourceTypes.find(t => t.name === HitType.ALL_RESOURCES.name);
+      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === HitType.ALL_RESOURCES.name);
+      this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
       this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
       this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
@@ -450,7 +449,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.query.size = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
     this.scrollToTopOfSearch();
-    this.updateUrlAndDoSearch(this.query);
+    this.updateUrlAndDoSearch();
   }
 
   addMyLocationControl(mapUI: google.maps.Map) {
@@ -511,7 +510,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.mapQuery.types.length === 1 &&
       (this.mapQuery.types.includes('location') ||
         this.mapQuery.types.includes('event'));
-    const is_sort_by_distance = this.selectedSort && this.selectedSort.name === 'Distance';
+    const is_sort_by_distance = this.selectedSort.name === 'Distance';
     return is_location_or_event_type || is_sort_by_distance;
   }
 
@@ -612,7 +611,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Return a random number for the given seed
-
   private _queryParamsToQuery(qParams: Params): Query {
 
     const query = new Query({});
@@ -656,11 +654,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedSort.name === 'Distance') {
       this.selectedSort = distance_sort;
       this.query.sort = this.selectedSort.sortQuery;
-      if (this.updateUrl === true) {
-        this.updateUrlAndDoSearch(this.query);
-      } else {
-        this.doSearch();
-      }
+      this.updateUrlAndDoSearch();
     }
   }
 
@@ -669,12 +663,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.paginatorElement) {
       this.paginatorElement.firstPage();
     }
-
-    if (this.updateUrl === true) {
-      this.updateUrlAndDoSearch(this.query);
-    } else {
-      this.doSearch();
-    }
+    this.updateUrlAndDoSearch();
   }
 
   private _updateFilterPanelState() {
@@ -691,5 +680,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.changeDetectorRef.detectChanges();
+  }
+
+  selectTypeTab($event: MatTabChangeEvent) {
+    const resourceType = ($event.index > 0) ? this.resourceTypesFiltered()[$event.index - 1] : HitType.ALL_RESOURCES;
+    this.selectType(resourceType.name);
   }
 }
