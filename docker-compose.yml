@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  db:
+    image: sartography/cr-connect-db
+    volumes:
+      - $HOME/docker/volumes/stardrive/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=ed_user
+      - POSTGRES_PASSWORD=ed_pass
+      - POSTGRES_MULTIPLE_DATABASES=stardrive,stardrive_test
+
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.11
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - $HOME/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
