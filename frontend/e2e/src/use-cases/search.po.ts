@@ -4,32 +4,75 @@ export class SearchUseCases {
   constructor(private page: AppPage) {
   }
 
-  enterKeywordsInSearchField() {
-    expect(this.page.getElements('app-search-result').count()).toEqual(0);
-    this.page.clickLinkTo('/home');
-    this.page.inputText('#site-header .search-bar input', 'autism');
-    this.page.pressKey('ENTER');
-    this.page.waitForVisible('app-search-result');
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
-    const relevance_radio = this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Relevance"]');
-    expect(relevance_radio.isSelected());
+  async enterKeywordsInSearchField() {
+    const searchFieldSelector = '#search-field input';
+    const resultSelector = 'app-search-result';
+    const autocompleteSelector = '.mat-autocomplete-panel';
+    const suggestionSelector = autocompleteSelector + ' .mat-option';
+    const typeTabSelector = '.type-tabs-container .type-tabs .mat-tab-label';
+    const activeFirstTabSelector = typeTabSelector + '.mat-tab-label-active#mat-tab-label-0-0';
+
+    const numResultsBefore = await this.page.getElements(resultSelector).count();
+    expect(numResultsBefore).toBeGreaterThan(0, 'Search results should be visible.');
+    const numTypeTabsBefore = await this.page.getElements(typeTabSelector).count();
+    expect(numTypeTabsBefore).toEqual(4, 'All type tabs should be present.');
+    const numFirstTabSelectedBefore = await this.page.getElements(activeFirstTabSelector).count();
+    expect(numFirstTabSelectedBefore).toEqual(1, 'First type tab should be selected.');
+
+    // Click the search field
+    this.page.clickElement(searchFieldSelector);
+    const autocompleteIsVisibleBefore = await this.page.isVisible(autocompleteSelector);
+    expect(autocompleteIsVisibleBefore).toEqual(false);
+    const numSuggestionsBefore = await this.page.getElements(suggestionSelector).count();
+    expect(numSuggestionsBefore).toEqual(0, 'No suggestions should be visible yet.');
+
+    // Input keyword
+    this.page.inputText(searchFieldSelector, 'ad');
+    const autocompleteIsVisibleAfter = await this.page.isVisible(autocompleteSelector);
+    expect(autocompleteIsVisibleAfter).toEqual(true);
+    const suggestionIsVisibleAfter = await this.page.isVisible(suggestionSelector);
+    expect(suggestionIsVisibleAfter).toEqual(true);
+    const numSuggestionsAfter = await this.page.getElements(suggestionSelector).count();
+    expect(numSuggestionsAfter).toBeGreaterThan(0, 'Search suggestions should be visible.');
+
+    // Select the first suggestion
+    this.page.clickElement(suggestionSelector);
+    this.page.waitForVisible(resultSelector);
+    const numResultsAfter = await this.page.getElements(resultSelector).count();
+    expect(numResultsAfter).toBeGreaterThan(0, 'Keyword search should return results.');
+    expect(numResultsAfter).toBeLessThan(numResultsBefore, 'Keyword search should filter the results.');
+
+    // First type tab should be selected.
+    const numTypeTabsAfter = await this.page.getElements(typeTabSelector).count();
+    const numFirstTabSelectedAfter  = await this.page.getElements(activeFirstTabSelector).count();
+    expect(numTypeTabsAfter).toEqual(numTypeTabsBefore, 'All type tabs should be present.');
+    expect(numFirstTabSelectedAfter).toEqual(numFirstTabSelectedBefore, 'First type tab should be selected.');
   }
 
-  async displaySelectedCategory(filterClass: string) {
-    const filterSelector = '.applied-filters .applied-filter';
-    const filterClassSelector = `.filter-by-${filterClass}`;
+  async clearKeywordSearch() {
 
-    expect(this.page.getElements('.filters-column').count()).toEqual(1);
-    expect(this.page.getElements(filterClassSelector).count()).toEqual(1);
-    expect(await this.page.getElements(filterSelector).count()).toEqual(1);
+  }
 
-    this.page.clickElement(filterClassSelector);
+  async displaySelectedCategory(filterBy: string) {
+    const appliedFilterSelector = '.applied-filters .applied-filter';
+    const filterMenuSelector = `.filter-by-${filterBy} mat-select`;
+    const filterMenuOptionSelector = '.mat-select-panel .mat-option[ng-reflect-value]';
+    const appliedFilterChipSelector = `${appliedFilterSelector}-${filterBy}`;
 
-    expect(this.page.getElements(filterSelector).count()).toEqual(2);
+    const numAppliedFiltersBefore = await this.page.getElements(appliedFilterSelector).count();
+    expect(numAppliedFiltersBefore).toEqual(0, 'No applied filters should be visible yet.');
 
-    const category_text = await this.page.getElement(`${filterClassSelector} .filter-facet-label`).getText();
-    const applied_filter_text = await this.page.getElement(`${filterSelector}-${filterClass}`).getText();
-    expect(applied_filter_text).toContain(category_text);
+    const numFilterMenus = await this.page.getElements(filterMenuSelector).count();
+    expect(numFilterMenus).toEqual(1, `Filter menu for ${filterBy} should be visible.`);
+
+    // Open dropdown menu & select first option
+    this.page.clickElement(filterMenuSelector);
+    await this.page.waitForVisible(filterMenuOptionSelector);
+    this.page.clickElement(filterMenuOptionSelector);
+    await this.page.waitForNotVisible(filterMenuOptionSelector);
+    await this.page.waitForVisible(appliedFilterChipSelector);
+    const numAppliedFiltersAfter = await this.page.getElements(appliedFilterSelector).count();
+    expect(numAppliedFiltersAfter).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 
@@ -44,7 +87,12 @@ export class SearchUseCases {
   }
 
   async sortByDistance() {
-    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]');
+    const menuSelector = '#sort-and-status .sort-order mat-select';
+    const optionSelector = '.mat-option.sort-by-distance';
+    this.page.clickElement(menuSelector);
+    await this.page.waitForVisible(optionSelector);
+    this.page.clickElement(optionSelector);
+    await this.page.waitForNotVisible(optionSelector);
     this.page.waitForAnimations();
     expect(this.page.getElements('agm-map').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
@@ -74,8 +122,12 @@ export class SearchUseCases {
   }
 
   async openZipCodeDialog() {
-    const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
-    this.page.clickElement(`${distSelector} button`);
+    expect(this.page.isVisible('#set-location')).toEqual(true);
+    expect(this.page.isVisible('.zipCodeSetButton')).toEqual(true);
+    expect(this.page.isVisible('.zipCodeField')).toEqual(false);
+
+    this.page.clickElement('.zipCodeSetButton');
+    expect(this.page.isVisible('.zipCodeField')).toEqual(true);
   }
 
   enterZipCode(zipCode = '24401') {

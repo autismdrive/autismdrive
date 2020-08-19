@@ -40,8 +40,8 @@ describe('Anonymous User', () => {
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Search
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should clear search filter', () => searchUseCases.removeFilter('keyword', 'type'));
   it('should display selected category', () => searchUseCases.displaySelectedCategory('age'));
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
   it('should open ZIP code dialog', () => searchUseCases.openZipCodeDialog());
@@ -50,26 +50,23 @@ describe('Anonymous User', () => {
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code dialog again', () => searchUseCases.openZipCodeDialog());
   it('should change ZIP code', () => searchUseCases.enterZipCode('24248'));
-  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should display different saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
+  it('should display different results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should display yet more differenter results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should show all age ranges', () => searchUseCases.removeFilter('age', 'keyword'));
   it('should clear search keyword', () => searchUseCases.removeFilter('keyword', 'type'));
   it('should sort results by event date', () => searchUseCases.sortByEventDate());
   it('should display selected category', () => searchUseCases.displaySelectedCategory('topic'));
   it('should preserve selected topic when removing type filter', () => searchUseCases.removeFilter('type', 'topic'));
   it('should sort results by last date updated', () => searchUseCases.sortByLastUpdated());
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
+  it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
-
-  // Resource details returns to search
-  it('should visit search page', () => globalHeaderUseCases.visitResourcesPage());
   it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
 
   // Studies & study details
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should navigate to home page', () => globalHeaderUseCases.visitHomePage());
   it('should navigate to studies page', () => studiesUseCases.navigateToStudiesPage());
   it('should show currently-enrolling studies', () => studiesUseCases.filterByStatus('currently_enrolling'));
   it('should show studies in progress', () => studiesUseCases.filterByStatus('study_in_progress'));
@@ -77,7 +74,7 @@ describe('Anonymous User', () => {
   it('should show studies that have been published', () => studiesUseCases.filterByStatus('study_results_published'));
 
   // Login & Register
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  it('should jump back to the home page', () => globalHeaderUseCases.visitHomePage());
   it('should display login form', () => loginUseCases.displayLoginForm());
   it('should display forgot password form', () => loginUseCases.displayForgotPasswordForm());
   it('should display register form', () => loginUseCases.displayRegisterForm());

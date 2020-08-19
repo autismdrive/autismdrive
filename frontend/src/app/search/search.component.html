@@ -89,7 +89,7 @@
           </button>
         </div>
         <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="row" fxLayout.lt-md="column" >
-          <mat-form-field>
+          <mat-form-field class="zipCodeField">
             <mat-label>Set Location:</mat-label>
             <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit($event)">
           </mat-form-field>
