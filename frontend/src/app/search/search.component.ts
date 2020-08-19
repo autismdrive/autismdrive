@@ -624,7 +624,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get hits(): Hit[] {
-    console.log('*** get hits ***');
     if (this.query && this.query.hits && this.query.hits.length > 0) {
       if (this.restrictToMappedResults) {
         return this.mapQuery.hits.filter(h => {

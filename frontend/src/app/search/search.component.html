@@ -302,7 +302,12 @@
     </mat-paginator>
   </div>
   <div id="map" fxFlex="30%" fxLayout="column" fxLayoutGap="2em">
-    <button id="listMappedResultsButton" mat-flat-button (click)="listMapResultsOnly(true)" *ngIf="!restrictToMappedResults">Show mapped results in list</button>
+    <button
+      id="listMappedResultsButton"
+      mat-flat-button
+      (click)="listMapResultsOnly(true)"
+      *ngIf="showMap() && !restrictToMappedResults"
+    >Show mapped results in list</button>
     <agm-map
       #mapTemplate
       *ngIf="showMap()"
