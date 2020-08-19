@@ -280,8 +280,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
+    const mapDataOnly = !this.restrictToMappedResults;
     this.searchService
-      .mapSearch(this.query)
+      .mapSearch(this.query, mapDataOnly)
       .subscribe(mapQueryWithResults => {
         this.mapQuery = mapQueryWithResults;
         this.loadMapResults();
@@ -626,18 +627,12 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('*** get hits ***');
     if (this.query && this.query.hits && this.query.hits.length > 0) {
       if (this.restrictToMappedResults) {
-        const mapHits = {};
-        this.mapQuery.hits.forEach(h => {
+        return this.mapQuery.hits.filter(h => {
           if (h.hasCoords()) {
             const latLng = new google.maps.LatLng(h.latitude, h.longitude);
-            if (this.mapBounds && this.mapBounds.contains(latLng)) {
-              mapHits[h.id] = h;
-            }
+            return (this.mapBounds && this.mapBounds.contains(latLng));
           }
         });
-        const hitsOnMap = this.query.hits.filter(h => mapHits.hasOwnProperty(h.id));
-        console.log('hits on map', hitsOnMap);
-        return hitsOnMap;
       } else {
         return this.query.hits;
       }
