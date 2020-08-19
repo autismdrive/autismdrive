@@ -20,7 +20,14 @@
         [currentUser]=currentUser
       ></app-add-button>
     </div>
-    <div class="type-tabs-container" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutGap.gt-sm="3em" fxLayoutGap.lt-md="1em">
+    <div
+      class="type-tabs-container"
+      fxLayout.gt-sm="row"
+      fxLayout.lt-md="column"
+      fxLayoutGap.gt-sm="2em"
+      fxLayoutGap.lt-md="1em"
+      fxLayoutAlign="start end"
+    >
       <div fxFlex="30%" fxHide fxShow.lt-md>
         <mat-form-field class="type-buttons">
           <mat-label>Resource types</mat-label>
@@ -72,7 +79,7 @@
         fxLayout.gt-sm="row"
         fxLayout.lt-md="column"
         fxLayoutAlign.gt-sm="start center"
-        fxLayoutGap=".5em"
+        fxLayoutGap="10px"
       >
         <h4 *ngIf="isZipCode(storedZip)">Location: ({{storedZip}})</h4>
         <h4 *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: (using GPS)</h4>
@@ -90,10 +97,14 @@
         </div>
         <div [ngClass]="{'zipCodeSet': true, 'show': this.noLocation || this.setLocOpen}" fxLayout="row" fxLayout.lt-md="column" >
           <mat-form-field class="zipCodeField">
-            <mat-label>Set Location:</mat-label>
-            <input matInput placeholder="ZIP Code" [(ngModel)]="updatedZip" (keyup.enter)="zipSubmit($event)">
+            <input
+              matInput
+              placeholder="Enter ZIP Code"
+              [(ngModel)]="updatedZip"
+              (keyup.enter)="zipSubmit($event)"
+            >
           </mat-form-field>
-          <div fxLayout="row" fxLayoutGap="1em" fxLayoutAlign="start center">
+          <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
               <button
                 mat-flat-button
                 color="accent"

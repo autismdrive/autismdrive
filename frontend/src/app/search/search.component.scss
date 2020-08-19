@@ -226,12 +226,14 @@ agm-map {
   }
 }
 
-::ng-deep .type-tabs .mat-tab-label {
-  color: $brand-primary;
-  margin: 5px;
-  opacity: 1;
-  &:focus {
-    outline: none;
+::ng-deep .type-tabs {
+  .mat-tab-label {
+    color: $brand-primary;
+    margin: 5px;
+    opacity: 1;
+    &:focus {
+      outline: none;
+    }
   }
 }
 
@@ -247,6 +249,12 @@ agm-map {
 
 ::ng-deep #set-location {
   margin: auto 1em;
+
+  h4 {
+    font-size: 1.2rem;
+    line-height: 2;
+    margin-bottom: 0;
+  }
 }
 
 #sort-and-status, #map, #partners, #filters, #type-buttons {
@@ -260,6 +268,7 @@ agm-map {
 .type-tabs-container {
   padding: 1em 1em 0 1em;
   background-color: $brand-gray-tint-4;
+  height: 94px;
   //color: white;
 
   h4 {

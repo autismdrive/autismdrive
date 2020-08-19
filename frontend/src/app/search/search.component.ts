@@ -3,6 +3,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {Location} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild, AfterViewInit} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
+import {MatInput} from '@angular/material/input';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTabChangeEvent} from '@angular/material/tabs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
@@ -368,9 +369,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateUrlAndDoSearch();
   }
 
-  reSort(sortName: string) {
-    // Don't re-sort if it's already selected.
-    if (sortName && (sortName !== this.selectedSort.name)) {
+  reSort(sortName: string, forceReSort = false) {
+    // Don't re-sort if it's already selected, but allow override.
+    if ((sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
       this.loading = true;
       this.selectedSort = this.sortMethods.find(s => s.name === sortName);
       this.query.start = this.selectedPageStart;
@@ -539,7 +540,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');
     this.setLocOpen = false;
-    this.reSort('Distance');
+    this.reSort('Distance', true);
   }
 
   useGPSLocation($event: MouseEvent|KeyboardEvent): void {
@@ -547,7 +548,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     localStorage.removeItem('zipCode');
     this.storedZip = null;
     this.setLocOpen = false;
-    this.reSort('Distance');
+    this.reSort('Distance', true);
   }
 
   isZipCode(zipCode: string): boolean {
