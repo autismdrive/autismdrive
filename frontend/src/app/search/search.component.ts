@@ -1,4 +1,4 @@
-import {LatLngLiteral} from '@agm/core';
+import {AgmMap, LatLngBounds, LatLngLiteral, MapsAPILoader} from '@agm/core';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {Location} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild, AfterViewInit} from '@angular/core';
@@ -19,6 +19,8 @@ import {GoogleAnalyticsService} from '../google-analytics.service';
 import {Meta} from '@angular/platform-browser';
 import {Study} from '../_models/study';
 import createClone from 'rfdc';
+
+declare var google: any;
 
 interface SortMethod {
   name: string;
@@ -153,6 +155,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
   private _mobileQueryListener: () => void;
+  private restrictToMappedResults: boolean;
+  private mapBounds: LatLngBounds;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -198,6 +202,12 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   set panel(value: MatExpansionPanel) {
     this.panelElement = value;
     this._updateFilterPanelState();
+  }
+
+  get showLocationButton(): boolean {
+    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
+    const isDistanceSort = this.selectedSort && this.selectedSort.name === 'Distance';
+    return (isLocation || isDistanceSort);
   }
 
   get showLocationForm(): boolean {
@@ -351,8 +361,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-  newSortSelection(value) {
-    this.reSort(value);
+  newSortSelection(sort: SortMethod) {
+    this.loading = true;
+    this.selectedSort = sort;
+    this.updateUrlAndDoSearch();
   }
 
   reSort(sortName: string) {
@@ -610,6 +622,30 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     return queryParams;
   }
 
+  get hits(): Hit[] {
+    console.log('*** get hits ***');
+    if (this.query && this.query.hits && this.query.hits.length > 0) {
+      if (this.restrictToMappedResults) {
+        const mapHits = {};
+        this.mapQuery.hits.forEach(h => {
+          if (h.hasCoords()) {
+            const latLng = new google.maps.LatLng(h.latitude, h.longitude);
+            if (this.mapBounds && this.mapBounds.contains(latLng)) {
+              mapHits[h.id] = h;
+            }
+          }
+        });
+        const hitsOnMap = this.query.hits.filter(h => mapHits.hasOwnProperty(h.id));
+        console.log('hits on map', hitsOnMap);
+        return hitsOnMap;
+      } else {
+        return this.query.hits;
+      }
+    }
+
+    return [];
+  }
+
   // Return a random number for the given seed
   private _queryParamsToQuery(qParams: Params): Query {
 
@@ -685,5 +721,30 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   selectTypeTab($event: MatTabChangeEvent) {
     const resourceType = ($event.index > 0) ? this.resourceTypesFiltered()[$event.index - 1] : HitType.ALL_RESOURCES;
     this.selectType(resourceType.name);
+  }
+
+  updateResultsList($event: LatLngBounds) {
+    this.mapBounds = $event;
+  }
+
+  listMapResultsOnly(shouldRestrict: boolean) {
+    this.restrictToMappedResults = shouldRestrict;
+    this.updateUrlAndDoSearch();
+  }
+
+  isLastPage(): boolean {
+    return (this.query.start + this.pageSize) < this.query.total;
+  }
+
+  numResultsFrom(): number {
+    return (this.paginatorElement.pageIndex * this.pageSize) + 1;
+  }
+
+  numResultsTo(): number {
+    return this.isLastPage() ? this.query.total : (this.paginatorElement.pageIndex + 1) * this.pageSize;
+  }
+
+  numTotalResults() {
+    return this.query.total;
   }
 }

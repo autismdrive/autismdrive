@@ -20,7 +20,7 @@
         [currentUser]=currentUser
       ></app-add-button>
     </div>
-    <div class="type-location-bar" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutGap.gt-sm="3em" fxLayoutGap.lt-md="1em">
+    <div class="type-tabs-container" fxLayout.gt-sm="row" fxLayout.lt-md="column" fxLayoutGap.gt-sm="3em" fxLayoutGap.lt-md="1em">
       <div fxFlex="30%" fxHide fxShow.lt-md>
         <mat-form-field class="type-buttons">
           <mat-label>Resource types</mat-label>
@@ -59,7 +59,7 @@
           *ngFor="let type of resourceTypesFiltered()"
         >
           <ng-template mat-tab-label>
-            <div class="type-buttons">
+            <div class="type-buttons {{type.name}}">
               <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
               {{type.label}}
             </div>
@@ -67,7 +67,7 @@
         </mat-tab>
       </mat-tab-group>
       <div
-        *ngIf="selectedType && (selectedType.name === 'event' || selectedType.name === 'location')"
+        *ngIf="showLocationButton"
         id="set-location"
         fxLayout.gt-sm="row"
         fxLayout.lt-md="column"
@@ -124,41 +124,36 @@
       <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
         <div class="filter-select" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em" fxFlex="60%">
           <div id="age-filter" fxFlex="30%">
-            <div *ngIf="!query">
-              <mat-spinner></mat-spinner>
-            </div>
             <div *ngIf="query">
-              <div *ngIf="query && !query.hasAgeCounts()">No age restrictions available for these search results.</div>
               <app-search-filter
                 [aggregations]="query.age_counts"
                 [label_title]="'By Age'"
+                [label_any]="'Any age'"
                 [label_map]="ageLabels"
                 (filterSelected)="selectAgeRange($event)"
                 [ngClass]="'filter-by-age'"
+                [isNotApplicable]="!loading && query && !query.hasAgeCounts()"
+                [notApplicableMessage]="'No age restrictions available for these search results.'"
               ></app-search-filter>
             </div>
           </div>
 
           <div id="language-filter" fxFlex="30%">
-            <div *ngIf="!query">
-              <mat-spinner></mat-spinner>
-            </div>
             <div *ngIf="query">
-              <div *ngIf="query && !query.hasLanguageCounts()">No language restrictions available for these search results.</div>
               <app-search-filter
                 [aggregations]="query.language_counts"
                 [label_title]="'By Language'"
+                [label_any]="'Any language'"
                 [label_map]="languageLabels"
                 (filterSelected)="selectLanguage($event)"
                 [ngClass]="'filter-by-language'"
+                [isNotApplicable]="!loading && query && !query.hasLanguageCounts()"
+                [notApplicableMessage]="'No language restrictions available for these search results.'"
               ></app-search-filter>
             </div>
           </div>
 
           <div id="topic-filter" fxFlex="30%">
-            <div *ngIf="!query">
-              <mat-spinner></mat-spinner>
-            </div>
             <app-search-topics
               *ngIf="query"
               [category]="query.category"
@@ -170,6 +165,15 @@
         <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container" fxLayout="column" fxFlex.gt-sm="30%">
           <h4>Selected Filters:</h4>
           <mat-chip-list class="applied-filters">
+            <ng-container *ngIf="restrictToMappedResults">
+              <mat-chip
+                (click)="listMapResultsOnly(false)"
+                class="applied-filter applied-filter-mapped"
+              >
+                <span class="applied-filter-label">Mapped results only</span>
+                <mat-icon>close</mat-icon>
+              </mat-chip>
+            </ng-container>
 
             <ng-container *ngIf="query && query.words">
               <mat-chip
@@ -242,61 +246,65 @@
     id="results"
     fxLayout="column"
     fxLayoutGap="40px"
+    fxFlex="70%"
   >
-    <div *ngIf="!query">
-      <mat-spinner></mat-spinner>
-    </div>
-    <div *ngIf="query && query.hits.length === 0" fxLayout="column" fxLayoutGap="20px"
-         fxLayoutAlign="center center" class="pad-4">
-      <h2>No results currently available.</h2>
-      <p>We could not find any results for your search. Please try removing some of the conditions
-        by clicking on the 'x' in the filter tiles above. This will broaden the search and give you more results.</p>
-      <h3>Check back soon for more updates!</h3>
-    </div>
-    <div *ngIf="query.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
-      <div class="search-result-status">
-        <h4 *ngIf="(query.start + pageSize) < query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{(paginatorElement.pageIndex + 1) * pageSize}} of {{query.total}} results</h4>
-        <h4 *ngIf="(query.start + pageSize) > query.total">Showing {{(paginatorElement.pageIndex * pageSize) + 1}}-{{query.total}} of {{query.total}} results</h4>
+    <ng-container *ngIf="!loading; else loadingMessage">
+      <div *ngIf="query?.hits.length === 0" fxLayout="column" fxLayoutGap="20px"
+           fxLayoutAlign="center center" class="pad-4">
+        <h2>No results currently available.</h2>
+        <p>We could not find any results for your search. Please try removing some of the conditions
+          by clicking on the 'x' in the filter tiles above. This will broaden the search and give you more results.</p>
+        <h3>Check back soon for more updates!</h3>
       </div>
-      <div class="sort-order">
-        <mat-form-field>
-          <mat-label>Sort By:</mat-label>
-          <mat-select [(value)]="selectedSort">
-            <mat-select-trigger>
-              <span class="type-label" *ngIf="selectedSort">{{selectedSort.label}}</span>
-            </mat-select-trigger>
-            <mat-option
-              *ngFor="let sort of sortMethods"
-              [value]="sort"
-              (click)="newSortSelection(sort.name)"
-            >
-              <span class="sort-label">{{sort.label}}</span>
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <div *ngIf="query?.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
+        <div class="search-result-status">
+          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom()}}-{{numResultsTo()}} of {{numTotalResults()}} results</h4>
+          <h4 *ngIf="restrictToMappedResults">Showing nearest {{hits.length}} mapped results</h4>
+        </div>
+        <div class="sort-order">
+          <mat-form-field>
+            <mat-label>Sort By:</mat-label>
+            <mat-select [(value)]="selectedSort">
+              <mat-select-trigger>
+                <span class="type-label" *ngIf="selectedSort">{{selectedSort.label}}</span>
+              </mat-select-trigger>
+              <mat-option
+                *ngFor="let sort of sortMethods"
+                [value]="sort"
+                (click)="newSortSelection(sort)"
+                [ngClass]="'sort-by-' + sort.name.toLowerCase()"
+              >
+                <span class="sort-label">{{sort.label}}</span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div *ngIf="query && query.hits.length > 0">
-      <app-search-result
-        *ngFor="let hit of query.hits"
-        [hit]="hit"
-        [mapLoc]="mapLoc"
-        [currentUser]="currentUser"
-      >
-      </app-search-result>
-    </div>
+      <div *ngIf="hits.length > 0">
+        <app-search-result
+          *ngFor="let hit of hits"
+          [hit]="hit"
+          [mapLoc]="mapLoc"
+          [currentUser]="currentUser"
+        >
+        </app-search-result>
+      </div>
+    </ng-container>
+
     <mat-paginator
       #paginator
-      [length]="query ? query.total : 0"
+      [length]="query?.total"
       [pageSize]="pageSize"
       [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
       (page)="updatePage($event)"
-      [ngClass]="{'ghost': (!query || (query.total === 0))}"
+      [ngClass]="{'ghost': (restrictToMappedResults || !query || (query.total === 0))}"
     >
     </mat-paginator>
   </div>
   <div id="map" fxFlex="30%" fxLayout="column" fxLayoutGap="2em">
+    <button id="listMappedResultsButton" mat-flat-button (click)="listMapResultsOnly(true)" *ngIf="!restrictToMappedResults">Show mapped results in list</button>
     <agm-map
+      #mapTemplate
       *ngIf="showMap()"
       [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
       [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
@@ -307,6 +315,7 @@
       [scrollwheel]="null"
       (mapClick)="closeInfoWindow()"
       (zoomChange)="updateZoom($event)"
+      (boundsChange)="updateResultsList($event)"
     >
       <agm-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
         <agm-marker
@@ -341,8 +350,8 @@
             [latitude]="hit.latitude"
             [longitude]="hit.longitude"
             [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
-            (markerClick)="showInfoWindow(hit)">
-          </agm-marker>
+            (markerClick)="showInfoWindow(hit)"
+          ></agm-marker>
         </ng-container>
       </agm-marker-cluster>
       <ng-container *ngIf="selectedMapResource">
@@ -407,3 +416,7 @@
     (click)="submitResource()"
   ></app-border-box-tile>
 </div>
+
+<ng-template #loadingMessage>
+  <app-loading></app-loading>
+</ng-template>

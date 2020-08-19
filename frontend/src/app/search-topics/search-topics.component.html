@@ -1,5 +1,4 @@
-<mat-spinner *ngIf="!category"></mat-spinner>
-<mat-list dense *ngIf="category">
+<mat-list dense *ngIf="category; else loadingMessage">
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
         (click)="selectCategory(parent)"
@@ -27,3 +26,7 @@
     </mat-option>
   </mat-select>
 </mat-form-field>
+
+<ng-template #loadingMessage>
+  <app-loading [isField]="true"></app-loading>
+</ng-template>
