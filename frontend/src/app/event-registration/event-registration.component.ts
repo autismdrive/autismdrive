@@ -29,7 +29,8 @@ export class EventRegistrationComponent implements OnInit {
     const dialogRef = this.dialog.open(EventRegistrationFormComponent, {
       width: `${window.innerWidth}px`,
       data: {
-        'registered': false
+        'registered': false,
+        'title': 'Register for ' + this.resource.title
       }
     });
 

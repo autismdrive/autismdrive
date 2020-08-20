@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Inject, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {User} from '../_models/user';
 import {FormGroup} from '@angular/forms';
@@ -147,7 +147,8 @@ export class EventRegistrationFormComponent implements OnInit {
     private googleAnalytics: GoogleAnalyticsService,
     public dialogRef: MatDialogRef<EventRegistrationComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
-      registered: boolean
+      registered: boolean,
+      title: string
     }
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
