@@ -1,18 +1,23 @@
+import {ElementFinder} from 'protractor';
 import {AppPage} from '../app-page.po';
 
 export class SearchUseCases {
   constructor(private page: AppPage) {
   }
 
-  async enterKeywordsInSearchField() {
+  async enterKeywordsInSearchField(keywordString = 'autism') {
     const searchFieldSelector = '#search-field input';
     const resultSelector = 'app-search-result';
+    const numResultsAttribute = 'data-num-results';
+    const numResultsSelector = '[data-num-results]';
     const autocompleteSelector = '.mat-autocomplete-panel';
     const suggestionSelector = autocompleteSelector + ' .mat-option';
     const typeTabSelector = '.type-tabs-container .type-tabs .mat-tab-label';
-    const activeFirstTabSelector = typeTabSelector + '.mat-tab-label-active#mat-tab-label-0-0';
+    const activeFirstTabSelector = typeTabSelector + '.mat-tab-label-active[tabindex="0"]';
+    await this.page.waitForVisible(typeTabSelector);
+    await this.page.waitForVisible(resultSelector);
 
-    const numResultsBefore = await this.page.getElements(resultSelector).count();
+    const numResultsBefore = parseInt(await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute), 10);
     expect(numResultsBefore).toBeGreaterThan(0, 'Search results should be visible.');
     const numTypeTabsBefore = await this.page.getElements(typeTabSelector).count();
     expect(numTypeTabsBefore).toEqual(4, 'All type tabs should be present.');
@@ -27,7 +32,7 @@ export class SearchUseCases {
     expect(numSuggestionsBefore).toEqual(0, 'No suggestions should be visible yet.');
 
     // Input keyword
-    this.page.inputText(searchFieldSelector, 'ad');
+    this.page.inputText(searchFieldSelector, keywordString);
     const autocompleteIsVisibleAfter = await this.page.isVisible(autocompleteSelector);
     expect(autocompleteIsVisibleAfter).toEqual(true);
     const suggestionIsVisibleAfter = await this.page.isVisible(suggestionSelector);
@@ -38,7 +43,7 @@ export class SearchUseCases {
     // Select the first suggestion
     this.page.clickElement(suggestionSelector);
     this.page.waitForVisible(resultSelector);
-    const numResultsAfter = await this.page.getElements(resultSelector).count();
+    const numResultsAfter = parseInt(await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute), 10);
     expect(numResultsAfter).toBeGreaterThan(0, 'Keyword search should return results.');
     expect(numResultsAfter).toBeLessThan(numResultsBefore, 'Keyword search should filter the results.');
 
@@ -49,19 +54,12 @@ export class SearchUseCases {
     expect(numFirstTabSelectedAfter).toEqual(numFirstTabSelectedBefore, 'First type tab should be selected.');
   }
 
-  async clearKeywordSearch() {
-
-  }
-
   async displaySelectedCategory(filterBy: string) {
     const appliedFilterSelector = '.applied-filters .applied-filter';
     const filterMenuSelector = `.filter-by-${filterBy} mat-select`;
     const filterMenuOptionSelector = '.mat-select-panel .mat-option[ng-reflect-value]';
     const appliedFilterChipSelector = `${appliedFilterSelector}-${filterBy}`;
-
     const numAppliedFiltersBefore = await this.page.getElements(appliedFilterSelector).count();
-    expect(numAppliedFiltersBefore).toEqual(0, 'No applied filters should be visible yet.');
-
     const numFilterMenus = await this.page.getElements(filterMenuSelector).count();
     expect(numFilterMenus).toEqual(1, `Filter menu for ${filterBy} should be visible.`);
 
@@ -72,28 +70,37 @@ export class SearchUseCases {
     await this.page.waitForNotVisible(filterMenuOptionSelector);
     await this.page.waitForVisible(appliedFilterChipSelector);
     const numAppliedFiltersAfter = await this.page.getElements(appliedFilterSelector).count();
-    expect(numAppliedFiltersAfter).toEqual(1);
+    expect(numAppliedFiltersAfter).toBeGreaterThan(numAppliedFiltersBefore);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 
-  async clearSearchBox() {
-    const input_text_before = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
-    expect(input_text_before).toEqual('autism');
+  async clearSearchBox(keywordString = 'autism') {
+    const searchFieldSelector = '#search-field input';
 
-    this.page.clickLinkTo('/home');
+    const input_text_before = await this.page.getElement(searchFieldSelector).getAttribute('value');
+    expect(input_text_before.toLowerCase()).toContain(keywordString);
 
-    const input_text_after = await this.page.getElement('#site-header .search-bar input').getAttribute('value');
+    this.page.clickAndExpectRoute('#logo', '/home');
+    this.page.waitForVisible('app-news-item');
+    this.page.clickLinkToVariation('/search');
+    this.page.waitForVisible('app-search-result');
+
+    const input_text_after = await this.page.getElement(searchFieldSelector).getAttribute('value');
     expect(input_text_after).toEqual('');
   }
 
-  async sortByDistance() {
+  async sortBy(sortMethod: string) {
     const menuSelector = '#sort-and-status .sort-order mat-select';
-    const optionSelector = '.mat-option.sort-by-distance';
+    const optionSelector = `.mat-option.sort-by-${sortMethod}`;
     this.page.clickElement(menuSelector);
     await this.page.waitForVisible(optionSelector);
     this.page.clickElement(optionSelector);
     await this.page.waitForNotVisible(optionSelector);
-    this.page.waitForAnimations();
+    await this.page.waitForAnimations();
+  }
+
+  async sortByDistance() {
+    this.sortBy('distance');
     expect(this.page.getElements('agm-map').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
   }
@@ -131,12 +138,12 @@ export class SearchUseCases {
   }
 
   enterZipCode(zipCode = '24401') {
-    this.page.inputText('mat-form-field [placeholder="ZIP Code"]', zipCode, true);
+    this.page.inputText('mat-form-field [placeholder="Enter ZIP Code"]', zipCode, true);
     this.page.clickElement('#btn_save');
   }
 
   checkSavedZipCode(zipCode = '24401') {
-    const distSelector = '.sort-order mat-radio-group [ng-reflect-value="Distance"]';
+    const distSelector = '#set-location h4';
     this.page.waitForText(distSelector, zipCode);
     this.page.waitFor(500);
     expect(this.page.getLocalStorageVar('zipCode')).toEqual(zipCode);
@@ -144,10 +151,9 @@ export class SearchUseCases {
   }
 
   async clearZipCode(zipCode = '24401') {
-    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Distance"] button');
+    await this.openZipCodeDialog();
     this.page.clickElement('#btn_gps');
-
-    const newText = await this.page.getElement('.sort-order mat-radio-group [ng-reflect-value="Distance"]').getText();
+    const newText = await this.page.getElement('#set-location h4').getText();
     expect(newText.includes(zipCode)).toBeFalsy();
   }
 
@@ -163,32 +169,37 @@ export class SearchUseCases {
   }
 
   sortByEventDate() {
-    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Date"]');
-    this.page.waitFor(1000);
+    this.sortBy('date');
     return this.checkResultsDates('.hit-event-date', 'asc');
   }
 
   sortByLastUpdated() {
-    this.page.clickElement('.sort-order mat-radio-group [ng-reflect-value="Updated"]');
-    this.page.waitFor(1000);
+    this.sortBy('updated');
     return this.checkResultsDates('.hit-last-updated', 'desc');
   }
 
   // Checks each date in the search results with the date of the result after it.
   // Each date should be less than the next one.
   async checkResultsDates(selector: string, direction: string) {
-    await this.page.waitForVisible(selector);
-    const results = await this.page.getElements(selector);
-    const isoSelector = 'data-iso-date-string';
+    const dateAttribute = 'data-iso-date-string';
+    const searchResultSelector = `app-search-result[class^='sort-order-']`;
+    const sortOrderSelector = '.sort-order-';
+    const selectorWithDate = selector + `[${dateAttribute}]`;
+    await this.page.waitForVisible(searchResultSelector);
+    await this.page.waitForVisible(sortOrderSelector + 0 + ' ' + selector);
+    await this.page.waitForVisible(selectorWithDate);
+    const numResults = await this.page.getElements(searchResultSelector).count();
+    const numWithDate = await this.page.getElements(selectorWithDate).count();
+    expect(numResults).toBeGreaterThanOrEqual(numWithDate);
     let numChecked = 0;
-    const numTotal = results.length - 1;
 
-    await expect(results.length).toBeGreaterThan(0);
-    for (let i = 0; i < results.length - 1; i++) {
-      const thisResult = results[i];
-      const nextResult = results[i + 1];
-      const thisDateStr: string = await thisResult.getAttribute(isoSelector);
-      const nextDateStr: string = await nextResult.getAttribute(isoSelector);
+    for (let i = 0; i < numWithDate - 1; i++) {
+      const thisResult = await this.page.getElement(sortOrderSelector + i + ' ' + selector);
+      const nextResult = await this.page.getElement(sortOrderSelector + (i + 1) + ' ' + selector);
+      expect(thisResult).toBeTruthy();
+      expect(nextResult).toBeTruthy();
+      const thisDateStr: string = await thisResult.getWebElement().getAttribute(dateAttribute);
+      const nextDateStr: string = await nextResult.getWebElement().getAttribute(dateAttribute);
       const thisDateInt = new Date(thisDateStr).getTime();
       const nextDateInt = new Date(nextDateStr).getTime();
 
@@ -200,7 +211,29 @@ export class SearchUseCases {
       numChecked++;
     }
 
-    return expect(numChecked).toEqual(numTotal);
+    return expect(numChecked).toEqual(numWithDate - 1);
+  }
+
+  async filterByType(keepType: string) {
+    const showAll = keepType === 'all';
+    const tabSelector = `.type-buttons.${keepType}`;
+    const selectedTabSelector = `.mat-tab-label-active ${tabSelector}`;
+    const iconSelector = `app-search-result app-type-icon`;
+    const iconTypeSelector = iconSelector + `[ng-reflect-icon-type='${showAll ? 'location' : keepType}']`;
+    const appliedFilterSelector = '.applied-filter.applied-filter-type';
+    this.page.clickElement(tabSelector);
+    expect(this.page.isVisible(selectedTabSelector)).toEqual(true);
+    this.page.waitForVisible(iconTypeSelector);
+
+    if (showAll) {
+      expect(this.page.getElements(appliedFilterSelector).count())
+        .toEqual(0, 'Should not filter by type when All Resources tab is clicked.');
+    } else {
+      expect(this.page.getElements(appliedFilterSelector).count()).toEqual(1, `Should filter by '${keepType}'`);
+      const numAllResults = await this.page.getElements(iconSelector).count();
+      const numTypeResults = await this.page.getElements(iconTypeSelector).count();
+      expect(numAllResults).toEqual(numTypeResults, `All result icons should match type '${keepType}'`);
+    }
   }
 
   async removeFilter(removeChip: string, preserveChip: string) {

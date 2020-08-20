@@ -40,9 +40,9 @@ describe('Anonymous User', () => {
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Search
-  it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField());
+  it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField('ad'));
   it('should clear search filter', () => searchUseCases.removeFilter('keyword', 'type'));
-  it('should display selected category', () => searchUseCases.displaySelectedCategory('age'));
+  it('should display results filtered by age', () => searchUseCases.displaySelectedCategory('age'));
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
   it('should open ZIP code dialog', () => searchUseCases.openZipCodeDialog());
   it('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
@@ -55,14 +55,21 @@ describe('Anonymous User', () => {
   it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
   it('should display yet more differenter results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should show all age ranges', () => searchUseCases.removeFilter('age', 'keyword'));
-  it('should clear search keyword', () => searchUseCases.removeFilter('keyword', 'type'));
-  it('should sort results by event date', () => searchUseCases.sortByEventDate());
-  it('should display selected category', () => searchUseCases.displaySelectedCategory('topic'));
+  it('should display only locations', () => searchUseCases.filterByType('location'));
+  it('should display only online resources', () => searchUseCases.filterByType('resource'));
+  it('should display only events', () => searchUseCases.filterByType('event'));
+  it('should remove type filters when clicking All Resources tab', () => searchUseCases.filterByType('all'));
+  it('should display only locations again', () => searchUseCases.filterByType('location'));
+  it('should display results filtered by topic', () => searchUseCases.displaySelectedCategory('topic'));
   it('should preserve selected topic when removing type filter', () => searchUseCases.removeFilter('type', 'topic'));
   it('should sort results by last date updated', () => searchUseCases.sortByLastUpdated());
   it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
   it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
-  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
+  it('should enter some other keywords in the search field', () => searchUseCases.enterKeywordsInSearchField('autism'));
+  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('autism'));
+  it('should display only events again', () => searchUseCases.filterByType('event'));
+  it('should sort results by event date', () => searchUseCases.sortByEventDate());
+  it('should display all resources again', () => searchUseCases.filterByType('all'));
   it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
 
   // Studies & study details

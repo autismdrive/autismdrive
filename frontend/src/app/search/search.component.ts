@@ -221,11 +221,11 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       if (navigator.geolocation) {
         this.gpsEnabled = true;
       }
-      this.loadMapLocation(f => {
+      this.loadMapLocation(() => {
         if (qParams.get('sort') && this.sortMethods.find(m => m.name === qParams.get('sort')) !== undefined) {
           this.reSort(qParams.get('sort'));
         } else {
-          this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+          this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance', true);
         }
       });
     });

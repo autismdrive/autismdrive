@@ -60,7 +60,7 @@
         color="accent"
       >
         <mat-tab>
-          <ng-template mat-tab-label><div class="type-buttons">All Resources</div></ng-template>
+          <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
         </mat-tab>
         <mat-tab
           *ngFor="let type of resourceTypesFiltered()"
@@ -268,7 +268,10 @@
         <h3>Check back soon for more updates!</h3>
       </div>
       <div *ngIf="query?.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
-        <div class="search-result-status">
+        <div
+          class="search-result-status"
+          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults()"
+        >
           <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom()}}-{{numResultsTo()}} of {{numTotalResults()}} results</h4>
           <h4 *ngIf="restrictToMappedResults">Showing nearest {{hits.length}} mapped results</h4>
         </div>
@@ -293,10 +296,11 @@
       </div>
       <div *ngIf="hits.length > 0">
         <app-search-result
-          *ngFor="let hit of hits"
+          *ngFor="let hit of hits; let i = index"
           [hit]="hit"
           [mapLoc]="mapLoc"
           [currentUser]="currentUser"
+          [ngClass]="'sort-order-' + i"
         >
         </app-search-result>
       </div>
