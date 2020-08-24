@@ -51,7 +51,7 @@ export enum Direction {
   animations: [
     trigger('toggleMobileMenu', [
       state(VisibilityState.Hidden, style({ top: '-100vh' })),
-      state(VisibilityState.Visible, style({ top: '148px' })),
+      state(VisibilityState.Visible, style({ top: '120px' })),
       transition('* => *', animate('500ms ease-in'))
     ]),
     trigger('toggleHide', [
@@ -64,8 +64,8 @@ export enum Direction {
       transition('* => *', animate('500ms ease-in'))
     ]),
     trigger('toggleDock', [
-      state(VisibilityState.Hidden + '-' + ViewportWidth.Small, style({ top: '52px' })),
-      state(VisibilityState.Visible + '-' + ViewportWidth.Small, style({ top: '92px' })),
+      state(VisibilityState.Hidden + '-' + ViewportWidth.Small, style({ top: '24px' })),
+      state(VisibilityState.Visible + '-' + ViewportWidth.Small, style({ top: '64px' })),
       state(VisibilityState.Hidden + '-' + ViewportWidth.Medium, style({ top: '84px' })),
       state(VisibilityState.Visible + '-' + ViewportWidth.Medium, style({ top: '124px' })),
       state(VisibilityState.Hidden + '-' + ViewportWidth.Large, style({ top: '52px' })),

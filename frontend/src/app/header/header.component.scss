@@ -2,6 +2,8 @@
 
 
 #menu-bar {
+  padding-right: 0;
+
   mat-toolbar-row {
     a {
       text-decoration: none;
@@ -36,7 +38,7 @@
 
   // SM
   @media (max-width: 959px) {
-    top: ($site-header-height * -1);
+    top: ($uva-header-height * -1);
     height: $site-header-height;
   }
 
@@ -55,7 +57,7 @@
 
 #uva-header {
   position: fixed;
-  top: 0;
+  top: 0px;
   width: 100%;
   height: $uva-header-height;
   background-color: white;
@@ -72,7 +74,7 @@
 
 #site-header {
   position: fixed;
-  top: 0;
+  top: 0px;
   width: 100%;
   height: $site-header-height;
   background-color: $brand-primary;

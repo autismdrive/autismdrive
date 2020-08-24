@@ -3,18 +3,18 @@
 #hero {
   background-color: $brand-gray-tint-4;
   display: grid;
+  padding-left: 16px;
+  padding-right: 16px;
 
   h1 {
     color: $brand-primary;
     text-align: start;
     font-size: 2.5rem;
-    margin: 1em;
   }
 
   app-search-box {
     color: black;
-    margin: 0 2em;
-    max-width: 60%;
+    width: 100%;
   }
 }
 
@@ -266,7 +266,6 @@ agm-map {
 }
 
 .type-tabs-container {
-  padding: 1em 1em 0 1em;
   background-color: $brand-gray-tint-4;
   height: 94px;
   //color: white;

@@ -6,10 +6,17 @@
     fxLayoutGap="1em"
   >
     <h1>Find Autism Resources</h1>
-    <div fxLayout="row" fxLayoutGap="2em">
+    <div
+      fxLayout.gt-sm="row"
+      fxLayout.lt-md="column"
+      fxLayoutGap.gt-sm="2em"
+      fxLayoutGap.lt-md="1em"
+      fxLayoutAlign.gt-sm="start end"
+      fxLayoutAlign.lt-md="start stretch"
+    >
       <app-search-box
+        fxFlex.gt-sm="60%"
         variant="light-bg"
-        fxFlex.gt-sm="80%"
         (searchUpdated)="updateUrlAndDoSearch()"
         [words]="query.words"
       ></app-search-box>
@@ -26,10 +33,11 @@
       fxLayout.lt-md="column"
       fxLayoutGap.gt-sm="2em"
       fxLayoutGap.lt-md="1em"
-      fxLayoutAlign="start end"
+      fxLayoutAlign.gt-sm="start end"
+      fxLayoutAlign.lt-md="start stretch"
     >
-      <div fxFlex="30%" fxHide fxShow.lt-md>
-        <mat-form-field class="type-buttons">
+      <div fxHide fxShow.lt-md>
+        <mat-form-field>
           <mat-label>Resource types</mat-label>
           <mat-select [(value)]="selectedType">
             <mat-select-trigger>
