@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e --dev-server-target=",
-    "bundle-report": "webpack-bundle-analyzer dist/star-drive/stats-es5.json"
+    "bundle-report": "webpack-bundle-analyzer dist/star-drive/stats-es5.json",
+    "backend-reset": "cd .. && ./reset-backend.sh --skip_update && cd .."
   },
   "private": true,
   "dependencies": {

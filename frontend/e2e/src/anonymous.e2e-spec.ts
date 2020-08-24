@@ -21,6 +21,7 @@ describe('Anonymous User', () => {
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
     await page.waitForAngularEnabled(true);
     await page.navigateToHome();
+    await loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
   afterAll(async () => {

@@ -30,6 +30,7 @@ describe('Admin', () => {
     studiesUseCases = new StudiesUseCases(page);
     await page.waitForAngularEnabled(true);
     await page.navigateToHome();
+    await loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
   afterAll(async () => {

@@ -1,0 +1,4 @@
+2020-08-21 08:59:59,525 - elasticsearch - WARNING - PUT http://localhost:9200/stardrive_resources [status:400 request:0.003s]
+2020-08-21 09:00:04,213 - elasticsearch - WARNING - PUT http://localhost:9200/stardrive_resources [status:400 request:0.004s]
+2020-08-21 09:03:01,170 - elasticsearch - WARNING - PUT http://localhost:9200/stardrive_resources [status:400 request:0.003s]
+2020-08-24 09:39:29,403 - elasticsearch - WARNING - PUT http://localhost:9200/stardrive_resources [status:400 request:0.005s]
