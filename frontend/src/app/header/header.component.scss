@@ -1,7 +1,7 @@
 @import '../../material';
 
 #header-bg {
-  background-color: $brand-primary;
+  background-color: $brand-gray;
   position: fixed;
   width: 100%;
   z-index: 98;
@@ -10,6 +10,7 @@
 #site-header {
   width: 100%;
   z-index: 100;
+  background-color: $brand-gray;
 
   mat-toolbar-row {
     background-color: $brand-primary;
