@@ -156,7 +156,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
   private _mobileQueryListener: () => void;
-  private restrictToMappedResults: boolean;
+  restrictToMappedResults: boolean;
   private mapBounds: LatLngBounds;
 
   constructor(
