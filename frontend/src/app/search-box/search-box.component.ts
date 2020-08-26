@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
@@ -12,11 +12,12 @@ import {ApiService} from '../_services/api/api.service';
   templateUrl: './search-box.component.html',
   styleUrls: ['./search-box.component.scss']
 })
-export class SearchBoxComponent implements OnInit {
+export class SearchBoxComponent implements OnInit, AfterViewInit {
   searchInputElement: MatInput;
-  words = '';
   queryParams: Params;
+  @Input() words: string;
   @Input() variant: string;
+  @Output() searchUpdated = new EventEmitter<Params>();
   searchUpdate = new Subject<String>();
   searchBoxControl = new FormControl();
   options: string[] = [];
@@ -34,18 +35,8 @@ export class SearchBoxComponent implements OnInit {
       .subscribe(qp => this.queryParams = qp);
     this.searchUpdate.pipe(
       debounceTime(400),
-      distinctUntilChanged())
-      .subscribe(value => {
-        this.updateSearch(false);
-      });
-
-    this.searchService.currentQuery.subscribe(q => {
-      if (q === null || (q && q.hasOwnProperty('words') && q.words === '')) {
-        if (this.searchInputElement) {
-          this.searchInputElement.value = '';
-        }
-      }
-    });
+      distinctUntilChanged()
+    ).subscribe(value => this.updateSearch(false));
 
     this.api.getCategoryNamesList().subscribe(categories => {
       this.options = categories;
@@ -65,6 +56,19 @@ export class SearchBoxComponent implements OnInit {
       );
   }
 
+  ngAfterViewInit() {
+    this.searchService.currentQuery.subscribe(q => {
+      if (q === null || (q && q.hasOwnProperty('words') && q.words === '')) {
+        if (this.searchInputElement) {
+          this.searchInputElement.value = '';
+        }
+      } else {
+        console.log('q.words', q.words);
+        this.searchInputElement.value = q.words || this.words;
+      }
+    });
+  }
+
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
@@ -80,15 +84,14 @@ export class SearchBoxComponent implements OnInit {
     const words: string = this.searchInputElement && this.searchInputElement.value || '';
     newParams.words = removeWords ? undefined : words;
     const hasFilters = Object.keys(newParams).length > 0;
-    const isOnSearch = this.router.url.split('/')[1] === 'search';
-    const doNotRedirect = !isOnSearch && removeWords;
 
-    if (!doNotRedirect) {
-      if (hasFilters) {
-        return this.router.navigate(['/search'], {queryParams: newParams});
-      } else {
-        return this.router.navigateByUrl('/search');
-      }
+    if (hasFilters) {
+      return this.router.navigate(['/search'], {
+        relativeTo: this.route,
+        queryParams: newParams,
+      }).finally(() => this.searchUpdated.emit(newParams));
+    } else {
+      return this.router.navigateByUrl('/search').finally(() => this.searchUpdated.emit(newParams));
     }
   }
 

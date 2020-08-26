@@ -49,20 +49,25 @@ export class LoginUseCases {
     this.page.navigateToUrl(tokenUrl.toString());
   }
 
-  displayErrorOnInsecurePassword(badPassword: string) {
-    this.page.inputText('[id*=_input_password_]', badPassword, true);
-    expect(this.page.getElements('.mat-error').count()).toEqual(1);
-    expect(this.page.getElement('.mat-error').getText()).toContain('Your password must be at least');
+  async displayErrorOnInsecurePassword(badPassword: string) {
+    const errorSelector = 'formly-field.password .mat-error formly-validation-message';
+    await this.page.inputText('formly-field.password input', badPassword, true);
+    await this.page.waitForVisible(errorSelector);
+    const numErrors = await this.page.getElements(errorSelector).count();
+    expect(numErrors).toEqual(1);
+
+    const errorText = await this.page.getElement(errorSelector).getText();
+    expect(errorText).toContain('Your password must be at least');
   }
 
   fillOutPasswordForm(goodPassword: string) {
-    this.page.inputText('[id*=_input_password_]', goodPassword, true);
+    this.page.inputText('formly-field.password input', goodPassword, true);
     expect(this.page.getElements('.mat-error').count()).toEqual(0);
   }
 
   submitResetPasswordForm(password: string) {
-    this.page.inputText('[id*=_input_password_]', password, true);
-    this.page.inputText('[id*=_input_passwordConfirm_]', password, true);
+    this.page.inputText('formly-field.password input', password, true);
+    this.page.inputText('formly-field.passwordConfirm input', password, true);
     expect(this.page.getElements('.mat-error').count()).toEqual(0);
     this.page.clickAndExpectRoute('#submit', '/profile');
   }

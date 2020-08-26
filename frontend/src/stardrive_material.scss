@@ -8,21 +8,22 @@
   $accent: map-get($theme, accent); // Global style overrides
 
   body {
-    padding-top: ($header-height-sm - 8px);
+    // XS
+    padding-top: 104px;
 
     // SM
     @media (min-width: 600px) {
-      padding-top: $header-height-sm;
+      padding-top: 104px;
     }
 
     // MD
     @media (min-width: 960px) {
-      padding-top: $header-height-md;
+      padding-top: 120px;
     }
 
     // XL
     @media (min-width: 1280px) {
-      padding-top: $header-height-lg;
+      padding-top: 120px;
     }
   }
 

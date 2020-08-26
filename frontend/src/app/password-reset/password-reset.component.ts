@@ -44,6 +44,7 @@ export class PasswordResetComponent implements OnInit {
         {
           key: 'password',
           type: 'input',
+          className: 'password',
           templateOptions: {
             type: 'password',
             label: 'Password',
@@ -59,6 +60,7 @@ export class PasswordResetComponent implements OnInit {
         {
           key: 'passwordConfirm',
           type: 'input',
+          className: 'passwordConfirm',
           templateOptions: {
             type: 'password',
             label: 'Confirm Password',

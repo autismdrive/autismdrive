@@ -1,306 +1,304 @@
 <div
+  [@toggleBackground]="headerViewportState"
   id="header-bg"
-  [@toggleBackground]="menuState"
 ></div>
-<div
-  id="uva-header"
-  [@toggleHide]="headerState"
-  fxLayout="row"
-  fxLayoutAlign="center center"
+<mat-toolbar
+  [ngClass]="{'mirroring': config.mirroring}"
+  id="site-header"
 >
-  <div
-    class="uva-logo"
-    fxFlex
-  ><a
-      target="_blank"
+  <mat-toolbar-row
+    [@toggleUvaHeader]="headerExpandedState"
+    fxLayout="row"
+    fxLayoutAlign="center center"
+    id="uva-header"
+  >
+    <div
+      class="uva-logo"
+      fxFlex
+    ><a
       href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"
+      target="_blank"
     >
+        <span
+          fxHide
+          fxShow.lt-lg
+        >About UVA STAR</span>
       <span
         fxHide
-        fxShow.lt-lg
-      >About UVA STAR</span>
-      <span
-        fxHide
-        fxShow.lg
         fxShow.gt-lg
+        fxShow.lg
       >Learn about the UVA STAR project</span>
 
     </a></div>
-  <span fxFlex></span>
-  <div class="mirror-message" *ngIf="config.mirroring">THIS IS A MIRRORED SERVER</div>
-  <a
-    mat-button
-    fxHide
-    fxShow.gt-sm
-    *ngIf="currentUser && currentUser.role == 'admin'"
-    [routerLink]="[ '/admin' ]"
-    routerLinkActive="selected"
-    color="accent"
-    id="admin-button"
-  >
-    <mat-icon>build</mat-icon>
-    Admin
-  </a>
-
-</div>
-<div
-  id="site-header"
-  [ngClass]="{'mirroring': config.mirroring}"
-  fxLayout="row"
-  fxLayoutAlign="center center"
-  [@toggleDock]="headerState"
->
-  <mat-toolbar [ngClass]="{'mirroring': config.mirroring}">
-    <mat-toolbar-row
-      id="menu-bar"
-      fxLayout="row"
+    <span fxFlex></span>
+    <div *ngIf="config.mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
+    <a
+      *ngIf="currentUser && currentUser.role == 'admin'"
+      [routerLink]="[ '/admin' ]"
+      color="accent"
+      fxHide
+      fxShow.gt-sm
+      id="admin-button"
+      mat-button
+      routerLinkActive="selected"
     >
-      <app-logo variant="light"></app-logo>
-      <span fxFlex></span>
-      <div
-        id="primary-nav"
-        *ngIf="!mobileQuery.matches"
-      >
-        <ul>
-          <li><a
-          mat-button
+      <mat-icon>build</mat-icon>
+      Admin
+    </a>
+  </mat-toolbar-row>
+  <mat-toolbar-row
+    [@toggleMenuBar]="menuState"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+    id="menu-bar"
+  >
+    <app-logo variant="light"></app-logo>
+    <span fxFlex></span>
+    <div
+      *ngIf="!mobileQuery.matches"
+      id="primary-nav"
+    >
+      <ul>
+        <li><a
           [routerLink]="[ '/about' ]"
-          routerLinkActive="selected"
           id="about-button"
+          mat-button
+          routerLinkActive="selected"
         >
+        <span
+          fxHide
+          fxShow.lt-lg
+        >About</span>
           <span
             fxHide
-            fxShow.lt-lg
-          >About</span>
-          <span
-            fxHide
-            fxShow.lg
             fxShow.gt-lg
+            fxShow.lg
           >About Autism DRIVE</span>
         </a></li>
         <li><a
-          mat-button
           [routerLink]="[ '/studies' ]"
-          routerLinkActive="selected"
           id="studies-button"
+          mat-button
+          routerLinkActive="selected"
         >
-          <span
-            fxHide
-            fxShow.lt-lg
-          >Studies</span>
+        <span
+          fxHide
+          fxShow.lt-lg
+        >Studies</span>
           <span
             fxHide
             fxShow.gt-md
           >Current Studies</span>
         </a></li>
         <li><a
-          mat-button
           [routerLink]="[ '/search' ]"
-          routerLinkActive="selected"
           id="resources-button"
+          mat-button
+          routerLinkActive="selected"
         >
+        <span
+          fxHide
+          fxShow.lt-lg
+        >Resources</span>
           <span
             fxHide
-            fxShow.lt-lg
-          >Resources</span>
-          <span
-            fxHide
-            fxShow.lg
             fxShow.gt-lg
+            fxShow.lg
           >Find Resources</span>
         </a></li>
         <li><a
-          mat-button
           [routerLink]="[ '/uva-education' ]"
-          routerLinkActive="selected"
           id="uva-education-button"
+          mat-button
+          routerLinkActive="selected"
         >
           Education
         </a></li>
 
         <li *ngIf="!currentUser"><a
-          mat-button
           [routerLink]="[ '/register' ]"
-          routerLinkActive="selected"
           id="register-button"
+          mat-button
+          routerLinkActive="selected"
         >
+        <span
+          fxHide
+          fxShow.lt-lg
+        >Join</span>
           <span
             fxHide
-            fxShow.lt-lg
-          >Join</span>
-          <span
-            fxHide
-            fxShow.lg
             fxShow.gt-lg
+            fxShow.lg
           >Join Us</span>
         </a></li>
         <li *ngIf="!currentUser"><a
-          mat-button
           (click)="goLogin()"
-          routerLinkActive="selected"
           id="login-button"
+          mat-button
+          routerLinkActive="selected"
         >
           Sign in
         </a></li>
         <li *ngIf="currentUser"><a
-          mat-button
           [routerLink]="[ '/profile' ]"
-          routerLinkActive="selected"
           id="profile-button"
+          mat-button
+          routerLinkActive="selected"
         >
           <mat-icon>account_circle</mat-icon>
           Profile
         </a></li>
         <li *ngIf="currentUser"><a
-          mat-button
           (click)="goLogout($event)"
           id="logout-button"
+          mat-button
         >
           <mat-icon>exit_to_app</mat-icon>
           Logout
         </a></li>
 
-        </ul>
-      </div>
+      </ul>
+    </div>
 
-      <button
-        mat-button
-        (click)="toggleMenu()"
-        fxHide
-        fxShow.lt-md
-        [color]="menuVisible ? '' : 'accent'"
-      >
-        <mat-icon>menu</mat-icon>
-      </button>
-    </mat-toolbar-row>
-    <mat-toolbar-row
-      class="covid19"
-      fxHide.lt-md
+    <button
+      (click)="toggleMenu()"
+      [color]="menuVisible ? '' : 'accent'"
+      fxHide
+      fxShow.lt-md
+      mat-button
     >
-      <button
-        mat-button
-        [routerLink]="[ '/studies' ]"
-        routerLinkActive="selected"
-        id="covid19-studies-button"
-      >
-        COVID-19 STUDY UPDATES
-      </button>
-      <button
-        mat-button
-        [routerLink]="[ '/covid19-resources' ]"
-        routerLinkActive="selected"
-        id="covid19-resources-button"
-      >
-        COVID-19 RESOURCES
-      </button>
-    </mat-toolbar-row>
-    <mat-toolbar-row class="tagline">
-      <p fxShow fxHide.lt-md>
-        A centralized system for autism research & resources for individuals, families & professionals.
-      </p>
-      <p fxHide fxShow.lt-md>
-        Autism research & resources for <br fxHide fxShow.xs/>
-        individuals, families & professionals.
-      </p>
-    </mat-toolbar-row>
-
-  </mat-toolbar>
-
-</div>
+      <mat-icon>menu</mat-icon>
+    </button>
+  </mat-toolbar-row>
+  <mat-toolbar-row
+    [@toggleCovid19Toolbar]="headerExpandedState"
+    id="covid19"
+    fxHide.lt-md
+  >
+    <button
+      [routerLink]="[ '/studies' ]"
+      id="covid19-studies-button"
+      mat-button
+      routerLinkActive="selected"
+    >
+      COVID-19 STUDY UPDATES
+    </button>
+    <button
+      [routerLink]="[ '/covid19-resources' ]"
+      id="covid19-resources-button"
+      mat-button
+      routerLinkActive="selected"
+    >
+      COVID-19 RESOURCES
+    </button>
+  </mat-toolbar-row>
+  <mat-toolbar-row
+    [@toggleTaglineToolbar]="taglineToolbarState"
+    id="tagline"
+  >
+    <p fxHide.lt-md fxShow>
+      A centralized system for autism research & resources for individuals, families & professionals.
+    </p>
+    <p fxHide fxShow.lt-md>
+      Autism research & resources for <br fxHide fxShow.xs/>
+      individuals, families & professionals.
+    </p>
+  </mat-toolbar-row>
+</mat-toolbar>
 <div
-  id="mobile-menu"
-  fxHide
-  fxShow.lt-md
   [@toggleMobileMenu]="menuState"
   [ngClass]="{'mirroring': config.mirroring}"
   class="mat-typography"
+  fxHide
+  fxShow.lt-md
+  id="mobile-menu"
 >
   <a
-    mat-button
-    [routerLink]="[ '/about' ]"
-    routerLinkActive="selected"
-    id="about-button-mobile"
     (click)="toggleMenu()"
+    [routerLink]="[ '/about' ]"
+    id="about-button-mobile"
+    mat-button
+    routerLinkActive="selected"
   >About Autism DRIVE</a>
   <a
-    mat-button
-    [routerLink]="[ '/studies' ]"
-    routerLinkActive="selected"
-    id="studies-button-mobile"
     (click)="toggleMenu()"
+    [routerLink]="[ '/studies' ]"
+    id="studies-button-mobile"
+    mat-button
+    routerLinkActive="selected"
   >Current studies</a>
   <a
-    mat-button
-    [routerLink]="[ '/search' ]"
-    routerLinkActive="selected"
-    id="resources-button-mobile"
     (click)="toggleMenu()"
+    [routerLink]="[ '/search' ]"
+    id="resources-button-mobile"
+    mat-button
+    routerLinkActive="selected"
   >Find Resources</a>
   <a
-    mat-button
-    [routerLink]="[ '/uva-education' ]"
-    routerLinkActive="selected"
-    id="uva-education-button-mobile"
     (click)="toggleMenu()"
+    [routerLink]="[ '/uva-education' ]"
+    id="uva-education-button-mobile"
+    mat-button
+    routerLinkActive="selected"
   >UVA Education</a>
   <a
-    mat-button
-    [routerLink]="[ '/covid19-resources' ]"
-    routerLinkActive="selected"
-    id="covid19-resources-button-mobile"
     (click)="toggleMenu()"
+    [routerLink]="[ '/covid19-resources' ]"
     color="accent"
+    id="covid19-resources-button-mobile"
+    mat-button
+    routerLinkActive="selected"
   >COVID-19 Resources</a>
   <a
-    mat-button
+    (click)="toggleMenu()"
     *ngIf="!currentUser"
     [routerLink]="[ '/register' ]"
-    routerLinkActive="selected"
     id="register-button-mobile"
-    (click)="toggleMenu()"
+    mat-button
+    routerLinkActive="selected"
   >
     <mat-icon>person_add</mat-icon>
     Join Us
   </a>
   <a
-    mat-button
+    (click)="toggleMenu()"
     *ngIf="!currentUser"
     [routerLink]="[ '/login' ]"
-    routerLinkActive="selected"
     id="login-button-mobile"
-    (click)="toggleMenu()"
+    mat-button
+    routerLinkActive="selected"
   >
     <mat-icon>account_circle</mat-icon>
     Sign in
   </a>
   <a
-    mat-button
+    (click)="toggleMenu()"
     *ngIf="currentUser && currentUser.role == 'admin'"
     [routerLink]="[ '/admin' ]"
-    routerLinkActive="selected"
     id="admin-button-mobile"
-    (click)="toggleMenu()"
+    mat-button
+    routerLinkActive="selected"
   >
     <mat-icon>build</mat-icon>
     Admin
   </a>
   <a
-    mat-button
+    (click)="toggleMenu()"
     *ngIf="currentUser"
     [routerLink]="[ '/profile' ]"
-    routerLinkActive="selected"
     id="profile-button-mobile"
-    (click)="toggleMenu()"
+    mat-button
+    routerLinkActive="selected"
   >
     <mat-icon>account_circle</mat-icon>
     Visit Profile
   </a>
   <a
-    mat-button
-    *ngIf="currentUser"
     (click)="goLogout($event)"
-    id="logout-button-mobile"
     (click)="toggleMenu()"
+    *ngIf="currentUser"
+    id="logout-button-mobile"
+    mat-button
   >
     <mat-icon>exit_to_app</mat-icon>
     Logout

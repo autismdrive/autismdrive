@@ -1,15 +1,18 @@
-<mat-spinner *ngIf="!aggregations"></mat-spinner>
-
-<mat-form-field *ngIf="aggregations">
+<mat-form-field *ngIf="aggregations; else loadingMessage">
   <mat-label>{{label_title}}</mat-label>
-  <mat-select>
+  <mat-select [(value)]="selectedAgg().value">
+    <mat-option (click)="select()">{{label_any}}</mat-option>
     <mat-option
       *ngFor="let agg of aggregations"
       [value]="agg.value"
       (click)="select(agg.value)"
     >
-      <span class="agg-label" *ngIf="agg.count == 1">{{label_map[agg.value]}} - {{agg.count}} result</span>
-      <span class="agg-label" *ngIf="agg.count != 1">{{label_map[agg.value]}} - {{agg.count}} results</span>
+      <span class="agg-label">{{label_map[agg.value]}} - {{agg.count}} result{{agg.count === 1 ? '' : 's'}}</span>
     </mat-option>
   </mat-select>
+  <mat-hint *ngIf="isNotApplicable">{{notApplicableMessage}}</mat-hint>
 </mat-form-field>
+
+<ng-template #loadingMessage>
+  <app-loading [isField]="true"></app-loading>
+</ng-template>

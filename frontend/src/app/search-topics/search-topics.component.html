@@ -1,5 +1,4 @@
-<mat-spinner *ngIf="!category"></mat-spinner>
-<mat-list dense *ngIf="category">
+<mat-list dense *ngIf="category; else loadingMessage">
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
         (click)="selectCategory(parent)"
@@ -21,9 +20,14 @@
     <mat-option
       *ngFor="let child of category.children"
       (click)="selectCategory(child)"
+      [value]="child.id"
     >
       <span class="child-label" *ngIf="child.hit_count == 1">{{child.name}} - {{child.hit_count}} result</span>
       <span class="child-label" *ngIf="child.hit_count != 1">{{child.name}} - {{child.hit_count}} results</span>
     </mat-option>
   </mat-select>
 </mat-form-field>
+
+<ng-template #loadingMessage>
+  <app-loading [isField]="true"></app-loading>
+</ng-template>

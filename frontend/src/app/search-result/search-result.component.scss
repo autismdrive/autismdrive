@@ -18,16 +18,19 @@
   }
 }
 
-.type {
+::ng-deep button.type {
   text-transform: uppercase;
   white-space: nowrap;
   color: $brand-primary-muted;
-  font-size: 3em;
   background-color: transparent;
 
   &:hover {
     color: $brand-primary;
     background-color: transparent;
+  }
+
+  i.icofont-3x {
+    margin-right: -1rem;
   }
 }
 

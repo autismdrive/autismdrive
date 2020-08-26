@@ -29,6 +29,21 @@ But we just have e2e tests on the front end at this time.
 ## Running end-to-end tests
 Make sure you have the database, backend, and frontend all running.
 
+### From PyCharm
+Open the Edit Configurations menu (Run > Edit Configurations...) and add a Protractor configuration with the following settings:
+* Configuration File: `[path-to-your-files]/star-drive/frontend/e2e/protractor.conf.js`
+* Protractor Options: `--dev-server-target=`
+
+Save the configuration. Now you can run end-to-end tests with the play button.
+
+### From command line
+Edit the tsconfig file path in the Protractor config file (frontend/e2e/protractor.conf.js):
+```
+    require('ts-node').register({
+      project: './e2e/tsconfig.e2e.json'
+    });
+```
+
 Execute the following at the top level of the repository, which will clear and re-seed the database, then run all e2e tests:
 ```BASH
 ./test-e2e.sh
