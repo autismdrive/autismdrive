@@ -30,7 +30,8 @@ export class EventRegistrationComponent implements OnInit {
       width: `${window.innerWidth}px`,
       data: {
         'registered': false,
-        'title': 'Register for ' + this.resource.title
+        'title': 'Register for ' + this.resource.title,
+        'event_id': this.resource.id
       }
     });
 

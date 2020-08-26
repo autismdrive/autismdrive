@@ -8,6 +8,7 @@ import {ActivatedRoute} from '@angular/router';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {EventRegistrationComponent} from '../event-registration/event-registration.component';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 @Component({
   selector: 'app-event-registration-form',
@@ -66,7 +67,7 @@ export class EventRegistrationFormComponent implements OnInit {
       }
     },
     {
-      key: 'zipcode',
+      key: 'zip_code',
       type: 'input',
       templateOptions: {
         type: 'number',
@@ -129,7 +130,7 @@ export class EventRegistrationFormComponent implements OnInit {
       hideExpression: '!(model.marketing_channel && model.marketing_channel.includes("other"))',
     },
     {
-      key: 'newsletter_signup',
+      key: 'newsletter_consent',
       type: 'checkbox',
       defaultValue: true,
       templateOptions: {
@@ -145,18 +146,26 @@ export class EventRegistrationFormComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private googleAnalytics: GoogleAnalyticsService,
+    private authenticationService: AuthenticationService,
     public dialogRef: MatDialogRef<EventRegistrationComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       registered: boolean,
-      title: string
+      title: string,
+      event_id: number
     }
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
-    this.user = new User({
-      id: null,
-      email: this.model['email'],
-      role: 'User'
+    this.authenticationService.currentUser.subscribe(user => {
+      if (user) {
+        this.user = user;
+      } else {
+        this.user = new User({
+          id: null,
+          email: this.model['email'],
+          role: 'User'
+        });
+      }
     });
   }
 
@@ -166,27 +175,40 @@ export class EventRegistrationFormComponent implements OnInit {
   submit() {
     localStorage.removeItem('token_url');
     if (this.form.valid) {
-      this._stateSubject.next('submitting');
-      this.registerState = this._stateSubject.asObservable();
-      this.errorMessage = '';
-      this.user['email'] = this.model['email']['email'];
-
-      this.api.addUser(this.user).subscribe(u => {
-        this.user = u;
-        if (u.hasOwnProperty('token_url')) {
-          localStorage.setItem('token_url', u.token_url);
-        }
-        this.googleAnalytics.accountEvent('register');
-        this._stateSubject.next('wait_for_email');
+      this.model['event_id'] = this.data.event_id;
+      if (this.user.id === null) {
+        this._stateSubject.next('submitting');
         this.registerState = this._stateSubject.asObservable();
-        this.changeDetectorRef.detectChanges();
-        this.data.registered = true;
-      }, error1 => {
-        this._stateSubject.next('form');
-        this.registerState = this._stateSubject.asObservable();
-        this.errorMessage = error1;
-        this.changeDetectorRef.detectChanges();
-      });
+        this.errorMessage = '';
+        this.user['email'] = this.model.email;
+        this.api.addUser(this.user).subscribe(u => {
+          this.user = u;
+          this.model['user_id'] = this.user.id;
+          this.api.submitRegistration(this.model).subscribe();
+          if (u.hasOwnProperty('token_url')) {
+            localStorage.setItem('token_url', u.token_url);
+          }
+          this.googleAnalytics.accountEvent('register');
+          this._stateSubject.next('wait_for_email');
+          this.registerState = this._stateSubject.asObservable();
+          this.changeDetectorRef.detectChanges();
+          this.data.registered = true;
+          this.dialogRef.close();
+        }, error1 => {
+          this._stateSubject.next('form');
+          this.registerState = this._stateSubject.asObservable();
+          this.errorMessage = error1;
+          this.changeDetectorRef.detectChanges();
+        });
+        this.dialogRef.close();
+      } else {
+        this.model['participant_id'] = this.user.getSelf().id;
+        this.api.submitQuestionnaire('registration', 'registration_questionnaire', this.model).subscribe(() => {
+          this.googleAnalytics.stepCompleteEvent('registration_questionnaire');
+          console.log('submitting questionnaire', this.model);
+          this.dialogRef.close();
+        });
+      }
     }
   }
 

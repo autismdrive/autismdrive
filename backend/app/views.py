@@ -18,7 +18,7 @@ from app.resources.FlowEndpoint import (
     FlowListEndpoint,
     FlowQuestionnaireEndpoint,
     FlowQuestionnaireMetaEndpoint)
-from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
+from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint, UserRegistrationEndpoint
 from app.resources.EmailLogEndpoint import EmailLogEndpoint, EmailLogListEndpoint
 from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByUserEndpoint, ResourceChangeLogByResourceEndpoint
 from app.resources.StepLogEndpoint import StepLogEndpoint
@@ -220,6 +220,7 @@ endpoints = [
 
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
+    (UserRegistrationEndpoint, "/user/registration"),
     (UserEndpoint, "/user/<id>"),
     (StudyByUserEndpoint, "/user/<user_id>/study"),
     (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),

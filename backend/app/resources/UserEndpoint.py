@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from app import app, RestException, db, email_service, auth
 from app.email_service import EmailService
 from app.model.email_log import EmailLog
+from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaireSchema
 from app.model.role import Permission, Role
 from app.model.study import Study
 from app.model.user import User
@@ -121,3 +122,18 @@ class UserListEndpoint(flask_restful.Resource):
         log = EmailLog(user_id=user.id, type="confirm_email", tracking_code=tracking_code)
         db.session.add(log)
         db.session.commit()
+
+
+class UserRegistrationEndpoint(flask_restful.Resource):
+
+    def post(self):
+        request_data = request.get_json()
+        if "_links" in request_data:
+            request_data.pop("_links")
+        schema = RegistrationQuestionnaireSchema()
+        registration_quest, errors = schema.load(request_data, session=db.session)
+
+        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        db.session.add(registration_quest)
+        db.session.commit()
+        return schema.dump(registration_quest)

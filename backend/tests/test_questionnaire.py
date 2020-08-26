@@ -1416,9 +1416,9 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("Contact", response[1]["display_name"])
         self.assertEqual("Employment", response[8]["display_name"])
         self.assertEqual("Professional Profile", response[14]["display_name"])
-        self.assertEqual("Supports", response[15]["display_name"])
-        self.assertEqual(4, len(response[15]["sub_tables"]))
-        self.assertEqual(16, len(response))
+        self.assertEqual("Supports", response[16]["display_name"])
+        self.assertEqual(4, len(response[16]["sub_tables"]))
+        self.assertEqual(17, len(response))
 
     def test_questionnaire_list_meta_basics(self):
         rv = self.app.get('/api/q/education_self_questionnaire/meta',
@@ -1488,7 +1488,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
         ws = wb.active
         self.assertEqual(2, ws.max_row)
-        self.assertEqual(21, len(wb.worksheets))
+        self.assertEqual(22, len(wb.worksheets))
         self.assertEqual('Alternative Augmentative', wb.worksheets[0].title)
         self.assertEqual('Assistive Device', wb.worksheets[1].title)
         self.assertEqual('Clinical Diagnoses', wb.worksheets[2].title)
@@ -1508,8 +1508,9 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual('Identification', wb.worksheets[16].title)
         self.assertEqual('Medication', wb.worksheets[17].title)
         self.assertEqual('Professional Profile', wb.worksheets[18].title)
-        self.assertEqual('Supports', wb.worksheets[19].title)
-        self.assertEqual('Therapy', wb.worksheets[20].title)
+        self.assertEqual('Registration', wb.worksheets[19].title)
+        self.assertEqual('Supports', wb.worksheets[20].title)
+        self.assertEqual('Therapy', wb.worksheets[21].title)
 
     def test_export_questionnaires_by_user(self):
         u1 = self.construct_user(email='1@sartography.com')
@@ -1522,8 +1523,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
-        ws = wb.active
-        self.assertEqual(21, len(wb.worksheets))
+        self.assertEqual(22, len(wb.worksheets))
         self.assertEqual(2, wb['Contact'].max_row)
         self.assertEqual('user_id', wb['Contact']['E1'].value)
         self.assertEqual(u1.id, wb['Contact']['E2'].value)
