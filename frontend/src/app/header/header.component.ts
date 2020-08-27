@@ -23,33 +23,13 @@ import {
   share,
   throttleTime
 } from 'rxjs/operators';
+import {Direction, HeaderState, MenuState, ViewportWidth} from '../_models/scroll';
 import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/api/authentication-service';
 import { ApiService } from '../_services/api/api.service';
 import {ConfigService} from '../_services/config.service';
 
-export enum ViewportWidth {
-  Small = 'sm',
-  Medium = 'md',
-  Large = 'lg'
-}
-
-export enum MenuState {
-  Visible = 'visible',
-  Hidden = 'hidden'
-}
-
-export enum HeaderState {
-  Expanded = 'expanded',
-  Collapsed = 'collapsed'
-}
-
-export enum Direction {
-  Up = 'Up',
-  Down = 'Down'
-}
-
-const boxShadow = '0px 10px rgba(0, 0, 0, 0.3)';
+const boxShadow = '0px 5px 5px 0px rgba(0, 0, 0, 0.3)';
 const stateHiddenCollapsed = MenuState.Hidden + '-' + HeaderState.Collapsed;
 const stateHiddenExpanded = MenuState.Hidden + '-' + HeaderState.Expanded;
 const stateVisibleCollapsed = MenuState.Visible + '-' + HeaderState.Collapsed;
