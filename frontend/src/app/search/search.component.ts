@@ -742,4 +742,35 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   numTotalResults() {
     return this.query.total;
   }
+
+  calculateMapHeight(mapContainer: HTMLDivElement) {
+    console.log('mapContainer.clientHeight', mapContainer.clientHeight);
+    return `${mapContainer.clientHeight}px`;
+  }
+
+  mapDockClass(scrollSpy: HTMLSpanElement, searchHeader: HTMLDivElement, searchFooter: HTMLDivElement): string {
+    const scrollSpyPos = scrollSpy.getBoundingClientRect();
+    const headerPos = searchHeader.getBoundingClientRect();
+    const footerPos = searchFooter.getBoundingClientRect();
+
+    console.log('scrollSpyPos', scrollSpyPos);
+    console.log('headerPos', headerPos);
+    console.log('footerPos', footerPos);
+
+    if (this._overlaps(scrollSpyPos, headerPos)) {
+      return 'align-top';
+    } else if (this._overlaps(scrollSpyPos, footerPos)) {
+      return 'align-bottom';
+    } else {
+      return 'docked';
+    }
+  }
+
+  private _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
+    return (
+      ((b.top < a.top) && (b.bottom > a.top)) ||      // b overlaps top edge of a
+      ((b.top > a.top) && (b.bottom < a.bottom)) ||   // b inside a
+      ((b.top < a.bottom) && (b.bottom > a.bottom))       // b overlaps bottom edge of a
+    );
+  }
 }
