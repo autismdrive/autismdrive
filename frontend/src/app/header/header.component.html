@@ -55,7 +55,7 @@
       id="menu-bar"
       fxLayout="row"
     >
-      <app-logo variant="dark"></app-logo>
+      <app-logo variant="light"></app-logo>
       <span fxFlex></span>
       <div
         id="primary-nav"
@@ -173,20 +173,6 @@
         <mat-icon>menu</mat-icon>
       </button>
     </mat-toolbar-row>
-    <mat-toolbar-row class="search">
-      <p class="tagline" fxShow fxHide.lt-md>
-        A centralized system for autism research & resources for individuals, families & professionals.
-      </p>
-      <p class="tagline" fxHide fxShow.lt-md>
-        Autism research & resources for <br fxHide fxShow.xs/>
-        individuals, families & professionals.
-      </p>
-      <app-search-box
-        variant="dark-bg"
-        fxHide
-        fxShow.gt-sm
-      ></app-search-box>
-    </mat-toolbar-row>
     <mat-toolbar-row
       class="covid19"
       fxHide.lt-md
@@ -208,6 +194,21 @@
         COVID-19 RESOURCES
       </button>
     </mat-toolbar-row>
+    <mat-toolbar-row class="search">
+      <p class="tagline" fxShow fxHide.lt-md>
+        A centralized system for autism research & resources for individuals, families & professionals.
+      </p>
+      <p class="tagline" fxHide fxShow.lt-md>
+        Autism research & resources for <br fxHide fxShow.xs/>
+        individuals, families & professionals.
+      </p>
+      <app-search-box
+        variant="dark-bg"
+        fxHide
+        fxShow.gt-sm
+      ></app-search-box>
+    </mat-toolbar-row>
+
   </mat-toolbar>
 
 </div>

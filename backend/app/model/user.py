@@ -2,8 +2,9 @@ import datetime
 import re
 
 import jwt
-from sqlalchemy import func
+from sqlalchemy import func, select
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 
 from app import app, db, RestException, bcrypt, password_requirements
 from app.model.participant import Participant
@@ -26,6 +27,10 @@ class User(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.Enum(Role))
     participants = db.relationship(Participant, back_populates="user")
+    participant_count = column_property(select([func.count(Participant.id)]).
+                                        where(Participant.user_id==id).
+                                        correlate_except(Participant)
+                                        )
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
     _password = db.Column('password', db.Binary(60))
     token = ''

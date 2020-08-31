@@ -90,9 +90,9 @@ class BaseTest:
         encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
         charset, encoding, encoded_text = re.match(encoded_word_regex,
                                                    encoded_words).groups()
-        if encoding is 'b':
+        if encoding == 'b':
             byte_string = base64.b64decode(encoded_text)
-        elif encoding is 'q':
+        elif encoding == 'q':
             byte_string = quopri.decodestring(encoded_text)
         text = byte_string.decode(charset)
         text = text.replace("_", " ")
@@ -149,11 +149,11 @@ class BaseTest:
 
     def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
                            phone="555-555-5555", website="http://stardrive.org", is_draft=False,
-                           organization_name="Some Org", categories=[], ages=[], languages=[], covid19_categories=[]):
+                           organization_name="Some Org", categories=[], ages=[], languages=[], covid19_categories=[], is_uva_education_content=False):
 
         resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages,
                             organization_name=organization_name, is_draft=is_draft, languages=languages,
-                            covid19_categories=covid19_categories)
+                            covid19_categories=covid19_categories, is_uva_education_content=is_uva_education_content)
         db.session.add(resource)
         db.session.commit()
         for category in categories:
