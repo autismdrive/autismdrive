@@ -4,4 +4,5 @@ export interface ContactQ {
   can_leave_voicemail?: number;
   contact_times?: string;
   email?: string;
+  zip?: number;
 }
