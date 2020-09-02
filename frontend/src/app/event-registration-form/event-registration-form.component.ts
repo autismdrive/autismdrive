@@ -159,6 +159,10 @@ export class EventRegistrationFormComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(user => {
       if (user) {
         this.user = user;
+        this.model['email'] = user.email;
+        this.model['first_name'] = user.getSelf().identification['first_name'];
+        this.model['last_name'] = user.getSelf().identification['last_name'];
+        this.model['zip_code'] = user.getSelf().contact['zip'];
       } else {
         this.user = new User({
           id: null,
