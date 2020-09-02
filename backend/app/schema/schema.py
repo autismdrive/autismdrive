@@ -26,6 +26,8 @@ from app.model.user import User
 from app.model.user_favorite import UserFavorite
 from app.model.event_user import EventUser
 from app.model.zip_code import ZipCode
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaireSchema
+from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaireSchema
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
@@ -385,12 +387,14 @@ class ParticipantSchema(ModelSchema):
     class Meta:
         model = Participant
         fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
-                  'has_consented', 'contact', 'percent_complete')
+                  'has_consented', 'contact', 'identification', 'percent_complete')
     id = fields.Integer(required=False, allow_none=True)
     name = fields.Function(lambda obj: obj.get_name())
     relationship = EnumField(Relationship)
     user_id = fields.Integer(required=False, allow_none=True)
     percent_complete = fields.Function(lambda obj: obj.get_percent_complete())
+    contact = fields.Nested(ContactQuestionnaireSchema, dump_only=True)
+    identification = fields.Nested(IdentificationQuestionnaireSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.participantendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')
