@@ -33,8 +33,8 @@ def upgrade():
     sa.Column('marketing_channel', sa.ARRAY(sa.String()), nullable=True),
     sa.Column('marketing_other', sa.String(), nullable=True),
     sa.Column('newsletter_consent', sa.Boolean(), nullable=True),
-    sa.ForeignKeyConstraint(['event_id'], ['event.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['stardrive_user.id'], ),
+    sa.ForeignKeyConstraint(['event_id'], ['event.id'], name='registration_questionnaire_event_id_fkey'),
+    sa.ForeignKeyConstraint(['user_id'], ['stardrive_user.id'], name='registration_questionnaire_user_id_fkey'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

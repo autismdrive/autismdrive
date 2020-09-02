@@ -23,8 +23,8 @@ def upgrade():
     sa.Column('last_updated', sa.DateTime(timezone=True), nullable=True),
     sa.Column('event_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['event_id'], ['event.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['stardrive_user.id'], ),
+    sa.ForeignKeyConstraint(['event_id'], ['event.id'], name='event_user_event_id_fkey' ),
+    sa.ForeignKeyConstraint(['user_id'], ['stardrive_user.id'], name='event_user_user_id_fkey' ),
     sa.PrimaryKeyConstraint('id')
     )
     op.add_column('event', sa.Column('includes_registration', sa.Boolean(), nullable=True))
