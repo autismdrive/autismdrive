@@ -15,7 +15,10 @@
       fxLayout="column"
       fxLayoutGap="40px"
     >
-      <h1>{{resource.title}}</h1>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="1em">
+        <app-type-icon [iconType]="resource.type.toLowerCase()" [size]="3"></app-type-icon>
+        <h1>{{resource.title}}</h1>
+      </div>
       <p *ngIf="resource.is_draft === true">[DRAFT]</p>
       <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" [currentUser]="currentUser" [editLink]='resource.type + "/" + resource.id + "/edit"' [editLabel]='"Edit " + resource.type'></app-edit-button>
       <app-favorite-resource-button [resource_id]="resource.id" [user]="currentUser"></app-favorite-resource-button>
