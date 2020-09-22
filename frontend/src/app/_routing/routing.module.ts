@@ -26,6 +26,12 @@ import {MirrorComponent} from '../mirror/mirror.component';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
 import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
+import {UserAdminComponent} from "../user-admin/user-admin.component";
+import {QuestionnaireDataViewComponent} from "../questionnaire-data-view/questionnaire-data-view.component";
+import {ParticipantAdminComponent} from "../participant-admin/participant-admin.component";
+import {TaxonomyAdminComponent} from "../taxonomy-admin/taxonomy-admin.component";
+import {AdminExportComponent} from "../admin-export/admin-export.component";
+import {EmailLogAdminComponent} from "../email-log-admin/email-log-admin.component";
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
@@ -111,7 +117,45 @@ const routes: Routes = [
     path: 'admin',
     component: AdminHomeComponent,
     data: {title: 'Autism DRIVE Admin Home', roles: ['admin', ]},
-    canActivate: [RoleGuard]
+    canActivate: [RoleGuard],
+    children: [
+      {
+        path: 'data-admin',
+        component: QuestionnaireDataViewComponent,
+        data: {title: 'Autism DRIVE Data Admin', roles: ['admin', ]},
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'user-admin',
+        component: UserAdminComponent,
+        data: {title: 'Autism DRIVE User Admin', roles: ['admin', ]},
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'participant-admin',
+        component: ParticipantAdminComponent,
+        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin', ]},
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'taxonomy-admin',
+        component: TaxonomyAdminComponent,
+        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin', ]},
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'import-export-status',
+        component: AdminExportComponent,
+        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin', ]},
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'email-log',
+        component: EmailLogAdminComponent,
+        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin', ]},
+        canActivate: [RoleGuard]
+      },
+    ]
   },
   {
     path: 'admin/user/:userId',
