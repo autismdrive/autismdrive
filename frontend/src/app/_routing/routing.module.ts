@@ -119,6 +119,7 @@ const routes: Routes = [
     data: {title: 'Autism DRIVE Admin Home', roles: ['admin', ]},
     canActivate: [RoleGuard],
     children: [
+      { path: '', redirectTo: 'data-admin', pathMatch: 'full' },
       {
         path: 'data-admin',
         component: QuestionnaireDataViewComponent,
