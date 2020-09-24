@@ -311,6 +311,12 @@ python3 -m venv python-env
 ```
 When pushing to production please create a new 'Release' on gitHub describing the changes that were rolled out.
 
+Currently we are using a separate repository for deployment: star-drive-dist. To prepare this for deployment, you should have a
+copy of star-drive-dist in the same directory as your local copy of star-drive. Your local star-drive should be on master, 
+up to date with all the changes for the release. Once this is ready, run the ```prepare_for_deploy.sh``` script in 
+star-drive-dist to prepare the release. Commit these changes referencing the release number and push them up. 
+
+
 
 
 
