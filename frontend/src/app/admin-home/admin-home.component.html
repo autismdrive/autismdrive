@@ -3,13 +3,18 @@
 >
   <h1>Administrative Options</h1>
 
-  <mat-tab-group>
-    <mat-tab label="Data Admin"><app-questionnaire-data-view></app-questionnaire-data-view></mat-tab>
-    <mat-tab label="User Admin"><app-user-admin></app-user-admin></mat-tab>
-    <mat-tab label="Participant Admin"><app-participant-admin></app-participant-admin></mat-tab>
-    <mat-tab label="Taxonomy Admin"><app-taxonomy-admin></app-taxonomy-admin></mat-tab>
-    <mat-tab label="Import/Export Status"><app-admin-export></app-admin-export></mat-tab>
-    <mat-tab label="Email Log"><app-email-log-admin></app-email-log-admin></mat-tab>
-  </mat-tab-group>
+  <nav mat-tab-nav-bar>
+    <a mat-tab-link
+      *ngFor="let link of navLinks"
+      [routerLink]="link.path"
+      routerLinkActive #rla="routerLinkActive"
+      [active]="rla.isActive"
+      [id]="link.id"
+    >
+      {{link.label}}
+    </a>
+  </nav>
+
+  <router-outlet></router-outlet>
 
 </div>

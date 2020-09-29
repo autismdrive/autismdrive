@@ -85,7 +85,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
                       flow=flow.name,
                       participant_id=questionnaire.participant_id,
                       user_id=g.user.id,
-                      date_completed=datetime.datetime.now(),
+                      date_completed=datetime.datetime.utcnow(),
                       time_on_task_ms=questionnaire.time_on_task_ms)
         db.session.add(log)
         db.session.commit()

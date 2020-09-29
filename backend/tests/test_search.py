@@ -331,10 +331,10 @@ class TestSearch(BaseTest, unittest.TestCase):
                          msg="It is a top level category if no filters are applied")
         self.assertEqual(2, len(search_results['category']['children']),
                          msg="The two true Top level categories are returned as children")
-        maker_cat = search_results['category']['children'][0]
-        talker_cat = search_results['category']['children'][1]
-        self.assertEqual("Makers", maker_cat['name'], "The first category returned is 'makers'")
-        self.assertEqual("Talkers", talker_cat['name'], "The second category returned is 'talkers'")
+        talker_cat = search_results['category']['children'][0]
+        maker_cat = search_results['category']['children'][1]
+        self.assertEqual("Talkers", talker_cat['name'], "The first category returned is 'talkers'")
+        self.assertEqual("Makers", maker_cat['name'], "The second category returned is 'makers'")
         self.assertEqual(3, maker_cat['hit_count'], "There are three makers present.")
 
     def test_top_level_category_repost_does_not_create_error(self):

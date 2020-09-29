@@ -31,7 +31,7 @@ class ImportService:
         self.import_interval_minutes = app.config['IMPORT_INTERVAL_MINUTES']
 
     def run_backup(self, load_admin=True, full_backup=False):
-        date_started = datetime.datetime.now()
+        date_started = datetime.datetime.utcnow()
         exportables = self.get_export_list(full_backup)
         # Note:  We request data THEN create the next log.  We depend on this order to get data since
         # the last log was recorded, but besure and set the start date from the moment this was called.

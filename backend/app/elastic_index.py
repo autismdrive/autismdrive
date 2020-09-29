@@ -157,7 +157,7 @@ class ElasticIndex:
         for cat in document.categories:
             doc.category.extend(cat.category.all_search_paths())
 
-        if document.__tablename__ is 'study':
+        if document.__tablename__ == 'study':
             doc.title = document.short_title
             doc.description = document.short_description
 
@@ -211,7 +211,7 @@ class ElasticIndex:
             elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
         else:
             elastic_search = elastic_search.filter('bool', **{"should": [
-                {"range": {"date": {"gte": datetime.datetime.now()}}},  # Future events OR
+                {"range": {"date": {"gte": datetime.datetime.utcnow()}}},  # Future events OR
                 {"bool": {"must_not": {"exists": {"field": "date"}}}}   # Date field is empty
             ]})
 
@@ -277,7 +277,7 @@ class ElasticIndex:
 
         # Filter out past events
         elastic_search = elastic_search.filter('bool', **{"should": [
-            {"range": {"date": {"gte": datetime.datetime.now()}}},  # Future events OR
+            {"range": {"date": {"gte": datetime.datetime.utcnow()}}},  # Future events OR
             {"bool": {"must_not": {"exists": {"field": "date"}}}}  # Date field is empty
         ]})
 

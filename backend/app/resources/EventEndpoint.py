@@ -54,7 +54,7 @@ class EventEndpoint(flask_restful.Resource):
             updated = self.schema.load(data=request_data, instance=instance, session=db.session)
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.args[0])
-        updated.last_updated = datetime.datetime.now()
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Event', latitude=updated.latitude, longitude=updated.longitude)

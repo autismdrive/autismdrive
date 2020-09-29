@@ -108,8 +108,8 @@ class ExportXlsService:
         # Add output to response
         response.data = output.read()
 
-        # Set filname
-        file_name = 'export_{}_{}.xlsx'.format(name, datetime.now())
+        # Set filename
+        file_name = 'export_{}_{}.xlsx'.format(name, datetime.utcnow())
 
         # HTTP headers for forcing file download
         response_headers = Headers({
