@@ -44,7 +44,9 @@ class User(db.Model):
 
     def get_self_participant(self):
         if len(self.participants) > 0:
-            return next(p for p in self.participants if "self" in p.relationship.name)
+            for p in self.participants:
+                if "self" in p.relationship.name:
+                    return p
 
     def self_registration_complete(self):
         if self.get_self_participant() is not None:
@@ -113,3 +115,16 @@ class User(db.Model):
         for p in self.participants:
             if p.contact:
                 return {'name': p.get_name(), 'relationship': p.relationship.name, 'contact': p.contact}
+
+    def created_password(self):
+        return self.password is not None
+
+    def identity(self):
+        if len(self.participants) > 0:
+            return self.get_self_participant().relationship.name
+        else:
+            return 'Not set'
+
+    def percent_self_registration_complete(self):
+        if len(self.participants) > 0:
+            return self.get_self_participant().get_percent_complete()

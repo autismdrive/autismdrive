@@ -398,7 +398,8 @@ class UserSchema(ModelSchema):
     class Meta:
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
-                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count')
+                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count',
+                  'created_password', 'identity', 'percent_self_registration_complete')
     password = fields.String(load_only=True)
     participants = fields.Nested(ParticipantSchema, dump_only=True, many=True)
     participant_count = fields.Integer(required=False, allow_none=True)
@@ -406,6 +407,7 @@ class UserSchema(ModelSchema):
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
     permissions = fields.Method('get_permissions', dump_only=True)
+    percent_self_registration_complete = fields.Integer(required=False, allow_none=True)
 
     def get_permissions(self, obj):
         permissions = []

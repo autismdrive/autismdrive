@@ -127,6 +127,13 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
     },
     {
+      name: 'The Faison Center',
+      shortName: 'Faison Center',
+      description: 'The Faison School provides full-time day school programs for students ages 5 to 22 years.',
+      image: '/assets/partners/faison_center.png',
+      url: 'https://www.faisoncenter.org',
+    },
+    {
       name: 'Piedmont Regional Education Program',
       shortName: 'PREP',
       description: `

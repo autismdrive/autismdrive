@@ -605,3 +605,38 @@ class TestUser(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, response['participant_count'])
+
+    def test_user_created_password(self):
+        pass_user = self.test_create_user_with_password()
+        self.assertEqual(pass_user.created_password(), True)
+        non_pass_user = self.construct_user()
+        self.assertEqual(non_pass_user.created_password(), False)
+
+    def test_user_identity(self):
+        u = self.construct_user(email='superuser@sartography.com')
+        self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        self.assertEqual(u.identity(), 'self_guardian')
+        u2 = self.construct_user(email='superuser2@sartography.com')
+        self.construct_participant(user=u2, relationship=Relationship.self_professional)
+        self.assertEqual(u2.identity(), 'self_professional')
+
+    def test_percent_self_registration_complete(self):
+        u = self.construct_user(email='prof@sartography.com')
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+
+        iq = {
+            'first_name': "Darah",
+            'middle_name': "Soo",
+            'last_name': "Ubway",
+            'is_first_name_preferred': True,
+            'birthdate': '02/02/2002',
+            'birth_city': 'Staunton',
+            'birth_state': 'VA',
+            'is_english_primary': True,
+            'participant_id': p.id
+        }
+        self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(iq),
+                           content_type="application/json",
+                           follow_redirects=True, headers=self.logged_in_headers(u))
+
+        self.assertGreater(u.percent_self_registration_complete(), 0)

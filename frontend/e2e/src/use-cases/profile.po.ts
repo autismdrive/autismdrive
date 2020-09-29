@@ -16,11 +16,11 @@ export class ProfileUseCases {
   }
 
   startDependentFlow() {
-    this.page.clickAndExpectRoute('#enroll_first_dependent', '/terms/dependent');
+    this.page.clickAndExpectRoute('#enroll_dependent', '/terms/dependent');
   }
 
   checkDependentButtonDisabled() {
-    return expect(this.page.getElements('#enroll_first_dependent').getAttribute('disabled')).toEqual([ 'true' ]);
+    return expect(this.page.getElements('#enroll_dependent').getAttribute('disabled')).toEqual([ 'true' ]);
   }
 
   navigateToProfile() {
