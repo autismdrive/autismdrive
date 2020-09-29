@@ -206,11 +206,13 @@ class ExportService:
         return meta_relationed
 
     @staticmethod
-    # this evil method recurses down through the metadata, removing items that have a
-    # RELATIONSHIP_REQUIRED, if the relationship isn't there and selecting the right
-    # content from a list, if RELATIONSHIP_SPECIFIC provides an array content for each
-    # possible type of relationship.
     def _recursive_relationship_changes(meta, relationship):
+        """
+        This evil method recurses down through the metadata, removing items that have a
+        RELATIONSHIP_REQUIRED, if the relationship isn't there and selecting the right
+        content from a list, if RELATIONSHIP_SPECIFIC provides an array content for each
+        possible type of relationship.
+        """
         meta_copy = {}
         for k, v in meta.items():
             if type(v) is dict:
@@ -240,12 +242,13 @@ class ExportService:
 
     @staticmethod
     def send_alert_if_exports_not_running():
-        """If more than 30 minutes pass without an export from the Public Mirror to the
-        Private Mirror, an email will be sent to an administrative email address.
-         Emails to this address will occur every two (2) hours for the first 24 hours
-          and every four hours after that until the fault is corrected or the system taken down.
-            After 24 hours, the PI will also be emailed notifications every 8 hours until
-             the fault is corrected or the system taken down."""
+        """
+        If more than 30 minutes pass without an export from the Public Mirror to the Private Mirror, an email will be
+        sent to an administrative email address. Emails to this address will occur every two (2) hours for the first
+        24 hours and every four hours after that until the fault is corrected or the system taken down. After 24
+        hours, the PI will also be emailed notifications every 8 hours until the fault is corrected or the system
+        taken down.
+        """
         alert_principal_investigator = False
         last_log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
             .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
@@ -257,7 +260,8 @@ class ExportService:
         else:
             msg = None
             subject = "Autism DRIVE: Error - "
-            time_difference = datetime.datetime.now(tz=UTC) - last_log.last_updated
+            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)  # Make date timezone aware
+            time_difference = now - last_log.last_updated
             hours = int(time_difference.total_seconds()/3600)
             minutes = int(time_difference.total_seconds()/60)
             if hours >= 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):

@@ -2,7 +2,6 @@ import datetime
 import flask_restful
 import os
 
-from dateutil.tz import tzutc
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import app, db, RestException, auth
@@ -59,7 +58,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
         if errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now(tz=tzutc())
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         return schema.dump(updated)

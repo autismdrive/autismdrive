@@ -52,7 +52,7 @@ class EventEndpoint(flask_restful.Resource):
             request_data['longitude'] = geocode['lng']
         updated, errors = self.schema.load(request_data, instance=instance)
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         elastic_index.update_document(updated, 'Event', latitude=updated.latitude, longitude=updated.longitude)

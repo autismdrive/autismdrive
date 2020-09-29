@@ -1,7 +1,6 @@
 import datetime
 import enum
 
-from dateutil.tz import tzutc
 from sqlalchemy import func
 
 from app import db

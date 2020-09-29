@@ -34,7 +34,7 @@ class AdminNoteEndpoint(flask_restful.Resource):
         instance = db.session.query(AdminNote).filter_by(id=id).first()
         updated, errors = self.schema.load(request_data, instance=instance)
         if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         return self.schema.dump(updated)
