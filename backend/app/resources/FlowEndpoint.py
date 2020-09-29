@@ -2,6 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request, g
+from marshmallow import ValidationError
 
 from app import RestException, db, auth
 from app.model.participant import Participant
@@ -61,11 +62,16 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         if "_links" in request_data:
             request_data.pop("_links")
         schema = ExportService.get_schema(ExportService.camel_case_it(questionnaire_name))
-        new_quest, errors = schema.load(request_data, session=db.session)
 
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        if new_quest.participant_id is None: raise RestException(RestException.INVALID_OBJECT, details=
-                                                                 "You must supply a participant id.")
+        try:
+            new_quest = schema.load(request_data, session=db.session)
+        except TypeError as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e.args[0])
+        except ValidationError as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e.messages)
+
+        if new_quest.participant_id is None:
+            raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
         if not g.user.related_to_participant(new_quest.participant_id):
             raise RestException(RestException.UNRELATED_PARTICIPANT)
         db.session.add(new_quest)

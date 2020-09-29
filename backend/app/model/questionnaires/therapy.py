@@ -1,5 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
-from marshmallow import fields
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields, EXCLUDE
 from sqlalchemy import func
 
 from app import db
@@ -137,9 +137,12 @@ class Therapy(db.Model):
         return info
 
 
-class TherapySchema(ModelSchema):
+class TherapySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Therapy
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         ordered = True
         fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other",
                   "timeframe", "notes", "participant_id", "user_id")

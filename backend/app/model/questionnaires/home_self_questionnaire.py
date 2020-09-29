@@ -1,5 +1,5 @@
-from marshmallow import fields, pre_load
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields, pre_load, EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 from app import db
 from app.model.questionnaires.housemate import HousemateSchema
@@ -63,13 +63,17 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
         return field_groups
 
 
-class HomeSelfQuestionnaireSchema(ModelSchema):
+class HomeSelfQuestionnaireSchema(SQLAlchemyAutoSchema):
     @pre_load
-    def set_field_session(self, data):
+    def set_field_session(self, data, **kwargs):
         self.fields['housemates'].schema.session = self.session
+        return data
 
     class Meta:
         model = HomeSelfQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",

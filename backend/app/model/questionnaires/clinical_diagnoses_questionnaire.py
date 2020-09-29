@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app import db, ma
@@ -231,9 +232,12 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             }
 
 
-class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
+class ClinicalDiagnosesQuestionnaireSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ClinicalDiagnosesQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         ordered = True
         include_fk = True
     _links = ma.Hyperlinks({

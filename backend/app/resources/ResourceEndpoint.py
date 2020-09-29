@@ -54,8 +54,10 @@ class ResourceEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Resource).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            updated = self.schema.load(request_data, instance=instance, session=db.session)
+        except Exception as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e)
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()

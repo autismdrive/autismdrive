@@ -1,5 +1,5 @@
-from marshmallow import fields, pre_load
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields, pre_load, EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app import db, ma
@@ -186,16 +186,20 @@ class SupportsQuestionnaire(db.Model):
         }
 
 
-class SupportsQuestionnaireSchema(ModelSchema):
+class SupportsQuestionnaireSchema(SQLAlchemyAutoSchema):
     @pre_load
-    def set_field_session(self, data):
+    def set_field_session(self, data, **kwargs):
         self.fields['medications'].schema.session = self.session
         self.fields['therapies'].schema.session = self.session
         self.fields['alternative_augmentative'].schema.session = self.session
         self.fields['assistive_devices'].schema.session = self.session
+        return data
 
     class Meta:
         model = SupportsQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         ordered = True
         include_fk = True
         fields = ("id", "last_updated", "time_on_task_ms", "participant_id", "user_id", "medications", "therapies",

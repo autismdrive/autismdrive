@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app import db, ma
@@ -80,9 +81,12 @@ class EmploymentQuestionnaire(db.Model):
         return {}
 
 
-class EmploymentQuestionnaireSchema(ModelSchema):
+class EmploymentQuestionnaireSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = EmploymentQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         ordered = True
         include_fk = True
     _links = ma.Hyperlinks({

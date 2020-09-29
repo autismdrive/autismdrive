@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 from app import db, ma
 from app.model.questionnaires.evaluation_history_mixin import EvaluationHistoryMixin
@@ -23,9 +24,12 @@ class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
         return field_groups
 
 
-class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
+class EvaluationHistorySelfQuestionnaireSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = EvaluationHistorySelfQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",

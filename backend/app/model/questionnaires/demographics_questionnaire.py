@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app import db, ma
@@ -174,11 +175,14 @@ class DemographicsQuestionnaire(db.Model):
             }
 
 
-class DemographicsQuestionnaireSchema(ModelSchema):
+class DemographicsQuestionnaireSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = DemographicsQuestionnaire
         ordered = True
         include_fk = True
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name="demographics_questionnaire", id='<id>')
     })

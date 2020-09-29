@@ -1,5 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
-from marshmallow import fields
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields, EXCLUDE
 from sqlalchemy import func
 
 from app import db
@@ -103,10 +103,13 @@ class AlternativeAugmentative(db.Model):
         }
 
 
-class AlternativeAugmentativeSchema(ModelSchema):
+class AlternativeAugmentativeSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = AlternativeAugmentative
         ordered = True
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other", "timeframe", "notes",
                   "participant_id", "user_id")
     participant_id = fields.Method('get_participant_id', dump_only=True)

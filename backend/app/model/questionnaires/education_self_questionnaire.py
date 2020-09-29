@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 from app import db
 from app.model.questionnaires.education_mixin import EducationMixin
@@ -45,9 +46,12 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
         return field_groups
 
 
-class EducationSelfQuestionnaireSchema(ModelSchema):
+class EducationSelfQuestionnaireSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = EducationSelfQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",

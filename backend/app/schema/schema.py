@@ -1,8 +1,7 @@
-from flask_marshmallow.sqla import ModelSchema
-from marshmallow import fields, Schema, post_load
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields, Schema, post_load, EXCLUDE
 from marshmallow_enum import EnumField
 from sqlalchemy import func
-
 
 from app import ma, db
 from app.model.admin_note import AdminNote
@@ -52,14 +51,12 @@ import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
 
 
-
-
-
-
-
-class InvestigatorSchema(ModelSchema):
+class InvestigatorSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Investigator
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'last_updated', 'name', 'title', 'organization_name', 'bio_link',
                   '_links')
     _links = ma.Hyperlinks({
@@ -68,10 +65,13 @@ class InvestigatorSchema(ModelSchema):
     })
 
 
-class ParentCategorySchema(ModelSchema):
+class ParentCategorySchema(SQLAlchemyAutoSchema):
     """Provides a view of the parent category, all the way to the top, but ignores children"""
     class Meta:
         model = Category
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'name', 'parent', 'level', '_links')
     parent = fields.Nested('self', dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level())
@@ -81,10 +81,13 @@ class ParentCategorySchema(ModelSchema):
     })
 
 
-class ChildCategoryInSearchSchema(ModelSchema):
+class ChildCategoryInSearchSchema(SQLAlchemyAutoSchema):
     """Children within a category have hit counts when returned as a part of a search."""
     class Meta:
         model = Category
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'name', '_links', 'hit_count')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
@@ -92,10 +95,13 @@ class ChildCategoryInSearchSchema(ModelSchema):
     })
 
 
-class CategoryInSearchSchema(ModelSchema):
+class CategoryInSearchSchema(SQLAlchemyAutoSchema):
     """streamlined category representation for inclusion in search results to provide faceted search"""
     class Meta:
         model = Category
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level')
     parent_id = fields.Number(required=False, allow_none=True)
     parent = fields.Nested(ParentCategorySchema, dump_only=True, required=False, allow_none=True)
@@ -103,12 +109,15 @@ class CategoryInSearchSchema(ModelSchema):
     level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
 
 
-class CategorySchema(ModelSchema):
+class CategorySchema(SQLAlchemyAutoSchema):
     """Provides detailed information about a category, including all the children"""
     class Meta:
         model = Category
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count', 'location_count',
-                  'resource_count', 'all_resource_count', 'study_count', '_links')
+                  'resource_count', 'all_resource_count', 'study_count', 'color', '_links', 'last_updated')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = fields.Nested('self', many=True, dump_only=True, exclude=('parent', 'color'))
@@ -155,9 +164,12 @@ class CategorySchema(ModelSchema):
         return query.session.execute(count_q).scalar()
 
 
-class CategoriesOnEventSchema(ModelSchema):
+class CategoriesOnEventSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(ParentCategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -167,9 +179,12 @@ class CategoriesOnEventSchema(ModelSchema):
     })
 
 
-class CategoriesOnLocationSchema(ModelSchema):
+class CategoriesOnLocationSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(ParentCategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -179,9 +194,12 @@ class CategoriesOnLocationSchema(ModelSchema):
     })
 
 
-class CategoriesOnResourceSchema(ModelSchema):
+class CategoriesOnResourceSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(ParentCategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -191,9 +209,12 @@ class CategoriesOnResourceSchema(ModelSchema):
     })
 
 
-class CategoriesOnStudySchema(ModelSchema):
+class CategoriesOnStudySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'category_id', 'category')
     category = fields.Nested(ParentCategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -203,9 +224,12 @@ class CategoriesOnStudySchema(ModelSchema):
     })
 
 
-class InvestigatorsOnStudySchema(ModelSchema):
+class InvestigatorsOnStudySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyInvestigator
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'investigator_id', 'investigator')
     investigator = fields.Nested(InvestigatorSchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -215,9 +239,12 @@ class InvestigatorsOnStudySchema(ModelSchema):
     })
 
 
-class ResourceSchema(ModelSchema):
+class ResourceSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Resource
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_name', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'resource_categories',
                   'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories', '_links')
@@ -229,9 +256,12 @@ class ResourceSchema(ModelSchema):
     })
 
 
-class ResourceCategoriesSchema(ModelSchema):
+class ResourceCategoriesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(CategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -241,9 +271,12 @@ class ResourceCategoriesSchema(ModelSchema):
     })
 
 
-class CategoryResourcesSchema(ModelSchema):
+class CategoryResourcesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
     resource = fields.Nested(ResourceSchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -253,9 +286,12 @@ class CategoryResourcesSchema(ModelSchema):
     })
 
 
-class ResourceCategorySchema(ModelSchema):
+class ResourceCategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'type')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourcecategoryendpoint', id='<id>'),
@@ -264,9 +300,12 @@ class ResourceCategorySchema(ModelSchema):
     })
 
 
-class EventSchema(ModelSchema):
+class EventSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Event
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'date', 'time', 'ticket_cost',
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
@@ -281,9 +320,12 @@ class EventSchema(ModelSchema):
     })
 
 
-class EventCategoriesSchema(ModelSchema):
+class EventCategoriesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(CategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -293,9 +335,12 @@ class EventCategoriesSchema(ModelSchema):
     })
 
 
-class CategoryEventsSchema(ModelSchema):
+class CategoryEventsSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
     resource = fields.Nested(EventSchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -305,9 +350,12 @@ class CategoryEventsSchema(ModelSchema):
     })
 
 
-class EventCategorySchema(ModelSchema):
+class EventCategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventcategoryendpoint', id='<id>'),
@@ -316,9 +364,12 @@ class EventCategorySchema(ModelSchema):
     })
 
 
-class LocationSchema(ModelSchema):
+class LocationSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Location
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'primary_contact',
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization_name', 'resource_categories',
@@ -332,9 +383,12 @@ class LocationSchema(ModelSchema):
     })
 
 
-class LocationCategoriesSchema(ModelSchema):
+class LocationCategoriesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'category')
     category = fields.Nested(CategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -344,9 +398,12 @@ class LocationCategoriesSchema(ModelSchema):
     })
 
 
-class CategoryLocationsSchema(ModelSchema):
+class CategoryLocationsSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id', 'resource')
     resource = fields.Nested(LocationSchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -356,9 +413,12 @@ class CategoryLocationsSchema(ModelSchema):
     })
 
 
-class LocationCategorySchema(ModelSchema):
+class LocationCategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'resource_id', 'category_id')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.locationcategoryendpoint', id='<id>'),
@@ -367,9 +427,12 @@ class LocationCategorySchema(ModelSchema):
     })
 
 
-class ParticipantSchema(ModelSchema):
+class ParticipantSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Participant
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
                   'has_consented', 'contact', 'percent_complete')
     id = fields.Integer(required=False, allow_none=True)
@@ -383,9 +446,12 @@ class ParticipantSchema(ModelSchema):
     })
 
 
-class UserFavoriteSchema(ModelSchema):
+class UserFavoriteSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = UserFavorite
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'last_updated', 'type', 'user_id', 'resource_id', 'resource', 'category_id', 'category',
                   'age_range', 'language', 'covid19_category')
     resource_id = fields.Integer(required=False, allow_none=True)
@@ -394,9 +460,12 @@ class UserFavoriteSchema(ModelSchema):
     category = fields.Nested(CategorySchema, dump_only=True)
 
 
-class UserSchema(ModelSchema):
+class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
                   'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count')
     password = fields.String(load_only=True)
@@ -414,9 +483,12 @@ class UserSchema(ModelSchema):
         return permissions
 
 
-class UsersOnStudySchema(ModelSchema):
+class UsersOnStudySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyUser
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
 
     user = fields.Nested(UserSchema, dump_only=True)
@@ -428,9 +500,12 @@ class UsersOnStudySchema(ModelSchema):
     })
 
 
-class StudyUsersSchema(ModelSchema):
+class StudyUsersSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyUser
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'user')
 
     user = fields.Nested(UserSchema, dump_only=True)
@@ -442,9 +517,12 @@ class StudyUsersSchema(ModelSchema):
     })
 
 
-class StudyUserSchema(ModelSchema):
+class StudyUserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyUser
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'status', 'study_id', 'user_id')
 
     status = EnumField(StudyUserStatus, allow_none=True)
@@ -455,9 +533,12 @@ class StudyUserSchema(ModelSchema):
     })
 
 
-class StudySchema(ModelSchema):
+class StudySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Study
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
                   'participant_description', 'benefit_description', 'coordinator_email', 'organization_name',
                   'location', 'status', 'study_categories', 'study_investigators', 'study_users',
@@ -473,9 +554,12 @@ class StudySchema(ModelSchema):
     })
 
 
-class UserStudiesSchema(ModelSchema):
+class UserStudiesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyUser
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'status', 'study_id', 'user_id', 'study')
     study = fields.Nested(StudySchema, dump_only=True)
     status = EnumField(StudyUserStatus, allow_none=True)
@@ -486,9 +570,12 @@ class UserStudiesSchema(ModelSchema):
     })
 
 
-class StudyCategoriesSchema(ModelSchema):
+class StudyCategoriesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'category_id', 'category')
     category = fields.Nested(CategorySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -498,9 +585,12 @@ class StudyCategoriesSchema(ModelSchema):
     })
 
 
-class CategoryStudiesSchema(ModelSchema):
+class CategoryStudiesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'category_id', 'study')
     study = fields.Nested(StudySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -510,9 +600,12 @@ class CategoryStudiesSchema(ModelSchema):
     })
 
 
-class StudyCategorySchema(ModelSchema):
+class StudyCategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyCategory
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'category_id')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studycategoryendpoint', id='<id>'),
@@ -521,9 +614,12 @@ class StudyCategorySchema(ModelSchema):
     })
 
 
-class StudyInvestigatorsSchema(ModelSchema):
+class StudyInvestigatorsSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyInvestigator
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'investigator_id', 'investigator')
     investigator = fields.Nested(InvestigatorSchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -533,9 +629,12 @@ class StudyInvestigatorsSchema(ModelSchema):
     })
 
 
-class InvestigatorStudiesSchema(ModelSchema):
+class InvestigatorStudiesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyInvestigator
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'investigator_id', 'study')
     study = fields.Nested(StudySchema, dump_only=True)
     _links = ma.Hyperlinks({
@@ -545,9 +644,12 @@ class InvestigatorStudiesSchema(ModelSchema):
     })
 
 
-class StudyInvestigatorSchema(ModelSchema):
+class StudyInvestigatorSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StudyInvestigator
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ('id', '_links', 'study_id', 'investigator_id')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyinvestigatorendpoint', id='<id>'),
@@ -632,33 +734,49 @@ class FlowSchema(Schema):
     steps = fields.Nested(StepSchema(), many=True)
 
 
-class EmailLogSchema(ModelSchema):
+class EmailLogSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = EmailLog
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         include_fk = True
 
 
-class ResourceChangeLogSchema(ModelSchema):
+class ResourceChangeLogSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ResourceChangeLog
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         include_fk = True
 
 
-class AdminNoteSchema(ModelSchema):
+class AdminNoteSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = AdminNote
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
+        include_fk = True
         fields = ('id', 'resource_id', 'user_id', 'resource', 'user', 'last_updated', 'note')
     user = fields.Nested(UserSchema, dump_only=True)
     resource = fields.Nested(ResourceSchema, dump_only=True)
 
 
-class StepLogSchema(ModelSchema):
+class StepLogSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StepLog
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         include_fk = True
 
 
-class ZipCodeSchema(ModelSchema):
+class ZipCodeSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ZipCode
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = ["id", "latitude", "longitude"]

@@ -50,8 +50,10 @@ class EventEndpoint(flask_restful.Resource):
             geocode = Geocode.get_geocode(address_dict=address_dict)
             request_data['latitude'] = geocode['lat']
             request_data['longitude'] = geocode['lng']
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            updated = self.schema.load(data=request_data, instance=instance, session=db.session)
+        except Exception as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e.args[0])
         updated.last_updated = datetime.datetime.now()
         db.session.add(updated)
         db.session.commit()
@@ -81,7 +83,7 @@ class EventListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.eventSchema.load(request_data).data
+            load_result = self.eventSchema.load(data=request_data, session=db.session)
             address_dict = {'street': load_result.street_address1, 'city': load_result.city,
                             'state': load_result.state, 'zip': load_result.zip}
             geocode = Geocode.get_geocode(address_dict=address_dict)

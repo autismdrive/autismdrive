@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app import db
@@ -15,6 +16,9 @@ class EmailLog(db.Model):
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
 
 
-class EmailLogSchema(ModelSchema):
+class EmailLogSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = EmailLog
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE

@@ -65,7 +65,7 @@ class ResourceCategoryListEndpoint(flask_restful.Resource):
 
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
+        load_result = self.schema.load(data=request_data, session=db.session)
         db.session.query(ResourceCategory).filter_by(resource_id=load_result.resource_id,
                                                      category_id=load_result.category_id).delete()
         db.session.add(load_result)

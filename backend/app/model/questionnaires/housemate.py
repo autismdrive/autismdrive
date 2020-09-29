@@ -1,5 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
-from marshmallow import fields
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields, EXCLUDE
 from sqlalchemy import func
 
 from app import db
@@ -123,9 +123,12 @@ class Housemate(db.Model):
         return {}
 
 
-class HousemateSchema(ModelSchema):
+class HousemateSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Housemate
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         ordered = True
         fields = ("id", "last_updated", "home_dependent_questionnaire_id", "home_self_questionnaire_id", "name",
                   "relationship", "relationship_other", "age", "has_autism", "participant_id", "user_id")

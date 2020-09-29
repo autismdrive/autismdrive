@@ -1,4 +1,5 @@
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 from app import db, ma
 from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMixin
@@ -37,9 +38,12 @@ class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
         return super().get_field_groups()
 
 
-class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
+class CurrentBehaviorsSelfQuestionnaireSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = CurrentBehaviorsSelfQuestionnaire
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",

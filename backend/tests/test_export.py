@@ -242,12 +242,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         for export in response:
-            self.assertTrue(export['size'] > 0, msg=export['class_name'] + " should have a count > 0")
+            self.assertGreater(export['size'], 0, msg=export['class_name'] + " should have a count > 0")
 
         rv = self.app.get('/api/export' + params, headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         for export in response:
-            self.assertTrue(export['size'] == 0, msg=export['class_name'] + " should have a count of 0")
+            self.assertEqual(export['size'], 0, msg=export['class_name'] + " should have a count of 0")
 
     def test_it_all_crazy_madness_wohoo(self):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.
@@ -347,7 +347,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                               total_records=2, type="export")
         db.session.add(log)
         db.session.commit()
-        for i in range(20):
+        for i in range(12):
             ExportService.send_alert_if_exports_not_running()
         self.assertEqual(message_count + 12, len(TEST_MESSAGES), msg="12 emails should have gone out.")
 

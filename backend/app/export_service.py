@@ -1,9 +1,10 @@
 import datetime
 import importlib
 import re
+import logging
 
 from dateutil.tz import UTC
-from flask import url_for, logging
+from flask import url_for
 from sqlalchemy import func, desc
 
 from app import db, EmailService, app
