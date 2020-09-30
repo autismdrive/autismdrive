@@ -120,11 +120,12 @@ class User(db.Model):
         return self.password is not None
 
     def identity(self):
-        if len(self.participants) > 0:
+        if len(self.participants) > 0 and self.get_self_participant() is not None:
             return self.get_self_participant().relationship.name
         else:
             return 'Not set'
 
     def percent_self_registration_complete(self):
-        if len(self.participants) > 0:
+        if len(self.participants) > 0 and self.get_self_participant() is not None:
             return self.get_self_participant().get_percent_complete()
+        return 0

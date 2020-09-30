@@ -1,9 +1,9 @@
-from marshmallow import fields, pre_load, EXCLUDE
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import pre_load
 
-from app import db
+from app import db, ma
 from app.model.questionnaires.housemate import HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
+from app.schema.model_schema import ModelSchema
 
 
 class HomeDependentQuestionnaire(db.Model, HomeMixin):
@@ -73,17 +73,14 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
         return field_groups
 
 
-class HomeDependentQuestionnaireSchema(SQLAlchemyAutoSchema):
+class HomeDependentQuestionnaireSchema(ModelSchema):
     @pre_load
     def set_field_session(self, data, **kwargs):
         self.fields['housemates'].schema.session = self.session
         return data
 
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = HomeDependentQuestionnaire
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",
@@ -95,5 +92,4 @@ class HomeDependentQuestionnaireSchema(SQLAlchemyAutoSchema):
             "housemates",
             "struggle_to_afford",
         )
-        ordered = True
-    housemates = fields.Nested(HousemateSchema, many=True)
+    housemates = ma.Nested(HousemateSchema, many=True)

@@ -124,26 +124,27 @@ class ImportService:
             if "_links" in item_copy:
                 links = item_copy.pop("_links")
             existing_model = self.db.session.query(model_class).filter_by(id=item['id']).first()
-            model, errors = schema.load(item_copy, session=self.db.session, instance=existing_model)
-            if not errors:
-                try:
-                    self.db.session.add(model)
-                    self.db.session.commit()
-                    log_detail.handle_success()
-                    self.db.session.add(log_detail)
-                    if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
-                        print("Sensitive Data.  Calling Delete.")
-                        self.delete_record(item)
-                except Exception as e:
-                    self.db.session.rollback()
-                    self.logger.error("Error processing " + export_info.class_name + " with id of " + str(
-                        item["id"]) + ".  Error: " + str(e))
-                    log_detail.handle_failure(e)
-                    self.db.session.add(log)
-                    self.db.session.add(log_detail)
-                    raise e
-            else:
-                e = Exception("Failed to parse model " + export_info.class_name + ". " + str(errors))
+            try:
+                model = schema.load(item_copy, session=self.db.session, instance=existing_model)
+            except Exception as e:
+                e = Exception("Failed to parse model " + export_info.class_name + ". " + str(e))
+                log_detail.handle_failure(e)
+                self.db.session.add(log)
+                self.db.session.add(log_detail)
+                raise e
+
+            try:
+                self.db.session.add(model)
+                self.db.session.commit()
+                log_detail.handle_success()
+                self.db.session.add(log_detail)
+                if hasattr(model, '__question_type__') and model.__question_type__ == ExportService.TYPE_SENSITIVE:
+                    print("Sensitive Data.  Calling Delete.")
+                    self.delete_record(item)
+            except Exception as e:
+                self.db.session.rollback()
+                self.logger.error("Error processing " + export_info.class_name + " with id of " + str(
+                    item["id"]) + ".  Error: " + str(e))
                 log_detail.handle_failure(e)
                 self.db.session.add(log)
                 self.db.session.add(log_detail)

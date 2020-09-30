@@ -70,10 +70,14 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         except ValidationError as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.messages)
 
-        if new_quest.participant_id is None:
+        if hasattr(new_quest, 'participant_id'):
+            if new_quest.participant_id is None:
+                raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
+            if not g.user.related_to_participant(new_quest.participant_id):
+                raise RestException(RestException.UNRELATED_PARTICIPANT)
+        else:
             raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
-        if not g.user.related_to_participant(new_quest.participant_id):
-            raise RestException(RestException.UNRELATED_PARTICIPANT)
+
         db.session.add(new_quest)
         db.session.commit()
         self.log_progress(flow, questionnaire_name, new_quest)

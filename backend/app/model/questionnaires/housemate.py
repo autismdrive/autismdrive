@@ -1,8 +1,8 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, missing
 from sqlalchemy import func
 
 from app import db
+from app.schema.model_schema import ModelSchema
 
 
 class Housemate(db.Model):
@@ -123,13 +123,9 @@ class Housemate(db.Model):
         return {}
 
 
-class HousemateSchema(SQLAlchemyAutoSchema):
-    class Meta:
+class HousemateSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = Housemate
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
-        ordered = True
         fields = ("id", "last_updated", "home_dependent_questionnaire_id", "home_self_questionnaire_id", "name",
                   "relationship", "relationship_other", "age", "has_autism", "participant_id", "user_id")
     participant_id = fields.Method('get_participant_id')
@@ -138,7 +134,11 @@ class HousemateSchema(SQLAlchemyAutoSchema):
     home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
 
     def get_participant_id(self, obj):
+        if obj is None:
+            return missing
         return obj.supports_questionnaire.participant_id
 
     def get_user_id(self, obj):
+        if obj is None:
+            return missing
         return obj.supports_questionnaire.user_id

@@ -1,7 +1,9 @@
 import re
 
 from flask_marshmallow import Schema
-from marshmallow import post_load, fields
+from marshmallow import post_load, fields, EXCLUDE
+
+from app import ma
 
 
 class ExportInfo:
@@ -34,10 +36,14 @@ class ExportInfo:
 
 class ExportInfoSchema(Schema):
     class Meta:
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
+        include_fk = True
         ordered = True
         fields = ["table_name", "class_name", "display_name", "size", "url", "question_type", "sub_tables"]
 
-    sub_tables = fields.Nested("self", default=None, many=True, dump_only=True)
+    sub_tables = ma.Nested(lambda: ExportInfoSchema(), default=None, many=True, dump_only=True)
     display_name = fields.String(dump_only=True)
 
     @post_load

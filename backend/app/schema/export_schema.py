@@ -1,10 +1,10 @@
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, EXCLUDE, missing
 from marshmallow_enum import EnumField
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 from app import ma
 from app.model.participant import Participant, Relationship
 from app.model.user import User, Role
+from app.schema.model_schema import ModelSchema
 
 
 """
@@ -18,16 +18,11 @@ this file.
 """
 
 
-class UserExportSchema(SQLAlchemyAutoSchema):
+class UserExportSchema(ModelSchema):
     """ Used exclusively for data export, removes identifying information"""
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = User
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
         fields = ('id', 'last_updated', 'role', 'email_verified', 'email', '_links')
-        ordered = True
-        include_fk = True
     role = EnumField(Role)
     email = fields.Method("obfuscate_email")
     _links = ma.Hyperlinks({
@@ -35,32 +30,26 @@ class UserExportSchema(SQLAlchemyAutoSchema):
     })
 
     def obfuscate_email(self, obj):
+        if obj is None:
+            return missing
         return obj.id
 
 
-class AdminExportSchema(SQLAlchemyAutoSchema):
+class AdminExportSchema(ModelSchema):
     """Allows the full details of an admin account to be exported, so that administrators
     can continue to log into the secondary private server with their normal credentials."""
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = User
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
         fields = ('id', 'last_updated', 'email', '_password', 'role',
                   'participants', 'token', 'email_verified')
     role = EnumField(Role)
 
 
-class ParticipantExportSchema(SQLAlchemyAutoSchema):
+class ParticipantExportSchema(ModelSchema):
     """ Used exclusively for data export, removes identifying information"""
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = Participant
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
         fields = ('id', 'last_updated', 'user_id', 'relationship', 'avatar_icon', 'avatar_color', '_links')
-        ordered = True
-        include_fk = True
     relationship = EnumField(Relationship)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.participantendpoint', id='<id>'),

@@ -1,8 +1,6 @@
-from marshmallow import EXCLUDE
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-
 from app import db, ma
 from app.model.questionnaires.evaluation_history_mixin import EvaluationHistoryMixin
+from app.schema.model_schema import ModelSchema
 
 
 class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
@@ -24,12 +22,9 @@ class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
         return field_groups
 
 
-class EvaluationHistorySelfQuestionnaireSchema(SQLAlchemyAutoSchema):
-    class Meta:
+class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = EvaluationHistorySelfQuestionnaire
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",
@@ -49,7 +44,6 @@ class EvaluationHistorySelfQuestionnaireSchema(SQLAlchemyAutoSchema):
             "recent_iq_score",
             "_links"
         )
-        ordered = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name='evaluation_history_self_questionnaire', id='<id>'),
     })

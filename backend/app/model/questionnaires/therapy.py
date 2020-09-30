@@ -1,8 +1,8 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, missing
 from sqlalchemy import func
 
 from app import db
+from app.schema.model_schema import ModelSchema
 
 
 class Therapy(db.Model):
@@ -137,20 +137,20 @@ class Therapy(db.Model):
         return info
 
 
-class TherapySchema(SQLAlchemyAutoSchema):
-    class Meta:
+class TherapySchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = Therapy
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
-        ordered = True
         fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other",
                   "timeframe", "notes", "participant_id", "user_id")
     participant_id = fields.Method('get_participant_id', dump_only=True)
     user_id = fields.Method('get_user_id', dump_only=True)
 
     def get_participant_id(self, obj):
+        if obj is None:
+            return missing
         return obj.supports_questionnaire.participant_id
 
     def get_user_id(self, obj):
+        if obj is None:
+            return missing
         return obj.supports_questionnaire.user_id

@@ -1,8 +1,6 @@
-from marshmallow import EXCLUDE
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-
 from app import db, ma
 from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMixin
+from app.schema.model_schema import ModelSchema
 
 
 class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
@@ -92,12 +90,9 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
         return super().get_field_groups()
 
 
-class CurrentBehaviorsDependentQuestionnaireSchema(SQLAlchemyAutoSchema):
-    class Meta:
+class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = CurrentBehaviorsDependentQuestionnaire
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
         fields = (
             "id",
             "last_updated",
@@ -112,7 +107,6 @@ class CurrentBehaviorsDependentQuestionnaireSchema(SQLAlchemyAutoSchema):
             "academic_difficulty_other",
             "_links"
         )
-        ordered = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name='current_behaviors_dependent_questionnaire', id='<id>'),
     })

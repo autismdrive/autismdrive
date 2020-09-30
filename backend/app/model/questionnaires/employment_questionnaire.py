@@ -1,9 +1,8 @@
-from marshmallow import EXCLUDE
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app import db, ma
 from app.export_service import ExportService
+from app.schema.model_schema import ModelSchema
 
 
 class EmploymentQuestionnaire(db.Model):
@@ -81,14 +80,9 @@ class EmploymentQuestionnaire(db.Model):
         return {}
 
 
-class EmploymentQuestionnaireSchema(SQLAlchemyAutoSchema):
-    class Meta:
+class EmploymentQuestionnaireSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = EmploymentQuestionnaire
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
-        ordered = True
-        include_fk = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name='employment_questionnaire', id='<id>'),
     })

@@ -1,8 +1,8 @@
 from marshmallow import fields, EXCLUDE
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func, ForeignKey
 
 from app import db, ma
+from app.schema.model_schema import ModelSchema
 
 
 class DataTransferLog(db.Model):
@@ -48,27 +48,17 @@ class DataTransferLogDetail(db.Model):
         self.success_count += 1
 
 
-class DataTransferLogDetailSchema(SQLAlchemyAutoSchema):
-    class Meta:
+class DataTransferLogDetailSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = DataTransferLogDetail
-        ordered = True
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
-        include_fk = True
 
 
-class DataTransferLogSchema(SQLAlchemyAutoSchema):
-    class Meta:
+class DataTransferLogSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
         model = DataTransferLog
         fields = ('id', 'type', 'date_started', 'last_updated', 'total_records',
                   'alerts_sent', 'details', '_links')
-        ordered = True
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
-        include_fk = True
-    details = fields.Nested(DataTransferLogDetailSchema, dump_only=True, many=True)
+    details = ma.Nested(DataTransferLogDetailSchema, dump_only=True, many=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.datatransferlogendpoint', id='<id>')
     })

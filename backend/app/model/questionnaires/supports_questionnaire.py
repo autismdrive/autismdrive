@@ -1,5 +1,4 @@
-from marshmallow import fields, pre_load, EXCLUDE
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields, pre_load
 from sqlalchemy import func
 
 from app import db, ma
@@ -8,6 +7,7 @@ from app.model.questionnaires.therapy import Therapy, TherapySchema
 from app.model.questionnaires.medication import Medication, MedicationSchema
 from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative, AlternativeAugmentativeSchema
+from app.schema.model_schema import ModelSchema
 
 
 class SupportsQuestionnaire(db.Model):
@@ -186,7 +186,7 @@ class SupportsQuestionnaire(db.Model):
         }
 
 
-class SupportsQuestionnaireSchema(SQLAlchemyAutoSchema):
+class SupportsQuestionnaireSchema(ModelSchema):
     @pre_load
     def set_field_session(self, data, **kwargs):
         self.fields['medications'].schema.session = self.session
@@ -195,19 +195,14 @@ class SupportsQuestionnaireSchema(SQLAlchemyAutoSchema):
         self.fields['assistive_devices'].schema.session = self.session
         return data
 
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = SupportsQuestionnaire
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
-        ordered = True
-        include_fk = True
         fields = ("id", "last_updated", "time_on_task_ms", "participant_id", "user_id", "medications", "therapies",
                   "assistive_devices", "alternative_augmentative", "_links")
-    medications = fields.Nested(MedicationSchema, many=True)
-    therapies = fields.Nested(TherapySchema, many=True)
-    assistive_devices = fields.Nested(AssistiveDeviceSchema, many=True)
-    alternative_augmentative = fields.Nested(AlternativeAugmentativeSchema, many=True)
+    medications = ma.Nested(MedicationSchema, many=True)
+    therapies = ma.Nested(TherapySchema, many=True)
+    assistive_devices = ma.Nested(AssistiveDeviceSchema, many=True)
+    alternative_augmentative = ma.Nested(AlternativeAugmentativeSchema, many=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name='supports_questionnaire', id='<id>'),
     })
