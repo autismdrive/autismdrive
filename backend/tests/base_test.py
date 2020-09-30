@@ -181,7 +181,7 @@ class BaseTest:
 
         db_location = db.session.query(Location).filter_by(title=location.title).first()
         self.assertEqual(db_location.website, location.website)
-        elastic_index.add_document(db_location, True, latitude=latitude, longitude=longitude)
+        elastic_index.add_document(document=db_location, flush=True, latitude=latitude, longitude=longitude)
         return db_location
 
     def construct_location_category(self, location_id, category_name):

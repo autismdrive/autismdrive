@@ -20,7 +20,6 @@ def get_date_arg():
     if date_arg:
         after_date = datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT)
 
-    print('after_date', after_date)
     return after_date
 
 

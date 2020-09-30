@@ -31,6 +31,7 @@ class ExportInfo:
         title = re.sub('([a-z0-9])([A-Z])', r'\1 \2', title)
         return title.replace("Questionnaire", "").strip()[:30]
 
+
 class ExportInfoSchema(Schema):
     class Meta:
         ordered = True

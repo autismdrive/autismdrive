@@ -209,6 +209,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                 self.assertTrue('self' in d['_links'])
                 self.assert_success(self.app.get(d['_links']['self'], headers=self.logged_in_headers()))
 
+                rv_link = self.app.get(d['_links']['self'], follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+                rv_link_data = json.loads(rv_link.get_data(as_text=True))
+
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
         exports = ExportService.get_table_info()
