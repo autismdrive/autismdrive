@@ -567,6 +567,8 @@ class StudyInvestigatorSchema(ModelSchema):
 
 
 class SearchSchema(ma.Schema):
+    class Meta:
+        unknown = EXCLUDE
 
     class HitSchema(ma.Schema):
         id = fields.Integer()
@@ -614,7 +616,7 @@ class SearchSchema(ma.Schema):
     hits = ma.Nested(HitSchema(), many=True, dump_only=True)
     category = ma.Nested(CategoryInSearchSchema)
     ordered = True
-    date = fields.Date(allow_none=True)
+    date = fields.DateTime(allow_none=True)
     map_data_only = fields.Boolean()
 
     @post_load

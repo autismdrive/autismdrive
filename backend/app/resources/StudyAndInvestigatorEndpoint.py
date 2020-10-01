@@ -35,7 +35,11 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
 
     def post(self, study_id):
         request_data = request.get_json()
-        study_investigators = self.schema.load(request_data, many=True).data
+
+        for item in request_data:
+            item['study_id'] = study_id
+
+        study_investigators = self.schema.load(request_data, many=True)
         db.session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
         for c in study_investigators:
             db.session.add(StudyInvestigator(study_id=study_id,
@@ -63,9 +67,9 @@ class StudyInvestigatorListEndpoint(flask_restful.Resource):
 
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
+        load_result = self.schema.load(request_data)
         db.session.query(StudyInvestigator).filter_by(study_id=load_result.study_id,
-                                                     investigator_id=load_result.investigator_id).delete()
+                                                      investigator_id=load_result.investigator_id).delete()
         db.session.add(load_result)
         db.session.commit()
         return self.schema.dump(load_result)

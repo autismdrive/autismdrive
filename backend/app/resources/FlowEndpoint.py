@@ -32,7 +32,7 @@ class FlowListEndpoint(flask_restful.Resource):
     flows_schema = FlowSchema(many=True)
 
     def get(self):
-        return self.flows_schema.dump(Flows.get_all_flows()).data
+        return self.flows_schema.dump(Flows.get_all_flows())
 
 
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):

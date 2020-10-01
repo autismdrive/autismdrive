@@ -86,7 +86,7 @@ class ResourceListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.resourceSchema.load(request_data).data
+            load_result = self.resourceSchema.load(request_data)
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Resource')

@@ -45,7 +45,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         response["image_url"] = '/some/url'
         response["coordinator_email"] = 'hello@study.com'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/study/%i' % s_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True)
         self.assert_success(rv)
         rv = self.app.get('/api/study/%i' % s_id, content_type="application/json")
@@ -75,7 +75,7 @@ class TestStudy(BaseTest, unittest.TestCase):
     def test_create_study(self):
         study = {'title': "Study of Studies", 'benefit_description': "This study will change your life.",
                  'organization_name': "Study Org"}
-        rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
+        rv = self.app.post('api/study', data=self.jsonify(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -155,7 +155,7 @@ class TestStudy(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/study_category',
-            data=json.dumps(sc_data),
+            data=self.jsonify(sc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -181,7 +181,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         ]
         rv = self.app.post(
             '/api/study/%i/category' % s.id,
-            data=json.dumps(sc_data),
+            data=self.jsonify(sc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -190,7 +190,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         sc_data = [{"category_id": c1.id}]
         rv = self.app.post(
             '/api/study/%i/category' % s.id,
-            data=json.dumps(sc_data),
+            data=self.jsonify(sc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -214,7 +214,7 @@ class TestStudy(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/study_investigator',
-            data=json.dumps(si_data),
+            data=self.jsonify(si_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -234,7 +234,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         ]
         rv = self.app.post(
             '/api/study/%i/investigator' % s.id,
-            data=json.dumps(si_data),
+            data=self.jsonify(si_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -243,7 +243,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         si_data = [{"investigator_id": i1.id}]
         rv = self.app.post(
             '/api/study/%i/investigator' % s.id,
-            data=json.dumps(si_data),
+            data=self.jsonify(si_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -271,7 +271,7 @@ class TestStudy(BaseTest, unittest.TestCase):
 
         data = {'user_id': u.id, 'study_id': s.id}
         rv = self.app.post('/api/study_inquiry',
-                           data=json.dumps(data),
+                           data=self.jsonify(data),
                            follow_redirects=True,
                            content_type="application/json",
                            headers=self.logged_in_headers())
@@ -298,7 +298,7 @@ class TestStudy(BaseTest, unittest.TestCase):
 
         data = {'user_id': u.id, 'study_id': s.id}
         rv = self.app.post('/api/study_inquiry',
-                           data=json.dumps(data),
+                           data=self.jsonify(data),
                            follow_redirects=True,
                            content_type="application/json",
                            headers=self.logged_in_headers())
@@ -319,7 +319,7 @@ class TestStudy(BaseTest, unittest.TestCase):
 
         data = {'user_id': u.id, 'study_id': 456}
         rv = self.app.post('/api/study_inquiry',
-                           data=json.dumps(data),
+                           data=self.jsonify(data),
                            follow_redirects=True,
                            content_type="application/json",
                            headers=self.logged_in_headers())
@@ -328,7 +328,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(response['message'], 'Error in finding correct user and study to complete study inquiry')
         data = {'user_id': 456, 'study_id': s.id}
         rv = self.app.post('/api/study_inquiry',
-                           data=json.dumps(data),
+                           data=self.jsonify(data),
                            follow_redirects=True,
                            content_type="application/json",
                            headers=self.logged_in_headers())

@@ -35,7 +35,11 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
 
     def post(self, resource_id):
         request_data = request.get_json()
-        resource_categories = self.schema.load(request_data, many=True).data
+
+        for item in request_data:
+            item['resource_id'] = resource_id
+
+        resource_categories = self.schema.load(request_data, many=True)
         db.session.query(ResourceCategory).filter_by(resource_id=resource_id).delete()
         for c in resource_categories:
             db.session.add(ResourceCategory(resource_id=resource_id,

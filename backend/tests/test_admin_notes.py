@@ -32,7 +32,7 @@ class TestAdminNote(BaseTest, unittest.TestCase):
         rv = self.app.get('/api/admin_note/%i' % an.id, content_type="application/json", headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         response['note'] = 'Related to Location #42'
-        rv = self.app.put('/api/admin_note/%i' % an.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/admin_note/%i' % an.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         db.session.commit()
@@ -55,7 +55,7 @@ class TestAdminNote(BaseTest, unittest.TestCase):
 
     def test_create_admin_note(self):
         admin_note = {'note': "My Favorite Things", 'user_id': self.construct_user().id, 'resource_id': self.construct_resource().id}
-        rv = self.app.post('api/admin_note', data=json.dumps(admin_note), content_type="application/json",
+        rv = self.app.post('api/admin_note', data=self.jsonify(admin_note), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))

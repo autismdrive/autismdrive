@@ -1,12 +1,11 @@
 import unittest
+import json
 from datetime import datetime, timedelta
 
-from flask import json
-
+from tests.base_test import BaseTest
 from app import elastic_index, db
 from app.model.category import Category
 from app.model.role import Role
-from tests.base_test import BaseTest
 
 
 class TestSearch(BaseTest, unittest.TestCase):
@@ -15,7 +14,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         """Executes a query as the given user, returning the resulting search results object."""
         rv = self.app.post(
             '/api/search' + path,
-            data=json.dumps(query),
+            data=self.jsonify(query),
             follow_redirects=True,
             content_type="application/json",
             headers=self.logged_in_headers(user))
@@ -32,7 +31,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         """Executes a query as an anonymous user, returning the resulting search results object."""
         rv = self.app.post(
             '/api/search',
-            data=json.dumps(query),
+            data=self.jsonify(query),
             follow_redirects=True,
             content_type="application/json")
         self.assert_success(rv)
@@ -119,7 +118,7 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         # test that elastic resource is created with post
         study = {'title': "space platypus", 'description': "delivering umbrellas", 'organization_name': "Study Org"}
-        rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
+        rv = self.app.post('api/study', data=self.jsonify(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -140,7 +139,7 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         # test that elastic resource is created with post
         resource = {'title': "space unicorn", 'description': "delivering rainbows", 'organization_name': "Resource Org"}
-        rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
+        rv = self.app.post('api/resource', data=self.jsonify(resource), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -229,7 +228,7 @@ class TestSearch(BaseTest, unittest.TestCase):
 
         response = json.loads(rv.get_data(as_text=True))
         response['description'] = 'all around the world'
-        rv = self.app.put('/api/resource/%i' % resource.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/resource/%i' % resource.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
 
@@ -476,7 +475,7 @@ class TestSearch(BaseTest, unittest.TestCase):
                                              "Bar %d" % i,
                                  categories=[sweets])
 
-        rv = self.app.post('/api/related', data=json.dumps({'resource_id': breakfast_club.id}), content_type="application/json")
+        rv = self.app.post('/api/related', data=self.jsonify({'resource_id': breakfast_club.id}), content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertTrue('resources' in response.keys())
@@ -556,7 +555,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(6, len(search_results['hits']))
         for hit in search_results['hits']:
             if hit['type'] == 'event':
-                self.assertGreaterEqual(datetime.strptime(hit['date'], "%Y-%m-%dT%H:%M:%S.%f"), now)
+                self.assertGreaterEqual(datetime.strptime(hit['date'], "%Y-%m-%d"), now)
             else:
                 self.assertTrue(hit['date'] is None)
 
@@ -598,7 +597,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         # test that elastic resource is created with post
         study = {'status': "currently_enrolling", 'title': "space platypus", 'description': "delivering umbrellas",
                  'organization_name': "Study Org"}
-        rv = self.app.post('api/study', data=json.dumps(study), content_type="application/json",
+        rv = self.app.post('api/study', data=self.jsonify(study), content_type="application/json",
                            follow_redirects=True)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -610,7 +609,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(search_results['hits'][0]['status'], 'Currently enrolling')
 
         response['status'] = "study_in_progress"
-        rv = self.app.put('/api/study/%i' % s_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/study/%i' % s_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True)
         self.assert_success(rv)
         rv = self.app.get('/api/study/%i' % s_id, content_type="application/json")
@@ -654,7 +653,7 @@ class TestSearch(BaseTest, unittest.TestCase):
         data = {'email': user.email, 'password': password}
         rv = self.app.post(
             '/api/login_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))

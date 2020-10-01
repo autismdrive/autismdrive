@@ -35,8 +35,10 @@ class StudyEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Study).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            updated = self.schema.load(request_data, instance=instance)
+        except Exception as errors:
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
@@ -56,7 +58,7 @@ class StudyListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.studySchema.load(request_data).data
+            load_result = self.studySchema.load(request_data)
             db.session.add(load_result)
             db.session.commit()
             elastic_index.add_document(load_result, 'Study')
