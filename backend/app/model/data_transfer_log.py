@@ -1,4 +1,4 @@
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields
 from sqlalchemy import func, ForeignKey
 
 from app import db, ma
