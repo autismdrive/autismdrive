@@ -58,7 +58,7 @@ class UserFavoriteListEndpoint(flask_restful.Resource):
     @auth.login_required
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data, many=True).data
+        load_result = self.schema.load(request_data, many=True)
         if load_result[0].type != 'resource':
             db.session.query(UserFavorite).filter_by(user_id=load_result[0].user_id, resource_id=None).delete()
         db.session.add_all(load_result)

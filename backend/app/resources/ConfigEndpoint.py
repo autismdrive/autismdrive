@@ -10,4 +10,4 @@ class ConfigEndpoint(flask_restful.Resource):
 
     def get(self):
         config = FrontendConfig()
-        return jsonify(self.schema.dump(config).data)
+        return jsonify(self.schema.dump(config))

@@ -26,5 +26,5 @@ class TestDataTransferLogs(BaseTest, unittest.TestCase):
         self.assertEqual(20, response['total'])
         self.assertEqual(2, response['pages'])
         self.assertEqual(10, len(response['items']))
-        results = DataTransferLogSchema(many=True, session=db.session).load(response['items']).data
+        results = DataTransferLogSchema(many=True, session=db.session).load(response['items'])
         self.assertEqual(10, len(results))

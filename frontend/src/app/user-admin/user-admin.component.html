@@ -110,6 +110,42 @@
       </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="created_password">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Created Password</mat-header-cell>
+      <mat-cell
+        *matCellDef="let user"
+      >
+        {{user.created_password}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="identity">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Identity</mat-header-cell>
+      <mat-cell
+        *matCellDef="let user"
+      >
+        {{user.identity}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="percent_self_registration_complete">
+      <mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+      >Percent Self Registration Complete</mat-header-cell>
+      <mat-cell
+        *matCellDef="let user"
+      >
+        {{user.percent_self_registration_complete | percent}}
+      </mat-cell>
+    </ng-container>
+
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 

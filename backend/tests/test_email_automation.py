@@ -34,15 +34,15 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             'user_id': u1.id,
             'participant_id': p1.id
         }
-        self.app.post('api/flow/guardian_intake/identification_questionnaire', data=json.dumps(q1),
+        self.app.post('api/flow/guardian_intake/identification_questionnaire', data=self.jsonify(q1),
                       content_type="application/json",
                       follow_redirects=True, headers=self.logged_in_headers(u1))
 
-        self.app.post('api/flow/guardian_intake/contact_questionnaire', data=json.dumps(q1),
+        self.app.post('api/flow/guardian_intake/contact_questionnaire', data=self.jsonify(q1),
                       content_type="application/json",
                       follow_redirects=True, headers=self.logged_in_headers(u1))
 
-        self.app.post('api/flow/guardian_intake/demographics_questionnaire', data=json.dumps(q1),
+        self.app.post('api/flow/guardian_intake/demographics_questionnaire', data=self.jsonify(q1),
                       content_type="application/json",
                       follow_redirects=True, headers=self.logged_in_headers(u1))
 
@@ -152,15 +152,15 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             'user_id': u1.id,
             'participant_id': p1.id
         }
-        self.app.post('api/flow/guardian_intake/identification_questionnaire', data=json.dumps(q1),
+        self.app.post('api/flow/guardian_intake/identification_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
 
-        self.app.post('api/flow/guardian_intake/contact_questionnaire', data=json.dumps(q1),
+        self.app.post('api/flow/guardian_intake/contact_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
 
-        self.app.post('api/flow/guardian_intake/demographics_questionnaire', data=json.dumps(q1),
+        self.app.post('api/flow/guardian_intake/demographics_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
 
@@ -172,11 +172,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             'user_id': u2.id,
             'participant_id': p2.id
         }
-        self.app.post('api/flow/guardian_intake/identification_questionnaire', data=json.dumps(q2),
+        self.app.post('api/flow/guardian_intake/identification_questionnaire', data=self.jsonify(q2),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u2))
 
-        self.app.post('api/flow/guardian_intake/contact_questionnaire', data=json.dumps(q2),
+        self.app.post('api/flow/guardian_intake/contact_questionnaire', data=self.jsonify(q2),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u2))
 
@@ -226,7 +226,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             'user_id': u1.id,
             'participant_id': d1.id
         }
-        rv = self.app.post('api/flow/dependent_intake/developmental_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/developmental_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
@@ -245,39 +245,39 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             'user_id': u1.id,
             'participant_id': d1.id
         }
-        rv = self.app.post('api/flow/dependent_intake/identification_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/identification_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/demographics_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/demographics_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/home_dependent_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/home_dependent_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/evaluation_history_dependent_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/evaluation_history_dependent_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/clinical_diagnoses_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/clinical_diagnoses_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/developmental_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/developmental_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/current_behaviors_dependent_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/current_behaviors_dependent_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/education_dependent_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/education_dependent_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)
-        rv = self.app.post('api/flow/dependent_intake/supports_questionnaire', data=json.dumps(q1),
+        rv = self.app.post('api/flow/dependent_intake/supports_questionnaire', data=self.jsonify(q1),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u1))
         self.assert_success(rv)

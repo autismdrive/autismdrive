@@ -21,6 +21,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
+import {MatMenuModule} from '@angular/material/menu';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -142,6 +143,7 @@ import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite
 import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
 import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
 import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
+import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
 
 // Attempt to load the configuration from a file called config.json right next to
@@ -294,56 +296,58 @@ export class FormlyConfig {
     FavoriteTopicsComponent,
     InvestigatorFormComponent,
     StudySurveyEntryComponent,
+    RegisterDialogComponent,
     EmailLogAdminComponent,
   ],
-  imports: [
-    AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
-    AgmJsMarkerClustererModule,
-    BrowserAnimationsModule,
-    BrowserModule,
-    CommonModule,
-    DeviceDetectorModule.forRoot(),
-    FlexLayoutModule,
-    FormlyMatDatepickerModule,
-    FormlyMaterialModule,
-    FormlyModule.forRoot(FormlyConfig.config),
-    FormsModule,
-    HttpClientModule,
-    MarkdownModule.forRoot(),
-    MatAutocompleteModule,
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatChipsModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatGridListModule,
-    MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatNativeDateModule,
-    MatPaginatorModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
-    MatRadioModule,
-    MatSelectModule,
-    MatSidenavModule,
-    MatSlideToggleModule,
-    MatSortModule,
-    MatStepperModule,
-    MatTabsModule,
-    MatTableModule,
-    MatToolbarModule,
-    MatTooltipModule,
-    NgProgressModule,
-    PdfJsViewerModule,
-    ReactiveFormsModule,
-    RoutingModule,
-    MatTreeModule,
-    MatBadgeModule,
-  ],
+    imports: [
+        AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
+        AgmJsMarkerClustererModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        CommonModule,
+        DeviceDetectorModule.forRoot(),
+        FlexLayoutModule,
+        FormlyMatDatepickerModule,
+        FormlyMaterialModule,
+        FormlyModule.forRoot(FormlyConfig.config),
+        FormsModule,
+        HttpClientModule,
+        MarkdownModule.forRoot(),
+        MatAutocompleteModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatChipsModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatGridListModule,
+        MatIconModule,
+        MatInputModule,
+        MatListModule,
+        MatNativeDateModule,
+        MatPaginatorModule,
+        MatProgressBarModule,
+        MatProgressSpinnerModule,
+        MatRadioModule,
+        MatSelectModule,
+        MatSidenavModule,
+        MatSlideToggleModule,
+        MatSortModule,
+        MatStepperModule,
+        MatTabsModule,
+        MatTableModule,
+        MatToolbarModule,
+        MatTooltipModule,
+        NgProgressModule,
+        PdfJsViewerModule,
+        ReactiveFormsModule,
+        RoutingModule,
+        MatTreeModule,
+        MatBadgeModule,
+        MatMenuModule,
+    ],
   providers: [
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
     {provide: LAZY_MAPS_API_CONFIG, useExisting: ConfigService},
@@ -362,7 +366,8 @@ export class FormlyConfig {
     RepeatSectionDialogComponent,
     AdminNoteFormComponent,
     FavoriteTopicsDialogComponent,
-    InvestigatorFormComponent
+    InvestigatorFormComponent,
+    RegisterDialogComponent
   ]
 })
 export class AppModule {

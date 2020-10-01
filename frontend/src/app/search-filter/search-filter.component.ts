@@ -10,6 +10,7 @@ import {Aggregation} from '../_models/query';
 export class SearchFilterComponent implements OnInit {
 
   @Input() label_title: string;
+  @Input() label_icon: string;
   @Input() label_any: string;
   @Input() label_map: {};
   @Input() aggregations: Aggregation[];

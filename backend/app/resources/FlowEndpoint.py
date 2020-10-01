@@ -2,6 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request, g
+from marshmallow import ValidationError
 
 from app import RestException, db, auth
 from app.model.participant import Participant
@@ -31,7 +32,7 @@ class FlowListEndpoint(flask_restful.Resource):
     flows_schema = FlowSchema(many=True)
 
     def get(self):
-        return self.flows_schema.dump(Flows.get_all_flows()).data
+        return self.flows_schema.dump(Flows.get_all_flows())
 
 
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
@@ -61,13 +62,20 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         if "_links" in request_data:
             request_data.pop("_links")
         schema = ExportService.get_schema(ExportService.camel_case_it(questionnaire_name))
-        new_quest, errors = schema.load(request_data, session=db.session)
 
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        if new_quest.participant_id is None: raise RestException(RestException.INVALID_OBJECT, details=
-                                                                 "You must supply a participant id.")
-        if not g.user.related_to_participant(new_quest.participant_id):
-            raise RestException(RestException.UNRELATED_PARTICIPANT)
+        try:
+            new_quest = schema.load(request_data, session=db.session)
+        except Exception as errors:
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
+
+        if hasattr(new_quest, 'participant_id'):
+            if new_quest.participant_id is None:
+                raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
+            if not g.user.related_to_participant(new_quest.participant_id):
+                raise RestException(RestException.UNRELATED_PARTICIPANT)
+        else:
+            raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
+
         db.session.add(new_quest)
         db.session.commit()
         self.log_progress(flow, questionnaire_name, new_quest)
@@ -79,7 +87,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
                       flow=flow.name,
                       participant_id=questionnaire.participant_id,
                       user_id=g.user.id,
-                      date_completed=datetime.datetime.now(),
+                      date_completed=datetime.datetime.utcnow(),
                       time_on_task_ms=questionnaire.time_on_task_ms)
         db.session.add(log)
         db.session.commit()

@@ -18,6 +18,9 @@ export class User {
   email_log?: EmailLog[];
   token_url?: string;
   participant_count?: number;
+  created_password: boolean;
+  identity: string;
+  percent_self_registration_complete: number;
 
   constructor(private _props) {
     for (const propName in this._props) {

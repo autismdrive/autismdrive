@@ -37,9 +37,13 @@ class ParticipantEndpoint(flask_restful.Resource):
         instance = db.session.query(Participant).filter_by(id=id).first()
         if not g.user.related_to_participant(instance.id) and not g.user.role == Role.admin:
             raise RestException(RestException.UNRELATED_PARTICIPANT)
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
+
+        try:
+            updated = self.schema.load(request_data, instance=instance)
+        except Exception as errors:
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
+
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         return self.schema.dump(updated)

@@ -1,7 +1,6 @@
-from marshmallow_sqlalchemy import ModelSchema
-
 from app import db
 from app.model.questionnaires.education_mixin import EducationMixin
+from app.schema.model_schema import ModelSchema
 
 
 class EducationDependentQuestionnaire(db.Model, EducationMixin):
@@ -53,7 +52,7 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
 
 
 class EducationDependentQuestionnaireSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = EducationDependentQuestionnaire
         fields = (
             "id",
@@ -70,4 +69,3 @@ class EducationDependentQuestionnaireSchema(ModelSchema):
             "school_services",
             "school_services_other",
         )
-        ordered = True

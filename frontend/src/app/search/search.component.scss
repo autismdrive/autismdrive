@@ -2,7 +2,6 @@
 
 #hero {
   background-color: $brand-gray-tint-4;
-  display: grid;
   padding-left: 16px;
   padding-right: 16px;
 
@@ -10,6 +9,7 @@
     color: $brand-primary;
     text-align: start;
     font-size: 2.5rem;
+    margin-bottom: 0;
   }
 
   app-search-box {
@@ -181,11 +181,6 @@ mat-expansion-panel, mat-accordion {
   }
 }
 
-agm-map {
-  height: 50vh;
-  width: 100%;
-}
-
 ::ng-deep .gm-style-iw.gm-style-iw-c, ::ng-deep .gm-style-iw-d {
   max-height: 50vh !important;
 
@@ -198,32 +193,6 @@ agm-map {
 
 ::ng-deep .mat-form-field-wrapper {
   padding-bottom: 0;
-}
-
-.zipCodeSet {
-  margin-left: 2em;
-  display: none;
-
-  ::ng-deep * {
-    display: none;
-  }
-
-  &.show {
-    display: inherit;
-
-    ::ng-deep * {
-      display: inherit;
-    }
-  }
-}
-
-.zipCodeSetButton {
-  opacity: 0;
-
-  &.show {
-    color: $brand-primary;
-    opacity: 1;
-  }
 }
 
 ::ng-deep .type-tabs {
@@ -247,17 +216,7 @@ agm-map {
   }
 }
 
-::ng-deep #set-location {
-  margin: auto 1em;
-
-  h4 {
-    font-size: 1.2rem;
-    line-height: 2;
-    margin-bottom: 0;
-  }
-}
-
-#sort-and-status, #map, #partners, #filters, #type-buttons {
+#sort-and-status, #partners, #filters, #type-buttons {
   margin: .5em 2em;
 }
 
@@ -289,15 +248,128 @@ agm-map {
   }
 }
 
-#map {
+#content {
   position: relative;
+}
+
+#location-and-map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  right: 0;
+
+  &.align-top, &.above {
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  &.docked {
+    &.up {
+      #set-location, #listMappedResultsButton { top: 194px; }
+    }
+
+    &.down {
+      #set-location, #listMappedResultsButton { top: 74px; }
+    }
+
+    #set-location {
+      position: fixed;
+      top: 74px;
+      left: calc(60% + 10px);
+      width: 240px;
+    }
+
+    #listMappedResultsButton {
+      position: fixed;
+      top: 74px;
+      right: 10px;
+      width: 240px;
+    }
+
+    #map {
+      position: fixed;
+      top: 64px;
+      left: 60%;
+      right: 0;
+      bottom: 0;
+    }
+  }
+
+  &.align-bottom {
+    #map {
+      position: absolute;
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      agm-map {
+        position: absolute;
+        bottom: 0;
+      }
+    }
+  }
 
   #listMappedResultsButton {
     position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    width: 240px;
+    height: 48px;
+    transition: top 300ms ease-in-out, margin-top 300ms ease-in-out;
+  }
+
+  ::ng-deep mat-expansion-panel#set-location {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    background-color: white;
+    border-radius: 5px;
+    width: 240px;
+    transition: top 300ms ease-in-out, margin-top 300ms ease-in-out;
+
+    ::ng-deep mat-expansion-panel-header {
+      font-size: 1em;
+      height: 48px !important;
+    }
+  }
+
+
+  #map {
+    height: 100%;
+
+    agm-map {
+      height: calc(100vh - 64px);
+      width: 100%;
+      z-index: 0;
+    }
+  }
+
+  .inset-shadow {
+    position: absolute;
     top: 0;
+    right: 0;
+    bottom: 0;
     left: 0;
-    z-index: 10;
-    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 40px 20px 40px -40px rgba(0, 0, 0, 0.1) inset;
+    z-index: 99;
+    pointer-events: none;
   }
 }
 
+#scroll-spy {
+  position: fixed;
+  top: 64px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  pointer-events: none;
+  background: transparent;
+}

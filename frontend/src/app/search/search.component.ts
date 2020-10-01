@@ -5,13 +5,16 @@ import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild, A
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatInput} from '@angular/material/input';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatTabChangeEvent} from '@angular/material/tabs';
+import {MatTabChangeEvent, MatTabGroup} from '@angular/material/tabs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
+import {fromEvent} from 'rxjs';
+import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
 import {AgeRange, HitType, Language} from '../_models/hit_type';
 import {Hit, Query, Sort} from '../_models/query';
 import {Resource} from '../_models/resource';
+import {Direction} from '../_models/scroll';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
@@ -135,6 +138,13 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
     },
     {
+      name: 'The Faison Center',
+      shortName: 'Faison Center',
+      description: 'The Faison School provides full-time day school programs for students ages 5 to 22 years.',
+      image: '/assets/partners/faison_center.png',
+      url: 'https://www.faisoncenter.org',
+    },
+    {
       name: 'Piedmont Regional Education Program',
       shortName: 'PREP',
       description: `
@@ -158,6 +168,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   private _mobileQueryListener: () => void;
   restrictToMappedResults: boolean;
   private mapBounds: LatLngBounds;
+  private scrollDirection: Direction;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -233,6 +244,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    this.watchScrollEvents();
     this.paginatorElement.pageIndex = (this.selectedPageStart - 1) / this.pageSize;
   }
 
@@ -536,14 +548,16 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setLocOpen = false;
   }
 
-  zipSubmit($event: MouseEvent|KeyboardEvent): void {
+  zipSubmit($event: MouseEvent|KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
+    setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');
     this.setLocOpen = false;
     this.reSort('Distance', true);
   }
 
-  useGPSLocation($event: MouseEvent|KeyboardEvent): void {
+  useGPSLocation($event: MouseEvent|KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
+    setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.removeItem('zipCode');
     this.storedZip = null;
@@ -742,4 +756,62 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   numTotalResults() {
     return this.query.total;
   }
+
+  calculateMapHeight(mapContainer: HTMLDivElement) {
+    return `${mapContainer.clientHeight}px`;
+  }
+
+  mapDockClass(scrollSpy: HTMLSpanElement, searchHeader: HTMLDivElement, searchFooter: HTMLDivElement): string {
+    const scrollSpyPos = scrollSpy.getBoundingClientRect();
+    const headerPos = searchHeader.getBoundingClientRect();
+    const footerPos = searchFooter.getBoundingClientRect();
+    const scrollDirection = this.scrollDirection ? this.scrollDirection.toLowerCase() : '';
+
+    let alignClass = '';
+
+    if (this._overlaps(scrollSpyPos, headerPos)) {
+      alignClass = 'align-top';
+    } else if (this._overlaps(scrollSpyPos, footerPos)) {
+      alignClass = 'align-bottom';
+    } else {
+      alignClass = 'docked';
+    }
+
+    return alignClass + ' ' + scrollDirection;
+  }
+
+  private _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
+    return (
+      ((b.top < a.top) && (b.bottom > a.top)) ||      // b overlaps top edge of a
+      ((b.top > a.top) && (b.bottom < a.bottom)) ||   // b inside a
+      ((b.top < a.bottom) && (b.bottom > a.bottom))   // b overlaps bottom edge of a
+    );
+  }
+
+  focusOnInput(zipCodeInput: HTMLInputElement) {
+    zipCodeInput.focus();
+  }
+
+  watchScrollEvents() {
+    const scroll$ = fromEvent(window, 'scroll').pipe(
+      throttleTime(10),
+      map((e: Event) => window.pageYOffset),
+      pairwise(),
+      map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
+      share()
+    );
+
+    scroll$
+      .pipe(filter(direction => direction === Direction.Up))
+      .subscribe(() => {
+        this.scrollDirection = Direction.Up;
+      });
+
+    scroll$
+      .pipe(filter(direction => direction === Direction.Down))
+      .subscribe(() => {
+        this.scrollDirection = Direction.Down;
+      });
+  }
+
 }

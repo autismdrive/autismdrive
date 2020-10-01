@@ -39,9 +39,10 @@ class CategoryEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Category).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            updated = self.schema.load(data=request_data, session=db.session, instance=instance)
+        except Exception as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e)
         db.session.add(updated)
         db.session.commit()
         return self.schema.dump(updated)
@@ -62,8 +63,10 @@ class CategoryListEndpoint(flask_restful.Resource):
     @requires_permission(Permission.taxonomy_admin)
     def post(self):
         request_data = request.get_json()
-        new_cat, errors = self.category_schema.load(request_data)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            new_cat = self.category_schema.load(data=request_data, session=db.session)
+        except Exception as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e)
         db.session.add(new_cat)
         db.session.commit()
         return self.category_schema.dump(new_cat)

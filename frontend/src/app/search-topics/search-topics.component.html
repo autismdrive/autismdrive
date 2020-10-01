@@ -1,4 +1,4 @@
-<mat-list dense *ngIf="category; else loadingMessage">
+<mat-list dense *ngIf="category">
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
         (click)="selectCategory(parent)"
@@ -12,21 +12,23 @@
     </ng-container>
 </mat-list>
 
-
-<mat-form-field *ngIf="category && category.children && category.children.length > 0">
-  <mat-label *ngIf="category.level == 0">By Topic</mat-label>
-  <mat-label *ngIf="category.level > 0">Select Subtopic</mat-label>
-  <mat-select>
-    <mat-option
-      *ngFor="let child of category.children"
-      (click)="selectCategory(child)"
-      [value]="child.id"
-    >
-      <span class="child-label" *ngIf="child.hit_count == 1">{{child.name}} - {{child.hit_count}} result</span>
-      <span class="child-label" *ngIf="child.hit_count != 1">{{child.name}} - {{child.hit_count}} results</span>
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+<ng-container *ngIf="category && category.children && (category.children.length > 0)">
+  <button mat-button [matMenuTriggerFor]="topicMenu">
+    <mat-icon>topic</mat-icon>
+    Filter by {{category.level <= 0 ? 'Topic' : 'Subtopic'}}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-menu #topicMenu>
+      <button
+        *ngFor="let child of category.children"
+        (click)="selectCategory(child)"
+        mat-menu-item
+      >
+        <span class="child-label" *ngIf="child.hit_count == 1">{{child.name}} - {{child.hit_count}} result</span>
+        <span class="child-label" *ngIf="child.hit_count != 1">{{child.name}} - {{child.hit_count}} results</span>
+      </button>
+  </mat-menu>
+</ng-container>
 
 <ng-template #loadingMessage>
   <app-loading [isField]="true"></app-loading>

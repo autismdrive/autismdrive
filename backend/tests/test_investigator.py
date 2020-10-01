@@ -31,7 +31,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'dungeon master'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/investigator/%i' % i.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/investigator/%i' % i.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
 
@@ -56,7 +56,7 @@ class TestStudy(BaseTest, unittest.TestCase):
     def test_create_investigator(self):
         investigator = {'name': "Tara Tarantula", 'title': "Assistant Professor of Arachnology",
                         'organization_name': "Spider University"}
-        rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
+        rv = self.app.post('api/investigator', data=self.jsonify(investigator), content_type="application/json",
                            headers=self.logged_in_headers(), follow_redirects=True)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -87,7 +87,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(response[0]['title'], 'Assistant Professor of Arachnology')
 
         investigator = {'name': "Tara Tarantula", 'title': "Spider"}
-        rv = self.app.post('api/investigator', data=json.dumps(investigator), content_type="application/json",
+        rv = self.app.post('api/investigator', data=self.jsonify(investigator), content_type="application/json",
                            headers=self.logged_in_headers(), follow_redirects=True)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
