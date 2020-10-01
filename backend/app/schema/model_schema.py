@@ -1,4 +1,5 @@
-from marshmallow import EXCLUDE
+from marshmallow.utils import EXCLUDE
+
 from app import ma
 
 

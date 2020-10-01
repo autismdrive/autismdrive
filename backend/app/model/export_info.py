@@ -1,7 +1,8 @@
 import re
 
 from flask_marshmallow import Schema
-from marshmallow import post_load, fields, EXCLUDE
+from marshmallow import post_load, fields
+from marshmallow.utils import EXCLUDE
 
 from app import ma
 

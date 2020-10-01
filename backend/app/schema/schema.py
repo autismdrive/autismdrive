@@ -1,4 +1,5 @@
-from marshmallow import fields, Schema, post_load, EXCLUDE, missing
+from marshmallow import fields, Schema, post_load, missing
+from marshmallow.utils import EXCLUDE
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 

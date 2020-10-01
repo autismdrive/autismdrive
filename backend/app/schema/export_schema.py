@@ -1,4 +1,4 @@
-from marshmallow import fields, EXCLUDE, missing
+from marshmallow import missing
 from marshmallow_enum import EnumField
 
 from app import ma

@@ -1,4 +1,3 @@
-from marshmallow import EXCLUDE
 from sqlalchemy import func
 
 from app import db
