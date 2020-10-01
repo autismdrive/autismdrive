@@ -109,7 +109,6 @@ class BaseTest:
                             "BAD Response: %i." % rv.status_code + ". " + msg)
 
     def construct_user(self, email="stan@staunton.com", role=Role.user, last_login=datetime.datetime.now()):
-
         db_user = db.session.query(User).filter_by(email=email).first()
         if db_user:
             return db_user

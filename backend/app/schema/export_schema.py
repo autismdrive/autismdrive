@@ -24,15 +24,10 @@ class UserExportSchema(ModelSchema):
         model = User
         fields = ('id', 'last_updated', 'role', 'email_verified', 'email', '_links')
     role = EnumField(Role)
-    email = fields.Method("obfuscate_email")
+    email = ma.Function(lambda obj: missing if obj is None else str(obj.id))
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.userendpoint', id='<id>'),
     })
-
-    def obfuscate_email(self, obj):
-        if obj is None:
-            return missing
-        return obj.id
 
 
 class AdminExportSchema(ModelSchema):

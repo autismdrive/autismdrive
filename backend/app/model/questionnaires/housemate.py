@@ -132,13 +132,21 @@ class HousemateSchema(ModelSchema):
     user_id = fields.Method('get_user_id')
     home_dependent_questionnaire_id = fields.Integer(required=False, allow_none=True)
     home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
+    home_dependent_questionnaire = fields.Nested('HomeDependentQuestionnaire', required=False, allow_none=True)
+    home_self_questionnaire = fields.Nested('HomeSelfQuestionnaire', required=False, allow_none=True)
 
     def get_participant_id(self, obj):
         if obj is None:
             return missing
-        return obj.supports_questionnaire.participant_id
+        elif obj.home_dependent_questionnaire is not None:
+            return obj.home_dependent_questionnaire.participant_id
+        elif obj.home_self_questionnaire is not None:
+            return obj.home_self_questionnaire.participant_id
 
     def get_user_id(self, obj):
         if obj is None:
             return missing
-        return obj.supports_questionnaire.user_id
+        elif obj.home_dependent_questionnaire is not None:
+            return obj.home_dependent_questionnaire.user_id
+        elif obj.home_self_questionnaire is not None:
+            return obj.home_self_questionnaire.user_id

@@ -403,7 +403,7 @@ class UserSchema(ModelSchema):
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
                   'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count',
-                  'created_password', 'identity', 'percent_self_registration_complete')
+                  'created_password', 'identity', 'percent_self_registration_complete', 'email_verified')
     password = fields.String(load_only=True)
     participants = ma.Nested(ParticipantSchema, dump_only=True, many=True)
     participant_count = fields.Integer(required=False, allow_none=True)
@@ -656,10 +656,8 @@ class AdminNoteSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = AdminNote
         fields = ('id', 'resource_id', 'user_id', 'resource', 'user', 'last_updated', 'note')
-    user = ma.auto_field(dump_only=True)
-    resource = ma.auto_field(dump_only=True)
-    # user = ma.Nested(UserSchema, dump_only=True)
-    # resource = ma.Nested(ResourceSchema, dump_only=True)
+    user = ma.Nested(UserSchema, dump_only=True)
+    resource = ma.Nested(ResourceSchema, dump_only=True)
 
 
 class StepLogSchema(ModelSchema):

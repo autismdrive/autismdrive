@@ -184,12 +184,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         iq = self.construct_identification_questionnaire(user=u, participant=p)
         id = u.id
         db.session.commit()
-
         data = self.get_export()
         clean_db(db)
         db.session.commit()
-        self.load_database(data)
 
+        self.load_database(data)
         self.assertEqual(ExportService.TYPE_IDENTIFYING,
                          IdentificationQuestionnaire().__question_type__)
         self.assertEqual(0, len(db.session.query(IdentificationQuestionnaire).all()),

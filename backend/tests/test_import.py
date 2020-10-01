@@ -128,8 +128,8 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
                     role=Role.user, email_verified=True, _password="m@kerspace")
-        user_json = json.dumps(UserExportSchema(many=True).dump([user]).data)
-        admin_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
+        user_json = json.dumps(UserExportSchema(many=True).dump([user]))
+        admin_json = json.dumps(AdminExportSchema(many=True).dump([user]))
 
         httpretty.register_uri(
             httpretty.GET,
@@ -236,7 +236,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
                     role=Role.admin, email_verified=True)
         user.password = password
-        user_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
+        user_json = json.dumps(AdminExportSchema(many=True).dump([user]))
         httpretty.register_uri(
             httpretty.GET,
             "http://na.edu/api/export/admin",
@@ -261,7 +261,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         q = self.construct_clinical_diagnoses_questionnaire()
         id = q.id
-        json_q = json.dumps(ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q]).data)
+        json_q = json.dumps(ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q]))
         db.session.delete(q)
 
         httpretty.register_uri(
@@ -293,7 +293,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         q = self.construct_employment_questionnaire()
         id = q.id
-        json_q = json.dumps(EmploymentQuestionnaireSchema(many=True).dump([q]).data)
+        json_q = json.dumps(EmploymentQuestionnaireSchema(many=True).dump([q]))
         db.session.delete(q)
 
         httpretty.register_uri(
