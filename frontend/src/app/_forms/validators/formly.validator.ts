@@ -12,6 +12,17 @@ export function EmailValidatorMessage(err, field: FormlyFieldConfig) {
   return `"${field.formControl.value}" is not a valid email address`;
 }
 
+export function EmailMatchValidator(control: FormControl): ValidationErrors {
+  const form = control.parent;
+  const email = form.get('email');
+  const emailConfirm = form.get('emailConfirm');
+  return emailConfirm.value === email.value || (!emailConfirm.value || !email.value) ? null : {'emailConfirm': true};
+}
+
+export function EmailMatchValidatorMessage(err, field: FormlyFieldConfig) {
+  return `Email Does Not Match`;
+}
+
 export function UrlValidator(control: FormControl): ValidationErrors {
   return  !control.value || URL_REGEX.test(control.value) ? null : { 'url': true };
 }

@@ -559,8 +559,6 @@ class TestSearch(BaseTest, unittest.TestCase):
             else:
                 self.assertTrue(hit['date'] is None)
 
-
-
     def test_search_for_map_points_only(self):
 
         # Add some locations with coordinates, and some with out.

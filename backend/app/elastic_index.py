@@ -151,7 +151,6 @@ class ElasticIndex:
         if hasattr(document, 'city') and document.city is not None:
             doc.content = doc.content + " " + document.city
 
-
         doc.meta.id = self._get_id(document)
 
         for cat in document.categories:

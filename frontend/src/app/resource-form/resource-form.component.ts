@@ -41,7 +41,7 @@ export class ResourceFormComponent implements OnInit {
         options: [
           {'value': 'resource', 'label': 'Online Information'},
           {'value': 'location', 'label': 'Local Services'},
-          {'value': 'event', 'label': 'Events and Training'}
+          {'value': 'event', 'label': 'Events and Training'},
         ],
         required: true,
       },
@@ -83,6 +83,23 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: '!model.type',
     },
     {
+      key: 'includes_registration',
+      type: 'radio',
+      defaultValue: false,
+      templateOptions: {
+        label: 'Allow Registration',
+        description: 'Should users be able to register for this event through Autism DRIVE?',
+        options: [
+          {value: true, label: 'Yes'},
+          {value: false, label: 'No'},
+        ]
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
+      },
+      hideExpression: 'model.type != "event"',
+    },
+    {
       key: 'date',
       type: 'datepicker',
       templateOptions: {
@@ -111,6 +128,36 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Event Ticket Cost',
         placeholder: 'Please enter the ticket cost for your event',
+      },
+      hideExpression: 'model.type != "event"',
+    },
+    {
+      key: 'webinar_link',
+      type: 'input',
+      templateOptions: {
+        label: 'Webinar Link',
+        placeholder: 'Please enter the link to attend the webinar',
+      },
+      hideExpression: 'model.type != "event"',
+      validators: {'validation': ['url']},
+    },
+    {
+      key: 'post_survey_link',
+      type: 'input',
+      templateOptions: {
+        label: 'Survey Link',
+        placeholder: 'Please enter the link to the post-event survey',
+      },
+      hideExpression: 'model.type != "event"',
+      validators: {'validation': ['url']},
+    },
+    {
+      key: 'max_users',
+      type: 'input',
+      templateOptions: {
+        label: 'Maximum attendees',
+        placeholder: 'Please enter the maximum number of users allowed to register',
+        type: 'number'
       },
       hideExpression: 'model.type != "event"',
     },

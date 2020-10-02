@@ -39,14 +39,14 @@ export class RelatedItemsComponent implements OnInit {
     }
   }
 
-  goFirstResource() {
+  goResource(resourceId: number) {
     this.googleAnalytics.relatedContentEvent('related_resource', this.parentComponent);
-    this.router.navigate(['/resource', this.relatedResources[0].id]);
+    this.router.navigate(['/resource', resourceId]);
   }
 
-  goFirstStudy() {
+  goStudy(studyId: number) {
     this.googleAnalytics.relatedContentEvent('related_study', this.parentComponent);
-    this.router.navigate(['/study', this.relatedStudies[0].id]);
+    this.router.navigate(['/study', studyId]);
   }
 
 }

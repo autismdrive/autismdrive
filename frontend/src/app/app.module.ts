@@ -57,6 +57,8 @@ import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.com
 import {
   EmailValidator,
   EmailValidatorMessage,
+  EmailMatchValidator,
+  EmailMatchValidatorMessage,
   MaxValidationMessage,
   MinValidationMessage,
   MulticheckboxValidator,
@@ -144,6 +146,8 @@ import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.compo
 import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
 import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
 import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
+import { EventRegistrationComponent } from './event-registration/event-registration.component';
+import { EventRegistrationFormComponent } from './event-registration-form/event-registration-form.component';
 import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
 
 // Attempt to load the configuration from a file called config.json right next to
@@ -196,10 +200,12 @@ export class FormlyConfig {
       {name: 'email', validation: EmailValidator},
       {name: 'url', validation: UrlValidator},
       {name: 'multicheckbox', validation: MulticheckboxValidator},
+      {name: 'emailConfirm', validation: EmailMatchValidator}
     ],
     validationMessages: [
       {name: 'phone', message: PhoneValidatorMessage},
       {name: 'email', message: EmailValidatorMessage},
+      {name: 'emailConfirm', message: EmailMatchValidatorMessage},
       {name: 'url', message: UrlValidatorMessage},
       {name: 'multicheckbox', message: MulticheckboxValidatorMessage},
       {name: 'required', message: 'This field is required.'},
@@ -297,6 +303,8 @@ export class FormlyConfig {
     InvestigatorFormComponent,
     StudySurveyEntryComponent,
     RegisterDialogComponent,
+    EventRegistrationComponent,
+    EventRegistrationFormComponent,
     EmailLogAdminComponent,
   ],
     imports: [
@@ -367,7 +375,8 @@ export class FormlyConfig {
     AdminNoteFormComponent,
     FavoriteTopicsDialogComponent,
     InvestigatorFormComponent,
-    RegisterDialogComponent
+    RegisterDialogComponent,
+    EventRegistrationFormComponent,
   ]
 })
 export class AppModule {
