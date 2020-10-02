@@ -274,7 +274,7 @@ class ResourceCategorySchema(ModelSchema):
 
 
 class EventUserSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = EventUser
         fields = ('id', 'last_updated', 'event_id', 'event', 'user_id', 'user')
     event_id = fields.Integer(required=False, allow_none=True)
