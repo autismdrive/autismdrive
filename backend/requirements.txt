@@ -12,6 +12,7 @@ psycopg2==2.8.6
 flask-bcrypt==0.7.1
 flask-cors==3.0.9
 flask-httpauth==4.1.0
+mod-wsgi==4.7.1
 PyJWT==1.7.1
 marshmallow-enum==1.5.1
 elasticsearch>=6.0.0,<7.0.0
