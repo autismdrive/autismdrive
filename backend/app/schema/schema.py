@@ -73,7 +73,7 @@ class ParentCategorySchema(ModelSchema):
         model = Category
         fields = ('id', 'name', 'parent', 'level', '_links')
     parent = ma.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level())
+    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
@@ -99,7 +99,7 @@ class CategoryInSearchSchema(ModelSchema):
     parent_id = fields.Number(required=False, allow_none=True)
     parent = ma.Nested(ParentCategorySchema, dump_only=True, required=False, allow_none=True)
     children = ma.Nested(ChildCategoryInSearchSchema, many=True, dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
 
 
 class CategorySchema(ModelSchema):
@@ -112,7 +112,7 @@ class CategorySchema(ModelSchema):
     parent_id = fields.Integer(required=False, allow_none=True)
     children = ma.Nested(lambda: CategorySchema(), many=True, dump_only=True, exclude=('parent', 'color'))
     parent = ma.Nested(ParentCategorySchema, dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
     event_count = fields.Method('get_event_count', dump_only=True)
     location_count = fields.Method('get_location_count', dump_only=True)
     resource_count = fields.Method('get_resource_count', dump_only=True)

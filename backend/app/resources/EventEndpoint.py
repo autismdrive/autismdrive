@@ -20,7 +20,8 @@ class EventEndpoint(flask_restful.Resource):
 
     def get(self, id):
         model = db.session.query(Event).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required

@@ -20,7 +20,7 @@ class Category(db.Model):
         """Provide the depth of the category """
         level = 0
         cat = self
-        while cat.parent:
+        while cat.parent and isinstance(cat, Category):
             level = level + 1
             cat = cat.parent
         return level
