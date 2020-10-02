@@ -128,8 +128,8 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
                     role=Role.user, email_verified=True, _password="m@kerspace")
-        user_json = json.dumps(UserExportSchema(many=True).dump([user]).data)
-        admin_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
+        user_json = self.jsonify(UserExportSchema(many=True).dump([user]))
+        admin_json = self.jsonify(AdminExportSchema(many=True).dump([user]))
 
         httpretty.register_uri(
             httpretty.GET,
@@ -181,7 +181,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
     def test_import_logs_schema_error(self):
         info = [ExportInfo('star_user', 'User', size=1, url="/api/export/user")]
         info_json = ExportInfoSchema(many=True).jsonify(info).data
-        user_json = json.dumps([{"id": "55", "pickes": "42"}])
+        user_json = self.jsonify([{"id": "55", "pickes": "42"}])
 
         httpretty.register_uri(
             httpretty.GET,
@@ -236,7 +236,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         user = User(id=4, last_updated=datetime.datetime.now(), email="dan@test.com",
                     role=Role.admin, email_verified=True)
         user.password = password
-        user_json = json.dumps(AdminExportSchema(many=True).dump([user]).data)
+        user_json = self.jsonify(AdminExportSchema(many=True).dump([user]))
         httpretty.register_uri(
             httpretty.GET,
             "http://na.edu/api/export/admin",
@@ -250,7 +250,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         data = {'email': 'dan@test.com', 'password': password}
         rv = self.app.post(
             '/api/login_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assertEqual(200, rv.status_code)
 
@@ -261,7 +261,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         q = self.construct_clinical_diagnoses_questionnaire()
         id = q.id
-        json_q = json.dumps(ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q]).data)
+        json_q = self.jsonify(ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q]))
         db.session.delete(q)
 
         httpretty.register_uri(
@@ -293,7 +293,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         q = self.construct_employment_questionnaire()
         id = q.id
-        json_q = json.dumps(EmploymentQuestionnaireSchema(many=True).dump([q]).data)
+        json_q = self.jsonify(EmploymentQuestionnaireSchema(many=True).dump([q]))
         db.session.delete(q)
 
         httpretty.register_uri(

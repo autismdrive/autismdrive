@@ -46,14 +46,14 @@ class EmailPromptService:
             if len(email_logs) > 0:
                 most_recent = email_logs[-1]
                 days_since_most_recent = (datetime.datetime.now(tz=UTC) - most_recent.last_updated).total_seconds() / 86400
-            if (len(email_logs) is 0) and (log_type is not 'confirm_email'):
+            if (len(email_logs) == 0) and (log_type != 'confirm_email'):
                 if (rec.last_login is not None) and ((datetime.datetime.now(tz=UTC) - rec.last_login).total_seconds() > (2 * 86400)):
                     self.__send_prompting_email(rec, send_method, log_type, '0days')
             elif 0 < len(email_logs) <= 2:
-                days = '7days' if len(email_logs) is 1 else '14days'
+                days = '7days' if len(email_logs) == 1 else '14days'
                 if days_since_most_recent > 7:
                     self.__send_prompting_email(rec, send_method, log_type, days)
-            elif len(email_logs) is 3:
+            elif len(email_logs) == 3:
                 if days_since_most_recent > 16:
                     self.__send_prompting_email(rec, send_method, log_type, '30days')
             elif 3 < len(email_logs) < 6:
@@ -63,11 +63,11 @@ class EmailPromptService:
 
     def __send_prompting_email(self, user, send_method, log_type, days):
         campaign = 'prompting'
-        if log_type is 'confirm_email':
+        if log_type == 'confirm_email':
             campaign = 'reset_password'
-        elif log_type is 'complete_registration_prompt':
+        elif log_type == 'complete_registration_prompt':
             campaign = 'create_yourprofile'
-        elif log_type is 'dependent_profile_prompt':
+        elif log_type == 'dependent_profile_prompt':
             campaign = 'create_dependentprofile'
         current_studies = self.db.session.query(self.study_model).filter_by(status='currently_enrolling').all()
         for study in current_studies:

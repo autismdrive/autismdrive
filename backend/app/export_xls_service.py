@@ -64,39 +64,40 @@ class ExportXlsService:
             schema = ExportService.get_schema(qname, many=True)
             header_fields = schema.fields
             if user_id:
-                questionnaires = schema.dump(ExportService().get_data(name=qname, user_id=user_id))
+                questionnaires = schema.dump(ExportService().get_data(name=qname, user_id=user_id), many=True)
             else:
-                questionnaires = schema.dump(ExportService().get_data(name=qname))
+                questionnaires = schema.dump(ExportService().get_data(name=qname), many=True)
 
             # Start from the first cell. Rows and columns are zero indexed.
             row = 0
             col = 0
 
             # Write the column headers.
-            for key in header_fields:
-                worksheet.write(row, col, key, bold)
-                col += 1
+            for (key, value) in header_fields.items():
+                if key != "_links":
+                    worksheet.write(row, col, key, bold)
+                    col += 1
             row += 1
 
             # Iterate over the data and write it out row by row.
-            for item in questionnaires[0]:
-                col = -1
-                for key in item:
+            for questionnaire in questionnaires:
+                # Start from the first cell. Rows and columns are zero indexed.
+                col = 0
+                for (key, value) in questionnaire.items():
                     if key == "_links":
+                        continue  # Don't export _links
+                    if isinstance(value, dict):
                         continue
-                    if isinstance(item[key], dict):
-                        continue
-                    if isinstance(item[key], list) and len(item[key]) > 0 and isinstance(item[key][0], dict):
-                        continue # Don't try to represent sub-table data.
-                    if isinstance(item[key], list):
+                    if isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+                        continue  # Don't try to represent sub-table data.
+                    if isinstance(value, list):
                         list_string = ''
-                        for value in item[key]:
-                            list_string = list_string + str(value) + ', '
-                        col += 1
+                        for list_value in value:
+                            list_string = list_string + str(list_value) + ', '
                         worksheet.write(row, col, list_string)
                     else:
-                        col += 1
-                        worksheet.write(row, col, item[key])
+                        worksheet.write(row, col, value)
+                    col += 1
                 row += 1
 
         # Close the workbook before streaming the data.
@@ -108,8 +109,8 @@ class ExportXlsService:
         # Add output to response
         response.data = output.read()
 
-        # Set filname
-        file_name = 'export_{}_{}.xlsx'.format(name, datetime.now())
+        # Set filename
+        file_name = 'export_{}_{}.xlsx'.format(name, datetime.utcnow())
 
         # HTTP headers for forcing file download
         response_headers = Headers({

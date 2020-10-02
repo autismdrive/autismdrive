@@ -143,6 +143,7 @@ import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite
 import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
 import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
 import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
+import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
 
 // Attempt to load the configuration from a file called config.json right next to
@@ -295,6 +296,7 @@ export class FormlyConfig {
     FavoriteTopicsComponent,
     InvestigatorFormComponent,
     StudySurveyEntryComponent,
+    RegisterDialogComponent,
     EmailLogAdminComponent,
   ],
     imports: [
@@ -364,7 +366,8 @@ export class FormlyConfig {
     RepeatSectionDialogComponent,
     AdminNoteFormComponent,
     FavoriteTopicsDialogComponent,
-    InvestigatorFormComponent
+    InvestigatorFormComponent,
+    RegisterDialogComponent
   ]
 })
 export class AppModule {

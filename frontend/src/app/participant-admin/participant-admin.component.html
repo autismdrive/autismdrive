@@ -10,7 +10,9 @@
     <h1>Participant Admin</h1>
 
     <mat-card *ngIf="userParticipantList">
-      <p>The filtered totals filter out all participants associated with Admin and Test User Accounts:</p>
+      <p>The filtered totals filter out all participants associated with Admin and Test User Accounts.</p>
+      <p>The subtotals reflect all guardians, self advocates, and dependents, but not professionals.</p>
+      <mat-divider></mat-divider>
       <div
         fxLayout="row"
         fxLayout.lt-sm="column"
@@ -18,17 +20,21 @@
       >
         <div>
           <p><i>Total Self Participants:</i> {{userParticipantList.num_self_participants}}</p>
-          <p><i>Total Self Professionals:</i> {{userParticipantList.num_self_professionals}}</p>
           <p><i>Total Self Guardians:</i> {{userParticipantList.num_self_guardians}}</p>
           <p><i>Total Dependents:</i> {{userParticipantList.num_dependents}}</p>
+          <p><b>SubTotal: {{userParticipantList.num_self_participants + userParticipantList.num_self_guardians + userParticipantList.num_dependents}}</b></p>
+          <hr>
+          <p><i>Total Self Professionals:</i> {{userParticipantList.num_self_professionals}}</p>
           <p><b>Total: {{userParticipantList.num_self_participants + userParticipantList.num_self_professionals
           + userParticipantList.num_self_guardians + userParticipantList.num_dependents}}</b></p>
         </div>
         <div>
           <p><i>Filtered Self Participants:</i> {{userParticipantList.filtered_self_participants}}</p>
-          <p><i>Filtered Self Professionals:</i> {{userParticipantList.filtered_self_professionals}}</p>
           <p><i>Filtered Self Guardians:</i> {{userParticipantList.filtered_self_guardians}}</p>
           <p><i>Filtered Dependents:</i> {{userParticipantList.filtered_dependents}}</p>
+          <p><b>Filtered SubTotal: {{userParticipantList.filtered_self_participants + userParticipantList.filtered_self_guardians + userParticipantList.filtered_dependents}}</b></p>
+          <hr>
+          <p><i>Filtered Self Professionals:</i> {{userParticipantList.filtered_self_professionals}}</p>
           <p><b>Filtered Total: {{userParticipantList.filtered_self_participants + userParticipantList.filtered_self_professionals
           + userParticipantList.filtered_self_guardians + userParticipantList.filtered_dependents}}</b></p>
         </div>

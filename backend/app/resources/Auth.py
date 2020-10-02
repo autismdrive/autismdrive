@@ -49,7 +49,7 @@ def login_password():
             auth_token = user.encode_auth_token().decode()
             g.user = user
             user.token = auth_token
-            user.last_login = datetime.datetime.now()
+            user.last_login = datetime.datetime.utcnow()
             db.session.add(user)
             db.session.commit()
             return schema.jsonify(user)
@@ -101,7 +101,7 @@ def reset_password():
     user.token_url = ''
     user.email_verified = True
     user.password = password
-    user.last_login = datetime.datetime.now()
+    user.last_login = datetime.datetime.utcnow()
     db.session.add(user)
     db.session.commit()
     auth_token = user.encode_auth_token().decode()

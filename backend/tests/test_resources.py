@@ -37,7 +37,7 @@ class TestResources(BaseTest, unittest.TestCase):
         response['description'] = 'Better fluids for you and your car.'
         response['website'] = 'http://sartography.com'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/resource/%i' % r_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/resource/%i' % r_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/resource/%i' % r_id, content_type="application/json")
@@ -77,7 +77,7 @@ class TestResources(BaseTest, unittest.TestCase):
     def test_create_resource(self):
         resource = {'title': "Resource of Resources", 'description': "You need this resource in your life.",
                     'organization_name': "Resource Org"}
-        rv = self.app.post('api/resource', data=json.dumps(resource), content_type="application/json",
+        rv = self.app.post('api/resource', data=self.jsonify(resource), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -157,7 +157,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/resource_category',
-            data=json.dumps(rc_data),
+            data=self.jsonify(rc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -183,7 +183,7 @@ class TestResources(BaseTest, unittest.TestCase):
         ]
         rv = self.app.post(
             '/api/resource/%i/category' % r.id,
-            data=json.dumps(rc_data),
+            data=self.jsonify(rc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -192,7 +192,7 @@ class TestResources(BaseTest, unittest.TestCase):
         rc_data = [{"category_id": c1.id}]
         rv = self.app.post(
             '/api/resource/%i/category' % r.id,
-            data=json.dumps(rc_data),
+            data=self.jsonify(rc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -211,7 +211,7 @@ class TestResources(BaseTest, unittest.TestCase):
     def test_resource_change_log_types(self):
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
         r = {'id': 258, 'title': "A Resource that is Super and Great", 'description': "You need this resource in your life."}
-        rv = self.app.post('api/resource', data=json.dumps(r), content_type="application/json",
+        rv = self.app.post('api/resource', data=self.jsonify(r), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
 
@@ -225,7 +225,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Super Great Resource'
-        rv = self.app.put('/api/resource/%i' % r['id'], data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/resource/%i' % r['id'], data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
         rv = self.app.get('/api/resource/%i' % r['id'], content_type="application/json")
@@ -255,7 +255,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Super Great Resource'
-        rv = self.app.put('/api/resource/%i' % r.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/resource/%i' % r.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
 
@@ -272,7 +272,7 @@ class TestResources(BaseTest, unittest.TestCase):
 
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Super Great Resource'
-        rv = self.app.put('/api/resource/%i' % r.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/resource/%i' % r.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
 
@@ -313,20 +313,19 @@ class TestResources(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(len(response), 1)
 
+    def test_is_uva_education_content(self):
+        self.construct_resource(is_draft=True, title='Autism at UVA', is_uva_education_content=True)
+        self.construct_resource(is_draft=False, title='Healthy Eating', is_uva_education_content=True)
+        self.construct_resource(is_draft=True, title='Autism and the Arts', is_uva_education_content=False)
+        self.construct_resource(is_draft=False, title='Autism One', is_uva_education_content=True)
+        self.construct_resource(is_draft=False, title='Two', is_uva_education_content=False)
 
-def test_is_uva_education_content(self):
-    self.construct_resource(_is_uva_education_content=True, is_draft=True, title='Autism at UVA')
-    self.construct_resource(_is_uva_education_content=True, is_draft=False, title='Healthy Eating')
-    self.construct_resource(_is_uva_education_content=False, is_draft=True, title='Autism and the Arts')
-    self.construct_resource(_is_uva_education_content=True, is_draft=False, title='Autism One')
-    self.construct_resource(_is_uva_education_content=False, is_draft=False, title='Two')
+        rv = self.app.get('api/resource/education', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(len(response), 2)
 
-    rv = self.app.get('api/resource/education', content_type="application/json")
-    self.assert_success(rv)
-    response = json.loads(rv.get_data(as_text=True))
-    self.assertEqual(len(response), 2)
-
-    rv = self.app.get('api/resource', content_type="application/json")
-    self.assert_success(rv)
-    response = json.loads(rv.get_data(as_text=True))
-    self.assertEqual(len(response), 5)
+        rv = self.app.get('api/resource', content_type="application/json")
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(len(response), 5)

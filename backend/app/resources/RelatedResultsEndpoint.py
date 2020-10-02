@@ -46,6 +46,6 @@ class RelatedResultsEndpoint(flask_restful.Resource):
         related_studies = db.session.query(Study).filter(Study.id.in_(study_ids))
 
         return jsonify({
-            'resources': self.resourcesSchema.dump(related_resources)[0],
-            'studies': self.studiesSchema.dump(related_studies)[0],
+            'resources': self.resourcesSchema.dump(related_resources),
+            'studies': self.studiesSchema.dump(related_studies),
         })

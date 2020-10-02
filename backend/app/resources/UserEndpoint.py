@@ -48,9 +48,11 @@ class UserEndpoint(flask_restful.Resource):
             else:
                 request_data['role'] = 'user'
         instance = db.session.query(User).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now()
+        try:
+            updated = self.schema.load(request_data, instance=instance)
+        except Exception as errors:
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         return self.schema.dump(updated)
@@ -91,8 +93,10 @@ class UserListEndpoint(flask_restful.Resource):
         request_data = request.get_json()
         try:
             request_data['role'] = 'user'
-            new_user, errors = self.userSchema.load(request_data)
-            if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+            try:
+                new_user = self.userSchema.load(request_data)
+            except Exception as errors:
+                raise RestException(RestException.INVALID_OBJECT, details=errors)
             email_exists = db.session.query(exists().where(User.email == new_user.email)).scalar()
             if email_exists:
                 raise RestException(RestException.EMAIL_EXISTS)

@@ -38,7 +38,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         response['description'] = 'Better fluids for you and your car.'
         response['website'] = 'http://sartography.com'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/event/%i' % r_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/event/%i' % r_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/event/%i' % r_id, content_type="application/json")
@@ -65,7 +65,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         data_loader.DataLoader().load_partial_zip_codes()
         event = {'title': "event of events", 'description': "You need this event in your life.", 'time': "4PM sharp",
                  'ticket_cost': "$500 suggested donation", 'organization_name': "Event Org"}
-        rv = self.app.post('api/event', data=json.dumps(event), content_type="application/json",
+        rv = self.app.post('api/event', data=self.jsonify(event), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -145,7 +145,7 @@ class TestEvents(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/resource_category',
-            data=json.dumps(ec_data),
+            data=self.jsonify(ec_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -171,7 +171,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         ]
         rv = self.app.post(
             '/api/event/%i/category' % ev.id,
-            data=json.dumps(ec_data),
+            data=self.jsonify(ec_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -180,7 +180,7 @@ class TestEvents(BaseTest, unittest.TestCase):
         ec_data = [{"category_id": c1.id}]
         rv = self.app.post(
             '/api/event/%i/category' % ev.id,
-            data=json.dumps(ec_data),
+            data=self.jsonify(ec_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -206,7 +206,7 @@ class TestEvents(BaseTest, unittest.TestCase):
 
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Super Great Event'
-        rv = self.app.put('/api/event/%i' % ev.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/event/%i' % ev.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
         rv = self.app.get('/api/event/%i' % ev.id, content_type="application/json")

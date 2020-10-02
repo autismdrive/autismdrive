@@ -104,7 +104,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        exports = ExportInfoSchema(many=True).load(response).data
+        exports = ExportInfoSchema(many=True).load(response)
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -114,9 +114,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
     def load_database(self, all_data):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        exports = ExportInfoSchema(many=True).load(response).data
+        exports = ExportInfoSchema(many=True).load(response)
         importer = ImportService(app, db)
-        log = importer.log_for_export(exports, datetime.datetime.now())
+        log = importer.log_for_export(exports, datetime.datetime.utcnow())
         for export in exports:
             export.json_data = all_data[export.class_name]
             importer.load_data(export, log)
@@ -130,9 +130,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         email_verified = u.email_verified
         orig_u_date = u.last_updated
 
-        orig_user_dict = UserSchema().dump(u).data  # Use standard schema
+        orig_user_dict = UserSchema().dump(u)  # Use standard schema
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
-        orig_p_dict = ParticipantSchema().dump(p).data  # Use standard schema
+        orig_p_dict = ParticipantSchema().dump(p)  # Use standard schema
         orig_p_date = p.last_updated
         db.session.commit()
 
@@ -184,12 +184,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         iq = self.construct_identification_questionnaire(user=u, participant=p)
         id = u.id
         db.session.commit()
-
         data = self.get_export()
         clean_db(db)
         db.session.commit()
-        self.load_database(data)
 
+        self.load_database(data)
         self.assertEqual(ExportService.TYPE_IDENTIFYING,
                          IdentificationQuestionnaire().__question_type__)
         self.assertEqual(0, len(db.session.query(IdentificationQuestionnaire).all()),
@@ -209,6 +208,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                 self.assertTrue('self' in d['_links'])
                 self.assert_success(self.app.get(d['_links']['self'], headers=self.logged_in_headers()))
 
+                rv_link = self.app.get(d['_links']['self'], follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+                rv_link_data = json.loads(rv_link.get_data(as_text=True))
+
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
         exports = ExportService.get_table_info()
@@ -223,9 +226,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-        #        date = datetime.datetime.now() - datetime.timedelta(minutes=5)
-
-        date = datetime.datetime.utcnow()
+        date = datetime.datetime.utcnow() + datetime.timedelta(seconds=1)  # One second in the future
         exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         for export in exports:
@@ -236,18 +237,18 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        date = datetime.datetime.utcnow()
+        date = datetime.datetime.utcnow() + datetime.timedelta(seconds=1)
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
 
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         for export in response:
-            self.assertTrue(export['size'] > 0, msg=export['class_name'] + " should have a count > 0")
+            self.assertGreater(export['size'], 0, msg=export['class_name'] + " should have a count > 0")
 
         rv = self.app.get('/api/export' + params, headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         for export in response:
-            self.assertTrue(export['size'] == 0, msg=export['class_name'] + " should have a count of 0")
+            self.assertEqual(export['size'], 0, msg=export['class_name'] + " should have a count of 0")
 
     def test_it_all_crazy_madness_wohoo(self):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.
@@ -294,7 +295,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         message_count = len(TEST_MESSAGES)
 
-        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=28), total_records=2,
+        log = DataTransferLog(last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=28), total_records=2,
                               type="export")
         db.session.add(log)
         db.session.commit()
@@ -302,10 +303,13 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(len(TEST_MESSAGES), message_count)
 
     def test_exporter_sends_email_alert_if_30_minutes_pass_without_export(self):
-
+        """
+        If more than 30 minutes pass without an export from the Public Mirror to the Private Mirror, an email should be
+        sent to an administrative email address.
+        """
         message_count = len(TEST_MESSAGES)
 
-        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=45), total_records=2,
+        log = DataTransferLog(last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=45), total_records=2,
                               type="export")
         db.session.add(log)
         db.session.commit()
@@ -321,39 +325,46 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual("admin@tester.com", TEST_MESSAGES[-1]['To'])
 
     def test_exporter_sends_second_email_after_2_hours(self):
-
+        """
+        If more than 2 hours pass without an export from the Public Mirror to the Private Mirror, an email will be
+        sent to an administrative email address at the 30 minute and 2 hour marks.
+        """
         message_count = len(TEST_MESSAGES)
 
-        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(minutes=30), total_records=2,
-                              type="export")
+        log = DataTransferLog(last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=30), total_records=2, type="export")
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
+        print('@ 30 minutes:', len(TEST_MESSAGES), 'messages')
         self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Error - 30 minutes since last successful export",
-                         self.decode(TEST_MESSAGES[-1]['subject']))
+        self.assertEqual("Autism DRIVE: Error - 30 minutes since last successful export", self.decode(TEST_MESSAGES[-1]['subject']))
 
-        log.last_updated = datetime.datetime.now() - datetime.timedelta(minutes=120)
+        log.last_updated = datetime.datetime.utcnow() - datetime.timedelta(minutes=120)
         db.session.add(log)
         db.session.commit()
         ExportService.send_alert_if_exports_not_running()
+        print('@ 2 hours:', len(TEST_MESSAGES), 'messages')
         self.assertGreater(len(TEST_MESSAGES), message_count + 1, "another email should have gone out")
-        self.assertEqual("Autism DRIVE: Error - 2 hours since last successful export",
-                         self.decode(TEST_MESSAGES[-1]['subject']))
+        self.assertEqual("Autism DRIVE: Error - 2 hours since last successful export", self.decode(TEST_MESSAGES[-1]['subject']))
 
     def test_exporter_sends_12_emails_over_first_24_hours(self):
+        """
+        If more than 24 hours pass without an export from the Public Mirror to the Private Mirror, an email will be
+        sent to an administrative email address at the 30 minute and then every 2 hours after that.
+        """
         message_count = len(TEST_MESSAGES)
-        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=22),
+        date = datetime.datetime.utcnow() - datetime.timedelta(hours=22)
+        log = DataTransferLog(last_updated=date,
                               total_records=2, type="export")
         db.session.add(log)
         db.session.commit()
-        for i in range(20):
+        for i in range(12):
             ExportService.send_alert_if_exports_not_running()
         self.assertEqual(message_count + 12, len(TEST_MESSAGES), msg="12 emails should have gone out.")
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(days=2), total_records=2,
+        log = DataTransferLog(last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=2), total_records=2,
                               type="export")
         db.session.add(log)
         db.session.commit()
@@ -363,7 +374,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = DataTransferLog(last_updated=datetime.datetime.now() - datetime.timedelta(hours=24), total_records=2,
+        log = DataTransferLog(last_updated=datetime.datetime.utcnow() - datetime.timedelta(hours=24), total_records=2,
                               type="export")
         db.session.add(log)
         db.session.commit()

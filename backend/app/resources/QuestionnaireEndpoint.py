@@ -2,7 +2,6 @@ import datetime
 import flask_restful
 import os
 
-from dateutil.tz import tzutc
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from app import app, db, RestException, auth
@@ -55,11 +54,13 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         request_data = request.get_json()
         if "_links" in request_data:
             request_data.pop("_links")
-        updated, errors = schema.load(request_data, instance=instance)
 
-        if errors:
+        try:
+            updated = schema.load(request_data, instance=instance)
+        except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.now(tz=tzutc())
+
+        updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
         return schema.dump(updated)

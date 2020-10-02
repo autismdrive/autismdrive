@@ -1,8 +1,8 @@
-from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
 from app import db, ma
 from app.export_service import ExportService
+from app.schema.model_schema import ModelSchema
 
 
 class ClinicalDiagnosesQuestionnaire(db.Model):
@@ -232,9 +232,9 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
 
 
 class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = ClinicalDiagnosesQuestionnaire
-        ordered = True
+
         include_fk = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name="clinical_diagnoses_questionnaire", id='<id>')
