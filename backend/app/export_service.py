@@ -1,9 +1,10 @@
 import datetime
 import importlib
 import re
+import logging
 
 from dateutil.tz import UTC
-from flask import url_for, logging
+from flask import url_for
 from sqlalchemy import func, desc
 
 from app import db, EmailService, app
@@ -40,25 +41,28 @@ class ExportService:
                 return c
 
     @staticmethod
-    def get_schema(name, many=False, session=None):
+    def get_schema(name, many=False, session=None, is_import=False):
         model = ExportService.get_class(name)
         class_name = model.__name__
+        schema_name = ''
+        schema_class = None
 
-        # Check for an 'ExportSchema'
-        schema_name = class_name + "ExportSchema"
-        schema_class = ExportService.str_to_class(ExportService.EXPORT_SCHEMA_PACKAGE, schema_name)
+        if not is_import:
+            # Check for an 'ExportSchema'
+            schema_name = class_name + "ExportSchema"
+            schema_class = ExportService.str_to_class(ExportService.EXPORT_SCHEMA_PACKAGE, schema_name)
 
         # If that doesn't work, then look in the resources schema file.
-        if not schema_class:
+        if schema_class is None:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(ExportService.SCHEMA_PACKAGE, schema_name)
 
         # If that doesn't work, check for a general schema in the class itself.
-        if not schema_class:
+        if schema_class is None:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(model.__module__, schema_name)
 
-        if not schema_class:
+        if schema_class is None:
             raise Exception("Unable to locate schema for class " + class_name)
 
         return schema_class(many=many, session=session)
@@ -142,9 +146,9 @@ class ExportService:
             try:
                 return getattr(module_, class_name)
             except AttributeError:
-                return False
+                return None
         except ImportError:
-            return False
+            return None
 
     # Given a string, creates an instance of that class
     @staticmethod
@@ -206,11 +210,13 @@ class ExportService:
         return meta_relationed
 
     @staticmethod
-    # this evil method recurses down through the metadata, removing items that have a
-    # RELATIONSHIP_REQUIRED, if the relationship isn't there and selecting the right
-    # content from a list, if RELATIONSHIP_SPECIFIC provides an array content for each
-    # possible type of relationship.
     def _recursive_relationship_changes(meta, relationship):
+        """
+        This evil method recurses down through the metadata, removing items that have a
+        RELATIONSHIP_REQUIRED, if the relationship isn't there and selecting the right
+        content from a list, if RELATIONSHIP_SPECIFIC provides an array content for each
+        possible type of relationship.
+        """
         meta_copy = {}
         for k, v in meta.items():
             if type(v) is dict:
@@ -240,12 +246,13 @@ class ExportService:
 
     @staticmethod
     def send_alert_if_exports_not_running():
-        """If more than 30 minutes pass without an export from the Public Mirror to the
-        Private Mirror, an email will be sent to an administrative email address.
-         Emails to this address will occur every two (2) hours for the first 24 hours
-          and every four hours after that until the fault is corrected or the system taken down.
-            After 24 hours, the PI will also be emailed notifications every 8 hours until
-             the fault is corrected or the system taken down."""
+        """
+        If more than 30 minutes pass without an export from the Public Mirror to the Private Mirror, an email will be
+        sent to an administrative email address. Emails to this address will occur every two (2) hours for the first
+        24 hours and every four hours after that until the fault is corrected or the system taken down. After 24
+        hours, the PI will also be emailed notifications every 8 hours until the fault is corrected or the system
+        taken down.
+        """
         alert_principal_investigator = False
         last_log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
             .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
@@ -257,7 +264,8 @@ class ExportService:
         else:
             msg = None
             subject = "Autism DRIVE: Error - "
-            time_difference = datetime.datetime.now(tz=UTC) - last_log.last_updated
+            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)  # Make date timezone aware
+            time_difference = now - last_log.last_updated
             hours = int(time_difference.total_seconds()/3600)
             minutes = int(time_difference.total_seconds()/60)
             if hours >= 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):

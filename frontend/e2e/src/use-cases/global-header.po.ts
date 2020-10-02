@@ -33,7 +33,7 @@ export class GlobalHeaderUseCases {
   }
 
   visitHomePage() {
-    this.page.clickLinkTo('/home');
+    this.page.clickAndExpectRoute('#logo', '/home');
     this.page.waitForVisible('app-news-item');
     expect(this.page.getElements('#hero').count()).toEqual(1);
     expect(this.page.getElements('.border-box-tile').count()).toBeGreaterThan(1);
@@ -68,15 +68,14 @@ export class GlobalHeaderUseCases {
     this.page.waitForVisible('app-search-result');
 
     ['resource', 'location', 'event'].forEach(t => {
-      expect(this.page.getElements(`app-border-box-tile .${t}`).count()).toEqual(1);
+      expect(this.page.getElements(`.type-tabs .${t}`).count()).toEqual(1);
     });
 
-    // TO DO: Re-enable this when we support no-address locations
+    // TODO: Re-enable this when we support no-address locations
     // expect(this.page.getElements('agm-map').count()).toEqual(1);
 
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     expect(this.page.getElements('.resource-gatherer').count()).toBeGreaterThan(1);
-    this.page.clickLinkTo('/home');
   }
 
   async checkForDoubleNavLabels() {

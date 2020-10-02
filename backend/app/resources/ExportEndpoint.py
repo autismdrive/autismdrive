@@ -19,6 +19,7 @@ def get_date_arg():
     after_date = None
     if date_arg:
         after_date = datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT)
+
     return after_date
 
 
@@ -48,7 +49,7 @@ class ExportListEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def get(self):
 
-        date_started = datetime.datetime.now()
+        date_started = datetime.datetime.utcnow()
         info_list = ExportService.get_table_info(get_date_arg())
 
         # Remove items that are not exportable, or that are identifying
@@ -71,7 +72,7 @@ class ExportListEndpoint(flask_restful.Resource):
             log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
                 .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
             if log is None: log = DataTransferLog(type="export", total_records=0)
-            log.last_updated = datetime.datetime.now()
+            log.last_updated = datetime.datetime.utcnow()
         db.session.add(log)
         db.session.commit()
 

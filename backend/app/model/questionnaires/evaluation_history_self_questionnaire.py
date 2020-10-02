@@ -1,7 +1,6 @@
-from marshmallow_sqlalchemy import ModelSchema
-
 from app import db, ma
 from app.model.questionnaires.evaluation_history_mixin import EvaluationHistoryMixin
+from app.schema.model_schema import ModelSchema
 
 
 class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
@@ -24,7 +23,7 @@ class EvaluationHistorySelfQuestionnaire(db.Model, EvaluationHistoryMixin):
 
 
 class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = EvaluationHistorySelfQuestionnaire
         fields = (
             "id",
@@ -45,7 +44,6 @@ class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
             "recent_iq_score",
             "_links"
         )
-        ordered = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name='evaluation_history_self_questionnaire', id='<id>'),
     })

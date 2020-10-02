@@ -28,7 +28,6 @@ from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
-
     def test_base_endpoint(self):
         rv = self.app.get('/',
                           follow_redirects=True,
@@ -68,7 +67,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
     def test_questionnare_post_fails_if_flow_does_not_exist(self):
         evaluation_history_self_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
         rv = self.app.post('api/flow/noSuchFlow/evaluation_history_self_questionnaire',
-                           data=json.dumps(evaluation_history_self_questionnaire), content_type="application/json",
+                           data=self.jsonify(evaluation_history_self_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=self.logged_in_headers())
         self.assertEqual(404, rv.status_code,
@@ -81,7 +80,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
     def test_questionnare_post_fails_if_question_not_in_flow(self):
         evaluation_history_self_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5}
         rv = self.app.post('api/flow/self_intake/guardian_demographics_questionnaire',
-                           data=json.dumps(evaluation_history_self_questionnaire), content_type="application/json",
+                           data=self.jsonify(evaluation_history_self_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=self.logged_in_headers())
         self.assertEqual(400, rv.status_code,
@@ -93,7 +92,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_questionnaire_post_fails_if_user_not_connected_to_participant(self):
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign"}
-        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(cq),
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=self.jsonify(cq),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assertEqual(400, rv.status_code,
@@ -109,7 +108,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         headers = self.logged_in_headers(u)
 
         cq = {'first_name': "Darah", 'marketing_channel': "Subway sign", 'participant_id': p.id}
-        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(cq),
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=self.jsonify(cq),
                            content_type="application/json",
                            follow_redirects=True, headers=headers)
         self.assert_success(rv)
@@ -144,7 +143,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['mental_health'] = ['depression']
         response['medical'] = ['gastrointestinal']
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/clinical_diagnoses_questionnaire/%i' % cq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -180,7 +179,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         clinical_diagnoses_questionnaire = {'medical': ['seizure'], 'genetic': ['fragileX'], 'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/clinical_diagnoses_questionnaire',
-                           data=json.dumps(clinical_diagnoses_questionnaire),
+                           data=self.jsonify(clinical_diagnoses_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -217,7 +216,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['zip'] = 22345
         response['marketing_channel'] = 'flyer'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/contact_questionnaire/%i' % cq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/contact_questionnaire/%i' % cq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -252,7 +251,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         headers = self.logged_in_headers(u)
 
         contact_questionnaire = {'phone': "123-456-7890", 'marketing_channel': "Subway sign", 'participant_id': p.id}
-        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=json.dumps(contact_questionnaire),
+        rv = self.app.post('api/flow/self_intake/contact_questionnaire', data=self.jsonify(contact_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -290,7 +289,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['concerning_behaviors'] = ['elopement']
         response['has_academic_difficulties'] = False
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/current_behaviors_dependent_questionnaire/%i' % cbdq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/current_behaviors_dependent_questionnaire/%i' % cbdq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -327,7 +326,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         current_behaviors_dependent_questionnaire = {'dependent_verbal_ability': 'verbal, AACsystem',
                                                      'has_academic_difficulties': False, 'participant_id': p.id}
         rv = self.app.post('api/flow/dependent_intake/current_behaviors_dependent_questionnaire',
-                           data=json.dumps(current_behaviors_dependent_questionnaire),
+                           data=self.jsonify(current_behaviors_dependent_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -361,7 +360,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['academic_difficulty_areas'] = ['math']
         response['has_academic_difficulties'] = False
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/current_behaviors_self_questionnaire/%i' % cbsq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -393,7 +392,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         current_behaviors_self_questionnaire = {'self_verbal_ability': ['verbal', 'AACsystem'],
                                                 'has_academic_difficulties': False, 'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/current_behaviors_self_questionnaire',
-                           data=json.dumps(current_behaviors_self_questionnaire),
+                           data=self.jsonify(current_behaviors_self_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -429,7 +428,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/demographics_questionnaire/%i' % dq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/demographics_questionnaire/%i' % dq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -460,7 +459,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         demographics_questionnaire = {'birth_sex': "female", 'gender_identity': "genderOther", 'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/demographics_questionnaire',
-                           data=json.dumps(demographics_questionnaire),
+                           data=self.jsonify(demographics_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -497,7 +496,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/developmental_questionnaire/%i' % dq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/developmental_questionnaire/%i' % dq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -530,7 +529,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         developmental_questionnaire = {'had_birth_complications': True, 'birth_complications_description': 'C-Section',
                                        'participant_id': p.id}
         rv = self.app.post('api/flow/dependent_intake/developmental_questionnaire',
-                           data=json.dumps(developmental_questionnaire),
+                           data=self.jsonify(developmental_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -567,7 +566,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/education_dependent_questionnaire/%i' % eq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/education_dependent_questionnaire/%i' % eq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -600,7 +599,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         education_dependent_questionnaire = {'attends_school': True, 'school_name': 'Attreyu Academy',
                                              'participant_id': p.id}
         rv = self.app.post('api/flow/dependent_intake/education_dependent_questionnaire',
-                           data=json.dumps(education_dependent_questionnaire),
+                           data=self.jsonify(education_dependent_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -637,7 +636,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/education_self_questionnaire/%i' % eq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/education_self_questionnaire/%i' % eq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -675,7 +674,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         education_self_questionnaire = {'attends_school': True, 'school_name': 'Attreyu Academy',
                                         'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/education_self_questionnaire',
-                           data=json.dumps(education_self_questionnaire),
+                           data=self.jsonify(education_self_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -714,7 +713,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/employment_questionnaire/%i' % eq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/employment_questionnaire/%i' % eq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -751,7 +750,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         employment_questionnaire = {'is_currently_employed': True, 'employment_capacity': 'partTime',
                                     'participant_id': p.id}
-        rv = self.app.post('api/flow/self_intake/employment_questionnaire', data=json.dumps(employment_questionnaire),
+        rv = self.app.post('api/flow/self_intake/employment_questionnaire', data=self.jsonify(employment_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -789,7 +788,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['years_old_at_first_diagnosis'] = 12
         response['who_diagnosed'] = 'healthTeam'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/evaluation_history_dependent_questionnaire/%i' % ehq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/evaluation_history_dependent_questionnaire/%i' % ehq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -831,7 +830,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                                                       'years_old_at_first_diagnosis': 5,
                                                       'participant_id': p.id}
         rv = self.app.post('api/flow/dependent_intake/evaluation_history_dependent_questionnaire',
-                           data=json.dumps(evaluation_history_dependent_questionnaire), content_type="application/json",
+                           data=self.jsonify(evaluation_history_dependent_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
         self.assert_success(rv)
@@ -867,7 +866,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['years_old_at_first_diagnosis'] = 12
         response['who_diagnosed'] = 'healthTeam'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/evaluation_history_self_questionnaire/%i' % ehq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/evaluation_history_self_questionnaire/%i' % ehq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -904,7 +903,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         evaluation_history_self_questionnaire = {'self_identifies_autistic': True, 'years_old_at_first_diagnosis': 5,
                                                  'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/evaluation_history_self_questionnaire',
-                           data=json.dumps(evaluation_history_self_questionnaire), content_type="application/json",
+                           data=self.jsonify(evaluation_history_self_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
         self.assert_success(rv)
@@ -944,7 +943,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['dependent_living_situation'] = ['caregiver']
         response['struggle_to_afford'] = True
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/home_dependent_questionnaire/%i' % hq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/home_dependent_questionnaire/%i' % hq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -982,7 +981,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         home_dependent_questionnaire = {'dependent_living_situation': ['family'], 'struggle_to_afford': False,
                                         'participant_id': p.id}
         rv = self.app.post('api/flow/dependent_intake/home_dependent_questionnaire',
-                           data=json.dumps(home_dependent_questionnaire), content_type="application/json",
+                           data=self.jsonify(home_dependent_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
         self.assert_success(rv)
@@ -1023,7 +1022,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['self_living_situation'] = ['caregiver']
         response['struggle_to_afford'] = True
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/home_self_questionnaire/%i' % hq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/home_self_questionnaire/%i' % hq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -1061,7 +1060,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         home_self_questionnaire = {'self_living_situation': ['family'], 'struggle_to_afford': False,
                                    'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/home_self_questionnaire',
-                           data=json.dumps(home_self_questionnaire), content_type="application/json",
+                           data=self.jsonify(home_self_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
         self.assert_success(rv)
@@ -1100,7 +1099,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         u2 = self.construct_user(email="rainbows@rainy.com")
         response['user_id'] = u2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/identification_questionnaire/%i' % iq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/identification_questionnaire/%i' % iq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -1137,7 +1136,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         identification_questionnaire = {'first_name': 'Eloise', 'middle_name': 'Elora', 'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/identification_questionnaire',
-                           data=json.dumps(identification_questionnaire),
+                           data=self.jsonify(identification_questionnaire),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
@@ -1176,7 +1175,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         response['participant_id'] = self.construct_participant(user=self.construct_user(),
                                                                 relationship=Relationship.self_participant).id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/q/supports_questionnaire/%i' % sq_id, data=json.dumps(response),
+        rv = self.app.put('/api/q/supports_questionnaire/%i' % sq_id, data=self.jsonify(response),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
@@ -1217,7 +1216,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         supports_questionnaire = {'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/supports_questionnaire',
-                           data=json.dumps(supports_questionnaire), content_type="application/json",
+                           data=self.jsonify(supports_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
         self.assert_success(rv)
@@ -1267,18 +1266,8 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(ExportService.TYPE_IDENTIFYING, response['steps'][0]['type'])
         self.assertEqual(Step.STATUS_INCOMPLETE, response['steps'][0]['status'])
 
-        cq = {
-            'first_name': "Darah",
-            'middle_name': "Soo",
-            'last_name': "Ubway",
-            'is_first_name_preferred': True,
-            'birthdate': '02/02/2002',
-            'birth_city': 'Staunton',
-            'birth_state': 'VA',
-            'is_english_primary': True,
-            'participant_id': p.id
-        }
-        rv = self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(cq),
+        cq = self.get_identification_questionnaire(p.id)
+        rv = self.app.post('api/flow/self_intake/identification_questionnaire', data=self.jsonify(cq),
                            content_type="application/json",
                            follow_redirects=True, headers=headers)
 
@@ -1476,7 +1465,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual('academic_difficulty_areas', ws['J1'].value)
         self.assertEqual('math, writing, ', ws['J2'].value)
         self.assertEqual('academic_difficulty_other', ws['K1'].value)
-        self.assertEqual(12, ws.max_column)
+        self.assertEqual(11, ws.max_column)
         self.assertEqual(2, ws.max_row)
 
     def test_export_all_questionnaires(self):

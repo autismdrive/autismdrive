@@ -1,147 +1,87 @@
 @import '../../material';
 
+#header-bg {
+  background-color: $brand-gray;
+  position: fixed;
+  width: 100%;
+  z-index: 98;
+}
 
-#menu-bar {
+#site-header {
+  width: 100%;
+  z-index: 100;
+  background-color: $brand-gray;
+
   mat-toolbar-row {
+    background-color: $brand-primary;
+    color: white;
+    position: fixed;
+    transition: translate ease-in-out 500ms, height ease-in-out 500ms, top ease-in-out 500ms;
+  }
+
+  mat-toolbar-row#uva-header {
+    width: 100%;
+    background-color: white;
+    z-index: 103;
+    padding-left: 16px;
+    color: $brand-primary;
+
+    .uva-logo a {
+      @include mat-typography-level-to-styles($custom-typography, button);
+      color: $brand-primary;
+      text-transform: uppercase;
+    }
+
+  }
+
+  mat-toolbar-row#menu-bar {
+    padding-right: 0;
+    background-color: $brand-primary;
+    z-index: 102;
+
     a {
       text-decoration: none;
       color: inherit;
     }
-  }
 
-  #primary-nav {
-    .mat-button {
-      &.selected {
-        border-bottom-left-radius: 0px;
-        border-bottom-right-radius: 0px;
-        border-bottom-width: 4px;
-        border-bottom-style: solid;
-        border-bottom-color: $brand-primary;
+    #primary-nav {
+      .mat-button {
+        &.selected {
+          border-bottom-left-radius: 0px;
+          border-bottom-right-radius: 0px;
+          border-bottom-width: 4px;
+          border-bottom-style: solid;
+          border-bottom-color: $brand-primary;
+        }
       }
     }
-  }
 
-  #primary-nav .mat-button {
-    margin-top: 0px;
-    margin-bottom: 0px;
-  }
-}
-
-
-#header-bg {
-  background-color: $brand-primary;
-  position: fixed;
-  width: 100%;
-  z-index: 98;
-
-  // SM
-  @media (max-width: 959px) {
-    top: ($site-header-height * -1);
-    height: $site-header-height;
-  }
-
-  // MD
-  @media (min-width: 960px) {
-    top: (($site-header-height + $search-bar-height-md) * -1);
-    height: ($site-header-height + $search-bar-height-md);
-  }
-
-  // XL
-  @media (min-width: 1280px) {
-    top: (($site-header-height + $search-bar-height-lg) * -1);
-    height: ($site-header-height + $search-bar-height-lg);
-  }
-}
-
-#uva-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: $uva-header-height;
-  background-color: white;
-  z-index: 101;
-  padding-left: 20px;
-
-  .uva-logo a {
-    @include mat-typography-level-to-styles($custom-typography, button);
-    color: $brand-primary;
-    text-transform: uppercase;
-  }
-
-}
-
-#site-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: $site-header-height;
-  background-color: $brand-primary;
-  box-shadow: 0px 10px rgba(0, 0, 0, 0.3);
-  z-index: 100;
-
-  mat-toolbar {
-    background-color: $brand-primary;
-    color: white
-  }
-
-  mat-toolbar-row.search {
-    background-color: $brand-primary;
-    color: white;
-    display: grid;
-
-    // SM
-    @media (max-width: 959px) {
-      grid-template-rows: 1fr;
-      align-content: center;
-      height: $search-bar-height-sm;
-    }
-
-    // MD
-    @media (min-width: 960px) {
-      grid-template-rows: 1fr 1fr;
-      align-content: center;
-      height: $search-bar-height-md;
-    }
-
-    // XL
-    @media (min-width: 1280px) {
-      grid-template-columns: 1fr 1fr;
-      height: $search-bar-height-lg;
-    }
-
-    p.tagline {
-      font-style: italic;
-
-      // SM
-      @media (max-width: 959px) {
-        justify-self: center;
-        margin: 0px;
-        padding: 0px;
-      }
-
-      // MD
-      @media (min-width: 960px) {
-        justify-self: center;
-        margin-top: 16px;
-        margin-bottom: 0px;
-      }
-
-      // XL
-      @media (min-width: 1280px) {
-        margin: 4px 20px 4px 0px;
-        justify-self: start;
-      }
+    #primary-nav .mat-button {
+      margin-top: 0px;
+      margin-bottom: 0px;
     }
   }
 
-  mat-toolbar-row.covid19 {
+  mat-toolbar-row#covid19 {
+    position: fixed;
     background-color: $brand-accent;
     color: white;
-    height: $covid19-header-height;
+    z-index: 101;
+    padding-left: 0px;
+  }
+
+  mat-toolbar-row#tagline {
+    position: fixed;
+    z-index: 100;
+    box-shadow: 40px 20px 40px -40px rgba(0, 0, 0, 0.1);
+
+    p {
+      font-style: italic;
+      margin: 0;
+    }
   }
 
   #primary-nav {
-
     ul {
       list-style: none;
       margin: 0px;
@@ -179,7 +119,7 @@
         text-decoration: none;
 
         &:after {
-          transition: all ease-in-out 300ms;
+          transition: all ease-in-out 500ms;
           content: '';
           background-color: transparent;
           width: 100%;
@@ -224,7 +164,6 @@ div.mirror-message {
 
 #mobile-menu {
   position: fixed;
-  top: -100vh;
   width: 100%;
   background-color: $brand-primary;
   color: white;
@@ -236,5 +175,4 @@ div.mirror-message {
   justify-content: stretch;
 
   .mat-button { text-align: left; }
-  app-search-box { text-align: center; }
 }

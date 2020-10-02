@@ -1,7 +1,6 @@
-from marshmallow_sqlalchemy import ModelSchema
-
 from app import db, ma
 from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMixin
+from app.schema.model_schema import ModelSchema
 
 
 class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
@@ -92,7 +91,7 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
 
 
 class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = CurrentBehaviorsDependentQuestionnaire
         fields = (
             "id",
@@ -108,7 +107,6 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "academic_difficulty_other",
             "_links"
         )
-        ordered = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name='current_behaviors_dependent_questionnaire', id='<id>'),
     })

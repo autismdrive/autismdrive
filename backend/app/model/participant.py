@@ -37,13 +37,15 @@ class Participant(db.Model):
 
     def get_percent_complete(self):
         flow = Flows.get_flow_by_relationship(self.relationship)
-        step_logs = db.session.query(StepLog).filter_by(participant_id=self.id, flow=flow.name)
+        step_logs = db.session.query(StepLog)\
+            .filter(StepLog.participant_id == self.id)\
+            .filter(StepLog.flow == flow.name).all()
         complete_steps = 0
         for log in step_logs:
             flow.update_step_progress(log)
 
         for step in flow.steps:
-            if step.status is 'COMPLETE':
+            if step.status == step.STATUS_COMPLETE:
                 complete_steps += 1
 
         return complete_steps / len(flow.steps)

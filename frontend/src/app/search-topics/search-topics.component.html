@@ -1,4 +1,3 @@
-<mat-spinner *ngIf="!category"></mat-spinner>
 <mat-list dense *ngIf="category">
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
@@ -11,14 +10,26 @@
         </span>
         </mat-list-item>
     </ng-container>
-  <div [ngClass]="{'sub-level' : category.level > 0}">
-  <div class="current-facet-label">{{category.name}}</div>
-  <ng-container *ngFor="let child of category.children">
-    <mat-list-item *ngIf="child.hit_count > 0" (click)="selectCategory(child)" [classList]="" >
-      <span class="filter-facet-label">{{child.name}}</span>
-      <div fxFlex></div>
-      <span class="hit-count">{{child.hit_count}}</span>
-    </mat-list-item>
-  </ng-container>
-  </div>
 </mat-list>
+
+<ng-container *ngIf="category && category.children && (category.children.length > 0)">
+  <button mat-button [matMenuTriggerFor]="topicMenu">
+    <mat-icon>topic</mat-icon>
+    Filter by {{category.level <= 0 ? 'Topic' : 'Subtopic'}}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-menu #topicMenu>
+      <button
+        *ngFor="let child of category.children"
+        (click)="selectCategory(child)"
+        mat-menu-item
+      >
+        <span class="child-label" *ngIf="child.hit_count == 1">{{child.name}} - {{child.hit_count}} result</span>
+        <span class="child-label" *ngIf="child.hit_count != 1">{{child.name}} - {{child.hit_count}} results</span>
+      </button>
+  </mat-menu>
+</ng-container>
+
+<ng-template #loadingMessage>
+  <app-loading [isField]="true"></app-loading>
+</ng-template>

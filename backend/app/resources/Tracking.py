@@ -14,7 +14,7 @@ def logo(user_id, code):
     email_log = EmailLog.query.filter_by(user_id=user_id, tracking_code=code).first()
     if email_log:
         email_log.viewed = True
-        email_log.date_viewed = datetime.datetime.now()
+        email_log.date_viewed = datetime.datetime.utcnow()
         db.session.add(email_log)
         db.session.commit()
     return send_file("static/UVA_STAR-logo.png", mimetype='image/png')

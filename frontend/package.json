@@ -7,8 +7,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "bundle-report": "webpack-bundle-analyzer dist/star-drive/stats-es5.json"
+    "e2e": "ng e2e --dev-server-target=",
+    "bundle-report": "webpack-bundle-analyzer dist/star-drive/stats-es5.json",
+    "backend-reset": "cd .. && ./reset-backend.sh --skip_update && cd .."
   },
   "private": true,
   "dependencies": {
@@ -39,6 +40,7 @@
     "ngx-markdown": "^8.2.1",
     "ngx-progressbar": "^2.1.1",
     "npm": "^6.13.4",
+    "rfdc": "^1.1.4",
     "rxjs": "^6.5.4",
     "to": "^0.2.9",
     "update": "^0.7.4",

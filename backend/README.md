@@ -23,15 +23,15 @@ sudo apt-get install -y libssl-dev libffi-dev
 export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 ```
 
-* Debian:
+* Debian/Ubuntu:
 ```BASH
-apt-get install postgresql postgresql-client
+apt-get install postgresql postgresql-client libpq-dev
 ```
 
 #### ElasticSearch
 We are currently using version 6, and should look at upgrading this in the future when my hair isn't on fire.
-# Debian
-https://medium.com/@pierangelo1982/how-to-install-elasticsearch-6-on-ubuntu-64316dc2de1c
+
+* Debian/Ubuntu: https://medium.com/@pierangelo1982/how-to-install-elasticsearch-6-on-ubuntu-64316dc2de1c
 
 #### Angular
 ```BASH
@@ -310,6 +310,12 @@ In the /var/www/autismdrive/ I create a python virtual enviroment with the comma
 python3 -m venv python-env
 ```
 When pushing to production please create a new 'Release' on gitHub describing the changes that were rolled out.
+
+Currently we are using a separate repository for deployment: star-drive-dist. To prepare this for deployment, you should have a
+copy of star-drive-dist in the same directory as your local copy of star-drive. Your local star-drive should be on master, 
+up to date with all the changes for the release. Once this is ready, run the ```prepare_for_deploy.sh``` script in 
+star-drive-dist to prepare the release. Commit these changes referencing the release number and push them up. 
+
 
 
 

@@ -6,14 +6,14 @@ export class AdminUseCases {
 
 
   navigateToAdmin() {
-    this.page.clickAndExpectRoute('#admin-button', '/admin');
+    this.page.clickAndExpectRoute('#admin-button', '/admin/data-admin');
   }
 
-  async navigateToTab(tabNumber: number, selector: string) {
-    const tab = this.page.getElement(`.mat-tab-label:nth-child(${tabNumber})`);
+  async navigateToTab(tabId: string, selector: string) {
+    const tab = this.page.getElement(tabId);
     await tab.click();
     await this.page.waitForVisible(selector);
-    await expect(tab.getAttribute('aria-selected')).toEqual('true');
+    await expect(tab.getAttribute('ng-reflect-active')).toEqual('true');
   }
 
   viewAddButton() {

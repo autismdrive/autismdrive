@@ -46,10 +46,10 @@ export class SearchService {
       }));
   }
 
-  mapSearch(query: Query): Observable<Query> {
+  mapSearch(query: Query, mapDataOnly = true): Observable<Query> {
     const mapQuery = clone(query);
     mapQuery.size = 999;
-    mapQuery.map_data_only = true;
+    mapQuery.map_data_only = mapDataOnly;
     return this.search(mapQuery);
   }
 

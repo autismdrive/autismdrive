@@ -1,9 +1,13 @@
-<div
-  id="spinner-container"
-  class="mat-typography"
-  fxLayout="column"
-  fxLayoutAlign="center center"
->
-  <mat-spinner></mat-spinner>
-  <h1>{{message}}</h1>
-</div>
+<ng-container *ngIf="!isField">
+  <div *ngIf="showSpinner" class="loading" fxLayoutAlign="center center">
+    {{message || ''}}
+    <mat-spinner [diameter]="diameter"></mat-spinner>
+  </div>
+  <span *ngIf="!showSpinner">{{message || '...'}}</span>
+</ng-container>
+<mat-form-field *ngIf="isField">
+  <mat-label>Loading...</mat-label>
+  <mat-select>
+    <mat-option>...</mat-option>
+  </mat-select>
+</mat-form-field>
