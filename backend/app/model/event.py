@@ -15,6 +15,8 @@ class Event(Location):
     post_survey_link = db.Column(db.String)
     max_users = db.Column(db.Integer)
     registered_users = db.relationship("EventUser", back_populates='event')
+    registration_url = db.Column(db.String, nullable=True)
+    image_url = db.Column(db.String, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'event',

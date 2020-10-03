@@ -37,6 +37,8 @@ export class Resource extends GeoLocation {
   webinar_link?: string;
   post_survey_link?: string;
   max_users?: number;
+  image_url?: string;
+  registration_url?: string;
 
   constructor(private _props) {
     super(_props);

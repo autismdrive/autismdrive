@@ -100,6 +100,29 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: 'model.type != "event"',
     },
     {
+      key: 'registration_url',
+      type: 'input',
+      templateOptions: {
+        label: 'Registration Link',
+        placeholder: 'http://link.to/external/website',
+        type: 'url',
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event" && !model.includes_registration'
+      },
+      hideExpression: '!(model.type === "event" && !model.includes_registration)',
+    },
+    {
+      key: 'image_url',
+      type: 'input',
+      templateOptions: {
+        label: 'Feature Image',
+        placeholder: 'http://link.to/file.jpg',
+        type: 'url',
+      },
+      hideExpression: 'model.type != "event"',
+    },
+    {
       key: 'date',
       type: 'datepicker',
       templateOptions: {

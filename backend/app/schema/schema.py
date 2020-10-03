@@ -291,7 +291,7 @@ class EventSchema(ModelSchema):
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
                   'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
                   'phone_extension', 'languages', 'covid19_categories', 'includes_registration', 'webinar_link',
-                  'post_survey_link', 'max_users', 'registered_users', '_links')
+                  'post_survey_link', 'max_users', 'registered_users', 'image_url', 'registration_url', '_links')
     id = fields.Integer(required=False, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
     registered_users = fields.Nested(EventUserSchema(), many=True, dump_only=True)
