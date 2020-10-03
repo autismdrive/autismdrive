@@ -100,6 +100,29 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: 'model.type != "event"',
     },
     {
+      key: 'registration_url',
+      type: 'input',
+      templateOptions: {
+        label: 'Registration Link',
+        placeholder: 'http://link.to/external/website',
+        type: 'url',
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event" && !model.includes_registration'
+      },
+      hideExpression: '!(model.type === "event" && !model.includes_registration)',
+    },
+    {
+      key: 'image_url',
+      type: 'input',
+      templateOptions: {
+        label: 'Feature Image',
+        placeholder: 'http://link.to/file.jpg',
+        type: 'url',
+      },
+      hideExpression: 'model.type != "event"',
+    },
+    {
       key: 'date',
       type: 'datepicker',
       templateOptions: {
@@ -334,6 +357,20 @@ export class ResourceFormComponent implements OnInit {
         label: 'COVID-19 Topics',
         type: 'array',
         options: this.getOptions(Covid19Categories.labels),
+      },
+      hideExpression: '!model.type',
+    },
+    {
+      key: 'should_hide_related_resources',
+      type: 'radio',
+      defaultValue: false,
+      templateOptions: {
+        label: 'Hide Related Resources',
+        description: 'Should related resources be displayed alongside this resource on the details page?',
+        options: [
+          {value: true, label: 'Yes'},
+          {value: false, label: 'No'},
+        ]
       },
       hideExpression: '!model.type',
     },

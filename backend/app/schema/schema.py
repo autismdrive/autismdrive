@@ -229,7 +229,8 @@ class ResourceSchema(ModelSchema):
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_name', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'resource_categories',
-                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories', '_links')
+                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories',
+                  'should_hide_related_resources', '_links')
     resource_categories = ma.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourceendpoint', id='<id>'),
@@ -291,7 +292,8 @@ class EventSchema(ModelSchema):
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
                   'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
                   'phone_extension', 'languages', 'covid19_categories', 'includes_registration', 'webinar_link',
-                  'post_survey_link', 'max_users', 'registered_users', '_links')
+                  'post_survey_link', 'max_users', 'registered_users', 'image_url', 'registration_url',
+                  'should_hide_related_resources', '_links')
     id = fields.Integer(required=False, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
     registered_users = fields.Nested(EventUserSchema(), many=True, dump_only=True)
@@ -344,7 +346,7 @@ class LocationSchema(ModelSchema):
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization_name', 'resource_categories',
                   'latitude', 'longitude', '_links', 'ages', 'insurance', 'phone_extension', 'languages',
-                  'covid19_categories', 'is_draft')
+                  'covid19_categories', 'is_draft', 'should_hide_related_resources')
     id = fields.Integer(required=False, allow_none=True)
     resource_categories = ma.Nested(CategoriesOnLocationSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
