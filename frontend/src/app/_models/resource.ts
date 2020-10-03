@@ -39,6 +39,7 @@ export class Resource extends GeoLocation {
   max_users?: number;
   image_url?: string;
   registration_url?: string;
+  should_hide_related_resources?: boolean;
 
   constructor(private _props) {
     super(_props);

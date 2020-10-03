@@ -27,6 +27,7 @@ class Resource(db.Model):
     languages = db.Column(db.ARRAY(db.String), default=[])
     covid19_categories = db.Column(ARRAY(db.String), default=[])
     categories = db.relationship("ResourceCategory", back_populates="resource")
+    should_hide_related_resources = db.Column(db.Boolean, default=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'resource',

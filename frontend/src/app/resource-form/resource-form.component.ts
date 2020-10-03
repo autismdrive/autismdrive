@@ -360,6 +360,20 @@ export class ResourceFormComponent implements OnInit {
       },
       hideExpression: '!model.type',
     },
+    {
+      key: 'should_hide_related_resources',
+      type: 'radio',
+      defaultValue: false,
+      templateOptions: {
+        label: 'Hide Related Resources',
+        description: 'Should related resources be displayed alongside this resource on the details page?',
+        options: [
+          {value: true, label: 'Yes'},
+          {value: false, label: 'No'},
+        ]
+      },
+      hideExpression: '!model.type',
+    },
   ];
 
 
