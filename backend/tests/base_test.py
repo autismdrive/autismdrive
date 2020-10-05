@@ -19,7 +19,7 @@ from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
 from app.model.user_favorite import UserFavorite
-
+from app.model.event_user import EventUser
 
 from flask import json
 
@@ -251,15 +251,26 @@ class BaseTest:
     def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
                         street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False, city="Stauntonville",
                         state="QX", zip="99775", phone="555-555-5555", website="http://stardrive.org",
-                        date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org"):
+                        date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org",
+                        post_survey_link="http://stardrive.org/survey", webinar_link="http://stardrive.org/event",
+                        includes_registration=True, max_users=35, registered_users=None):
 
+        if registered_users is None:
+            registered_users = [self.construct_user(email="e1@sartography.com"),
+                                self.construct_user("e2@sartography.com")]
         event = Event(title=title, description=description, street_address1=street_address1,
                       street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
-                      date=date, is_draft=is_draft, organization_name=organization_name)
+                      date=date, is_draft=is_draft, organization_name=organization_name, webinar_link=webinar_link,
+                      post_survey_link=post_survey_link, includes_registration=includes_registration, max_users=max_users)
         db.session.add(event)
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
         self.assertEqual(db_event.website, event.website)
+
+        for user in registered_users:
+            eu = EventUser(event_id=db_event.id, user_id=user.id)
+            db.session.add(eu)
+
         elastic_index.add_document(db_event, 'Event')
         return db_event
 
@@ -280,7 +291,7 @@ class BaseTest:
         self.construct_resource()
         study = self.construct_study()
         location = self.construct_location()
-        event = self.construct_event()
+        self.construct_event()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()

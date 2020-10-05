@@ -18,7 +18,7 @@ from app.resources.FlowEndpoint import (
     FlowListEndpoint,
     FlowQuestionnaireEndpoint,
     FlowQuestionnaireMetaEndpoint)
-from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint
+from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint, UserRegistrationEndpoint
 from app.resources.EmailLogEndpoint import EmailLogEndpoint, EmailLogListEndpoint
 from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByUserEndpoint, ResourceChangeLogByResourceEndpoint
 from app.resources.StepLogEndpoint import StepLogEndpoint
@@ -104,6 +104,12 @@ from app.resources.ResourceAndCategoryEndpoint import (
     ResourceByCategoryEndpoint,
     ResourceCategoryListEndpoint
 )
+from app.resources.EventAndUserEndpoint import (
+    EventByUserEndpoint,
+    EventUserEndpoint,
+    UserByEventEndpoint,
+    EventUserListEndpoint
+)
 from app.resources.UserFavoriteEndpoint import (
     UserFavoriteEndpoint,
     UserFavoriteListEndpoint,
@@ -169,6 +175,10 @@ endpoints = [
     (CategoryByEventEndpoint, "/event/<event_id>/category"),
     (EventCategoryListEndpoint, "/event_category"),
     (EventCategoryEndpoint, "/event_category/<id>"),
+    (EventByUserEndpoint, "/user/<user_id>/event"),
+    (UserByEventEndpoint, "/event/<event_id>/user"),
+    (EventUserEndpoint, "/event_user/<id>"),
+    (EventUserListEndpoint, "/event_user"),
     # Locations
     (LocationListEndpoint, "/location"),
     (LocationEndpoint, "/location/<id>"),
@@ -212,6 +222,7 @@ endpoints = [
 
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
+    (UserRegistrationEndpoint, "/user/registration"),
     (UserEndpoint, "/user/<id>"),
     (StudyByUserEndpoint, "/user/<user_id>/study"),
     (StudyInquiryByUserEndpoint, "/user/<user_id>/inquiry/study"),

@@ -23,8 +23,11 @@ from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
+from app.model.event_user import EventUser
 from app.model.zip_code import ZipCode
 from app.schema.model_schema import ModelSchema
+from app.model.questionnaires.contact_questionnaire import ContactQuestionnaireSchema
+from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaireSchema
 
 # Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
 # ensure that the tables don't get accidentally dropped!)
@@ -50,6 +53,7 @@ import app.model.questionnaires.home_self_questionnaire
 import app.model.questionnaires.identification_questionnaire
 import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
+import app.model.questionnaires.registration_questionnaire
 
 
 class InvestigatorSchema(ModelSchema):
@@ -69,7 +73,7 @@ class ParentCategorySchema(ModelSchema):
         model = Category
         fields = ('id', 'name', 'parent', 'level', '_links')
     parent = ma.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level())
+    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
@@ -95,7 +99,7 @@ class CategoryInSearchSchema(ModelSchema):
     parent_id = fields.Number(required=False, allow_none=True)
     parent = ma.Nested(ParentCategorySchema, dump_only=True, required=False, allow_none=True)
     children = ma.Nested(ChildCategoryInSearchSchema, many=True, dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
 
 
 class CategorySchema(ModelSchema):
@@ -108,7 +112,7 @@ class CategorySchema(ModelSchema):
     parent_id = fields.Integer(required=False, allow_none=True)
     children = ma.Nested(lambda: CategorySchema(), many=True, dump_only=True, exclude=('parent', 'color'))
     parent = ma.Nested(ParentCategorySchema, dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level(), dump_only=True)
+    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
     event_count = fields.Method('get_event_count', dump_only=True)
     location_count = fields.Method('get_location_count', dump_only=True)
     resource_count = fields.Method('get_resource_count', dump_only=True)
@@ -225,7 +229,8 @@ class ResourceSchema(ModelSchema):
         model = Resource
         fields = ('id', 'type', 'title', 'last_updated', 'description', 'organization_name', 'phone', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'resource_categories',
-                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories', '_links')
+                  'is_draft', 'ages', 'insurance', 'phone_extension', 'languages', 'covid19_categories',
+                  'should_hide_related_resources', '_links')
     resource_categories = ma.Nested(CategoriesOnResourceSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.resourceendpoint', id='<id>'),
@@ -269,6 +274,16 @@ class ResourceCategorySchema(ModelSchema):
     })
 
 
+class EventUserSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
+        model = EventUser
+        fields = ('id', 'last_updated', 'event_id', 'event', 'user_id', 'user')
+    event_id = fields.Integer(required=False, allow_none=True)
+    user_id = fields.Integer(required=False, allow_none=True)
+    event = fields.Nested(ResourceSchema, dump_only=True)
+    user = fields.Nested(CategorySchema, dump_only=True)
+
+
 class EventSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Event
@@ -276,9 +291,12 @@ class EventSchema(ModelSchema):
                   'primary_contact', 'location_name', 'street_address1', 'street_address2', 'city', 'state', 'zip',
                   'phone', 'website', 'contact_email', 'video_code', 'is_uva_education_content', 'is_draft',
                   'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
-                  'phone_extension', 'languages', 'covid19_categories', '_links')
+                  'phone_extension', 'languages', 'covid19_categories', 'includes_registration', 'webinar_link',
+                  'post_survey_link', 'max_users', 'registered_users', 'image_url', 'registration_url',
+                  'should_hide_related_resources', '_links')
     id = fields.Integer(required=False, allow_none=True)
-    resource_categories = ma.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
+    resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
+    registered_users = fields.Nested(EventUserSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.eventendpoint', id='<id>'),
         'collection': ma.URLFor('api.eventlistendpoint'),
@@ -328,7 +346,7 @@ class LocationSchema(ModelSchema):
                   'street_address1', 'street_address2', 'city', 'state', 'zip', 'phone', 'email', 'website',
                   'contact_email', 'video_code', 'is_uva_education_content', 'organization_name', 'resource_categories',
                   'latitude', 'longitude', '_links', 'ages', 'insurance', 'phone_extension', 'languages',
-                  'covid19_categories', 'is_draft')
+                  'covid19_categories', 'is_draft', 'should_hide_related_resources')
     id = fields.Integer(required=False, allow_none=True)
     resource_categories = ma.Nested(CategoriesOnLocationSchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
@@ -376,12 +394,14 @@ class ParticipantSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Participant
         fields = ('id', '_links', 'last_updated', 'name', 'relationship', 'user_id', 'avatar_icon', 'avatar_color',
-                  'has_consented', 'contact', 'percent_complete')
+                  'has_consented', 'contact', 'identification', 'percent_complete')
     id = fields.Integer(required=False, allow_none=True)
     name = ma.Function(lambda obj: missing if obj is None else obj.get_name())
     relationship = EnumField(Relationship)
     user_id = fields.Integer(required=False, allow_none=True)
     percent_complete = ma.Function(lambda obj: missing if obj is None else obj.get_percent_complete())
+    contact = fields.Nested(ContactQuestionnaireSchema, dump_only=True)
+    identification = fields.Nested(IdentificationQuestionnaireSchema, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.participantendpoint', id='<id>'),
         'user': ma.URLFor('api.userendpoint', id='<user_id>')

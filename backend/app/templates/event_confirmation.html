@@ -1,0 +1,24 @@
+{% extends "base_email.html" %}
+{% block content %}
+    <p style="font-family: sans-serif; font-size: 24px; font-weight: bold; margin: 0; Margin-bottom: 15px;">
+        Thank you for registering for {{ event_title }}.
+    </p>
+
+    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
+        This email is confirmation of your successful registration.
+    </p>
+    <h4><a href="{{event.link}}">{{ event.title }}</a></h4>
+    <p>{{ event.description }}</p>
+    <p>Presenter: {{ event.presenter }}</p>
+    <p>{{ event.date }} {{ event.time }}</p>
+
+    <p>Join from a PC, MAC, iPad, iPhone or Android device once you Download Zoom:
+        {{ event.webinar_link }}</p>
+
+    <p>Join by phone: </p>
+    <p>{{ event.phone }}</p>
+    <p>{{ event.webinar_id }}</p>
+
+    <p>Please submit any questions to:  autismdrive@virginia.edu</p>
+
+{% endblock %}

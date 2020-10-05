@@ -1,24 +1,28 @@
-<mat-card *ngIf="!loading && (relatedResources.length > 0 || relatedStudies.length > 0)" [ngClass]="{'related-items': true}">
-  <mat-card-title>Related</mat-card-title>
-  <mat-card-content>
-    <mat-list>
-
-      <ng-container *ngIf="relatedResources.length > 0">
-        <h3 mat-subheader>Resources</h3>
-        <mat-list-item>
-          <a  mat-line (click)="goFirstResource()">{{relatedResources[0].title}}</a>
-          <p mat-line>{{relatedResources[0].description}}</p>
-        </mat-list-item>
-      </ng-container>
-
-      <ng-container *ngIf="relatedStudies.length > 0">
-        <h3 mat-subheader>Research Studies</h3>
-        <mat-list-item>
-          <a  mat-line (click)="goFirstStudy()">{{relatedStudies[0].short_title || relatedStudies[0].title}}</a>
-          <p mat-line>{{relatedStudies[0].short_description || relatedStudies[0].description}}</p>
-        </mat-list-item>
-      </ng-container>
-
-    </mat-list>
-  </mat-card-content>
-</mat-card>
+<div fxLayout="column" fxLayoutGap="2em">
+  <mat-card *ngIf="!loading && (relatedStudies.length > 0)" [ngClass]="{'related-items': true}">
+    <mat-card-title>Related Research Studies</mat-card-title>
+    <mat-card-content>
+      <mat-list>
+        <div *ngFor="let relStudy of relatedStudies">
+          <mat-list-item>
+            <a  mat-line (click)="goStudy(relStudy.id)"><app-type-icon [iconType]="'study'"></app-type-icon>  {{relStudy.short_title || relStudy.title}}</a>
+            <p mat-line>{{relStudy.short_description || relStudy.description}}</p>
+          </mat-list-item>
+        </div>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+  <mat-card *ngIf="!loading && (relatedResources.length > 0)" [ngClass]="{'related-items': true}">
+    <mat-card-title>Related Resources</mat-card-title>
+    <mat-card-content>
+      <mat-list>
+        <div *ngFor="let relResource of relatedResources">
+          <mat-list-item>
+            <a  mat-line (click)="goResource(relResource.id)"><app-type-icon [iconType]="relResource.type"></app-type-icon>  {{relResource.title}}</a>
+            <p mat-line>{{relResource.description}}</p>
+          </mat-list-item>
+        </div>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>

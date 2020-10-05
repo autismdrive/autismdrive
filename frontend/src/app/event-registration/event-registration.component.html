@@ -1,0 +1,35 @@
+<div
+  fxLayout="column"
+  fxLayoutAlign="center center"
+>
+  <h2>Interested in Participating?</h2>
+  <div
+    *ngIf="!currentUser"
+    fxLayout="column"
+    fxLayoutGap="20px"
+  >
+    <p>Joining Autism DRIVE is the first step toward participating in our events. Click below to join and register.</p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="openDialog()"
+    >Join And Register</button>
+    <p>Already a user? Sign in to see the link to register.</p>
+    <button
+      mat-flat-button
+      color="accent"
+      (click)="goLogin()"
+    >Sign In</button>
+  </div>
+  <div
+    *ngIf="currentUser"
+  >
+    <button
+      mat-flat-button
+      color="accent"
+      (click)="openDialog()"
+      id="register-button"
+      class="btn-xl"
+    >Register Now</button>
+  </div>
+</div>

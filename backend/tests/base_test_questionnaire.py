@@ -1,4 +1,5 @@
 from app.export_service import ExportService
+from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaire
 from tests.base_test import BaseTest
 from app.model.flow import Step
 import json
@@ -527,6 +528,38 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_pq.learning_interests, pq.learning_interests)
         return db_pq
 
+    def construct_registration_questionnaire(self, first_name='Nora', last_name='Bora', email='nora@bora.com',
+                                             zip_code=24401, relationship_to_autism=None, marketing_channel=None,
+                                             user=None, event=None):
+
+        rq = RegistrationQuestionnaire(first_name=first_name, last_name=last_name, email=email, zip_code=zip_code,
+                                       relationship_to_autism=relationship_to_autism,
+                                       marketing_channel=marketing_channel)
+
+        if marketing_channel is None:
+            rq.marketing_channel = ['drive', 'facebook']
+        if relationship_to_autism is None:
+            rq.relationship_to_autism = ['self', 'professional']
+
+        if user is None:
+            u = self.construct_user(email='nora@bora.com')
+            rq.user_id = u.id
+        else:
+            u = user
+            rq.user_id = u.id
+
+        if event is None:
+            rq.event_id = self.construct_event(title='Webinar: You have to be here (virtually)').id
+        else:
+            rq.event_id = event.id
+
+        db.session.add(rq)
+        db.session.commit()
+
+        db_rq = db.session.query(RegistrationQuestionnaire).filter_by(user_id=rq.user_id).first()
+        self.assertEqual(db_rq.email, rq.email)
+        return db_rq
+
     def construct_medication(self, symptom='symptomInsomnia', name='Magic Potion', notes='I feel better than ever!', supports_questionnaire=None):
 
         m = Medication(symptom=symptom, name=name, notes=notes)
@@ -617,4 +650,5 @@ class BaseTestQuestionnaire(BaseTest):
         self.construct_identification_questionnaire(user=user, participant=participant)
         self.construct_professional_questionnaire(user=user, participant=participant)
         self.construct_supports_questionnaire(user=user, participant=participant)
+        self.construct_registration_questionnaire(user=user)
 

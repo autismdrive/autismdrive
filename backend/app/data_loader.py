@@ -12,12 +12,14 @@ from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
 from app.model.user import User
+from app.model.user_favorite import UserFavorite
 from app import app, db, elastic_index
 from sqlalchemy import Sequence
 import os
 import csv
 import googlemaps
 
+from app.model.event_user import EventUser
 from app.model.zip_code import ZipCode
 
 
@@ -55,7 +57,6 @@ class DataLoader:
             Category).count())
 
     def load_events(self):
-        items = []
         with open(self.event_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -67,20 +68,20 @@ class DataLoader:
                 )
                 event = Event(title=row[0], description=row[1], date=row[2], time=row[3], ticket_cost=row[4],
                               organization_name=org, primary_contact=row[6], location_name=row[7],
-                              street_address1=row[8], street_address2=row[9], city=row[10], state=row[11], zip=row[12],
-                              website=row[13], phone=row[14], latitude=geocode['lat'], longitude=geocode['lng'], ages=[],
-                              languages=[], covid19_categories=[], is_draft=False, is_uva_education_content=True)
+                              street_address1=row[8], street_address2=row[9], city=row[10], state=row[11],
+                              zip=row[12], website=row[13], phone=row[14], latitude=geocode['lat'],
+                              longitude=geocode['lng'], ages=[], is_draft=False, webinar_link=row[29],
+                              post_survey_link=row[30], max_users=None, registered_users=[],
+                              includes_registration=True, is_uva_education_content=True)
                 self.__increment_id_sequence(Resource)
 
-                for i in range(26, 29):
+                if isinstance(row[31], int):
+                    event.max_users = row[31]
+
+                for i in range(26, 28):
                     if row[i]:
                         event.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
-                for i in range(29, 36):
-                    if row[i]:
-                        event.languages.append(row[i])
-                for i in range(36, len(row)):
-                    if row[i]:
-                        event.covid19_categories.append(row[i])
+
                 db.session.add(event)
                 db.session.commit()
 
@@ -91,13 +92,18 @@ class DataLoader:
                         category_id = category.id
                         db.session.add(ResourceCategory(resource_id=event_id, category_id=category_id, type='event'))
 
+                db.session.add(EventUser(event_id=event.id, user_id=1))
+                db.session.add(EventUser(event_id=event.id, user_id=2))
+                db.session.add(EventUser(event_id=event.id, user_id=4))
+                db.session.add(EventUser(event_id=event.id, user_id=5))
+
         db.session.commit()
         print("Events loaded.  There are now %i events in the database." % db.session.query(Event).count())
         print("There are now %i links between events and categories in the database." %
               db.session.query(ResourceCategory).filter(ResourceCategory.type == 'event').count())
+        print("There are now %i links between events and users in the database." % db.session.query(EventUser).count())
 
     def load_locations(self):
-        items = []
         with open(self.location_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -138,7 +144,6 @@ class DataLoader:
               db.session.query(ResourceCategory).filter(ResourceCategory.type == 'location').count())
 
     def load_resources(self):
-        items = []
         with open(self.resource_file, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -153,10 +158,8 @@ class DataLoader:
                     if row[i]:
                         resource.ages.extend(AgeRange.get_age_range_for_csv_data(row[i]))
 
-                for i in range (15, len(row )):
-
-                    db.session.add(resource)
-                    db.session.commit()
+                db.session.add(resource)
+                db.session.commit()
 
                 for i in range(7, 14):
                     if row[i] and row[i] != '':
@@ -333,6 +336,8 @@ class DataLoader:
     def clear_resources(self):
         db.session.query(AdminNote).delete()
         db.session.query(ResourceCategory).delete()
+        db.session.query(UserFavorite).delete()
+        db.session.query(EventUser).delete()
         db.session.query(StudyUser).delete()
         db.session.query(StudyCategory).delete()
         db.session.query(StudyInvestigator).delete()
