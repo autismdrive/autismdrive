@@ -1,7 +1,18 @@
 import {AgmMap, LatLngBounds, LatLngLiteral, MapsAPILoader} from '@agm/core';
+import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {Location} from '@angular/common';
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2, ViewChild, AfterViewInit} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  ViewChild,
+  AfterViewInit,
+  HostBinding
+} from '@angular/core';
+import {MatChipList} from '@angular/material/chips';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatInput} from '@angular/material/input';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -41,8 +52,22 @@ class MapControlDiv extends HTMLDivElement {
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
+  animations: [
+    trigger('pageAnimations', [
+      transition(':enter', [
+        query('#age-filter, #language-filter, #topic-filter', [
+          style({opacity: 0, transform: 'translateX(-100px)'}),
+          stagger(-30, [
+            animate('500ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'none' }))
+          ])
+        ])
+      ])
+    ]),
+  ]
 })
 export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
+  @HostBinding('@pageAnimations')
+  public animatePage = true;
   query: Query;
   mapQuery: Query;
   resourceTypes = HitType.all_resources();
@@ -814,4 +839,17 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+  hasFilters(appliedFilters?: MatChipList): boolean {
+    return !!(appliedFilters && appliedFilters.chips && (appliedFilters.chips.length > 0));
+  }
+
+  clearAllFilters() {
+    this.listMapResultsOnly(false);
+    this.removeWords();
+    this.selectAgeRange();
+    this.selectLanguage();
+    this.selectType();
+    this.removeCategory();
+    this.router.navigate(['/search']);
+  }
 }
