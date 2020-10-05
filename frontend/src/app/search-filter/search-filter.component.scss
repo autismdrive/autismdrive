@@ -1,10 +1,7 @@
 @import '../../config';
 
-::ng-deep mat-form-field {
-  width: 100%;
-
-  .mat-hint {
-    color: $brand-accent;
-    font-size: 1rem;
-  }
+::ng-deep .mat-hint {
+  display: block;
+  color: $brand-accent;
+  font-size: 0.75rem;
 }
