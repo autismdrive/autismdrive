@@ -46,6 +46,7 @@ export class StudySurveyEntryComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.currentUser = true;
+        this.goSurvey();
       }
     });
   }
