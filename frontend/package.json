@@ -29,6 +29,7 @@
     "@angular/router": "^8.2.14",
     "@ngx-formly/core": "^5.5.7",
     "@ngx-formly/material": "^5.5.7",
+    "@yellowspot/ng-truncate": "^1.5.2",
     "angular-jwt": "^0.1.11",
     "core-js": "^3.6.1",
     "flat": "^4.1.0",

@@ -5,7 +5,10 @@
       <mat-list>
         <div *ngFor="let relStudy of relatedStudies">
           <mat-list-item>
-            <a  mat-line (click)="goStudy(relStudy.id)"><app-type-icon [iconType]="'study'"></app-type-icon>  {{relStudy.short_title || relStudy.title}}</a>
+            <a mat-line (click)="goStudy(relStudy.id)" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="8px">
+              <app-type-icon [iconType]="'study'"></app-type-icon>
+              <span class="study-title">{{relStudy.short_title || relStudy.title}}</span>
+            </a>
             <p mat-line>{{relStudy.short_description || relStudy.description}}</p>
           </mat-list-item>
         </div>
@@ -18,8 +21,11 @@
       <mat-list>
         <div *ngFor="let relResource of relatedResources">
           <mat-list-item>
-            <a  mat-line (click)="goResource(relResource.id)"><app-type-icon [iconType]="relResource.type"></app-type-icon>  {{relResource.title}}</a>
-            <p mat-line>{{relResource.description}}</p>
+            <a  mat-line (click)="goResource(relResource.id)" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="8px">
+              <app-type-icon [iconType]="relResource.type"></app-type-icon>
+              <span class="resource-title">{{relResource.title}}</span>
+            </a>
+            <p mat-line>{{relResource.description | truncate: 140}}</p>
           </mat-list-item>
         </div>
       </mat-list>

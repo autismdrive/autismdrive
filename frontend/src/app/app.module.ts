@@ -40,6 +40,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
+import {TruncateModule} from '@yellowspot/ng-truncate';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorModule} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
@@ -55,10 +56,10 @@ import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tr
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
 import {
-  EmailValidator,
-  EmailValidatorMessage,
   EmailMatchValidator,
   EmailMatchValidatorMessage,
+  EmailValidator,
+  EmailValidatorMessage,
   MaxValidationMessage,
   MinValidationMessage,
   MulticheckboxValidator,
@@ -88,9 +89,17 @@ import {AppComponent} from './app.component';
 import {AvatarDialogComponent} from './avatar-dialog/avatar-dialog.component';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
 import {ContactItemComponent} from './contact-item/contact-item.component';
+import {Covid19ResourcesComponent} from './covid19-resources/covid19-resources.component';
 import {DetailsLinkComponent} from './details-link/details-link.component';
 import {EditButtonComponent} from './edit-button/edit-button.component';
+import {EmailLogAdminComponent} from './email-log-admin/email-log-admin.component';
 import {EventDateComponent} from './event-date/event-date.component';
+import {EventRegistrationFormComponent} from './event-registration-form/event-registration-form.component';
+import {EventRegistrationComponent} from './event-registration/event-registration.component';
+import {FavoriteResourceButtonComponent} from './favorite-resource-button/favorite-resource-button.component';
+import {FavoriteResourcesComponent} from './favorite-resources/favorite-resources.component';
+import {FavoriteTopicsDialogComponent} from './favorite-topics-dialog/favorite-topics-dialog.component';
+import {FavoriteTopicsComponent} from './favorite-topics/favorite-topics.component';
 import {FilterChipsComponent} from './filter-chips/filter-chips.component';
 import {FiltersComponent} from './filters/filters.component';
 import {FlowCompleteComponent} from './flow-complete/flow-complete.component';
@@ -102,6 +111,7 @@ import {GoogleAnalyticsService} from './google-analytics.service';
 import {HeaderComponent} from './header/header.component';
 import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';
+import {InvestigatorFormComponent} from './investigator-form/investigator-form.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 import {LoadingComponent} from './loading/loading.component';
 import {LoginComponent} from './login/login.component';
@@ -118,6 +128,7 @@ import {QuestionnaireDataTableComponent} from './questionnaire-data-table/questi
 import {QuestionnaireDataViewComponent} from './questionnaire-data-view/questionnaire-data-view.component';
 import {QuestionnaireStepComponent} from './questionnaire-step/questionnaire-step.component';
 import {QuestionnaireStepsListComponent} from './questionnaire-steps-list/questionnaire-steps-list.component';
+import {RegisterDialogComponent} from './register-dialog/register-dialog.component';
 import {RegisterComponent} from './register/register.component';
 import {RelatedItemsComponent} from './related-items/related-items.component';
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
@@ -131,6 +142,7 @@ import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
 import {StudyFormComponent} from './study-form/study-form.component';
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
+import {StudySurveyEntryComponent} from './study-survey-entry/study-survey-entry.component';
 import {TaxonomyAdminComponent} from './taxonomy-admin/taxonomy-admin.component';
 import {TermsComponent} from './terms/terms.component';
 import {TimedoutComponent} from './timed-out/timed-out.component';
@@ -138,17 +150,6 @@ import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
-import { Covid19ResourcesComponent } from './covid19-resources/covid19-resources.component';
-import { FavoriteResourceButtonComponent } from './favorite-resource-button/favorite-resource-button.component';
-import { FavoriteResourcesComponent } from './favorite-resources/favorite-resources.component';
-import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite-topics-dialog.component';
-import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
-import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
-import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
-import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
-import { EventRegistrationComponent } from './event-registration/event-registration.component';
-import { EventRegistrationFormComponent } from './event-registration-form/event-registration-form.component';
-import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -307,55 +308,56 @@ export class FormlyConfig {
     EventRegistrationFormComponent,
     EmailLogAdminComponent,
   ],
-    imports: [
-        AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
-        AgmJsMarkerClustererModule,
-        BrowserAnimationsModule,
-        BrowserModule,
-        CommonModule,
-        DeviceDetectorModule.forRoot(),
-        FlexLayoutModule,
-        FormlyMatDatepickerModule,
-        FormlyMaterialModule,
-        FormlyModule.forRoot(FormlyConfig.config),
-        FormsModule,
-        HttpClientModule,
-        MarkdownModule.forRoot(),
-        MatAutocompleteModule,
-        MatButtonModule,
-        MatCardModule,
-        MatCheckboxModule,
-        MatChipsModule,
-        MatDatepickerModule,
-        MatDialogModule,
-        MatExpansionModule,
-        MatFormFieldModule,
-        MatGridListModule,
-        MatIconModule,
-        MatInputModule,
-        MatListModule,
-        MatNativeDateModule,
-        MatPaginatorModule,
-        MatProgressBarModule,
-        MatProgressSpinnerModule,
-        MatRadioModule,
-        MatSelectModule,
-        MatSidenavModule,
-        MatSlideToggleModule,
-        MatSortModule,
-        MatStepperModule,
-        MatTabsModule,
-        MatTableModule,
-        MatToolbarModule,
-        MatTooltipModule,
-        NgProgressModule,
-        PdfJsViewerModule,
-        ReactiveFormsModule,
-        RoutingModule,
-        MatTreeModule,
-        MatBadgeModule,
-        MatMenuModule,
-    ],
+  imports: [
+    AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
+    AgmJsMarkerClustererModule,
+    BrowserAnimationsModule,
+    BrowserModule,
+    CommonModule,
+    DeviceDetectorModule.forRoot(),
+    FlexLayoutModule,
+    FormlyMatDatepickerModule,
+    FormlyMaterialModule,
+    FormlyModule.forRoot(FormlyConfig.config),
+    FormsModule,
+    HttpClientModule,
+    MarkdownModule.forRoot(),
+    MatAutocompleteModule,
+    MatBadgeModule,
+    MatButtonModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatMenuModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSlideToggleModule,
+    MatSortModule,
+    MatStepperModule,
+    MatTableModule,
+    MatTabsModule,
+    MatToolbarModule,
+    MatTooltipModule,
+    MatTreeModule,
+    NgProgressModule,
+    PdfJsViewerModule,
+    ReactiveFormsModule,
+    TruncateModule,
+    RoutingModule,
+  ],
   providers: [
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
     {provide: LAZY_MAPS_API_CONFIG, useExisting: ConfigService},

@@ -15,7 +15,7 @@
       fxLayout="column"
       fxLayoutGap="40px"
     >
-      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="1em">
+      <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="1em">
         <app-type-icon [iconType]="resource.type.toLowerCase()" [size]="3"></app-type-icon>
         <h1>{{resource.title}}</h1>
       </div>
@@ -153,7 +153,7 @@
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
             [radius]="32186.9"
-            [fillColor]="resource.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
+            [fillColor]="resource.type.toLowerCase() === 'location' ? '#6c799c' : '#E57200'"
             fillOpacity="0.1"
             [clickable]="true"
             (circleClick)="toggleInfoWindow($event)"
