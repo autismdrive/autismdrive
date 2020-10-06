@@ -95,6 +95,10 @@ class UserListEndpoint(flask_restful.Resource):
         return self.searchSchema.dump(page)
 
     def post(self):
+        """
+        Adds new user (with given attributes in request data) to the database and sends confirmation email
+        to the provided email address
+        """
         request_data = request.get_json()
         try:
             request_data['role'] = 'user'
