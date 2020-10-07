@@ -109,8 +109,9 @@ export class AppPage {
     this.waitForNotVisible(optionSelector);
   }
 
-  isVisible(selector: string) {
-    return this.getElement(selector).isDisplayed();
+  async isVisible(selector: string) {
+    const numElements = await this.getElements(selector).count();
+    return (numElements > 0) ? this.getElement(selector).isDisplayed() : false;
   }
 
   getElement(selector: string): ElementFinder {

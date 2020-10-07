@@ -14,9 +14,12 @@ export class SearchUseCases {
     const suggestionSelector = autocompleteSelector + ' .mat-option';
     const typeTabSelector = '.type-tabs-container .type-tabs .mat-tab-label';
     const activeFirstTabSelector = typeTabSelector + '.mat-tab-label-active[tabindex="0"]';
+
+    // Wait for type tabs and results to load.
     await this.page.waitForVisible(typeTabSelector);
     await this.page.waitForVisible(resultSelector);
 
+    // Verify that type tabs and search results are displayed.
     const numResultsBefore = parseInt(await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute), 10);
     expect(numResultsBefore).toBeGreaterThan(0, 'Search results should be visible.');
     const numTypeTabsBefore = await this.page.getElements(typeTabSelector).count();
@@ -24,10 +27,10 @@ export class SearchUseCases {
     const numFirstTabSelectedBefore = await this.page.getElements(activeFirstTabSelector).count();
     expect(numFirstTabSelectedBefore).toEqual(1, 'First type tab should be selected.');
 
-    // Click the search field
+    // Click the search field.
     this.page.clickElement(searchFieldSelector);
     const autocompleteIsVisibleBefore = await this.page.isVisible(autocompleteSelector);
-    expect(autocompleteIsVisibleBefore).toEqual(false);
+    expect(autocompleteIsVisibleBefore).toEqual(false, 'Autocomplete panel should not be visible yet.');
     const numSuggestionsBefore = await this.page.getElements(suggestionSelector).count();
     expect(numSuggestionsBefore).toEqual(0, 'No suggestions should be visible yet.');
 

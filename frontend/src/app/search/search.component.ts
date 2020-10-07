@@ -14,9 +14,8 @@ import {
 } from '@angular/core';
 import {MatChipList} from '@angular/material/chips';
 import {MatExpansionPanel} from '@angular/material/expansion';
-import {MatInput} from '@angular/material/input';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatTabChangeEvent, MatTabGroup} from '@angular/material/tabs';
+import {MatTabChangeEvent} from '@angular/material/tabs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
@@ -92,7 +91,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
   mapZoomLevel: number;
-  mobileQuery: MediaQueryList;
   sortMethods: SortMethod[] = [
     {
       name: 'Relevance',
@@ -142,7 +140,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedPageStart = 0;
   pageEvent: PageEvent;
   paginatorElement: MatPaginator;
-  panelElement: MatExpansionPanel;
   mapTemplateElement: AgmMap;
   currentUser: User;
   highlightedStudy: Study;
@@ -188,7 +185,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   showFilters: boolean;
   expandResults: boolean;
-  private _mobileQueryListener: () => void;
   restrictToMappedResults: boolean;
   private mapBounds: LatLngBounds;
   private scrollDirection: Direction;
@@ -202,21 +198,13 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     private searchService: SearchService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
-    media: MediaMatcher,
     private api: ApiService,
     private meta: Meta,
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this._mobileQueryListener = () => this._updateFilterPanelState();
-    this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this.languageOptions = this.getOptions(Language.labels);
     this.ageOptions = this.getOptions(AgeRange.labels);
 
-    // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
-    // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
-    // tslint:disable-next-line:deprecation
-    this.mobileQuery.addListener(this._mobileQueryListener);
-    window.addEventListener('resize', this._mobileQueryListener);
     this.meta.updateTag(
         { property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
         `property='og:image'`);
@@ -233,17 +221,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorElement = value;
   }
 
-  @ViewChild(MatExpansionPanel, {static: false})
-  set panel(value: MatExpansionPanel) {
-    this.panelElement = value;
-    this._updateFilterPanelState();
-  }
-
   @ViewChild('mapTemplate', {static: false})
   set mapTemplate(value: AgmMap) {
     this.mapTemplateElement = value;
   }
-
 
   get showLocationButton(): boolean {
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
@@ -281,11 +262,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchService.reset();
-    // removeEventListener fails on older versions of iOS / Safari / iPhone
-    // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
-    // tslint:disable-next-line:deprecation
-    this.mobileQuery.removeListener(this._mobileQueryListener);
-    window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   getOptions(modelLabels) {
@@ -739,22 +715,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.paginatorElement.firstPage();
     }
     this.updateUrlAndDoSearch();
-  }
-
-  private _updateFilterPanelState() {
-    if (this.panelElement) {
-      if (this.mobileQuery.matches) {
-        this.panelElement.close();
-        this.panelElement.hideToggle = false;
-        this.panelElement.disabled = false;
-      } else {
-        this.panelElement.open();
-        this.panelElement.hideToggle = true;
-        this.panelElement.disabled = true;
-      }
-    }
-
-    this.changeDetectorRef.detectChanges();
   }
 
   selectTypeTab($event: MatTabChangeEvent) {
