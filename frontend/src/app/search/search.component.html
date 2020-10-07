@@ -329,6 +329,7 @@
       (click)="listMapResultsOnly(!restrictToMappedResults)"
       [color]="restrictToMappedResults ? 'accent' : ''"
       [ngClass]="'mat-elevation-z1'"
+      [fxHide]="!shouldShowMap"
     >
       <mat-icon *ngIf="!restrictToMappedResults">check_box_outline_blank</mat-icon>
       <mat-icon *ngIf="restrictToMappedResults">check_box</mat-icon>
