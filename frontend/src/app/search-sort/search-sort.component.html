@@ -1,0 +1,16 @@
+<mat-form-field>
+  <mat-label>Sort By:</mat-label>
+  <mat-select [(value)]="selectedSort">
+    <mat-select-trigger>
+      <span class="type-label" *ngIf="selectedSort">{{selectedSort.label}}</span>
+    </mat-select-trigger>
+    <mat-option
+      *ngFor="let sort of sortMethods"
+      [value]="sort"
+      (click)="sortMethodSelected.emit(sort)"
+      [ngClass]="'sort-by-' + sort.name.toLowerCase()"
+    >
+      <span class="sort-label">{{sort.label}}</span>
+    </mat-option>
+  </mat-select>
+</mat-form-field>

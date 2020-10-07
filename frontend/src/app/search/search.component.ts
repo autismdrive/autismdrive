@@ -26,6 +26,7 @@ import {AgeRange, HitType, Language} from '../_models/hit_type';
 import {Hit, Query, Sort} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {Direction} from '../_models/scroll';
+import {SortMethod} from '../_models/sort_method';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
@@ -36,12 +37,6 @@ import {Study} from '../_models/study';
 import createClone from 'rfdc';
 
 declare var google: any;
-
-interface SortMethod {
-  name: string;
-  label: string;
-  sortQuery: Sort;
-}
 
 
 class MapControlDiv extends HTMLDivElement {
@@ -190,6 +185,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       url: 'https://www.viaschool.org/',
     },
   ];
+  showFilters: boolean;
+  expandResults: boolean;
   private _mobileQueryListener: () => void;
   restrictToMappedResults: boolean;
   private mapBounds: LatLngBounds;
@@ -271,6 +268,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.watchScrollEvents();
     this.paginatorElement.pageIndex = (this.selectedPageStart - 1) / this.pageSize;
+    this.expandResults = true;
   }
 
   ngOnDestroy(): void {
@@ -398,7 +396,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.gpsEnabled = false;
     }
   }
-
 
   newSortSelection(sort: SortMethod) {
     this.loading = true;
@@ -555,7 +552,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  showMap() {
+  get shouldShowMap() {
     const is_location_or_event_type = this.mapQuery &&
       this.mapQuery.types &&
       this.mapQuery.types.length === 1 &&
@@ -638,27 +635,27 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     return {url: url, anchor: {x: x, y: y}};
   }
 
-  protected mapLoad(map: google.maps.Map) {
-    this.addMyLocationControl(map);
+  protected mapLoad(m: google.maps.Map) {
+    this.addMyLocationControl(m);
   }
 
-  private _queryToQueryParams(query: Query): Params {
+  private _queryToQueryParams(q: Query): Params {
     const queryParams: Params = {};
 
-    if (query.hasOwnProperty('words') && query.words) {
-      queryParams.words = query.words;
+    if (q.hasOwnProperty('words') && q.words) {
+      queryParams.words = q.words;
     } else {
       queryParams.words = undefined;
     }
 
-    queryParams.types = query.types;
-    queryParams.ages = query.ages;
-    queryParams.languages = query.languages;
+    queryParams.types = q.types;
+    queryParams.ages = q.ages;
+    queryParams.languages = q.languages;
     queryParams.sort = this.selectedSort.name;
-    queryParams.pageStart = query.start;
+    queryParams.pageStart = q.start;
 
-    if (query.hasOwnProperty('category') && query.category) {
-      queryParams.category = query.category.id;
+    if (q.hasOwnProperty('category') && q.category) {
+      queryParams.category = q.category.id;
     }
     return queryParams;
   }
@@ -683,37 +680,37 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   // Return a random number for the given seed
   private _queryParamsToQuery(qParams: Params): Query {
 
-    const query = new Query({});
-    query.size = this.pageSize;
+    const q = new Query({});
+    q.size = this.pageSize;
     if (qParams && qParams.keys) {
       for (const key of qParams.keys) {
         switch (key) {
           case ('words'):
-            query.words = qParams.get(key);
+            q.words = qParams.get(key);
             break;
           case ('category'):
-            query.category = {'id': qParams.get(key)};
+            q.category = {'id': qParams.get(key)};
             break;
           case('ages'):
-            query.ages = qParams.getAll(key);
+            q.ages = qParams.getAll(key);
             break;
           case('languages'):
-            query.languages = qParams.getAll(key);
+            q.languages = qParams.getAll(key);
             break;
           case('sort'):
             if (this.sortMethods.find(m => m.name === qParams.get(key)) !== undefined) {
-              query.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery;
+              q.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery;
             }
             break;
           case('pageStart'):
             this.selectedPageStart = Number(qParams.get(key));
             break;
           case('types'):
-            query.types = qParams.getAll(key);
+            q.types = qParams.getAll(key);
         }
       }
     }
-    return query;
+    return q;
 
   }
 
@@ -851,5 +848,13 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectType();
     this.removeCategory();
     this.router.navigate(['/search']);
+  }
+
+  toggleShowFilters() {
+    this.showFilters = !this.showFilters;
+
+    if (!this.shouldShowMap) {
+      this.expandResults = true;
+    }
   }
 }

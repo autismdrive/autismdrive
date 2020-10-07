@@ -135,6 +135,13 @@ mat-expansion-panel, mat-accordion {
       margin-left: 0;
     }
   }
+
+  &.applied-filters-small {
+    .applied-filter {
+      font-size: 0.75rem;
+      mat-icon { font-size: 1rem; line-height: 1.5; }
+    }
+  }
 }
 
 .sort-order {
@@ -176,10 +183,11 @@ mat-expansion-panel, mat-accordion {
 }
 
 ::ng-deep .mat-option, ::ng-deep .mat-select-trigger {
-  app-type-icon  {
+  app-type-icon {
     [class*="icofont-"] { margin-right: 0.5em; }
-    .mat-icon { margin-right: 0em; margin-top: 0.5em; }
+    .mat-icon { margin-right: 0.5em; margin-top: -0.25em; }
   }
+  .mat-select-value app-type-icon .mat-icon { margin-top: 0.25em; }
 }
 
 ::ng-deep .gm-style-iw.gm-style-iw-c, ::ng-deep .gm-style-iw-d {
@@ -257,7 +265,6 @@ mat-expansion-panel, mat-accordion {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 40%;
   right: 0;
 
   &.align-top, &.above {
@@ -271,11 +278,11 @@ mat-expansion-panel, mat-accordion {
 
   &.docked {
     &.up {
-      #set-location, #listMappedResultsButton { top: 194px; }
+      #set-location, #list-mapped-results-button { top: 194px; }
     }
 
     &.down {
-      #set-location, #listMappedResultsButton { top: 74px; }
+      #set-location, #list-mapped-results-button { top: 74px; }
     }
 
     #set-location {
@@ -285,7 +292,7 @@ mat-expansion-panel, mat-accordion {
       width: 240px;
     }
 
-    #listMappedResultsButton {
+    #list-mapped-results-button {
       position: fixed;
       top: 74px;
       right: 10px;
@@ -316,7 +323,7 @@ mat-expansion-panel, mat-accordion {
     }
   }
 
-  #listMappedResultsButton {
+  #list-mapped-results-button {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -373,4 +380,57 @@ mat-expansion-panel, mat-accordion {
   right: 0px;
   pointer-events: none;
   background: transparent;
+}
+
+#filters {
+  &.minimized {
+    display: none !important;
+  }
+
+  &.full-screen {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: white;
+    z-index: 1000;
+    margin: 0;
+    padding: 2rem;
+  }
+}
+
+.filter-container {
+  padding-top: 2em;
+  padding-bottom: 2em;
+  border-top: 1px solid $brand-gray-tint-4;
+}
+
+#type-filter {
+  width: 100%;
+
+  .mat-form-field { width: 100%; }
+}
+
+#results-vs-map {
+  width: 100%;
+
+  .mat-button-toggle-group {
+    width: 100%;
+
+    .mat-button-toggle {
+      width: 50%;
+    }
+  }
+}
+
+.sort-order-small {
+  width: 100%;
+}
+
+#show-filters-button {
+  margin-bottom: 2em;
 }

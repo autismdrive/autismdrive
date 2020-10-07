@@ -10,6 +10,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule, MatTabsModule} from
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatChipsModule} from '@angular/material/chips';
@@ -150,6 +151,7 @@ import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
+import { SearchSortComponent } from './search-sort/search-sort.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -307,6 +309,7 @@ export class FormlyConfig {
     EventRegistrationComponent,
     EventRegistrationFormComponent,
     EmailLogAdminComponent,
+    SearchSortComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -357,6 +360,7 @@ export class FormlyConfig {
     ReactiveFormsModule,
     TruncateModule,
     RoutingModule,
+    MatButtonToggleModule,
   ],
   providers: [
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
