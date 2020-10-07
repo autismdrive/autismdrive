@@ -320,6 +320,7 @@
     fxShow
     [fxShow.lt-md]="!expandResults"
     [ngClass.gt-sm]="mapDockClass(scrollSpy, searchHeader, searchFooter)"
+    [ngStyle.gt-sm]="{width: '40%'}"
   >
     <span class="inset-shadow"></span>
     <button
@@ -454,7 +455,15 @@
     </div>
   </div>
 </div>
-<div id="partners" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="3em" fxLayoutAlign="auto center" #searchFooter>
+<div
+  id="partners"
+  fxLayout="row"
+  fxLayout.lt-md="column"
+  fxLayoutGap="3em"
+  fxLayoutAlign="auto center"
+  #searchFooter
+  [ngStyle.lt-md]="{marginTop: '120vh'}"
+>
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>
     <p class="pad-0">We are partnering with the following initiatives and organizations to identify

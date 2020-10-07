@@ -143,6 +143,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   pageEvent: PageEvent;
   paginatorElement: MatPaginator;
   panelElement: MatExpansionPanel;
+  mapTemplateElement: AgmMap;
   currentUser: User;
   highlightedStudy: Study;
   resourceGatherers: AccordionItem[] = [
@@ -238,6 +239,12 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this._updateFilterPanelState();
   }
 
+  @ViewChild('mapTemplate', {static: false})
+  set mapTemplate(value: AgmMap) {
+    this.mapTemplateElement = value;
+  }
+
+
   get showLocationButton(): boolean {
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
     const isDistanceSort = this.selectedSort && this.selectedSort.name === 'Distance';
@@ -269,6 +276,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.watchScrollEvents();
     this.paginatorElement.pageIndex = (this.selectedPageStart - 1) / this.pageSize;
     this.expandResults = true;
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -777,10 +785,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   numTotalResults() {
     return this.query.total;
-  }
-
-  calculateMapHeight(mapContainer: HTMLDivElement) {
-    return `${mapContainer.clientHeight}px`;
   }
 
   mapDockClass(scrollSpy: HTMLSpanElement, searchHeader: HTMLDivElement, searchFooter: HTMLDivElement): string {
