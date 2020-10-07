@@ -28,8 +28,12 @@ class InvestigatorEndpoint(flask_restful.Resource):
     def put(self, id):
         request_data = request.get_json()
         instance = db.session.query(Investigator).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+
+        try:
+            updated = self.schema.load(request_data, instance=instance)
+        except Exception as errors:
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
+
         updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
@@ -48,7 +52,7 @@ class InvestigatorListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.investigatorSchema.load(request_data).data
+            load_result = self.investigatorSchema.load(request_data)
             model = db.session.query(Investigator).filter_by(name=load_result.name).first()
             if model:
                 return self.investigatorSchema.dump(model)

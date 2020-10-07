@@ -72,7 +72,11 @@ class UserByStudyEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def post(self, study_id):
         request_data = request.get_json()
-        study_users = self.schema.load(request_data, many=True).data
+
+        for item in request_data:
+            item['study_id'] = study_id
+
+        study_users = self.schema.load(request_data, many=True)
         db.session.query(StudyUser).filter_by(study_id=study_id).delete()
         for c in study_users:
             db.session.add(StudyUser(study_id=study_id,
@@ -103,7 +107,7 @@ class StudyUserListEndpoint(flask_restful.Resource):
     @auth.login_required
     def post(self):
         request_data = request.get_json()
-        load_result = self.schema.load(request_data).data
+        load_result = self.schema.load(request_data)
         db.session.query(StudyUser).filter_by(study_id=load_result.study_id,
                                                      user_id=load_result.user_id).delete()
         db.session.add(load_result)

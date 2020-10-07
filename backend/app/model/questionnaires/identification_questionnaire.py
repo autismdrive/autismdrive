@@ -1,8 +1,8 @@
-from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
 from app import db, ma
 from app.export_service import ExportService
+from app.schema.model_schema import ModelSchema
 
 
 class IdentificationQuestionnaire(db.Model):
@@ -131,7 +131,7 @@ class IdentificationQuestionnaire(db.Model):
         },
     )
     birthdate = db.Column(
-        db.Date,
+        db.DateTime,
         info={
             "display_order": 7,
             "type": "datepicker",
@@ -246,10 +246,8 @@ class IdentificationQuestionnaire(db.Model):
 
 
 class IdentificationQuestionnaireSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = IdentificationQuestionnaire
-        ordered = True
-        include_fk = True
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.questionnaireendpoint', name="identification_questionnaire", id='<id>')
     })

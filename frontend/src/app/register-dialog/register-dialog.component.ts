@@ -77,6 +77,8 @@ export class RegisterDialogComponent implements OnInit {
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
+
+    // Create an empty user instance to hold the form data.
     this.user = new User({
       id: null,
       email: this.model['email'],
@@ -93,8 +95,11 @@ export class RegisterDialogComponent implements OnInit {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();
       this.errorMessage = '';
+
+      // Add email address from the form into the user instance.
       this.user['email'] = this.model['email']['email'];
 
+      // Submit the user data to the backend.
       this.api.addUser(this.user).subscribe(u => {
         this.user = u;
         if (u.hasOwnProperty('token_url')) {

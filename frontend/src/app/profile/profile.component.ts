@@ -70,6 +70,7 @@ export class ProfileComponent implements OnInit {
         this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(
           f => {
             this.selfPercentComplete = f.percentComplete();
+            console.log('selfPercentComplete', this.selfPercentComplete);
           }
         );
       });

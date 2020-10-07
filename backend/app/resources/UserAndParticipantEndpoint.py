@@ -36,7 +36,7 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
         if 'user_id' not in request_data:
             request_data['user_id'] = g.user.id
         try:
-            load_result = self.schema.load(request_data).data
+            load_result = self.schema.load(request_data)
             load_result.user = db.session.query(User).filter(User.id == request_data['user_id']).first()
             load_result.relationship = relationship
             db.session.add(load_result)

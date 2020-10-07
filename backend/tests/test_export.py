@@ -104,7 +104,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        exports = ExportInfoSchema(many=True).load(response).data
+        exports = ExportInfoSchema(many=True).load(response)
         for export in exports:
             rv = self.app.get(export.url, follow_redirects=True, content_type="application/json",
                               headers=self.logged_in_headers())
@@ -114,7 +114,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
     def load_database(self, all_data):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
-        exports = ExportInfoSchema(many=True).load(response).data
+        exports = ExportInfoSchema(many=True).load(response)
         importer = ImportService(app, db)
         log = importer.log_for_export(exports, datetime.datetime.utcnow())
         for export in exports:
@@ -130,9 +130,9 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         email_verified = u.email_verified
         orig_u_date = u.last_updated
 
-        orig_user_dict = UserSchema().dump(u).data  # Use standard schema
+        orig_user_dict = UserSchema().dump(u)  # Use standard schema
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
-        orig_p_dict = ParticipantSchema().dump(p).data  # Use standard schema
+        orig_p_dict = ParticipantSchema().dump(p)  # Use standard schema
         orig_p_date = p.last_updated
         db.session.commit()
 
@@ -184,12 +184,11 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         iq = self.construct_identification_questionnaire(user=u, participant=p)
         id = u.id
         db.session.commit()
-
         data = self.get_export()
         clean_db(db)
         db.session.commit()
-        self.load_database(data)
 
+        self.load_database(data)
         self.assertEqual(ExportService.TYPE_IDENTIFYING,
                          IdentificationQuestionnaire().__question_type__)
         self.assertEqual(0, len(db.session.query(IdentificationQuestionnaire).all()),
@@ -208,6 +207,10 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                 self.assertTrue('_links' in d, msg="%s should have links in json." % export.class_name)
                 self.assertTrue('self' in d['_links'])
                 self.assert_success(self.app.get(d['_links']['self'], headers=self.logged_in_headers()))
+
+                rv_link = self.app.get(d['_links']['self'], follow_redirects=True, content_type="application/json",
+                              headers=self.logged_in_headers())
+                rv_link_data = json.loads(rv_link.get_data(as_text=True))
 
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
@@ -240,12 +243,12 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
         rv = self.app.get('/api/export', headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         for export in response:
-            self.assertTrue(export['size'] > 0, msg=export['class_name'] + " should have a count > 0")
+            self.assertGreater(export['size'], 0, msg=export['class_name'] + " should have a count > 0")
 
         rv = self.app.get('/api/export' + params, headers=self.logged_in_headers())
         response = json.loads(rv.get_data(as_text=True))
         for export in response:
-            self.assertTrue(export['size'] == 0, msg=export['class_name'] + " should have a count of 0")
+            self.assertEqual(export['size'], 0, msg=export['class_name'] + " should have a count of 0")
 
     def test_it_all_crazy_madness_wohoo(self):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.
@@ -355,7 +358,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
                               total_records=2, type="export")
         db.session.add(log)
         db.session.commit()
-        for i in range(20):
+        for i in range(12):
             ExportService.send_alert_if_exports_not_running()
         self.assertEqual(message_count + 12, len(TEST_MESSAGES), msg="12 emails should have gone out.")
 

@@ -1,6 +1,9 @@
+import datetime
+
 import elasticsearch
 import flask_restful
 from flask import request, json
+from marshmallow import ValidationError
 
 from app import elastic_index, RestException, db
 from app.model.category import Category
@@ -9,17 +12,18 @@ from app.schema.schema import SearchSchema
 
 
 class SearchEndpoint(flask_restful.Resource):
-    def __post__(self, result_types = None):
+    def __post__(self, result_types=None):
         request_data = request.get_json()
 
         # Handle some sloppy category data.
         if 'category' in request_data and (not request_data['category'] or not request_data['category']['id']):
             del request_data['category']
 
-        search, errors = SearchSchema().load(request_data)
+        try:
+            search = SearchSchema().load(request_data)
+        except ValidationError as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e.messages)
 
-        if errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
         try:
             # Overwrite the result types if requested.
             if not search.types and result_types:

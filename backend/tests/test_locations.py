@@ -40,7 +40,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         response['latitude'] = 34.5678
         response['longitude'] = -98.7654
         orig_date = response['last_updated']
-        rv = self.app.put('/api/location/%i' % r_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/location/%i' % r_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/location/%i' % r_id, content_type="application/json")
@@ -69,7 +69,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         data_loader.DataLoader().load_partial_zip_codes()
         location = {'title': "location of locations", 'description': "You need this location in your life.",
                     'organization_name': "Location Org"}
-        rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
+        rv = self.app.post('api/location', data=self.jsonify(location), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -138,7 +138,7 @@ class TestLocations(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/resource_category',
-            data=json.dumps(rc_data),
+            data=self.jsonify(rc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -164,7 +164,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         ]
         rv = self.app.post(
             '/api/location/%i/category' % loc.id,
-            data=json.dumps(lc_data),
+            data=self.jsonify(lc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -173,7 +173,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         lc_data = [{"category_id": c1.id}]
         rv = self.app.post(
             '/api/location/%i/category' % loc.id,
-            data=json.dumps(lc_data),
+            data=self.jsonify(lc_data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -208,7 +208,7 @@ class TestLocations(BaseTest, unittest.TestCase):
 
         response = json.loads(rv.get_data(as_text=True))
         response['title'] = 'Super Great Location'
-        rv = self.app.put('/api/location/%i' % l.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/location/%i' % l.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
         rv = self.app.get('/api/location/%i' % l.id, content_type="application/json")
@@ -233,7 +233,7 @@ class TestLocations(BaseTest, unittest.TestCase):
     def test_geocode_setting(self):
         data_loader.DataLoader().load_partial_zip_codes()
         location = {'title': "Some super place", 'description': "You should go here every day."}
-        rv = self.app.post('api/location', data=json.dumps(location), content_type="application/json",
+        rv = self.app.post('api/location', data=self.jsonify(location), content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -244,7 +244,7 @@ class TestLocations(BaseTest, unittest.TestCase):
 
         # lat and lng shouldn't change on edit unless the street_address1 or zip fields are edited.
         response['description'] = "Something different"
-        rv = self.app.put('/api/location/%i' % location_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/location/%i' % location_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/location/%i' % location_id, content_type="application/json")
@@ -253,7 +253,7 @@ class TestLocations(BaseTest, unittest.TestCase):
         self.assertEqual(initial_lat_lng, str(response['latitude']) + str(response['longitude']))
 
         response['zip'] = '24401'
-        rv = self.app.put('/api/location/%i' % location_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/location/%i' % location_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.app.get('/api/location/%i' % location_id, content_type="application/json")

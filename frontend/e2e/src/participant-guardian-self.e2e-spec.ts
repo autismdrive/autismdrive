@@ -28,6 +28,7 @@ describe('Participant (Guardian - Self)', () => {
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
     await page.waitForAngularEnabled(true);
     await page.navigateToHome();
+    await loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
   afterAll(async () => {
@@ -73,7 +74,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
   it('should cancel out of the terms consent page', () => enrollUseCases.cancelTerms());
   it('should navigate back to the Guardian flow', () => profileUseCases.startGuardianFlow());
-  it('should accept the terms', () => enrollUseCases.acceptTerms());
+  it('should accept the terms for Guardian', () => enrollUseCases.acceptTerms());
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display a disabled button for adding a dependent', () => profileUseCases.checkDependentButtonDisabled());
   it('should display avatars for each participant', () => profileUseCases.displayAvatars());
@@ -95,9 +96,9 @@ describe('Participant (Guardian - Self)', () => {
   it('should complete Guardian Identification step', () => enrollUseCases.completeStep(0));
   it('should complete Guardian Contact Information step', () => enrollUseCases.completeStep(1));
   it('should complete Guardian Demographics step', () => enrollUseCases.completeStep(2));
-  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
+  it('should navigate back to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should start the Dependent flow', () => profileUseCases.startDependentFlow());
-  it('should accept the terms', () => enrollUseCases.acceptTerms());
+  it('should accept the terms for Dependent', () => enrollUseCases.acceptTerms());
   it('should complete Dependent Identification step', () => enrollUseCases.completeStep(0));
   it('should complete Dependent Demographics step', () => enrollUseCases.completeStep(1));
   it('should complete Dependent Home step', () => enrollUseCases.completeStep(2));
@@ -113,29 +114,39 @@ describe('Participant (Guardian - Self)', () => {
 
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should display selected category', () => searchUseCases.displaySelectedCategory('age'));
+  it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
+  it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField('ad'));
+  it('should clear search filter', () => searchUseCases.removeFilter('keyword', 'type'));
+  it('should autofocus on search box', () => searchUseCases.focusAndBlurSearchBox());
+  it('should display results filtered by age', () => searchUseCases.displaySelectedCategory('age'));
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code dialog', () => searchUseCases.openZipCodeDialog());
   it('should allow user to set location via ZIP code', () => searchUseCases.enterZipCode('22101'));
   it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('22101'));
   it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should open ZIP code dialog again', () => searchUseCases.openZipCodeDialog());
   it('should change ZIP code', () => searchUseCases.enterZipCode('24248'));
-  it('should display saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should display different saved ZIP code', () => searchUseCases.checkSavedZipCode('24248'));
+  it('should display different results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should allow user to use GPS for location instead, clearing the stored ZIP code', () => searchUseCases.clearZipCode('24248'));
-  it('should display results in order by distance', () => searchUseCases.checkResultsDistance());
+  it('should display yet more differenter results in order by distance', () => searchUseCases.checkResultsDistance());
   it('should show all age ranges', () => searchUseCases.removeFilter('age', 'keyword'));
-  it('should clear search keyword', () => searchUseCases.removeFilter('keyword', 'type'));
-  it('should sort results by event date', () => searchUseCases.sortByEventDate());
-  it('should display selected category', () => searchUseCases.displaySelectedCategory('topic'));
+  it('should display only locations', () => searchUseCases.filterByType('location'));
+  it('should display only online resources', () => searchUseCases.filterByType('resource'));
+  it('should display only events', () => searchUseCases.filterByType('event'));
+  it('should remove type filters when clicking All Resources tab', () => searchUseCases.filterByType('all'));
+  it('should display only locations again', () => searchUseCases.filterByType('location'));
+  it('should display results filtered by topic', () => searchUseCases.displaySelectedCategory('topic'));
   it('should preserve selected topic when removing type filter', () => searchUseCases.removeFilter('type', 'topic'));
   it('should sort results by last date updated', () => searchUseCases.sortByLastUpdated());
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should go to search page when user presses enter in the search field', () => searchUseCases.enterKeywordsInSearchField());
-  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox());
+  it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
+  it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
+  it('should enter some other keywords in the search field', () => searchUseCases.enterKeywordsInSearchField('autism'));
+  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('autism'));
+  it('should display only events again', () => searchUseCases.filterByType('event'));
+  it('should sort results by event date', () => searchUseCases.sortByEventDate());
+  it('should display all resources again', () => searchUseCases.filterByType('all'));
+  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
 
   // Log out
   it('should log out', () => loginUseCases.logout());

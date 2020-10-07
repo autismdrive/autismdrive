@@ -43,13 +43,13 @@ class TestUser(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['email'] = 'ed@edwardos.com'
         orig_date = response['last_updated']
-        rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/user/%i' % u.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=user_headers)
         self.assert_success(rv)
 
         # Only Admin users can make other admin users
         response['role'] = 'admin'
-        rv = self.app.put('/api/user/%i' % u.id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/user/%i' % u.id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=admin_headers)
         self.assert_success(rv)
 
@@ -81,7 +81,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
     def test_create_user(self):
         user = {'email': "tara@spiders.org"}
-        rv = self.app.post('api/user', data=json.dumps(user), content_type="application/json",
+        rv = self.app.post('api/user', data=self.jsonify(user), content_type="application/json",
                            headers=self.logged_in_headers(), follow_redirects=True)
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -92,7 +92,7 @@ class TestUser(BaseTest, unittest.TestCase):
         user = {'email': "tara@spiders.org", 'role': 'web_weaver'}
 
         # post should change unknown role to 'user'
-        rv = self.app.post('/api/user', data=json.dumps(user),
+        rv = self.app.post('/api/user', data=self.jsonify(user),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -103,7 +103,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
         # post should make role 'user'
         new_admin_user = {'email': "tara@spiders.org", 'role': 'admin'}
-        rv = self.app.post('/api/user', data=json.dumps(new_admin_user),
+        rv = self.app.post('/api/user', data=self.jsonify(new_admin_user),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -111,14 +111,14 @@ class TestUser(BaseTest, unittest.TestCase):
         new_id = response['id']
 
         # put as non-admin user should keep role as 'user'
-        rv = self.app.put('/api/user/%i' % u.id, data=json.dumps({'email': u.email, 'role': 'admin'}),
+        rv = self.app.put('/api/user/%i' % u.id, data=self.jsonify({'email': u.email, 'role': 'admin'}),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers(user=u))
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['role'], 'user')
 
         # put as admin user should allow to make role 'admin'
-        rv = self.app.put('/api/user/%i' % new_id, data=json.dumps(new_admin_user),
+        rv = self.app.put('/api/user/%i' % new_id, data=self.jsonify(new_admin_user),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -132,7 +132,7 @@ class TestUser(BaseTest, unittest.TestCase):
         }
         rv = self.app.post(
             '/api/user',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             follow_redirects=True,
             headers=self.logged_in_headers(),
             content_type="application/json")
@@ -150,7 +150,7 @@ class TestUser(BaseTest, unittest.TestCase):
         }
         rv = self.app.post(
             '/api/user',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             follow_redirects=True,
             headers=self.logged_in_headers(),
             content_type="application/json")
@@ -184,14 +184,14 @@ class TestUser(BaseTest, unittest.TestCase):
         # Login shouldn't work with email not yet verified
         rv = self.app.post(
             '/api/login_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assertEqual(400, rv.status_code)
 
         user.email_verified = True
         rv = self.app.post(
             '/api/login_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -227,7 +227,7 @@ class TestUser(BaseTest, unittest.TestCase):
         data = {"email": user.email}
         rv = self.app.post(
             '/api/forgot_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assert_success(rv)
         self.assertGreater(len(TEST_MESSAGES), message_count)
@@ -334,7 +334,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/study_user',
-            data=json.dumps(us_data),
+            data=self.jsonify(us_data),
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -361,7 +361,7 @@ class TestUser(BaseTest, unittest.TestCase):
         ]
         rv = self.app.post(
             '/api/study/%i/user' % s.id,
-            data=json.dumps(us_data),
+            data=self.jsonify(us_data),
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -371,7 +371,7 @@ class TestUser(BaseTest, unittest.TestCase):
         us_data = [{"user_id": u1.id}]
         rv = self.app.post(
             '/api/study/%i/user' % s.id,
-            data=json.dumps(us_data),
+            data=self.jsonify(us_data),
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -429,7 +429,7 @@ class TestUser(BaseTest, unittest.TestCase):
         user.email_verified = True
         rv = self.app.post(
             '/api/login_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -438,7 +438,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/login_password',
-            data=json.dumps(data),
+            data=self.jsonify(data),
             content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
@@ -534,7 +534,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/user_favorite',
-            data=json.dumps(fav_data),
+            data=self.jsonify(fav_data),
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -564,7 +564,7 @@ class TestUser(BaseTest, unittest.TestCase):
 
         rv = self.app.post(
             '/api/user_favorite',
-            data=json.dumps(fav_data),
+            data=self.jsonify(fav_data),
             content_type="application/json",
             headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -623,19 +623,8 @@ class TestUser(BaseTest, unittest.TestCase):
     def test_percent_self_registration_complete(self):
         u = self.construct_user(email='prof@sartography.com')
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
-
-        iq = {
-            'first_name': "Darah",
-            'middle_name': "Soo",
-            'last_name': "Ubway",
-            'is_first_name_preferred': True,
-            'birthdate': '02/02/2002',
-            'birth_city': 'Staunton',
-            'birth_state': 'VA',
-            'is_english_primary': True,
-            'participant_id': p.id
-        }
-        self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(iq),
+        iq = self.get_identification_questionnaire(p.id)
+        self.app.post('api/flow/self_intake/identification_questionnaire', data=self.jsonify(iq),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u))
 

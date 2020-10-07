@@ -4,9 +4,10 @@ import requests
 # Fire of the scheduler
 # The Data Importer should run on the MIRROR, and will make calls to the primary server to download
 # data, store it locally, and remove it from the master when necessary.
-from flask import logging
+import logging
 from sqlalchemy import desc
 
+from app import RestException
 from app.export_service import ExportService
 from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
 from app.model.export_info import ExportInfoSchema
@@ -87,7 +88,7 @@ class ImportService:
             date_string = last_log.date_started.strftime(ExportService.DATE_FORMAT)
             url += "?after=" + date_string
         response = requests.get(url, headers=self.get_headers())
-        exportables = ExportInfoSchema(many=True).load(response.json()).data
+        exportables = ExportInfoSchema(many=True).load(response.json())
         return exportables
 
     def request_data(self, export_list, full_backup=False):
@@ -115,7 +116,7 @@ class ImportService:
     def load_data(self, export_info, log):
         if len(export_info.json_data) < 1:
             return  # Nothing to do here.
-        schema = ExportService.get_schema(export_info.class_name, many=False)
+        schema = ExportService.get_schema(export_info.class_name, many=False, is_import=True)
         model_class = ExportService.get_class(export_info.class_name)
         log_detail = DataTransferLogDetail(class_name=export_info.class_name, date_started=log.date_started, successful=True, success_count=0, failure_count=0)
         log.details.append(log_detail)
@@ -124,8 +125,12 @@ class ImportService:
             if "_links" in item_copy:
                 links = item_copy.pop("_links")
             existing_model = self.db.session.query(model_class).filter_by(id=item['id']).first()
-            model, errors = schema.load(item_copy, session=self.db.session, instance=existing_model)
-            if not errors:
+            try:
+                if existing_model:
+                    model = schema.load(data=item_copy, session=self.db.session, instance=existing_model)
+                else:
+                    model = schema.load(data=item_copy, session=self.db.session)
+
                 try:
                     self.db.session.add(model)
                     self.db.session.commit()
@@ -142,12 +147,14 @@ class ImportService:
                     self.db.session.add(log)
                     self.db.session.add(log_detail)
                     raise e
-            else:
-                e = Exception("Failed to parse model " + export_info.class_name + ". " + str(errors))
+
+            except Exception as e:
+                e = Exception("Failed to parse model " + export_info.class_name + ". " + str(e))
                 log_detail.handle_failure(e)
                 self.db.session.add(log)
                 self.db.session.add(log_detail)
                 raise e
+
         self.db.session.commit()
 
     def delete_record(self, item):
@@ -177,7 +184,7 @@ class ImportService:
         for json_admin in json_response:
             try:
                 password = str.encode(json_admin.pop('_password'))
-                admin, errors = schema.load(json_admin, session=self.db.session)
+                admin = schema.load(json_admin, session=self.db.session)
                 admin._password = password
                 self.db.session.add(admin)
             except:

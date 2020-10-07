@@ -15,14 +15,36 @@
       fxLayout="column"
       fxLayoutGap="40px"
     >
-      <h1>{{resource.title}}</h1>
+      <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="1em">
+        <app-type-icon [iconType]="resource.type.toLowerCase()" [size]="3"></app-type-icon>
+        <h1>{{resource.title}}</h1>
+      </div>
       <p *ngIf="resource.is_draft === true">[DRAFT]</p>
       <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" [currentUser]="currentUser" [editLink]='resource.type + "/" + resource.id + "/edit"' [editLabel]='"Edit " + resource.type'></app-edit-button>
       <app-favorite-resource-button [resource_id]="resource.id" [user]="currentUser"></app-favorite-resource-button>
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
       <p *ngIf="resource.is_draft === true && (!currentUser || currentUser && !currentUser.permissions.includes('edit_resource'))">This resource is being edited and is under review. Please check back for more up-to-date information soon.</p>
+      <p *ngIf="resource.type === 'event' && resource.image_url">
+        <a [href]="resource.website" target="_blank"><img src="{{resource.image_url}}"></a>
+      </p>
       <p>{{resource.description}}</p>
+      <div *ngIf="resource.type === 'event'" fxLayout="column" fxLayoutAlign="center center">
+        <app-event-registration
+          *ngIf="resource.includes_registration"
+          id="star_event_registration"
+          [currentUser]="currentUser"
+          [resource]="resource"
+        ></app-event-registration>
+        <a
+          *ngIf="!resource.includes_registration"
+          mat-flat-button
+          class="btn btn-xl"
+          color="accent"
+          [href]="resource.registration_url"
+          target="_blank"
+        >Register Now</a>
+      </div>
       <p *ngIf="resource.insurance">Insurance accepted: {{resource.insurance}}</p>
 
       <div *ngIf="safeVideoLink">
@@ -89,6 +111,7 @@
           (click)="goWebsite($event)"
         >Visit website</button>
       </div>
+
       <div
         *ngIf="currentUser && currentUser.permissions.includes('edit_resource')"
         fxLayout="column"
@@ -130,7 +153,7 @@
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
             [radius]="32186.9"
-            [fillColor]="resource.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
+            [fillColor]="resource.type.toLowerCase() === 'location' ? '#6c799c' : '#E57200'"
             fillOpacity="0.1"
             [clickable]="true"
             (circleClick)="toggleInfoWindow($event)"
@@ -185,7 +208,7 @@
       <div id="resource-categories">
         <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages" [languages]="resource.languages" [covid19_categories]="resource.covid19_categories" [parentComponent]="'resource_detail'"></app-filter-chips>
       </div>
-      <div id="resource-related">
+      <div id="resource-related" *ngIf="!resource.should_hide_related_resources">
         <app-related-items [resource]="resource" [loading]="loading" [parentComponent]="'resource-detail'"></app-related-items>
       </div>
     </div>

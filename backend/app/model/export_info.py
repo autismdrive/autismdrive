@@ -2,6 +2,9 @@ import re
 
 from flask_marshmallow import Schema
 from marshmallow import post_load, fields
+from marshmallow.utils import EXCLUDE
+
+from app import ma
 
 
 class ExportInfo:
@@ -31,12 +34,17 @@ class ExportInfo:
         title = re.sub('([a-z0-9])([A-Z])', r'\1 \2', title)
         return title.replace("Questionnaire", "").strip()[:30]
 
+
 class ExportInfoSchema(Schema):
     class Meta:
+        include_relationships = True
+        load_instance = True
+        unknown = EXCLUDE
+        include_fk = True
         ordered = True
         fields = ["table_name", "class_name", "display_name", "size", "url", "question_type", "sub_tables"]
 
-    sub_tables = fields.Nested("self", default=None, many=True, dump_only=True)
+    sub_tables = ma.Nested(lambda: ExportInfoSchema(), default=None, many=True, dump_only=True)
     display_name = fields.String(dump_only=True)
 
     @post_load

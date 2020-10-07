@@ -1,8 +1,8 @@
-from marshmallow_sqlalchemy import ModelSchema
-from marshmallow import fields
+from marshmallow import fields, missing
 from sqlalchemy import func
 
 from app import db
+from app.schema.model_schema import ModelSchema
 
 
 class Housemate(db.Model):
@@ -124,18 +124,29 @@ class Housemate(db.Model):
 
 
 class HousemateSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = Housemate
-        ordered = True
         fields = ("id", "last_updated", "home_dependent_questionnaire_id", "home_self_questionnaire_id", "name",
                   "relationship", "relationship_other", "age", "has_autism", "participant_id", "user_id")
     participant_id = fields.Method('get_participant_id')
     user_id = fields.Method('get_user_id')
     home_dependent_questionnaire_id = fields.Integer(required=False, allow_none=True)
     home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
+    home_dependent_questionnaire = fields.Nested('HomeDependentQuestionnaire', required=False, allow_none=True)
+    home_self_questionnaire = fields.Nested('HomeSelfQuestionnaire', required=False, allow_none=True)
 
     def get_participant_id(self, obj):
-        return obj.supports_questionnaire.participant_id
+        if obj is None:
+            return missing
+        elif obj.home_dependent_questionnaire is not None:
+            return obj.home_dependent_questionnaire.participant_id
+        elif obj.home_self_questionnaire is not None:
+            return obj.home_self_questionnaire.participant_id
 
     def get_user_id(self, obj):
-        return obj.supports_questionnaire.user_id
+        if obj is None:
+            return missing
+        elif obj.home_dependent_questionnaire is not None:
+            return obj.home_dependent_questionnaire.user_id
+        elif obj.home_self_questionnaire is not None:
+            return obj.home_self_questionnaire.user_id

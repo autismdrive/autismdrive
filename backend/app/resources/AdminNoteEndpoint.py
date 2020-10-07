@@ -16,14 +16,15 @@ class AdminNoteEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def get(self, id):
-        model = db.session.query(AdminNote).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+        model = db.session.query(AdminNote).filter(AdminNote.id == id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def delete(self, id):
-        db.session.query(AdminNote).filter_by(id=id).delete()
+        db.session.query(AdminNote).filter(AdminNote.id == id).delete()
         db.session.commit()
         return None
 
@@ -31,9 +32,11 @@ class AdminNoteEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
-        instance = db.session.query(AdminNote).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        instance = db.session.query(AdminNote).filter(AdminNote.id == id).first()
+        try:
+            updated = self.schema.load(data=request_data, instance=instance, session=db.session)
+        except ValidationError as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e.messages)
         updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
@@ -56,14 +59,12 @@ class AdminNoteListEndpoint(flask_restful.Resource):
     def post(self):
         request_data = request.get_json()
         try:
-            new_note, errors = self.adminNoteSchema.load(request_data)
-            if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+            new_note = self.adminNoteSchema.load(data=request_data, session=db.session)
             db.session.add(new_note)
             db.session.commit()
             return self.adminNoteSchema.dump(new_note)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=new_note.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err)
 
 
 class AdminNoteListByUserEndpoint(flask_restful.Resource):

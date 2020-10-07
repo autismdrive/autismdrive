@@ -33,7 +33,7 @@ class TestCategory(BaseTest, unittest.TestCase):
         response['name'] = 'JellyBoxes'
         new_parent = self.construct_category(name="Strange Kitchen Gadgets")
         response['parent_id'] = new_parent.id
-        rv = self.app.put('/api/category/%i' % c_id, data=json.dumps(response),
+        rv = self.app.put('/api/category/%i' % c_id, data=self.jsonify(response),
                           content_type="application/json", follow_redirects=True,
                           headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -97,7 +97,7 @@ class TestCategory(BaseTest, unittest.TestCase):
 
     def test_create_category(self):
         category = {'name': "My Favorite Things"}
-        rv = self.app.post('api/category', data=json.dumps(category),
+        rv = self.app.post('api/category', data=self.jsonify(category),
                            content_type="application/json",
                            follow_redirects=True,
                            headers=self.logged_in_headers())

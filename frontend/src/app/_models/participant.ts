@@ -1,6 +1,7 @@
 import { ParticipantRelationship } from './participantRelationship';
 import { StepLog } from './step_log';
 import { ContactQ } from './contact_q';
+import { IdentificationQ } from './identification_q';
 
 export class Participant {
   id?: number;
@@ -14,6 +15,7 @@ export class Participant {
   has_consented: boolean;
   step_log?: StepLog[];
   contact?: ContactQ;
+  identification?: IdentificationQ;
 
   constructor(private _props) {
     for (const propName in this._props) {

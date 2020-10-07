@@ -9,10 +9,13 @@ from sqlalchemy.exc import IntegrityError
 from app import app, RestException, db, email_service, auth
 from app.email_service import EmailService
 from app.model.email_log import EmailLog
+from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaireSchema
 from app.model.role import Permission, Role
 from app.model.study import Study
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
+from app.model.event_user import EventUser
+from app.model.study_user import StudyUser
 from app.schema.schema import UserSchema, UserSearchSchema
 from app.wrappers import requires_permission
 
@@ -32,6 +35,8 @@ class UserEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.delete_user)
     def delete(self, id):
+        db.session.query(EventUser).filter_by(user_id=id).delete()
+        db.session.query(StudyUser).filter_by(user_id=id).delete()
         db.session.query(UserFavorite).filter_by(user_id=id).delete()
         db.session.query(User).filter_by(id=id).delete()
         db.session.commit()
@@ -48,8 +53,10 @@ class UserEndpoint(flask_restful.Resource):
             else:
                 request_data['role'] = 'user'
         instance = db.session.query(User).filter_by(id=id).first()
-        updated, errors = self.schema.load(request_data, instance=instance)
-        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        try:
+            updated = self.schema.load(request_data, instance=instance)
+        except Exception as errors:
+            raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.utcnow()
         db.session.add(updated)
         db.session.commit()
@@ -88,11 +95,17 @@ class UserListEndpoint(flask_restful.Resource):
         return self.searchSchema.dump(page)
 
     def post(self):
+        """
+        Adds new user (with given attributes in request data) to the database and sends confirmation email
+        to the provided email address
+        """
         request_data = request.get_json()
         try:
             request_data['role'] = 'user'
-            new_user, errors = self.userSchema.load(request_data)
-            if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+            try:
+                new_user = self.userSchema.load(request_data)
+            except Exception as errors:
+                raise RestException(RestException.INVALID_OBJECT, details=errors)
             email_exists = db.session.query(exists().where(User.email == new_user.email)).scalar()
             if email_exists:
                 raise RestException(RestException.EMAIL_EXISTS)
@@ -117,3 +130,18 @@ class UserListEndpoint(flask_restful.Resource):
         log = EmailLog(user_id=user.id, type="confirm_email", tracking_code=tracking_code)
         db.session.add(log)
         db.session.commit()
+
+
+class UserRegistrationEndpoint(flask_restful.Resource):
+
+    def post(self):
+        request_data = request.get_json()
+        if "_links" in request_data:
+            request_data.pop("_links")
+        schema = RegistrationQuestionnaireSchema()
+        registration_quest, errors = schema.load(request_data, session=db.session)
+
+        if errors: raise RestException(RestException.INVALID_OBJECT, details=errors)
+        db.session.add(registration_quest)
+        db.session.commit()
+        return schema.dump(registration_quest)

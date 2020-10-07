@@ -1,9 +1,10 @@
 import datetime
 import importlib
 import re
+import logging
 
 from dateutil.tz import UTC
-from flask import url_for, logging
+from flask import url_for
 from sqlalchemy import func, desc
 
 from app import db, EmailService, app
@@ -40,25 +41,28 @@ class ExportService:
                 return c
 
     @staticmethod
-    def get_schema(name, many=False, session=None):
+    def get_schema(name, many=False, session=None, is_import=False):
         model = ExportService.get_class(name)
         class_name = model.__name__
+        schema_name = ''
+        schema_class = None
 
-        # Check for an 'ExportSchema'
-        schema_name = class_name + "ExportSchema"
-        schema_class = ExportService.str_to_class(ExportService.EXPORT_SCHEMA_PACKAGE, schema_name)
+        if not is_import:
+            # Check for an 'ExportSchema'
+            schema_name = class_name + "ExportSchema"
+            schema_class = ExportService.str_to_class(ExportService.EXPORT_SCHEMA_PACKAGE, schema_name)
 
         # If that doesn't work, then look in the resources schema file.
-        if not schema_class:
+        if schema_class is None:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(ExportService.SCHEMA_PACKAGE, schema_name)
 
         # If that doesn't work, check for a general schema in the class itself.
-        if not schema_class:
+        if schema_class is None:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(model.__module__, schema_name)
 
-        if not schema_class:
+        if schema_class is None:
             raise Exception("Unable to locate schema for class " + class_name)
 
         return schema_class(many=many, session=session)
@@ -142,9 +146,9 @@ class ExportService:
             try:
                 return getattr(module_, class_name)
             except AttributeError:
-                return False
+                return None
         except ImportError:
-            return False
+            return None
 
     # Given a string, creates an instance of that class
     @staticmethod

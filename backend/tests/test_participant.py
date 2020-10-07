@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 
 from flask import json
 
@@ -52,15 +53,15 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         p = db.session.query(Participant).first()
         odd_user = self.construct_user(email='frankie@badfella.rf')
         participant = {'first_name': "Lil' Johnny", 'last_name': "Tables"}
-        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+        rv = self.app.put('/api/participant/%i' % p.id, data=self.jsonify(participant), content_type="application/json",
                           follow_redirects=True)
         self.assertEqual(401, rv.status_code, "you have to be logged in to edit participant.")
-        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+        rv = self.app.put('/api/participant/%i' % p.id, data=self.jsonify(participant), content_type="application/json",
                           follow_redirects=True, headers=self.logged_in_headers(odd_user))
         self.assertEqual(400, rv.status_code, "you have to have a relationship with the user to do stuff.")
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual("unrelated_participant", response['code'])
-        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+        rv = self.app.put('/api/participant/%i' % p.id, data=self.jsonify(participant), content_type="application/json",
                           follow_redirects=True, headers=good_headers)
         self.assertEqual(200, rv.status_code, "The owner can edit the user.")
 
@@ -69,7 +70,7 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
         participant = {'id': 567}
-        rv = self.app.put('/api/participant/%i' % p.id, data=json.dumps(participant), content_type="application/json",
+        rv = self.app.put('/api/participant/%i' % p.id, data=self.jsonify(participant), content_type="application/json",
                           follow_redirects=True, headers=headers)
         self.assert_success(rv)
         p = db.session.query(Participant).filter_by(id=p.id).first()
@@ -88,7 +89,7 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         response['user_id'] = user2.id
         orig_date = response['last_updated']
-        rv = self.app.put('/api/participant/%i' % p_id, data=json.dumps(response), content_type="application/json",
+        rv = self.app.put('/api/participant/%i' % p_id, data=self.jsonify(response), content_type="application/json",
                           follow_redirects=True, headers=logged_in_headers)
         self.assert_success(rv)
         rv = self.app.get('/api/participant/%i' % p_id, content_type="application/json",
@@ -122,12 +123,12 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_create_participant(self):
         p = {'id': 7, 'relationship': 'self_participant'}
-        rv = self.app.post('/api/session/participant', data=json.dumps(p), content_type="application/json",
+        rv = self.app.post('/api/session/participant', data=self.jsonify(p), content_type="application/json",
                            follow_redirects=True)
         self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
 
         rv = self.app.post(
-            '/api/session/participant', data=json.dumps(p),
+            '/api/session/participant', data=self.jsonify(p),
             content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
@@ -138,7 +139,7 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_create_participant_to_have_bad_relationship(self):
         participant = {'id': 234, 'relationship': 'free_loader'}
-        rv = self.app.post('/api/session/participant', data=json.dumps(participant),
+        rv = self.app.post('/api/session/participant', data=self.jsonify(participant),
                            content_type="application/json", follow_redirects=True, headers=self.logged_in_headers())
         self.assertEqual(400, rv.status_code, "you can't create a participant using an invalid relationship")
         response = json.loads(rv.get_data(as_text=True))
@@ -196,18 +197,8 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(0, response[0]['percent_complete'])
 
-        iq = {
-            'first_name': "Darah",
-            'middle_name': "Soo",
-            'last_name': "Ubway",
-            'is_first_name_preferred': True,
-            'birthdate': '02/02/2002',
-            'birth_city': 'Staunton',
-            'birth_state': 'VA',
-            'is_english_primary': True,
-            'participant_id': p.id
-        }
-        self.app.post('api/flow/self_intake/identification_questionnaire', data=json.dumps(iq),
+        iq = self.get_identification_questionnaire(p.id)
+        self.app.post('api/flow/self_intake/identification_questionnaire', data=self.jsonify(iq),
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u))
 

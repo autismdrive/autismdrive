@@ -44,6 +44,9 @@ export class ResourceDetailComponent implements OnInit {
         const resourceType = path.charAt(0).toUpperCase() + path.slice(1);
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
           this.resource = new Resource(resource);
+
+          console.log('resource = ', this.resource);
+
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;

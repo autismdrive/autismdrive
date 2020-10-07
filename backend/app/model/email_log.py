@@ -1,7 +1,7 @@
-from marshmallow_sqlalchemy import ModelSchema
 from sqlalchemy import func
 
 from app import db
+from app.schema.model_schema import ModelSchema
 
 
 class EmailLog(db.Model):
@@ -16,5 +16,5 @@ class EmailLog(db.Model):
 
 
 class EmailLogSchema(ModelSchema):
-    class Meta:
+    class Meta(ModelSchema.Meta):
         model = EmailLog

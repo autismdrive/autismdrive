@@ -21,4 +21,8 @@ export class TypeIconComponent implements OnInit {
     return actual === expected;
   }
 
+  get pxSize() {
+    return `${this.size * 16}px`;
+  }
+
 }

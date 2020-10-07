@@ -10,6 +10,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatNativeDateModule, MatTabsModule} from
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatChipsModule} from '@angular/material/chips';
@@ -21,6 +22,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
+import {MatMenuModule} from '@angular/material/menu';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -39,6 +41,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
+import {TruncateModule} from '@yellowspot/ng-truncate';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorModule} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
@@ -54,6 +57,8 @@ import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tr
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
 import {
+  EmailMatchValidator,
+  EmailMatchValidatorMessage,
   EmailValidator,
   EmailValidatorMessage,
   MaxValidationMessage,
@@ -85,9 +90,17 @@ import {AppComponent} from './app.component';
 import {AvatarDialogComponent} from './avatar-dialog/avatar-dialog.component';
 import {BorderBoxTileComponent} from './border-box-tile/border-box-tile.component';
 import {ContactItemComponent} from './contact-item/contact-item.component';
+import {Covid19ResourcesComponent} from './covid19-resources/covid19-resources.component';
 import {DetailsLinkComponent} from './details-link/details-link.component';
 import {EditButtonComponent} from './edit-button/edit-button.component';
+import {EmailLogAdminComponent} from './email-log-admin/email-log-admin.component';
 import {EventDateComponent} from './event-date/event-date.component';
+import {EventRegistrationFormComponent} from './event-registration-form/event-registration-form.component';
+import {EventRegistrationComponent} from './event-registration/event-registration.component';
+import {FavoriteResourceButtonComponent} from './favorite-resource-button/favorite-resource-button.component';
+import {FavoriteResourcesComponent} from './favorite-resources/favorite-resources.component';
+import {FavoriteTopicsDialogComponent} from './favorite-topics-dialog/favorite-topics-dialog.component';
+import {FavoriteTopicsComponent} from './favorite-topics/favorite-topics.component';
 import {FilterChipsComponent} from './filter-chips/filter-chips.component';
 import {FiltersComponent} from './filters/filters.component';
 import {FlowCompleteComponent} from './flow-complete/flow-complete.component';
@@ -99,6 +112,7 @@ import {GoogleAnalyticsService} from './google-analytics.service';
 import {HeaderComponent} from './header/header.component';
 import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';
+import {InvestigatorFormComponent} from './investigator-form/investigator-form.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
 import {LoadingComponent} from './loading/loading.component';
 import {LoginComponent} from './login/login.component';
@@ -115,6 +129,7 @@ import {QuestionnaireDataTableComponent} from './questionnaire-data-table/questi
 import {QuestionnaireDataViewComponent} from './questionnaire-data-view/questionnaire-data-view.component';
 import {QuestionnaireStepComponent} from './questionnaire-step/questionnaire-step.component';
 import {QuestionnaireStepsListComponent} from './questionnaire-steps-list/questionnaire-steps-list.component';
+import {RegisterDialogComponent} from './register-dialog/register-dialog.component';
 import {RegisterComponent} from './register/register.component';
 import {RelatedItemsComponent} from './related-items/related-items.component';
 import {ResourceDetailComponent} from './resource-detail/resource-detail.component';
@@ -128,6 +143,7 @@ import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
 import {StudyFormComponent} from './study-form/study-form.component';
 import {StudyInquiryComponent} from './study-inquiry/study-inquiry.component';
+import {StudySurveyEntryComponent} from './study-survey-entry/study-survey-entry.component';
 import {TaxonomyAdminComponent} from './taxonomy-admin/taxonomy-admin.component';
 import {TermsComponent} from './terms/terms.component';
 import {TimedoutComponent} from './timed-out/timed-out.component';
@@ -135,15 +151,7 @@ import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
-import { Covid19ResourcesComponent } from './covid19-resources/covid19-resources.component';
-import { FavoriteResourceButtonComponent } from './favorite-resource-button/favorite-resource-button.component';
-import { FavoriteResourcesComponent } from './favorite-resources/favorite-resources.component';
-import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog/favorite-topics-dialog.component';
-import { FavoriteTopicsComponent } from './favorite-topics/favorite-topics.component';
-import { InvestigatorFormComponent } from './investigator-form/investigator-form.component';
-import { StudySurveyEntryComponent } from './study-survey-entry/study-survey-entry.component';
-import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
-import { EmailLogAdminComponent } from './email-log-admin/email-log-admin.component';
+import { SearchSortComponent } from './search-sort/search-sort.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -195,10 +203,12 @@ export class FormlyConfig {
       {name: 'email', validation: EmailValidator},
       {name: 'url', validation: UrlValidator},
       {name: 'multicheckbox', validation: MulticheckboxValidator},
+      {name: 'emailConfirm', validation: EmailMatchValidator}
     ],
     validationMessages: [
       {name: 'phone', message: PhoneValidatorMessage},
       {name: 'email', message: EmailValidatorMessage},
+      {name: 'emailConfirm', message: EmailMatchValidatorMessage},
       {name: 'url', message: UrlValidatorMessage},
       {name: 'multicheckbox', message: MulticheckboxValidatorMessage},
       {name: 'required', message: 'This field is required.'},
@@ -296,7 +306,10 @@ export class FormlyConfig {
     InvestigatorFormComponent,
     StudySurveyEntryComponent,
     RegisterDialogComponent,
+    EventRegistrationComponent,
+    EventRegistrationFormComponent,
     EmailLogAdminComponent,
+    SearchSortComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -313,6 +326,7 @@ export class FormlyConfig {
     HttpClientModule,
     MarkdownModule.forRoot(),
     MatAutocompleteModule,
+    MatBadgeModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -325,6 +339,7 @@ export class FormlyConfig {
     MatIconModule,
     MatInputModule,
     MatListModule,
+    MatMenuModule,
     MatNativeDateModule,
     MatPaginatorModule,
     MatProgressBarModule,
@@ -335,16 +350,17 @@ export class FormlyConfig {
     MatSlideToggleModule,
     MatSortModule,
     MatStepperModule,
-    MatTabsModule,
     MatTableModule,
+    MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
+    MatTreeModule,
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,
+    TruncateModule,
     RoutingModule,
-    MatTreeModule,
-    MatBadgeModule,
+    MatButtonToggleModule,
   ],
   providers: [
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
@@ -365,7 +381,8 @@ export class FormlyConfig {
     AdminNoteFormComponent,
     FavoriteTopicsDialogComponent,
     InvestigatorFormComponent,
-    RegisterDialogComponent
+    RegisterDialogComponent,
+    EventRegistrationFormComponent,
   ]
 })
 export class AppModule {

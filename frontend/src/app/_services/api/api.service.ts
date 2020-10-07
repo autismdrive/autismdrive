@@ -47,6 +47,7 @@ export class ApiService {
     categorybyevent: '/api/event/<event_id>/category',
     categorybystudy: '/api/study/<study_id>/category',
     categorylist: '/api/category',
+    categorynameslist: '/api/category/names_list',
     data_transfer_log: '/api/data_transfer_log',
     event: '/api/event/<id>',
     eventbycategory: '/api/category/<category_id>/event',
@@ -116,6 +117,7 @@ export class ApiService {
     userResourceChangeLog: '/api/user/<user_id>/resource_change_log',
     userStudyInquiryList: '/api/user/<id>/inquiry/study',
     userlist: '/api/user',
+    userRegistration: '/api/user/registration',
     userparticipant: '/api/user_participant/<id>',
     zip_code_coords: '/api/zip_code_coords/<id>',
   };
@@ -432,6 +434,12 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** getCategoryNamesList */
+  getCategoryNamesList(): Observable<any> {
+    return this.httpClient.get<any>(this._endpointUrl('categorynameslist'))
+      .pipe(catchError(this._handleError));
+  }
+
   /** getCategoryTree */
   getCategoryTree(): Observable<Category[]> {
     return this.httpClient.get<Category[]>(this._endpointUrl('categorytree'))
@@ -652,6 +660,13 @@ export class ApiService {
       ._endpointUrl('flowquestionnaire')
       .replace('<flow>', flow)
       .replace('<questionnaire_name>', questionnaire_name);
+    return this.httpClient.post<object>(url, options)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** submitRegistration */
+  submitRegistration(options: object) {
+    const url = this._endpointUrl('userRegistration');
     return this.httpClient.post<object>(url, options)
       .pipe(catchError(this._handleError));
   }

@@ -1,7 +1,9 @@
 <div
   [class]="'search-bar ' + variant"
+  fxLayout="column"
 >
-  <mat-form-field fxFlex="100%" id="search-field">
+  <h1>Find Autism Resources</h1>
+  <mat-form-field id="search-field">
     <input
       matInput
       #searchInput
@@ -9,7 +11,14 @@
       (keyup.escape)="updateSearch(true)"
       placeholder="Search for Autism Resources"
       type="text"
+      [formControl]="searchBoxControl"
+      [matAutocomplete]="auto"
     >
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="updateSearch(false)">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
     <div
        matSuffix
       fxLayout="row"
@@ -17,6 +26,7 @@
       <button
         mat-icon-button
         matSuffix
+        *ngIf="hasWords()"
         [ngClass]="{'btn-cancel': true, 'hidden': !hasWords()}"
         (click)="updateSearch(true)"
       ><mat-icon>cancel</mat-icon>

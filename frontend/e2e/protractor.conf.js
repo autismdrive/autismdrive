@@ -10,7 +10,11 @@ exports.config = {
   ],
   capabilities: {
     chromeOptions: {
-      args: [ "--window-size=1024x768" ]
+      args: [
+        "--window-size=1440x900",
+        // "--headless",
+        // "--no-sandbox",
+      ]
     },
     'browserName': 'chrome'
   },
@@ -24,7 +28,7 @@ exports.config = {
   },
   onPrepare() {
     require('ts-node').register({
-      project: 'e2e/tsconfig.e2e.json'
+      project: './tsconfig.e2e.json'
     });
     jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
   }

@@ -19,8 +19,9 @@ export class ProfileUseCases {
     this.page.clickAndExpectRoute('#enroll_dependent', '/terms/dependent');
   }
 
-  checkDependentButtonDisabled() {
-    return expect(this.page.getElements('#enroll_dependent').getAttribute('disabled')).toEqual([ 'true' ]);
+  async checkDependentButtonDisabled() {
+    const numButtons = await this.page.getElements('#enroll_first_dependent').count();
+    return expect(numButtons).toEqual(0, 'No dependent enroll button should be visible if guardian has not completed their profile yet.');
   }
 
   navigateToProfile() {

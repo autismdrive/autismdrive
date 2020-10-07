@@ -6,6 +6,8 @@ import os
 import quopri
 import re
 
+from flask.json import JSONEncoder
+
 os.environ["TESTING"] = "true"
 
 from app.model.email_log import EmailLog
@@ -17,7 +19,7 @@ from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
 from app.model.user_favorite import UserFavorite
-
+from app.model.event_user import EventUser
 
 from flask import json
 
@@ -32,9 +34,10 @@ from app.model.resource_change_log import ResourceChangeLog
 from app.model.user import User, Role
 from app.model.zip_code import ZipCode
 
-def clean_db(db):
-    for table in reversed(db.metadata.sorted_tables):
-        db.session.execute(table.delete())
+
+def clean_db(database):
+    for table in reversed(database.metadata.sorted_tables):
+        database.session.execute(table.delete())
 
 
 class BaseTest:
@@ -98,18 +101,28 @@ class BaseTest:
         text = text.replace("_", " ")
         return text
 
+    def jsonify(self, data):
+        """
+        Returns given data as JSON string, converting dates to ISO format.
+        """
+        class DateTimeEncoder(JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, (datetime.date, datetime.datetime)):
+                    return obj.isoformat()
+
+        return json.dumps(data, cls=DateTimeEncoder)
+
     def assert_success(self, rv, msg=""):
         try:
             data = json.loads(rv.get_data(as_text=True))
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
                             "BAD Response: %i. \n %s" %
-                            (rv.status_code, json.dumps(data)) + ". " + msg)
+                            (rv.status_code, self.jsonify(data)) + ". " + msg)
         except:
             self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
                             "BAD Response: %i." % rv.status_code + ". " + msg)
 
     def construct_user(self, email="stan@staunton.com", role=Role.user, last_login=datetime.datetime.now()):
-
         db_user = db.session.query(User).filter_by(email=email).first()
         if db_user:
             return db_user
@@ -181,7 +194,7 @@ class BaseTest:
 
         db_location = db.session.query(Location).filter_by(title=location.title).first()
         self.assertEqual(db_location.website, location.website)
-        elastic_index.add_document(db_location, True, latitude=latitude, longitude=longitude)
+        elastic_index.add_document(document=db_location, flush=True, latitude=latitude, longitude=longitude)
         return db_location
 
     def construct_location_category(self, location_id, category_name):
@@ -238,15 +251,26 @@ class BaseTest:
     def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
                         street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False, city="Stauntonville",
                         state="QX", zip="99775", phone="555-555-5555", website="http://stardrive.org",
-                        date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org"):
+                        date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org",
+                        post_survey_link="http://stardrive.org/survey", webinar_link="http://stardrive.org/event",
+                        includes_registration=True, max_users=35, registered_users=None):
 
+        if registered_users is None:
+            registered_users = [self.construct_user(email="e1@sartography.com"),
+                                self.construct_user("e2@sartography.com")]
         event = Event(title=title, description=description, street_address1=street_address1,
                       street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
-                      date=date, is_draft=is_draft, organization_name=organization_name)
+                      date=date, is_draft=is_draft, organization_name=organization_name, webinar_link=webinar_link,
+                      post_survey_link=post_survey_link, includes_registration=includes_registration, max_users=max_users)
         db.session.add(event)
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
         self.assertEqual(db_event.website, event.website)
+
+        for user in registered_users:
+            eu = EventUser(event_id=db_event.id, user_id=user.id)
+            db.session.add(eu)
+
         elastic_index.add_document(db_event, 'Event')
         return db_event
 
@@ -267,7 +291,7 @@ class BaseTest:
         self.construct_resource()
         study = self.construct_study()
         location = self.construct_location()
-        event = self.construct_event()
+        self.construct_event()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
@@ -281,3 +305,17 @@ class BaseTest:
         db.session.add(ResourceChangeLog())
         db.session.add(StepLog())
         db.session.commit()
+
+    def get_identification_questionnaire(self, participant_id):
+        return {
+            'first_name': "Darah",
+            'middle_name': "Soo",
+            'last_name': "Ubway",
+            'is_first_name_preferred': True,
+            'birthdate': '2002-02-02T00:00:00.000000Z',
+            'birth_city': 'Staunton',
+            'birth_state': 'VA',
+            'is_english_primary': True,
+            'participant_id': participant_id
+        }
+
