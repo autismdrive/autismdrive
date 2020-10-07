@@ -1,5 +1,6 @@
 import unittest
 import json
+import dateutil.parser
 from datetime import datetime, timedelta
 
 from tests.base_test import BaseTest
@@ -555,7 +556,8 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(6, len(search_results['hits']))
         for hit in search_results['hits']:
             if hit['type'] == 'event':
-                self.assertGreaterEqual(datetime.strptime(hit['date'], "%Y-%m-%d"), now)
+                hit_date = dateutil.parser.parse(hit['date'])
+                self.assertGreaterEqual(hit_date, now)
             else:
                 self.assertTrue(hit['date'] is None)
 

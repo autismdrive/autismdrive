@@ -59,9 +59,24 @@ export class AppPage {
     return browser.wait(ExpectedConditions.invisibilityOf(e), 5000);
   }
 
-  waitForVisible(selector: string) {
-    const e = this.getElement(selector);
-    return browser.wait(ExpectedConditions.visibilityOf(e), 5000);
+  // If given CSS selector is found on the page, waits 5 seconds for the element to become visible. If it's not found
+  // on the page, recursively calls itself maxLoops number of times, waiting 1 second between each call, until the
+  // element becomes present.
+  async waitForVisible(selector: string, maxLoops = 5) {
+    const numElements = await this.getElements(selector).count();
+    if (numElements > 0) {
+      const e = await this.getElement(selector);
+      return browser.wait(
+        ExpectedConditions.visibilityOf(e),
+        5000,
+        `Element "${selector}" is still not visible after waiting for 5 seconds.`
+      );
+    } else if (maxLoops > 0) {
+      await this.waitFor(1000);
+      await this.waitForVisible(selector, maxLoops - 1);
+    } else {
+      expect(numElements).toBeGreaterThan(0, `Element "${selector}" is not present on the page.`);
+    }
   }
 
   getLocalStorageVar(name: string) {
@@ -147,6 +162,14 @@ export class AppPage {
     return browser.controlFlow().execute(() => {
       return browser.executeScript('arguments[0].focus()', this.getElement(selector).getWebElement());
     });
+  }
+
+  async isFocused(selector: string) {
+    const expectedEl = await this.getElement(selector);
+    const expectedId = await expectedEl.getAttribute('id');
+    const actualEl = await browser.switchTo().activeElement();
+    const actualId = await actualEl.getAttribute('id');
+    return expectedId === actualId;
   }
 
   inputText(selector: string, textToEnter: string, clearFirst?: boolean) {

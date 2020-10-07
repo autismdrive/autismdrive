@@ -7,7 +7,7 @@ import {ProfileUseCases} from './use-cases/profile.po';
 import {SearchUseCases} from './use-cases/search.po';
 import {StudiesUseCases} from './use-cases/studies.po';
 
-describe('Admin', () => {
+xdescribe('Admin', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;

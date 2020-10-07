@@ -131,7 +131,7 @@ class IdentificationQuestionnaire(db.Model):
         },
     )
     birthdate = db.Column(
-        db.Date,
+        db.DateTime,
         info={
             "display_order": 7,
             "type": "datepicker",

@@ -65,8 +65,8 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
 
         try:
             new_quest = schema.load(request_data, session=db.session)
-        except Exception as errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
+        except ValidationError as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e.messages)
 
         if hasattr(new_quest, 'participant_id'):
             if new_quest.participant_id is None:

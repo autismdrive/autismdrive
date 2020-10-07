@@ -4,7 +4,7 @@ import {LoginUseCases} from './use-cases/login.po';
 import {SearchUseCases} from './use-cases/search.po';
 import {StudiesUseCases} from './use-cases/studies.po';
 
-describe('Anonymous User', () => {
+xdescribe('Anonymous User', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
@@ -43,6 +43,7 @@ describe('Anonymous User', () => {
   // Search
   it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField('ad'));
   it('should clear search filter', () => searchUseCases.removeFilter('keyword', 'type'));
+  it('should autofocus on search box', () => searchUseCases.focusAndBlurSearchBox());
   it('should display results filtered by age', () => searchUseCases.displaySelectedCategory('age'));
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
   it('should open ZIP code dialog', () => searchUseCases.openZipCodeDialog());

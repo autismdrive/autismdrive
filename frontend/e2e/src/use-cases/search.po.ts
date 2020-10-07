@@ -1,4 +1,3 @@
-import {ElementFinder} from 'protractor';
 import {AppPage} from '../app-page.po';
 
 export class SearchUseCases {
@@ -59,8 +58,8 @@ export class SearchUseCases {
 
   async displaySelectedCategory(filterBy: string) {
     const appliedFilterSelector = '.applied-filters .applied-filter';
-    const filterMenuSelector = `.filter-by-${filterBy} mat-select`;
-    const filterMenuOptionSelector = '.mat-select-panel .mat-option[ng-reflect-value]';
+    const filterMenuSelector = `.filter-by-${filterBy} .mat-menu-trigger`;
+    const filterMenuOptionSelector = '.mat-menu-panel .mat-menu-item:nth-child(2)';
     const appliedFilterChipSelector = `${appliedFilterSelector}-${filterBy}`;
     const numAppliedFiltersBefore = await this.page.getElements(appliedFilterSelector).count();
     const numFilterMenus = await this.page.getElements(filterMenuSelector).count();
@@ -79,7 +78,6 @@ export class SearchUseCases {
 
   async clearSearchBox(keywordString = 'autism') {
     const searchFieldSelector = '#search-field input';
-
     const input_text_before = await this.page.getElement(searchFieldSelector).getAttribute('value');
     expect(input_text_before.toLowerCase()).toContain(keywordString);
 
@@ -146,7 +144,7 @@ export class SearchUseCases {
   }
 
   checkSavedZipCode(zipCode = '24401') {
-    const distSelector = '#set-location h4';
+    const distSelector = '#set-location mat-expansion-panel-header';
     this.page.waitForText(distSelector, zipCode);
     this.page.waitFor(500);
     expect(this.page.getLocalStorageVar('zipCode')).toEqual(zipCode);
@@ -156,7 +154,7 @@ export class SearchUseCases {
   async clearZipCode(zipCode = '24401') {
     await this.openZipCodeDialog();
     this.page.clickElement('#btn_gps');
-    const newText = await this.page.getElement('#set-location h4').getText();
+    const newText = await this.page.getElement('#set-location mat-expansion-panel-header').getText();
     expect(newText.includes(zipCode)).toBeFalsy();
   }
 
@@ -185,7 +183,7 @@ export class SearchUseCases {
   // Each date should be less than the next one.
   async checkResultsDates(selector: string, direction: string) {
     const dateAttribute = 'data-iso-date-string';
-    const searchResultSelector = `app-search-result[class^='sort-order-']`;
+    const searchResultSelector = `app-search-result[class*='sort-order-']`;
     const sortOrderSelector = '.sort-order-';
     const selectorWithDate = selector + `[${dateAttribute}]`;
     await this.page.waitForVisible(searchResultSelector);
@@ -259,5 +257,11 @@ export class SearchUseCases {
     await expect(numFiltersAfter).toEqual(numFiltersBefore - 1);
     await expect(numPreserveChipsAfter).toEqual(numPreserveChipsBefore);
     return expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
+  }
+
+  focusAndBlurSearchBox() {
+    const searchSelector = '#search-field input';
+    expect(this.page.isFocused(searchSelector)).toBeTruthy();
+    this.page.pressKey('ESCAPE');
   }
 }

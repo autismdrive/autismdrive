@@ -598,11 +598,11 @@ class SearchSchema(ma.Schema):
         title = fields.Str(missing=None)
         type = fields.Str()
         label = fields.Str(missing=None)
-        last_updated = fields.Date(missing=None)
+        last_updated = fields.DateTime(missing=None)
         highlights = fields.Str(missing=None)
         latitude = fields.Float()
         longitude = fields.Float()
-        date = fields.Date(missing=None)
+        date = fields.DateTime(missing=None)
         status = fields.Str(missing=None)
         no_address = fields.Boolean(missing=None)
         is_draft = fields.Boolean(missing=None)
@@ -656,7 +656,7 @@ class StepSchema(Schema):
     type = fields.Str()
     label = fields.Str()
     status = fields.Str()
-    date_completed = fields.Date()
+    date_completed = fields.DateTime()
     questionnaire_id = fields.Integer()
 
 

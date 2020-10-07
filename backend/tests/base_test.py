@@ -312,7 +312,7 @@ class BaseTest:
             'middle_name': "Soo",
             'last_name': "Ubway",
             'is_first_name_preferred': True,
-            'birthdate': '2002-02-02',
+            'birthdate': '2002-02-02T00:00:00.000000Z',
             'birth_city': 'Staunton',
             'birth_state': 'VA',
             'is_english_primary': True,
