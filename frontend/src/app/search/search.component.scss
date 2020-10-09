@@ -294,9 +294,9 @@ mat-expansion-panel, mat-accordion {
 
     #list-mapped-results-button {
       position: fixed;
+      width: 240px;
       top: 74px;
       right: 10px;
-      width: 240px;
     }
 
     #map {
@@ -325,12 +325,21 @@ mat-expansion-panel, mat-accordion {
 
   #list-mapped-results-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
     z-index: 1;
     width: 240px;
     height: 48px;
     transition: top 300ms ease-in-out, margin-top 300ms ease-in-out;
+
+    &.gt-sm {
+      top: 10px;
+      right: 10px;
+    }
+
+    &.lt-md {
+      // 20px - 48px - 64px = 132px
+      top: calc(100vh - 132px);
+      left: 10px;
+    }
   }
 
   ::ng-deep mat-expansion-panel#set-location {
@@ -400,6 +409,7 @@ mat-expansion-panel, mat-accordion {
     z-index: 1000;
     margin: 0;
     padding: 2rem;
+    overflow-y: scroll;
   }
 }
 
