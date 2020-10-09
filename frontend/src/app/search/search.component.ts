@@ -291,6 +291,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       queryParams: qParams,
     }).finally(() => {
       this.doSearch();
+      this.changeDetectorRef.detectChanges();
     });
   }
 
@@ -307,12 +308,14 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.mapQuery = mapQueryWithResults;
         this.loadMapResults();
         this.loading = false;
+        this.changeDetectorRef.detectChanges();
       });
     this.searchService
       .search(this.query)
       .subscribe(queryWithResults => {
         this.query = queryWithResults;
         this.loading = false;
+        this.changeDetectorRef.detectChanges();
       });
 
     const studyQuery = createClone()(this.query);
@@ -321,11 +324,13 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       if (results.hits.length > 0) {
         this.api.getStudy(results.hits[0].id).subscribe(study => {
           this.highlightedStudy = study;
+          this.changeDetectorRef.detectChanges();
         });
       } else {
         this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
           this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
-        });
+          this.changeDetectorRef.detectChanges();
+      });
       }
     });
     this.googleAnalyticsService.searchEvent(this.query);
@@ -413,6 +418,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.query.ages = [];
     }
     this._goToFirstPage();
+    this.changeDetectorRef.detectChanges();
   }
 
   selectLanguage(language: string = null) {
@@ -422,11 +428,13 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.query.languages = [];
     }
     this._goToFirstPage();
+    this.changeDetectorRef.detectChanges();
   }
 
   selectCategory(newCategory: Category) {
     this.query.category = newCategory;
     this._goToFirstPage();
+    this.changeDetectorRef.detectChanges();
   }
 
   selectType(keepType: string = null) {
@@ -461,6 +469,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
     }
     this._goToFirstPage();
+    this.changeDetectorRef.detectChanges();
   }
 
   submitResource() {
@@ -534,6 +543,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       this.hitsWithAddress = [];
       this.hitsWithNoAddress = [];
     }
+
+    this.changeDetectorRef.detectChanges();
   }
 
   get shouldShowMap() {
@@ -732,7 +743,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isLastPage(): boolean {
-    return (this.query.start + this.pageSize) < this.query.total;
+    return (this.query.start + this.pageSize) > this.query.total;
   }
 
   numResultsFrom(): number {

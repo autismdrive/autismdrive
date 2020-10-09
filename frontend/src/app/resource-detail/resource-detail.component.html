@@ -37,11 +37,11 @@
           [resource]="resource"
         ></app-event-registration>
         <a
-          *ngIf="!resource.includes_registration"
+          *ngIf="!resource.includes_registration && (resource.registration_url || resource.contact_email)"
           mat-flat-button
           class="btn btn-xl"
           color="accent"
-          [href]="resource.registration_url"
+          [href]="resource.registration_url || 'mailto:' + resource.contact_email + '?subject=Registration+for+' + resource.title"
           target="_blank"
         >Register Now</a>
       </div>
