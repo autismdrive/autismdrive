@@ -87,11 +87,11 @@ export class ResourceFormComponent implements OnInit {
       type: 'radio',
       defaultValue: false,
       templateOptions: {
-        label: 'Allow Registration',
+        label: 'Use Autism DRIVE or an external system for registration?',
         description: 'Should users be able to register for this event through Autism DRIVE?',
         options: [
-          {value: true, label: 'Yes'},
-          {value: false, label: 'No'},
+          {value: true, label: 'Autism DRIVE'},
+          {value: false, label: 'External system'},
         ]
       },
       expressionProperties: {
@@ -104,11 +104,9 @@ export class ResourceFormComponent implements OnInit {
       type: 'input',
       templateOptions: {
         label: 'Registration Link',
-        placeholder: 'http://link.to/external/website',
+        description: 'If this is left blank, the contact email address will be used for registration.',
+        placeholder: 'https://link.to/external/website',
         type: 'url',
-      },
-      expressionProperties: {
-        'templateOptions.required': 'model.type === "event" && !model.includes_registration'
       },
       hideExpression: '!(model.type === "event" && !model.includes_registration)',
     },
@@ -117,7 +115,7 @@ export class ResourceFormComponent implements OnInit {
       type: 'input',
       templateOptions: {
         label: 'Feature Image',
-        placeholder: 'http://link.to/file.jpg',
+        placeholder: 'https://link.to/external/website/file.jpg',
         type: 'url',
       },
       hideExpression: 'model.type != "event"',
@@ -207,10 +205,22 @@ export class ResourceFormComponent implements OnInit {
       type: 'input',
       templateOptions: {
         label: 'Contact Email',
-        placeholder: 'This contact email will not be displayed on the site and is intended for admin use only',
       },
       validators: {'validation': ['email']},
       hideExpression: '!model.type',
+      expressionProperties: {
+        'templateOptions.description': (model, formState, field) => {
+          if (
+            model.type === 'event' &&
+            !model.includes_registration &&
+            !model.registration_link
+          ) {
+            return 'This contact email will be used for attendees to request information about registering for this event.';
+          } else {
+            return 'This contact email will not be displayed on the site and is intended for admin use only';
+          }
+        }
+      },
     },
     {
       key: 'location_name',

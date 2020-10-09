@@ -129,7 +129,7 @@
           <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults()}} Results</button>
         </div>
       </div>
-      <div *ngIf="showBreadcrumbs()" class="breadcrumbs-container" fxLayout="row" fxFlex.gt-sm="100%" fxLayoutGap="10px">
+      <div [fxShow]="showBreadcrumbs()" [fxHide]="!showBreadcrumbs()" class="breadcrumbs-container" fxLayout="row" fxFlex.gt-sm="100%" fxLayoutGap="10px">
         <h4 *ngIf="hasFilters(appliedFilters)" fxShow fxHide.lt-md>Selected Filters:</h4>
         <mat-chip-list class="applied-filters" #appliedFilters ngClass.lt-md="applied-filters-small">
           <ng-container *ngIf="restrictToMappedResults">
@@ -329,6 +329,8 @@
       (click)="listMapResultsOnly(!restrictToMappedResults)"
       [color]="restrictToMappedResults ? 'accent' : ''"
       [ngClass]="'mat-elevation-z1'"
+      [ngClass.gt-sm]="'gt-sm'"
+      [ngClass.lt-md]="'lt-md'"
       [fxHide]="!shouldShowMap"
     >
       <mat-icon *ngIf="!restrictToMappedResults">check_box_outline_blank</mat-icon>
