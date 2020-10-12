@@ -432,11 +432,12 @@
             <a
               class="title mat-h2"
               href="/#/{{selectedMapResource.type.toLowerCase()}}/{{selectedMapResource.id}}"
+              (click)="goSelectedMapResource(selectedMapResource)"
             >{{selectedMapResource.title}}</a>
             <a
               class="chevron-link"
-              [routerLink]="['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]"
-              routerLinkActive="router-link-active">
+              (click)="goSelectedMapResource(selectedMapResource)"
+            >
               {{selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type}} Details</a>
           </agm-info-window>
         </ng-container>

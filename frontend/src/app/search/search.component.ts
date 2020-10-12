@@ -569,6 +569,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');
+    this.googleAnalyticsService.searchInteractionEvent('set_zip_code_location');
     this.setLocOpen = false;
     this.reSort('Distance', true);
   }
@@ -577,6 +578,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.removeItem('zipCode');
+    this.googleAnalyticsService.searchInteractionEvent('set_gps_location');
     this.storedZip = null;
     this.setLocOpen = false;
     this.reSort('Distance', true);
@@ -740,6 +742,9 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   listMapResultsOnly(shouldRestrict: boolean) {
     this.restrictToMappedResults = shouldRestrict;
     this.updateUrlAndDoSearch();
+    if (shouldRestrict) {
+      this.googleAnalyticsService.searchInteractionEvent('search_as_map_moves');
+    }
   }
 
   isLastPage(): boolean {
@@ -831,5 +836,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.shouldShowMap) {
       this.expandResults = true;
     }
+  }
+
+  goSelectedMapResource(selectedMapResource: Resource) {
+    this.googleAnalyticsService.mapResourceEvent(selectedMapResource.id.toString());
+    this.router.navigate(['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]);
   }
 }
