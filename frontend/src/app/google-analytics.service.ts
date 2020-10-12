@@ -26,7 +26,6 @@ export class GoogleAnalyticsService {
     });
   }
 
-
   public errorEvent(error: StarError) {
     this.event(error.code, 'error_messages', error.message);
   }
@@ -53,8 +52,16 @@ export class GoogleAnalyticsService {
     this.event(query.start.toString(), 'search_start', '');
   }
 
+  public searchInteractionEvent(eventName: string) {
+    this.event(eventName, 'search_interaction', '');
+  }
+
   public mapEvent(windowId: string) {
-    this.event(windowId, 'map_interaction', '');
+    this.event(windowId, 'map_interaction', 'map_pin_click');
+  }
+
+  public mapResourceEvent(resourceId: string) {
+    this.event(resourceId, 'map_interaction', 'map_pin_resource_click');
   }
 
   public studyInquiryEvent(study: Study) {
