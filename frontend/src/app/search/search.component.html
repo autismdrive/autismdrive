@@ -5,7 +5,10 @@
     mat-button
   >Background <mat-icon>arrow_drop_down</mat-icon></button>
   <mat-menu #designOptionsBg>
-    <button *ngFor="let className of searchBgClasses" mat-menu-item (click)="searchBgClass = className">{{className}}</button>
+    <button *ngFor="let className of searchBgClasses" mat-menu-item (click)="searchBgClass = className" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <span class="color-swatch {{className}}"></span>
+      {{className}}
+    </button>
   </mat-menu>
 </div>
 
