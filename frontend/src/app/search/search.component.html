@@ -1,6 +1,18 @@
+<div id="design-options" class="mat-elevation-z4">
+  Theme:
+  <button
+    [matMenuTriggerFor]="designOptionsBg"
+    mat-button
+  >Background <mat-icon>arrow_drop_down</mat-icon></button>
+  <mat-menu #designOptionsBg>
+    <button *ngFor="let className of searchBgClasses" mat-menu-item (click)="searchBgClass = className">{{className}}</button>
+  </mat-menu>
+</div>
+
 <div
   id="hero"
   #searchHeader
+  [class]="searchBgClass"
 >
   <div
     fxLayout="column"

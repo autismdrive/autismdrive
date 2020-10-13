@@ -189,6 +189,20 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   private mapBounds: LatLngBounds;
   private scrollDirection: Direction;
 
+  searchBgClasses = [
+    'light-gray',
+    'white',
+    'uva-blue',
+    'uva-orange',
+    'black',
+    'gray',
+    'mountain',
+    'sky',
+    'energy-burst-dark',
+    'energy-burst-light',
+  ];
+  searchBgClass = '';
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
