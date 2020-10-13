@@ -1,0 +1,18 @@
+$video-width: 560px;
+$video-height: 315px;
+$text-height: 48px;
+
+.video-preview {
+  display: block;
+  background-color: black;
+  outline: 1px solid black;
+  margin: 2em;
+  color: white;
+
+  p { margin: 0; text-align: center; padding: 0.5em; }
+
+  &.large { width: ($video-width); }
+  &.medium { width: ($video-width * 0.75); }
+  &.small { width: ($video-width * 0.5); }
+}
+

@@ -202,6 +202,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     'energy-burst-light',
   ];
   searchBgClass = '';
+  videoPlacements = ['left', 'right'];
+  videoPlacement = 'left';
+  videoSizes = ['large', 'medium', 'small'];
+  videoSize = 'large';
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
