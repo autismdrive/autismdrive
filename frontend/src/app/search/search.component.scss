@@ -450,6 +450,7 @@ mat-expansion-panel, mat-accordion {
   position: fixed;
   top: 0;
   left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
   background-color: #EEEEEE;
   border-radius: 0px 0px 8px 8px;
@@ -468,8 +469,14 @@ mat-expansion-panel, mat-accordion {
 
   ::ng-deep h1,
   ::ng-deep .mat-menu-trigger,
-  ::ng-deep .mat-tab-label {
+  ::ng-deep .mat-tab-label,
+  ::ng-deep .breadcrumbs-container h4,
+  ::ng-deep .breadcrumbs-container .mat-button {
     color: white !important;
+  }
+
+  ::ng-deep .mat-menu-trigger {
+    background-color: rgba(0,0,0,0.2);
   }
 }
 .light-gray, #hero.light-gray { background-color: #EEE; }
@@ -500,4 +507,10 @@ mat-expansion-panel, mat-accordion {
 .energy-burst-light, #hero.energy-burst-light {
   @extend %invert-headings;
   background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst-footer-crop.jpg');
+}
+.color-swatch {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  outline: 1px solid #EEE;
 }
