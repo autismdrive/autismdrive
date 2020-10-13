@@ -1,5 +1,6 @@
-<div id="design-options" class="mat-elevation-z4">
-  Theme:
+<div id="design-options" fxLayout="row" fxLayoutGap="10px" class="mat-elevation-z4" fxLayoutAlign="center center">
+  <h4>Theme</h4>
+
   <button
     [matMenuTriggerFor]="designOptionsBg"
     mat-button
@@ -7,6 +8,26 @@
   <mat-menu #designOptionsBg>
     <button *ngFor="let className of searchBgClasses" mat-menu-item (click)="searchBgClass = className" fxLayoutAlign="start center" fxLayoutGap="10px">
       <span class="color-swatch {{className}}"></span>
+      {{className}}
+    </button>
+  </mat-menu>
+
+  <button
+    [matMenuTriggerFor]="designOptionsVideoPlacement"
+    mat-button
+  >Video placement <mat-icon>arrow_drop_down</mat-icon></button>
+  <mat-menu #designOptionsVideoPlacement>
+    <button *ngFor="let className of videoPlacements" mat-menu-item (click)="videoPlacement = className" fxLayoutAlign="start center" fxLayoutGap="10px">
+      {{className}}
+    </button>
+  </mat-menu>
+
+  <button
+    [matMenuTriggerFor]="designOptionsVideoSize"
+    mat-button
+  >Video size <mat-icon>arrow_drop_down</mat-icon></button>
+  <mat-menu #designOptionsVideoSize>
+    <button *ngFor="let className of videoSizes" mat-menu-item (click)="videoSize = className" fxLayoutAlign="start center" fxLayoutGap="10px">
       {{className}}
     </button>
   </mat-menu>
@@ -22,13 +43,16 @@
   >
     <div
       fxLayoutAlign="center center"
+      fxLayout="row"
     >
+      <app-tutorial-video *ngIf="videoPlacement === 'left'" [videoSize]="videoSize"></app-tutorial-video>
       <app-search-box
         variant="light-bg"
         (searchUpdated)="updateUrlAndDoSearch()"
         [words]="query.words"
         fxFlex.gt-sm="60%"
       ></app-search-box>
+      <app-tutorial-video *ngIf="videoPlacement === 'right'" [videoSize]="videoSize"></app-tutorial-video>
     </div>
     <app-add-button
       *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
