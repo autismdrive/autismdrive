@@ -234,7 +234,7 @@ mat-expansion-panel, mat-accordion {
 }
 
 .type-tabs-container {
-  background-color: $brand-gray-tint-4;
+  //background-color: $brand-gray-tint-4;
   height: 94px;
   //color: white;
 
@@ -443,4 +443,61 @@ mat-expansion-panel, mat-accordion {
 
 #show-filters-button {
   margin-bottom: 2em;
+}
+
+#design-options {
+  padding: 8px;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 1000;
+  background-color: #EEEEEE;
+  border-radius: 0px 0px 8px 8px;
+
+}
+
+%invert-hint {
+  ::ng-deep .mat-hint {
+    color: white !important;
+    font-style: italic;
+  }
+}
+
+%invert-headings {
+  @extend %invert-hint;
+
+  ::ng-deep h1,
+  ::ng-deep .mat-menu-trigger,
+  ::ng-deep .mat-tab-label {
+    color: white !important;
+  }
+}
+.light-gray, #hero.light-gray { background-color: #EEE; }
+.white, #hero.white { background-color: #FFF; }
+.uva-blue, #hero.uva-blue {
+  @extend %invert-headings;
+  background-color: #002F6C;
+}
+.uva-orange, #hero.uva-orange {
+  @extend %invert-hint;
+  background-color: #E57200; }
+.black, #hero.black {
+  @extend %invert-headings;
+  background-color: #000;
+}
+.gray, #hero.gray {
+  @extend %invert-headings;
+  background-color: #636466;
+}
+.mountain, #hero.mountain {
+  @extend %invert-headings;
+  background-color: #6F7EA0; }
+.sky, #hero.sky { background-color: #E5EEF3; }
+.energy-burst-dark, #hero.energy-burst-dark {
+  @extend %invert-headings;
+  background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst.jpg');
+}
+.energy-burst-light, #hero.energy-burst-light {
+  @extend %invert-headings;
+  background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst-footer-crop.jpg');
 }
