@@ -237,43 +237,6 @@ class TestUser(BaseTest, unittest.TestCase):
         logs = EmailLog.query.all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-    def test_get_study_by_user(self):
-        u = self.construct_user()
-        s = self.construct_study()
-        su = StudyUser(study=s, user=u, status=StudyUserStatus.inquiry_sent)
-        db.session.add(su)
-        db.session.commit()
-        rv = self.app.get(
-            '/api/user/%i/study' % u.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(s.id, response[0]["study_id"])
-        self.assertEqual(s.description, response[0]["study"]["description"])
-
-    def test_get_study_by_user_includes_user_details(self):
-        u = self.construct_user(email="c1")
-        u2 = self.construct_user(email="c2")
-        s = self.construct_study()
-        su = StudyUser(study=s, user=u, status=StudyUserStatus.inquiry_sent)
-        su2 = StudyUser(study=s, user=u2, status=StudyUserStatus.enrolled)
-        db.session.add_all([su, su2])
-        db.session.commit()
-        rv = self.app.get(
-            '/api/user/%i/study' % u.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(s.id, response[0]["study_id"])
-        self.assertEqual(2,
-                         len(response[0]["study"]["study_users"]))
-        self.assertEqual(
-            "c1", response[0]["study"]["study_users"][0]["user"]
-            ["email"])
-
     def test_enrolled_vs_inquiry_studies_by_user(self):
         u = self.construct_user(email="u1@sartography.com")
         s1 = self.construct_study(title="Super Study")
@@ -284,13 +247,7 @@ class TestUser(BaseTest, unittest.TestCase):
         su3 = StudyUser(study=s2, user=u, status=StudyUserStatus.enrolled)
         db.session.add_all([su1, su2, su3])
         db.session.commit()
-        rv = self.app.get(
-            '/api/user/%i/study' % u.id,
-            content_type="application/json",
-            headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(3, len(response))
+
         rv = self.app.get(
             '/api/user/%i/inquiry/study' % u.id,
             content_type="application/json",

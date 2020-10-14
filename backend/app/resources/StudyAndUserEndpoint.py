@@ -10,20 +10,6 @@ from app.schema.schema import StudyUserSchema, UserStudiesSchema, StudyUsersSche
 from app.wrappers import requires_roles
 
 
-class StudyByUserEndpoint(flask_restful.Resource):
-
-    schema = UserStudiesSchema()
-
-    @auth.login_required
-    def get(self, user_id):
-        study_users = db.session.query(StudyUser)\
-            .join(StudyUser.study)\
-            .filter(StudyUser.user_id == user_id)\
-            .order_by(Study.title)\
-            .all()
-        return self.schema.dump(study_users, many=True)
-
-
 class StudyInquiryByUserEndpoint(flask_restful.Resource):
 
     schema = UserStudiesSchema()

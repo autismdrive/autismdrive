@@ -29,6 +29,8 @@ class TestStudy(BaseTest, unittest.TestCase):
         self.assertEqual(response["id"], s_id)
         self.assertEqual(response["title"], 'Fantastic Study')
         self.assertEqual(response["description"], 'A study that will go down in history')
+        self.assertNotIn('study_users', response, "Never include info about other users in a non-protected endpoint")
+        self.assertNotIn('users', response, "Never include info about other users in a non-protected endpoint")
 
     def test_modify_study_basics(self):
         self.construct_study()
@@ -287,10 +289,7 @@ class TestStudy(BaseTest, unittest.TestCase):
         s = self.construct_study(title="The Best Study")
         u = self.construct_user()
 
-        rv = self.app.get('api/user/%i/study' % u.id, content_type="application/json", headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(0, len(response))
+        self.assertEquals(0, len(s.study_users))
 
         guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
@@ -304,11 +303,7 @@ class TestStudy(BaseTest, unittest.TestCase):
                            headers=self.logged_in_headers())
         self.assert_success(rv)
 
-        rv = self.app.get('api/user/%i/study' % u.id, content_type="application/json", headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual(1, len(response))
-        self.assertEqual(s.id, response[0]["study_id"])
+        self.assertEquals(1, len(s.study_users))
 
     def test_study_inquiry_fails_without_valid_study_or_user(self):
         s = self.construct_study(title="The Best Study")
