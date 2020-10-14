@@ -59,6 +59,7 @@
       <app-search-box
         variant="light-bg"
         (searchUpdated)="updateUrlAndDoSearch()"
+        (categorySelected)="selectCategory($event)"
         [words]="query.words"
       ></app-search-box>
       <app-tutorial-video *ngIf="videoPlacement === 'right'" [videoSize]="videoSize"></app-tutorial-video>
