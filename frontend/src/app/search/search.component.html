@@ -21,7 +21,16 @@
       mat-button
     >Video placement <mat-icon>arrow_drop_down</mat-icon></button>
     <mat-menu #designOptionsVideoPlacement>
-      <button *ngFor="let className of videoPlacements" mat-menu-item (click)="videoPlacement = className" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <button
+        [disabled]="shouldHideVideo"
+        mat-menu-item
+        (click)="hideVideo(true)"
+      >hidden</button>
+      <button
+        *ngFor="let className of videoPlacements"
+        (click)="showVideo(className)"
+        mat-menu-item
+      >
         {{className}}
       </button>
     </mat-menu>
@@ -44,256 +53,210 @@
   id="hero"
   #searchHeader
   [class]="searchBgClass"
+  fxLayout="column"
 >
+  <app-tutorial-video
+    *ngIf="videoPlacement === 'above' && !shouldHideVideo"
+    [videoSize]="videoSize"
+    [url]="videoUrl"
+    [instructions]="videoInstructions"
+    fxFlexAlign="center"
+  ></app-tutorial-video>
   <div
-    fxLayout="column"
+    fxLayout="row"
+    fxLayout.lt-md="column"
     fxLayoutAlign="center center"
   >
-    <app-tutorial-video *ngIf="videoPlacement === 'above'" [videoSize]="videoSize"></app-tutorial-video>
-    <div
-      fxLayout="row"
-      fxLayout.lt-md="column"
-      fxLayoutAlign="center center"
-    >
-      <app-tutorial-video *ngIf="videoPlacement === 'left'" [videoSize]="videoSize"></app-tutorial-video>
+    <app-tutorial-video
+      *ngIf="videoPlacement === 'left' && !shouldHideVideo"
+      [videoSize]="videoSize"
+      [url]="videoUrl"
+      [instructions]="videoInstructions"
+    ></app-tutorial-video>
+    <div fxLayout="column">
       <app-search-box
         variant="light-bg"
         (searchUpdated)="updateUrlAndDoSearch()"
         (categorySelected)="selectCategory($event)"
         [words]="query.words"
       ></app-search-box>
-      <app-tutorial-video *ngIf="videoPlacement === 'right'" [videoSize]="videoSize"></app-tutorial-video>
-    </div>
-    <app-tutorial-video *ngIf="videoPlacement === 'below'" [videoSize]="videoSize"></app-tutorial-video>
-  </div>
-  <div fxLayout="column">
-    <app-add-button
-      *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
-      [addLabel]='"Add Resource"'
-      [addLink]='"resources/add"'
-      [currentUser]=currentUser
-    ></app-add-button>
-    <button
-      id="show-filters-button"
-      (click)="showFilters = !showFilters"
-      mat-flat-button
-      color="primary"
-      fxHide
-      fxShow.lt-md
-    >
-      <mat-icon>filter_alt</mat-icon>
-      Filter Search Results
-    </button>
-    <div
-      fxLayout="column"
-      fxLayoutAlign="center center"
-      fxFlex.gt-sm="60%"
-      id="filters-container"
-    >
+      <app-add-button
+        *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
+        [addLabel]='"Add Resource"'
+        [addLink]='"resources/add"'
+        [currentUser]=currentUser
+      ></app-add-button>
+      <button
+        id="show-filters-button"
+        (click)="showFilters = !showFilters"
+        mat-flat-button
+        color="primary"
+        fxHide
+        fxShow.lt-md
+      >
+        <mat-icon>filter_alt</mat-icon>
+        Filter Search Results
+      </button>
       <div
-        id="filters"
-        fxFlex.gt-sm="60%"
-        [ngClass.lt-md]="{'full-screen': showFilters, 'minimized': !showFilters}"
+        fxLayout="column"
+        fxLayoutAlign="center center"
+        id="filters-container"
       >
-        <div fxHide fxShow.lt-md>
-          <div fxLayoutAlign="end end">
-            <button mat-button (click)="toggleShowFilters()">Done</button>
-          </div>
-          <h2>Filter Resources</h2>
-        </div>
-        <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
-          <div class="filter-select" fxLayout="row" fxLayout.lt-md="row wrap" fxLayoutGap="2em" fxShow>
-
-            <div fxHide fxShow.lt-md id="type-filter">
-              <mat-form-field>
-                <mat-label>Resource types</mat-label>
-                <mat-select [(value)]="selectedType">
-                  <mat-select-trigger>
-                    <app-type-icon
-                      *ngIf="selectedType"
-                      [iconType]="selectedType && selectedType.name"
-                      [size]="1"
-                    ></app-type-icon>
-                    <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
-                  </mat-select-trigger>
-                  <mat-option
-                    *ngFor="let type of resourceTypes"
-                    [value]="type"
-                    (click)="selectType(type.name)"
-                  >
-                    <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-                    <span class="type-label">{{type.label}}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div id="age-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
-              <div *ngIf="query">
-                <app-search-filter
-                  [aggregations]="query.age_counts"
-                  [label_title]="'Filter by Age'"
-                  [label_any]="'Any age'"
-                  [label_map]="ageLabels"
-                  [label_icon]="'cake'"
-                  (filterSelected)="selectAgeRange($event)"
-                  [ngClass]="'filter-by-age'"
-                  [isNotApplicable]="!loading && query && !query.hasAgeCounts()"
-                  [notApplicableMessage]="'No age restrictions available for these search results.'"
-                ></app-search-filter>
-              </div>
-            </div>
-
-            <div id="language-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
-              <div *ngIf="query">
-                <app-search-filter
-                  [aggregations]="query.language_counts"
-                  [label_title]="'Filter by Language'"
-                  [label_any]="'Any language'"
-                  [label_map]="languageLabels"
-                  [label_icon]="'language'"
-                  (filterSelected)="selectLanguage($event)"
-                  [ngClass]="'filter-by-language'"
-                  [isNotApplicable]="!loading && query && !query.hasLanguageCounts()"
-                  [notApplicableMessage]="'No language restrictions available for these search results.'"
-                ></app-search-filter>
-              </div>
-            </div>
-
-            <div id="topic-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
-              <app-search-topics
-                *ngIf="query"
-                [category]="query.category"
-                (categorySelected)="selectCategory($event)"
-                [ngClass]="'filter-by-topic'"
-              ></app-search-topics>
-            </div>
-          </div>
-        </div>
-        <div class="sort-order-small" fxHide fxShow.lt-md>
-          <app-search-sort
-            [selectedSort]="selectedSort"
-            [sortMethods]="sortMethods"
-            (sortMethodSelected)="newSortSelection($event)"
-          ></app-search-sort>
-        </div>
-        <div fxHide fxShow.lt-md fxLayoutAlign="center center">
-          <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults()}} Results</button>
-        </div>
-      </div>
-      <div [fxShow]="showBreadcrumbs()" [fxHide]="!showBreadcrumbs()" class="breadcrumbs-container" fxLayout="row" fxFlex.gt-sm="100%" fxLayoutGap="10px">
-        <h4 *ngIf="hasFilters(appliedFilters)" fxShow fxHide.lt-md>Selected Filters:</h4>
-        <mat-chip-list class="applied-filters" #appliedFilters ngClass.lt-md="applied-filters-small">
-          <ng-container *ngIf="restrictToMappedResults">
-            <mat-chip
-              (click)="listMapResultsOnly(false)"
-              class="applied-filter applied-filter-mapped"
-            >
-              <span class="applied-filter-label">Mapped results only</span>
-              <mat-icon>close</mat-icon>
-            </mat-chip>
-          </ng-container>
-
-          <ng-container *ngIf="query && query.words">
-            <mat-chip
-              (click)="removeWords()"
-              class="applied-filter applied-filter-keyword"
-            >
-              <span class="applied-filter-label">"{{query.words}}"</span>
-              <mat-icon>close</mat-icon>
-            </mat-chip>
-          </ng-container>
-
-          <ng-container *ngFor="let age of query.ages let i = index">
-            <mat-chip
-              (click)="selectAgeRange()"
-              class="applied-filter applied-filter-age"
-            >
-              <span class="applied-filter-label">{{ageLabels[age]}}</span>
-              <mat-icon>close</mat-icon>
-            </mat-chip>
-          </ng-container>
-
-          <ng-container *ngFor="let language of query.languages let i = index">
-            <mat-chip
-              (click)="selectLanguage()"
-              class="applied-filter applied-filter-language"
-            >
-              <span class="applied-filter-label">{{languageLabels[language]}}</span>
-              <mat-icon>close</mat-icon>
-            </mat-chip>
-          </ng-container>
-
-          <div *ngIf="query.types.length === 1">
-            <mat-chip
-              (click)="selectType()"
-              class="applied-filter applied-filter-type">
-              <span class="applied-filter-label">{{typeLabels[query.types[0]]}}</span>
-              <mat-icon>close</mat-icon>
-            </mat-chip>
-          </div>
-
-          <ng-container *ngIf="query && query.category && query.category.id">
-            <mat-chip
-              (click)="removeCategory()"
-              class="applied-filter applied-filter-topic"
-            >
-              <div class="applied-filter-label" fxLayout="row" fxLayoutAlign="center center">
-                <ng-container *ngIf="query.category.parent && query.category.parent.parent">
-                  {{query.category.parent.parent.name}}
-                  <mat-icon>chevron_right</mat-icon>
-                </ng-container>
-                <ng-container *ngIf="query.category.parent">
-                  {{query.category.parent.name}}
-                  <mat-icon>chevron_right</mat-icon>
-                </ng-container>
-                {{query.category.name}}
-              </div>
-              <mat-icon>close</mat-icon>
-            </mat-chip>
-          </ng-container>
-        </mat-chip-list>
-        <a
-          *ngIf="hasFilters(appliedFilters)"
-          mat-button
-          (click)="clearAllFilters()"
-          fxShow
-          fxHide.lt-md
-        >Clear All</a>
-      </div>
-    </div>
-    <div
-      class="type-tabs-container"
-      fxShow
-      fxHide.lt-md
-      fxLayout="row"
-      fxLayoutGap="2em"
-      fxLayoutAlign="start end"
-    >
-      <mat-tab-group
-        mat-align-tabs="start"
-        fxHide.lt-md
-        [ngClass]="'type-tabs'"
-        (selectedTabChange)="selectTypeTab($event)"
-        [(selectedIndex)]="selectedTypeTabIndex"
-        color="accent"
-        #typeTabs
-      >
-        <mat-tab>
-          <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
-        </mat-tab>
-        <mat-tab
-          *ngFor="let type of resourceTypesFiltered()"
+        <div
+          id="filters"
+          fxFlex.gt-sm="60%"
+          [ngClass.lt-md]="{'full-screen': showFilters, 'minimized': !showFilters}"
         >
-          <ng-template mat-tab-label>
-            <div class="type-buttons {{type.name}}">
-              <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-              {{type.label}}
+          <div fxHide fxShow.lt-md>
+            <div fxLayoutAlign="end end">
+              <button mat-button (click)="toggleShowFilters()">Done</button>
             </div>
-          </ng-template>
-        </mat-tab>
-      </mat-tab-group>
+            <h2>Filter Resources</h2>
+          </div>
+          <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
+
+            <div class="filter-select" fxLayout="row" fxLayout.lt-md="row wrap" fxLayoutGap="2em" fxShow>
+
+              <div fxHide fxShow.lt-md id="type-filter">
+                <mat-form-field>
+                  <mat-label>Resource types</mat-label>
+                  <mat-select [(value)]="selectedType">
+                    <mat-select-trigger>
+                      <app-type-icon
+                        *ngIf="selectedType"
+                        [iconType]="selectedType && selectedType.name"
+                        [size]="1"
+                      ></app-type-icon>
+                      <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
+                    </mat-select-trigger>
+                    <mat-option
+                      *ngFor="let type of resourceTypes"
+                      [value]="type"
+                      (click)="selectType(type.name)"
+                    >
+                      <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+                      <span class="type-label">{{type.label}}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div id="age-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
+                <div *ngIf="query">
+                  <app-search-filter
+                    [aggregations]="query.age_counts"
+                    [label_title]="'Filter by Age'"
+                    [label_any]="'Any age'"
+                    [label_map]="ageLabels"
+                    [label_icon]="'cake'"
+                    (filterSelected)="selectAgeRange($event)"
+                    [ngClass]="'filter-by-age'"
+                    [isNotApplicable]="!loading && query && !query.hasAgeCounts()"
+                    [notApplicableMessage]="'No age restrictions available for these search results.'"
+                  ></app-search-filter>
+                </div>
+              </div>
+
+              <div id="language-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
+                <div *ngIf="query">
+                  <app-search-filter
+                    [aggregations]="query.language_counts"
+                    [label_title]="'Filter by Language'"
+                    [label_any]="'Any language'"
+                    [label_map]="languageLabels"
+                    [label_icon]="'language'"
+                    (filterSelected)="selectLanguage($event)"
+                    [ngClass]="'filter-by-language'"
+                    [isNotApplicable]="!loading && query && !query.hasLanguageCounts()"
+                    [notApplicableMessage]="'No language restrictions available for these search results.'"
+                  ></app-search-filter>
+                </div>
+              </div>
+
+              <div id="topic-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
+                <app-search-topics
+                  *ngIf="query"
+                  [category]="query.category"
+                  (categorySelected)="selectCategory($event)"
+                  [ngClass]="'filter-by-topic'"
+                ></app-search-topics>
+              </div>
+            </div>
+          </div>
+          <div class="sort-order-small" fxHide fxShow.lt-md>
+            <app-search-sort
+              [selectedSort]="selectedSort"
+              [sortMethods]="sortMethods"
+              (sortMethodSelected)="newSortSelection($event)"
+            ></app-search-sort>
+          </div>
+          <div fxHide fxShow.lt-md fxLayoutAlign="center center">
+            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults()}} Results</button>
+          </div>
+        </div>
+      </div>
     </div>
+    <app-tutorial-video
+      *ngIf="videoPlacement === 'right' && !shouldHideVideo"
+      [videoSize]="videoSize"
+      [url]="videoUrl"
+      [instructions]="videoInstructions"
+    ></app-tutorial-video>
+  </div>
+  <app-tutorial-video
+    *ngIf="videoPlacement === 'below' && !shouldHideVideo"
+    [videoSize]="videoSize"
+    [url]="videoUrl"
+    [instructions]="videoInstructions"
+    fxFlexAlign="center"
+  ></app-tutorial-video>
+  <app-search-filters-breadcrumbs
+    (ageRangeChipClicked)="selectAgeRange()"
+    (categoryChipClicked)="removeCategory()"
+    (clearAllClicked)="clearAllFilters()"
+    (keywordChipClicked)="removeWords()"
+    (languageChipClicked)="selectLanguage()"
+    (mappedResultsChipClicked)="listMapResultsOnly($event)"
+    (typeChipClicked)="selectType()"
+    [ageLabels]="ageLabels"
+    [fxHide]="!showBreadcrumbs()"
+    [fxShow]="showBreadcrumbs()"
+    [languageLabels]="languageLabels"
+    [query]="query"
+    [restrictToMappedResults]="restrictToMappedResults"
+    [typeLabels]="typeLabels"
+  ></app-search-filters-breadcrumbs>
+  <div
+    class="type-tabs-container"
+    fxShow
+    fxHide.lt-md
+    fxLayout="row"
+    fxLayoutGap="2em"
+    fxLayoutAlign="start end"
+  >
+    <mat-tab-group
+      mat-align-tabs="start"
+      fxHide.lt-md
+      [ngClass]="'type-tabs'"
+      (selectedTabChange)="selectTypeTab($event)"
+      [(selectedIndex)]="selectedTypeTabIndex"
+      color="accent"
+      #typeTabs
+    >
+      <mat-tab>
+        <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
+      </mat-tab>
+      <mat-tab
+        *ngFor="let type of resourceTypesFiltered()"
+      >
+        <ng-template mat-tab-label>
+          <div class="type-buttons {{type.name}}">
+            <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
+            {{type.label}}
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
   </div>
 </div>
 <div fxHide fxShow.lt-md id="results-vs-map">

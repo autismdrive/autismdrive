@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-tutorial-video',
@@ -7,10 +8,19 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class TutorialVideoComponent implements OnInit {
   @Input() videoSize: string;
+  @Input() url: string;
+  @Input() instructions: string;
 
-  constructor() { }
+  constructor(
+    private sanitizer: DomSanitizer
+  ) {
+  }
 
   ngOnInit() {
+  }
+
+  get safeVideoLink(): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
   }
 
   get videoWidth() {
@@ -35,5 +45,9 @@ export class TutorialVideoComponent implements OnInit {
       case 'small':
         return Math.floor(baseSize * 0.5);
     }
+  }
+
+  hideVideo() {
+    localStorage.setItem('shouldHideVideo', 'true');
   }
 }

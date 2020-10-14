@@ -3,11 +3,9 @@ $video-height: 315px;
 $text-height: 48px;
 
 .video-preview {
+  position: relative;
   display: block;
-  background-color: black;
-  outline: 1px solid black;
   margin: 2em;
-  color: white;
 
   p { margin: 0; text-align: center; padding: 0.5em; }
 
@@ -16,3 +14,8 @@ $text-height: 48px;
   &.small { width: ($video-width * 0.5); }
 }
 
+.hide-video {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+}

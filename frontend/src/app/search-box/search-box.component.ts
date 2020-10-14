@@ -46,19 +46,13 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     ).subscribe(value => this.updateSearch(false));
 
     this.api.getCategoryTree().subscribe(categoryTree => {
-      console.log('category tree', categoryTree);
       this.categoryTree = categoryTree;
       const flattened = {};
       this._flattenCategoryTree(categoryTree, flattened);
       this.flattenedCategoryTree = this._flattenCategoryTree(categoryTree, flattened);
       this.options = Object.values(flattened);
       this._populateCategoryParents();
-      console.log('flattened category tree', this.flattenedCategoryTree);
     });
-
-    // this.api.getCategoryNamesList().subscribe(categories => {
-    //   this.options = categories;
-    // });
   }
 
   @ViewChild('searchInput', {read: MatInput, static: false})
@@ -82,18 +76,21 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
           this.searchInputElement.value = '';
         }
       } else {
-        console.log('q.words', q.words);
         this.searchInputElement.value = q.words || this.words;
       }
     });
   }
 
   private _filter(value: string): Category[] {
-    const filterValue = value.toLowerCase();
-    return this.options.filter(option => {
-      const indentedString = (this.levelIndent(option) + ' ' + option.name);
-      return indentedString.toLowerCase().includes(filterValue);
-    });
+    if (value && value.length > 0) {
+      const filterValue = value.toLowerCase();
+      return this.options.filter(option => {
+        const indentedString = (this.levelIndent(option) + ' ' + option.name);
+        return indentedString.toLowerCase().includes(filterValue);
+      });
+    } else {
+      return this.options;
+    }
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
@@ -155,7 +152,6 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   }
 
   selectCategory($event) {
-    console.log('$event', $event);
     this.categorySelected.emit($event.option.value as Category);
   }
 }
