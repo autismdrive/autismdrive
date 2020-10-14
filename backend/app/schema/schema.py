@@ -491,12 +491,11 @@ class StudySchema(ModelSchema):
         model = Study
         fields = ('id', 'title', 'short_title', 'short_description', 'image_url', 'last_updated', 'description',
                   'participant_description', 'benefit_description', 'coordinator_email', 'organization_name',
-                  'location', 'status', 'study_categories', 'study_investigators', 'study_users',
+                  'location', 'status', 'study_categories', 'study_investigators',
                   'eligibility_url', 'survey_url', 'results_url', 'ages', 'languages', 'num_visits', '_links')
     status = EnumField(Status)
     study_categories = ma.Nested(CategoriesOnStudySchema(), many=True, dump_only=True)
     study_investigators = ma.Nested(InvestigatorsOnStudySchema(), many=True, dump_only=True)
-    study_users = ma.Nested(UsersOnStudySchema(), many=True, dump_only=True)
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.studyendpoint', id='<id>'),
         'collection': ma.URLFor('api.studylistendpoint'),
