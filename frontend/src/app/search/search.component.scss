@@ -96,52 +96,12 @@ mat-expansion-panel, mat-accordion {
   line-height: 1;
 }
 
-.breadcrumbs-container {
+app-search-filters-breadcrumbs {
   width: 100%;
   padding-right: 0;
   padding-left: 0;
   margin-left: 1em;
   margin-right: 1em;
-}
-
-.applied-filters {
-  grid-area: filters;
-  margin-left: 0;
-  justify-self: start;
-
-  ::ng-deep .mat-chip-list-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    overflow-x: auto;
-    padding-bottom: 1em;
-
-    .mat-chip {
-      flex: 0 0 auto;
-    }
-  }
-
-  .applied-filter {
-    color: white;
-    background-color: $brand-accent;
-
-    mat-icon {
-      margin-left: 0.75rem;
-      margin-right: -0.25rem;
-      font-size: 1.25rem;
-      line-height: 1.25;
-    }
-
-    .applied-filter-label mat-icon {
-      margin-left: 0;
-    }
-  }
-
-  &.applied-filters-small {
-    .applied-filter {
-      font-size: 0.75rem;
-      mat-icon { font-size: 1rem; line-height: 1.5; }
-    }
-  }
 }
 
 .sort-order {

@@ -153,6 +153,7 @@ import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { SearchSortComponent } from './search-sort/search-sort.component';
 import { TutorialVideoComponent } from './tutorial-video/tutorial-video.component';
+import { SearchFiltersBreadcrumbsComponent } from './search-filters-breadcrumbs/search-filters-breadcrumbs.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -312,6 +313,7 @@ export class FormlyConfig {
     EmailLogAdminComponent,
     SearchSortComponent,
     TutorialVideoComponent,
+    SearchFiltersBreadcrumbsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)

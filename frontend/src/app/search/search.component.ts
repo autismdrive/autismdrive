@@ -206,6 +206,14 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   videoPlacement = 'left';
   videoSizes = ['large', 'medium', 'small'];
   videoSize = 'large';
+  videoUrl = 'https://www.youtube.com/embed/Lmoww_2ZydI';
+  videoInstructions = `
+### Watch this video for guidance on selecting resources.
+For more information on evidence-based resources, check out resources from the
+[National Autism Center](https://www.nationalautismcenter.org/resources/for-families/)
+and the
+[Frank Porter Graham Child Development Institute](https://afirm.fpg.unc.edu/selecting-ebp).
+`;
   expandTheme = false;
 
   constructor(
@@ -835,10 +843,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  hasFilters(appliedFilters?: MatChipList): boolean {
-    return !!(appliedFilters && appliedFilters.chips && (appliedFilters.chips.length > 0));
-  }
-
   clearAllFilters() {
     this.listMapResultsOnly(false);
     this.removeWords();
@@ -860,5 +864,22 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   goSelectedMapResource(selectedMapResource: Resource) {
     this.googleAnalyticsService.mapResourceEvent(selectedMapResource.id.toString());
     this.router.navigate(['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]);
+  }
+
+  hideVideo(shouldHide = true) {
+    if (shouldHide) {
+      localStorage.setItem('shouldHideVideo', `${shouldHide}`);
+    } else {
+      localStorage.removeItem('shouldHideVideo');
+    }
+  }
+
+  get shouldHideVideo() {
+    return !!localStorage.getItem('shouldHideVideo');
+  }
+
+  showVideo(className: string) {
+    this.videoPlacement = className;
+    this.hideVideo(false);
   }
 }

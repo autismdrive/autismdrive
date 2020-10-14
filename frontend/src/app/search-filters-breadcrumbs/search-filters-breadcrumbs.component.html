@@ -1,0 +1,84 @@
+<div
+  fxLayout="row"
+  fxFlex.gt-sm="100%"
+  fxLayoutGap="10px"
+>
+  <h4 *ngIf="hasFilters(appliedFilters)" fxShow fxHide.lt-md>Selected Filters:</h4>
+  <mat-chip-list class="applied-filters" #appliedFilters ngClass.lt-md="applied-filters-small">
+    <ng-container *ngIf="restrictToMappedResults">
+      <mat-chip
+        (click)="mappedResultsChipClicked.emit(false)"
+        class="applied-filter applied-filter-mapped"
+      >
+        <span class="applied-filter-label">Mapped results only</span>
+        <mat-icon>close</mat-icon>
+      </mat-chip>
+    </ng-container>
+
+    <ng-container *ngIf="query && query.words">
+      <mat-chip
+        (click)="keywordChipClicked.emit()"
+        class="applied-filter applied-filter-keyword"
+      >
+        <span class="applied-filter-label">"{{query.words}}"</span>
+        <mat-icon>close</mat-icon>
+      </mat-chip>
+    </ng-container>
+
+    <ng-container *ngFor="let age of query.ages let i = index">
+      <mat-chip
+        (click)="ageRangeChipClicked.emit()"
+        class="applied-filter applied-filter-age"
+      >
+        <span class="applied-filter-label">{{ageLabels[age]}}</span>
+        <mat-icon>close</mat-icon>
+      </mat-chip>
+    </ng-container>
+
+    <ng-container *ngFor="let language of query.languages let i = index">
+      <mat-chip
+        (click)="languageChipClicked.emit()"
+        class="applied-filter applied-filter-language"
+      >
+        <span class="applied-filter-label">{{languageLabels[language]}}</span>
+        <mat-icon>close</mat-icon>
+      </mat-chip>
+    </ng-container>
+
+    <div *ngIf="query.types.length === 1">
+      <mat-chip
+        (click)="typeChipClicked.emit()"
+        class="applied-filter applied-filter-type">
+        <span class="applied-filter-label">{{typeLabels[query.types[0]]}}</span>
+        <mat-icon>close</mat-icon>
+      </mat-chip>
+    </div>
+
+    <ng-container *ngIf="query && query.category && query.category.id">
+      <mat-chip
+        (click)="categoryChipClicked.emit()"
+        class="applied-filter applied-filter-topic"
+      >
+        <div class="applied-filter-label" fxLayout="row" fxLayoutAlign="center center">
+          <ng-container *ngIf="query.category.parent && query.category.parent.parent">
+            {{query.category.parent.parent.name}}
+            <mat-icon>chevron_right</mat-icon>
+          </ng-container>
+          <ng-container *ngIf="query.category.parent">
+            {{query.category.parent.name}}
+            <mat-icon>chevron_right</mat-icon>
+          </ng-container>
+          {{query.category.name}}
+        </div>
+        <mat-icon>close</mat-icon>
+      </mat-chip>
+    </ng-container>
+  </mat-chip-list>
+  <a
+    *ngIf="hasFilters(appliedFilters)"
+    mat-button
+    (click)="clearAllClicked.emit()"
+    fxShow
+    fxHide.lt-md
+  >Clear All</a>
+</div>
