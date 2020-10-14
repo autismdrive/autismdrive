@@ -47,21 +47,26 @@
 >
   <div
     fxLayout="column"
+    fxLayoutAlign="center center"
   >
+    <app-tutorial-video *ngIf="videoPlacement === 'above'" [videoSize]="videoSize"></app-tutorial-video>
     <div
-      fxLayoutAlign="center center"
       fxLayout="row"
       fxLayout.lt-md="column"
+      fxLayoutAlign="center center"
     >
       <app-tutorial-video *ngIf="videoPlacement === 'left'" [videoSize]="videoSize"></app-tutorial-video>
       <app-search-box
         variant="light-bg"
         (searchUpdated)="updateUrlAndDoSearch()"
+        (categorySelected)="selectCategory($event)"
         [words]="query.words"
-        fxFlex.gt-sm="60%"
       ></app-search-box>
       <app-tutorial-video *ngIf="videoPlacement === 'right'" [videoSize]="videoSize"></app-tutorial-video>
     </div>
+    <app-tutorial-video *ngIf="videoPlacement === 'below'" [videoSize]="videoSize"></app-tutorial-video>
+  </div>
+  <div fxLayout="column">
     <app-add-button
       *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
       [addLabel]='"Add Resource"'

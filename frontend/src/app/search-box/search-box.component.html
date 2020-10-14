@@ -14,9 +14,9 @@
       [formControl]="searchBoxControl"
       [matAutocomplete]="auto"
     >
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="updateSearch(false)">
+    <mat-autocomplete #auto="matAutocomplete" panelWidth="600px" (optionSelected)="selectCategory($event)">
       <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-        {{option}}
+        {{levelIndent(option)}} {{option.name}}
       </mat-option>
     </mat-autocomplete>
     <div
@@ -39,5 +39,6 @@
       ><mat-icon>search</mat-icon>
       </button>
     </div>
+    <mat-hint>Type a search term or select a resources category</mat-hint>
   </mat-form-field>
 </div>

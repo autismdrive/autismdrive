@@ -79,3 +79,9 @@
   background-color: white;
   border-radius: 5px;
 }
+
+::ng-deep .mat-option-text {
+  font-size: 16px;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
