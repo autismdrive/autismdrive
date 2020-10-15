@@ -214,16 +214,16 @@ and the
   private scrollDirection: Direction;
 
   constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
     private changeDetectorRef: ChangeDetectorRef,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private location: Location,
+    private meta: Meta,
+    private renderer: Renderer2,
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
-    private renderer: Renderer2,
     private searchService: SearchService,
-    private googleAnalyticsService: GoogleAnalyticsService,
-    private authenticationService: AuthenticationService,
-    private api: ApiService,
-    private meta: Meta,
   ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
@@ -250,24 +250,10 @@ and the
     this.mapTemplateElement = value;
   }
 
-  get showLocationButton(): boolean {
-    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    const isDistanceSort = this.selectedSort && this.selectedSort.name === 'Distance';
-    return (isLocation || isDistanceSort);
-  }
-
-  get showLocationForm(): boolean {
-    return !this.noLocation && !this.setLocOpen;
-  }
-
-  get shouldShowMap() {
-    const is_location_or_event_type = this.mapQuery &&
-      this.mapQuery.types &&
-      this.mapQuery.types.length === 1 &&
-      (this.mapQuery.types.includes('location') ||
-        this.mapQuery.types.includes('event'));
-    const is_sort_by_distance = this.selectedSort.name === 'Distance';
-    return is_location_or_event_type || is_sort_by_distance;
+  get circleRadius(): number {
+    const maxMiles = 100;
+    const metersPerMi = 1609.34;
+    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
   }
 
   get hits(): Hit[] {
@@ -287,24 +273,64 @@ and the
     return [];
   }
 
+  get isInfoWindowOpen(): boolean {
+    return this.selectedMapResource != null;
+  }
+
   get isLastPage(): boolean {
-    return (this.query.start + this.pageSize) > this.query.total;
+    if (this.paginatorElement) {
+      return !this.paginatorElement.hasNextPage();
+    } else {
+      return true;
+    }
   }
 
   get numResultsFrom(): number {
-    return (this.paginatorElement.pageIndex * this.pageSize) + 1;
+    if (this.paginatorElement) {
+      return (this.paginatorElement.pageIndex * this.pageSize) + 1;
+    } else {
+      return 0;
+    }
   }
 
   get numResultsTo(): number {
-    return this.isLastPage ? this.query.total : (this.paginatorElement.pageIndex + 1) * this.pageSize;
+    if (this.paginatorElement) {
+      return this.isLastPage ? this.numTotalResults : (this.paginatorElement.pageIndex + 1) * this.pageSize;
+    } else {
+      return this.numTotalResults;
+    }
   }
 
   get numTotalResults() {
-    return this.query.total;
+    if (this.query && this.query.total) {
+      return this.query.total;
+    } else {
+      return 0;
+    }
   }
 
   get shouldHideVideo() {
     return !!localStorage.getItem('shouldHideVideo');
+  }
+
+  get showLocationButton(): boolean {
+    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
+    const isDistanceSort = this.selectedSort && this.selectedSort.name === 'Distance';
+    return (isLocation || isDistanceSort);
+  }
+
+  get showLocationForm(): boolean {
+    return !this.noLocation && !this.setLocOpen;
+  }
+
+  get shouldShowMap() {
+    const is_location_or_event_type = this.mapQuery &&
+      this.mapQuery.types &&
+      this.mapQuery.types.length === 1 &&
+      (this.mapQuery.types.includes('location') ||
+        this.mapQuery.types.includes('event'));
+    const is_sort_by_distance = this.selectedSort.name === 'Distance';
+    return is_location_or_event_type || is_sort_by_distance;
   }
 
   ngOnInit() {
@@ -662,10 +688,6 @@ and the
     this.selectedMapHit = null;
   }
 
-  isInfoWindowOpen(): boolean {
-    return this.selectedMapResource != null;
-  }
-
   /**
    * Returns a random number for the given seed
    * https://stackoverflow.com/a/19303725/1791917
@@ -681,12 +703,6 @@ and the
 
   updateZoom(zoomLevel: number) {
     this.mapZoomLevel = zoomLevel;
-  }
-
-  getCircleRadius(): number {
-    const maxMiles = 100;
-    const metersPerMi = 1609.34;
-    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
   }
 
   getMarkerIcon(hit: Hit) {
