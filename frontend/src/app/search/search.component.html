@@ -191,7 +191,7 @@
             ></app-search-sort>
           </div>
           <div fxHide fxShow.lt-md fxLayoutAlign="center center">
-            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults()}} Results</button>
+            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults}} Results</button>
           </div>
         </div>
       </div>
@@ -262,7 +262,7 @@
 <div fxHide fxShow.lt-md id="results-vs-map">
   <mat-button-toggle-group [value]="expandResults" (change)="expandResults = !expandResults">
     <mat-button-toggle [value]="true">
-      <ng-container *ngIf="!restrictToMappedResults">{{numTotalResults()}} results</ng-container>
+      <ng-container *ngIf="!restrictToMappedResults">{{numTotalResults}} results</ng-container>
       <ng-container *ngIf="restrictToMappedResults">{{hits.length}} mapped results</ng-container>
     </mat-button-toggle>
     <mat-button-toggle [value]="false" [disabled]="!shouldShowMap">Map</mat-button-toggle>
@@ -291,11 +291,11 @@
       <div *ngIf="query?.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
         <div
           class="search-result-status"
-          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults()"
+          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults"
           fxShow
           fxHide.lt-md
         >
-          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom()}}-{{numResultsTo()}} of {{numTotalResults()}} results</h4>
+          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} results</h4>
           <h4 *ngIf="restrictToMappedResults">Showing nearest {{hits.length}} mapped results</h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
