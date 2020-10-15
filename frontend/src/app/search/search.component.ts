@@ -135,8 +135,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
   selectedSort: SortMethod = this.sortMethods[0];
-  selectedPageStart = 0;
-  pageEvent: PageEvent;
   paginatorElement: MatPaginator;
   mapTemplateElement: AgmMap;
   currentUser: User;
@@ -240,7 +238,7 @@ and the
       `name='twitter:image'`);
   }
 
-  @ViewChild(MatPaginator, {static: false})
+  @ViewChild('paginator', {static: false})
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
@@ -352,7 +350,7 @@ and the
 
   ngAfterViewInit() {
     this.watchScrollEvents();
-    this.paginatorElement.pageIndex = (this.selectedPageStart - 1) / this.pageSize;
+    this.paginatorElement.pageIndex = (this.query.start - 1) / this.pageSize;
     this.expandResults = true;
     this.changeDetectorRef.detectChanges();
   }
@@ -494,8 +492,7 @@ and the
     if ((sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
       this.loading = true;
       this.selectedSort = this.sortMethods.find(s => s.name === sortName);
-      this.query.start = this.selectedPageStart;
-      this.selectedPageStart = 0;
+      this.query.start = 0;
       this.query.sort = this.selectedSort.sortQuery;
 
       if (this.selectedSort.name === 'Date') {
@@ -583,8 +580,8 @@ and the
 
   updatePage(event: PageEvent) {
     this.loading = true;
-    this.pageEvent = event;
     this.query.size = event.pageSize;
+    this.pageSize = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
     this.scrollToTopOfSearch();
     this.updateUrlAndDoSearch();
@@ -859,7 +856,7 @@ and the
             }
             break;
           case('pageStart'):
-            this.selectedPageStart = Number(qParams.get(key));
+            q.start = parseInt(qParams.get(key), 10);
             break;
           case('types'):
             q.types = qParams.getAll(key);
