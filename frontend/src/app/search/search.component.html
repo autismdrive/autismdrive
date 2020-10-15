@@ -191,7 +191,7 @@
             ></app-search-sort>
           </div>
           <div fxHide fxShow.lt-md fxLayoutAlign="center center">
-            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults()}} Results</button>
+            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults}} Results</button>
           </div>
         </div>
       </div>
@@ -262,7 +262,7 @@
 <div fxHide fxShow.lt-md id="results-vs-map">
   <mat-button-toggle-group [value]="expandResults" (change)="expandResults = !expandResults">
     <mat-button-toggle [value]="true">
-      <ng-container *ngIf="!restrictToMappedResults">{{numTotalResults()}} results</ng-container>
+      <ng-container *ngIf="!restrictToMappedResults">{{numTotalResults}} results</ng-container>
       <ng-container *ngIf="restrictToMappedResults">{{hits.length}} mapped results</ng-container>
     </mat-button-toggle>
     <mat-button-toggle [value]="false" [disabled]="!shouldShowMap">Map</mat-button-toggle>
@@ -291,11 +291,12 @@
       <div *ngIf="query?.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
         <div
           class="search-result-status"
-          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults()"
+          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults"
           fxShow
           fxHide.lt-md
+          *ngIf="paginatorElement"
         >
-          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom()}}-{{numResultsTo()}} of {{numTotalResults()}} results</h4>
+          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} results</h4>
           <h4 *ngIf="restrictToMappedResults">Showing nearest {{hits.length}} mapped results</h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
@@ -320,11 +321,11 @@
 
     <mat-paginator
       #paginator
-      [length]="query?.total"
+      [length]="numTotalResults"
       [pageSize]="pageSize"
       [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
       (page)="updatePage($event)"
-      [ngClass]="{'ghost': (restrictToMappedResults || !query || (query.total === 0))}"
+      [ngClass]="{'ghost': (restrictToMappedResults || !query || (numTotalResults === 0))}"
     >
     </mat-paginator>
   </div>
@@ -415,11 +416,11 @@
             <agm-circle
               [latitude]="hit.latitude + mapJitter(hit.id, true)"
               [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [radius]="getCircleRadius()"
+              [radius]="circleRadius"
               [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
               fillOpacity="0.1"
               [clickable]="true"
-              [visible]="isInfoWindowOpen() && selectedMapHit.id == hit.id"
+              [visible]="isInfoWindowOpen && selectedMapHit.id == hit.id"
               (circleClick)="showInfoWindow(hit)"
               zIndex="-1"
             >
@@ -442,7 +443,7 @@
           </ng-container>
         </agm-marker-cluster>
         <ng-container *ngIf="selectedMapResource">
-          <agm-info-window [isOpen]="isInfoWindowOpen()" [latitude]="selectedMapHit.latitude"
+          <agm-info-window [isOpen]="isInfoWindowOpen" [latitude]="selectedMapHit.latitude"
                            [longitude]="selectedMapHit.longitude" (infoWindowClose)="closeInfoWindow()">
             <a
               class="title mat-h2"
