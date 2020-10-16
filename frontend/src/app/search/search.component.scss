@@ -61,6 +61,7 @@ mat-expansion-panel, mat-accordion {
   margin-bottom: 1em;
 }
 
+
 .filters {
 
   #reset-filters {
@@ -100,8 +101,7 @@ app-search-filters-breadcrumbs {
   width: 100%;
   padding-right: 0;
   padding-left: 0;
-  margin-left: 1em;
-  margin-right: 1em;
+  margin: 2em 1em 1em 1em;
 }
 
 .sort-order {
@@ -375,7 +375,7 @@ app-search-filters-breadcrumbs {
 
 .filter-container {
   padding-top: 2em;
-  padding-bottom: 2em;
+  padding-bottom: 1em;
   border-top: 1px solid $brand-gray-tint-4;
 }
 
@@ -399,10 +399,6 @@ app-search-filters-breadcrumbs {
 
 .sort-order-small {
   width: 100%;
-}
-
-#show-filters-button {
-  margin-bottom: 2em;
 }
 
 #design-options {
@@ -429,8 +425,7 @@ app-search-filters-breadcrumbs {
   @extend %invert-hint;
 
   ::ng-deep h1,
-  ::ng-deep h2,
-  ::ng-deep em,
+  ::ng-deep h5,
   ::ng-deep .mat-select-value-text,
   ::ng-deep .mat-form-field-label,
   ::ng-deep .mat-menu-trigger,
