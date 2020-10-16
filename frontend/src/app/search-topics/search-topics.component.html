@@ -1,4 +1,4 @@
-<mat-list dense *ngIf="category">
+<mat-list dense *ngIf="category && parentList().length > 0" class="parent-topics">
     <ng-container *ngFor="let parent of parentList()">
       <mat-list-item
         (click)="selectCategory(parent)"
@@ -12,8 +12,8 @@
     </ng-container>
 </mat-list>
 
-<ng-container *ngIf="category && category.children && (category.children.length > 0)">
-  <button mat-button [matMenuTriggerFor]="topicMenu">
+<ng-container *ngIf="category && category.children && (category.children.length > 0); else loadingMessage">
+  <button mat-button [matMenuTriggerFor]="topicMenu" [ngClass.gt-sm]="'select-topic'">
     <mat-icon>topic</mat-icon>
     Filter by {{category.level <= 0 ? 'Topic' : 'Subtopic'}}
     <mat-icon>arrow_drop_down</mat-icon>
@@ -31,5 +31,5 @@
 </ng-container>
 
 <ng-template #loadingMessage>
-  <app-loading [isField]="true"></app-loading>
+  <div class="placeholder"></div>
 </ng-template>

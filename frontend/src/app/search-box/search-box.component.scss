@@ -3,6 +3,7 @@
 .search-bar {
   display: inline-flex;
   width: 100%;
+  margin-top: 2em;
 
   &.hidden {
     display: block;
@@ -11,8 +12,9 @@
     left: 100%;
   }
 
-  h1 {
-    margin-bottom: 0;
+  h1, h4 {
+    margin: 0;
+    padding: 0;
   }
 
   .mat-hint {

@@ -1,4 +1,4 @@
-<div id="design-options" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="10px" class="mat-elevation-z4" fxLayoutAlign="center center">
+<div *ngIf="showDesignOptions" id="design-options" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="10px" class="mat-elevation-z4" fxLayoutAlign="center center">
   <div (click)="expandTheme = !expandTheme" fxLayout="row" fxLayoutAlign="center center">
     <h4>Theme</h4>
     <mat-icon *ngIf="!expandTheme">expand_more</mat-icon>
@@ -105,11 +105,11 @@
         <div
           id="filters"
           fxFlex.gt-sm="60%"
-          [ngClass.lt-md]="{'full-screen': showFilters, 'minimized': !showFilters}"
+          [ngClass.lt-md]="filtersPanelStyles"
         >
           <div fxHide fxShow.lt-md>
             <div fxLayoutAlign="end end">
-              <button mat-button (click)="toggleShowFilters()">Done</button>
+              <button class="done-button" mat-button (click)="toggleShowFilters()">Done</button>
             </div>
             <h2>Filter Resources</h2>
           </div>
@@ -323,7 +323,7 @@
       #paginator
       [length]="numTotalResults"
       [pageSize]="pageSize"
-      [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+      [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
       [ngClass]="{'ghost': (restrictToMappedResults || !query || (numTotalResults === 0))}"
     >
