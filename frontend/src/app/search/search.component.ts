@@ -73,7 +73,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   ageOptions = [];
   languageOptions = [];
   loading = true;
-  pageSize = 20;
+  pageSizeOptions = [20, 60, 100];
+  pageSize = this.pageSizeOptions[0];
   noLocation = true;
   storedZip: string;
   updatedZip: string;

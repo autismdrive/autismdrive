@@ -323,7 +323,7 @@
       #paginator
       [length]="numTotalResults"
       [pageSize]="pageSize"
-      [pageSizeOptions]="[pageSize, pageSize*3, pageSize*5]"
+      [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
       [ngClass]="{'ghost': (restrictToMappedResults || !query || (numTotalResults === 0))}"
     >
