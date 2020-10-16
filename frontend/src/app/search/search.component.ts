@@ -1,39 +1,37 @@
-import {AgmMap, LatLngBounds, LatLngLiteral, MapsAPILoader} from '@agm/core';
+import {AgmMap, LatLngBounds, LatLngLiteral} from '@agm/core';
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
-import {MediaMatcher} from '@angular/cdk/layout';
 import {Location} from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
+  HostBinding,
   OnDestroy,
   OnInit,
   Renderer2,
-  ViewChild,
-  AfterViewInit,
-  HostBinding
+  ViewChild
 } from '@angular/core';
-import {MatChipList} from '@angular/material/chips';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTabChangeEvent} from '@angular/material/tabs';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Params, Router} from '@angular/router';
+import createClone from 'rfdc';
 import {fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
 import {AgeRange, HitType, Language} from '../_models/hit_type';
-import {Hit, Query, Sort} from '../_models/query';
+import {Hit, Query} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {Direction} from '../_models/scroll';
 import {SortMethod} from '../_models/sort_method';
+import {Study} from '../_models/study';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {Meta} from '@angular/platform-browser';
-import {Study} from '../_models/study';
-import createClone from 'rfdc';
 
 declare var google: any;
 
@@ -52,7 +50,7 @@ class MapControlDiv extends HTMLDivElement {
         query('#age-filter, #language-filter, #topic-filter', [
           style({opacity: 0, transform: 'translateX(-100px)'}),
           stagger(-30, [
-            animate('500ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'none' }))
+            animate('500ms cubic-bezier(0.35, 0, 0.25, 1)', style({opacity: 1, transform: 'none'}))
           ])
         ])
       ])
@@ -75,7 +73,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   ageOptions = [];
   languageOptions = [];
   loading = true;
-  pageSize = 20;
+  pageSizeOptions = [20, 60, 100];
+  pageSize = this.pageSizeOptions[0];
   noLocation = true;
   storedZip: string;
   updatedZip: string;
@@ -137,8 +136,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
   selectedSort: SortMethod = this.sortMethods[0];
-  selectedPageStart = 0;
-  pageEvent: PageEvent;
   paginatorElement: MatPaginator;
   mapTemplateElement: AgmMap;
   currentUser: User;
@@ -186,37 +183,65 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   showFilters: boolean;
   expandResults: boolean;
   restrictToMappedResults: boolean;
+  showDesignOptions = false;
+  searchBgClasses = [
+    'light-gray',
+    'white',
+    'uva-blue',
+    'uva-orange',
+    'black',
+    'gray',
+    'mountain',
+    'sky',
+    'energy-burst-dark',
+    'energy-burst-light',
+  ];
+  searchBgClass = 'mountain';
+  videoPlacements = ['left', 'right', 'above', 'below'];
+  videoPlacement = 'left';
+  videoSizes = ['large', 'medium', 'small'];
+  videoSize = 'large';
+  videoUrl = 'https://www.youtube.com/embed/Lmoww_2ZydI';
+  videoInstructions = `
+### Watch this video for guidance on selecting resources.
+For more information on evidence-based resources, check out resources from the
+[National Autism Center](https://www.nationalautismcenter.org/resources/for-families/)
+and the
+[Frank Porter Graham Child Development Institute](https://afirm.fpg.unc.edu/selecting-ebp).
+`;
+  expandTheme = false;
   private mapBounds: LatLngBounds;
   private scrollDirection: Direction;
 
   constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
     private changeDetectorRef: ChangeDetectorRef,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private location: Location,
+    private meta: Meta,
+    private renderer: Renderer2,
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
-    private renderer: Renderer2,
     private searchService: SearchService,
-    private googleAnalyticsService: GoogleAnalyticsService,
-    private authenticationService: AuthenticationService,
-    private api: ApiService,
-    private meta: Meta,
   ) {
+    this.hideVideo();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
     this.ageOptions = this.getOptions(AgeRange.labels);
 
     this.meta.updateTag(
-        { property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
-        `property='og:image'`);
+      {property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+      `property='og:image'`);
     this.meta.updateTag(
-      { property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
+      {property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `property='og:image:secure_url'`);
     this.meta.updateTag(
-      { name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg' },
+      {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `name='twitter:image'`);
   }
 
-  @ViewChild(MatPaginator, {static: false})
+  @ViewChild('paginator', {static: false})
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
@@ -224,6 +249,79 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapTemplate', {static: false})
   set mapTemplate(value: AgmMap) {
     this.mapTemplateElement = value;
+  }
+
+  get circleRadius(): number {
+    const maxMiles = 100;
+    const metersPerMi = 1609.34;
+    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
+  }
+
+  get filtersPanelStyles() {
+    const styles = {
+      'full-screen': this.showFilters,
+      'minimized': !this.showFilters,
+    };
+
+    styles[this.searchBgClass] = true;
+    return styles;
+  }
+
+  get hits(): Hit[] {
+    if (this.query && this.query.hits && this.query.hits.length > 0) {
+      if (this.restrictToMappedResults) {
+        return this.mapQuery.hits.filter(h => {
+          if (h.hasCoords()) {
+            const latLng = new google.maps.LatLng(h.latitude, h.longitude);
+            return (this.mapBounds && this.mapBounds.contains(latLng));
+          }
+        });
+      } else {
+        return this.query.hits;
+      }
+    }
+
+    return [];
+  }
+
+  get isInfoWindowOpen(): boolean {
+    return this.selectedMapResource != null;
+  }
+
+  get isLastPage(): boolean {
+    if (this.paginatorElement) {
+      return !this.paginatorElement.hasNextPage();
+    } else {
+      return true;
+    }
+  }
+
+  get numResultsFrom(): number {
+    if (this.paginatorElement) {
+      return (this.paginatorElement.pageIndex * this.pageSize) + 1;
+    } else {
+      return 0;
+    }
+  }
+
+  get numResultsTo(): number {
+    if (this.paginatorElement) {
+      return this.isLastPage ? this.numTotalResults : (this.paginatorElement.pageIndex + 1) * this.pageSize;
+    } else {
+      return this.numTotalResults;
+    }
+  }
+
+  get numTotalResults() {
+    if (this.query && this.query.total) {
+      return this.query.total;
+    } else {
+      return 0;
+    }
+  }
+
+  get shouldHideVideo() {
+    return !!localStorage.getItem('shouldHideVideo');
   }
 
   get showLocationButton(): boolean {
@@ -234,6 +332,16 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get showLocationForm(): boolean {
     return !this.noLocation && !this.setLocOpen;
+  }
+
+  get shouldShowMap() {
+    const is_location_or_event_type = this.mapQuery &&
+      this.mapQuery.types &&
+      this.mapQuery.types.length === 1 &&
+      (this.mapQuery.types.includes('location') ||
+        this.mapQuery.types.includes('event'));
+    const is_sort_by_distance = this.selectedSort.name === 'Distance';
+    return is_location_or_event_type || is_sort_by_distance;
   }
 
   ngOnInit() {
@@ -255,7 +363,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.watchScrollEvents();
-    this.paginatorElement.pageIndex = (this.selectedPageStart - 1) / this.pageSize;
+    this.paginatorElement.pageIndex = (this.query.start - 1) / this.pageSize;
     this.expandResults = true;
     this.changeDetectorRef.detectChanges();
   }
@@ -330,7 +438,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
           this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
           this.changeDetectorRef.detectChanges();
-      });
+        });
       }
     });
     this.googleAnalyticsService.searchEvent(this.query);
@@ -397,8 +505,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     if ((sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
       this.loading = true;
       this.selectedSort = this.sortMethods.find(s => s.name === sortName);
-      this.query.start = this.selectedPageStart;
-      this.selectedPageStart = 0;
+      this.query.start = 0;
       this.query.sort = this.selectedSort.sortQuery;
 
       if (this.selectedSort.name === 'Date') {
@@ -486,8 +593,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updatePage(event: PageEvent) {
     this.loading = true;
-    this.pageEvent = event;
     this.query.size = event.pageSize;
+    this.pageSize = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
     this.scrollToTopOfSearch();
     this.updateUrlAndDoSearch();
@@ -547,16 +654,6 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
   }
 
-  get shouldShowMap() {
-    const is_location_or_event_type = this.mapQuery &&
-      this.mapQuery.types &&
-      this.mapQuery.types.length === 1 &&
-      (this.mapQuery.types.includes('location') ||
-        this.mapQuery.types.includes('event'));
-    const is_sort_by_distance = this.selectedSort.name === 'Distance';
-    return is_location_or_event_type || is_sort_by_distance;
-  }
-
   openSetLocation() {
     this.setLocOpen = true;
   }
@@ -565,7 +662,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setLocOpen = false;
   }
 
-  zipSubmit($event: MouseEvent|KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
+  zipSubmit($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');
@@ -574,7 +671,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reSort('Distance', true);
   }
 
-  useGPSLocation($event: MouseEvent|KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
+  useGPSLocation($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.removeItem('zipCode');
@@ -601,11 +698,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedMapHit = null;
   }
 
-  isInfoWindowOpen(): boolean {
-    return this.selectedMapResource != null;
-  }
-
-  // https://stackoverflow.com/a/19303725/1791917
+  /**
+   * Returns a random number for the given seed
+   * https://stackoverflow.com/a/19303725/1791917
+   **/
   mapJitter(seed: number, isLat: boolean): number {
     let m = seed % 2 === 0 ? 1 : -1;
     if (isLat) {
@@ -619,17 +715,109 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mapZoomLevel = zoomLevel;
   }
 
-  getCircleRadius(): number {
-    const maxMiles = 100;
-    const metersPerMi = 1609.34;
-    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
-  }
-
   getMarkerIcon(hit: Hit) {
     const url = `/assets/map/${hit.type}${hit.no_address ? '-no-address' : ''}.svg`;
     const x = 16;
     const y = hit.no_address ? 16 : 0;
     return {url: url, anchor: {x: x, y: y}};
+  }
+
+  selectTypeTab($event: MatTabChangeEvent) {
+    const resourceType = ($event.index > 0) ? this.resourceTypesFiltered()[$event.index - 1] : HitType.ALL_RESOURCES;
+    this.selectType(resourceType.name);
+  }
+
+  updateResultsList($event: LatLngBounds) {
+    this.mapBounds = $event;
+  }
+
+  listMapResultsOnly(shouldRestrict: boolean) {
+    this.restrictToMappedResults = shouldRestrict;
+    this.updateUrlAndDoSearch();
+    if (shouldRestrict) {
+      this.googleAnalyticsService.searchInteractionEvent('search_as_map_moves');
+    }
+  }
+
+  mapDockClass(scrollSpy: HTMLSpanElement, searchHeader: HTMLDivElement, searchFooter: HTMLDivElement): string {
+    const scrollSpyPos = scrollSpy.getBoundingClientRect();
+    const headerPos = searchHeader.getBoundingClientRect();
+    const footerPos = searchFooter.getBoundingClientRect();
+    const scrollDirection = this.scrollDirection ? this.scrollDirection.toLowerCase() : '';
+
+    let alignClass = '';
+
+    if (this._overlaps(scrollSpyPos, headerPos)) {
+      alignClass = 'align-top';
+    } else if (this._overlaps(scrollSpyPos, footerPos)) {
+      alignClass = 'align-bottom';
+    } else {
+      alignClass = 'docked';
+    }
+
+    return alignClass + ' ' + scrollDirection;
+  }
+
+  focusOnInput(zipCodeInput: HTMLInputElement) {
+    zipCodeInput.focus();
+  }
+
+  watchScrollEvents() {
+    const scroll$ = fromEvent(window, 'scroll').pipe(
+      throttleTime(10),
+      map((e: Event) => window.pageYOffset),
+      pairwise(),
+      map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
+      share()
+    );
+
+    scroll$
+      .pipe(filter(direction => direction === Direction.Up))
+      .subscribe(() => {
+        this.scrollDirection = Direction.Up;
+      });
+
+    scroll$
+      .pipe(filter(direction => direction === Direction.Down))
+      .subscribe(() => {
+        this.scrollDirection = Direction.Down;
+      });
+  }
+
+  clearAllFilters() {
+    this.listMapResultsOnly(false);
+    this.removeWords();
+    this.selectAgeRange();
+    this.selectLanguage();
+    this.selectType();
+    this.removeCategory();
+    this.router.navigate(['/search']);
+  }
+
+  toggleShowFilters() {
+    this.showFilters = !this.showFilters;
+
+    if (!this.shouldShowMap) {
+      this.expandResults = true;
+    }
+  }
+
+  goSelectedMapResource(selectedMapResource: Resource) {
+    this.googleAnalyticsService.mapResourceEvent(selectedMapResource.id.toString());
+    this.router.navigate(['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]);
+  }
+
+  hideVideo(shouldHide = true) {
+    if (shouldHide) {
+      localStorage.setItem('shouldHideVideo', `${shouldHide}`);
+    } else {
+      localStorage.removeItem('shouldHideVideo');
+    }
+  }
+
+  showVideo(className: string) {
+    this.videoPlacement = className;
+    this.hideVideo(false);
   }
 
   protected mapLoad(m: google.maps.Map) {
@@ -657,26 +845,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     return queryParams;
   }
 
-  get hits(): Hit[] {
-    if (this.query && this.query.hits && this.query.hits.length > 0) {
-      if (this.restrictToMappedResults) {
-        return this.mapQuery.hits.filter(h => {
-          if (h.hasCoords()) {
-            const latLng = new google.maps.LatLng(h.latitude, h.longitude);
-            return (this.mapBounds && this.mapBounds.contains(latLng));
-          }
-        });
-      } else {
-        return this.query.hits;
-      }
-    }
-
-    return [];
-  }
-
-  // Return a random number for the given seed
   private _queryParamsToQuery(qParams: Params): Query {
-
     const q = new Query({});
     q.size = this.pageSize;
     if (qParams && qParams.keys) {
@@ -700,7 +869,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             break;
           case('pageStart'):
-            this.selectedPageStart = Number(qParams.get(key));
+            q.start = parseInt(qParams.get(key), 10);
             break;
           case('types'):
             q.types = qParams.getAll(key);
@@ -730,116 +899,11 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateUrlAndDoSearch();
   }
 
-  selectTypeTab($event: MatTabChangeEvent) {
-    const resourceType = ($event.index > 0) ? this.resourceTypesFiltered()[$event.index - 1] : HitType.ALL_RESOURCES;
-    this.selectType(resourceType.name);
-  }
-
-  updateResultsList($event: LatLngBounds) {
-    this.mapBounds = $event;
-  }
-
-  listMapResultsOnly(shouldRestrict: boolean) {
-    this.restrictToMappedResults = shouldRestrict;
-    this.updateUrlAndDoSearch();
-    if (shouldRestrict) {
-      this.googleAnalyticsService.searchInteractionEvent('search_as_map_moves');
-    }
-  }
-
-  isLastPage(): boolean {
-    return (this.query.start + this.pageSize) > this.query.total;
-  }
-
-  numResultsFrom(): number {
-    return (this.paginatorElement.pageIndex * this.pageSize) + 1;
-  }
-
-  numResultsTo(): number {
-    return this.isLastPage() ? this.query.total : (this.paginatorElement.pageIndex + 1) * this.pageSize;
-  }
-
-  numTotalResults() {
-    return this.query.total;
-  }
-
-  mapDockClass(scrollSpy: HTMLSpanElement, searchHeader: HTMLDivElement, searchFooter: HTMLDivElement): string {
-    const scrollSpyPos = scrollSpy.getBoundingClientRect();
-    const headerPos = searchHeader.getBoundingClientRect();
-    const footerPos = searchFooter.getBoundingClientRect();
-    const scrollDirection = this.scrollDirection ? this.scrollDirection.toLowerCase() : '';
-
-    let alignClass = '';
-
-    if (this._overlaps(scrollSpyPos, headerPos)) {
-      alignClass = 'align-top';
-    } else if (this._overlaps(scrollSpyPos, footerPos)) {
-      alignClass = 'align-bottom';
-    } else {
-      alignClass = 'docked';
-    }
-
-    return alignClass + ' ' + scrollDirection;
-  }
-
   private _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
     return (
       ((b.top < a.top) && (b.bottom > a.top)) ||      // b overlaps top edge of a
       ((b.top > a.top) && (b.bottom < a.bottom)) ||   // b inside a
       ((b.top < a.bottom) && (b.bottom > a.bottom))   // b overlaps bottom edge of a
     );
-  }
-
-  focusOnInput(zipCodeInput: HTMLInputElement) {
-    zipCodeInput.focus();
-  }
-
-  watchScrollEvents() {
-    const scroll$ = fromEvent(window, 'scroll').pipe(
-      throttleTime(10),
-      map((e: Event) => window.pageYOffset),
-      pairwise(),
-      map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
-      share()
-    );
-
-    scroll$
-      .pipe(filter(direction => direction === Direction.Up))
-      .subscribe(() => {
-        this.scrollDirection = Direction.Up;
-      });
-
-    scroll$
-      .pipe(filter(direction => direction === Direction.Down))
-      .subscribe(() => {
-        this.scrollDirection = Direction.Down;
-      });
-  }
-
-  hasFilters(appliedFilters?: MatChipList): boolean {
-    return !!(appliedFilters && appliedFilters.chips && (appliedFilters.chips.length > 0));
-  }
-
-  clearAllFilters() {
-    this.listMapResultsOnly(false);
-    this.removeWords();
-    this.selectAgeRange();
-    this.selectLanguage();
-    this.selectType();
-    this.removeCategory();
-    this.router.navigate(['/search']);
-  }
-
-  toggleShowFilters() {
-    this.showFilters = !this.showFilters;
-
-    if (!this.shouldShowMap) {
-      this.expandResults = true;
-    }
-  }
-
-  goSelectedMapResource(selectedMapResource: Resource) {
-    this.googleAnalyticsService.mapResourceEvent(selectedMapResource.id.toString());
-    this.router.navigate(['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]);
   }
 }

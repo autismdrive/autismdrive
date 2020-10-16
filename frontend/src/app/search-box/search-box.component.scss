@@ -3,6 +3,7 @@
 .search-bar {
   display: inline-flex;
   width: 100%;
+  margin-top: 2em;
 
   &.hidden {
     display: block;
@@ -11,8 +12,13 @@
     left: 100%;
   }
 
-  h1 {
-    margin-bottom: 0;
+  h1, h5 {
+    margin: 0;
+    padding: 0;
+  }
+
+  .mat-hint {
+    font-size: 1em;
   }
 }
 
@@ -73,4 +79,15 @@
       }
     }
   }
+}
+
+::ng-deep #search-field .mat-form-field-outline {
+  background-color: white;
+  border-radius: 5px;
+}
+
+::ng-deep .mat-option-text {
+  font-size: 16px;
+  overflow: visible !important;
+  text-overflow: unset !important;
 }

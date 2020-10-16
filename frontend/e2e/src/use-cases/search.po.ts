@@ -4,7 +4,7 @@ export class SearchUseCases {
   constructor(private page: AppPage) {
   }
 
-  async enterKeywordsInSearchField(keywordString = 'autism') {
+  async enterKeywordsInSearchField(keywordString = 'autism', autocomplete = true) {
     const searchFieldSelector = '#search-field input';
     const resultSelector = 'app-search-result';
     const numResultsAttribute = 'data-num-results';
@@ -35,15 +35,22 @@ export class SearchUseCases {
 
     // Input keyword
     this.page.inputText(searchFieldSelector, keywordString);
-    const autocompleteIsVisibleAfter = await this.page.isVisible(autocompleteSelector);
-    expect(autocompleteIsVisibleAfter).toEqual(true);
-    const suggestionIsVisibleAfter = await this.page.isVisible(suggestionSelector);
-    expect(suggestionIsVisibleAfter).toEqual(true);
-    const numSuggestionsAfter = await this.page.getElements(suggestionSelector).count();
-    expect(numSuggestionsAfter).toBeGreaterThan(0, 'Search suggestions should be visible.');
 
-    // Select the first suggestion
-    this.page.clickElement(suggestionSelector);
+    if (autocomplete) {
+      const autocompleteIsVisibleAfter = await this.page.isVisible(autocompleteSelector);
+      expect(autocompleteIsVisibleAfter).toEqual(true);
+      const suggestionIsVisibleAfter = await this.page.isVisible(suggestionSelector);
+      expect(suggestionIsVisibleAfter).toEqual(true);
+      const numSuggestionsAfter = await this.page.getElements(suggestionSelector).count();
+      expect(numSuggestionsAfter).toBeGreaterThan(0, 'Search suggestions should be visible.');
+
+      // Select the first suggestion
+      this.page.clickElement(suggestionSelector);
+    } else {
+      // Submit the search
+      this.page.pressKey('ENTER');
+    }
+
     this.page.waitForVisible(resultSelector);
     const numResultsAfter = parseInt(await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute), 10);
     expect(numResultsAfter).toBeGreaterThan(0, 'Keyword search should return results.');

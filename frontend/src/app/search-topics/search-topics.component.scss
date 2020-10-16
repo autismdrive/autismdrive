@@ -15,3 +15,23 @@ button {
   width: 100%;
   text-align: left;
 }
+
+::ng-deep .mat-menu-panel {
+  max-width: 400px !important;
+  width: 400px;
+  .mat-menu-content {
+    width: initial;
+
+    .mat-menu-item {
+      text-overflow: unset;
+    }
+  }
+}
+
+.placeholder,
+.parent-topics,
+::ng-deep .parent-topics mat-list-item,
+.select-topic {
+  min-width: 320px;
+  min-height: 36px;
+}

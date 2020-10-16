@@ -1,0 +1,21 @@
+$video-width: 560px;
+$video-height: 315px;
+$text-height: 48px;
+
+.video-preview {
+  position: relative;
+  display: block;
+  margin: 2em;
+
+  p { margin: 0; text-align: center; padding: 0.5em; }
+
+  &.large { width: ($video-width); }
+  &.medium { width: ($video-width * 0.75); }
+  &.small { width: ($video-width * 0.5); }
+}
+
+.hide-video {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+}

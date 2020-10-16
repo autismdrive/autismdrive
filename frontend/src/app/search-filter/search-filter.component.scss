@@ -3,10 +3,27 @@
 ::ng-deep .mat-hint {
   display: block;
   color: $brand-accent;
-  font-size: 0.75rem;
+  font-size: 1rem;
+  padding-top: 0.5rem;
 }
 
 button {
   width: 100%;
   text-align: left;
+}
+
+::ng-deep .mat-menu-panel {
+  max-width: 400px !important;
+  width: 400px;
+  .mat-menu-content {
+    width: initial;
+
+    .mat-menu-item {
+      text-overflow: unset;
+    }
+  }
+}
+.mat-menu-trigger {
+  min-width: 320px;
+  min-height: 36px;
 }

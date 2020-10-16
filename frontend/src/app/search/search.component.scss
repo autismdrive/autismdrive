@@ -61,6 +61,7 @@ mat-expansion-panel, mat-accordion {
   margin-bottom: 1em;
 }
 
+
 .filters {
 
   #reset-filters {
@@ -96,52 +97,11 @@ mat-expansion-panel, mat-accordion {
   line-height: 1;
 }
 
-.breadcrumbs-container {
+app-search-filters-breadcrumbs {
   width: 100%;
   padding-right: 0;
   padding-left: 0;
-  margin-left: 1em;
-  margin-right: 1em;
-}
-
-.applied-filters {
-  grid-area: filters;
-  margin-left: 0;
-  justify-self: start;
-
-  ::ng-deep .mat-chip-list-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    overflow-x: auto;
-    padding-bottom: 1em;
-
-    .mat-chip {
-      flex: 0 0 auto;
-    }
-  }
-
-  .applied-filter {
-    color: white;
-    background-color: $brand-accent;
-
-    mat-icon {
-      margin-left: 0.75rem;
-      margin-right: -0.25rem;
-      font-size: 1.25rem;
-      line-height: 1.25;
-    }
-
-    .applied-filter-label mat-icon {
-      margin-left: 0;
-    }
-  }
-
-  &.applied-filters-small {
-    .applied-filter {
-      font-size: 0.75rem;
-      mat-icon { font-size: 1rem; line-height: 1.5; }
-    }
-  }
+  margin: 2em 1em 1em 1em;
 }
 
 .sort-order {
@@ -234,7 +194,7 @@ mat-expansion-panel, mat-accordion {
 }
 
 .type-tabs-container {
-  background-color: $brand-gray-tint-4;
+  //background-color: $brand-gray-tint-4;
   height: 94px;
   //color: white;
 
@@ -415,7 +375,7 @@ mat-expansion-panel, mat-accordion {
 
 .filter-container {
   padding-top: 2em;
-  padding-bottom: 2em;
+  padding-bottom: 1em;
   border-top: 1px solid $brand-gray-tint-4;
 }
 
@@ -441,6 +401,78 @@ mat-expansion-panel, mat-accordion {
   width: 100%;
 }
 
-#show-filters-button {
-  margin-bottom: 2em;
+#design-options {
+  padding: 8px;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background-color: #EEEEEE;
+  border-radius: 0px 0px 8px 8px;
+
+  h4 { padding: 0.2em 0.5em 0.2em 0.5em; }
+}
+
+%invert-hint {
+  ::ng-deep .mat-hint {
+    color: white !important;
+    font-style: italic;
+  }
+}
+
+%invert-headings {
+  @extend %invert-hint;
+
+  ::ng-deep h1,
+  ::ng-deep h5,
+  ::ng-deep .mat-select-value-text,
+  ::ng-deep .mat-form-field-label,
+  ::ng-deep .mat-menu-trigger,
+  ::ng-deep .mat-tab-label,
+  ::ng-deep .show-all,
+  ::ng-deep .done-button,
+  ::ng-deep app-search-filters-breadcrumbs h4,
+  ::ng-deep app-search-filters-breadcrumbs .mat-button {
+    color: white !important;
+  }
+
+  ::ng-deep .mat-menu-trigger {
+    background-color: rgba(0,0,0,0.2);
+  }
+}
+.light-gray, #filters.light-gray, #hero.light-gray { background-color: #EEE; }
+.white, #filters.white, #hero.white { background-color: #FFF; }
+.uva-blue, #filters.uva-blue, #hero.uva-blue {
+  @extend %invert-headings;
+  background-color: #002F6C;
+}
+.uva-orange, #filters.uva-orange, #hero.uva-orange {
+  @extend %invert-hint;
+  background-color: #E57200; }
+.black, #filters.black, #hero.black {
+  @extend %invert-headings;
+  background-color: #000;
+}
+.gray, #filters.gray, #hero.gray {
+  @extend %invert-headings;
+  background-color: #636466;
+}
+.mountain, #filters.mountain, #hero.mountain {
+  @extend %invert-headings;
+  background-color: #6F7EA0; }
+.sky, #filters.sky, #hero.sky { background-color: #E5EEF3; }
+.energy-burst-dark, #hero.energy-burst-dark {
+  @extend %invert-headings;
+  background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst.jpg');
+}
+.energy-burst-light, #hero.energy-burst-light {
+  @extend %invert-headings;
+  background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst-footer-crop.jpg');
+}
+.color-swatch {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  outline: 1px solid #EEE;
 }
