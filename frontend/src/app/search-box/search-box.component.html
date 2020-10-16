@@ -2,7 +2,10 @@
   [class]="'search-bar ' + variant"
   fxLayout="column"
 >
-  <h1>Find Autism Resources</h1>
+  <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="40px">
+    <h1>Find Autism Resources</h1>
+    <em>Type a search term or select a resources category</em>
+  </div>
   <mat-form-field id="search-field">
     <input
       matInput
@@ -39,6 +42,5 @@
       ><mat-icon>search</mat-icon>
       </button>
     </div>
-    <mat-hint>Type a search term or select a resources category</mat-hint>
   </mat-form-field>
 </div>

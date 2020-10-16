@@ -183,6 +183,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   showFilters: boolean;
   expandResults: boolean;
   restrictToMappedResults: boolean;
+  showDesignOptions = false;
   searchBgClasses = [
     'light-gray',
     'white',
@@ -195,7 +196,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     'energy-burst-dark',
     'energy-burst-light',
   ];
-  searchBgClass = '';
+  searchBgClass = 'mountain';
   videoPlacements = ['left', 'right', 'above', 'below'];
   videoPlacement = 'left';
   videoSizes = ['large', 'medium', 'small'];
@@ -224,6 +225,7 @@ and the
     private router: Router,
     private searchService: SearchService,
   ) {
+    this.hideVideo();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
     this.ageOptions = this.getOptions(AgeRange.labels);
@@ -253,6 +255,16 @@ and the
     const maxMiles = 100;
     const metersPerMi = 1609.34;
     return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
+  }
+
+  get filtersPanelStyles() {
+    const styles = {
+      'full-screen': this.showFilters,
+      'minimized': !this.showFilters,
+    };
+
+    styles[this.searchBgClass] = true;
+    return styles;
   }
 
   get hits(): Hit[] {

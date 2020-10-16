@@ -429,10 +429,16 @@ app-search-filters-breadcrumbs {
   @extend %invert-hint;
 
   ::ng-deep h1,
+  ::ng-deep h2,
+  ::ng-deep em,
+  ::ng-deep .mat-select-value-text,
+  ::ng-deep .mat-form-field-label,
   ::ng-deep .mat-menu-trigger,
   ::ng-deep .mat-tab-label,
-  ::ng-deep .breadcrumbs-container h4,
-  ::ng-deep .breadcrumbs-container .mat-button {
+  ::ng-deep .show-all,
+  ::ng-deep .done-button,
+  ::ng-deep app-search-filters-breadcrumbs h4,
+  ::ng-deep app-search-filters-breadcrumbs .mat-button {
     color: white !important;
   }
 
@@ -440,27 +446,27 @@ app-search-filters-breadcrumbs {
     background-color: rgba(0,0,0,0.2);
   }
 }
-.light-gray, #hero.light-gray { background-color: #EEE; }
-.white, #hero.white { background-color: #FFF; }
-.uva-blue, #hero.uva-blue {
+.light-gray, #filters.light-gray, #hero.light-gray { background-color: #EEE; }
+.white, #filters.white, #hero.white { background-color: #FFF; }
+.uva-blue, #filters.uva-blue, #hero.uva-blue {
   @extend %invert-headings;
   background-color: #002F6C;
 }
-.uva-orange, #hero.uva-orange {
+.uva-orange, #filters.uva-orange, #hero.uva-orange {
   @extend %invert-hint;
   background-color: #E57200; }
-.black, #hero.black {
+.black, #filters.black, #hero.black {
   @extend %invert-headings;
   background-color: #000;
 }
-.gray, #hero.gray {
+.gray, #filters.gray, #hero.gray {
   @extend %invert-headings;
   background-color: #636466;
 }
-.mountain, #hero.mountain {
+.mountain, #filters.mountain, #hero.mountain {
   @extend %invert-headings;
   background-color: #6F7EA0; }
-.sky, #hero.sky { background-color: #E5EEF3; }
+.sky, #filters.sky, #hero.sky { background-color: #E5EEF3; }
 .energy-burst-dark, #hero.energy-burst-dark {
   @extend %invert-headings;
   background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst.jpg');
