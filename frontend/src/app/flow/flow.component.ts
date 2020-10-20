@@ -75,7 +75,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     });
   }
 
-  @ViewChild(MatDrawer, {static: false})
+  @ViewChild(MatDrawer)
   set sidenav(value: MatDrawer) {
     this.sidenavElement = value;
     this._updateSidenavState();

@@ -1,5 +1,5 @@
 import {Component, ComponentFactory, ComponentFactoryResolver, OnInit, ViewChild, ViewChildren, ViewContainerRef} from '@angular/core';
-import {MatPaginator} from '@angular/material';
+import {MatPaginator} from '@angular/material/paginator';
 import {ApiService} from '../_services/api/api.service';
 import {Router} from '@angular/router';
 import {tap} from 'rxjs/operators';

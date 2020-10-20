@@ -43,10 +43,7 @@
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js/dist/zone';  // Included with Angular CLI.
-
-// Required by some of the Angular Material components.
-import 'hammerjs';
+import 'zone.js/dist/zone';
 
 // IE 9/10/11
 import 'core-js/es/array';

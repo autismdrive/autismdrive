@@ -90,52 +90,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
   mapZoomLevel: number;
-  sortMethods: SortMethod[] = [
-    {
-      name: 'Relevance',
-      label: 'Relevance',
-      sortQuery: {
-        field: '_score',
-        order: 'desc',
-      }
-    },
-    {
-      name: 'Distance',
-      label: 'Distance from me',
-      sortQuery: {
-        field: 'geo_point',
-        latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
-        longitude: this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng,
-        order: 'asc',
-        unit: 'mi'
-      }
-    },
-    {
-      name: 'Updated',
-      label: 'Recently Updated',
-      sortQuery: {
-        field: 'last_updated',
-        order: 'desc'
-      }
-    },
-    {
-      name: 'Date',
-      label: 'Happening Soon',
-      sortQuery: {
-        field: 'date',
-        order: 'asc'
-      }
-    },
-    {
-      name: 'Drafts',
-      label: 'Drafts',
-      sortQuery: {
-        field: 'is_draft',
-        order: 'desc'
-      }
-    },
-  ];
-  selectedSort: SortMethod = this.sortMethods[0];
+  sortMethods: SortMethod[];
+  selectedSort: SortMethod;
   paginatorElement: MatPaginator;
   mapTemplateElement: AgmMap;
   currentUser: User;
@@ -225,6 +181,54 @@ and the
     private router: Router,
     private searchService: SearchService,
   ) {
+    this.sortMethods = [
+      {
+        name: 'Relevance',
+        label: 'Relevance',
+        sortQuery: {
+          field: '_score',
+          order: 'desc',
+        }
+      },
+      {
+        name: 'Distance',
+        label: 'Distance from me',
+        sortQuery: {
+          field: 'geo_point',
+          latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
+          longitude: this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng,
+          order: 'asc',
+          unit: 'mi'
+        }
+      },
+      {
+        name: 'Updated',
+        label: 'Recently Updated',
+        sortQuery: {
+          field: 'last_updated',
+          order: 'desc'
+        }
+      },
+      {
+        name: 'Date',
+        label: 'Happening Soon',
+        sortQuery: {
+          field: 'date',
+          order: 'asc'
+        }
+      },
+      {
+        name: 'Drafts',
+        label: 'Drafts',
+        sortQuery: {
+          field: 'is_draft',
+          order: 'desc'
+        }
+      },
+    ];
+
+    this.selectedSort = this.sortMethods[0];
+
     this.hideVideo();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
@@ -241,12 +245,12 @@ and the
       `name='twitter:image'`);
   }
 
-  @ViewChild('paginator', {static: false})
+  @ViewChild('paginator')
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
 
-  @ViewChild('mapTemplate', {static: false})
+  @ViewChild('mapTemplate')
   set mapTemplate(value: AgmMap) {
     this.mapTemplateElement = value;
   }
