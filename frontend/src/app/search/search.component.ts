@@ -1,4 +1,4 @@
-import {AgmMap, LatLngBounds, LatLngLiteral} from '@agm/core';
+import {AgmMap} from '@agm/core';
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
 import {
@@ -32,8 +32,8 @@ import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-
-declare var google: any;
+import LatLngBounds = google.maps.LatLngBounds;
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 
 class MapControlDiv extends HTMLDivElement {

@@ -1,4 +1,3 @@
-import {LatLngLiteral} from '@agm/core';
 import {formatDate} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
@@ -9,6 +8,7 @@ import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {ResourceChangeLog} from '../_models/resource_change_log';
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 @Component({
   selector: 'app-resource-detail',

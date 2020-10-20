@@ -16,9 +16,9 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
   initialModel: any;
 
   constructor(
-    public dialogRef: MatDialogRef<RepeatSectionDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: RepeatSectionDialogData,
     private deviceDetectorService: DeviceDetectorService,
-    @Inject(MAT_DIALOG_DATA) public data: RepeatSectionDialogData
+    public dialogRef: MatDialogRef<RepeatSectionDialogComponent>,
   ) {
   }
 

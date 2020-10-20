@@ -1,5 +1,5 @@
 import {AgmCoreModule, LAZY_MAPS_API_CONFIG} from '@agm/core';
-import {AgmJsMarkerClustererModule} from '@agm/js-marker-clusterer';
+import {AgmMarkerClustererModule} from '@agm/markerclusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule} from '@angular/common';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
@@ -44,7 +44,7 @@ import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
 import {TruncateModule} from '@yellowspot/ng-truncate';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer/dist';
-import {DeviceDetectorModule} from 'ngx-device-detector';
+import {DeviceDetectorService} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
 import {NgProgressModule} from 'ngx-progressbar';
 import {Observable, ObservableInput, of} from 'rxjs';
@@ -318,11 +318,10 @@ export class FormlyConfig {
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
-    AgmJsMarkerClustererModule,
+    AgmMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
     CommonModule,
-    DeviceDetectorModule.forRoot(),
     FlexLayoutModule,
     FormlyMatDatepickerModule,
     FormlyMaterialModule,
@@ -374,6 +373,7 @@ export class FormlyConfig {
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
     ApiService,
+    DeviceDetectorService,
     GoogleAnalyticsService,
     IntervalService,
     SearchService,

@@ -18,6 +18,8 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "allowedCommonJsDependencies": [
+              "geolib",
+              "rxjs",
               "rxjs-compat"
             ],
             "aot": true,

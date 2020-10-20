@@ -48,14 +48,14 @@ export class FlowComponent implements OnInit, OnDestroy {
   private _mobileQueryListener: () => void;
 
   constructor(
+    media: MediaMatcher,
     private api: ApiService,
     private authenticationService: AuthenticationService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private googleAnalyticsService: GoogleAnalyticsService,
     private changeDetectorRef: ChangeDetectorRef,
     private deviceDetectorService: DeviceDetectorService,
-    media: MediaMatcher,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 959px)');

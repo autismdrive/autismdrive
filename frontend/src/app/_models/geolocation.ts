@@ -1,6 +1,5 @@
 import { getDistance, convertDistance } from 'geolib';
 import { UserInputCoordinates } from 'geolib/es/types';
-import {LatLngLiteral} from '@agm/core';
 
 export class GeoLocation {
   latitude?: number;
