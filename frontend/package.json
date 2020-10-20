@@ -13,7 +13,7 @@
   },
   "private": true,
   "dependencies": {
-    "@agm/core": "^1.1.0",
+    "@agm/core": "^3.0.0-beta.0",
     "@agm/js-marker-clusterer": "^1.1.0",
     "@angular/animations": "^11.0.0-next.6",
     "@angular/cdk": "^10.2.5",
