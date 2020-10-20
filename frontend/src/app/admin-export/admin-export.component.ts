@@ -4,7 +4,7 @@ import {ApiService} from '../_services/api/api.service';
 import {Router} from '@angular/router';
 import {tap} from 'rxjs/operators';
 import {DataTransferDataSource} from '../_models/data_transfer_data_source';
-import { merge } from 'rxjs/internal/observable/merge';
+import { merge } from 'rxjs/observable/merge';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 import {DataTransferLog} from '../_models/data_transfer_log';
 import {ConfigService} from '../_services/config.service';

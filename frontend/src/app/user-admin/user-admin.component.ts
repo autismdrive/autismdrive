@@ -4,8 +4,8 @@ import { ApiService } from '../_services/api/api.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { merge } from 'rxjs/internal/observable/merge';
-import { fromEvent } from 'rxjs/internal/observable/fromEvent';
+import { merge } from 'rxjs/observable/merge';
+import { fromEvent } from 'rxjs/observable/fromEvent';
 import { Router } from '@angular/router';
 
 
