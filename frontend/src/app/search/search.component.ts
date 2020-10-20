@@ -549,11 +549,13 @@ and the
   }
 
   selectType(keepType: string = null) {
-    if (keepType) {
+    const all = HitType.ALL_RESOURCES.name;
+
+    if (keepType && keepType !== all) {
       this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === keepType);
       this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
 
-      if (keepType === HitType.ALL_RESOURCES.name) {
+      if (keepType === all) {
         this.query.types = this.resourceTypesFilteredNames();
       } else {
         this.query.types = [keepType];
@@ -573,11 +575,11 @@ and the
       }
       this.query.sort = this.selectedSort.sortQuery;
     } else {
-      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === HitType.ALL_RESOURCES.name);
+      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === all);
       this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
       this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
-      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance', true);
     }
     this._goToFirstPage();
     this.changeDetectorRef.detectChanges();

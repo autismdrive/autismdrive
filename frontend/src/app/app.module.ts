@@ -1,5 +1,5 @@
 import {AgmCoreModule, LAZY_MAPS_API_CONFIG} from '@agm/core';
-import {AgmMarkerClustererModule} from '@agm/markerclusterer';
+import {AgmJsMarkerClustererModule} from '@agm/js-marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule} from '@angular/common';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
@@ -318,7 +318,7 @@ export class FormlyConfig {
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
-    AgmMarkerClustererModule,
+    AgmJsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
     CommonModule,
@@ -332,6 +332,7 @@ export class FormlyConfig {
     MatAutocompleteModule,
     MatBadgeModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
@@ -362,9 +363,8 @@ export class FormlyConfig {
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,
-    TruncateModule,
     RoutingModule,
-    MatButtonToggleModule,
+    TruncateModule,
   ],
   providers: [
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},

@@ -14,9 +14,11 @@ exports.config = {
         "--window-size=1440x900",
         // "--headless",
         // "--no-sandbox",
-      ]
+        // "--disable-dev-shm-usage",
+      ],
     },
-    'browserName': 'chrome'
+    'browserName': 'chrome',
+    'binary': '/usr/bin/google-chrome-stable'
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
@@ -31,5 +33,5 @@ exports.config = {
       project: './tsconfig.e2e.json'
     });
     jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-  }
+  },
 };
