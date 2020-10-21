@@ -175,6 +175,8 @@ export class AppPage {
   inputText(selector: string, textToEnter: string, clearFirst?: boolean) {
     expect(this.getElements(selector).count()).toEqual(1);
     const field = this.getElement(selector);
+    this.waitForAngularEnabled(true);
+    this.waitForVisible(selector, 100);
 
     if (clearFirst) {
       field.clear();

@@ -83,7 +83,9 @@ export class EnrollUseCases {
 
   async _fillOutRequiredFieldsRecursive(reqSelector: string, btnSelector: string, invalidSelector: string, highlightSelector: string) {
     await this.page.clickElement(highlightSelector);
+    await this.page.waitFor(300);
     const numInvalidBefore = await this.page.getElements(invalidSelector).count();
+
     if (numInvalidBefore > 0) {
       await expect(this.page.getElements(btnSelector).count()).toEqual(1);
       await this.page.fillOutFields(invalidSelector);
@@ -115,11 +117,10 @@ export class EnrollUseCases {
       '#highlight-required-fields'
     );
     await this.fillOutRepeatSections();
-    await this.page.waitFor(500);
+    await this.page.waitFor(1000);
     await this.saveStep(stepIndex);
-    await this.page.waitFor(500);
-
-    return expect(this.page.getElements(`${selector} .done .visible`).count()).toEqual(1);
+    await this.page.waitFor(1000);
+    expect(this.page.getElements(`${selector} .done .visible`).count()).toEqual(1);
   }
 
   async fillOutRepeatSections() {
