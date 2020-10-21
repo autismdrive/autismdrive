@@ -9,6 +9,7 @@ class Category(db.Model):
     name = db.Column(db.String)
     parent_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
+    display_order = db.Column(db.Integer, nullable=True)
     children = db.relationship("Category",
                                backref=db.backref('parent', remote_side=[id]),
                                lazy="joined",
