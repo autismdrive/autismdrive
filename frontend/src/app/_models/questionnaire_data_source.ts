@@ -1,7 +1,7 @@
 import {CollectionViewer} from '@angular/cdk/collections';
 import {DataSource} from '@angular/cdk/table';
-import {BehaviorSubject} from 'rxjs/internal/BehaviorSubject';
-import {Observable} from 'rxjs/internal/Observable';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Observable} from 'rxjs/Observable';
 import {ApiService} from '../_services/api/api.service';
 import {Step} from './step';
 

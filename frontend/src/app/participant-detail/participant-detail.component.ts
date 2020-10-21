@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MatTableDataSource} from '@angular/material';
+import {MatTableDataSource} from '@angular/material/table';
 import {Participant} from '../_models/participant';
 import {StepLog} from '../_models/step_log';
 import {ApiService} from '../_services/api/api.service';

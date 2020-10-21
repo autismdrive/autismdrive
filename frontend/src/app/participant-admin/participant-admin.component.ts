@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material';
 import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {Participant} from '../_models/participant';
 import {ParticipantAdminList} from '../_models/participant_admin_list';
 import {ApiService} from '../_services/api/api.service';

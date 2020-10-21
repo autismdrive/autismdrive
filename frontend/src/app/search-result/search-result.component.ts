@@ -1,8 +1,8 @@
-import {LatLngLiteral} from '@agm/core';
 import {Component, Input, OnInit} from '@angular/core';
 import {Hit} from '../_models/query';
 import {StudyStatus} from '../_models/study';
 import {User} from '../_models/user';
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 @Component({
   selector: 'app-search-result',
