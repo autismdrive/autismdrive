@@ -1,4 +1,4 @@
-import {AgmMap, LatLngBounds, LatLngLiteral} from '@agm/core';
+import {AgmMap} from '@agm/core';
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
 import {
@@ -32,8 +32,8 @@ import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {SearchService} from '../_services/api/search.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-
-declare var google: any;
+import LatLngBounds = google.maps.LatLngBounds;
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 
 class MapControlDiv extends HTMLDivElement {
@@ -90,52 +90,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
   mapZoomLevel: number;
-  sortMethods: SortMethod[] = [
-    {
-      name: 'Relevance',
-      label: 'Relevance',
-      sortQuery: {
-        field: '_score',
-        order: 'desc',
-      }
-    },
-    {
-      name: 'Distance',
-      label: 'Distance from me',
-      sortQuery: {
-        field: 'geo_point',
-        latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
-        longitude: this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng,
-        order: 'asc',
-        unit: 'mi'
-      }
-    },
-    {
-      name: 'Updated',
-      label: 'Recently Updated',
-      sortQuery: {
-        field: 'last_updated',
-        order: 'desc'
-      }
-    },
-    {
-      name: 'Date',
-      label: 'Happening Soon',
-      sortQuery: {
-        field: 'date',
-        order: 'asc'
-      }
-    },
-    {
-      name: 'Drafts',
-      label: 'Drafts',
-      sortQuery: {
-        field: 'is_draft',
-        order: 'desc'
-      }
-    },
-  ];
-  selectedSort: SortMethod = this.sortMethods[0];
+  sortMethods: SortMethod[];
+  selectedSort: SortMethod;
   paginatorElement: MatPaginator;
   mapTemplateElement: AgmMap;
   currentUser: User;
@@ -225,6 +181,54 @@ and the
     private router: Router,
     private searchService: SearchService,
   ) {
+    this.sortMethods = [
+      {
+        name: 'Relevance',
+        label: 'Relevance',
+        sortQuery: {
+          field: '_score',
+          order: 'desc',
+        }
+      },
+      {
+        name: 'Distance',
+        label: 'Distance from me',
+        sortQuery: {
+          field: 'geo_point',
+          latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
+          longitude: this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng,
+          order: 'asc',
+          unit: 'mi'
+        }
+      },
+      {
+        name: 'Updated',
+        label: 'Recently Updated',
+        sortQuery: {
+          field: 'last_updated',
+          order: 'desc'
+        }
+      },
+      {
+        name: 'Date',
+        label: 'Happening Soon',
+        sortQuery: {
+          field: 'date',
+          order: 'asc'
+        }
+      },
+      {
+        name: 'Drafts',
+        label: 'Drafts',
+        sortQuery: {
+          field: 'is_draft',
+          order: 'desc'
+        }
+      },
+    ];
+
+    this.selectedSort = this.sortMethods[0];
+
     this.hideVideo();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
@@ -241,12 +245,12 @@ and the
       `name='twitter:image'`);
   }
 
-  @ViewChild('paginator', {static: false})
+  @ViewChild('paginator')
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
   }
 
-  @ViewChild('mapTemplate', {static: false})
+  @ViewChild('mapTemplate')
   set mapTemplate(value: AgmMap) {
     this.mapTemplateElement = value;
   }
@@ -545,11 +549,13 @@ and the
   }
 
   selectType(keepType: string = null) {
-    if (keepType) {
+    const all = HitType.ALL_RESOURCES.name;
+
+    if (keepType && keepType !== all) {
       this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === keepType);
       this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
 
-      if (keepType === HitType.ALL_RESOURCES.name) {
+      if (keepType === all) {
         this.query.types = this.resourceTypesFilteredNames();
       } else {
         this.query.types = [keepType];
@@ -569,11 +575,11 @@ and the
       }
       this.query.sort = this.selectedSort.sortQuery;
     } else {
-      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === HitType.ALL_RESOURCES.name);
+      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === all);
       this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
       this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
-      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance');
+      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance', true);
     }
     this._goToFirstPage();
     this.changeDetectorRef.detectChanges();

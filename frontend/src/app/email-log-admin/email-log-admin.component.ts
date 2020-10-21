@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import {MatTableDataSource} from '@angular/material/table';
 import { ApiService } from '../_services/api/api.service';
 import { MatSort } from '@angular/material/sort';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthenticationService} from '../_services/api/authentication-service';
 import {EmailLog} from '../_models/email_log';
 import {User} from '../_models/user';
-import {MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'app-email-log-admin',

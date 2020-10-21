@@ -1,41 +1,31 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActivatedRoute, Route } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { of as observableOf } from 'rxjs';
-import { GradientBorderDirective } from '../gradient-border.directive';
-import { Resource } from '../resource';
-import { ResourceQuery } from '../resource-query';
-import { getDummyResource } from '../shared/fixtures/resource';
-import { MockResourceApiService } from '../shared/mocks/resource-api.service.mock';
-import { ResourceApiService } from '../shared/resource-api/resource-api.service';
-import { SearchComponent } from './search.component';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatListModule} from '@angular/material/list';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ActivatedRoute, Route} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
+import {of as observableOf} from 'rxjs';
+import {SearchComponent} from './search.component';
 
 describe('SearchComponent', () => {
-  let api: MockResourceApiService;
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
-  const resources: Resource[] = [getDummyResource()];
 
-  beforeEach(async(() => {
-    api = new MockResourceApiService();
-    const route: Route = { path: 'search', component: SearchComponent, data: { title: 'Search Resources' } };
+  beforeEach(waitForAsync(() => {
+    const route: Route = {path: 'search', component: SearchComponent, data: {title: 'Search Resources'}};
 
     TestBed
       .configureTestingModule({
         declarations: [
           SearchComponent,
-          GradientBorderDirective
         ],
         imports: [
           BrowserAnimationsModule,
@@ -54,27 +44,16 @@ describe('SearchComponent', () => {
           {
             provide: ActivatedRoute,
             useValue: {
-              queryParamMap: observableOf({ query: '', keys: [] }),
+              queryParamMap: observableOf({query: '', keys: []}),
             }
           },
-          { provide: ResourceApiService, useValue: api }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       })
       .compileComponents()
       .then(() => {
-        api.spyAndReturnFake('searchResources', resources);
         fixture = TestBed.createComponent(SearchComponent);
         component = fixture.componentInstance;
-        component.resourceQuery = new ResourceQuery({
-          query: '',
-          filters: [],
-          facets: [],
-          total: 0,
-          size: 0,
-          start: 0,
-          resources: [],
-        });
         fixture.detectChanges();
       });
   }));

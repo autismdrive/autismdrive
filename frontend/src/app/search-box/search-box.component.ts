@@ -55,7 +55,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
-  @ViewChild('searchInput', {read: MatInput, static: false})
+  @ViewChild('searchInput', { read: MatInput })
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
     this.searchInputElement.focus();

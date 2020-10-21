@@ -43,11 +43,11 @@ export class LoginComponent implements OnInit {
   ];
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
     private authenticationService: AuthenticationService,
     private deviceDetectorService: DeviceDetectorService,
-    private googleAnalytics: GoogleAnalyticsService
+    private googleAnalytics: GoogleAnalyticsService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
     this.route.queryParams.subscribe(qParams => {
       if (qParams.hasOwnProperty('returnUrl')) {

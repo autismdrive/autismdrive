@@ -33,9 +33,11 @@
 
     <div *ngIf="state !== flowState.LOADING">
       <mat-drawer-container>
-        <mat-drawer #sidenav
-                    [mode]="mobileQuery.matches ? 'over' : 'side'"
-                    [(opened)]="sidebarOpen">
+        <mat-drawer
+          #sidenav
+          [mode]="mobileQuery.matches ? 'over' : 'side'"
+          [(opened)]="sidebarOpen"
+        >
           <app-questionnaire-steps-list
             [flow]="flow"
             [stepIndex]="activeStep"

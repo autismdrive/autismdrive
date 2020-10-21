@@ -1,15 +1,15 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ResourceCategory} from '../_models/resource_category';
-import {ApiService} from '../_services/api/api.service';
-import {Resource} from '../_models/resource';
-import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
-import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/api/authentication-service';
-import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AgeRange, Language, Covid19Categories} from '../_models/hit_type';
+import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
+import {Resource} from '../_models/resource';
+import {ResourceCategory} from '../_models/resource_category';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/api/authentication-service';
 
 
 enum PageState {
@@ -387,17 +387,17 @@ export class ResourceFormComponent implements OnInit {
   ];
 
 
-
   options: FormlyFormOptions;
 
   createNew = false;
 
-  constructor(private api: ApiService,
-              private route: ActivatedRoute,
-              private router: Router,
-              private authenticationService: AuthenticationService,
-              private deviceDetectorService: DeviceDetectorService,
-              ) {
+  constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
+    private deviceDetectorService: DeviceDetectorService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
 
   }
@@ -503,7 +503,7 @@ export class ResourceFormComponent implements OnInit {
   setDateTime() {
     if (this.model.date) {
       if (this.model.date instanceof Date) {
-          this.model.date.setHours(12);
+        this.model.date.setHours(12);
       } else {
         this.model.date = new Date(this.model.date);
         this.model.date.setHours(12);

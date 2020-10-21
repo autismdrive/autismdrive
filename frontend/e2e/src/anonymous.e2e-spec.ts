@@ -42,8 +42,7 @@ describe('Anonymous User', () => {
 
   // Search
   it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField('ad'));
-  it('should clear search filter', () => searchUseCases.removeFilter('keyword', 'type'));
-  it('should autofocus on search box', () => searchUseCases.focusAndBlurSearchBox());
+  it('should clear search filter', () => searchUseCases.removeFilter('topic', 'type'));
   it('should display results filtered by age', () => searchUseCases.displaySelectedCategory('age'));
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
   it('should open ZIP code dialog', () => searchUseCases.openZipCodeDialog());
@@ -67,8 +66,8 @@ describe('Anonymous User', () => {
   it('should sort results by last date updated', () => searchUseCases.sortByLastUpdated());
   it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
   it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
-  it('should enter some other keywords in the search field', () => searchUseCases.enterKeywordsInSearchField('autism'));
-  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('autism'));
+  it('should enter some other keywords in the search field', () => searchUseCases.enterKeywordsInSearchField('staunton', false));
+  it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('staunton'));
   it('should display only events again', () => searchUseCases.filterByType('event'));
   it('should sort results by event date', () => searchUseCases.sortByEventDate());
   it('should display all resources again', () => searchUseCases.filterByType('all'));

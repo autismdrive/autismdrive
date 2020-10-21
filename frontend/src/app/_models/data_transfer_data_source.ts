@@ -1,9 +1,9 @@
 import { User } from './user';
 import { DataSource } from '@angular/cdk/table';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ApiService } from '../_services/api/api.service';
 import { CollectionViewer } from '@angular/cdk/collections';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs/Observable';
 import {DataTransferLog} from './data_transfer_log';
 
 export class DataTransferDataSource implements DataSource<DataTransferLog> {
