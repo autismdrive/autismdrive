@@ -14,7 +14,7 @@ class Category(db.Model):
                                backref=db.backref('parent', remote_side=[id]),
                                lazy="joined",
                                join_depth=2,
-                               order_by="Category.name")
+                               order_by="Category.display_order,Category.name")
     hit_count = 0  # when returning categories in the context of a search.
 
     def calculate_level(self):
