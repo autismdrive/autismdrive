@@ -8,7 +8,8 @@ import {SearchService} from '../_services/api/search.service';
 import {FormControl} from '@angular/forms';
 import {ApiService} from '../_services/api/api.service';
 
-interface CategoryMap { [key: number]: Category; }
+interface CategoriesById { [key: number]: Category; }
+interface CategoriesByDisplayOrder { [key: string]: Category; }
 
 @Component({
   selector: 'app-search-box',
@@ -27,7 +28,8 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   options: Category[] = [];
   filteredOptions: Observable<Category[]>;
   categoryTree: Category[];
-  flattenedCategoryTree: CategoryMap = {};
+  categoriesById: CategoriesById = {};
+  categoriesByDisplayOrder: CategoriesByDisplayOrder = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -47,10 +49,14 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
 
     this.api.getCategoryTree().subscribe(categoryTree => {
       this.categoryTree = categoryTree;
-      const flattened = {};
-      this._flattenCategoryTree(categoryTree, flattened);
-      this.flattenedCategoryTree = this._flattenCategoryTree(categoryTree, flattened);
-      this.options = Object.values(flattened);
+      this._populateCategoryIndices(this.categoryTree);
+
+      // Sort options by category level and display order
+      this.options = Object
+        .entries(this.categoriesByDisplayOrder)
+        .sort((a, b) => a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1)
+        .map(c => c[1]);
+
       this._populateCategoryParents();
     });
   }
@@ -118,23 +124,44 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
   }
 
-  private _flattenCategoryTree(categoryTree: Category[], flattened: CategoryMap) {
+  /** Recursively walks the given category tree and puts each category into flattened indices for faster retrieval and sorting. */
+  private _populateCategoryIndices(categoryTree: Category[], displayOrders = []) {
+    // Index should be a string that can be sorted such that categories will be
+    // in display order like this:
+    // 0
+    // 0.0
+    // 0.0.0
+    // 0.0.1
+    // 0.1
+    // 0.1.0
+    // 0.0.1
+    // ...
+    // 1
+    // 1.0
+    // 1.0.0
+    // ...etc...
+    // so we want to add the ancestors' display orders into an array like this:
+    // [0, 0, 1].join('.')
+    // which means we need to walk the tree,
+    // pushing the ancestors display orders into the array as we go down.
     categoryTree.forEach(c => {
-      if (!flattened[c.id]) { flattened[c.id] = c; }
+      const displayOrder = (c.display_order !== null && c.display_order !== undefined) ? c.display_order : c.id;
+      const indexArray = displayOrders.concat([displayOrder]);
+      const indexStr = indexArray.join('.');
+      if (!this.categoriesByDisplayOrder[indexStr]) { this.categoriesByDisplayOrder[indexStr] = c; }
+      if (!this.categoriesById[c.id]) { this.categoriesById[c.id] = c; }
 
       if (c.children && c.children.length > 0) {
-        this._flattenCategoryTree(c.children, flattened);
+        this._populateCategoryIndices(c.children, indexArray);
       }
     });
-
-    return flattened;
   }
 
   private _populateCategoryParents() {
     this.options.forEach(c => {
       if (c.parent_id !== null) {
-        c.parent = this.flattenedCategoryTree[c.parent_id];
-        this.flattenedCategoryTree[c.id].parent = c.parent;
+        c.parent = this.categoriesById[c.parent_id];
+        this.categoriesById[c.id].parent = c.parent;
       }
     });
   }
