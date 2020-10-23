@@ -16,7 +16,7 @@ import {CategoriesService} from '../_services/categories/categories.service';
   templateUrl: './search-topics.component.html',
   styleUrls: ['./search-topics.component.scss']
 })
-export class SearchTopicsComponent implements OnInit, OnChanges {
+export class SearchTopicsComponent {
   @Input() category: Category;
   @Output() categorySelected = new EventEmitter<Category>();
   categoriesById: CategoriesById = {};
@@ -26,6 +26,11 @@ export class SearchTopicsComponent implements OnInit, OnChanges {
     private categoriesService: CategoriesService,
     private changeDetectorRef: ChangeDetectorRef,
   ) {
+    if (this.categoriesService.categoriesById) {
+      this.categoriesById = this.categoriesService.categoriesById;
+      this.loading = false;
+    }
+
     this.categoriesService.updated.subscribe(() => {
       this.categoriesById = this.categoriesService.categoriesById;
       this.loading = false;
@@ -35,12 +40,6 @@ export class SearchTopicsComponent implements OnInit, OnChanges {
 
   get categories() {
     return this.getChildrenWithHits(this.category);
-  }
-
-  ngOnInit() {
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
   }
 
   selectCategory(cat: Category) {
