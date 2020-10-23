@@ -176,7 +176,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
       const words = value.replace(/\W+/gi, ' ').toLowerCase().split(' ');
       const patternString = words.map(w => `(?=.*${w})`).join('');
       const filterPattern = new RegExp(patternString, 'gi');
-      return this.options.filter(option => filterPattern.test(option.indentedString));
+      return this.options.filter(option => option.all_resource_count > 0 && filterPattern.test(option.indentedString));
     } else {
       return this.options;
     }

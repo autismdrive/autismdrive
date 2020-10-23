@@ -20,7 +20,7 @@
   </button>
   <mat-menu #topicMenu>
       <button
-        *ngFor="let child of category.children"
+        *ngFor="let child of categories"
         (click)="selectCategory(child)"
         mat-menu-item
       >

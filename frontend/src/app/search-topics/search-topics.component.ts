@@ -20,6 +20,14 @@ export class SearchTopicsComponent implements OnInit {
   ngOnInit() {
   }
 
+  get categories() {
+    if (this.category && this.category.children && (this.category.children.length > 0)) {
+      return this.category.children.filter(c => c.hit_count > 0);
+    }
+
+    return [];
+  }
+
   selectCategory(cat: Category) {
     this.categorySelected.emit(cat);
   }
