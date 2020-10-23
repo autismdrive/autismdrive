@@ -5,7 +5,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {Meta} from '@angular/platform-browser';
 
 @Component({

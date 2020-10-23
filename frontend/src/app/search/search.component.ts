@@ -31,7 +31,7 @@ import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {SearchService} from '../_services/search/search.service';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import LatLngBounds = google.maps.LatLngBounds;
 import LatLngLiteral = google.maps.LatLngLiteral;
 

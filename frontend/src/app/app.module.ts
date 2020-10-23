@@ -110,7 +110,7 @@ import {FlowIntroComponent} from './flow-intro/flow-intro.component';
 import {FlowComponent} from './flow/flow.component';
 import {FooterComponent} from './footer/footer.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
-import {GoogleAnalyticsService} from './google-analytics.service';
+import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
 import {HeaderComponent} from './header/header.component';
 import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';

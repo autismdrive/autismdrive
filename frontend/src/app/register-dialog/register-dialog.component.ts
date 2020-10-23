@@ -5,7 +5,7 @@ import {FormGroup} from '@angular/forms';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {ApiService} from '../_services/api/api.service';
 import {ActivatedRoute} from '@angular/router';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
