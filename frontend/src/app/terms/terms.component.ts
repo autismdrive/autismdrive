@@ -4,7 +4,7 @@ import { ParticipantRelationship } from '../_models/participantRelationship';
 import {Participant} from '../_models/participant';
 import {ApiService} from '../_services/api/api.service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {User} from '../_models/user';
 
 

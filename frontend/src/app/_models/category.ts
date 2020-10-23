@@ -17,3 +17,11 @@ export interface Category {
   // _meta: any;
   indentedString?: string;
 }
+
+export interface CategoriesById {
+  [key: number]: Category;
+}
+
+export interface CategoriesByDisplayOrder {
+  [key: string]: Category;
+}

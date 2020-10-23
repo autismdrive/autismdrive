@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {ConfigService} from './_services/config.service';
+import {ConfigService} from './_services/config/config.service';
 import {Study} from './_models/study';
 import {StarError} from './star-error';
 import {Query} from './_models/query';

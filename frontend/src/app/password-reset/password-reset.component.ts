@@ -7,7 +7,7 @@ import {scrollToTop} from '../../util/scrollToTop';
 import {PasswordRequirements} from '../_models/password_requirements';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 
 @Component({

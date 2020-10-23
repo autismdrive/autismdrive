@@ -3,7 +3,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import { ApiService } from '../_services/api/api.service';
 import { MatSort } from '@angular/material/sort';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {EmailLog} from '../_models/email_log';
 import {User} from '../_models/user';
 

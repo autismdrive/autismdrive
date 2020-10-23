@@ -5,7 +5,7 @@ import {catchError, map} from 'rxjs/operators';
 import { User } from '../../_models/user';
 import { GoogleAnalyticsService } from '../../google-analytics.service';
 import {StarError} from '../../star-error';
-import {ConfigService} from '../config.service';
+import {ConfigService} from '../config/config.service';
 
 
 

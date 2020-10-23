@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ApiService} from '../_services/api/api.service';
 import {Hit, Query} from '../_models/query';
 import {Study, StudyStatus} from '../_models/study';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {User} from '../_models/user';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Meta} from '@angular/platform-browser';

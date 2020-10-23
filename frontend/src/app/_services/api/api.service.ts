@@ -22,7 +22,7 @@ import {DataTransferPageResults} from '../../_models/data_transfer_log';
 import {StarError} from '../../star-error';
 import {GeoLocation} from '../../_models/geolocation';
 import {RelatedOptions, RelatedResults} from 'src/app/_models/related_results';
-import {ConfigService} from '../config.service';
+import {ConfigService} from '../config/config.service';
 import {PasswordRequirements} from '../../_models/password_requirements';
 import {ResourceChangeLog} from '../../_models/resource_change_log';
 import {Investigator} from '../../_models/investigator';

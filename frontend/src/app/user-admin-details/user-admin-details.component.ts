@@ -6,7 +6,7 @@ import {EmailLog} from '../_models/email_log';
 import {ResourceChangeLog} from '../_models/resource_change_log';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 @Component({
   selector: 'app-user-admin-details',

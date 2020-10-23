@@ -4,7 +4,7 @@ import {snakeToUpperCase} from '../../util/snakeToUpper';
 import {Study} from '../_models/study';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {MatDialog} from '@angular/material/dialog';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
