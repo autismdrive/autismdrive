@@ -15,11 +15,19 @@
       type="text"
       [formControl]="searchBoxControl"
       [matAutocomplete]="auto"
+      (click)="autocompletePanel.showPanel = true"
     >
-    <mat-autocomplete #auto="matAutocomplete" panelWidth="600px" (optionSelected)="selectCategory($event)">
-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-        {{levelIndent(option)}} {{option.name}}
-      </mat-option>
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      #autocompletePanel
+      panelWidth="600px"
+      (optionSelected)="selectCategory($event)"
+      [displayWith]="optionText"
+    >
+      <mat-option
+        *ngFor="let option of filteredOptions | async"
+        [value]="option"
+      >{{optionText(option)}}</mat-option>
     </mat-autocomplete>
     <div
        matSuffix

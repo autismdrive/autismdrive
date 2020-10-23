@@ -1,4 +1,9 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  MatAutocomplete,
+  MatAutocompleteActivatedEvent,
+  MatAutocompleteSelectedEvent
+} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
@@ -8,7 +13,8 @@ import {SearchService} from '../_services/api/search.service';
 import {FormControl} from '@angular/forms';
 import {ApiService} from '../_services/api/api.service';
 
-interface CategoryMap { [key: number]: Category; }
+interface CategoriesById { [key: number]: Category; }
+interface CategoriesByDisplayOrder { [key: string]: Category; }
 
 @Component({
   selector: 'app-search-box',
@@ -27,7 +33,10 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   options: Category[] = [];
   filteredOptions: Observable<Category[]>;
   categoryTree: Category[];
-  flattenedCategoryTree: CategoryMap = {};
+  categoriesById: CategoriesById = {};
+  categoriesByDisplayOrder: CategoriesByDisplayOrder = {};
+  autocompletePanelElement: MatAutocomplete;
+  skipUpdate = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,11 +56,18 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
 
     this.api.getCategoryTree().subscribe(categoryTree => {
       this.categoryTree = categoryTree;
-      const flattened = {};
-      this._flattenCategoryTree(categoryTree, flattened);
-      this.flattenedCategoryTree = this._flattenCategoryTree(categoryTree, flattened);
-      this.options = Object.values(flattened);
+      this._populateCategoryIndices(this.categoryTree);
+
+      // Sort options by category level and display order
+      this.options = Object
+        .entries(this.categoriesByDisplayOrder) // each entry is an array containing [key, value]
+        .sort((a, b) => a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1)
+        .map(entry => entry[1]);
+
       this._populateCategoryParents();
+      this.options.forEach(cat => {
+        cat.indentedString = this.indentedString(cat);
+      });
     });
   }
 
@@ -59,6 +75,11 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
     this.searchInputElement.focus();
+  }
+
+  @ViewChild('autocompletePanel', { read: MatAutocomplete })
+  set autocompletePanel(value: MatAutocomplete) {
+    this.autocompletePanelElement = value;
   }
 
   ngOnInit() {
@@ -81,19 +102,30 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
+  optionText(option: Category) {
+    return option?.indentedString;
+  }
+
   private _filter(value: string): Category[] {
     if (value && value.length > 0) {
-      const filterValue = value.toLowerCase();
-      return this.options.filter(option => {
-        const indentedString = (this.levelIndent(option) + ' ' + option.name);
-        return indentedString.toLowerCase().includes(filterValue);
-      });
+      const words = value.replace(/\W+/gi, ' ').toLowerCase().split(' ');
+      const patternString = words.map(w => `(?=.*${w})`).join('');
+      const filterPattern = new RegExp(patternString, 'gi');
+      return this.options.filter(option => filterPattern.test(option.indentedString));
     } else {
       return this.options;
     }
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
+
+    // Stupid hack to prevent submitting a keyword search when the user is selecting
+    // a topic from the autocomplete panel.
+    if (this.skipUpdate) {
+      this.skipUpdate = false;
+      return;
+    }
+
     if (removeWords) {
       this.words = '';
       this.searchInputElement.value = this.words;
@@ -118,28 +150,49 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
   }
 
-  private _flattenCategoryTree(categoryTree: Category[], flattened: CategoryMap) {
+  /** Recursively walks the given category tree and puts each category into flattened indices for faster retrieval and sorting. */
+  private _populateCategoryIndices(categoryTree: Category[], displayOrders = []) {
+    // Index should be a string that can be sorted such that categories will be
+    // in display order like this:
+    // 0
+    // 0.0
+    // 0.0.0
+    // 0.0.1
+    // 0.1
+    // 0.1.0
+    // 0.0.1
+    // ...
+    // 1
+    // 1.0
+    // 1.0.0
+    // ...etc...
+    // so we want to add the ancestors' display orders into an array like this:
+    // [0, 0, 1].join('.')
+    // which means we need to walk the tree,
+    // pushing the ancestors display orders into the array as we go down.
     categoryTree.forEach(c => {
-      if (!flattened[c.id]) { flattened[c.id] = c; }
+      const displayOrder = (c.display_order !== null && c.display_order !== undefined) ? c.display_order : c.id;
+      const indexArray = displayOrders.concat([displayOrder]);
+      const indexStr = indexArray.join('.');
+      if (!this.categoriesByDisplayOrder[indexStr]) { this.categoriesByDisplayOrder[indexStr] = c; }
+      if (!this.categoriesById[c.id]) { this.categoriesById[c.id] = c; }
 
       if (c.children && c.children.length > 0) {
-        this._flattenCategoryTree(c.children, flattened);
+        this._populateCategoryIndices(c.children, indexArray);
       }
     });
-
-    return flattened;
   }
 
   private _populateCategoryParents() {
     this.options.forEach(c => {
       if (c.parent_id !== null) {
-        c.parent = this.flattenedCategoryTree[c.parent_id];
-        this.flattenedCategoryTree[c.id].parent = c.parent;
+        c.parent = this.categoriesById[c.parent_id];
+        this.categoriesById[c.id].parent = c.parent;
       }
     });
   }
 
-  levelIndent(option: Category) {
+  indentedString(option: Category) {
     let indentString = '';
     let parent = option.parent;
 
@@ -148,10 +201,13 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
       parent = parent.parent;
     }
 
-    return indentString;
+    return indentString + ' ' + option.name;
   }
 
-  selectCategory($event) {
+  selectCategory($event: MatAutocompleteSelectedEvent) {
+    // Stupid hack to prevent submitting a keyword search when the user is selecting
+    // a topic from the autocomplete panel.
+    this.skipUpdate = true;
     this.categorySelected.emit($event.option.value as Category);
   }
 }

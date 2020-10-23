@@ -80,6 +80,7 @@ class SearchEndpoint(flask_restful.Resource):
             category = Category(name="Topics")
             category.children = db.session.query(Category)\
                 .filter(Category.parent_id == None)\
+                .order_by(Category.display_order)\
                 .order_by(Category.name.desc())\
                 .all()
         else:
