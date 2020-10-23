@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantRelationship } from '../_models/participantRelationship';
 import {Participant} from '../_models/participant';
 import {ApiService} from '../_services/api/api.service';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {User} from '../_models/user';
 

@@ -4,7 +4,7 @@ import {Study} from '../_models/study';
 import {ApiService} from '../_services/api/api.service';
 import {RelatedOptions} from '../_models/related_results';
 import {Router} from '@angular/router';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-related-items',

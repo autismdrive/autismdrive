@@ -3,7 +3,7 @@ import {StudyCategory} from '../_models/study_category';
 import {ResourceCategory} from '../_models/resource_category';
 import {AgeRange, Language, Covid19Categories} from '../_models/hit_type';
 import {Router} from '@angular/router';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-filter-chips',

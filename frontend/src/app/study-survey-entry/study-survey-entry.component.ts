@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {Study} from '../_models/study';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {MatDialog} from '@angular/material/dialog';
 import {RegisterDialogComponent} from '../register-dialog/register-dialog.component';
 

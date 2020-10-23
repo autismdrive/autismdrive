@@ -3,7 +3,7 @@ import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router} f
 import { User } from './_models/user';
 import { AuthenticationService } from './_services/authentication/authentication-service';
 import {ApiService} from './_services/api/api.service';
-import {GoogleAnalyticsService} from './google-analytics.service';
+import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
 import {ConfigService} from './_services/config/config.service';
 import {Meta} from '@angular/platform-browser';
 
