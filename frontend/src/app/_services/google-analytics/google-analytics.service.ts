@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {ConfigService} from './_services/config.service';
-import {Study} from './_models/study';
-import {StarError} from './star-error';
-import {Query} from './_models/query';
+import {ConfigService} from '../config/config.service';
+import {Study} from '../../_models/study';
+import {StarError} from '../../star-error';
+import {Query} from '../../_models/query';
 
 declare var gtag: Function;
 
@@ -42,7 +42,7 @@ export class GoogleAnalyticsService {
       this.event(age.toString(), 'search_filter', '');
     }
     if (query.category) {
-      this.event(query.category.name, 'search_filter', '');
+      this.event(query.category.name, 'search_filter', 'search_topic');
     }
     if (query.types.length === 1) {
       this.event(query.types[0].toString(), 'search_filter', '');

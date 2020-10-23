@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { Participant } from '../_models/participant';
 import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
-import { AuthenticationService } from '../_services/api/authentication-service';
+import { AuthenticationService } from '../_services/authentication/authentication-service';
 import { Resource } from '../_models/resource';
 
 enum ProfileState {

@@ -5,10 +5,10 @@ import {FormGroup} from '@angular/forms';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {ApiService} from '../_services/api/api.service';
 import {ActivatedRoute} from '@angular/router';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {EventRegistrationComponent} from '../event-registration/event-registration.component';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 @Component({
   selector: 'app-event-registration-form',

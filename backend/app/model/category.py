@@ -9,11 +9,12 @@ class Category(db.Model):
     name = db.Column(db.String)
     parent_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
+    display_order = db.Column(db.Integer, nullable=True)
     children = db.relationship("Category",
                                backref=db.backref('parent', remote_side=[id]),
                                lazy="joined",
                                join_depth=2,
-                               order_by="Category.name")
+                               order_by="Category.display_order,Category.name")
     hit_count = 0  # when returning categories in the context of a search.
 
     def calculate_level(self):

@@ -1,7 +1,7 @@
 import {AgmCoreModule, LAZY_MAPS_API_CONFIG} from '@agm/core';
 import {AgmJsMarkerClustererModule} from '@agm/js-marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {APP_INITIALIZER, Injectable, NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -76,8 +76,9 @@ import {ErrorInterceptor} from './_routing/error-interceptor';
 import {JwtInterceptor} from './_routing/jwt-interceptor';
 import {RoutingModule} from './_routing/routing.module';
 import {ApiService} from './_services/api/api.service';
-import {SearchService} from './_services/api/search.service';
-import {ConfigService} from './_services/config.service';
+import {CategoriesService} from './_services/categories/categories.service';
+import {SearchService} from './_services/search/search.service';
+import {ConfigService} from './_services/config/config.service';
 import {IntervalService} from './_services/interval/interval.service';
 import {AboutComponent} from './about/about.component';
 import {AccordionComponent} from './accordion/accordion.component';
@@ -109,7 +110,7 @@ import {FlowIntroComponent} from './flow-intro/flow-intro.component';
 import {FlowComponent} from './flow/flow.component';
 import {FooterComponent} from './footer/footer.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
-import {GoogleAnalyticsService} from './google-analytics.service';
+import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
 import {HeaderComponent} from './header/header.component';
 import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';
@@ -373,6 +374,8 @@ export class FormlyConfig {
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
     ApiService,
+    CategoriesService,
+    DatePipe,
     DeviceDetectorService,
     GoogleAnalyticsService,
     IntervalService,

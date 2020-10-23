@@ -12,6 +12,16 @@ export interface Category {
   study_count?: number;
   training_count?: number;
   hit_count?: number;
+  display_order?: number;
   // _links: any;
   // _meta: any;
+  indentedString?: string;
+}
+
+export interface CategoriesById {
+  [key: number]: Category;
+}
+
+export interface CategoriesByDisplayOrder {
+  [key: string]: Category;
 }

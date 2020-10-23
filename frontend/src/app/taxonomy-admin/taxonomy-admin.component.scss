@@ -1,3 +1,5 @@
+@import "../../config";
+
 .tree-select-invisible {
   display: none;
 }
@@ -17,4 +19,15 @@
 .associated-records {
   margin-left: 0.5em;
   margin-right: 0.5em;
+}
+
+.highlight-node {
+  background-color: $brand-primary-light;
+  -webkit-animation-name: fade-out;
+  animation: fade-out 5s forwards;
+}
+
+@keyframes fade-out {
+  0% { background-color: $brand-primary-light; }
+  100% { background-color: transparent; }
 }

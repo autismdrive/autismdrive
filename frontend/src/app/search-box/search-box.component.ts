@@ -1,14 +1,14 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
-import {debounce, debounceTime, distinctUntilChanged, startWith, map} from 'rxjs/operators';
+import {debounce, debounceTime, distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {Category} from '../_models/category';
-import {SearchService} from '../_services/api/search.service';
-import {FormControl} from '@angular/forms';
 import {ApiService} from '../_services/api/api.service';
-
-interface CategoryMap { [key: number]: Category; }
+import {CategoriesService} from '../_services/categories/categories.service';
+import {SearchService} from '../_services/search/search.service';
 
 @Component({
   selector: 'app-search-box',
@@ -16,24 +16,24 @@ interface CategoryMap { [key: number]: Category; }
   styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {
-  searchInputElement: MatInput;
-  queryParams: Params;
-  @Input() words: string;
   @Input() variant: string;
-  @Output() searchUpdated = new EventEmitter<Params>();
+  @Input() words: string;
   @Output() categorySelected = new EventEmitter<Category>();
-  searchUpdate = new Subject<String>();
-  searchBoxControl = new FormControl();
-  options: Category[] = [];
+  @Output() searchUpdated = new EventEmitter<Params>();
+  autocompletePanelElement: MatAutocomplete;
   filteredOptions: Observable<Category[]>;
-  categoryTree: Category[];
-  flattenedCategoryTree: CategoryMap = {};
+  queryParams: Params;
+  searchBoxControl = new FormControl();
+  searchInputElement: MatInput;
+  searchUpdate = new Subject<String>();
+  skipUpdate = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private searchService: SearchService,
-    private api: ApiService
+    private api: ApiService,
+    private categoryService: CategoriesService,
   ) {
     this.route
       .queryParams
@@ -43,22 +43,18 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     this.searchUpdate.pipe(
       debounceTime(400),
       distinctUntilChanged()
-    ).subscribe(value => this.updateSearch(false));
-
-    this.api.getCategoryTree().subscribe(categoryTree => {
-      this.categoryTree = categoryTree;
-      const flattened = {};
-      this._flattenCategoryTree(categoryTree, flattened);
-      this.flattenedCategoryTree = this._flattenCategoryTree(categoryTree, flattened);
-      this.options = Object.values(flattened);
-      this._populateCategoryParents();
-    });
+    ).subscribe(() => this.updateSearch(false));
   }
 
-  @ViewChild('searchInput', { read: MatInput })
+  @ViewChild('searchInput', {read: MatInput})
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
     this.searchInputElement.focus();
+  }
+
+  @ViewChild('autocompletePanel', {read: MatAutocomplete})
+  set autocompletePanel(value: MatAutocomplete) {
+    this.autocompletePanelElement = value;
   }
 
   ngOnInit() {
@@ -81,19 +77,19 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private _filter(value: string): Category[] {
-    if (value && value.length > 0) {
-      const filterValue = value.toLowerCase();
-      return this.options.filter(option => {
-        const indentedString = (this.levelIndent(option) + ' ' + option.name);
-        return indentedString.toLowerCase().includes(filterValue);
-      });
-    } else {
-      return this.options;
-    }
+  optionText(option: Category) {
+    return option?.indentedString;
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
+
+    if (this.skipUpdate) {
+      // Stupid hack to prevent submitting a keyword search when the user is selecting
+      // a topic from the autocomplete panel.
+      this.skipUpdate = false;
+      return;
+    }
+
     if (removeWords) {
       this.words = '';
       this.searchInputElement.value = this.words;
@@ -118,40 +114,54 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
   }
 
-  private _flattenCategoryTree(categoryTree: Category[], flattened: CategoryMap) {
-    categoryTree.forEach(c => {
-      if (!flattened[c.id]) { flattened[c.id] = c; }
-
-      if (c.children && c.children.length > 0) {
-        this._flattenCategoryTree(c.children, flattened);
-      }
-    });
-
-    return flattened;
-  }
-
-  private _populateCategoryParents() {
-    this.options.forEach(c => {
-      if (c.parent_id !== null) {
-        c.parent = this.flattenedCategoryTree[c.parent_id];
-        this.flattenedCategoryTree[c.id].parent = c.parent;
-      }
-    });
-  }
-
-  levelIndent(option: Category) {
-    let indentString = '';
+  /**
+   * Returns a string of the given category's ancestors' names in the format:
+   * "Grandparent Category Name > Parent Category Name > Category Name"
+   */
+  indentedString(option: Category) {
     let parent = option.parent;
+    const parents = [];
 
     while (parent) {
-      indentString += `${parent.name} > `;
+      // Add ancestor to beginning of the parents array.
+      parents.unshift(parent);
+
+      // Go up to the next ancestor
       parent = parent.parent;
     }
 
-    return indentString;
+    return parents
+      .map(p => p.name)
+      .concat([option.name])
+      .join(' > ');
   }
 
-  selectCategory($event) {
+  selectCategory($event: MatAutocompleteSelectedEvent) {
+    // Stupid hack to prevent submitting a keyword search when the user is selecting
+    // a topic from the autocomplete panel.
+    this.skipUpdate = true;
+
+    // Emit the selected category.
     this.categorySelected.emit($event.option.value as Category);
+  }
+
+  private _filter(value: string): Category[] {
+    if (value && value.length > 0) {
+      const words = value
+        .replace(/\W+/gi, ' ')
+        .toLowerCase()
+        .split(' ');
+      const patternString = words.map(w => `(?=.*${w})`).join('');
+      const filterPattern = new RegExp(patternString, 'gi');
+      return this.categoryService.categoryList
+        .filter(option => {
+          return (
+            (option.all_resource_count > 0) &&
+            filterPattern.test(option.indentedString)
+          );
+        });
+    } else {
+      return this.categoryService.categoryList;
+    }
   }
 }

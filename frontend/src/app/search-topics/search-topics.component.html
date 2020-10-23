@@ -12,7 +12,7 @@
     </ng-container>
 </mat-list>
 
-<ng-container *ngIf="category && category.children && (category.children.length > 0); else loadingMessage">
+<ng-container *ngIf="!loading && category && category.children && (category.children.length > 0); else loadingMessage">
   <button mat-button [matMenuTriggerFor]="topicMenu" [ngClass.gt-sm]="'select-topic'">
     <mat-icon>topic</mat-icon>
     Filter by {{category.level <= 0 ? 'Topic' : 'Subtopic'}}
@@ -20,12 +20,17 @@
   </button>
   <mat-menu #topicMenu>
       <button
-        *ngFor="let child of category.children"
+        *ngFor="let child of categories"
         (click)="selectCategory(child)"
         mat-menu-item
       >
         <span class="child-label" *ngIf="child.hit_count == 1">{{child.name}} - {{child.hit_count}} result</span>
         <span class="child-label" *ngIf="child.hit_count != 1">{{child.name}} - {{child.hit_count}} results</span>
+
+        <mat-icon
+          *ngIf="hasChildren(child)"
+          matTooltip="Subtopics"
+        >arrow_right</mat-icon>
       </button>
   </mat-menu>
 </ng-container>

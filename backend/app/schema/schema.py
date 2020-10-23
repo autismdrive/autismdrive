@@ -71,7 +71,7 @@ class ParentCategorySchema(ModelSchema):
     """Provides a view of the parent category, all the way to the top, but ignores children"""
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ('id', 'name', 'parent', 'level', '_links')
+        fields = ('id', 'name', 'parent', 'level', '_links', 'display_order')
     parent = ma.Nested(lambda: ParentCategorySchema(), dump_only=True)
     level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
     _links = ma.Hyperlinks({
@@ -84,7 +84,7 @@ class ChildCategoryInSearchSchema(ModelSchema):
     """Children within a category have hit counts when returned as a part of a search."""
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ('id', 'name', '_links', 'hit_count')
+        fields = ('id', 'name', '_links', 'hit_count', 'display_order')
     _links = ma.Hyperlinks({
         'self': ma.URLFor('api.categoryendpoint', id='<id>'),
         'collection': ma.URLFor('api.categorylistendpoint')
@@ -95,7 +95,7 @@ class CategoryInSearchSchema(ModelSchema):
     """streamlined category representation for inclusion in search results to provide faceted search"""
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level')
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'display_order')
     parent_id = fields.Number(required=False, allow_none=True)
     parent = ma.Nested(ParentCategorySchema, dump_only=True, required=False, allow_none=True)
     children = ma.Nested(ChildCategoryInSearchSchema, many=True, dump_only=True)
@@ -106,8 +106,9 @@ class CategorySchema(ModelSchema):
     """Provides detailed information about a category, including all the children"""
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count', 'location_count',
-                  'resource_count', 'all_resource_count', 'study_count', 'color', '_links', 'last_updated')
+        fields = ('id', 'name', 'children', 'parent_id', 'parent', 'level', 'event_count',
+                  'location_count', 'resource_count', 'all_resource_count', 'study_count',
+                  'color', '_links', 'last_updated', 'display_order')
     id = fields.Integer(required=False, allow_none=True)
     parent_id = fields.Integer(required=False, allow_none=True)
     children = ma.Nested(lambda: CategorySchema(), many=True, dump_only=True, exclude=('parent', 'color'))

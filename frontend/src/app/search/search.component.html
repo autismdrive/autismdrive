@@ -141,6 +141,15 @@
                 </mat-form-field>
               </div>
 
+              <div id="topic-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
+                <app-search-topics
+                  *ngIf="query"
+                  [category]="query.category"
+                  (categorySelected)="selectCategory($event)"
+                  [ngClass]="'filter-by-topic'"
+                ></app-search-topics>
+              </div>
+
               <div id="age-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
                 <div *ngIf="query">
                   <app-search-filter
@@ -171,15 +180,6 @@
                     [notApplicableMessage]="'No language restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
-              </div>
-
-              <div id="topic-filter" fxFlex="30%" fxFlex.lt-md="100%" [ngClass.lt-md]="'filter-container'">
-                <app-search-topics
-                  *ngIf="query"
-                  [category]="query.category"
-                  (categorySelected)="selectCategory($event)"
-                  [ngClass]="'filter-by-topic'"
-                ></app-search-topics>
               </div>
             </div>
           </div>

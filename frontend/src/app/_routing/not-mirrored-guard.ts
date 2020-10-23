@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import {ConfigService} from '../_services/config.service';
+import {ConfigService} from '../_services/config/config.service';
 
 
 @Injectable({ providedIn: 'root' })

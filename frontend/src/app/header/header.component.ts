@@ -25,9 +25,9 @@ import {
 } from 'rxjs/operators';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '../_models/scroll';
 import { User } from '../_models/user';
-import { AuthenticationService } from '../_services/api/authentication-service';
+import { AuthenticationService } from '../_services/authentication/authentication-service';
 import { ApiService } from '../_services/api/api.service';
-import {ConfigService} from '../_services/config.service';
+import {ConfigService} from '../_services/config/config.service';
 
 const boxShadow = '0px 5px 5px 0px rgba(0, 0, 0, 0.3)';
 const stateHiddenCollapsed = MenuState.Hidden + '-' + HeaderState.Collapsed;

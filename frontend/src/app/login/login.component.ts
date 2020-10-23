@@ -3,10 +3,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FormGroup} from '@angular/forms';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {scrollToTop} from '../../util/scrollToTop';
 import {User} from '../_models/user';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-login',

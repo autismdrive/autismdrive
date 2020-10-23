@@ -3,7 +3,7 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/c
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {GoogleAnalyticsService} from '../google-analytics.service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {StarError} from '../star-error';
 
 @Injectable()

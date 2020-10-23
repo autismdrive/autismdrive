@@ -4,7 +4,7 @@ import {Study} from '../_models/study';
 import {ApiService} from '../_services/api/api.service';
 import {NewsItem} from '../_models/news-item';
 import {HitType} from '../_models/hit_type';
-import {ConfigService} from '../_services/config.service';
+import {ConfigService} from '../_services/config/config.service';
 import {Meta} from '@angular/platform-browser';
 
 @Component({

@@ -6,7 +6,7 @@ import {ContactItem} from '../_models/contact_item';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {ResourceChangeLog} from '../_models/resource_change_log';
 import LatLngLiteral = google.maps.LatLngLiteral;
 
