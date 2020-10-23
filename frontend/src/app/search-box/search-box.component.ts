@@ -1,20 +1,21 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {
-  MatAutocomplete,
-  MatAutocompleteActivatedEvent,
-  MatAutocompleteSelectedEvent
-} from '@angular/material/autocomplete';
+import {FormControl} from '@angular/forms';
+import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
-import {debounce, debounceTime, distinctUntilChanged, startWith, map} from 'rxjs/operators';
+import {debounce, debounceTime, distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {Category} from '../_models/category';
-import {SearchService} from '../_services/api/search.service';
-import {FormControl} from '@angular/forms';
 import {ApiService} from '../_services/api/api.service';
+import {SearchService} from '../_services/api/search.service';
 
-interface CategoriesById { [key: number]: Category; }
-interface CategoriesByDisplayOrder { [key: string]: Category; }
+interface CategoriesById {
+  [key: number]: Category;
+}
+
+interface CategoriesByDisplayOrder {
+  [key: string]: Category;
+}
 
 @Component({
   selector: 'app-search-box',
@@ -22,20 +23,20 @@ interface CategoriesByDisplayOrder { [key: string]: Category; }
   styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {
-  searchInputElement: MatInput;
-  queryParams: Params;
-  @Input() words: string;
   @Input() variant: string;
-  @Output() searchUpdated = new EventEmitter<Params>();
+  @Input() words: string;
   @Output() categorySelected = new EventEmitter<Category>();
-  searchUpdate = new Subject<String>();
-  searchBoxControl = new FormControl();
-  options: Category[] = [];
-  filteredOptions: Observable<Category[]>;
-  categoryTree: Category[];
-  categoriesById: CategoriesById = {};
-  categoriesByDisplayOrder: CategoriesByDisplayOrder = {};
+  @Output() searchUpdated = new EventEmitter<Params>();
   autocompletePanelElement: MatAutocomplete;
+  categoriesByDisplayOrder: CategoriesByDisplayOrder = {};
+  categoriesById: CategoriesById = {};
+  categoryTree: Category[];
+  filteredOptions: Observable<Category[]>;
+  options: Category[] = [];
+  queryParams: Params;
+  searchBoxControl = new FormControl();
+  searchInputElement: MatInput;
+  searchUpdate = new Subject<String>();
   skipUpdate = false;
 
   constructor(
@@ -71,13 +72,13 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
-  @ViewChild('searchInput', { read: MatInput })
+  @ViewChild('searchInput', {read: MatInput})
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
     this.searchInputElement.focus();
   }
 
-  @ViewChild('autocompletePanel', { read: MatAutocomplete })
+  @ViewChild('autocompletePanel', {read: MatAutocomplete})
   set autocompletePanel(value: MatAutocomplete) {
     this.autocompletePanelElement = value;
   }
@@ -106,22 +107,11 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     return option?.indentedString;
   }
 
-  private _filter(value: string): Category[] {
-    if (value && value.length > 0) {
-      const words = value.replace(/\W+/gi, ' ').toLowerCase().split(' ');
-      const patternString = words.map(w => `(?=.*${w})`).join('');
-      const filterPattern = new RegExp(patternString, 'gi');
-      return this.options.filter(option => filterPattern.test(option.indentedString));
-    } else {
-      return this.options;
-    }
-  }
-
   updateSearch(removeWords: boolean): Promise<boolean> {
 
-    // Stupid hack to prevent submitting a keyword search when the user is selecting
-    // a topic from the autocomplete panel.
     if (this.skipUpdate) {
+      // Stupid hack to prevent submitting a keyword search when the user is selecting
+      // a topic from the autocomplete panel.
       this.skipUpdate = false;
       return;
     }
@@ -150,6 +140,48 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
   }
 
+  /**
+   * Returns a string of the given category's ancestors' names in the format:
+   * "Grandparent Category Name > Parent Category Name > Category Name"
+   */
+  indentedString(option: Category) {
+    let parent = option.parent;
+    const parents = [];
+
+    while (parent) {
+      // Add ancestor to beginning of the parents array.
+      parents.unshift(parent);
+
+      // Go up to the next ancestor
+      parent = parent.parent;
+    }
+
+    return parents
+      .map(p => p.name)
+      .concat([option.name])
+      .join(' > ');
+  }
+
+  selectCategory($event: MatAutocompleteSelectedEvent) {
+    // Stupid hack to prevent submitting a keyword search when the user is selecting
+    // a topic from the autocomplete panel.
+    this.skipUpdate = true;
+
+    // Emit the selected category.
+    this.categorySelected.emit($event.option.value as Category);
+  }
+
+  private _filter(value: string): Category[] {
+    if (value && value.length > 0) {
+      const words = value.replace(/\W+/gi, ' ').toLowerCase().split(' ');
+      const patternString = words.map(w => `(?=.*${w})`).join('');
+      const filterPattern = new RegExp(patternString, 'gi');
+      return this.options.filter(option => filterPattern.test(option.indentedString));
+    } else {
+      return this.options;
+    }
+  }
+
   /** Recursively walks the given category tree and puts each category into flattened indices for faster retrieval and sorting. */
   private _populateCategoryIndices(categoryTree: Category[], displayOrders = []) {
     // Index should be a string that can be sorted such that categories will be
@@ -168,14 +200,18 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     // ...etc...
     // so we want to add the ancestors' display orders into an array like this:
     // [0, 0, 1].join('.')
-    // which means we need to walk the tree,
-    // pushing the ancestors display orders into the array as we go down.
+
+    // Walk the tree, pushing the ancestors display orders into the array as we go down.
     categoryTree.forEach(c => {
       const displayOrder = (c.display_order !== null && c.display_order !== undefined) ? c.display_order : c.id;
       const indexArray = displayOrders.concat([displayOrder]);
       const indexStr = indexArray.join('.');
-      if (!this.categoriesByDisplayOrder[indexStr]) { this.categoriesByDisplayOrder[indexStr] = c; }
-      if (!this.categoriesById[c.id]) { this.categoriesById[c.id] = c; }
+      if (!this.categoriesByDisplayOrder[indexStr]) {
+        this.categoriesByDisplayOrder[indexStr] = c;
+      }
+      if (!this.categoriesById[c.id]) {
+        this.categoriesById[c.id] = c;
+      }
 
       if (c.children && c.children.length > 0) {
         this._populateCategoryIndices(c.children, indexArray);
@@ -183,6 +219,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /** Adds the parent property to each of the categories in categoriesById */
   private _populateCategoryParents() {
     this.options.forEach(c => {
       if (c.parent_id !== null) {
@@ -190,24 +227,5 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
         this.categoriesById[c.id].parent = c.parent;
       }
     });
-  }
-
-  indentedString(option: Category) {
-    let indentString = '';
-    let parent = option.parent;
-
-    while (parent) {
-      indentString += `${parent.name} > `;
-      parent = parent.parent;
-    }
-
-    return indentString + ' ' + option.name;
-  }
-
-  selectCategory($event: MatAutocompleteSelectedEvent) {
-    // Stupid hack to prevent submitting a keyword search when the user is selecting
-    // a topic from the autocomplete panel.
-    this.skipUpdate = true;
-    this.categorySelected.emit($event.option.value as Category);
   }
 }
