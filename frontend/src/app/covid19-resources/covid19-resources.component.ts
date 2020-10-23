@@ -5,7 +5,7 @@ import {Covid19Categories} from '../_models/hit_type';
 import {Hit, Query} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 interface C19ResourceCategoryObj {
   name: string;

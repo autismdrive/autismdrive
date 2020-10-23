@@ -1,23 +1,46 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Query} from '../_models/query';
-import {Category} from '../_models/category';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges
+} from '@angular/core';
+import {CategoriesById, Category} from '../_models/category';
+import {CategoriesService} from '../_services/categories/categories.service';
 
 @Component({
   selector: 'app-search-topics',
   templateUrl: './search-topics.component.html',
   styleUrls: ['./search-topics.component.scss']
 })
-export class SearchTopicsComponent implements OnInit {
+export class SearchTopicsComponent implements OnInit, OnChanges {
+  @Input() category: Category;
+  @Output() categorySelected = new EventEmitter<Category>();
+  categoriesById: CategoriesById = {};
+  loading = true;
 
-  @Input()
-  category: Category;
+  constructor(
+    private categoriesService: CategoriesService,
+    private changeDetectorRef: ChangeDetectorRef,
+  ) {
+    this.categoriesService.updated.subscribe(() => {
+      this.categoriesById = this.categoriesService.categoriesById;
+      this.loading = false;
+      this.changeDetectorRef.detectChanges();
+    });
+  }
 
-  @Output()
-  categorySelected = new EventEmitter<Category>();
-
-  constructor() { }
+  get categories() {
+    return this.getChildrenWithHits(this.category);
+  }
 
   ngOnInit() {
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
   }
 
   selectCategory(cat: Category) {
@@ -30,6 +53,19 @@ export class SearchTopicsComponent implements OnInit {
       return this.parentList(current.parent, parents);
     } else {
       return parents;
+    }
+  }
+
+  hasChildren(cat: Category) {
+    const category = (cat.id === null) ? cat : this.categoriesById[cat.id];
+    return category && category.children && category.children.length > 0;
+  }
+
+  getChildrenWithHits(cat: Category) {
+    if (this.hasChildren(cat)) {
+      return cat.children.filter(c => c.hit_count > 0);
+    } else {
+      return [];
     }
   }
 

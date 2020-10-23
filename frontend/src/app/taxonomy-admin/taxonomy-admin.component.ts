@@ -6,7 +6,7 @@ import {Observable, of} from 'rxjs';
 import {Category} from '../_models/category';
 import {ApiService} from '../_services/api/api.service';
 import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 @Component({
   selector: 'app-taxonomy-admin',

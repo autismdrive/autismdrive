@@ -12,7 +12,7 @@ import {Participant} from '../_models/participant';
 import {Step, StepStatus} from '../_models/step';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '../google-analytics.service';
 
 enum FlowState {

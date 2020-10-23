@@ -9,7 +9,7 @@ import {Resource} from '../_models/resource';
 import {ResourceCategory} from '../_models/resource_category';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 
 enum PageState {

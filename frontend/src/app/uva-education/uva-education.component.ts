@@ -4,7 +4,7 @@ import {NewsItem} from '../_models/news-item';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/api/authentication-service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {Meta} from '@angular/platform-browser';
 
 @Component({
