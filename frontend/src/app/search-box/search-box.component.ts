@@ -1,4 +1,9 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  MatAutocomplete,
+  MatAutocompleteActivatedEvent,
+  MatAutocompleteSelectedEvent
+} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
@@ -30,6 +35,8 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   categoryTree: Category[];
   categoriesById: CategoriesById = {};
   categoriesByDisplayOrder: CategoriesByDisplayOrder = {};
+  autocompletePanelElement: MatAutocomplete;
+  skipUpdate = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -53,11 +60,14 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
 
       // Sort options by category level and display order
       this.options = Object
-        .entries(this.categoriesByDisplayOrder)
+        .entries(this.categoriesByDisplayOrder) // each entry is an array containing [key, value]
         .sort((a, b) => a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1)
-        .map(c => c[1]);
+        .map(entry => entry[1]);
 
       this._populateCategoryParents();
+      this.options.forEach(cat => {
+        cat.indentedString = this.indentedString(cat);
+      });
     });
   }
 
@@ -65,6 +75,11 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
     this.searchInputElement.focus();
+  }
+
+  @ViewChild('autocompletePanel', { read: MatAutocomplete })
+  set autocompletePanel(value: MatAutocomplete) {
+    this.autocompletePanelElement = value;
   }
 
   ngOnInit() {
@@ -87,19 +102,30 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
+  optionText(option: Category) {
+    return option?.indentedString;
+  }
+
   private _filter(value: string): Category[] {
     if (value && value.length > 0) {
-      const filterValue = value.toLowerCase();
-      return this.options.filter(option => {
-        const indentedString = (this.levelIndent(option) + ' ' + option.name);
-        return indentedString.toLowerCase().includes(filterValue);
-      });
+      const words = value.replace(/\W+/gi, ' ').toLowerCase().split(' ');
+      const patternString = words.map(w => `(?=.*${w})`).join('');
+      const filterPattern = new RegExp(patternString, 'gi');
+      return this.options.filter(option => filterPattern.test(option.indentedString));
     } else {
       return this.options;
     }
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
+
+    // Stupid hack to prevent submitting a keyword search when the user is selecting
+    // a topic from the autocomplete panel.
+    if (this.skipUpdate) {
+      this.skipUpdate = false;
+      return;
+    }
+
     if (removeWords) {
       this.words = '';
       this.searchInputElement.value = this.words;
@@ -166,7 +192,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     });
   }
 
-  levelIndent(option: Category) {
+  indentedString(option: Category) {
     let indentString = '';
     let parent = option.parent;
 
@@ -175,10 +201,13 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
       parent = parent.parent;
     }
 
-    return indentString;
+    return indentString + ' ' + option.name;
   }
 
-  selectCategory($event) {
+  selectCategory($event: MatAutocompleteSelectedEvent) {
+    // Stupid hack to prevent submitting a keyword search when the user is selecting
+    // a topic from the autocomplete panel.
+    this.skipUpdate = true;
     this.categorySelected.emit($event.option.value as Category);
   }
 }

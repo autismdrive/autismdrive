@@ -15,4 +15,5 @@ export interface Category {
   display_order?: number;
   // _links: any;
   // _meta: any;
+  indentedString?: string;
 }
