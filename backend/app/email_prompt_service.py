@@ -27,8 +27,8 @@ class EmailPromptService:
         confirmed_users = self.db.session.query(self.user_model).filter(self.user_model.password is not None).all()
         recipients = []
         for u in confirmed_users:
-            if (u.self_participant is not None) \
-                    and (u.self_participant.relationship.name == 'self_guardian') \
+            if (u.self_participant() is not None) \
+                    and (u.self_participant().relationship.name == 'self_guardian') \
                     and (u.self_registration_complete() is True):
                 dependents = [p for p in u.participants if p.relationship.name == 'dependent']
                 incomplete_dependents = [p for p in dependents if p.get_percent_complete() < 1]
