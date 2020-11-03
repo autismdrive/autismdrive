@@ -12,7 +12,7 @@ import {ConfigService} from '../config/config.service';
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
   public static LOCAL_TOKEN_KEY = 'star_token';
-  private currentUserSubject: Subject<User>;
+  private currentUserSubject = new BehaviorSubject<User>(null);
   public currentUser: Observable<User>;
 
   private login_url: string;
@@ -26,8 +26,6 @@ export class AuthenticationService {
     this.reset_pass_url = `${configService.apiUrl}/api/reset_password`;
     this.refresh_url = `${configService.apiUrl}/api/session`;
 
-
-    this.currentUserSubject = new BehaviorSubject<User>(null);
     this.currentUser = this.currentUserSubject.asObservable();
     if (token) {
       console.log('A token is set.  Grabbing the user.');
