@@ -433,9 +433,9 @@ class UserSchema(ModelSchema):
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
     permissions = fields.Method('get_permissions', dump_only=True)
-    percent_self_registration_complete = fields.Function(lambda obj: missing if obj is None else obj.percent_self_registration_complete(), dump_only=True)
-    created_password = fields.Function(lambda obj: missing if obj is None else obj.created_password(), dump_only=True)
-    identity = fields.Function(lambda obj: missing if obj is None else obj.identity(), dump_only=True)
+    percent_self_registration_complete = fields.Function(lambda obj: missing if obj is None else obj.percent_self_registration_complete, dump_only=True)
+    created_password = fields.Function(lambda obj: missing if obj is None else obj.created_password, dump_only=True)
+    identity = fields.Function(lambda obj: missing if obj is None else obj.identity, dump_only=True)
 
     def get_permissions(self, obj):
         if obj is None:
