@@ -41,26 +41,15 @@ class User(db.Model):
             if participant_id == p.id:
                 return True
 
-    @hybrid_property
     def self_participant(self):
         if len(self.participants) > 0:
             for p in self.participants:
                 if 'self' in p.relationship.name:
                     return p
 
-    @self_participant.expression
-    def self_participant(cls):
-        return select(Participant).where(Participant.user_id==cls.id)
-
-    @hybrid_property
     def self_registration_complete(self):
-        if self.self_participant is not None:
-            return self.self_participant.get_percent_complete() == 1
-
-    @self_registration_complete.expression
-    def self_registration_complete(self):
-        if self.self_participant is not None:
-            return self.self_participant.get_percent_complete() == 1
+        if self.self_participant() is not None:
+            return self.self_participant().get_percent_complete() == 1
 
     @hybrid_property
     def password(self):
@@ -126,28 +115,13 @@ class User(db.Model):
             if p.contact:
                 return {'name': p.get_name(), 'relationship': p.relationship.name, 'contact': p.contact}
 
-    @hybrid_property
     def created_password(self):
-        return self.password is not None
+        return self._password is not None
 
-    @created_password.expression
-    def created_password(self):
-        return self.password is not None
-
-    @hybrid_property
     def identity(self):
-        self_participant = self.self_participant
+        self_participant = self.self_participant()
         return 'Not set' if self_participant is None else self_participant.relationship.name
 
-    @identity.expression
-    def identity(self):
-        self_participant = self.self_participant
-        return 'Not set' if self_participant is None else self_participant.relationship.name
-
-    @hybrid_property
     def percent_self_registration_complete(self):
-        return 0 if self.self_participant is None else self.self_participant.get_percent_complete()
-
-    @percent_self_registration_complete.expression
-    def percent_self_registration_complete(cls):
-        return select(Participant.get_percent_complete()).where(Participant.user_id==cls.id)
+        self_participant = self.self_participant()
+        return 0 if self_participant is None else self_participant.get_percent_complete()

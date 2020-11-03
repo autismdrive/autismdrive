@@ -1,4 +1,5 @@
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 from app.model.step_log import StepLog

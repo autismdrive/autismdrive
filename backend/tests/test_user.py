@@ -565,17 +565,17 @@ class TestUser(BaseTest, unittest.TestCase):
 
     def test_user_created_password(self):
         pass_user = self.test_create_user_with_password()
-        self.assertEqual(pass_user.created_password, True)
+        self.assertEqual(pass_user.created_password(), True)
         non_pass_user = self.construct_user()
-        self.assertEqual(non_pass_user.created_password, False)
+        self.assertEqual(non_pass_user.created_password(), False)
 
     def test_user_identity(self):
         u = self.construct_user(email='superuser@sartography.com')
         self.construct_participant(user=u, relationship=Relationship.self_guardian)
-        self.assertEqual(u.identity, 'self_guardian')
+        self.assertEqual(u.identity(), 'self_guardian')
         u2 = self.construct_user(email='superuser2@sartography.com')
         self.construct_participant(user=u2, relationship=Relationship.self_professional)
-        self.assertEqual(u2.identity, 'self_professional')
+        self.assertEqual(u2.identity(), 'self_professional')
 
     def test_percent_self_registration_complete(self):
         u = self.construct_user(email='prof@sartography.com')
@@ -585,4 +585,4 @@ class TestUser(BaseTest, unittest.TestCase):
                            content_type="application/json",
                            follow_redirects=True, headers=self.logged_in_headers(u))
 
-        self.assertGreater(u.percent_self_registration_complete, 0)
+        self.assertGreater(u.percent_self_registration_complete(), 0)

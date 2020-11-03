@@ -87,10 +87,12 @@ class UserListEndpoint(flask_restful.Resource):
         sort_column = args["sort"] if ("sort" in args) else "email"
         col = getattr(User, sort_column)
 
-        if args["sortOrder"] == "desc":
-            query = query.order_by(desc(col))
-        else:
-            query = query.order_by(col)
+        # FIXME: Enable sorting by function properties.
+        if isinstance(col, InstrumentedAttribute):
+            if args["sortOrder"] == "desc":
+                query = query.order_by(desc(col))
+            else:
+                query = query.order_by(col)
 
         page = query.paginate(page=pageNumber + 1, per_page=per_page, error_out=False)
         return self.searchSchema.dump(page)
