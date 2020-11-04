@@ -1,13 +1,21 @@
-import {Component, ComponentFactory, ComponentFactoryResolver, OnInit, ViewChild, ViewChildren, ViewContainerRef} from '@angular/core';
+import {
+  Component,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  OnInit,
+  ViewChild,
+  ViewChildren,
+  ViewContainerRef
+} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
-import {ApiService} from '../_services/api/api.service';
 import {Router} from '@angular/router';
+import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {DataTransferDataSource} from '../_models/data_transfer_data_source';
-import { merge } from 'rxjs/observable/merge';
-import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 import {DataTransferLog} from '../_models/data_transfer_log';
+import {ApiService} from '../_services/api/api.service';
 import {ConfigService} from '../_services/config/config.service';
+import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({
   selector: 'app-admin-export',
@@ -24,14 +32,15 @@ export class AdminExportComponent implements OnInit {
   latestLog: DataTransferLog;
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren('tableRow', { read: ViewContainerRef }) rowContainers;
+  @ViewChildren('tableRow', {read: ViewContainerRef}) rowContainers;
 
   constructor(
     private api: ApiService,
     private configService: ConfigService,
     private router: Router,
     private resolver: ComponentFactoryResolver
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.mirroring = this.configService.mirroring;
@@ -43,10 +52,12 @@ export class AdminExportComponent implements OnInit {
   }
 
   loadData() {
-      this.dataTransferDataSource = new DataTransferDataSource(this.api);
-      this.columns = ['id', 'type', 'date_started', 'last_updated', 'total_records', 'alerts_sent'];
-      this.dataTransferDataSource.loadLogs(this.paginator.pageIndex, this.paginator.pageSize);
-      this.dataTransferDataSource.count$.subscribe(c => {this.count = c; });
+    this.dataTransferDataSource = new DataTransferDataSource(this.api);
+    this.columns = ['id', 'type', 'date_started', 'last_updated', 'total_records', 'alerts_sent'];
+    this.dataTransferDataSource.loadLogs(this.paginator.pageIndex, this.paginator.pageSize);
+    this.dataTransferDataSource.count$.subscribe(c => {
+      this.count = c;
+    });
   }
 
   getRowClass(log: DataTransferLog) {
