@@ -28,10 +28,11 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
   constructor(
     private api: ApiService,
     private router: Router
-  ) { }
+  ) {
+    this.dataSource = new UserDataSource(this.api);
+  }
 
   ngOnInit() {
-    this.dataSource = new UserDataSource(this.api);
     this.dataSource.loadUsers('', 'email', 'asc',
       0, this.default_page_size);
   }
