@@ -98,6 +98,11 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
     const words: string = this.searchInputElement && this.searchInputElement.value || '';
     newParams.words = removeWords ? undefined : words;
+
+    if (newParams.words) {
+      newParams.sort = 'Relevance';
+    }
+
     const hasFilters = Object.keys(newParams).length > 0;
 
     if (hasFilters) {
