@@ -1,24 +1,22 @@
-import { User } from './user';
-import { DataSource } from '@angular/cdk/table';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { ApiService } from '../_services/api/api.service';
-import { CollectionViewer } from '@angular/cdk/collections';
-import { Observable } from 'rxjs/Observable';
+import {CollectionViewer} from '@angular/cdk/collections';
+import {DataSource} from '@angular/cdk/table';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ApiService} from '../_services/api/api.service';
 import {DataTransferLog} from './data_transfer_log';
 
 export class DataTransferDataSource implements DataSource<DataTransferLog> {
 
   private logSubject = new BehaviorSubject<DataTransferLog[]>([]);
-  private countSubject = new BehaviorSubject<number>(0);
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-
   public logs$ = this.logSubject.asObservable();
-  public loading$ = this.loadingSubject.asObservable();
+  private countSubject = new BehaviorSubject<number>(0);
   public count$ = this.countSubject.asObservable();
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
 
   constructor(
     private api: ApiService
-  ) {}
+  ) {
+  }
 
   connect(collectionViewer: CollectionViewer): Observable<DataTransferLog[]> {
     return this.logSubject.asObservable();
@@ -34,14 +32,14 @@ export class DataTransferDataSource implements DataSource<DataTransferLog> {
     this.loadingSubject.next(true);
     this.api.getDataTransferLogs(pageNumber, pageSize)
       .subscribe(results => {
-        this.logSubject.next(results.items);
-        this.countSubject.next(results.total);
-        this.loadingSubject.next(false);
-      },
+          this.logSubject.next(results.items);
+          this.countSubject.next(results.total);
+          this.loadingSubject.next(false);
+        },
         error1 => {
           this.logSubject.next(null);
           this.countSubject.next(0);
           this.loadingSubject.next(false);
-      });
+        });
   }
 }

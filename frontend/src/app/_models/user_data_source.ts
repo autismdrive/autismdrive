@@ -1,25 +1,20 @@
-import {Injectable} from '@angular/core';
-import { User } from './user';
-import { DataSource } from '@angular/cdk/table';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { ApiService } from '../_services/api/api.service';
-import { CollectionViewer } from '@angular/cdk/collections';
-import { Observable } from 'rxjs/Observable';
+import {CollectionViewer} from '@angular/cdk/collections';
+import {DataSource} from '@angular/cdk/table';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ApiService} from '../_services/api/api.service';
+import {User} from './user';
 
-
-@Injectable({providedIn: 'root'})
 export class UserDataSource implements DataSource<User> {
-
   private userSubject = new BehaviorSubject<User[]>([]);
   private countSubject = new BehaviorSubject<number>(0);
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-
-  public loading$ = this.loadingSubject.asObservable();
   public count$ = this.countSubject.asObservable();
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
 
   constructor(
     private api: ApiService
-  ) {}
+  ) {
+  }
 
   connect(collectionViewer: CollectionViewer): Observable<User[]> {
     return this.userSubject.asObservable();
@@ -36,15 +31,15 @@ export class UserDataSource implements DataSource<User> {
     this.loadingSubject.next(true);
     this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize)
       .subscribe(results => {
-        console.log('UserDataSource loadUsers results', results);
-        this.userSubject.next(results.items);
-        this.countSubject.next(results.total);
-        this.loadingSubject.next(false);
-      },
+          console.log('UserDataSource loadUsers results', results);
+          this.userSubject.next(results.items);
+          this.countSubject.next(results.total);
+          this.loadingSubject.next(false);
+        },
         error1 => {
           this.userSubject.next(null);
           this.countSubject.next(0);
           this.loadingSubject.next(false);
-      });
+        });
   }
 }

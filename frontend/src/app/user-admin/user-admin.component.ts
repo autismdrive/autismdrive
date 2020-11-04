@@ -1,13 +1,11 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { UserDataSource } from '../_models/user_data_source';
-import { ApiService } from '../_services/api/api.service';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { merge } from 'rxjs/observable/merge';
-import { fromEvent } from 'rxjs/observable/fromEvent';
-import { Router } from '@angular/router';
-
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
+import {Router} from '@angular/router';
+import {fromEvent, merge} from 'rxjs';
+import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
+import {UserDataSource} from '../_models/user_data_source';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-user-admin',
@@ -15,7 +13,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-admin.component.scss']
 })
 export class UserAdminComponent implements OnInit, AfterViewInit {
-
   dataSource: UserDataSource;
   displayedColumns = ['id', 'role', 'email', 'last_updated', 'registration_date', 'last_login', 'participant_count',
     'created_password', 'identity', 'percent_self_registration_complete'];
