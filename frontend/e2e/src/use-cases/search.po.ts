@@ -61,6 +61,14 @@ export class SearchUseCases {
     const numFirstTabSelectedAfter  = await this.page.getElements(activeFirstTabSelector).count();
     expect(numTypeTabsAfter).toEqual(numTypeTabsBefore, 'All type tabs should be present.');
     expect(numFirstTabSelectedAfter).toEqual(numFirstTabSelectedBefore, 'First type tab should be selected.');
+
+    if (!autocomplete) {
+      // Results should be sorted by Relevance
+      const selectedSortSelector = '.sort-order app-search-sort mat-select-trigger .selected-sort-label';
+      await this.page.waitForVisible(selectedSortSelector);
+      const selectEl = await this.page.getElement(selectedSortSelector);
+      expect(selectEl.getText()).toEqual('Relevance');
+    }
   }
 
   async displaySelectedCategory(filterBy: string) {
