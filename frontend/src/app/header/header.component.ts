@@ -11,12 +11,11 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  OnDestroy, OnInit
+  OnDestroy,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
 import {
-  distinctUntilChanged,
   filter,
   map,
   pairwise,

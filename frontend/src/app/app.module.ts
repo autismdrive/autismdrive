@@ -77,9 +77,10 @@ import {JwtInterceptor} from './_routing/jwt-interceptor';
 import {RoutingModule} from './_routing/routing.module';
 import {ApiService} from './_services/api/api.service';
 import {CategoriesService} from './_services/categories/categories.service';
-import {SearchService} from './_services/search/search.service';
 import {ConfigService} from './_services/config/config.service';
+import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
 import {IntervalService} from './_services/interval/interval.service';
+import {SearchService} from './_services/search/search.service';
 import {AboutComponent} from './about/about.component';
 import {AccordionComponent} from './accordion/accordion.component';
 import {AddButtonComponent} from './add-button/add-button.component';
@@ -110,7 +111,6 @@ import {FlowIntroComponent} from './flow-intro/flow-intro.component';
 import {FlowComponent} from './flow/flow.component';
 import {FooterComponent} from './footer/footer.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
-import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
 import {HeaderComponent} from './header/header.component';
 import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';
@@ -138,7 +138,9 @@ import {ResourceDetailComponent} from './resource-detail/resource-detail.compone
 import {ResourceFormComponent} from './resource-form/resource-form.component';
 import {SearchBoxComponent} from './search-box/search-box.component';
 import {SearchFilterComponent} from './search-filter/search-filter.component';
+import {SearchFiltersBreadcrumbsComponent} from './search-filters-breadcrumbs/search-filters-breadcrumbs.component';
 import {SearchResultComponent} from './search-result/search-result.component';
+import {SearchSortComponent} from './search-sort/search-sort.component';
 import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {SearchComponent} from './search/search.component';
 import {StudiesComponent} from './studies/studies.component';
@@ -149,13 +151,11 @@ import {StudySurveyEntryComponent} from './study-survey-entry/study-survey-entry
 import {TaxonomyAdminComponent} from './taxonomy-admin/taxonomy-admin.component';
 import {TermsComponent} from './terms/terms.component';
 import {TimedoutComponent} from './timed-out/timed-out.component';
+import {TutorialVideoComponent} from './tutorial-video/tutorial-video.component';
 import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
-import { SearchSortComponent } from './search-sort/search-sort.component';
-import { TutorialVideoComponent } from './tutorial-video/tutorial-video.component';
-import { SearchFiltersBreadcrumbsComponent } from './search-filters-breadcrumbs/search-filters-breadcrumbs.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -230,17 +230,31 @@ export class FormlyConfig {
   declarations: [
     AboutComponent,
     AccordionComponent,
+    AddButtonComponent,
     AdminExportComponent,
     AdminExportDetailsComponent,
     AdminHomeComponent,
+    AdminNoteDisplayComponent,
+    AdminNoteFormComponent,
     AppComponent,
     AutocompleteSectionComponent,
     AvatarDialogComponent,
     AvatarDialogComponent,
     BorderBoxTileComponent,
     CardWrapperComponent,
-    FilterChipsComponent,
+    ContactItemComponent,
+    Covid19ResourcesComponent,
     DetailsLinkComponent,
+    EditButtonComponent,
+    EmailLogAdminComponent,
+    EventDateComponent,
+    EventRegistrationComponent,
+    EventRegistrationFormComponent,
+    FavoriteResourceButtonComponent,
+    FavoriteResourcesComponent,
+    FavoriteTopicsComponent,
+    FavoriteTopicsDialogComponent,
+    FilterChipsComponent,
     FiltersComponent,
     FiltersComponent,
     FlowCompleteComponent,
@@ -255,13 +269,17 @@ export class FormlyConfig {
     HelpWrapperComponent,
     HeroSlidesComponent,
     HomeComponent,
+    InvestigatorFormComponent,
+    LastUpdatedDateComponent,
     LoadingComponent,
     LoginComponent,
     LogoComponent,
     LogoutComponent,
     LogoutComponent,
     MirrorComponent,
+    MultiselectTreeComponent,
     NewsItemComponent,
+    ParticipantAdminComponent,
     ParticipantDetailComponent,
     ParticipantProfileComponent,
     PasswordResetComponent,
@@ -271,51 +289,33 @@ export class FormlyConfig {
     QuestionnaireStepComponent,
     QuestionnaireStepsListComponent,
     RegisterComponent,
+    RegisterDialogComponent,
+    RelatedItemsComponent,
     RepeatSectionComponent,
     RepeatSectionDialogComponent,
     ResourceDetailComponent,
     ResourceFormComponent,
     SearchBoxComponent,
     SearchComponent,
+    SearchFilterComponent,
+    SearchFiltersBreadcrumbsComponent,
     SearchResultComponent,
     SearchResultComponent,
+    SearchSortComponent,
+    SearchTopicsComponent,
     StudiesComponent,
     StudyDetailComponent,
     StudyFormComponent,
     StudyInquiryComponent,
+    StudySurveyEntryComponent,
+    TaxonomyAdminComponent,
     TermsComponent,
     TimedoutComponent,
+    TutorialVideoComponent,
     TypeIconComponent,
     UserAdminComponent,
     UserAdminDetailsComponent,
-    SearchTopicsComponent,
-    SearchFilterComponent,
-    AdminNoteFormComponent,
-    AdminNoteDisplayComponent,
-    EventDateComponent,
-    LastUpdatedDateComponent,
-    RelatedItemsComponent,
-    ContactItemComponent,
-    AddButtonComponent,
-    EditButtonComponent,
-    ParticipantAdminComponent,
     UvaEducationComponent,
-    MultiselectTreeComponent,
-    TaxonomyAdminComponent,
-    Covid19ResourcesComponent,
-    FavoriteResourceButtonComponent,
-    FavoriteResourcesComponent,
-    FavoriteTopicsDialogComponent,
-    FavoriteTopicsComponent,
-    InvestigatorFormComponent,
-    StudySurveyEntryComponent,
-    RegisterDialogComponent,
-    EventRegistrationComponent,
-    EventRegistrationFormComponent,
-    EmailLogAdminComponent,
-    SearchSortComponent,
-    TutorialVideoComponent,
-    SearchFiltersBreadcrumbsComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -364,15 +364,10 @@ export class FormlyConfig {
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,
-    RoutingModule,
     TruncateModule,
+    RoutingModule, // This line must be the last module imported
   ],
   providers: [
-    {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
-    {provide: LAZY_MAPS_API_CONFIG, useExisting: ConfigService},
-    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
-    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
-    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
     ApiService,
     CategoriesService,
     DatePipe,
@@ -380,17 +375,22 @@ export class FormlyConfig {
     GoogleAnalyticsService,
     IntervalService,
     SearchService,
+    {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
+    {provide: LAZY_MAPS_API_CONFIG, useExisting: ConfigService},
+    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
   ],
   bootstrap: [AppComponent],
   entryComponents: [
     AdminExportDetailsComponent,
-    AvatarDialogComponent,
-    RepeatSectionDialogComponent,
     AdminNoteFormComponent,
+    AvatarDialogComponent,
+    EventRegistrationFormComponent,
     FavoriteTopicsDialogComponent,
     InvestigatorFormComponent,
     RegisterDialogComponent,
-    EventRegistrationFormComponent,
+    RepeatSectionDialogComponent,
   ]
 })
 export class AppModule {
