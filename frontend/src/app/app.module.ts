@@ -72,6 +72,7 @@ import {
   UrlValidator,
   UrlValidatorMessage
 } from './_forms/validators/formly.validator';
+import {UserDataSource} from './_models/user_data_source';
 import {ErrorInterceptor} from './_routing/error-interceptor';
 import {JwtInterceptor} from './_routing/jwt-interceptor';
 import {RoutingModule} from './_routing/routing.module';
@@ -380,6 +381,7 @@ export class FormlyConfig {
     GoogleAnalyticsService,
     IntervalService,
     SearchService,
+    UserDataSource,
   ],
   bootstrap: [AppComponent],
   entryComponents: [

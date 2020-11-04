@@ -3,8 +3,9 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists, desc
+from sqlalchemy import exists, desc, asc, text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from app import app, RestException, db, email_service, auth
 from app.email_service import EmailService
@@ -86,10 +87,12 @@ class UserListEndpoint(flask_restful.Resource):
         sort_column = args["sort"] if ("sort" in args) else "email"
         col = getattr(User, sort_column)
 
-        if args["sortOrder"] == "desc":
-            query = query.order_by(desc(col))
-        else:
-            query = query.order_by(col)
+        # FIXME: Enable sorting by function properties.
+        if isinstance(col, InstrumentedAttribute):
+            if args["sortOrder"] == "desc":
+                query = query.order_by(desc(col))
+            else:
+                query = query.order_by(col)
 
         page = query.paginate(page=pageNumber + 1, per_page=per_page, error_out=False)
         return self.searchSchema.dump(page)

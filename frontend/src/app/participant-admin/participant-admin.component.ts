@@ -13,7 +13,7 @@ import {ApiService} from '../_services/api/api.service';
 export class ParticipantAdminComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   userParticipantList: ParticipantAdminList;
-  participantDataSource: MatTableDataSource<Participant>;
+  participantDataSource = new MatTableDataSource<Participant>([]);
   displayedColumns: string[] = ['id', 'name', 'user_id', 'relationship', 'percent_complete', 'has_consented', 'last_updated'];
   loading = true;
 
@@ -25,7 +25,7 @@ export class ParticipantAdminComponent implements OnInit {
   ngOnInit() {
     this.api.getParticipantAdminList().subscribe(pal => {
       this.userParticipantList = pal;
-      this.participantDataSource = new MatTableDataSource(pal.all_participants[0]);
+      this.participantDataSource.data = pal.all_participants;
       this.participantDataSource.sort = this.sort;
       this.loading = false;
     });

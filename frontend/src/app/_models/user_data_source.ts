@@ -1,3 +1,4 @@
+import {Injectable} from '@angular/core';
 import { User } from './user';
 import { DataSource } from '@angular/cdk/table';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -5,6 +6,8 @@ import { ApiService } from '../_services/api/api.service';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { Observable } from 'rxjs/Observable';
 
+
+@Injectable({providedIn: 'root'})
 export class UserDataSource implements DataSource<User> {
 
   private userSubject = new BehaviorSubject<User[]>([]);
@@ -33,6 +36,7 @@ export class UserDataSource implements DataSource<User> {
     this.loadingSubject.next(true);
     this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize)
       .subscribe(results => {
+        console.log('UserDataSource loadUsers results', results);
         this.userSubject.next(results.items);
         this.countSubject.next(results.total);
         this.loadingSubject.next(false);

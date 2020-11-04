@@ -2,8 +2,8 @@ import datetime
 import re
 
 import jwt
-from sqlalchemy import func, select
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import func, select, case, text
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import column_property
 
 from app import app, db, RestException, bcrypt, password_requirements
@@ -38,19 +38,18 @@ class User(db.Model):
 
     def related_to_participant(self, participant_id):
         for p in self.participants:
-            if p.id == participant_id:
+            if participant_id == p.id:
                 return True
-        return False
 
-    def get_self_participant(self):
+    def self_participant(self):
         if len(self.participants) > 0:
             for p in self.participants:
-                if "self" in p.relationship.name:
+                if 'self' in p.relationship.name:
                     return p
 
     def self_registration_complete(self):
-        if self.get_self_participant() is not None:
-            return self.get_self_participant().get_percent_complete() == 1
+        if self.self_participant() is not None:
+            return self.self_participant().get_percent_complete() == 1
 
     @hybrid_property
     def password(self):
@@ -117,15 +116,12 @@ class User(db.Model):
                 return {'name': p.get_name(), 'relationship': p.relationship.name, 'contact': p.contact}
 
     def created_password(self):
-        return self.password is not None
+        return self._password is not None
 
     def identity(self):
-        if len(self.participants) > 0 and self.get_self_participant() is not None:
-            return self.get_self_participant().relationship.name
-        else:
-            return 'Not set'
+        self_participant = self.self_participant()
+        return 'Not set' if self_participant is None else self_participant.relationship.name
 
     def percent_self_registration_complete(self):
-        if len(self.participants) > 0 and self.get_self_participant() is not None:
-            return self.get_self_participant().get_percent_complete()
-        return 0
+        self_participant = self.self_participant()
+        return 0 if self_participant is None else self_participant.get_percent_complete()
