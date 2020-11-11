@@ -3,8 +3,26 @@ import {GeoLocation} from './geolocation';
 import {HitType} from './hit_type';
 
 
-export class Query {
+export interface QueryProps {
+  words?: string;
+  total?: number;
+  start?: number;
+  size?: number;
+  types?: String[];
+  ages?: String[];
+  languages?: String[];
+  sort?: Sort;
+  hits?: Hit[];
+  category?: Category;
+  type_counts?: Aggregation[];
+  age_counts?: Aggregation[];
+  language_counts?: Aggregation[];
+  date?: Date;
+  status?: string;
+  map_data_only?: boolean;
+}
 
+export class Query {
   words = '';
   total?: number;
   start = 0;
@@ -25,7 +43,7 @@ export class Query {
   status?: string;
   map_data_only = false;
 
-  constructor(private _props) {
+  constructor(private _props: QueryProps) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));
     for (const propName in clonedProps) {
       if (clonedProps.hasOwnProperty(propName)) {

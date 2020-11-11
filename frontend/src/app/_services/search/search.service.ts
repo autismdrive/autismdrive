@@ -32,6 +32,7 @@ export class SearchService {
     return this._http
       .post<any>(url, query)
       .pipe(map(queryDict => {
+        console.log('queryDict', queryDict);
         return this._loadQuery(queryDict);
       }));
   }

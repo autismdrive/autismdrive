@@ -235,29 +235,29 @@ and the
       {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `name='twitter:image'`);
 
-    this.loadMapLocation();
+    this.loadMapLocation(() => {
+      this.route.queryParamMap
+        .subscribe(qParamMap => {
+          this.queryParamMap = qParamMap;
+          this.query = this._queryParamsToQuery(qParamMap);
 
-    this.route.queryParamMap
-      .subscribe(qParamMap => {
-        this.queryParamMap = qParamMap;
-        this.query = this._queryParamsToQuery(qParamMap);
-
-        if (navigator.geolocation) {
-          this.gpsEnabled = true;
-        }
-        const sortName = qParamMap.get('sort');
-        const forceReSort = (this.prevQuery && this.query.start === 0);
-
-        if (forceReSort) {
-          if (sortName && this.sortMethods[sortName.toUpperCase()]) {
-            this.reSort(sortName, forceReSort);
-          } else {
-            this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
+          if (navigator.geolocation) {
+            this.gpsEnabled = true;
           }
-        } else {
-          this.doSearch();
-        }
-      });
+          const sortName = qParamMap.get('sort');
+          const forceReSort = (this.prevQuery && this.query.start === 0);
+
+          if (forceReSort) {
+            if (sortName && this.sortMethods[sortName.toUpperCase()]) {
+              this.reSort(sortName, forceReSort);
+            } else {
+              this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
+            }
+          } else {
+            this.doSearch();
+          }
+        });
+    });
 
   }
 
@@ -411,27 +411,32 @@ and the
     }
   }
 
-  loadMapLocation() {
+  loadMapLocation(callback?: () => void) {
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
+        console.log('this.api.getZipCoords subscribe callback');
         this.noLocation = false;
         this.zipLoc = {
           lat: z.latitude,
           lng: z.longitude
         };
         this.mapLoc = this.zipLoc;
+        this._setDistanceSortLatLong();
+        if (callback) { callback(); }
       });
     } else {
-      this.getGPSLocation();
+      this.getGPSLocation(callback);
     }
   }
 
-  getGPSLocation() {
+  getGPSLocation(callback?: () => void) {
     // If we already know the GPS location, then just return.
     if (this.gpsEnabled && this.gpsLoc) {
       this.noLocation = false;
       this.mapLoc = this.gpsLoc;
+      this._setDistanceSortLatLong();
+      if (callback) { callback(); }
       return;
     } else {
       this.noLocation = true;
@@ -441,19 +446,26 @@ and the
     // Now, try to get the position, and if we can get it, use it.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
+        console.log('navigator.geolocation.getCurrentPosition callback');
         this.noLocation = false;
         this.gpsLoc = {
           lat: p.coords.latitude,
           lng: p.coords.longitude
         };
         this.mapLoc = this.gpsLoc;
+        this._setDistanceSortLatLong();
+        if (callback) { callback(); }
       }, error => {
         this.gpsEnabled = false;
         this.noLocation = true;
-      });
+        this._setDistanceSortLatLong();
+        if (callback) { callback(); }
+    });
     } else {
       this.noLocation = true;
       this.gpsEnabled = false;
+      this._setDistanceSortLatLong();
+      if (callback) { callback(); }
     }
   }
 
@@ -807,7 +819,14 @@ and the
   }
 
   private _queryParamsToQuery(qParams: ParamMap): Query {
-    const q = new Query({});
+    const q = new Query({
+      words: '',
+      ages: [],
+      languages: [],
+      sort: this.sortMethods.DISTANCE.sortQuery,
+      start: 0,
+      types: this.resourceTypesFilteredNames(),
+    });
     q.size = this.pageSize;
     if (qParams && qParams.keys) {
       for (const key of qParams.keys) {
@@ -840,16 +859,14 @@ and the
         }
       }
     }
-    return q;
 
+    return q;
   }
 
   private _updateDistanceSort() {
-    const distanceSort = this.sortMethods.DISTANCE;
-    distanceSort.sortQuery.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
-    distanceSort.sortQuery.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
+    this._setDistanceSortLatLong();
     if (this.isDistanceSort) {
-      this.selectedSort = distanceSort;
+      this.selectedSort = this.sortMethods.DISTANCE;
       this.query.sort = this.selectedSort.sortQuery;
       this.updateUrlAndDoSearch();
     }
@@ -881,6 +898,7 @@ and the
   }
 
   private _loadSearchResults() {
+    console.log('=== _loadSearchResults ===');
     this.searchService
       .search(this.query)
       .subscribe(queryWithResults => {
@@ -926,5 +944,12 @@ and the
         });
       }
     });
+  }
+
+  private _setDistanceSortLatLong() {
+    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
+    const useMapLoc = !!(!this.noLocation && this.mapLoc);
+    distanceSortQuery.latitude = useMapLoc ? this.mapLoc.lat : this.defaultLoc.lat;
+    distanceSortQuery.longitude = useMapLoc ? this.mapLoc.lng : this.defaultLoc.lng;
   }
 }

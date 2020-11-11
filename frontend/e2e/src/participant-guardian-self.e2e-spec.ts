@@ -5,7 +5,7 @@ import { ProfileUseCases } from './use-cases/profile.po';
 import { EnrollUseCases } from './use-cases/enroll.po';
 import { SearchUseCases } from './use-cases/search.po';
 
-describe('Participant (Guardian - Self)', () => {
+xdescribe('Participant (Guardian - Self)', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;

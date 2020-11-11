@@ -30,14 +30,14 @@ describe('Anonymous User', () => {
 
   // Global Header
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
-  it('should not display double nav labels', () => globalHeaderUseCases.checkForDoubleNavLabels());
-  it('should stay on the home page on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
-  it('should display logged-out state in navigation', () => globalHeaderUseCases.displayLoggedOutState());
-  it('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
-  it('should visit home page', () => globalHeaderUseCases.visitHomePage());
-  it('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
-  it('should visit about page', () => globalHeaderUseCases.visitAboutPage());
-  it('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
+  xit('should not display double nav labels', () => globalHeaderUseCases.checkForDoubleNavLabels());
+  xit('should stay on the home page on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
+  xit('should display logged-out state in navigation', () => globalHeaderUseCases.displayLoggedOutState());
+  xit('should display primary navigation', () => globalHeaderUseCases.displayPrimaryNav());
+  xit('should visit home page', () => globalHeaderUseCases.visitHomePage());
+  xit('should display a sliding hero image', () => globalHeaderUseCases.displayHomeHero());
+  xit('should visit about page', () => globalHeaderUseCases.visitAboutPage());
+  xit('should visit studies page', () => globalHeaderUseCases.visitStudiesPage());
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Search
