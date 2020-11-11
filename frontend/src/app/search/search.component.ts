@@ -244,7 +244,7 @@ and the
           if (navigator.geolocation) {
             this.gpsEnabled = true;
           }
-          const sortName = qParamMap.get('sort');
+          const sortName = qParamMap.get('sort') || 'Distance';
           const forceReSort = (this.prevQuery && this.query.start === 0);
 
           if (forceReSort) {
@@ -254,6 +254,7 @@ and the
               this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
             }
           } else {
+            this.selectedSort = this.sortMethods[sortName.toUpperCase()];
             this.doSearch();
           }
         });
@@ -623,8 +624,9 @@ and the
     localStorage.setItem('zipCode', this.updatedZip || '');
     this.googleAnalyticsService.searchInteractionEvent('set_zip_code_location');
     this.setLocOpen = false;
-    this.loadMapLocation();
-    this.reSort('Distance', true);
+    this.loadMapLocation(() => {
+      this.reSort('Distance', true);
+    });
   }
 
   useGPSLocation($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
@@ -809,7 +811,7 @@ and the
     queryParams.types = q.types;
     queryParams.ages = q.ages;
     queryParams.languages = q.languages;
-    queryParams.sort = this.selectedSort.name;
+    queryParams.sort = queryParams.words ? this.sortMethods.RELEVANCE.name : this.selectedSort.name;
     queryParams.pageStart = q.start;
 
     if (q.hasOwnProperty('category') && q.category) {
@@ -834,6 +836,7 @@ and the
           switch (key) {
             case ('words'):
               q.words = qParams.get(key);
+              q.sort = this.sortMethods.RELEVANCE.sortQuery;
               break;
             case ('category'):
               q.category = {id: parseInt(qParams.get(key), 10)};
@@ -864,12 +867,14 @@ and the
   }
 
   private _updateDistanceSort() {
-    this._setDistanceSortLatLong();
-    if (this.isDistanceSort) {
-      this.selectedSort = this.sortMethods.DISTANCE;
-      this.query.sort = this.selectedSort.sortQuery;
-      this.updateUrlAndDoSearch();
-    }
+    this.loadMapLocation(() => {
+      this._setDistanceSortLatLong();
+      if (this.isDistanceSort) {
+        this.selectedSort = this.sortMethods.DISTANCE;
+        this.query.sort = this.selectedSort.sortQuery;
+        this.updateUrlAndDoSearch();
+      }
+    });
   }
 
   private _goToFirstPage(skipUpdate = false) {
