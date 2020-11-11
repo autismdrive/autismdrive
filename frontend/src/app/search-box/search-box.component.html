@@ -44,8 +44,9 @@
       <button
         mat-icon-button
         matSuffix
-        *ngIf="hasWords()"
-        [ngClass]="{'btn-cancel': true, 'hidden': !hasWords()}"
+        fxHide
+        [fxShow]="hasWords"
+        [ngClass]="{'btn-cancel': true, 'hidden': !hasWords}"
         (click)="updateSearch(true)"
       ><mat-icon>cancel</mat-icon>
       </button>

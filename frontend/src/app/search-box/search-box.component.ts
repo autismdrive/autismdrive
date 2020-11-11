@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
@@ -34,6 +43,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     private searchService: SearchService,
     private api: ApiService,
     private categoryService: CategoriesService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.route
       .queryParams
@@ -98,6 +108,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
     const words: string = this.searchInputElement && this.searchInputElement.value || '';
     newParams.words = removeWords ? undefined : words;
+    newParams.pageStart = 0;
 
     if (newParams.words) {
       newParams.sort = 'Relevance';
@@ -109,14 +120,21 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
       return this.router.navigate(['/search'], {
         relativeTo: this.route,
         queryParams: newParams,
-      }).finally(() => this.searchUpdated.emit(newParams));
+      }).finally(() => {
+        this.searchUpdated.emit(newParams);
+        this.changeDetectorRef.detectChanges();
+      });
     } else {
       return this.router.navigateByUrl('/search').finally(() => this.searchUpdated.emit(newParams));
     }
   }
 
-  hasWords(): boolean {
-    return this.searchInputElement && this.searchInputElement.value && (this.searchInputElement.value.length > 0);
+  get hasWords(): boolean {
+    return !!(
+      this.searchInputElement &&
+      this.searchInputElement.value &&
+      (this.searchInputElement.value.length > 0)
+    );
   }
 
   /**

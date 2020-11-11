@@ -369,9 +369,6 @@ and the
 
   ngAfterViewInit() {
     this.watchScrollEvents();
-    this.paginatorElement.pageIndex = this.query && (this.query.start - 1) / this.pageSize;
-    this.expandResults = true;
-    this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -409,6 +406,7 @@ and the
       this._loadSearchResults();
       this._loadMapResults();
       this._loadRelatedStudies();
+      this._updatePaginator();
     }
   }
 
@@ -812,7 +810,7 @@ and the
     queryParams.ages = q.ages;
     queryParams.languages = q.languages;
     queryParams.sort = queryParams.words ? this.sortMethods.RELEVANCE.name : this.selectedSort.name;
-    queryParams.pageStart = q.start;
+    queryParams.pageStart = q.start || 0;
 
     if (q.hasOwnProperty('category') && q.category) {
       queryParams.category = q.category.id;
@@ -956,5 +954,14 @@ and the
     const useMapLoc = !!(!this.noLocation && this.mapLoc);
     distanceSortQuery.latitude = useMapLoc ? this.mapLoc.lat : this.defaultLoc.lat;
     distanceSortQuery.longitude = useMapLoc ? this.mapLoc.lng : this.defaultLoc.lng;
+  }
+
+  private _updatePaginator() {
+    const queryStart = this.query && (this.query.start - 1);
+    const paramStart = parseInt(this.queryParamMap.get('pageStart'), 10) - 1;
+    const pageStart = this.queryParamMap.has('pageStart') ? paramStart : queryStart;
+    this.paginatorElement.pageIndex = pageStart / this.pageSize;
+    this.expandResults = true;
+    this.changeDetectorRef.detectChanges();
   }
 }
