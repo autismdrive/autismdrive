@@ -4,10 +4,10 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContactItem} from '../_models/contact_item';
 import {Resource} from '../_models/resource';
+import {ResourceChangeLog} from '../_models/resource_change_log';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {ResourceChangeLog} from '../_models/resource_change_log';
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 @Component({
@@ -25,6 +25,18 @@ export class ResourceDetailComponent implements OnInit {
   typeName: string;
   showInfoWindow = false;
   safeVideoLink: SafeResourceUrl;
+  get isPastEvent(): boolean {
+    const eventDate = new Date(this.resource.date);
+    const now = new Date();
+
+    console.log('eventDate', eventDate);
+    return !!(
+      this.resource &&
+      this.resource.type === 'event' &&
+      (eventDate < now) &&
+      this.resource.post_event_description
+    );
+  }
 
   constructor(
     private api: ApiService,
@@ -62,7 +74,17 @@ export class ResourceDetailComponent implements OnInit {
         });
       }
     });
+  }
 
+  get userCanEdit(): boolean {
+    return (
+      this.currentUser &&
+      this.currentUser.permissions.includes('edit_resource')
+    );
+  }
+
+  get resourceIsDraft(): boolean {
+    return (this.resource.is_draft === true);
   }
 
   ngOnInit() {
@@ -146,7 +168,7 @@ export class ResourceDetailComponent implements OnInit {
       {
         condition: !!r.phone_extension,
         icon: 'dialpad',
-        details: [r.phone_extension ],
+        details: [r.phone_extension],
         type: 'phone_extension',
       },
       {
