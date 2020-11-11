@@ -51,7 +51,7 @@
     class="description"
   >
     <app-last-updated-date [lastUpdatedDate]="hit.last_updated"></app-last-updated-date>
-    {{hit.description}}
+    <markdown>{{hit.description}}</markdown>
     <app-event-date *ngIf="hit.date" [eventDate]="hit.date"></app-event-date>
   </p>
   <app-details-link

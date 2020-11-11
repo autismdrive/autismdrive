@@ -56,6 +56,10 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     ).subscribe(() => this.updateSearch(false));
   }
 
+  get videoIsVisible(): boolean {
+    return localStorage.getItem('shouldHideTutorialVideo') === 'true';
+  }
+
   @ViewChild('searchInput', {read: MatInput})
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
@@ -65,6 +69,14 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   @ViewChild('autocompletePanel', {read: MatAutocomplete})
   set autocompletePanel(value: MatAutocomplete) {
     this.autocompletePanelElement = value;
+  }
+
+  get hasWords(): boolean {
+    return !!(
+      this.searchInputElement &&
+      this.searchInputElement.value &&
+      (this.searchInputElement.value.length > 0)
+    );
   }
 
   ngOnInit() {
@@ -129,14 +141,6 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     }
   }
 
-  get hasWords(): boolean {
-    return !!(
-      this.searchInputElement &&
-      this.searchInputElement.value &&
-      (this.searchInputElement.value.length > 0)
-    );
-  }
-
   /**
    * Returns a string of the given category's ancestors' names in the format:
    * "Grandparent Category Name > Parent Category Name > Category Name"
@@ -166,6 +170,10 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
 
     // Emit the selected category.
     this.categorySelected.emit($event.option.value as Category);
+  }
+
+  showVideo() {
+    localStorage.removeItem('shouldHideTutorialVideo');
   }
 
   private _filter(value: string): Category[] {
