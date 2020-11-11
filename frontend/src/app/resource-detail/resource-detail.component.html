@@ -28,7 +28,7 @@
       <p *ngIf="resource.type === 'event' && resource.image_url">
         <a [href]="resource.website" target="_blank"><img src="{{resource.image_url}}"></a>
       </p>
-      <p>{{resource.description}}</p>
+      <markdown>{{resource.description}}</markdown>
       <div *ngIf="resource.type === 'event'" fxLayout="column" fxLayoutAlign="center center">
         <app-event-registration
           *ngIf="resource.includes_registration"

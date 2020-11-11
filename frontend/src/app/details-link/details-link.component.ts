@@ -12,6 +12,9 @@ export class DetailsLinkComponent implements OnInit {
   @Input() hover;
   @Input() selected = false;
   @Input() subtitle = '';
+  @Input() inverted = false;
+  @Input() allCaps = true;
+  @Input() externalLink = false;
   shouldHover = false;
 
   constructor() { }

@@ -10,8 +10,6 @@ a {
     @include mat-typography-level-to-styles($custom-typography, title);
     font-style: italic;
     color: $brand-primary;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
   }
 
   .details-link-text-1x {
@@ -52,4 +50,16 @@ a {
 
 .muted {
   color: $brand-gray;
+}
+
+.inverted {
+  color: white;
+  [class*="details-link-text"] { color: white; }
+}
+
+.all-caps {
+  [class*="details-link-text"] {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
 }

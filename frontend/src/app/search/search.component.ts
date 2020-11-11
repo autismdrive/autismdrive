@@ -13,6 +13,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
 import {AgeRange, HitType, Language} from '../_models/hit_type';
+import {NavItem} from '../_models/nav-item';
 import {Hit, Query} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {Direction} from '../_models/scroll';
@@ -144,18 +145,24 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     'energy-burst-light',
   ];
   searchBgClass = 'mountain';
-  videoPlacements = ['left', 'right', 'above', 'below'];
-  videoPlacement = 'left';
-  videoSizes = ['large', 'medium', 'small'];
-  videoSize = 'large';
-  videoUrl = 'https://www.youtube.com/embed/Lmoww_2ZydI';
-  videoInstructions = `
-### Watch this video for guidance on selecting resources.
-For more information on evidence-based resources, check out resources from the
-[National Autism Center](https://www.nationalautismcenter.org/resources/for-families/)
-and the
-[Frank Porter Graham Child Development Institute](https://afirm.fpg.unc.edu/selecting-ebp).
-`;
+  videoPlacement = 'right';
+  videoSize = 'medium';
+  videoId = 'oURTNCsiq3Y';
+  videoInstructions = `Watch this video for tips about resources`;
+  videoLinks: NavItem[] = [
+    {
+      label: 'Learn scientifically-supported interventions online',
+      url: 'https://afirm.fpg.unc.edu/selecting-ebp',
+    },
+    {
+      label: 'Read about scientifically-supported interventions',
+      url: 'https://www.nationalautismcenter.org/resources/for-families/',
+    },
+    {
+      label: 'Contact a Family Navigator for resource help',
+      url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/star/resources/star-family-navigation',
+    },
+  ];
   expandTheme = false;
   queryParamMap: ParamMap;
   private mapBounds: LatLngBounds;
@@ -220,7 +227,6 @@ and the
     };
 
     this.selectedSort = this.sortMethods.DISTANCE;
-    this.hideVideo();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
     this.ageOptions = this.getOptions(AgeRange.labels);
@@ -346,7 +352,7 @@ and the
   }
 
   get shouldHideVideo() {
-    return !!localStorage.getItem('shouldHideVideo');
+    return !!localStorage.getItem('shouldHideTutorialVideo');
   }
 
   get showLocationButton(): boolean {
@@ -770,9 +776,9 @@ and the
 
   hideVideo(shouldHide = true) {
     if (shouldHide) {
-      localStorage.setItem('shouldHideVideo', `${shouldHide}`);
+      localStorage.setItem('shouldHideTutorialVideo', `${shouldHide}`);
     } else {
-      localStorage.removeItem('shouldHideVideo');
+      localStorage.removeItem('shouldHideTutorialVideo');
     }
   }
 

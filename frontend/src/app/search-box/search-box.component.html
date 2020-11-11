@@ -3,6 +3,7 @@
   fxLayout="column"
 >
   <div
+    class="search-bar-header"
     fxLayout.lt-md="column"
     fxLayout="row"
     fxLayoutAlign.lt-md="end start"
@@ -11,52 +12,63 @@
     fxLayoutGap="40px"
   >
     <h1>Find Autism Resources</h1>
-    <h5>Type a search term and/or use filters below</h5>
+    <h5>
+      Type a search term and/or use filters below
+    </h5>
   </div>
-  <mat-form-field id="search-field">
-    <input
-      matInput
-      #searchInput
-      (keyup.enter)="updateSearch(false)"
-      (keyup.escape)="updateSearch(true)"
-      placeholder="Search for Autism Resources"
-      type="text"
-      [formControl]="searchBoxControl"
-      [matAutocomplete]="auto"
-      (click)="autocompletePanel.showPanel = true"
-    >
-    <mat-autocomplete
-      #auto="matAutocomplete"
-      #autocompletePanel
-      panelWidth="600px"
-      (optionSelected)="selectCategory($event)"
-      [displayWith]="optionText"
-    >
-      <mat-option
-        *ngFor="let option of filteredOptions | async"
-        [value]="option"
-      >{{optionText(option)}}</mat-option>
-    </mat-autocomplete>
-    <div
-       matSuffix
-      fxLayout="row"
-    >
-      <button
-        mat-icon-button
-        matSuffix
-        fxHide
-        [fxShow]="hasWords"
-        [ngClass]="{'btn-cancel': true, 'hidden': !hasWords}"
-        (click)="updateSearch(true)"
-      ><mat-icon>cancel</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        matSuffix
-        (click)="updateSearch(false)"
-        [ngClass]="{'btn-search': true}"
-      ><mat-icon>search</mat-icon>
-      </button>
-    </div>
-  </mat-form-field>
+  <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center center">
+    <mat-form-field id="search-field" fxFlex="90%">
+      <input
+        matInput
+        #searchInput
+        (keyup.enter)="updateSearch(false)"
+        (keyup.escape)="updateSearch(true)"
+        placeholder="Search for Autism Resources"
+        type="text"
+        [formControl]="searchBoxControl"
+        [matAutocomplete]="auto"
+        (click)="autocompletePanel.showPanel = true"
+      >
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        #autocompletePanel
+        panelWidth="600px"
+        (optionSelected)="selectCategory($event)"
+        [displayWith]="optionText"
+      >
+        <mat-option
+          *ngFor="let option of filteredOptions | async"
+          [value]="option"
+        >{{optionText(option)}}</mat-option>
+      </mat-autocomplete>
+      <div
+         matSuffix
+        fxLayout="row"
+      >
+        <button
+          mat-icon-button
+          matSuffix
+          fxHide
+          [fxShow]="hasWords"
+          [ngClass]="{'btn-cancel': true, 'hidden': !hasWords}"
+          (click)="updateSearch(true)"
+        ><mat-icon>cancel</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="updateSearch(false)"
+          [ngClass]="{'btn-search': true}"
+        ><mat-icon>search</mat-icon>
+        </button>
+      </div>
+    </mat-form-field>
+    <button
+      class="show-video"
+      mat-fab
+      [fxHide]="!videoIsVisible"
+      (click)="showVideo()"
+      matTooltip="Watch a video with tips about resources"
+    ><mat-icon>ondemand_video</mat-icon></button>
+  </div>
 </div>

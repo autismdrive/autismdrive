@@ -39,6 +39,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule} from '@angular/material/tree';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {YouTubePlayerModule} from '@angular/youtube-player';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
@@ -365,6 +366,7 @@ export class FormlyConfig {
     PdfJsViewerModule,
     ReactiveFormsModule,
     TruncateModule,
+    YouTubePlayerModule,
     RoutingModule, // This line must be the last module imported
   ],
   providers: [
