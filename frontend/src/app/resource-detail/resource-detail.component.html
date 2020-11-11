@@ -19,21 +19,34 @@
         <app-type-icon [iconType]="resource.type.toLowerCase()" [size]="3"></app-type-icon>
         <h1>{{resource.title}}</h1>
       </div>
-      <p *ngIf="resource.is_draft === true">[DRAFT]</p>
-      <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" [currentUser]="currentUser" [editLink]='resource.type + "/" + resource.id + "/edit"' [editLabel]='"Edit " + resource.type'></app-edit-button>
+      <p *ngIf="resourceIsDraft">[DRAFT]</p>
+      <app-edit-button
+        *ngIf="userCanEdit"
+        [currentUser]="currentUser"
+        [editLink]="this.resource.type + '/' + this.resource.id + '/edit'"
+        [editLabel]="'Edit ' + resource.type"
+      ></app-edit-button>
       <app-favorite-resource-button [resource_id]="resource.id" [user]="currentUser"></app-favorite-resource-button>
       <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
       <h2>About this resource</h2>
-      <p *ngIf="resource.is_draft === true && (!currentUser || currentUser && !currentUser.permissions.includes('edit_resource'))">This resource is being edited and is under review. Please check back for more up-to-date information soon.</p>
+      <p *ngIf="resourceIsDraft && !userCanEdit">This resource is being edited and is under review. Please check back for more up-to-date information soon.</p>
       <p *ngIf="resource.type === 'event' && resource.image_url">
         <a [href]="resource.website" target="_blank"><img src="{{resource.image_url}}"></a>
       </p>
-      <markdown>{{resource.description}}</markdown>
+
+      <ng-container *ngIf="resource.type !== 'event'">
+        <markdown>{{resource.description}}</markdown>
+      </ng-container>
+      <ng-container *ngIf="resource.type === 'event'">
+        <markdown>{{isPastEvent ? resource.post_event_description : resource.description}}</markdown>
+      </ng-container>
+
+
       <div *ngIf="resource.type === 'event'" fxLayout="column" fxLayoutAlign="center center">
         <app-event-registration
           *ngIf="resource.includes_registration"
           id="star_event_registration"
-          [currentUser]="currentUser"
+          [hasCurrentUser]="!!currentUser"
           [resource]="resource"
         ></app-event-registration>
         <a

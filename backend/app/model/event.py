@@ -17,6 +17,7 @@ class Event(Location):
     registered_users = db.relationship("EventUser", back_populates='event')
     registration_url = db.Column(db.String, nullable=True)
     image_url = db.Column(db.String, nullable=True)
+    post_event_description = db.Column(db.String, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'event',

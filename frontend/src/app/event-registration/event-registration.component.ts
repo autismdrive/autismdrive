@@ -11,7 +11,7 @@ import {EventRegistrationFormComponent} from '../event-registration-form/event-r
 })
 export class EventRegistrationComponent implements OnInit {
   @Input() resource: Resource;
-  @Input() currentUser = false;
+  @Input() hasCurrentUser = false;
 
   constructor(
     private router: Router,
@@ -37,7 +37,7 @@ export class EventRegistrationComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.currentUser = true;
+        this.hasCurrentUser = true;
       }
     });
   }
