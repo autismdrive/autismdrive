@@ -2,8 +2,9 @@
   fxLayout="row"
   fxFlex.gt-sm="100%"
   fxLayoutGap="10px"
+  *ngIf="query.hasFilters"
 >
-  <h4 *ngIf="hasFilters(appliedFilters)" fxShow fxHide.lt-md>Selected Filters:</h4>
+  <h4 fxShow fxHide.lt-md>Selected Filters:</h4>
   <mat-chip-list class="applied-filters" #appliedFilters ngClass.lt-md="applied-filters-small">
     <ng-container *ngIf="restrictToMappedResults">
       <mat-chip
@@ -15,7 +16,7 @@
       </mat-chip>
     </ng-container>
 
-    <ng-container *ngIf="query && query.words">
+    <ng-container *ngIf="query.hasWords">
       <mat-chip
         (click)="keywordChipClicked.emit()"
         class="applied-filter applied-filter-keyword"
@@ -45,7 +46,7 @@
       </mat-chip>
     </ng-container>
 
-    <div *ngIf="query.types.length === 1">
+    <div *ngIf="query.hasTypes">
       <mat-chip
         (click)="typeChipClicked.emit()"
         class="applied-filter applied-filter-type">
@@ -54,7 +55,7 @@
       </mat-chip>
     </div>
 
-    <ng-container *ngIf="query && query.category && query.category.id">
+    <ng-container *ngIf="query.hasCategory">
       <mat-chip
         (click)="categoryChipClicked.emit()"
         class="applied-filter applied-filter-topic"
@@ -75,7 +76,7 @@
     </ng-container>
   </mat-chip-list>
   <a
-    *ngIf="hasFilters(appliedFilters)"
+    *ngIf="query.hasFilters"
     mat-button
     (click)="clearAllClicked.emit()"
     fxShow

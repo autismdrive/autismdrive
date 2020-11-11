@@ -1,17 +1,17 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Query } from 'src/app/_models/query';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {Query} from 'src/app/_models/query';
+import createClone from 'rfdc';
 import {ConfigService} from '../config/config.service';
-import {clone} from '../../../util/clone';
 
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class SearchService {
-  private _querySubject: BehaviorSubject<Query>;
   public currentQuery: Observable<Query>;
   query_url = '/api/search/resources';
+  private _querySubject: BehaviorSubject<Query>;
 
   constructor(private _http: HttpClient, private config: ConfigService) {
     const queryDict = JSON.parse(localStorage.getItem('currentQuery'));
@@ -27,16 +27,6 @@ export class SearchService {
     return this._querySubject.value;
   }
 
-  private _loadQuery(queryDict): Query {
-    if (queryDict && queryDict.hits) {
-      const query = new Query(queryDict);
-      localStorage.setItem('currentQuery', JSON.stringify(queryDict));
-      this._querySubject.next(query);
-      this.currentQuery = this._querySubject.asObservable();
-      return query;
-    }
-  }
-
   search(query: Query): Observable<Query> {
     const url = this.config.apiUrl + this.query_url;
     return this._http
@@ -47,7 +37,7 @@ export class SearchService {
   }
 
   mapSearch(query: Query, mapDataOnly = true): Observable<Query> {
-    const mapQuery = clone(query);
+    const mapQuery = createClone({circles: true})(query);
     mapQuery.size = 999;
     mapQuery.map_data_only = mapDataOnly;
     return this.search(mapQuery);
@@ -56,5 +46,15 @@ export class SearchService {
   reset() {
     localStorage.removeItem('currentQuery');
     this._querySubject.next(null);
+  }
+
+  private _loadQuery(queryDict): Query {
+    if (queryDict && queryDict.hits) {
+      const query = new Query(queryDict);
+      localStorage.setItem('currentQuery', JSON.stringify(queryDict));
+      this._querySubject.next(query);
+      this.currentQuery = this._querySubject.asObservable();
+      return query;
+    }
   }
 }

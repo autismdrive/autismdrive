@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MatChipList} from '@angular/material/chips';
 import {Query} from '../_models/query';
 
 @Component({
@@ -10,9 +9,9 @@ import {Query} from '../_models/query';
 export class SearchFiltersBreadcrumbsComponent implements OnInit {
   @Input() query: Query;
   @Input() restrictToMappedResults: boolean;
-  @Input() ageLabels: {[key: string]: string};
-  @Input() languageLabels: {[key: string]: string};
-  @Input() typeLabels: {[key: string]: string};
+  @Input() ageLabels: { [key: string]: string };
+  @Input() languageLabels: { [key: string]: string };
+  @Input() typeLabels: { [key: string]: string };
   @Output() mappedResultsChipClicked = new EventEmitter<boolean>();
   @Output() keywordChipClicked = new EventEmitter();
   @Output() ageRangeChipClicked = new EventEmitter();
@@ -21,12 +20,10 @@ export class SearchFiltersBreadcrumbsComponent implements OnInit {
   @Output() categoryChipClicked = new EventEmitter();
   @Output() clearAllClicked = new EventEmitter();
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
 
-  hasFilters(appliedFilters?: MatChipList): boolean {
-    return !!(appliedFilters && appliedFilters.chips && (appliedFilters.chips.length > 0));
-  }
 }

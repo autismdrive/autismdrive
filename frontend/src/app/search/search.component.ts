@@ -1,21 +1,12 @@
-import {AgmMap} from '@agm/core';
+import {AgmMap, LatLngBounds} from '@agm/core';
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  HostBinding,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnDestroy, Renderer2, ViewChild} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTabChangeEvent} from '@angular/material/tabs';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {ActivatedRoute, convertToParamMap, ParamMap, Params, Router} from '@angular/router';
 import createClone from 'rfdc';
 import {fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
@@ -30,9 +21,8 @@ import {Study} from '../_models/study';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {SearchService} from '../_services/search/search.service';
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
-import LatLngBounds = google.maps.LatLngBounds;
+import {SearchService} from '../_services/search/search.service';
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 
@@ -57,10 +47,11 @@ class MapControlDiv extends HTMLDivElement {
     ]),
   ]
 })
-export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SearchComponent implements AfterViewInit, OnDestroy {
   @HostBinding('@pageAnimations')
   public animatePage = true;
   query: Query;
+  prevQuery: Query;
   mapQuery: Query;
   resourceTypes = HitType.all_resources();
   selectedMapResource: Resource;
@@ -90,7 +81,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
   mapZoomLevel: number;
-  sortMethods: SortMethod[];
+  sortMethods: { [key: string]: SortMethod };
   selectedSort: SortMethod;
   paginatorElement: MatPaginator;
   mapTemplateElement: AgmMap;
@@ -166,6 +157,7 @@ and the
 [Frank Porter Graham Child Development Institute](https://afirm.fpg.unc.edu/selecting-ebp).
 `;
   expandTheme = false;
+  queryParamMap: ParamMap;
   private mapBounds: LatLngBounds;
   private scrollDirection: Direction;
 
@@ -181,8 +173,8 @@ and the
     private router: Router,
     private searchService: SearchService,
   ) {
-    this.sortMethods = [
-      {
+    this.sortMethods = {
+      RELEVANCE: {
         name: 'Relevance',
         label: 'Relevance',
         sortQuery: {
@@ -190,7 +182,7 @@ and the
           order: 'desc',
         }
       },
-      {
+      DISTANCE: {
         name: 'Distance',
         label: 'Distance from me',
         sortQuery: {
@@ -201,7 +193,7 @@ and the
           unit: 'mi'
         }
       },
-      {
+      UPDATED: {
         name: 'Updated',
         label: 'Recently Updated',
         sortQuery: {
@@ -209,7 +201,7 @@ and the
           order: 'desc'
         }
       },
-      {
+      DATE: {
         name: 'Date',
         label: 'Happening Soon',
         sortQuery: {
@@ -217,7 +209,7 @@ and the
           order: 'asc'
         }
       },
-      {
+      DRAFTS: {
         name: 'Drafts',
         label: 'Drafts',
         sortQuery: {
@@ -225,10 +217,9 @@ and the
           order: 'desc'
         }
       },
-    ];
+    };
 
-    this.selectedSort = this.sortMethods[0];
-
+    this.selectedSort = this.sortMethods.DISTANCE;
     this.hideVideo();
     this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
     this.languageOptions = this.getOptions(Language.labels);
@@ -243,6 +234,31 @@ and the
     this.meta.updateTag(
       {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `name='twitter:image'`);
+
+    this.loadMapLocation();
+
+    this.route.queryParamMap
+      .subscribe(qParamMap => {
+        this.queryParamMap = qParamMap;
+        this.query = this._queryParamsToQuery(qParamMap);
+
+        if (navigator.geolocation) {
+          this.gpsEnabled = true;
+        }
+        const sortName = qParamMap.get('sort');
+        const forceReSort = (this.prevQuery && this.query.start === 0);
+
+        if (forceReSort) {
+          if (sortName && this.sortMethods[sortName.toUpperCase()]) {
+            this.reSort(sortName, forceReSort);
+          } else {
+            this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
+          }
+        } else {
+          this.doSearch();
+        }
+      });
+
   }
 
   @ViewChild('paginator')
@@ -272,7 +288,7 @@ and the
   }
 
   get hits(): Hit[] {
-    if (this.query && this.query.hits && this.query.hits.length > 0) {
+    if (this.query && this.query.hasHits) {
       if (this.restrictToMappedResults) {
         return this.mapQuery.hits.filter(h => {
           if (h.hasCoords()) {
@@ -286,6 +302,10 @@ and the
     }
 
     return [];
+  }
+
+  get isDistanceSort(): boolean {
+    return (this.selectedSort && (this.selectedSort.name === 'Distance'));
   }
 
   get isInfoWindowOpen(): boolean {
@@ -330,8 +350,7 @@ and the
 
   get showLocationButton(): boolean {
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    const isDistanceSort = this.selectedSort && this.selectedSort.name === 'Distance';
-    return (isLocation || isDistanceSort);
+    return (isLocation || this.isDistanceSort);
   }
 
   get showLocationForm(): boolean {
@@ -344,30 +363,12 @@ and the
       this.mapQuery.types.length === 1 &&
       (this.mapQuery.types.includes('location') ||
         this.mapQuery.types.includes('event'));
-    const is_sort_by_distance = this.selectedSort.name === 'Distance';
-    return is_location_or_event_type || is_sort_by_distance;
-  }
-
-  ngOnInit() {
-    this.route.queryParamMap.subscribe(qParams => {
-      this.query = this._queryParamsToQuery(qParams);
-      if (navigator.geolocation) {
-        this.gpsEnabled = true;
-      }
-      this.loadMapLocation(() => {
-        if (qParams.get('sort') && this.sortMethods.find(m => m.name === qParams.get('sort')) !== undefined) {
-          this.reSort(qParams.get('sort'));
-        } else {
-          this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance', true);
-        }
-      });
-    });
-
+    return is_location_or_event_type || this.isDistanceSort;
   }
 
   ngAfterViewInit() {
     this.watchScrollEvents();
-    this.paginatorElement.pageIndex = (this.query.start - 1) / this.pageSize;
+    this.paginatorElement.pageIndex = this.query && (this.query.start - 1) / this.pageSize;
     this.expandResults = true;
     this.changeDetectorRef.detectChanges();
   }
@@ -386,25 +387,14 @@ and the
     return opts;
   }
 
-  removeCategory() {
+  removeCategory(skipUpdate = false) {
     this.query.category = null;
-    this._goToFirstPage();
+    this._goToFirstPage(skipUpdate);
   }
 
-  removeWords() {
+  removeWords(skipUpdate = false) {
     this.query.words = '';
-    this._goToFirstPage();
-  }
-
-  updateUrlAndDoSearch() {
-    const qParams = this._queryToQueryParams(this.query);
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: qParams,
-    }).finally(() => {
-      this.doSearch();
-      this.changeDetectorRef.detectChanges();
-    });
+    this._goToFirstPage(skipUpdate);
   }
 
   scrollToTopOfSearch() {
@@ -413,42 +403,15 @@ and the
 
   doSearch() {
     this.loading = true;
-    const mapDataOnly = !this.restrictToMappedResults;
-    this.searchService
-      .mapSearch(this.query, mapDataOnly)
-      .subscribe(mapQueryWithResults => {
-        this.mapQuery = mapQueryWithResults;
-        this.loadMapResults();
-        this.loading = false;
-        this.changeDetectorRef.detectChanges();
-      });
-    this.searchService
-      .search(this.query)
-      .subscribe(queryWithResults => {
-        this.query = queryWithResults;
-        this.loading = false;
-        this.changeDetectorRef.detectChanges();
-      });
 
-    const studyQuery = createClone()(this.query);
-    studyQuery.types = ['study'];
-    this.api.searchStudies(studyQuery).subscribe(results => {
-      if (results.hits.length > 0) {
-        this.api.getStudy(results.hits[0].id).subscribe(study => {
-          this.highlightedStudy = study;
-          this.changeDetectorRef.detectChanges();
-        });
-      } else {
-        this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
-          this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
-          this.changeDetectorRef.detectChanges();
-        });
-      }
-    });
-    this.googleAnalyticsService.searchEvent(this.query);
+    if (this.query) {
+      this._loadSearchResults();
+      this._loadMapResults();
+      this._loadRelatedStudies();
+    }
   }
 
-  loadMapLocation(callback: Function) {
+  loadMapLocation() {
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.api.getZipCoords(this.storedZip).subscribe(z => {
@@ -458,23 +421,20 @@ and the
           lng: z.longitude
         };
         this.mapLoc = this.zipLoc;
-        callback.call(this);
       });
     } else {
-      this.getGPSLocation(callback);
+      this.getGPSLocation();
     }
   }
 
-  getGPSLocation(callback: Function) {
+  getGPSLocation() {
     // If we already know the GPS location, then just return.
     if (this.gpsEnabled && this.gpsLoc) {
       this.noLocation = false;
       this.mapLoc = this.gpsLoc;
-      callback.call(this);
       return;
     } else {
       this.noLocation = true;
-      callback.call(this);
       // But don't return, go ahead and ask in the following chunk of code.
     }
 
@@ -487,7 +447,6 @@ and the
           lng: p.coords.longitude
         };
         this.mapLoc = this.gpsLoc;
-        callback.call(this);
       }, error => {
         this.gpsEnabled = false;
         this.noLocation = true;
@@ -498,91 +457,84 @@ and the
     }
   }
 
-  newSortSelection(sort: SortMethod) {
-    this.loading = true;
-    this.selectedSort = sort;
-    this.updateUrlAndDoSearch();
-  }
-
   reSort(sortName: string, forceReSort = false) {
+    console.log(`*** reSort sortName: ${sortName} ***`);
+    // Don't re-sort if the query hasn't changed.
+    const qParamsHaveChanged = this._queryParamsHaveChanged(this.queryParamMap);
+
     // Don't re-sort if it's already selected, but allow override.
-    if ((sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
+    if ((qParamsHaveChanged && sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
       this.loading = true;
-      this.selectedSort = this.sortMethods.find(s => s.name === sortName);
+      this.selectedSort = this.sortMethods[sortName.toUpperCase()];
       this.query.start = 0;
       this.query.sort = this.selectedSort.sortQuery;
 
       if (this.selectedSort.name === 'Date') {
         this.selectType(HitType.EVENT.name);
-      } else if (this.selectedSort.name === 'Distance') {
-        this.loadMapLocation(() => this._updateDistanceSort());
+      } else if (this.isDistanceSort) {
+        this._updateDistanceSort();
       } else {
         this.updateUrlAndDoSearch();
       }
     }
   }
 
-  selectAgeRange(age: string = null) {
-    if (age) {
+  selectAgeRange(age: string = null, skipUpdate = false) {
+    if (this.query && age) {
       this.query.ages = [age];
     } else {
       this.query.ages = [];
     }
-    this._goToFirstPage();
-    this.changeDetectorRef.detectChanges();
+    this._goToFirstPage(skipUpdate);
   }
 
-  selectLanguage(language: string = null) {
+  selectLanguage(language: string = null, skipUpdate = false) {
     if (language) {
       this.query.languages = [language];
     } else {
       this.query.languages = [];
     }
-    this._goToFirstPage();
-    this.changeDetectorRef.detectChanges();
+    this._goToFirstPage(skipUpdate);
   }
 
   selectCategory(newCategory: Category) {
     this.query.category = newCategory;
     this._goToFirstPage();
-    this.changeDetectorRef.detectChanges();
   }
 
-  selectType(keepType: string = null) {
+  selectType(keepType: string = null, skipUpdate = false) {
+    console.log(`=== selectType: keepType = ${keepType} ===`);
     const all = HitType.ALL_RESOURCES.name;
+    const forceReSort = !(keepType && keepType !== all);
 
-    if (keepType && keepType !== all) {
-      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === keepType);
-      this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
-
-      if (keepType === all) {
-        this.query.types = this.resourceTypesFilteredNames();
-      } else {
-        this.query.types = [keepType];
-      }
-      this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
-
-      if (keepType === HitType.LOCATION.name) {
-        this.selectedSort = this.sortMethods.find(s => s.name === 'Distance');
-      } else if (keepType === HitType.RESOURCE.name) {
-        if (this.query.words !== '') {
-          this.selectedSort = this.sortMethods.find(s => s.name === 'Relevance');
-        } else {
-          this.selectedSort = this.sortMethods.find(s => s.name === 'Updated');
-        }
-      } else if (keepType === HitType.EVENT.name) {
-        this.selectedSort = this.sortMethods.find(s => s.name === 'Date');
-      }
-      this.query.sort = this.selectedSort.sortQuery;
-    } else {
+    if (forceReSort) {
       this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === all);
       this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
       this.query.types = this.resourceTypesFilteredNames();
       this.query.date = null;
-      this.reSort(this.query.words.length > 0 ? 'Relevance' : 'Distance', true);
+      this.selectedSort = this.sortMethods.DISTANCE;
+    } else {
+      this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === keepType);
+      this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
+      this.query.types = (keepType === all) ? this.resourceTypesFilteredNames() : [keepType];
+      this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
+
+      if (keepType === HitType.LOCATION.name) {
+        this.selectedSort = this.sortMethods.DISTANCE;
+      } else if (keepType === HitType.RESOURCE.name) {
+        if (this.query.hasWords) {
+          this.selectedSort = this.sortMethods.RELEVANCE;
+        } else {
+          this.selectedSort = this.sortMethods.UPDATED;
+        }
+      } else if (keepType === HitType.EVENT.name) {
+        this.selectedSort = this.sortMethods.DATE;
+      }
+      this.query.sort = this.selectedSort.sortQuery;
     }
-    this._goToFirstPage();
-    this.changeDetectorRef.detectChanges();
+
+    this._goToFirstPage(skipUpdate);
+    this.reSort(this.selectedSort.name, forceReSort);
   }
 
   submitResource() {
@@ -641,23 +593,8 @@ and the
     mapUI.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
   }
 
-  showBreadcrumbs() {
-    if (!this.query) {
-      return false;
-    }
-    return this.query.hasFilters();
-  }
-
-  loadMapResults() {
-    if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
-      this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
-      this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
-    } else {
-      this.hitsWithAddress = [];
-      this.hitsWithNoAddress = [];
-    }
-
-    this.changeDetectorRef.detectChanges();
+  showBreadcrumbs(): boolean {
+    return !!(this.query && this.query.hasFilters);
   }
 
   openSetLocation() {
@@ -668,12 +605,13 @@ and the
     this.setLocOpen = false;
   }
 
-  zipSubmit($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
+  submitZip($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.updatedZip || '');
     this.googleAnalyticsService.searchInteractionEvent('set_zip_code_location');
     this.setLocOpen = false;
+    this.loadMapLocation();
     this.reSort('Distance', true);
   }
 
@@ -684,6 +622,7 @@ and the
     this.googleAnalyticsService.searchInteractionEvent('set_gps_location');
     this.storedZip = null;
     this.setLocOpen = false;
+    this.loadMapLocation();
     this.reSort('Distance', true);
   }
 
@@ -737,11 +676,14 @@ and the
     this.mapBounds = $event;
   }
 
-  listMapResultsOnly(shouldRestrict: boolean) {
+  listMapResultsOnly(shouldRestrict: boolean, skipUpdate = false) {
     this.restrictToMappedResults = shouldRestrict;
-    this.updateUrlAndDoSearch();
     if (shouldRestrict) {
       this.googleAnalyticsService.searchInteractionEvent('search_as_map_moves');
+    }
+
+    if (!skipUpdate) {
+      this.updateUrlAndDoSearch();
     }
   }
 
@@ -791,13 +733,14 @@ and the
   }
 
   clearAllFilters() {
-    this.listMapResultsOnly(false);
-    this.removeWords();
-    this.selectAgeRange();
-    this.selectLanguage();
-    this.selectType();
-    this.removeCategory();
-    this.router.navigate(['/search']);
+    const skipUpdate = true;
+    this.listMapResultsOnly(false, skipUpdate);
+    this.removeWords(skipUpdate);
+    this.selectAgeRange(null, skipUpdate);
+    this.selectLanguage(null, skipUpdate);
+    this.selectType(null, skipUpdate);
+    this.removeCategory(skipUpdate);
+    this.updateUrlAndDoSearch();
   }
 
   toggleShowFilters() {
@@ -826,17 +769,29 @@ and the
     this.hideVideo(false);
   }
 
+  updateUrlAndDoSearch() {
+    const qParams = this._queryToQueryParams(this.query);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: qParams,
+      skipLocationChange: false,
+    }).finally(() => {
+      this.prevQuery = createClone()(this.query);
+      this.doSearch();
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
   protected mapLoad(m: google.maps.Map) {
     this.addMyLocationControl(m);
   }
 
-  private _queryToQueryParams(q: Query): Params {
+  private _queryToQueryParams(qBefore: Query): Params {
+    const q = createClone({circles: true})(qBefore);
     const queryParams: Params = {};
 
     if (q.hasOwnProperty('words') && q.words) {
       queryParams.words = q.words;
-    } else {
-      queryParams.words = undefined;
     }
 
     queryParams.types = q.types;
@@ -851,34 +806,37 @@ and the
     return queryParams;
   }
 
-  private _queryParamsToQuery(qParams: Params): Query {
+  private _queryParamsToQuery(qParams: ParamMap): Query {
     const q = new Query({});
     q.size = this.pageSize;
     if (qParams && qParams.keys) {
       for (const key of qParams.keys) {
-        switch (key) {
-          case ('words'):
-            q.words = qParams.get(key);
-            break;
-          case ('category'):
-            q.category = {'id': qParams.get(key)};
-            break;
-          case('ages'):
-            q.ages = qParams.getAll(key);
-            break;
-          case('languages'):
-            q.languages = qParams.getAll(key);
-            break;
-          case('sort'):
-            if (this.sortMethods.find(m => m.name === qParams.get(key)) !== undefined) {
-              q.sort = this.sortMethods.find(m => m.name === qParams.get(key)).sortQuery;
-            }
-            break;
-          case('pageStart'):
-            q.start = parseInt(qParams.get(key), 10);
-            break;
-          case('types'):
-            q.types = qParams.getAll(key);
+        if (qParams.get(key) !== undefined) {
+          switch (key) {
+            case ('words'):
+              q.words = qParams.get(key);
+              break;
+            case ('category'):
+              q.category = {id: parseInt(qParams.get(key), 10)};
+              break;
+            case('ages'):
+              q.ages = qParams.getAll(key);
+              break;
+            case('languages'):
+              q.languages = qParams.getAll(key);
+              break;
+            case('sort'):
+              const sortKey = qParams.get(key).toLowerCase();
+              if (this.sortMethods[sortKey]) {
+                q.sort = this.sortMethods[sortKey].sortQuery;
+              }
+              break;
+            case('pageStart'):
+              q.start = parseInt(qParams.get(key), 10);
+              break;
+            case('types'):
+              q.types = qParams.getAll(key);
+          }
         }
       }
     }
@@ -887,22 +845,25 @@ and the
   }
 
   private _updateDistanceSort() {
-    const distance_sort = this.sortMethods.find(s => s.name === 'Distance');
-    distance_sort.sortQuery.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
-    distance_sort.sortQuery.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
-    if (this.selectedSort.name === 'Distance') {
-      this.selectedSort = distance_sort;
+    const distanceSort = this.sortMethods.DISTANCE;
+    distanceSort.sortQuery.latitude = this.noLocation ? this.defaultLoc.lat : this.mapLoc.lat;
+    distanceSort.sortQuery.longitude = this.noLocation ? this.defaultLoc.lng : this.mapLoc.lng;
+    if (this.isDistanceSort) {
+      this.selectedSort = distanceSort;
       this.query.sort = this.selectedSort.sortQuery;
       this.updateUrlAndDoSearch();
     }
   }
 
-  private _goToFirstPage() {
+  private _goToFirstPage(skipUpdate = false) {
     this.query.start = 0;
     if (this.paginatorElement) {
       this.paginatorElement.firstPage();
     }
-    this.updateUrlAndDoSearch();
+
+    if (!skipUpdate) {
+      this.updateUrlAndDoSearch();
+    }
   }
 
   private _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
@@ -911,5 +872,59 @@ and the
       ((b.top > a.top) && (b.bottom < a.bottom)) ||   // b inside a
       ((b.top < a.bottom) && (b.bottom > a.bottom))   // b overlaps bottom edge of a
     );
+  }
+
+  private _queryParamsHaveChanged(qParamMapBefore: ParamMap) {
+    const qBefore = this._queryParamsToQuery(qParamMapBefore);
+    const qAfter = this._queryParamsToQuery(convertToParamMap(this._queryToQueryParams(this.query)));
+    return (!this.prevQuery || qBefore.equals(qAfter));
+  }
+
+  private _loadSearchResults() {
+    this.searchService
+      .search(this.query)
+      .subscribe(queryWithResults => {
+        this.query = queryWithResults;
+        this.googleAnalyticsService.searchEvent(this.query);
+        this.loading = false;
+        this.changeDetectorRef.detectChanges();
+      });
+  }
+
+  private _loadMapResults() {
+    this.searchService
+      .mapSearch(this.query, !this.restrictToMappedResults)
+      .subscribe(mapQueryWithResults => {
+        this.mapQuery = mapQueryWithResults;
+
+        if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
+          this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
+          this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
+        } else {
+          this.hitsWithAddress = [];
+          this.hitsWithNoAddress = [];
+        }
+
+        this.loading = false;
+        this.changeDetectorRef.detectChanges();
+      });
+  }
+
+  private _loadRelatedStudies() {
+    const studyQuery = createClone()(this.query);
+    studyQuery.types = ['study'];
+    this.api.searchStudies(studyQuery).subscribe(results => {
+      if (results.hits.length > 0) {
+        this.api.getStudy(results.hits[0].id).subscribe(study => {
+          this.highlightedStudy = study;
+          this.changeDetectorRef.detectChanges();
+        });
+      } else {
+        this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
+          this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
+          this.changeDetectorRef.detectChanges();
+        });
+      }
+    });
   }
 }

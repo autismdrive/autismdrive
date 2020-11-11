@@ -8,12 +8,17 @@ import {SortMethod} from '../_models/sort_method';
 })
 export class SearchSortComponent implements OnInit {
   @Input() selectedSort: SortMethod;
-  @Input() sortMethods: SortMethod[];
+  @Input() sortMethods: { [key: string]: SortMethod };
   @Output() sortMethodSelected = new EventEmitter<SortMethod>();
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
+  }
+
+  get sortMethodsList() {
+    return Object.values(this.sortMethods);
   }
 
 }

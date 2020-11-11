@@ -5,7 +5,7 @@
       <span class="selected-sort-label" *ngIf="selectedSort">{{selectedSort.label}}</span>
     </mat-select-trigger>
     <mat-option
-      *ngFor="let sort of sortMethods"
+      *ngFor="let sort of sortMethodsList"
       [value]="sort"
       (click)="sortMethodSelected.emit(sort)"
       [ngClass]="'sort-by-' + sort.name.toLowerCase()"
