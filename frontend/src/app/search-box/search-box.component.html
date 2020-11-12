@@ -4,20 +4,19 @@
 >
   <div
     class="search-bar-header"
-    fxLayout.lt-md="column"
-    fxLayout="row"
-    fxLayoutAlign.lt-md="end start"
-    fxLayoutAlign="space-between end"
-    fxLayoutGap.lt-md="0px"
-    fxLayoutGap="40px"
+    fxLayout="row wrap"
+    fxLayoutAlign="center center"
+    fxLayoutGap="0px"
   >
-    <h1>Find Autism Resources</h1>
-    <h5>
-      Type a search term and/or use filters below
-    </h5>
+    <h1 [fxFlex]="videoIsVisible ? 'calc(100% - 66px)' : '100%'">Find Autism Resources</h1>
+    <h5 [fxFlex]="videoIsVisible ? 'calc(100% - 66px)' : '100%'">Type a search term and/or use filters below</h5>
   </div>
   <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center center">
-    <mat-form-field id="search-field" fxFlex="90%">
+    <mat-form-field
+      id="search-field"
+      [fxFlex]="videoIsVisible ? 'calc(100% - 66px)' : '100%'"
+      (click)="openAutocompletePanel($event)"
+    >
       <input
         matInput
         #searchInput
@@ -27,7 +26,7 @@
         type="text"
         [formControl]="searchBoxControl"
         [matAutocomplete]="auto"
-        (click)="autocompletePanel.showPanel = true"
+        (click)="openAutocompletePanel($event)"
       >
       <mat-autocomplete
         #auto="matAutocomplete"
@@ -41,10 +40,7 @@
           [value]="option"
         >{{optionText(option)}}</mat-option>
       </mat-autocomplete>
-      <div
-         matSuffix
-        fxLayout="row"
-      >
+      <div matSuffix fxLayout="row">
         <button
           mat-icon-button
           matSuffix

@@ -29,9 +29,9 @@ export class SearchUseCases {
     // Click the search field.
     this.page.clickElement(searchFieldSelector);
     const autocompleteIsVisibleBefore = await this.page.isVisible(autocompleteSelector);
-    expect(autocompleteIsVisibleBefore).toEqual(false, 'Autocomplete panel should not be visible yet.');
+    expect(autocompleteIsVisibleBefore).toEqual(true, 'Autocomplete panel should be visible.');
     const numSuggestionsBefore = await this.page.getElements(suggestionSelector).count();
-    expect(numSuggestionsBefore).toEqual(0, 'No suggestions should be visible yet.');
+    expect(numSuggestionsBefore).toBeGreaterThan(0, 'Search suggestions should be visible.');
 
     // Input keyword
     this.page.inputText(searchFieldSelector, keywordString);
