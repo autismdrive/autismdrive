@@ -91,3 +91,15 @@
   overflow: visible !important;
   text-overflow: unset !important;
 }
+
+.search-bar-header {
+  h1, h5 {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.btn-cancel, .btn-search {
+  margin-top: 4px;
+  margin-bottom: -4px;
+}

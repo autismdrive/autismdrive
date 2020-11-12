@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
@@ -30,6 +30,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   @Output() categorySelected = new EventEmitter<Category>();
   @Output() searchUpdated = new EventEmitter<Params>();
   autocompletePanelElement: MatAutocomplete;
+  autocompletePanelTriggerElement: MatAutocompleteTrigger;
   filteredOptions: Observable<Category[]>;
   queryParams: Params;
   searchBoxControl = new FormControl();
@@ -63,12 +64,16 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   @ViewChild('searchInput', {read: MatInput})
   set searchInput(value: MatInput) {
     this.searchInputElement = value;
-    this.searchInputElement.focus();
   }
 
   @ViewChild('autocompletePanel', {read: MatAutocomplete})
   set autocompletePanel(value: MatAutocomplete) {
     this.autocompletePanelElement = value;
+  }
+
+  @ViewChild(MatAutocompleteTrigger)
+  set autocompletePanelTrigger(value: MatAutocompleteTrigger) {
+    this.autocompletePanelTriggerElement = value;
   }
 
   get hasWords(): boolean {
@@ -194,5 +199,13 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     } else {
       return this.categoryService.categoryList;
     }
+  }
+
+  openAutocompletePanel($event: MouseEvent) {
+    this.autocompletePanelTriggerElement._onChange('');
+    $event.stopPropagation();
+    this.autocompletePanelTriggerElement.openPanel();
+    this.autocompletePanelElement.showPanel = true;
+    this.changeDetectorRef.detectChanges();
   }
 }
