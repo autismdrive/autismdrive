@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime, timedelta
+from dateutil import tz
 
 from app.model.role import Permission
 from elasticsearch import RequestError
@@ -51,40 +52,13 @@ class StarDocument(Document):
     is_draft = Boolean()
 
 
+def _start_of_day(date=datetime.utcnow().date()):
+    return datetime(date.year, date.month, date.day, tzinfo=tz.tzutc())
+
+
 class ElasticIndex:
 
     logger = logging.getLogger("ElasticIndex")
-
-    # Past events with a non-empty post-event description
-    _past_events_filter = {
-        "bool": {
-            "filter": [
-                {"terms": {"type": ["event"]}},
-                {"exists": {"field": "post_event_description"}},
-                {"range": {"date": {"lt": datetime.datetime.utcnow()}}},
-            ]
-        }
-    }
-
-    # Future events
-    _future_events_filter = {
-        "bool": {
-            "filter": [
-                {"terms": {"type": ["event"]}},
-                {"range": {"date": {"gte": datetime.datetime.utcnow()}}},
-            ]
-        }
-    }
-
-    # Non-events (i.e., date field is empty)
-    _non_events_filter = {"bool": {"must_not": {"exists": {"field": "date"}}}}
-
-    # Past events, future events, and non-events
-    _default_filter = [
-        _past_events_filter,
-        _future_events_filter,
-        _non_events_filter,
-    ]
 
     def __init__(self, app):
         self.logger.debug("Initializing Elastic Index")
@@ -248,16 +222,16 @@ class ElasticIndex:
         if set(search.types) == {'resource', 'event'}:
             # Include past events in resource search results
             elastic_search = elastic_search.filter('bool', **{"should": [
-                self._past_events_filter,  # Past events OR
-                self._non_events_filter,   # Date field is empty
+                self._past_events_filter(),  # Past events OR
+                self._non_events_filter(),   # Date field is empty
             ]})
         elif search.date:
             # Filter results by date
-            elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
+            elastic_search = elastic_search.filter('range', **{"date": {"gte": _start_of_day(search.date)}})
         elif set(search.types) == {'event'}:
-            elastic_search = elastic_search.filter('bool', **{"should": self._future_events_filter})
+            elastic_search = elastic_search.filter('bool', **{"should": self._future_events_filter()})
         else:
-            elastic_search = elastic_search.filter('bool', **{"should": self._default_filter})
+            elastic_search = elastic_search.filter('bool', **{"should": self._default_filter()})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
@@ -320,6 +294,43 @@ class ElasticIndex:
         elastic_search = elastic_search[0:max_hits]
 
         # Filter out past events
-        elastic_search = elastic_search.filter('bool', **{"should": self._default_filter})
+        elastic_search = elastic_search.filter('bool', **{"should": self._default_filter()})
 
         return elastic_search.execute()
+
+    # Past events with a non-empty post-event description
+    def _past_events_filter(self):
+        return {
+            "bool": {
+                "filter": [
+                    {"terms": {"type": ["event"]}},
+                    {"exists": {"field": "post_event_description"}},
+                    {"range": {"date": {"lt": _start_of_day()}}},
+                ]
+            }
+        }
+
+    # Future events
+    def _future_events_filter(self):
+        return {
+            "bool": {
+                "filter": [
+                    {"terms": {"type": ["event"]}},
+                    {"range": {"date": {"gte": _start_of_day()}}},
+                ]
+            }
+        }
+
+    # Non-events (i.e., date field is empty)
+    def _non_events_filter(self):
+        return {"bool": {"must_not": {"exists": {"field": "date"}}}}
+
+    # Past events, future events, and non-events
+    def _default_filter(self):
+        return [
+            self._past_events_filter(),
+            self._future_events_filter(),
+            self._non_events_filter(),
+        ]
+
+
