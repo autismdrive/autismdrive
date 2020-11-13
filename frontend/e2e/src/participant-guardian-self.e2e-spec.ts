@@ -146,6 +146,11 @@ describe('Participant (Guardian - Self)', () => {
   it('should sort results by event date', () => searchUseCases.sortByEventDate());
   it('should display all resources again', () => searchUseCases.filterByType('all'));
   it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+  it('should go back to the home page again', () => globalHeaderUseCases.visitHomePage());
+  it('should go back to the search page again', () => globalHeaderUseCases.visitResourcesPage());
+  it('should go to second page of results', () => searchUseCases.goToNextResultsPage());
+  it('should display resource details', () => searchUseCases.displayResource());
+  it('should go back to the second page of results', () => searchUseCases.goBackAndCheckPageNum());
 
   // Log out
   it('should log out', () => loginUseCases.logout());

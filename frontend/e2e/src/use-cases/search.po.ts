@@ -61,6 +61,14 @@ export class SearchUseCases {
     const numFirstTabSelectedAfter  = await this.page.getElements(activeFirstTabSelector).count();
     expect(numTypeTabsAfter).toEqual(numTypeTabsBefore, 'All type tabs should be present.');
     expect(numFirstTabSelectedAfter).toEqual(numFirstTabSelectedBefore, 'First type tab should be selected.');
+
+    if (!autocomplete) {
+      // Results should be sorted by Relevance
+      const selectedSortSelector = '.sort-order app-search-sort mat-select-trigger .selected-sort-label';
+      await this.page.waitForVisible(selectedSortSelector);
+      const selectEl = await this.page.getElement(selectedSortSelector);
+      expect(selectEl.getText()).toEqual('Relevance');
+    }
   }
 
   async displaySelectedCategory(filterBy: string) {
@@ -167,13 +175,16 @@ export class SearchUseCases {
 
   displayResourceAndClickChip() {
     this.page.clickLinkToVariation('/search');
-    this.page.waitForVisible('app-search-result');
-    this.page.getElements('.result-item div a').first().click();
-    this.page.waitForVisible('app-resource-detail');
-
+    this.displayResource();
     this.page.clickElement('mat-chip');
     this.page.waitForVisible('.applied-filter');
     expect(this.page.getElements('.applied-filter').count()).toEqual(1);
+  }
+
+  displayResource() {
+    this.page.waitForVisible('app-search-result');
+    this.page.getElements('.result-item div a').first().click();
+    this.page.waitForVisible('app-resource-detail');
   }
 
   sortByEventDate() {
@@ -270,5 +281,29 @@ export class SearchUseCases {
     const searchSelector = '#search-field input';
     expect(this.page.isFocused(searchSelector)).toBeTruthy();
     this.page.pressKey('ESCAPE');
+  }
+
+  async goToNextResultsPage() {
+    const selector = '.mat-paginator-range-label';
+    const headingSelector = '.search-result-status h4';
+    await expect(this.page.getElement(selector).getText()).toMatch(/^1 – 20 of/);
+    await expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 1-20 of/);
+    await this.page.clickElement('button[aria-label="Next page"]');
+    await this.page.waitForVisible('app-search-result');
+    await expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
+    await expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
+  }
+
+  async goBackAndCheckPageNum() {
+    const resultSelector = 'app-search-result a.title';
+    const selector = '.mat-paginator-range-label';
+    const headingSelector = '.search-result-status h4';
+    const titleBefore = await this.page.getElement('h1').getText();
+    await this.page.goBack();
+    await this.page.waitForVisible(resultSelector);
+    const titleAfter = await this.page.getElement(resultSelector).getText();
+    expect(titleBefore).toEqual(titleAfter);
+    await expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
+    await expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
   }
 }

@@ -300,4 +300,8 @@ export class AppPage {
       });
     }
   }
+
+  goBack() {
+    return browser.executeScript('window.history.back()');
+  }
 }

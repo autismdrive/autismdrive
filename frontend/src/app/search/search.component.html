@@ -78,7 +78,7 @@
         variant="light-bg"
         (searchUpdated)="updateUrlAndDoSearch()"
         (categorySelected)="selectCategory($event)"
-        [words]="query.words"
+        [words]="query?.words"
       ></app-search-box>
       <app-add-button
         *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
@@ -160,7 +160,7 @@
                     [label_icon]="'cake'"
                     (filterSelected)="selectAgeRange($event)"
                     [ngClass]="'filter-by-age'"
-                    [isNotApplicable]="!loading && query && !query.hasAgeCounts()"
+                    [isNotApplicable]="!loading && !query.hasAgeCounts"
                     [notApplicableMessage]="'No age restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -176,7 +176,7 @@
                     [label_icon]="'language'"
                     (filterSelected)="selectLanguage($event)"
                     [ngClass]="'filter-by-language'"
-                    [isNotApplicable]="!loading && query && !query.hasLanguageCounts()"
+                    [isNotApplicable]="!loading && !query.hasLanguageCounts"
                     [notApplicableMessage]="'No language restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -187,7 +187,7 @@
             <app-search-sort
               [selectedSort]="selectedSort"
               [sortMethods]="sortMethods"
-              (sortMethodSelected)="newSortSelection($event)"
+              (sortMethodSelected)="reSort($event.name, true)"
             ></app-search-sort>
           </div>
           <div fxHide fxShow.lt-md fxLayoutAlign="center center">
@@ -211,6 +211,7 @@
     fxFlexAlign="center"
   ></app-tutorial-video>
   <app-search-filters-breadcrumbs
+    *ngIf="query"
     (ageRangeChipClicked)="selectAgeRange()"
     (categoryChipClicked)="removeCategory()"
     (clearAllClicked)="clearAllFilters()"
@@ -303,7 +304,7 @@
           <app-search-sort
             [selectedSort]="selectedSort"
             [sortMethods]="sortMethods"
-            (sortMethodSelected)="newSortSelection($event)"
+            (sortMethodSelected)="reSort($event.name, true)"
           ></app-search-sort>
         </div>
       </div>
@@ -370,7 +371,7 @@
             matInput
             placeholder="Enter ZIP Code"
             [(ngModel)]="updatedZip"
-            (keyup.enter)="zipSubmit($event, setLocationExpansionPanel)"
+            (keyup.enter)="submitZip($event, setLocationExpansionPanel)"
             #zipCodeInput
           >
         </mat-form-field>
@@ -378,7 +379,7 @@
             <button
               mat-flat-button
               color="accent"
-              (click)="zipSubmit($event, setLocationExpansionPanel)"
+              (click)="submitZip($event, setLocationExpansionPanel)"
               id="btn_save"
             >Save</button>
             <button
