@@ -65,7 +65,7 @@ export class Query {
   }
 
   public get hasTypes(): boolean {
-    return !!(this.types && (this.types.length === 1));
+    return !!(this.types && ((this.types.length === 1 || (this.types.length === 2))));
   }
 
   public get hasAges(): boolean {

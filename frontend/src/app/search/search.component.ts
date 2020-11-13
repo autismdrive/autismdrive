@@ -546,8 +546,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
         }
       } else if (keepType === HitType.EVENT.name) {
         this.selectedSort = this.sortMethods.DATE;
-      } else if (keepType === HitType.ONLINE_RESOURCES.name) {
-        this.selectedSort = this.sortMethods.DATE;
       }
       this.query.sort = this.selectedSort.sortQuery;
     }
