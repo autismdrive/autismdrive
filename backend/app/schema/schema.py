@@ -294,7 +294,7 @@ class EventSchema(ModelSchema):
                   'organization_name', 'resource_categories', 'latitude', 'longitude',  'ages', 'insurance',
                   'phone_extension', 'languages', 'covid19_categories', 'includes_registration', 'webinar_link',
                   'post_survey_link', 'max_users', 'registered_users', 'image_url', 'registration_url',
-                  'should_hide_related_resources', '_links')
+                  'should_hide_related_resources', 'post_event_description', '_links')
     id = fields.Integer(required=False, allow_none=True)
     resource_categories = fields.Nested(CategoriesOnEventSchema(), many=True, dump_only=True)
     registered_users = fields.Nested(EventUserSchema(), many=True, dump_only=True)
@@ -595,6 +595,7 @@ class SearchSchema(ma.Schema):
         id = fields.Integer()
         content = fields.Str(missing=None)
         description = fields.Str(missing=None)
+        post_event_description = fields.Str(missing=None)
         title = fields.Str(missing=None)
         type = fields.Str()
         label = fields.Str(missing=None)

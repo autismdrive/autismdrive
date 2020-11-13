@@ -66,12 +66,27 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Description',
         placeholder: 'Please enter a description',
+        description: 'You may use Markdown syntax to insert simple formatting, text links, and images',
         required: true,
       },
       expressionProperties: {
         'templateOptions.placeholder': '"Please enter a description of your " + (model.type || "resource")',
       },
       hideExpression: '!model.type',
+    },
+    {
+      key: 'post_event_description',
+      type: 'textarea',
+      templateOptions: {
+        label: 'Post-Event Description',
+        placeholder: 'Description to display after event has occurred',
+        description: 'You may use Markdown syntax to insert simple formatting, text links, and images',
+        required: true,
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.type === "event"'
+      },
+      hideExpression: 'model.type != "event"',
     },
     {
       key: 'insurance',

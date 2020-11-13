@@ -106,10 +106,11 @@ class Sort:
 class Hit:
 
     def __init__(self, result_id, content, description, title, doc_type, label, date, last_updated, highlights, latitude,
-                 longitude, status, no_address, is_draft):
+                 longitude, status, no_address, is_draft, post_event_description):
         self.id = result_id
         self.content = content
         self.description = description
+        self.post_event_description = post_event_description
         self.title = title
         self.type = doc_type
         self.label = label

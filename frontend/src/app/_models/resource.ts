@@ -7,6 +7,7 @@ export class Resource extends GeoLocation {
   type: string;
   title: string;
   description: string;
+  post_event_description: string;
   insurance: string;
   date?: string;
   time?: string;

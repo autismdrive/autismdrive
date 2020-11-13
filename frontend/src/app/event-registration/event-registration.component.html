@@ -4,7 +4,7 @@
 >
   <h2>Interested in Participating?</h2>
   <div
-    *ngIf="!currentUser"
+    *ngIf="!hasCurrentUser"
     fxLayout="column"
     fxLayoutGap="20px"
   >
@@ -22,7 +22,7 @@
     >Sign In</button>
   </div>
   <div
-    *ngIf="currentUser"
+    *ngIf="hasCurrentUser"
   >
     <button
       mat-flat-button

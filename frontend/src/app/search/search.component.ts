@@ -558,12 +558,12 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
   }
 
-  resourceTypesFiltered(): HitType[] {
+  get resourceTypesFiltered(): HitType[] {
     return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
   }
 
   resourceTypesFilteredNames(): string[] {
-    return this.resourceTypesFiltered().map(t => t.name);
+    return this.resourceTypesFiltered.map(t => t.name);
   }
 
   updatePage(event: PageEvent) {
@@ -686,7 +686,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   }
 
   selectTypeTab($event: MatTabChangeEvent) {
-    const resourceType = ($event.index > 0) ? this.resourceTypesFiltered()[$event.index - 1] : HitType.ALL_RESOURCES;
+    const resourceType = ($event.index > 0) ? this.resourceTypesFiltered[$event.index - 1] : HitType.ALL_RESOURCES;
     this.selectType(resourceType.name);
   }
 

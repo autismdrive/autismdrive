@@ -1,3 +1,5 @@
+import datetime
+
 from app import db
 from app.model.location import Location
 
@@ -17,7 +19,15 @@ class Event(Location):
     registered_users = db.relationship("EventUser", back_populates='event')
     registration_url = db.Column(db.String, nullable=True)
     image_url = db.Column(db.String, nullable=True)
+    post_event_description = db.Column(db.String, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'event',
     }
+
+    def indexable_content(self):
+        return ' '.join(filter(None, (self.title,
+                                      self.description,
+                                      self.post_event_description,
+                                      self.insurance,
+                                      self.category_names(),)))
