@@ -35,6 +35,7 @@ class StarDocument(Document):
     last_updated = Date()
     content = Text(analyzer=stem_analyzer)
     description = Text()
+    post_event_description = Text()
     organization_name = Keyword()
     website = Keyword()
     location = Keyword()
@@ -53,6 +54,37 @@ class StarDocument(Document):
 class ElasticIndex:
 
     logger = logging.getLogger("ElasticIndex")
+
+    # Past events with a non-empty post-event description
+    _past_events_filter = {
+        "bool": {
+            "filter": [
+                {"terms": {"type": ["event"]}},
+                {"exists": {"field": "post_event_description"}},
+                {"range": {"date": {"lt": datetime.datetime.utcnow()}}},
+            ]
+        }
+    }
+
+    # Future events
+    _future_events_filter = {
+        "bool": {
+            "filter": [
+                {"terms": {"type": ["event"]}},
+                {"range": {"date": {"gte": datetime.datetime.utcnow()}}},
+            ]
+        }
+    }
+
+    # Non-events (i.e., date field is empty)
+    _non_events_filter = {"bool": {"must_not": {"exists": {"field": "date"}}}}
+
+    # Past events, future events, and non-events
+    _default_filter = [
+        _past_events_filter,
+        _future_events_filter,
+        _non_events_filter,
+    ]
 
     def __init__(self, app):
         self.logger.debug("Initializing Elastic Index")
@@ -120,7 +152,7 @@ class ElasticIndex:
         # update is the same as add, as it will overwrite.  Better to have code in one place.
         self.add_document(document, flush, latitude, longitude)
 
-    def add_document(self, document, flush=True, latitude=None, longitude=None):
+    def add_document(self, document, flush=True, latitude=None, longitude=None, post_event_description=None):
         doc = StarDocument(id=document.id,
                            type=document.__tablename__,
                            label=document.__label__,
@@ -128,6 +160,7 @@ class ElasticIndex:
                            last_updated=document.last_updated,
                            content=document.indexable_content(),
                            description=document.description,
+                           post_event_description=post_event_description,
                            organization_name=document.organization_name,
                            location=None,
                            ages=document.ages,
@@ -140,6 +173,8 @@ class ElasticIndex:
 
         if hasattr(document, 'date'):
             doc.date = document.date
+        if hasattr(document, 'post_event_description'):
+            doc.post_event_description = document.post_event_description
         if hasattr(document, 'languages'):
             doc.languages = document.languages
         if hasattr(document, 'website'):
@@ -175,7 +210,8 @@ class ElasticIndex:
         for r in resources:
             self.add_document(r, flush=False)
         for e in events:
-            self.add_document(e, flush=False, latitude=e.latitude, longitude=e.longitude)
+            post_event_description = e.post_event_description if hasattr(e, 'post_event_description') else None
+            self.add_document(e, flush=False, latitude=e.latitude, longitude=e.longitude, post_event_description=post_event_description)
         for l in locations:
             self.add_document(l, flush=False, latitude=l.latitude, longitude=l.longitude)
         for s in studies:
@@ -199,20 +235,29 @@ class ElasticIndex:
 
         # Filter results for type, ages, and languages
         if search.types:
+            if set(search.types) == {'resource'}:
+                # Include past events in resource search results
+                search.types.append('event')
+
             elastic_search = elastic_search.filter('terms', **{"type": search.types})
         if search.ages:
             elastic_search = elastic_search.filter('terms', **{"ages": search.ages})
         if search.languages:
             elastic_search = elastic_search.filter('terms', **{"languages": search.languages})
 
-        # Filter results by date
-        if search.date:
-            elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
-        else:
+        if set(search.types) == {'resource', 'event'}:
+            # Include past events in resource search results
             elastic_search = elastic_search.filter('bool', **{"should": [
-                {"range": {"date": {"gte": datetime.datetime.utcnow()}}},  # Future events OR
-                {"bool": {"must_not": {"exists": {"field": "date"}}}}   # Date field is empty
+                self._past_events_filter,  # Past events OR
+                self._non_events_filter,   # Date field is empty
             ]})
+        elif search.date:
+            # Filter results by date
+            elastic_search = elastic_search.filter('range', **{"date": {"gte": search.date}})
+        elif set(search.types) == {'event'}:
+            elastic_search = elastic_search.filter('bool', **{"should": self._future_events_filter})
+        else:
+            elastic_search = elastic_search.filter('bool', **{"should": self._default_filter})
 
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
@@ -275,9 +320,6 @@ class ElasticIndex:
         elastic_search = elastic_search[0:max_hits]
 
         # Filter out past events
-        elastic_search = elastic_search.filter('bool', **{"should": [
-            {"range": {"date": {"gte": datetime.datetime.utcnow()}}},  # Future events OR
-            {"bool": {"must_not": {"exists": {"field": "date"}}}}  # Date field is empty
-        ]})
+        elastic_search = elastic_search.filter('bool', **{"should": self._default_filter})
 
         return elastic_search.execute()

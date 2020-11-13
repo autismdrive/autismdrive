@@ -131,6 +131,7 @@ export class Hit extends GeoLocation {
   title: string;
   content: string;
   description: string;
+  post_event_description: string;
   last_updated: Date;
   date?: Date;
   highlights: string;

@@ -19,6 +19,14 @@ export class SearchResultComponent implements OnInit {
   constructor() {
   }
 
+  get isPastEvent(): boolean {
+    return !!(
+      this.hit.date &&
+      (new Date(this.hit.date) < new Date()) &&
+      this.hit.post_event_description
+    );
+  }
+
   ngOnInit() {
   }
 
