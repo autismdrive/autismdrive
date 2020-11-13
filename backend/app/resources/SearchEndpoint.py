@@ -50,9 +50,6 @@ class SearchEndpoint(flask_restful.Resource):
             if "highlight" in hit.meta:
                 highlights = "... ".join(hit.meta.highlight.content)
 
-            if hasattr(hit, 'post_event_description'):
-                print(hit.post_event_description)
-
             search_hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.date,
                              hit.last_updated, highlights, hit.latitude, hit.longitude, hit.status, hit.no_address,
                              hit.is_draft, hit.post_event_description)

@@ -81,10 +81,6 @@ export class ResourceFormComponent implements OnInit {
         label: 'Post-Event Description',
         placeholder: 'Description to display after event has occurred',
         description: 'You may use Markdown syntax to insert simple formatting, text links, and images',
-        required: true,
-      },
-      expressionProperties: {
-        'templateOptions.required': 'model.type === "event"'
       },
       hideExpression: 'model.type != "event"',
     },

@@ -256,11 +256,11 @@ class TestSearch(BaseTest, unittest.TestCase):
                                     description="Electronically-delivered rainbows through the internets")
         l = self.construct_location(title='space unicorn main office',
                                     description="Where rainbows are manufactured for galactic distribution")
-        future_date = datetime.now() + timedelta(days=7)
+        future_date = datetime.utcnow() + timedelta(days=7)
         future_event = self.construct_event(title='space unicorn workshop',
                                  description="Learn how to deliver sparkling rainbows in this interactive workshop",
                                  date=future_date)
-        past_date = datetime.now() + timedelta(days=-7)
+        past_date = datetime.utcnow() + timedelta(days=-7)
         past_event = self.construct_event(title='space rainbows webinar',
                                  description="Future practical tips on how to generate interplanetary sparkly colors",
                                  post_event_description="Past practical tips on how to generate interplanetary sparkly colors",
@@ -544,10 +544,14 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertNotEqual(title2, title3)
 
     def test_search_sort_by_date_filters_out_past_events(self):
-        now = datetime.now()
+        now = datetime.utcnow()
         last_year = self.construct_event(title="A year ago", date=now + timedelta(days=-365))
         last_week = self.construct_event(title="A week ago", date=now + timedelta(days=-7))
         yesterday = self.construct_event(title="Yesterday", date=now + timedelta(days=-1))
+
+        # Events earlier in the day are included. They aren't excluded until the local time is past midnight.
+        earlier_today = self.construct_event(title="Earlier today", date=now - timedelta(hours=1))
+        later_today = self.construct_event(title="Later today", date=now + timedelta(hours=1))
         tomorrow = self.construct_event(title="Tomorrow", date=now + timedelta(days=1))
         next_week = self.construct_event(title="Next week", date=now + timedelta(days=7))
         next_year = self.construct_event(title="Next year", date=now + timedelta(days=365))
@@ -560,13 +564,15 @@ class TestSearch(BaseTest, unittest.TestCase):
             }
         }
         search_results = self.search(query)
-        self.assertEqual(3, len(search_results['hits']))
-        self.assertEqual(search_results['hits'][0]['title'], tomorrow.title)
-        self.assertEqual(search_results['hits'][1]['title'], next_week.title)
-        self.assertEqual(search_results['hits'][2]['title'], next_year.title)
+        self.assertEqual(5, len(search_results['hits']))
+        self.assertEqual(search_results['hits'][0]['title'], earlier_today.title)
+        self.assertEqual(search_results['hits'][1]['title'], later_today.title)
+        self.assertEqual(search_results['hits'][2]['title'], tomorrow.title)
+        self.assertEqual(search_results['hits'][3]['title'], next_week.title)
+        self.assertEqual(search_results['hits'][4]['title'], next_year.title)
 
     def test_search_filters_out_past_events(self):
-        now = datetime.now()
+        now = datetime.utcnow()
         self.construct_resource(title="How to style unicorn hair")
         self.construct_resource(title="Rainbow-emitting capabilities of unicorn horns")
         self.construct_resource(title="Tips for time travel with a unicorn")
