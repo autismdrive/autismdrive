@@ -201,7 +201,7 @@
         <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
       </mat-tab>
       <mat-tab
-        *ngFor="let type of resourceTypesFiltered()"
+        *ngFor="let type of resourceTypesFiltered"
       >
         <ng-template mat-tab-label>
           <div class="type-buttons {{type.name}}">

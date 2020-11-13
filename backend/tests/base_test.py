@@ -253,7 +253,7 @@ class BaseTest:
                         state="QX", zip="99775", phone="555-555-5555", website="http://stardrive.org",
                         date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org",
                         post_survey_link="http://stardrive.org/survey", webinar_link="http://stardrive.org/event",
-                        includes_registration=True, max_users=35, registered_users=None):
+                        includes_registration=True, max_users=35, registered_users=None, post_event_description=None):
 
         if registered_users is None:
             registered_users = [self.construct_user(email="e1@sartography.com"),
@@ -261,7 +261,8 @@ class BaseTest:
         event = Event(title=title, description=description, street_address1=street_address1,
                       street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
                       date=date, is_draft=is_draft, organization_name=organization_name, webinar_link=webinar_link,
-                      post_survey_link=post_survey_link, includes_registration=includes_registration, max_users=max_users)
+                      post_survey_link=post_survey_link, includes_registration=includes_registration, max_users=max_users,
+                      post_event_description=post_event_description)
         db.session.add(event)
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()

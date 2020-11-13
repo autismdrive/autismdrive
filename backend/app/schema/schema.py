@@ -595,6 +595,7 @@ class SearchSchema(ma.Schema):
         id = fields.Integer()
         content = fields.Str(missing=None)
         description = fields.Str(missing=None)
+        post_event_description = fields.Str(missing=None)
         title = fields.Str(missing=None)
         type = fields.Str()
         label = fields.Str(missing=None)

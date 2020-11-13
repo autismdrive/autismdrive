@@ -249,6 +249,32 @@ class TestSearch(BaseTest, unittest.TestCase):
         search_results = self.search(rainbow_query)
         self.assertEqual(0, len(search_results['hits']))
 
+    def test_filter_resources_returns_resources_and_past_events(self):
+        rainbow_query = {'types': ['resource']}
+
+        r = self.construct_resource(title='space unicorn online resource',
+                                    description="Electronically-delivered rainbows through the internets")
+        l = self.construct_location(title='space unicorn main office',
+                                    description="Where rainbows are manufactured for galactic distribution")
+        future_date = datetime.now() + timedelta(days=7)
+        future_event = self.construct_event(title='space unicorn workshop',
+                                 description="Learn how to deliver sparkling rainbows in this interactive workshop",
+                                 date=future_date)
+        past_date = datetime.now() + timedelta(days=-7)
+        past_event = self.construct_event(title='space rainbows webinar',
+                                 description="Future practical tips on how to generate interplanetary sparkly colors",
+                                 post_event_description="Past practical tips on how to generate interplanetary sparkly colors",
+                                 date=past_date)
+        s = self.construct_study(title='space unicorn research study',
+                                 description="Investigating the long-term outcomes of interstellar unicorn-based delivery of rainbows")
+
+        search_results = self.search_resources(rainbow_query)
+        self.assertEqual(2, len(search_results['hits']), 'should only return 2 results')
+
+        expected_types = ['resource', 'event']
+        not_expected_types = ['study', 'location']
+        self.check_search_results(search_results, expected_types, not_expected_types)
+
     def test_search_resources_returns_only_resources(self):
         rainbow_query = {'words': 'rainbows'}
 
@@ -544,22 +570,41 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.construct_resource(title="How to style unicorn hair")
         self.construct_resource(title="Rainbow-emitting capabilities of unicorn horns")
         self.construct_resource(title="Tips for time travel with a unicorn")
-        self.construct_event(title="Unicorn council last year", date=now + timedelta(days=-365))
+        self.construct_event(
+            title="Unicorn council last year",
+            date=now + timedelta(days=-365),
+            description="Upcoming unicorn council",
+            post_event_description="Previously recorded unicorn council"
+        )
         self.construct_event(title="Unicorn meetup a week ago", date=now + timedelta(days=-7))
         self.construct_event(title="Unicorn workshop yesterday", date=now + timedelta(days=-1))
         self.construct_event(title="Unicorn playdate tomorrow", date=now + timedelta(days=1))
         self.construct_event(title="Unicorn training next week", date=now + timedelta(days=7))
         self.construct_event(title="Unicorn conference next year", date=now + timedelta(days=365))
 
+        # Should return future events, plus past events that have a post_event_description
         query = {'words': 'unicorn'}
         search_results = self.search(query)
-        self.assertEqual(6, len(search_results['hits']))
+        self.assertEqual(7, len(search_results['hits']))
         for hit in search_results['hits']:
             if hit['type'] == 'event':
                 hit_date = dateutil.parser.parse(hit['date'])
-                self.assertGreaterEqual(hit_date, now)
+                if hit_date >= now:
+                    self.assertGreaterEqual(hit_date, now)
+                else:
+                    self.assertTrue('post_event_description' in hit, 'Hit has no post-event description.')
+                    self.assertIsNotNone(hit['post_event_description'], 'Post-event description is empty.')
             else:
                 self.assertTrue(hit['date'] is None)
+
+        # Should only return future events when filtering by event type
+        event_query = {'words': 'unicorn', 'types': ['event']}
+        event_search_results = self.search(event_query)
+        self.assertEqual(3, len(event_search_results['hits']))
+        for hit in event_search_results['hits']:
+            self.assertEqual(hit['type'], 'event')
+            hit_date = dateutil.parser.parse(hit['date'])
+            self.assertGreaterEqual(hit_date, now)
 
     def test_search_for_map_points_only(self):
 

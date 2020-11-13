@@ -1,3 +1,5 @@
+import datetime
+
 from app import db
 from app.model.location import Location
 
@@ -22,3 +24,10 @@ class Event(Location):
     __mapper_args__ = {
         'polymorphic_identity': 'event',
     }
+
+    def indexable_content(self):
+        return ' '.join(filter(None, (self.title,
+                                      self.description,
+                                      self.post_event_description,
+                                      self.insurance,
+                                      self.category_names(),)))
