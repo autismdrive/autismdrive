@@ -19,15 +19,26 @@ services:
     volumes:
       - /home/elad/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
     ports:
-      - 127:0.0.1:9200:9200
+      - 127.0.0.1:9200:9200
       - 127.0.0.1:9300:9300
 
   backend:
     image: stardrive-test-backend:latest
     ports:
-      - 127.0.0.1:1500:1500
+      - 127.0.0.1:5000:5000
+    restart: unless-stopped
+    depends_on:
+      - es
+      - db
+
 
   frontend:
     image: stardrive-test-frontend:latest
+    environment:
+      - "API_URL=http://star-drive_backend_1:5000"
     ports:
-      - 127.0.0.1:1500:1500
+      - 127.0.0.1:4200:4200
+    depends_on:
+      - es
+      - db
+      - backend
