@@ -54,6 +54,8 @@ import app.model.questionnaires.identification_questionnaire
 import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
 import app.model.questionnaires.registration_questionnaire
+# SkillStar Questionnaires:
+import app.model.questionnaires.baseline_assessment_questionnaire
 
 
 class InvestigatorSchema(ModelSchema):

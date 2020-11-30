@@ -1,6 +1,7 @@
 import logging.config
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from traceback_with_variables import activate_by_import, iter_tb_lines, prints_tb, printing_tb
 
 from config.logging import logging_config
 
@@ -99,6 +100,12 @@ def handler(error, endpoint, values=''):
 
 
 app.url_build_error_handlers.append(handler)
+
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error('\n'.join(iter_tb_lines(e)))
+    return 'Server Error', 500
 
 
 # Handle errors consistently

@@ -1477,7 +1477,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
         ws = wb.active
         self.assertEqual(2, ws.max_row)
-        self.assertEqual(22, len(wb.worksheets))
+        self.assertEqual(23, len(wb.worksheets))
         self.assertEqual('Alternative Augmentative', wb.worksheets[0].title)
         self.assertEqual('Assistive Device', wb.worksheets[1].title)
         self.assertEqual('Clinical Diagnoses', wb.worksheets[2].title)
@@ -1500,6 +1500,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual('Registration', wb.worksheets[19].title)
         self.assertEqual('Supports', wb.worksheets[20].title)
         self.assertEqual('Therapy', wb.worksheets[21].title)
+        self.assertEqual('SkillStar Baseline Assessment', wb.worksheets[22].title)
 
     def test_export_questionnaires_by_user(self):
         u1 = self.construct_user(email='1@sartography.com')
