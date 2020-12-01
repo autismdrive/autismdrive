@@ -32,11 +32,6 @@ class BaselineAssessmentQuestionnaire(db.Model, TaskAssessmentMixin):
 
 
 class BaselineAssessmentQuestionnaireSchema(ModelSchema):
-    @pre_load
-    def set_field_session(self, data, **kwargs):
-        self.fields['is_task_complete'].schema.session = self.session
-        return data
-
     class Meta(ModelSchema.Meta):
         model = BaselineAssessmentQuestionnaire
         fields = (
