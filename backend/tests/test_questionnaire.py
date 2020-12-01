@@ -1,12 +1,13 @@
-from app.export_service import ExportService
-from app.model.flow import Step
 import json
 import unittest
 import openpyxl
 import io
+from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, elastic_index
-from app.model.user import User
+from app.export_service import ExportService
+from app.model.flow import Step
 from app.model.participant import Relationship
+from app.model.questionnaires.baseline_assessment_questionnaire import BaselineAssessmentQuestionnaire
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -24,7 +25,7 @@ from app.model.questionnaires.identification_questionnaire import Identification
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
-from tests.base_test_questionnaire import BaseTestQuestionnaire
+from app.model.user import User
 
 
 class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
@@ -1217,6 +1218,75 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         supports_questionnaire = {'participant_id': p.id}
         rv = self.app.post('api/flow/self_intake/supports_questionnaire',
                            data=self.jsonify(supports_questionnaire), content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['participant_id'], p.id)
+        self.assertIsNotNone(response['id'])
+
+    def test_baseline_assessment_questionnaire_basics(self):
+        self.construct_skillstar_baseline_assessment_questionnaire()
+        sq = db.session.query(BaselineAssessmentQuestionnaire).first()
+        self.assertIsNotNone(sq)
+        sq_id = sq.id
+        rv = self.app.get('/api/q/baseline_assessment_questionnaire/%i' % sq_id,
+                          follow_redirects=True,
+                          content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], sq_id)
+        self.assertEqual(response["participant_id"], sq.participant_id)
+        self.assertEqual(response["user_id"], sq.user_id)
+        self.assertEqual(len(response["is_task_complete"]), len(sq.is_task_complete))
+        self.assertEqual(len(response["has_challenging_behavior"]), len(sq.has_challenging_behavior))
+
+    def test_modify_baseline_assessment_questionnaire_basics(self):
+        self.construct_skillstar_baseline_assessment_questionnaire()
+        sq = db.session.query(BaselineAssessmentQuestionnaire).first()
+        self.assertIsNotNone(sq)
+        sq_id = sq.id
+        rv = self.app.get('/api/q/baseline_assessment_questionnaire/%i' % sq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        response = json.loads(rv.get_data(as_text=True))
+        response['participant_id'] = self.construct_participant(user=self.construct_user(),
+                                                                relationship=Relationship.self_participant).id
+        orig_date = response['last_updated']
+        rv = self.app.put('/api/q/baseline_assessment_questionnaire/%i' % sq_id, data=self.jsonify(response),
+                          content_type="application/json",
+                          follow_redirects=True,
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        rv = self.app.get('/api/q/baseline_assessment_questionnaire/%i' % sq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertNotEqual(orig_date, response['last_updated'])
+
+    def test_delete_baseline_assessment_questionnaire(self):
+        sq = self.construct_skillstar_baseline_assessment_questionnaire()
+        sq_id = sq.id
+        rv = self.app.get('api/q/baseline_assessment_questionnaire/%i' % sq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.delete('api/q/baseline_assessment_questionnaire/%i' % sq_id, content_type="application/json",
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/q/baseline_assessment_questionnaire/%i' % sq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_baseline_assessment_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        headers = self.logged_in_headers(u)
+
+        baseline_assessment_questionnaire = {'participant_id': p.id}
+        rv = self.app.post('api/flow/skillstar_baseline/baseline_assessment_questionnaire',
+                           data=self.jsonify(baseline_assessment_questionnaire), content_type="application/json",
                            follow_redirects=True,
                            headers=headers)
         self.assert_success(rv)
