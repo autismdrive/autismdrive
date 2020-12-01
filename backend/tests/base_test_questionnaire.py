@@ -647,7 +647,7 @@ class BaseTestQuestionnaire(BaseTest):
             p = participant
             bq.participant_id = p.id
 
-        bq.is_task_complete = ['task_00_complete', 'task_01_complete', 'task_02_complete', 'task_03_complete']
+        bq.is_task_complete = ['task_01_complete', 'task_02_complete', 'task_03_complete']
         bq.has_challenging_behavior = ['task_03_challenge', 'task_04_challenge', 'task_05_challenge', 'task_06_challenge']
 
         db.session.add(bq)
