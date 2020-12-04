@@ -43,9 +43,12 @@ class ExportService:
     @staticmethod
     def get_schema(name, many=False, session=None, is_import=False):
         model = ExportService.get_class(name)
-        class_name = model.__name__
+        class_name = None if model is None else model.__name__
         schema_name = ''
         schema_class = None
+
+        if class_name is None:
+            return None
 
         if not is_import:
             # Check for an 'ExportSchema'

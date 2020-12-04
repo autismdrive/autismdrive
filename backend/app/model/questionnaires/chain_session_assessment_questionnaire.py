@@ -1,22 +1,32 @@
+from marshmallow import pre_load
 from sqlalchemy import func
-from sqlalchemy.ext.declarative import declared_attr
 
-from app import db
+from app import db, ma
 from app.export_service import ExportService
+from app.schema.model_schema import ModelSchema
+from app.model.questionnaires.chain_session_step_mixin import ChainSessionStepMixin
+from app.model.questionnaires.chain_session_step import ChainSessionStepSchema
 
 
-class TaskAssessmentMixin(object):
+class ChainSessionAssessmentQuestionnaire(db.Model, ChainSessionStepMixin):
     """
-    SkillStar: Task Assessment
+    SkillStar: Chain Session Assessment Questionnaire
     """
-    info = {}
+    __tablename__ = "chain_session_assessment_questionnaire"
+    __label__ = "SkillStar Chain Session Assessment"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
-    __label__ = "Task Assessment"
-    __estimated_duration_minutes__ = 1
+    __estimated_duration_minutes__ = 5
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     time_on_task_ms = db.Column(db.BigInteger, default=0)
+
+    date_introduced = db.Column(db.DateTime(timezone=True), nullable=True)
+    date_mastered = db.Column(db.DateTime(timezone=True), nullable=True)
+    date_booster_required = db.Column(db.DateTime(timezone=True), nullable=True)
+    date_booster_mastered = db.Column(db.DateTime(timezone=True), nullable=True)
+    date_attempted = db.Column(db.DateTime(timezone=True), nullable=True)
+    prompt_level = db.Column(db.String)
     tasks = [
         {"id": "task_01", "label": "Put toothpaste on your toothbrush"},
         {"id": "task_02", "label": "Put toothpaste away"},
@@ -43,61 +53,43 @@ class TaskAssessmentMixin(object):
         {"id": "task_23", "label": "Clean up"},
     ]
 
-    @declared_attr
-    def participant_id(cls):
-        return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
-
-    @declared_attr
-    def user_id(cls):
-        return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
-
-    @declared_attr
-    def is_task_complete(cls):
-        options = []
-        for task in cls.tasks:
-            options.append({
-                "value": task["id"] + "_complete",
-                "label": task["label"],
-            })
-        return db.Column(
-            db.ARRAY(db.String),
-            info={
-                "display_order": 1.1,
-                "type": "multicheckbox",
-                "template_options": {
-                    "type": "array",
-                    "label": "Task Complete?",
-                    "required": True,
-                    "description": "(select all that apply)",
-                    "options": options,
-                    "validators": {"required": "multicheckbox"},
-                },
-            },
-        )
-
-    @declared_attr
-    def has_challenging_behavior(cls):
-        options = []
-        for task in cls.tasks:
-            options.append({
-                "value": task["id"] + "_challenge",
-                "label": task["label"],
-            })
-        return db.Column(
-            db.ARRAY(db.String),
-            info={
-                "display_order": 1.1,
-                "type": "multicheckbox",
-                "template_options": {
-                    "type": "array",
-                    "label": "Challenging Behavior?",
-                    "required": True,
-                    "description": "(select all that apply)",
-                    "options": options,
-                    "validators": {"required": "multicheckbox"},
-                },
-            },
-        )
+    participant_id = db.Column(
+        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
+    )
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
+    )
 
     def get_field_groups(self):
-        return {}
+        return super().get_field_groups()
+
+
+class ChainSessionAssessmentQuestionnaireSchema(ModelSchema):
+    @pre_load
+    def set_field_session(self, data, **kwargs):
+        self.fields['focus_steps'].schema.session = self.session
+        return data
+
+    class Meta(ModelSchema.Meta):
+        model = ChainSessionAssessmentQuestionnaire
+        fields = (
+            "id",
+            "last_updated",
+            "participant_id",
+            "user_id",
+            "time_on_task_ms",
+            "focus_steps",
+            "date_introduced",
+            "date_mastered",
+            "date_booster_required",
+            "date_booster_mastered",
+            "date_attempted",
+            # "prompt_level",
+            "_links"
+        )
+    _links = ma.Hyperlinks({
+        'self': ma.URLFor('api.questionnaireendpoint', name="chain_session_assessment_questionnaire", id='<id>')
+    })
+
+    focus_steps = ma.Nested(ChainSessionStepSchema, many=True)
+

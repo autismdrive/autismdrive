@@ -11,7 +11,7 @@ from app.model.flow import Step
 from app.model.participant import Participant, Relationship
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.assistive_device import AssistiveDevice
-from app.model.questionnaires.baseline_assessment_questionnaire import BaselineAssessmentQuestionnaire
+from app.model.questionnaires.chain_session_assessment_questionnaire import ChainSessionAssessmentQuestionnaire
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -631,8 +631,8 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_sq.last_updated, sq.last_updated)
         return db_sq
 
-    def construct_skillstar_baseline_assessment_questionnaire(self, participant=None, user=None):
-        bq = BaselineAssessmentQuestionnaire()
+    def construct_chain_session_assessment_questionnaire(self, participant=None, user=None):
+        bq = ChainSessionAssessmentQuestionnaire()
         if user is None:
             u = self.construct_user(email='edudep@questionnaire.com')
             bq.user_id = u.id
@@ -647,14 +647,13 @@ class BaseTestQuestionnaire(BaseTest):
             p = participant
             bq.participant_id = p.id
 
-        bq.is_task_complete = ['task_01_complete', 'task_02_complete', 'task_03_complete']
-        bq.has_challenging_behavior = ['task_03_challenge', 'task_04_challenge', 'task_05_challenge', 'task_06_challenge']
+        bq.tasks = []
 
         db.session.add(bq)
         db.session.commit()
 
-        db_bq = db.session.query(BaselineAssessmentQuestionnaire).filter_by(participant_id=bq.participant_id).first()
-        self.assertEqual(db_bq.is_task_complete, bq.is_task_complete)
+        db_bq = db.session.query(ChainSessionAssessmentQuestionnaire).filter_by(participant_id=bq.participant_id).first()
+        self.assertEqual(db_bq.tasks, bq.tasks)
         return db_bq
 
     def construct_all_questionnaires(self, user=None):
@@ -678,5 +677,5 @@ class BaseTestQuestionnaire(BaseTest):
         self.construct_professional_questionnaire(user=user, participant=participant)
         self.construct_supports_questionnaire(user=user, participant=participant)
         self.construct_registration_questionnaire(user=user)
-        self.construct_skillstar_baseline_assessment_questionnaire(user=user, participant=participant)
+        self.construct_chain_session_assessment_questionnaire(user=user, participant=participant)
 
