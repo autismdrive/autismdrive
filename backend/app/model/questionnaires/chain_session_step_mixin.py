@@ -19,6 +19,9 @@ class ChainSessionStepMixin(object):
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     time_on_task_ms = db.Column(db.BigInteger, default=0)
 
+    # task_id = db.Column(db.String)
+    # task_label = db.Column(db.String)
+
     is_task_complete = db.Column(
         db.Boolean,
         info={
@@ -53,6 +56,64 @@ class ChainSessionStepMixin(object):
         },
     )
 
+    # prompt_level = db.Column(
+    #     db.String,
+    #     info={
+    #         "display_order": 1.3,
+    #         "type": "radio",
+    #         "template_options": {
+    #             "type": "array",
+    #             "label": "What prompt did you use to complete the step?",
+    #             "required": True,
+    #             "options": [
+    #                 {
+    #                     "value": "none",
+    #                     "label": "No Prompt (Independent)"
+    #                 },
+    #                 {
+    #                     "value": "shadow",
+    #                     "label": "Shadow Prompt (approximately one inch)"
+    #                 },
+    #                 {
+    #                     "value": "partial_physical",
+    #                     "label": "Partial Physical Prompt (thumb and index finger)"
+    #                 },
+    #                 {
+    #                     "value": "full_physical",
+    #                     "label": "Full Physical Prompt (hand-over-hand)"
+    #                 },
+    #             ],
+    #         },
+    #     },
+    # )
+    #
+    # challenging_behavior_severity = db.Column(
+    #     db.String,
+    #     info={
+    #         "display_order": 1.4,
+    #         "type": "radio",
+    #         "template_options": {
+    #             "type": "array",
+    #             "label": "How severe was the challenging behavior?",
+    #             "required": True,
+    #             "options": [
+    #                 {
+    #                     "value": "mild",
+    #                     "label": "Mild (did not interfere with task)"
+    #                 },
+    #                 {
+    #                     "value": "moderate",
+    #                     "label": "Moderate (interfered with task, but we were able to work through it)"
+    #                 },
+    #                 {
+    #                     "value": 'severe',
+    #                     "label": "Severe (we were not able to complete the task due to the severity of the behavior)"
+    #                 },
+    #             ],
+    #         },
+    #     },
+    # )
+
     @declared_attr
     def participant_id(cls):
         return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
@@ -62,7 +123,7 @@ class ChainSessionStepMixin(object):
         return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
 
     @declared_attr
-    def focus_steps(cls):
+    def step_attempts(cls):
         return db.relationship(
             "ChainSessionStep",
             backref=db.backref(cls.__tablename__, lazy=True),
@@ -72,7 +133,7 @@ class ChainSessionStepMixin(object):
 
     def get_field_groups(self):
         field_groups = {
-            "focus_steps": {
+            "step_attempts": {
                 "type": "repeat",
                 "display_order": 3,
                 "wrappers": ["card"],

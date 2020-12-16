@@ -175,11 +175,11 @@ class QuestionnaireInfoEndpoint(flask_restful.Resource):
 
         Returns:
             list[ExportInfoSchema] - A list of dict objects, including the following info for each questionnaire:
-                table_name (str): Snake-case database table name. E.g., "chain_session_assessment_questionnaire",
-                class_name (str): Pascal-case class name for Model class. E.g., "ChainSessionAssessmentQuestionnaire",
+                table_name (str): Snake-case database table name. E.g., "chain_session_questionnaire",
+                class_name (str): Pascal-case class name for Model class. E.g., "ChainSession",
                 display_name (str): Questionnaire title. E.g., "Chain Session Assessment",
                 size (int): Number of questionnaire records in the database,
-                url (str): Export endpoint. E.g., "/api/export/chain_session_assessment_questionnaire",
+                url (str): Export endpoint. E.g., "/api/export/chain_session_questionnaire",
                 question_type (str): 'sensitive' | 'identifying' | 'unrestricted' | 'sub-table'
                 sub_tables (list[ExportInfoSchema]): A list of sub-tables within this table, if applicable.
         """

@@ -42,7 +42,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Enable CORS
-if app.config["CORS_ENABLED"] :
+if app.config["CORS_ENABLED"]:
     cors = CORS(app, resources={r"*": {"origins": "*"}})
 
 # Flask-Marshmallow provides HATEOAS links

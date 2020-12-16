@@ -55,7 +55,7 @@ import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
 import app.model.questionnaires.registration_questionnaire
 # SkillStar Questionnaires:
-import app.model.questionnaires.chain_session_assessment_questionnaire
+import app.model.questionnaires.chain_session
 
 
 class InvestigatorSchema(ModelSchema):

@@ -12,10 +12,10 @@ class ChainSessionStep(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    chain_session_assessment_questionnaire_id = db.Column(
-        "chain_session_assessment_questionnaire_id",
+    chain_session_id = db.Column(
+        "chain_session_id",
         db.Integer,
-        db.ForeignKey("chain_session_assessment_questionnaire.id"),
+        db.ForeignKey("chain_session.id"),
     )
 
     def get_field_groups(self):
@@ -25,21 +25,20 @@ class ChainSessionStep(db.Model):
 class ChainSessionStepSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ChainSessionStep
-        fields = ("id", "last_updated", "chain_session_assessment_questionnaire_id", "participant_id", "user_id")
+        fields = ("id", "last_updated", "chain_session_id", "participant_id", "user_id")
     participant_id = fields.Method('get_participant_id')
     user_id = fields.Method('get_user_id')
-    chain_session_assessment_questionnaire_id = fields.Integer(required=False, allow_none=True)
-    home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
-    chain_session_assessment_questionnaire = fields.Nested('ChainSessionAssessmentQuestionnaire', required=False, allow_none=True)
+    chain_session_id = fields.Integer(required=False, allow_none=True)
+    chain_session = fields.Nested('ChainSession', required=False, allow_none=True)
 
     def get_participant_id(self, obj):
         if obj is None:
             return missing
-        elif obj.chain_session_assessment_questionnaire is not None:
-            return obj.chain_session_assessment_questionnaire.participant_id
+        elif obj.chain_session is not None:
+            return obj.chain_session.participant_id
 
     def get_user_id(self, obj):
         if obj is None:
             return missing
-        elif obj.chain_session_assessment_questionnaire is not None:
-            return obj.chain_session_assessment_questionnaire.user_id
+        elif obj.chain_session is not None:
+            return obj.chain_session.user_id
