@@ -698,9 +698,3 @@ class ZipCodeSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ZipCode
         fields = ["id", "latitude", "longitude"]
-
-
-class ChainStepSchema(ModelSchema):
-    class Meta(ModelSchema.Meta):
-        model = ChainStep
-        fields = ["id", "instruction", "last_updated"]

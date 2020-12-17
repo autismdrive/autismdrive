@@ -6,10 +6,10 @@ import io
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, elastic_index
 from app.export_service import ExportService
+from app.model.chain_step import ChainStep
 from app.model.flow import Step
 from app.model.participant import Relationship
 from app.model.questionnaires.chain_questionnaire import ChainQuestionnaire
-from app.model.questionnaires.chain_session import ChainSession
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -1227,6 +1227,23 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(response['participant_id'], p.id)
         self.assertIsNotNone(response['id'])
 
+    def test_get_chain_steps(self):
+        self.construct_chain_steps()
+        chain_step = db.session.query(ChainStep).first()
+        self.assertIsNotNone(chain_step)
+        chain_step_id = chain_step.id
+        chain_step_name = chain_step.name
+        chain_step_instruction = chain_step.instruction
+        rv = self.app.get('/api/chain_step/%i' % chain_step_id,
+                          follow_redirects=True,
+                          content_type='application/json',
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['id'], chain_step_id)
+        self.assertEqual(response['name'], chain_step_name)
+        self.assertEqual(response['instruction'], chain_step_instruction)
+
     def test_chain_session_questionnaire_basics(self):
         self.construct_chain_session_questionnaire()
         cq = db.session.query(ChainQuestionnaire).first()
@@ -1242,7 +1259,16 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(response["participant_id"], cq.participant_id)
         self.assertEqual(response["user_id"], cq.user_id)
         self.assertEqual(len(response["sessions"]), len(cq.sessions))
-        self.assertEqual(len(response["sessions"][0]["step_attempts"]), len(cq.sessions[0].step_attempts))
+        self.assertEqual(
+            len(response["sessions"][0]["step_attempts"]),
+            len(cq.sessions[0].step_attempts)
+        )
+        self.assertEqual(
+            response["sessions"][0]["step_attempts"][0]["chain_step_id"],
+            cq.sessions[0].step_attempts[0].chain_step_id
+        )
+        self.assertTrue('chain_step' in response["sessions"][0]["step_attempts"][0])
+        self.assertIsNotNone(response["sessions"][0]["step_attempts"][0]["chain_step"]["name"])
 
     def test_modify_chain_session_questionnaire_basics(self):
         self.construct_chain_session_questionnaire()

@@ -122,6 +122,7 @@ from app.resources.ExportEndpoint import (
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
 from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
+from app.resources.ChainStepEndpoint import ChainStepEndpoint, ChainStepListEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -278,6 +279,10 @@ endpoints = [
 
     # Password Requirements Endpoint
     (PasswordRequirementsEndpoint, "/password_requirements/<role>"),
+
+    # SkillSTAR
+    (ChainStepListEndpoint, "/chain_step"),
+    (ChainStepEndpoint, "/chain_step/<chain_step_id>"),
 
 ]
 

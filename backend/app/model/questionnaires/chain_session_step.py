@@ -1,4 +1,4 @@
-from marshmallow import fields, missing
+from marshmallow import fields, missing, pre_load
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -6,6 +6,7 @@ from app import db, ma
 from app.schema.model_schema import ModelSchema
 from app.export_service import ExportService
 from app.model.chain_step import ChainStep
+from app.schema.chain_step_schema import ChainStepSchema
 
 
 class ChainSessionStep(db.Model):
@@ -21,12 +22,6 @@ class ChainSessionStep(db.Model):
         "chain_session_id",
         db.Integer,
         db.ForeignKey("chain_session.id")
-    )
-
-    chain_step_id = db.Column(
-        "chain_step_id",
-        db.Integer,
-        db.ForeignKey('chain_step.id')
     )
 
     date = db.Column(
@@ -178,6 +173,10 @@ class ChainSessionStep(db.Model):
     )
 
     @declared_attr
+    def chain_step_id(cls):
+        return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'))
+
+    @declared_attr
     def participant_id(cls):
         return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
 
@@ -208,13 +207,11 @@ class ChainSessionStepSchema(ModelSchema):
             "challenging_behavior_severity",
         )
 
-    # chain_step_id = fields.Integer(required=False, allow_none=True)
-    chain_step = fields.Nested(ChainStep, required=False, allow_none=True)
-    # chain_step = ma.Nested(ChainStepSchema)
-    # chain_step = fields.Method('get_chain_step')
-    # def get_chain_step(self, obj):
-    #     if obj is None:
-    #         return missing
-    #     elif obj.chain_id is not None:
-    #         chain_step = db.session.query(ChainStep).filter_by(ChainStep.id == obj.chain_id)
-    #         return ChainStepSchema().dump(chain_step)
+    chain_step = fields.Method('get_chain_step', dump_only=True)
+
+    def get_chain_step(self, obj):
+        if obj is None:
+            return missing
+
+        db_chain_step = db.session.query(ChainStep).filter_by(id=obj.chain_step_id).first()
+        return ChainStepSchema().dump(db_chain_step)
