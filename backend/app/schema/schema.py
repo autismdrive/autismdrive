@@ -25,6 +25,7 @@ from app.model.user import User
 from app.model.user_favorite import UserFavorite
 from app.model.event_user import EventUser
 from app.model.zip_code import ZipCode
+from app.model.chain_step import ChainStep
 from app.schema.model_schema import ModelSchema
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaireSchema
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaireSchema
@@ -55,7 +56,9 @@ import app.model.questionnaires.professional_profile_questionnaire
 import app.model.questionnaires.supports_questionnaire
 import app.model.questionnaires.registration_questionnaire
 # SkillStar Questionnaires:
+import app.model.questionnaires.chain_questionnaire
 import app.model.questionnaires.chain_session
+import app.model.questionnaires.chain_session_step
 
 
 class InvestigatorSchema(ModelSchema):
@@ -695,3 +698,9 @@ class ZipCodeSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ZipCode
         fields = ["id", "latitude", "longitude"]
+
+
+class ChainStepSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
+        model = ChainStep
+        fields = ["id", "instruction", "last_updated"]

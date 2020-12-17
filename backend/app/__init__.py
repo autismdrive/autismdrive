@@ -130,6 +130,7 @@ def _load_data(data_loader):
     data_loader.load_resources()
     data_loader.load_studies()
     data_loader.load_zip_codes()
+    data_loader.load_chain_steps()
 
 
 @app.cli.command()

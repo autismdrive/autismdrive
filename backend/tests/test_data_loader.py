@@ -4,6 +4,7 @@ from datetime import datetime
 
 from app import db, data_loader, elastic_index
 from app.model.category import Category
+from app.model.chain_step import ChainStep
 from app.model.event import Event
 from app.model.location import Location
 from app.model.participant import Participant
@@ -77,6 +78,9 @@ class TestDataLoader(BaseTest, unittest.TestCase):
 
     def test_load_zip_codes(self):
         self._load_and_assert_success(ZipCode, 'load_zip_codes')
+
+    def test_load_chain_steps(self):
+        self._load_and_assert_success(ChainStep, 'load_chain_steps')
 
     def test_get_category_by_name(self):
         expected_name = 'Schools of Witchcraft and Wizardry'

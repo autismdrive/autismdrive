@@ -1,14 +1,16 @@
-import datetime
-
+from marshmallow import pre_load
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
-from app import db
-from app.model.questionnaires.chain_session import ChainSession
+from app import db, ma
+from app.model.questionnaires.chain_session import ChainSessionSchema, ChainSession
+from app.schema.model_schema import ModelSchema
 from app.export_service import ExportService
 
 
-class ChainMixin(object):
+class ChainQuestionnaire(db.Model):
+    __tablename__ = "chain_questionnaire"
+    __label__ = "SkillSTAR Chain Questionnaire"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
@@ -33,38 +35,6 @@ class ChainMixin(object):
             passive_deletes=True
         )
 
-    @declared_attr
-    def date(cls):
-        return db.Column(
-            db.DateTime,
-            info={
-                "display_order": 1,
-                "type": "datepicker",
-                "template_options": {
-                    "required": True,
-                    "label": 'Session Date',
-                },
-            },
-        )
-
-    @declared_attr
-    def complete(cls):
-        return db.Column(
-            db.Boolean,
-            info={
-                "display_order": 2,
-                "type": "radio",
-                "template_options": {
-                    "required": False,
-                    "label": 'Session Complete?',
-                    "options": [
-                        {"value": True, "label": "Yes"},
-                        {"value": False, "label": "No"},
-                    ],
-                },
-            },
-        )
-
     def get_field_groups(self):
         field_groups = {
                 "sessions": {
@@ -80,3 +50,22 @@ class ChainMixin(object):
                 },
             }
         return field_groups
+
+
+class ChainQuestionnaireSchema(ModelSchema):
+    @pre_load
+    def set_field_session(self, data, **kwargs):
+        self.fields['sessions'].schema.session = self.session
+        return data
+
+    class Meta(ModelSchema.Meta):
+        model = ChainQuestionnaire
+        fields = (
+            "id",
+            "last_updated",
+            "participant_id",
+            "user_id",
+            "time_on_task_ms",
+            "sessions",
+        )
+    sessions = ma.Nested(ChainSessionSchema, many=True)
