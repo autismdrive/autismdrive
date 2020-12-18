@@ -24,10 +24,26 @@ class ChainSessionStep(db.Model):
         db.ForeignKey("chain_session.id")
     )
 
+    @declared_attr
+    def chain_step_id(cls):
+        chain_steps = db.session.query(ChainStep).all()
+        options = [{"value": s.id, "label": s.instruction} for s in chain_steps]
+        print('options', options)
+        return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'), info={
+                "display_order": 1,
+                "type": "select",
+                "template_options": {
+                    "required": True,
+                    "label": 'Task',
+                    "options": options,
+                },
+            }
+         )
+
     date = db.Column(
         db.DateTime,
         info={
-            "display_order": 1.1,
+            "display_order": 2,
             "type": "datepicker",
             "template_options": {
                 "required": True,
@@ -39,7 +55,7 @@ class ChainSessionStep(db.Model):
     status = db.Column(
         db.String,
         info={
-            "display_order": 1.4,
+            "display_order": 3,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -66,7 +82,7 @@ class ChainSessionStep(db.Model):
     completed = db.Column(
         db.Boolean,
         info={
-            "display_order": 1.2,
+            "display_order": 4,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -83,7 +99,7 @@ class ChainSessionStep(db.Model):
     was_prompted = db.Column(
         db.Boolean,
         info={
-            "display_order": 1.3,
+            "display_order": 5,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -100,7 +116,7 @@ class ChainSessionStep(db.Model):
     prompt_level = db.Column(
         db.String,
         info={
-            "display_order": 1.4,
+            "display_order": 6,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -131,7 +147,7 @@ class ChainSessionStep(db.Model):
     had_challenging_behavior = db.Column(
         db.Boolean,
         info={
-            "display_order": 1.5,
+            "display_order": 7,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -148,7 +164,7 @@ class ChainSessionStep(db.Model):
     challenging_behavior_severity = db.Column(
         db.String,
         info={
-            "display_order": 1.6,
+            "display_order": 8,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -171,10 +187,6 @@ class ChainSessionStep(db.Model):
             },
         },
     )
-
-    @declared_attr
-    def chain_step_id(cls):
-        return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'))
 
     @declared_attr
     def participant_id(cls):
