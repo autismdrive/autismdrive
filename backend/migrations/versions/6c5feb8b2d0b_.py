@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e7c813d23512
+Revision ID: 6c5feb8b2d0b
 Revises: 9b14a3e90c8e
-Create Date: 2020-12-17 12:49:41.354641
+Create Date: 2020-12-18 11:49:43.961774
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'e7c813d23512'
+revision = '6c5feb8b2d0b'
 down_revision = '9b14a3e90c8e'
 branch_labels = None
 depends_on = None
@@ -40,21 +40,16 @@ def upgrade():
     sa.Column('last_updated', sa.DateTime(timezone=True), nullable=True),
     sa.Column('time_on_task_ms', sa.BigInteger(), nullable=True),
     sa.Column('chain_questionnaire_id', sa.Integer(), nullable=True),
-    sa.Column('participant_id', sa.Integer(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('date', sa.DateTime(), nullable=True),
     sa.Column('completed', sa.Boolean(), nullable=True),
     sa.Column('session_type', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['chain_questionnaire_id'], ['chain_questionnaire.id'], ),
-    sa.ForeignKeyConstraint(['participant_id'], ['stardrive_participant.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['stardrive_user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('chain_session_step',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('last_updated', sa.DateTime(timezone=True), nullable=True),
     sa.Column('chain_session_id', sa.Integer(), nullable=True),
-    sa.Column('chain_step_id', sa.Integer(), nullable=True),
     sa.Column('date', sa.DateTime(), nullable=True),
     sa.Column('status', sa.String(), nullable=True),
     sa.Column('completed', sa.Boolean(), nullable=True),
@@ -62,6 +57,7 @@ def upgrade():
     sa.Column('prompt_level', sa.String(), nullable=True),
     sa.Column('had_challenging_behavior', sa.Boolean(), nullable=True),
     sa.Column('challenging_behavior_severity', sa.String(), nullable=True),
+    sa.Column('chain_step_id', sa.Integer(), nullable=True),
     sa.Column('participant_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['chain_session_id'], ['chain_session.id'], ),

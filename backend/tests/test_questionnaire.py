@@ -2,6 +2,7 @@ import json
 import unittest
 import openpyxl
 import io
+import datetime
 
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, elastic_index
@@ -1271,26 +1272,54 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(response["sessions"][0]["step_attempts"][0]["chain_step"]["name"])
 
     def test_modify_chain_session_questionnaire_basics(self):
+        user = self.construct_user()
+        participant = self.construct_participant(user=user, relationship=Relationship.self_participant)
         self.construct_chain_session_questionnaire()
         cq = db.session.query(ChainQuestionnaire).first()
         self.assertIsNotNone(cq)
         cq_id = cq.id
-        rv = self.app.get('/api/q/chain_questionnaire/%i' % cq_id, content_type="application/json",
+        response_1 = self.app.get('/api/q/chain_questionnaire/%i' % cq_id, content_type="application/json",
                           headers=self.logged_in_headers())
-        response = json.loads(rv.get_data(as_text=True))
-        response['participant_id'] = self.construct_participant(user=self.construct_user(),
-                                                                relationship=Relationship.self_participant).id
-        orig_date = response['last_updated']
-        rv = self.app.put('/api/q/chain_questionnaire/%i' % cq_id, data=self.jsonify(response),
+        data_before = json.loads(response_1.get_data(as_text=True))
+
+        data_before['user_id'] = user.id
+        data_before['participant_id'] = participant.id
+        data_before['sessions'] = [
+            {
+                'completed': False,
+                'session_type': 'training',
+                'step_attempts': [
+                    {
+                        'chain_step_id': 100,
+                        'date': datetime.datetime.now().isoformat(),
+                        'status': 'focus',
+                        'completed': False,
+                        'was_prompted': True,
+                        'prompt_level': 'partial_physical',
+                        'had_challenging_behavior': True,
+                        'challenging_behavior_severity': 'moderate'
+                    }
+                ]
+            }
+        ]
+
+        orig_date = data_before['last_updated']
+        response_2 = self.app.put('/api/q/chain_questionnaire/%i' % cq_id, data=self.jsonify(data_before),
                           content_type="application/json",
                           follow_redirects=True,
                           headers=self.logged_in_headers())
-        self.assert_success(rv)
-        rv = self.app.get('/api/q/chain_questionnaire/%i' % cq_id, content_type="application/json",
+        self.assert_success(response_2)
+        response_3 = self.app.get('/api/q/chain_questionnaire/%i' % cq_id, content_type="application/json",
                           headers=self.logged_in_headers())
-        self.assert_success(rv)
-        response = json.loads(rv.get_data(as_text=True))
-        self.assertNotEqual(orig_date, response['last_updated'])
+        self.assert_success(response_3)
+        data_after = json.loads(response_3.get_data(as_text=True))
+        self.assertNotEqual(orig_date, data_after['last_updated'])
+        self.assertEqual(
+            data_before['sessions'][0]['step_attempts'][0]['prompt_level'],
+            data_after['sessions'][0]['step_attempts'][0]['prompt_level']
+        )
+        self.assertFalse('chain_step' in data_before['sessions'][0]['step_attempts'][0])
+        self.assertTrue('chain_step' in data_after['sessions'][0]['step_attempts'][0])
 
     def test_delete_chain_session_questionnaire(self):
         sq = self.construct_chain_session_questionnaire()

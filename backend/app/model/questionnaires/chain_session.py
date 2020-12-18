@@ -88,14 +88,6 @@ class ChainSession(db.Model):
             passive_deletes=True
         )
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
-
-    user_id = db.Column(
-        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-
     def get_field_groups(self):
         field_groups = {
             "step_attempts": {
@@ -123,31 +115,11 @@ class ChainSessionSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
-            "participant_id",
-            "user_id",
             "time_on_task_ms",
             "date",
             "completed",
             "session_type",
             "step_attempts",
-            # "chain_questionnaire_id",
         )
 
     step_attempts = ma.Nested(ChainSessionStepSchema, many=True)
-
-    # participant_id = fields.Method('get_participant_id')
-    # user_id = fields.Method('get_user_id')
-    # chain_questionnaire_id = fields.Integer(required=False, allow_none=True)
-    # chain_questionnaire = fields.Nested('ChainQuestionnaire', required=False, allow_none=True)
-    #
-    # def get_participant_id(self, obj):
-    #     if obj is None:
-    #         return missing
-    #     elif obj.chain_questionnaire is not None:
-    #         return obj.chain_questionnaire.participant_id
-    #
-    # def get_user_id(self, obj):
-    #     if obj is None:
-    #         return missing
-    #     elif obj.chain_questionnaire is not None:
-    #         return obj.chain_questionnaire.user_id
