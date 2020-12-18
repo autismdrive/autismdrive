@@ -287,7 +287,7 @@ class BaseTest:
     def construct_chain_steps(self):
         num_steps = db.session.query(ChainStep).count()
 
-        if num_steps is 0:
+        if num_steps == 0:
             db.session.add(ChainStep(id=100, name="cookies_01", instruction="Gather ingredients"))
             db.session.commit()
 

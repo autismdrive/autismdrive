@@ -26,9 +26,15 @@ class ChainSessionStep(db.Model):
 
     @declared_attr
     def chain_step_id(cls):
-        chain_steps = db.session.query(ChainStep).all()
-        options = [{"value": s.id, "label": s.instruction} for s in chain_steps]
-        print('options', options)
+        options = []
+        try:
+            chain_steps = db.session.query(ChainStep).all()
+            options = [{"value": s.id, "label": s.instruction} for s in chain_steps]
+            print('options', options)
+        except:
+            print('No chain steps in database yet.')
+            pass
+
         return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'), info={
                 "display_order": 1,
                 "type": "select",
