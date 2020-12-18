@@ -122,6 +122,7 @@ from app.resources.ExportEndpoint import (
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
 from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
+from app.resources.ChainStepEndpoint import ChainStepEndpoint, ChainStepListEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -168,6 +169,7 @@ endpoints = [
     (LocationByCategoryEndpoint, "/category/<category_id>/location"),
     (ResourceByCategoryEndpoint, "/category/<category_id>/resource"),
     (StudyByCategoryEndpoint, "/category/<category_id>/study"),
+
     # Events
     (EventListEndpoint, "/event"),
     (EventEndpoint, "/event/<id>"),
@@ -178,12 +180,14 @@ endpoints = [
     (UserByEventEndpoint, "/event/<event_id>/user"),
     (EventUserEndpoint, "/event_user/<id>"),
     (EventUserListEndpoint, "/event_user"),
+
     # Locations
     (LocationListEndpoint, "/location"),
     (LocationEndpoint, "/location/<id>"),
     (CategoryByLocationEndpoint, "/location/<location_id>/category"),
     (LocationCategoryListEndpoint, "/location_category"),
     (LocationCategoryEndpoint, "/location_category/<id>"),
+
     # Resources
     (ResourceListEndpoint, "/resource"),
     (ResourceEndpoint, "/resource/<id>"),
@@ -232,11 +236,13 @@ endpoints = [
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     (ResourceChangeLogByUserEndpoint, "/user/<user_id>/resource_change_log"),
     (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
+
     # Participants
     (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
     (ParticipantAdminListEndpoint, "/participant_admin_list"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
+
     # Questionnaires
     (QuestionnaireInfoEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
@@ -245,17 +251,20 @@ endpoints = [
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireDataExportEndpoint, "/q/<string:name>/export"),
     (QuestionnaireUserDataExportEndpoint, "/q/<string:name>/export/user/<string:user_id>"),
-    # Flow Endpoint
+
+    # Flows
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),
     (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
-    # Search Endpoint
+
+    # Search
     (SearchEndpoint, "/search"),
     (SearchResourcesEndpoint, "/search/resources"),
     (SearchStudiesEndpoint, "/search/studies"),
     (RelatedResultsEndpoint, "/related"),
 
+    # Admin
     (ExportListEndpoint, "/export"),
     (ExportEndpoint, "/export/<string:name>"),
     (EmailLogListEndpoint, "/email_log"),
@@ -269,7 +278,12 @@ endpoints = [
     (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
 
     # Password Requirements Endpoint
-    (PasswordRequirementsEndpoint, "/password_requirements/<role>")
+    (PasswordRequirementsEndpoint, "/password_requirements/<role>"),
+
+    # SkillSTAR
+    (ChainStepListEndpoint, "/chain_step"),
+    (ChainStepEndpoint, "/chain_step/<chain_step_id>"),
+
 ]
 
 # Add all endpoints to the API

@@ -18,6 +18,7 @@ class ExportService:
 
     QUESTION_PACKAGE = "app.model.questionnaires"
     SCHEMA_PACKAGE = "app.schema.schema"
+    APP_PACKAGE = "app.schema"
     EXPORT_SCHEMA_PACKAGE = "app.schema.export_schema"
 
     TYPE_SENSITIVE = 'sensitive'
@@ -43,9 +44,12 @@ class ExportService:
     @staticmethod
     def get_schema(name, many=False, session=None, is_import=False):
         model = ExportService.get_class(name)
-        class_name = model.__name__
+        class_name = None if model is None else model.__name__
         schema_name = ''
         schema_class = None
+
+        if class_name is None:
+            return None
 
         if not is_import:
             # Check for an 'ExportSchema'
@@ -56,6 +60,12 @@ class ExportService:
         if schema_class is None:
             schema_name = class_name + "Schema"
             schema_class = ExportService.str_to_class(ExportService.SCHEMA_PACKAGE, schema_name)
+
+        # If that doesn't work, then look in the app.schema package.
+        if schema_class is None:
+            schema_name = class_name + "Schema"
+            package = ExportService.APP_PACKAGE + "." + model.__tablename__ + "_schema"
+            schema_class = ExportService.str_to_class(package, schema_name)
 
         # If that doesn't work, check for a general schema in the class itself.
         if schema_class is None:

@@ -59,6 +59,21 @@ class Flows:
         flow.add_step('registration_questionnaire')
         return flow
 
+    # SkillStar Flows
+    @staticmethod
+    def get_skillstar_flow():
+        flow = Flow(name="skillstar")
+        flow.relationship = Relationship.self_professional
+        flow.add_step('chain_questionnaire')
+        return flow
+
+    @staticmethod
+    def get_skillstar_flows():
+        flows = [
+            Flows.get_skillstar_flow(),
+        ]
+        return flows
+
     @staticmethod
     def get_all_flows():
         flows = [
@@ -66,7 +81,8 @@ class Flows:
             Flows.get_dependent_intake_flow(),
             Flows.get_guardian_intake_flow(),
             Flows.get_professional_intake_flow(),
-            Flows.get_registration_flow()
+            Flows.get_registration_flow(),
+            Flows.get_skillstar_flow(),
         ]
         return flows
 
@@ -82,6 +98,8 @@ class Flows:
             return Flows.get_professional_intake_flow()
         if name == 'registration':
             return Flows.get_registration_flow()
+        if name == 'skillstar':
+            return Flows.get_skillstar_flow()
 
     @staticmethod
     def get_flow_by_relationship(name):

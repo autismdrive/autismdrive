@@ -1,37 +1,35 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
-import base64
-import datetime
 import os
-import quopri
-import re
-
-from flask.json import JSONEncoder
-
 os.environ["TESTING"] = "true"
 
+import base64
+import datetime
+import quopri
+import re
+from flask import json
+from flask.json import JSONEncoder
+
+from app import app, db, elastic_index
+from app.model.admin_note import AdminNote
+from app.model.category import Category
+from app.model.chain_step import ChainStep
 from app.model.email_log import EmailLog
 from app.model.event import Event
+from app.model.event_user import EventUser
 from app.model.investigator import Investigator
+from app.model.location import Location
+from app.model.participant import Participant
+from app.model.resource import Resource
+from app.model.resource_category import ResourceCategory
+from app.model.resource_change_log import ResourceChangeLog
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
-from app.model.user_favorite import UserFavorite
-from app.model.event_user import EventUser
-
-from flask import json
-
-from app import app, db, elastic_index
-from app.model.admin_note import AdminNote
-from app.model.category import Category
-from app.model.resource_category import ResourceCategory
-from app.model.location import Location
-from app.model.participant import Participant
-from app.model.resource import Resource
-from app.model.resource_change_log import ResourceChangeLog
 from app.model.user import User, Role
+from app.model.user_favorite import UserFavorite
 from app.model.zip_code import ZipCode
 
 
@@ -285,6 +283,13 @@ class BaseTest:
         self.assertEqual(db_z.latitude, z.latitude)
         self.assertEqual(db_z.longitude, z.longitude)
         return db_z
+
+    def construct_chain_steps(self):
+        num_steps = db.session.query(ChainStep).count()
+
+        if num_steps is 0:
+            db.session.add(ChainStep(id=100, name="cookies_01", instruction="Gather ingredients"))
+            db.session.commit()
 
     def construct_everything(self):
         self.construct_all_questionnaires()

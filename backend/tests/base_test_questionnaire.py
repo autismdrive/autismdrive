@@ -1,18 +1,21 @@
-from app.export_service import ExportService
-from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaire
-from tests.base_test import BaseTest
-from app.model.flow import Step
 import json
 import random
 import string
 import unittest
+from datetime import datetime
+
+from dateutil import parser
 import openpyxl
 import io
+
+from data_loader import DataLoader
+from tests.base_test import BaseTest
 from app import db, app, elastic_index
-from app.model.user import User, Role
+from app.export_service import ExportService
+from app.model.flow import Step
 from app.model.participant import Participant, Relationship
-from app.model.questionnaires.assistive_device import AssistiveDevice
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
+from app.model.questionnaires.assistive_device import AssistiveDevice
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -28,12 +31,18 @@ from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQ
 from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
 from app.model.questionnaires.housemate import Housemate
 from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
-from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.medication import Medication
+from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
+from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaire
+from app.model.chain_step import ChainStep
+from app.model.questionnaires.chain_questionnaire import ChainQuestionnaire
+from app.model.questionnaires.chain_session import ChainSession
+from app.model.questionnaires.chain_session_step import ChainSessionStep
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
+from app.model.user import User, Role
 
 
 class BaseTestQuestionnaire(BaseTest):
@@ -630,6 +639,48 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_sq.last_updated, sq.last_updated)
         return db_sq
 
+    def construct_chain_session_questionnaire(self, participant=None, user=None):
+        self.construct_chain_steps()
+
+        bq = ChainQuestionnaire()
+        if user is None:
+            u = self.construct_user(email='edudep@questionnaire.com', role=Role.researcher)
+            bq.user_id = u.id
+        else:
+            u = user
+            bq.user_id = u.id
+
+        if participant is None:
+            p = self.construct_participant(user=u, relationship=Relationship.dependent)
+            bq.participant_id = p.id
+        else:
+            p = participant
+            bq.participant_id = p.id
+
+
+        session_1_step_1 = ChainSessionStep(
+            date=parser.parse("2020-12-14T17:46:14.030Z"),
+            chain_step_id=100,
+            status="focus",
+            completed=False,
+            was_prompted=True,
+            prompt_level="partial_physical",
+            had_challenging_behavior=True,
+            challenging_behavior_severity="moderate"
+        )
+        session_1 = ChainSession()
+        session_1.step_attempts = [session_1_step_1]
+        bq.sessions = [session_1]
+
+        db.session.add(bq)
+        db.session.commit()
+
+        db_bq = db.session.query(ChainQuestionnaire).filter_by(participant_id=bq.participant_id).first()
+        self.assertEqual(db_bq.participant_id, bq.participant_id)
+        self.assertEqual(db_bq.user_id, bq.user_id)
+        self.assertEqual(db_bq.sessions, bq.sessions)
+        return db_bq
+
     def construct_all_questionnaires(self, user=None):
         if user is None:
             user = self.construct_user()
@@ -651,4 +702,5 @@ class BaseTestQuestionnaire(BaseTest):
         self.construct_professional_questionnaire(user=user, participant=participant)
         self.construct_supports_questionnaire(user=user, participant=participant)
         self.construct_registration_questionnaire(user=user)
+        self.construct_chain_session_questionnaire(user=user, participant=participant)
 

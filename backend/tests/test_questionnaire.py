@@ -1,12 +1,16 @@
-from app.export_service import ExportService
-from app.model.flow import Step
 import json
 import unittest
 import openpyxl
 import io
+import datetime
+
+from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, elastic_index
-from app.model.user import User
+from app.export_service import ExportService
+from app.model.chain_step import ChainStep
+from app.model.flow import Step
 from app.model.participant import Relationship
+from app.model.questionnaires.chain_questionnaire import ChainQuestionnaire
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -24,7 +28,7 @@ from app.model.questionnaires.identification_questionnaire import Identification
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.resource_category import ResourceCategory
 from app.model.step_log import StepLog
-from tests.base_test_questionnaire import BaseTestQuestionnaire
+from app.model.user import User
 
 
 class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
@@ -1224,6 +1228,129 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(response['participant_id'], p.id)
         self.assertIsNotNone(response['id'])
 
+    def test_get_chain_steps(self):
+        self.construct_chain_steps()
+        chain_step = db.session.query(ChainStep).first()
+        self.assertIsNotNone(chain_step)
+        chain_step_id = chain_step.id
+        chain_step_name = chain_step.name
+        chain_step_instruction = chain_step.instruction
+        rv = self.app.get('/api/chain_step/%i' % chain_step_id,
+                          follow_redirects=True,
+                          content_type='application/json',
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['id'], chain_step_id)
+        self.assertEqual(response['name'], chain_step_name)
+        self.assertEqual(response['instruction'], chain_step_instruction)
+
+    def test_chain_session_questionnaire_basics(self):
+        self.construct_chain_session_questionnaire()
+        cq = db.session.query(ChainQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        rv = self.app.get('/api/q/chain_questionnaire/%i' % cq_id,
+                          follow_redirects=True,
+                          content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["id"], cq_id)
+        self.assertEqual(response["participant_id"], cq.participant_id)
+        self.assertEqual(response["user_id"], cq.user_id)
+        self.assertEqual(len(response["sessions"]), len(cq.sessions))
+        self.assertEqual(
+            len(response["sessions"][0]["step_attempts"]),
+            len(cq.sessions[0].step_attempts)
+        )
+        self.assertEqual(
+            response["sessions"][0]["step_attempts"][0]["chain_step_id"],
+            cq.sessions[0].step_attempts[0].chain_step_id
+        )
+        self.assertTrue('chain_step' in response["sessions"][0]["step_attempts"][0])
+        self.assertIsNotNone(response["sessions"][0]["step_attempts"][0]["chain_step"]["name"])
+
+    def test_modify_chain_session_questionnaire_basics(self):
+        user = self.construct_user()
+        participant = self.construct_participant(user=user, relationship=Relationship.self_participant)
+        self.construct_chain_session_questionnaire()
+        cq = db.session.query(ChainQuestionnaire).first()
+        self.assertIsNotNone(cq)
+        cq_id = cq.id
+        response_1 = self.app.get('/api/q/chain_questionnaire/%i' % cq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        data_before = json.loads(response_1.get_data(as_text=True))
+
+        data_before['user_id'] = user.id
+        data_before['participant_id'] = participant.id
+        data_before['sessions'] = [
+            {
+                'completed': False,
+                'session_type': 'training',
+                'step_attempts': [
+                    {
+                        'chain_step_id': 100,
+                        'date': datetime.datetime.now().isoformat(),
+                        'status': 'focus',
+                        'completed': False,
+                        'was_prompted': True,
+                        'prompt_level': 'partial_physical',
+                        'had_challenging_behavior': True,
+                        'challenging_behavior_severity': 'moderate'
+                    }
+                ]
+            }
+        ]
+
+        orig_date = data_before['last_updated']
+        response_2 = self.app.put('/api/q/chain_questionnaire/%i' % cq_id, data=self.jsonify(data_before),
+                          content_type="application/json",
+                          follow_redirects=True,
+                          headers=self.logged_in_headers())
+        self.assert_success(response_2)
+        response_3 = self.app.get('/api/q/chain_questionnaire/%i' % cq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(response_3)
+        data_after = json.loads(response_3.get_data(as_text=True))
+        self.assertNotEqual(orig_date, data_after['last_updated'])
+        self.assertEqual(
+            data_before['sessions'][0]['step_attempts'][0]['prompt_level'],
+            data_after['sessions'][0]['step_attempts'][0]['prompt_level']
+        )
+        self.assertFalse('chain_step' in data_before['sessions'][0]['step_attempts'][0])
+        self.assertTrue('chain_step' in data_after['sessions'][0]['step_attempts'][0])
+
+    def test_delete_chain_session_questionnaire(self):
+        sq = self.construct_chain_session_questionnaire()
+        sq_id = sq.id
+        rv = self.app.get('api/q/chain_questionnaire/%i' % sq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.delete('api/q/chain_questionnaire/%i' % sq_id, content_type="application/json",
+                             headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/q/chain_questionnaire/%i' % sq_id, content_type="application/json",
+                          headers=self.logged_in_headers())
+        self.assertEqual(404, rv.status_code)
+
+    def test_create_chain_session_questionnaire(self):
+        u = self.construct_user()
+        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        headers = self.logged_in_headers(u)
+
+        cq = {'participant_id': p.id}
+        rv = self.app.post('api/flow/skillstar/chain_questionnaire',
+                           data=self.jsonify(cq), content_type="application/json",
+                           follow_redirects=True,
+                           headers=headers)
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response['participant_id'], p.id)
+        self.assertIsNotNone(response['id'])
+
     def test_flow_endpoint(self):
         # It should be possible to get a list of available flows
         rv = self.app.get('api/flow', content_type="application/json", headers=self.logged_in_headers())
@@ -1402,12 +1529,12 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           content_type="application/json")
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
-        self.assertEqual("Contact", response[1]["display_name"])
-        self.assertEqual("Employment", response[8]["display_name"])
-        self.assertEqual("Professional Profile", response[14]["display_name"])
-        self.assertEqual("Supports", response[16]["display_name"])
-        self.assertEqual(4, len(response[16]["sub_tables"]))
-        self.assertEqual(17, len(response))
+        self.assertEqual("Contact", response[4]["display_name"])
+        self.assertEqual("Employment", response[11]["display_name"])
+        self.assertEqual("Professional Profile", response[17]["display_name"])
+        self.assertEqual("Supports", response[19]["display_name"])
+        self.assertEqual(4, len(response[19]["sub_tables"]))
+        self.assertEqual(20, len(response))
 
     def test_questionnaire_list_meta_basics(self):
         rv = self.app.get('/api/q/education_self_questionnaire/meta',
@@ -1477,29 +1604,32 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
         ws = wb.active
         self.assertEqual(2, ws.max_row)
-        self.assertEqual(22, len(wb.worksheets))
+        self.assertEqual(25, len(wb.worksheets))
         self.assertEqual('Alternative Augmentative', wb.worksheets[0].title)
         self.assertEqual('Assistive Device', wb.worksheets[1].title)
-        self.assertEqual('Clinical Diagnoses', wb.worksheets[2].title)
-        self.assertEqual('Contact', wb.worksheets[3].title)
-        self.assertEqual('Current Behaviors Dependent', wb.worksheets[4].title)
-        self.assertEqual('Current Behaviors Self', wb.worksheets[5].title)
-        self.assertEqual('Demographics', wb.worksheets[6].title)
-        self.assertEqual('Developmental', wb.worksheets[7].title)
-        self.assertEqual('Education Dependent', wb.worksheets[8].title)
-        self.assertEqual('Education Self', wb.worksheets[9].title)
-        self.assertEqual('Employment', wb.worksheets[10].title)
-        self.assertEqual('Evaluation History Dependent', wb.worksheets[11].title)
-        self.assertEqual('Evaluation History Self', wb.worksheets[12].title)
-        self.assertEqual('Home Dependent', wb.worksheets[13].title)
-        self.assertEqual('Home Self', wb.worksheets[14].title)
-        self.assertEqual('Housemate', wb.worksheets[15].title)
-        self.assertEqual('Identification', wb.worksheets[16].title)
-        self.assertEqual('Medication', wb.worksheets[17].title)
-        self.assertEqual('Professional Profile', wb.worksheets[18].title)
-        self.assertEqual('Registration', wb.worksheets[19].title)
-        self.assertEqual('Supports', wb.worksheets[20].title)
-        self.assertEqual('Therapy', wb.worksheets[21].title)
+        self.assertEqual('Chain', wb.worksheets[2].title)
+        self.assertEqual('Chain Session', wb.worksheets[3].title)
+        self.assertEqual('Chain Session Step', wb.worksheets[4].title)
+        self.assertEqual('Clinical Diagnoses', wb.worksheets[5].title)
+        self.assertEqual('Contact', wb.worksheets[6].title)
+        self.assertEqual('Current Behaviors Dependent', wb.worksheets[7].title)
+        self.assertEqual('Current Behaviors Self', wb.worksheets[8].title)
+        self.assertEqual('Demographics', wb.worksheets[9].title)
+        self.assertEqual('Developmental', wb.worksheets[10].title)
+        self.assertEqual('Education Dependent', wb.worksheets[11].title)
+        self.assertEqual('Education Self', wb.worksheets[12].title)
+        self.assertEqual('Employment', wb.worksheets[13].title)
+        self.assertEqual('Evaluation History Dependent', wb.worksheets[14].title)
+        self.assertEqual('Evaluation History Self', wb.worksheets[15].title)
+        self.assertEqual('Home Dependent', wb.worksheets[16].title)
+        self.assertEqual('Home Self', wb.worksheets[17].title)
+        self.assertEqual('Housemate', wb.worksheets[18].title)
+        self.assertEqual('Identification', wb.worksheets[19].title)
+        self.assertEqual('Medication', wb.worksheets[20].title)
+        self.assertEqual('Professional Profile', wb.worksheets[21].title)
+        self.assertEqual('Registration', wb.worksheets[22].title)
+        self.assertEqual('Supports', wb.worksheets[23].title)
+        self.assertEqual('Therapy', wb.worksheets[24].title)
 
     def test_export_questionnaires_by_user(self):
         u1 = self.construct_user(email='1@sartography.com')
@@ -1512,7 +1642,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
-        self.assertEqual(22, len(wb.worksheets))
+        self.assertEqual(25, len(wb.worksheets))
         self.assertEqual(2, wb['Contact'].max_row)
         self.assertEqual('user_id', wb['Contact']['E1'].value)
         self.assertEqual(u1.id, wb['Contact']['E2'].value)

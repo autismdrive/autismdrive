@@ -24,6 +24,19 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, name, id):
+        """
+        Returns a single questionnaire record.
+
+        Parameters:
+            name (str):
+                Snake-cased name of the questionnaire class (should also match the table name),
+                found in app.model.questionnaires.
+                E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
+
+            id (int): ID of the questionnaire record to retrieve
+
+        Returns: A single questionnaire record.
+        """
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
@@ -34,6 +47,17 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def delete(self, name, id):
+        """
+        Deletes a single questionnaire record.
+
+        Parameters:
+            name (str):
+                Snake-cased name of the questionnaire class (should also match the table name),
+                found in app.model.questionnaires.
+                E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
+
+            id (int): ID of the questionnaire record to delete
+        """
         try:
             name = ExportService.camel_case_it(name)
             class_ref = ExportService.get_class(name)
@@ -47,6 +71,19 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def put(self, name, id):
+        """
+        Modifies an existing questionnaire record.
+
+        Parameters:
+            name (str):
+                Snake-cased name of the questionnaire class (should also match the table name),
+                found in app.model.questionnaires.
+                E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
+
+            id (int): ID of the questionnaire record to retrieve
+
+        Returns: The updated questionnaire record.
+        """
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         instance = db.session.query(class_ref).filter(class_ref.id == id).first()
@@ -79,8 +116,28 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
 
 
 class QuestionnaireListMetaEndpoint(flask_restful.Resource):
-    # Used for data export to get meta without specifying flow and relationship
     def get(self, name):
+        """
+        Retrieves metadata about the given questionnaire name. Includes JSON Formly field definition.
+        Used for data export to get meta without specifying flow and relationship.
+
+        Returns:
+            A dict object containing the metadata about the questionnaire. Example:
+            {
+                table: {
+                    question_type: "sensitive",
+                    label: "Clinical Diagnosis"
+                },
+                fields: [
+                    {
+                    name: "id",
+                    key: "id",
+                    display_order: 0
+                    },
+                    ...
+                ]
+            }
+        """
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         questionnaire = class_ref()
@@ -113,7 +170,19 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
 class QuestionnaireInfoEndpoint(flask_restful.Resource):
 
     def get(self):
+        """
+        Lists available questionnaires. Used for data export to get meta without specifying flow and relationship.
 
+        Returns:
+            list[ExportInfoSchema] - A list of dict objects, including the following info for each questionnaire:
+                table_name (str): Snake-case database table name. E.g., "chain_session_questionnaire",
+                class_name (str): Pascal-case class name for Model class. E.g., "ChainSession",
+                display_name (str): Questionnaire title. E.g., "Chain Session Assessment",
+                size (int): Number of questionnaire records in the database,
+                url (str): Export endpoint. E.g., "/api/export/chain_session_questionnaire",
+                question_type (str): 'sensitive' | 'identifying' | 'unrestricted' | 'sub-table'
+                sub_tables (list[ExportInfoSchema]): A list of sub-tables within this table, if applicable.
+        """
         info_list = ExportService.get_table_info()
         info_list = [item for item in info_list if item.question_type]
         info_list = sorted(info_list, key=lambda item: item.table_name)
