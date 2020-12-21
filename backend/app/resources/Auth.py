@@ -38,7 +38,9 @@ def confirm_email(email_token):
 def login_password():
     request_data = request.get_json()
 
-    print('request_data', request_data)
+    if request_data is None:
+        raise RestException(RestException.INVALID_INPUT)
+
     email = request_data['email']
     user = User.query.filter(func.lower(User.email) == email.lower()).first()
     schema = UserSchema(many=False)

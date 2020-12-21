@@ -31,9 +31,7 @@ class ChainSessionStep(db.Model):
         try:
             chain_steps = db.session.query(ChainStep).all()
             options = [{"value": s.id, "label": s.instruction} for s in chain_steps]
-            print('options', options)
         except:
-            print('No chain steps in database yet.')
             pass
 
         return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'), info={
