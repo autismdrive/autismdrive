@@ -43,7 +43,9 @@ db = SQLAlchemy(app)
 
 # Enable CORS
 if app.config["CORS_ENABLED"]:
-    cors = CORS(app, resources={r"*": {"origins": "*"}})
+    # Convert list of allowed origins to list of regexes
+    origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['CORS_ALLOW_ORIGINS']]
+    cors = CORS(app, origins=origins_re)
 
 # Flask-Marshmallow provides HATEOAS links
 ma = Marshmallow(app)
