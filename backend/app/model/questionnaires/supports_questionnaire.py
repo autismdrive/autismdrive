@@ -1,13 +1,13 @@
-from marshmallow import fields, pre_load
+from marshmallow import pre_load
 from sqlalchemy import func
 
 from app import db, ma
+from app.schema.model_schema import ModelSchema
 from app.export_service import ExportService
 from app.model.questionnaires.therapy import Therapy, TherapySchema
 from app.model.questionnaires.medication import Medication, MedicationSchema
 from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative, AlternativeAugmentativeSchema
-from app.schema.model_schema import ModelSchema
 
 
 class SupportsQuestionnaire(db.Model):

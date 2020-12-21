@@ -36,6 +36,7 @@ from app.model.zip_code import ZipCode
 def clean_db(database):
     for table in reversed(database.metadata.sorted_tables):
         database.session.execute(table.delete())
+    database.session.commit()
 
 
 class BaseTest:

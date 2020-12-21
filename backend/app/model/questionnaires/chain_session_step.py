@@ -1,4 +1,4 @@
-from marshmallow import fields, missing, pre_load
+from marshmallow import missing, pre_load
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -6,6 +6,7 @@ from app import db, ma
 from app.schema.model_schema import ModelSchema
 from app.export_service import ExportService
 from app.model.chain_step import ChainStep
+from app.model.questionnaires.challenging_behavior import ChallengingBehavior, ChallengingBehaviorSchema
 from app.schema.chain_step_schema import ChainStepSchema
 
 
@@ -194,6 +195,14 @@ class ChainSessionStep(db.Model):
         },
     )
 
+    challenging_behaviors = db.relationship(
+        "ChallengingBehavior",
+        backref=db.backref("chain_session_step", lazy=True),
+        cascade="all, delete, delete-orphan",
+        passive_deletes=True
+    )
+
+
     @declared_attr
     def participant_id(cls):
         return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
@@ -204,11 +213,26 @@ class ChainSessionStep(db.Model):
 
     def get_field_groups(self):
         field_groups = {
+            "challenging_behaviors": {
+                "type": "repeat",
+                "display_order": 9,
+                "wrappers": ["card"],
+                "repeat_class": ChallengingBehavior,
+                "template_options": {
+                    "label": "",
+                    "description": "Add a challenging behavior",
+                },
+            },
         }
         return field_groups
 
 
 class ChainSessionStepSchema(ModelSchema):
+    # @pre_load
+    # def set_field_session(self, data, **kwargs):
+    #     self.fields['challenging_behaviors'].schema.session = self.session
+    #     return data
+
     class Meta(ModelSchema.Meta):
         model = ChainSessionStep
         fields = (
@@ -223,9 +247,10 @@ class ChainSessionStepSchema(ModelSchema):
             "prompt_level",
             "had_challenging_behavior",
             "challenging_behavior_severity",
+            "challenging_behaviors",
         )
-
-    chain_step = fields.Method('get_chain_step', dump_only=True)
+    challenging_behaviors = ma.Nested(ChallengingBehaviorSchema, many=True)
+    chain_step = ma.Method('get_chain_step', dump_only=True)
 
     def get_chain_step(self, obj):
         if obj is None:

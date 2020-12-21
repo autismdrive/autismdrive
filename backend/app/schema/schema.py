@@ -34,6 +34,7 @@ from app.model.questionnaires.identification_questionnaire import Identification
 # ensure that the tables don't get accidentally dropped!)
 # Models:
 import app.model.questionnaires.assistive_device
+import app.model.questionnaires.challenging_behavior
 import app.model.questionnaires.housemate
 import app.model.questionnaires.medication
 import app.model.questionnaires.therapy

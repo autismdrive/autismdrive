@@ -1,1 +1,3 @@
 2020-12-18 13:58:53,556 - elasticsearch - WARNING - PUT http://localhost:9200/stardrive_resources [status:400 request:0.003s]
+2020-12-21 09:42:11,803 - elasticsearch - WARNING - PUT http://localhost:9200/stardrive_resources [status:400 request:0.002s]
+2020-12-21 09:42:12,065 - root - ERROR - Error: Path doesn't exist: '/home/ajl/Documents/sartography-git-local/star-drive/migrations'.  Please use the 'init' command to create a new scripts folder.
