@@ -11,6 +11,7 @@ from app.model.chain_step import ChainStep
 from app.model.flow import Step
 from app.model.participant import Relationship
 from app.model.questionnaires.chain_questionnaire import ChainQuestionnaire
+from app.model.questionnaires.challenging_behavior import ChallengingBehavior
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -1284,6 +1285,10 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         data_before['user_id'] = user.id
         data_before['participant_id'] = participant.id
+        now = datetime.datetime.now()
+        later_1 = now + datetime.timedelta(minutes=1)
+        later_2 = now + datetime.timedelta(minutes=2)
+        later_3 = now + datetime.timedelta(minutes=3)
         data_before['sessions'] = [
             {
                 'completed': False,
@@ -1291,13 +1296,19 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                 'step_attempts': [
                     {
                         'chain_step_id': 100,
-                        'date': datetime.datetime.now().isoformat(),
+                        'date': now.isoformat(),
                         'status': 'focus',
                         'completed': False,
                         'was_prompted': True,
                         'prompt_level': 'partial_physical',
                         'had_challenging_behavior': True,
-                        'challenging_behavior_severity': 'moderate'
+                        'challenging_behavior_severity': 'moderate',
+                        'challenging_behaviors': [
+                            {'time': later_1.isoformat()},
+                            {'time': later_2.isoformat()},
+                            {'time': later_3.isoformat()},
+                        ],
+
                     }
                 ]
             }
@@ -1320,6 +1331,15 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         )
         self.assertFalse('chain_step' in data_before['sessions'][0]['step_attempts'][0])
         self.assertTrue('chain_step' in data_after['sessions'][0]['step_attempts'][0])
+
+        print('challenging_behaviors after:', data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'])
+        all_cbs = db.session.query(ChallengingBehavior).all()
+        print('all_cbs', all_cbs)
+
+        self.assertEqual(
+            data_before['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time'],
+            data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time'],
+        )
 
     def test_delete_chain_session_questionnaire(self):
         sq = self.construct_chain_session_questionnaire()
@@ -1604,32 +1624,36 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
         ws = wb.active
         self.assertEqual(2, ws.max_row)
-        self.assertEqual(25, len(wb.worksheets))
-        self.assertEqual('Alternative Augmentative', wb.worksheets[0].title)
-        self.assertEqual('Assistive Device', wb.worksheets[1].title)
-        self.assertEqual('Chain', wb.worksheets[2].title)
-        self.assertEqual('Chain Session', wb.worksheets[3].title)
-        self.assertEqual('Chain Session Step', wb.worksheets[4].title)
-        self.assertEqual('Clinical Diagnoses', wb.worksheets[5].title)
-        self.assertEqual('Contact', wb.worksheets[6].title)
-        self.assertEqual('Current Behaviors Dependent', wb.worksheets[7].title)
-        self.assertEqual('Current Behaviors Self', wb.worksheets[8].title)
-        self.assertEqual('Demographics', wb.worksheets[9].title)
-        self.assertEqual('Developmental', wb.worksheets[10].title)
-        self.assertEqual('Education Dependent', wb.worksheets[11].title)
-        self.assertEqual('Education Self', wb.worksheets[12].title)
-        self.assertEqual('Employment', wb.worksheets[13].title)
-        self.assertEqual('Evaluation History Dependent', wb.worksheets[14].title)
-        self.assertEqual('Evaluation History Self', wb.worksheets[15].title)
-        self.assertEqual('Home Dependent', wb.worksheets[16].title)
-        self.assertEqual('Home Self', wb.worksheets[17].title)
-        self.assertEqual('Housemate', wb.worksheets[18].title)
-        self.assertEqual('Identification', wb.worksheets[19].title)
-        self.assertEqual('Medication', wb.worksheets[20].title)
-        self.assertEqual('Professional Profile', wb.worksheets[21].title)
-        self.assertEqual('Registration', wb.worksheets[22].title)
-        self.assertEqual('Supports', wb.worksheets[23].title)
-        self.assertEqual('Therapy', wb.worksheets[24].title)
+        self.assertEqual(26, len(wb.worksheets))
+        worksheet_titles = [ws.title for ws in wb.worksheets]
+        self.assertEqual([
+            'Alternative Augmentative',
+            'Assistive Device',
+            'Chain',
+            'Chain Session',
+            'Chain Session Step',
+            'Challenging Behavior',
+            'Clinical Diagnoses',
+            'Contact',
+            'Current Behaviors Dependent',
+            'Current Behaviors Self',
+            'Demographics',
+            'Developmental',
+            'Education Dependent',
+            'Education Self',
+            'Employment',
+            'Evaluation History Dependent',
+            'Evaluation History Self',
+            'Home Dependent',
+            'Home Self',
+            'Housemate',
+            'Identification',
+            'Medication',
+            'Professional Profile',
+            'Registration',
+            'Supports',
+            'Therapy',
+        ], worksheet_titles)
 
     def test_export_questionnaires_by_user(self):
         u1 = self.construct_user(email='1@sartography.com')
@@ -1642,7 +1666,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                           headers=self.logged_in_headers())
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
-        self.assertEqual(25, len(wb.worksheets))
+        self.assertEqual(26, len(wb.worksheets))
         self.assertEqual(2, wb['Contact'].max_row)
         self.assertEqual('user_id', wb['Contact']['E1'].value)
         self.assertEqual(u1.id, wb['Contact']['E2'].value)
