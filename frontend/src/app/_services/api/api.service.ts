@@ -4,6 +4,7 @@ import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {AdminNote} from '../../_models/admin_note';
 import {Category} from '../../_models/category';
+import {ChainStep} from '../../_models/chain_step';
 import {EmailLog} from '../../_models/email_log';
 import {Flow} from '../../_models/flow';
 import {Participant} from '../../_models/participant';
@@ -48,6 +49,8 @@ export class ApiService {
     categorybystudy: '/api/study/<study_id>/category',
     categorylist: '/api/category',
     categorynameslist: '/api/category/names_list',
+    chainStepsList: '/api/chain_step',
+    chainStep: '/api/chain_step/<chain_step_id>',
     data_transfer_log: '/api/data_transfer_log',
     event: '/api/event/<id>',
     eventbycategory: '/api/category/<category_id>/event',
@@ -715,7 +718,19 @@ export class ApiService {
     return throwError(message);
   }
 
+  /** getChainStepsList */
+  getChainStepsList(): Observable<ChainStep[]> {
+    return this.httpClient.get<ChainStep[]>(this._endpointUrl('chainStepsList'))
+      .pipe(catchError(this._handleError));
+  }
 
+  /** EditChainStep */
+  editChainStep(chainStep: ChainStep): Observable<ChainStep> {
+    const url = this._endpointUrl('chainStep')
+      .replace('<chain_step_id>', chainStep.id.toString());
+    return this.httpClient.put<ChainStep>(url, chainStep)
+      .pipe(catchError(this._handleError));
+  }
 
   private _endpointUrl(endpointName: string): string {
     const path = this.endpoints[endpointName];
