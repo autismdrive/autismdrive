@@ -30,7 +30,7 @@ class ChainStepEndpoint(flask_restful.Resource):
             if instance is None:
                 # New step
                 updated_step = self.schema.load(request_data)
-                updated_step.name = 'toothbrushing_' + f'{updated_step.id:02}'
+                updated_step.name = 'toothbrushing_' + f'{(updated_step.id + 1):02}'
             else:
                 updated_step = self.schema.load(request_data, instance=instance, session=db.session)
         except Exception as e:
