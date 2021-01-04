@@ -660,7 +660,7 @@ class BaseTestQuestionnaire(BaseTest):
 
         session_1_step_1 = ChainSessionStep(
             date=parser.parse("2020-12-14T17:46:14.030Z"),
-            chain_step_id=100,
+            chain_step_id=0,
             status="focus",
             completed=False,
             was_prompted=True,
