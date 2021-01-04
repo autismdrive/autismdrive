@@ -1295,7 +1295,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                 'session_type': 'training',
                 'step_attempts': [
                     {
-                        'chain_step_id': 100,
+                        'chain_step_id': 0,
                         'date': now.isoformat(),
                         'status': 'focus',
                         'completed': False,
