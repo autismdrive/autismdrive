@@ -30,7 +30,7 @@ class ChainSessionStep(db.Model):
         options = []
         try:
             chain_steps = db.session.query(ChainStep).all()
-            sorted_steps = sorted(chain_steps, key=lambda i: i['id'])
+            sorted_steps = sorted(chain_steps, key=lambda chain_step: chain_step.id)
             options = [{"value": s.id, "label": s.instruction} for s in sorted_steps]
         except:
             pass
@@ -197,7 +197,7 @@ class ChainSessionStep(db.Model):
     challenging_behaviors = db.relationship(
         "ChallengingBehavior",
         backref=db.backref("chain_session_step", lazy=True),
-        cascade="all, delete, delete-orphan",
+        cascade="all, delete-orphan",
         passive_deletes=True
     )
 
