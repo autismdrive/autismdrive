@@ -30,7 +30,8 @@ class ChainSessionStep(db.Model):
         options = []
         try:
             chain_steps = db.session.query(ChainStep).all()
-            options = [{"value": s.id, "label": s.instruction} for s in chain_steps]
+            sorted_steps = sorted(chain_steps, key=lambda i: i['id'])
+            options = [{"value": s.id, "label": s.instruction} for s in sorted_steps]
         except:
             pass
 
