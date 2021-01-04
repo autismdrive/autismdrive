@@ -50,5 +50,5 @@ class ChainStepListEndpoint(flask_restful.Resource):
         if chain_steps is None:
             raise RestException(RestException.NOT_FOUND)
 
-        sorted_steps = sorted(chain_steps, key=lambda i: i['id'])
+        sorted_steps = sorted(chain_steps, key=lambda chain_step: chain_step.id)
         return self.schema.dump(sorted_steps)
