@@ -35,7 +35,18 @@ export class SkillstarAdminComponent implements OnInit {
       });
 
     stepInstructions.forEach(step => {
-      this.api.editChainStep(step).subscribe();
+      if (step.instruction === '') {
+        this.api.deleteChainStep(step).subscribe(
+          result => {
+            console.log('Delete blank step ID', step.id);
+          },
+          error => {
+            console.error(`Cannot delete step ID ${step.id}`, error);
+          }
+        );
+      } else {
+        this.api.editChainStep(step).subscribe();
+      }
     });
   }
 }

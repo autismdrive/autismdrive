@@ -5,6 +5,7 @@ from flask import json
 from tests.base_test import BaseTest
 from app import db
 from app.model.chain_step import ChainStep
+from app.model.questionnaires.chain_session_step import ChainSessionStep
 
 
 class TestChainStep(BaseTest, unittest.TestCase):
@@ -35,6 +36,32 @@ class TestChainStep(BaseTest, unittest.TestCase):
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response['instruction'], 'Take out the trash')
+
+    def test_delete_chain_step(self):
+        chain_step = self.construct_chain_step()
+        chain_step_id = chain_step.id
+        rv = self.app.get('api/chain_step/%i' % chain_step_id, content_type="application/json")
+        self.assert_success(rv)
+
+        rv = self.app.delete('api/chain_step/%i' % chain_step_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+
+        rv = self.app.get('api/chain_step/%i' % chain_step_id, content_type="application/json")
+        self.assertEqual(404, rv.status_code)
+
+    def test_disallow_deleting_chain_step_if_being_used(self):
+        chain_step = self.construct_chain_step()
+        chain_step_id = chain_step.id
+
+        db.session.add(ChainSessionStep(chain_step_id=chain_step_id))
+        db.session.commit()
+
+        rv = self.app.get('api/chain_step/%i' % chain_step_id, content_type="application/json")
+        self.assert_success(rv)
+
+        rv = self.app.delete('api/chain_step/%i' % chain_step_id, content_type="application/json", headers=self.logged_in_headers())
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.json['code'], 'can_not_delete')
 
     def test_multiple_chain_steps(self):
         chain_steps = self.construct_chain_steps()

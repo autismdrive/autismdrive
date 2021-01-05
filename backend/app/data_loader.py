@@ -22,6 +22,7 @@ from app.model.study_user import StudyUser
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
 from app.model.zip_code import ZipCode
+from app.model.questionnaires.chain_session_step import ChainSessionStep
 
 
 class DataLoader:
@@ -362,7 +363,11 @@ class DataLoader:
         db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.query(ZipCode).delete()
-        db.session.query(ChainStep).delete()
+
+        num_steps = db.session.query(ChainSessionStep).count()
+        if num_steps == 0:
+            db.session.query(ChainStep).delete()
+
         db.session.commit()
 
     def __increment_id_sequence(self, model):

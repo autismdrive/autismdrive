@@ -732,6 +732,14 @@ export class ApiService {
       .pipe(catchError(this._handleError));
   }
 
+  /** EditChainStep */
+  deleteChainStep(chainStep: ChainStep): Observable<ChainStep> {
+    const url = this._endpointUrl('chainStep')
+      .replace('<chain_step_id>', chainStep.id.toString());
+    return this.httpClient.delete<ChainStep>(url)
+      .pipe(catchError(this._handleError));
+  }
+
   private _endpointUrl(endpointName: string): string {
     const path = this.endpoints[endpointName];
 
