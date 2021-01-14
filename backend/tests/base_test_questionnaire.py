@@ -666,7 +666,7 @@ class BaseTestQuestionnaire(BaseTest):
             was_prompted=True,
             prompt_level="partial_physical",
             had_challenging_behavior=True,
-            challenging_behavior_severity="moderate"
+            reason_step_incomplete="challenging_behavior"
         )
         session_1 = ChainSession()
         session_1.step_attempts = [session_1_step_1]

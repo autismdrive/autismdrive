@@ -5,7 +5,7 @@ frontend/package-lock.json
 .vscode
 .isort.cfg
 setup.cfg
-backend/star_drive.log
+star_drive.log
 
 .release-it.json
 environment.prod.ts
