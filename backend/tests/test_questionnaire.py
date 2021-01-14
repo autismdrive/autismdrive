@@ -1302,7 +1302,7 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
                         'was_prompted': True,
                         'prompt_level': 'partial_physical',
                         'had_challenging_behavior': True,
-                        'challenging_behavior_severity': 'moderate',
+                        'reason_step_incomplete': 'challenging_behavior',
                         'challenging_behaviors': [
                             {'time': later_1.isoformat()},
                             {'time': later_2.isoformat()},

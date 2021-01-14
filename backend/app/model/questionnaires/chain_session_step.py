@@ -167,28 +167,20 @@ class ChainSessionStep(db.Model):
         },
     )
 
-    challenging_behavior_severity = db.Column(
+    reason_step_incomplete = db.Column(
         db.String,
         info={
             "display_order": 8,
             "type": "radio",
             "template_options": {
                 "type": "array",
-                "label": "How severe was the challenging behavior?",
+                "label": "What was the primary reason for failing to complete the task?",
                 "required": True,
                 "options": [
-                    {
-                        "value": "mild",
-                        "label": "Mild (did not interfere with task)"
-                    },
-                    {
-                        "value": "moderate",
-                        "label": "Moderate (interfered with task, but we were able to work through it)"
-                    },
-                    {
-                        "value": 'severe',
-                        "label": "Severe (we were not able to complete the task due to the severity of the behavior)"
-                    },
+                    {"value": "lack_of_attending", "label": "Lack of Attending"},
+                    {"value": "challenging_behavior", "label": "Challenging Behavior"},
+                    {"value": "sensory_issues", "label": "Sensory Issues(materials are aversive)"},
+                    {"value": "other", "label": "Other"},
                 ],
             },
         },
@@ -245,7 +237,7 @@ class ChainSessionStepSchema(ModelSchema):
             "was_prompted",
             "prompt_level",
             "had_challenging_behavior",
-            "challenging_behavior_severity",
+            "reason_step_incomplete",
             "challenging_behaviors",
         )
     challenging_behaviors = ma.Nested(ChallengingBehaviorSchema, many=True)
