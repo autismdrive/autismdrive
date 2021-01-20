@@ -16,6 +16,8 @@ class ChainSessionStep(db.Model):
     __no_export__ = True  # This will be transferred as a part of a parent class
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 1
+    training_session_hide_expression = '!(model.session_type && (model.session_type === "training"))'
+    focus_step_hide_expression = '!model.was_focus_step'
 
     id = db.Column(db.Integer, primary_key=True)
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -58,10 +60,66 @@ class ChainSessionStep(db.Model):
         },
     )
 
+    was_focus_step = db.Column(
+        db.Boolean,
+        info={
+            "display_order": 3,
+            "type": "radio",
+            "template_options": {
+                "type": "array",
+                "label": "Focus Step",
+                "required": True,
+                "options": [
+                    {"value": True, "label": "Yes"},
+                    {"value": False, "label": "No"},
+                ],
+            },
+            "hide_expression": training_session_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + training_session_hide_expression
+            },
+        },
+    )
+
+    target_prompt_level = db.Column(
+        db.String,
+        info={
+            "display_order": 4,
+            "type": "radio",
+            "template_options": {
+                "type": "array",
+                "label": "What prompt level was targeted for the focus step?",
+                "required": True,
+                "options": [
+                    {
+                        "value": "none",
+                        "label": "No Prompt (Independent)"
+                    },
+                    {
+                        "value": "shadow",
+                        "label": "Shadow Prompt (approximately one inch)"
+                    },
+                    {
+                        "value": "partial_physical",
+                        "label": "Partial Physical Prompt (thumb and index finger)"
+                    },
+                    {
+                        "value": "full_physical",
+                        "label": "Full Physical Prompt (hand-over-hand)"
+                    },
+                ],
+            },
+            "hide_expression": focus_step_hide_expression,
+            "expression_properties": {
+                "template_options.required": '!' + focus_step_hide_expression
+            },
+        },
+    )
+
     status = db.Column(
         db.String,
         info={
-            "display_order": 3,
+            "display_order": 5,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -88,7 +146,7 @@ class ChainSessionStep(db.Model):
     completed = db.Column(
         db.Boolean,
         info={
-            "display_order": 4,
+            "display_order": 6,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -105,7 +163,7 @@ class ChainSessionStep(db.Model):
     was_prompted = db.Column(
         db.Boolean,
         info={
-            "display_order": 5,
+            "display_order": 7,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -122,7 +180,7 @@ class ChainSessionStep(db.Model):
     prompt_level = db.Column(
         db.String,
         info={
-            "display_order": 6,
+            "display_order": 8,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -153,7 +211,7 @@ class ChainSessionStep(db.Model):
     had_challenging_behavior = db.Column(
         db.Boolean,
         info={
-            "display_order": 7,
+            "display_order": 9,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -170,7 +228,7 @@ class ChainSessionStep(db.Model):
     reason_step_incomplete = db.Column(
         db.String,
         info={
-            "display_order": 8,
+            "display_order": 10,
             "type": "radio",
             "template_options": {
                 "type": "array",
@@ -206,7 +264,7 @@ class ChainSessionStep(db.Model):
         field_groups = {
             "challenging_behaviors": {
                 "type": "repeat",
-                "display_order": 9,
+                "display_order": 11,
                 "wrappers": ["card"],
                 "repeat_class": ChallengingBehavior,
                 "template_options": {
@@ -232,6 +290,9 @@ class ChainSessionStepSchema(ModelSchema):
             "chain_step_id",
             "chain_step",
             "date",
+            "session_type",
+            "was_focus_step",
+            "target_prompt_level",
             "status",
             "completed",
             "was_prompted",
@@ -242,6 +303,7 @@ class ChainSessionStepSchema(ModelSchema):
         )
     challenging_behaviors = ma.Nested(ChallengingBehaviorSchema, many=True)
     chain_step = ma.Method('get_chain_step', dump_only=True)
+    session_type = ma.Method('get_session_type', dump_only=True)
 
     def get_chain_step(self, obj):
         if obj is None:
@@ -249,3 +311,10 @@ class ChainSessionStepSchema(ModelSchema):
 
         db_chain_step = db.session.query(ChainStep).filter_by(id=obj.chain_step_id).first()
         return ChainStepSchema().dump(db_chain_step)
+
+    def get_session_type(self, obj):
+        if obj is None:
+            return missing
+
+        if hasattr(obj, 'chain_session'):
+            return obj.chain_session.session_type
