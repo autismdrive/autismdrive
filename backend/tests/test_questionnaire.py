@@ -1330,7 +1330,14 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
             data_after['sessions'][0]['step_attempts'][0]['prompt_level']
         )
         self.assertFalse('chain_step' in data_before['sessions'][0]['step_attempts'][0])
+        self.assertFalse('session_type' in data_before['sessions'][0]['step_attempts'][0])
+        self.assertFalse('was_focus_step' in data_before['sessions'][0]['step_attempts'][0])
+        self.assertFalse('target_prompt_level' in data_before['sessions'][0]['step_attempts'][0])
+
         self.assertTrue('chain_step' in data_after['sessions'][0]['step_attempts'][0])
+        self.assertTrue('session_type' in data_after['sessions'][0]['step_attempts'][0])
+        self.assertTrue('was_focus_step' in data_after['sessions'][0]['step_attempts'][0])
+        self.assertTrue('target_prompt_level' in data_after['sessions'][0]['step_attempts'][0])
 
         print('challenging_behaviors after:', data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'])
         all_cbs = db.session.query(ChallengingBehavior).all()
