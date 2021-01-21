@@ -138,6 +138,14 @@ class ChainSessionStep(db.Model):
                         "value": "mastered",
                         "label": "Mastered"
                     },
+                    {
+                        "value": "booster_needed",
+                        "label": "Booster needed"
+                    },
+                    {
+                        "value": "booster_mastered",
+                        "label": "Booster mastered"
+                    },
                 ],
             },
         },
