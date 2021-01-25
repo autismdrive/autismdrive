@@ -1,7 +1,7 @@
 id,name,instruction
 0,toothbrushing_01,"Put toothpaste on your toothbrush"
 1,toothbrushing_02,"Put toothpaste away"
-2,toothbrushing_03,"Get toothpaste and toothbrush wet"
+2,toothbrushing_03,"Get toothbrush wet"
 3,toothbrushing_04,"Brush biting surface of your bottom teeth, moving from one side to the other"
 4,toothbrushing_05,"Brush the biting surface of your top teeth, moving from one side to the other"
 5,toothbrushing_06,"Brush the outside surface (facing cheeks) of bottom teeth, moving from one side to the other"
