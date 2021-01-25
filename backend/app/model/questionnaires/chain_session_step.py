@@ -127,6 +127,10 @@ class ChainSessionStep(db.Model):
                 "required": True,
                 "options": [
                     {
+                        "value": "not_yet_started",
+                        "label": "Not yet started"
+                    },
+                    {
                         "value": "not_complete",
                         "label": "Not complete"
                     },
