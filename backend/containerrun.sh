@@ -1,5 +1,6 @@
 #! /bin/bash
-timeout 300 bash -c "until curl --silent --output /dev/null http://star-drive_es_1:9200/_cat/health?h=st; do printf '.'; sleep 5; done; printf '\n'"
+es=${es:="star-drive_es_1"}
+timeout 300 bash -c "until curl --silent --output /dev/null http://$es:9200/_cat/health?h=st; do printf '.'; sleep 5; done; printf '\n'"
 flask db init
 sleep 5
 flask db migrate
