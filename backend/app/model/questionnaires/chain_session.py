@@ -31,7 +31,7 @@ class ChainSession(db.Model):
     @declared_attr
     def date(cls):
         return db.Column(
-            db.DateTime,
+            db.DateTime(timezone=True),
             info={
                 "display_order": 1,
                 "type": "datepicker",

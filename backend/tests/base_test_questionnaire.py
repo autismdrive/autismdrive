@@ -657,9 +657,9 @@ class BaseTestQuestionnaire(BaseTest):
             p = participant
             bq.participant_id = p.id
 
-
+        session_date = parser.parse("2020-12-14T17:46:14.030Z")
         session_1_step_1 = ChainSessionStep(
-            date=parser.parse("2020-12-14T17:46:14.030Z"),
+            date=session_date,
             chain_step_id=0,
             status="focus",
             completed=False,
@@ -668,7 +668,7 @@ class BaseTestQuestionnaire(BaseTest):
             had_challenging_behavior=True,
             reason_step_incomplete="challenging_behavior"
         )
-        session_1 = ChainSession()
+        session_1 = ChainSession(date=session_date)
         session_1.step_attempts = [session_1_step_1]
         bq.sessions = [session_1]
 
@@ -679,6 +679,8 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_bq.participant_id, bq.participant_id)
         self.assertEqual(db_bq.user_id, bq.user_id)
         self.assertEqual(db_bq.sessions, bq.sessions)
+        self.assertEqual(db_bq.sessions[0].date, session_date)
+        self.assertEqual(db_bq.sessions[0].step_attempts[0].date, session_date)
         return db_bq
 
     def construct_all_questionnaires(self, user=None):

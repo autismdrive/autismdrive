@@ -49,7 +49,7 @@ class ChainSessionStep(db.Model):
          )
 
     date = db.Column(
-        db.DateTime,
+        db.DateTime(timezone=True),
         info={
             "display_order": 2,
             "type": "datepicker",

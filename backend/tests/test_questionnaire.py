@@ -4,6 +4,8 @@ import openpyxl
 import io
 import datetime
 
+from dateutil import parser
+
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app import db, elastic_index
 from app.export_service import ExportService
@@ -1285,12 +1287,13 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
 
         data_before['user_id'] = user.id
         data_before['participant_id'] = participant.id
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
         later_1 = now + datetime.timedelta(minutes=1)
         later_2 = now + datetime.timedelta(minutes=2)
         later_3 = now + datetime.timedelta(minutes=3)
         data_before['sessions'] = [
             {
+                'date': now.isoformat(),
                 'completed': False,
                 'session_type': 'training',
                 'step_attempts': [
@@ -1344,8 +1347,19 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         print('all_cbs', all_cbs)
 
         self.assertEqual(
-            data_before['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time'],
-            data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time'],
+            self._parse_date(data_before['sessions'][0]['date']) -
+            self._parse_date(data_after['sessions'][0]['date']),
+            datetime.timedelta(0)
+        )
+        self.assertEqual(
+            self._parse_date(data_before['sessions'][0]['step_attempts'][0]['date']) -
+            self._parse_date(data_after['sessions'][0]['step_attempts'][0]['date']),
+            datetime.timedelta(0)
+        )
+        self.assertEqual(
+            self._parse_date(data_before['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time']) -
+            self._parse_date(data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time']),
+            datetime.timedelta(0)
         )
 
     def test_delete_chain_session_questionnaire(self):
@@ -1686,3 +1700,6 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(2, wb['Contact'].max_row)
         self.assertEqual('user_id', wb['Contact']['E1'].value)
         self.assertEqual(u2.id, wb['Contact']['E2'].value)
+
+    def _parse_date(self, date_str):
+        return parser.parse(date_str).replace(tzinfo=None)
