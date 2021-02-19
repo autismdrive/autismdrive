@@ -1,21 +1,16 @@
-import json
+import random
 import random
 import string
-import unittest
-from datetime import datetime
 
 from dateutil import parser
-import openpyxl
-import io
 
-from data_loader import DataLoader
-from tests.base_test import BaseTest
-from app import db, app, elastic_index
-from app.export_service import ExportService
-from app.model.flow import Step
-from app.model.participant import Participant, Relationship
+from app import db
+from app.model.participant import Relationship
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
 from app.model.questionnaires.assistive_device import AssistiveDevice
+from app.model.questionnaires.chain_questionnaire import ChainQuestionnaire
+from app.model.questionnaires.chain_session import ChainSession
+from app.model.questionnaires.chain_session_step import ChainSessionStep
 from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
 from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
 from app.model.questionnaires.current_behaviors_dependent_questionnaire import CurrentBehaviorsDependentQuestionnaire
@@ -34,15 +29,10 @@ from app.model.questionnaires.identification_questionnaire import Identification
 from app.model.questionnaires.medication import Medication
 from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
 from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaire
-from app.model.chain_step import ChainStep
-from app.model.questionnaires.chain_questionnaire import ChainQuestionnaire
-from app.model.questionnaires.chain_session import ChainSession
-from app.model.questionnaires.chain_session_step import ChainSessionStep
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
-from app.model.resource_category import ResourceCategory
-from app.model.step_log import StepLog
 from app.model.user import User, Role
+from tests.base_test import BaseTest
 
 
 class BaseTestQuestionnaire(BaseTest):
