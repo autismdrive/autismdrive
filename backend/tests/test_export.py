@@ -65,7 +65,7 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
             self.assertTrue('url' in entry, msg="No url provided for " + entry["class_name"])
             self.assertNotEqual("", entry['url'], msg="No url provided for " + entry["class_name"])
 
-    def test_al_urls_respond_with_success(self):
+    def test_all_urls_respond_with_success(self):
         rv = self.app.get('/api/export',
                           follow_redirects=True,
                           content_type="application/json",

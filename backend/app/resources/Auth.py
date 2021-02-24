@@ -37,6 +37,10 @@ def confirm_email(email_token):
 @auth_blueprint.route('/login_password', methods=["GET", "POST"])
 def login_password():
     request_data = request.get_json()
+
+    if request_data is None:
+        raise RestException(RestException.INVALID_INPUT)
+
     email = request_data['email']
     user = User.query.filter(func.lower(User.email) == email.lower()).first()
     schema = UserSchema(many=False)

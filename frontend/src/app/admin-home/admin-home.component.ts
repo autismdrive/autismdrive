@@ -13,6 +13,7 @@ export class AdminHomeComponent implements OnInit {
     { path: '/admin/taxonomy-admin', label: 'Taxonomy Admin', id: 'taxonomy-admin'  },
     { path: '/admin/import-export-status', label: 'Import/Export Status', id: 'import-export-status'  },
     { path: '/admin/email-log', label: 'Email Log', id: 'email-log'  },
+    // { path: '/admin/skillstar-admin', label: 'SkillSTAR Admin', id: 'skillstar-admin'  },
   ];
 
   constructor(

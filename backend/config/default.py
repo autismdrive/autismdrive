@@ -1,7 +1,12 @@
+import os
+import re
+from os import environ
+
 NAME = "STAR DRIVE Database"
 VERSION = "0.1"
 
-CORS_ENABLED = False
+CORS_ENABLED = True
+CORS_ALLOW_ORIGINS = re.split(r',\s*', environ.get('CORS_ALLOW_ORIGINS', default="localhost:4200"))
 DEVELOPMENT = True
 TESTING = True
 

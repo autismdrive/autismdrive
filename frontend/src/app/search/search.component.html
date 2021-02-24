@@ -442,10 +442,11 @@
     <h1>Resource partners</h1>
     <p class="pad-0">We are partnering with the following initiatives and organizations to identify
       resources that will improve outcomes for individuals with autism and their families.</p>
-    <div fxLayoutAlign.gt-xs="row" fxLayout.lt-sm="row wrap" fxLayoutAlign="space-between" fxLayoutGap="40px">
+    <div fxLayoutAlign.gt-xs="row" fxLayout.lt-sm="row wrap" fxLayoutAlign="space-between center" fxLayoutGap="40px">
       <span
         *ngFor="let rg of resourceGatherers"
         fxFlex.lt-md="40%"
+        fxLayoutAlign="center center"
       >
         <a
           [href]="rg.url"

@@ -157,6 +157,7 @@ import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
+import { SkillstarAdminComponent } from './skillstar-admin/skillstar-admin.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -317,6 +318,7 @@ export class FormlyConfig {
     UserAdminComponent,
     UserAdminDetailsComponent,
     UvaEducationComponent,
+    SkillstarAdminComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)

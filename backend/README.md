@@ -62,7 +62,7 @@ createdb stardrive_test -O ed_user ed_platform
 ```BASH
 sudo su postgres
 createuser --no-createdb --no-superuser --pwprompt ed_user
-createdb stardrive -O ed_user ed_platform WITH ENCODING = ‘UTF8′
+createdb stardrive -O ed_user ed_platform WITH ENCODING = 'UTF8'
 createdb stardrive_test -O ed_user ed_platform
 exit
 ```
@@ -321,4 +321,3 @@ star-drive-dist to prepare the release. Commit these changes referencing the rel
 
 
 
- 

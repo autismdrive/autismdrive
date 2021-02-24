@@ -1,6 +1,7 @@
 import logging.config
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from traceback_with_variables import activate_by_import, iter_tb_lines, prints_tb, printing_tb
 
 from config.logging import logging_config
 
@@ -41,8 +42,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Enable CORS
-if app.config["CORS_ENABLED"] :
-    cors = CORS(app, resources={r"*": {"origins": "*"}})
+if app.config["CORS_ENABLED"]:
+    # Convert list of allowed origins to list of regexes
+    origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['CORS_ALLOW_ORIGINS']]
+    cors = CORS(app, origins=origins_re)
 
 # Flask-Marshmallow provides HATEOAS links
 ma = Marshmallow(app)
@@ -101,6 +104,12 @@ def handler(error, endpoint, values=''):
 app.url_build_error_handlers.append(handler)
 
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error('\n'.join(iter_tb_lines(e)))
+    return 'Server Error', 500
+
+
 # Handle errors consistently
 @app.errorhandler(RestException)
 def handle_invalid_usage(error):
@@ -123,6 +132,7 @@ def _load_data(data_loader):
     data_loader.load_resources()
     data_loader.load_studies()
     data_loader.load_zip_codes()
+    data_loader.load_chain_steps()
 
 
 @app.cli.command()
@@ -188,6 +198,7 @@ def resourcereset():
     data_loader.load_resources()
     data_loader.load_studies()
     data_loader.load_zip_codes()
+    data_loader.load_chain_steps()
 
 
 @app.cli.command()

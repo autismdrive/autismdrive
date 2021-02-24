@@ -1,10 +1,18 @@
+import os
+import csv
+import googlemaps
+from sqlalchemy import Sequence
+
+from app import app, db, elastic_index
 from app.model.admin_note import AdminNote
 from app.model.age_range import AgeRange
 from app.model.category import Category
-from app.model.investigator import Investigator
-from app.model.participant import Participant
+from app.model.chain_step import ChainStep
 from app.model.event import Event
+from app.model.event_user import EventUser
+from app.model.investigator import Investigator
 from app.model.location import Location
+from app.model.participant import Participant
 from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.study import Study, Status
@@ -13,14 +21,8 @@ from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
-from app import app, db, elastic_index
-from sqlalchemy import Sequence
-import os
-import csv
-import googlemaps
-
-from app.model.event_user import EventUser
 from app.model.zip_code import ZipCode
+from app.model.questionnaires.chain_session_step import ChainSessionStep
 
 
 class DataLoader:
@@ -41,6 +43,7 @@ class DataLoader:
         self.participant_file = directory + "/participants.csv"
         self.user_participant_file = directory + "/user_participants.csv"
         self.zip_code_coords_file = directory + "/zip_code_coords.csv"
+        self.chain_steps_file = directory + "/chain_steps.csv"
         print("Data loader initialized")
 
     def load_categories(self):
@@ -277,6 +280,18 @@ class DataLoader:
         db.session.commit()
         print("ZIP codes loaded.  There are now %i ZIP codes in the database." % db.session.query(ZipCode).count())
 
+    def load_chain_steps(self):
+        items = []
+        with open(self.chain_steps_file, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
+            next(reader, None)  # skip the headers
+            for row in reader:
+                items.append(ChainStep(id=row[0], name=row[1], instruction=row[2]))
+
+        db.session.bulk_save_objects(items)
+        db.session.commit()
+        print("SkillSTAR Chain Steps loaded.  There are now %i SkillSTAR Chain Steps in the database." % db.session.query(ChainStep).count())
+
     def get_category_by_name(self, category_name, parent=None, create_missing=False):
         category = db.session.query(Category).filter(Category.name == category_name).first()
         if category is None:
@@ -348,6 +363,11 @@ class DataLoader:
         db.session.query(Resource).delete()
         db.session.query(Study).delete()
         db.session.query(ZipCode).delete()
+
+        num_steps = db.session.query(ChainSessionStep).count()
+        if num_steps == 0:
+            db.session.query(ChainStep).delete()
+
         db.session.commit()
 
     def __increment_id_sequence(self, model):

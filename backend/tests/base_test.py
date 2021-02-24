@@ -1,43 +1,47 @@
 # Set environment variable to testing before loading.
 # IMPORTANT - Environment must be loaded before app, models, etc....
-import base64
-import datetime
 import os
-import quopri
-import re
 
-from flask.json import JSONEncoder
 
 os.environ["TESTING"] = "true"
 
+import base64
+import datetime
+import quopri
+import re
+from flask import json
+from flask.json import JSONEncoder
+
+from app import app, db, elastic_index
+from app.model.questionnaires.challenging_behavior import ChallengingBehavior
+from app.model.admin_note import AdminNote
+from app.model.category import Category
+from app.model.chain_step import ChainStep
 from app.model.email_log import EmailLog
 from app.model.event import Event
+from app.model.event_user import EventUser
 from app.model.investigator import Investigator
+from app.model.location import Location
+from app.model.participant import Participant
+from app.model.resource import Resource
+from app.model.resource_category import ResourceCategory
+from app.model.resource_change_log import ResourceChangeLog
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
 from app.model.study_investigator import StudyInvestigator
 from app.model.study_user import StudyUser
-from app.model.user_favorite import UserFavorite
-from app.model.event_user import EventUser
-
-from flask import json
-
-from app import app, db, elastic_index
-from app.model.admin_note import AdminNote
-from app.model.category import Category
-from app.model.resource_category import ResourceCategory
-from app.model.location import Location
-from app.model.participant import Participant
-from app.model.resource import Resource
-from app.model.resource_change_log import ResourceChangeLog
 from app.model.user import User, Role
+from app.model.user_favorite import UserFavorite
 from app.model.zip_code import ZipCode
 
 
 def clean_db(database):
+    database.session.commit()
+
     for table in reversed(database.metadata.sorted_tables):
         database.session.execute(table.delete())
+        database.session.commit()
 
 
 class BaseTest:
@@ -285,6 +289,22 @@ class BaseTest:
         self.assertEqual(db_z.latitude, z.latitude)
         self.assertEqual(db_z.longitude, z.longitude)
         return db_z
+
+    def construct_chain_steps(self):
+        num_steps = db.session.query(ChainStep).count()
+
+        if num_steps == 0:
+            self.construct_chain_step(id=0, name="time_warp_01", instruction="Jump to the left")
+            self.construct_chain_step(id=1, name="time_warp_02", instruction="Step to the right")
+            self.construct_chain_step(id=2, name="time_warp_03", instruction="Put your hands on your hips")
+            self.construct_chain_step(id=3, name="time_warp_04", instruction="Pull your knees in tight")
+
+        return db.session.query(ChainStep).all()
+
+    def construct_chain_step(self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=datetime.datetime.now()):
+        db.session.add(ChainStep(id=id, name=name, instruction=instruction, last_updated=last_updated))
+        db.session.commit()
+        return db.session.query(ChainStep).filter(ChainStep.id == id).first()
 
     def construct_everything(self):
         self.construct_all_questionnaires()

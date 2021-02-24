@@ -1,42 +1,48 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {AdminHomeComponent} from '../admin-home/admin-home.component';
 import {AboutComponent} from '../about/about.component';
+import {AdminExportComponent} from '../admin-export/admin-export.component';
+import {AdminHomeComponent} from '../admin-home/admin-home.component';
+import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
+import {EmailLogAdminComponent} from '../email-log-admin/email-log-admin.component';
 import {FlowCompleteComponent} from '../flow-complete/flow-complete.component';
 import {FlowComponent} from '../flow/flow.component';
 import {ForgotPasswordComponent} from '../forgot-password/forgot-password.component';
 import {HomeComponent} from '../home/home.component';
 import {LoginComponent} from '../login/login.component';
 import {LogoutComponent} from '../logout/logout.component';
+import {MirrorComponent} from '../mirror/mirror.component';
+import {ParticipantAdminComponent} from '../participant-admin/participant-admin.component';
 import {PasswordResetComponent} from '../password-reset/password-reset.component';
 import {ProfileComponent} from '../profile/profile.component';
+import {QuestionnaireDataViewComponent} from '../questionnaire-data-view/questionnaire-data-view.component';
 import {RegisterComponent} from '../register/register.component';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
 import {ResourceFormComponent} from '../resource-form/resource-form.component';
 import {SearchComponent} from '../search/search.component';
+import {SkillstarAdminComponent} from '../skillstar-admin/skillstar-admin.component';
 import {StudiesComponent} from '../studies/studies.component';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
 import {StudyFormComponent} from '../study-form/study-form.component';
+import {TaxonomyAdminComponent} from '../taxonomy-admin/taxonomy-admin.component';
 import {TermsComponent} from '../terms/terms.component';
-import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
 import {TimedoutComponent} from '../timed-out/timed-out.component';
-import {RoleGuard} from './role-guard';
-import {AuthGuard} from './auth-guard';
-import {MirrorComponent} from '../mirror/mirror.component';
-import {NotMirroredGuard} from './not-mirrored-guard';
+import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
+import {UserAdminComponent} from '../user-admin/user-admin.component';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
-import {Covid19ResourcesComponent} from '../covid19-resources/covid19-resources.component';
-import {UserAdminComponent} from "../user-admin/user-admin.component";
-import {QuestionnaireDataViewComponent} from "../questionnaire-data-view/questionnaire-data-view.component";
-import {ParticipantAdminComponent} from "../participant-admin/participant-admin.component";
-import {TaxonomyAdminComponent} from "../taxonomy-admin/taxonomy-admin.component";
-import {AdminExportComponent} from "../admin-export/admin-export.component";
-import {EmailLogAdminComponent} from "../email-log-admin/email-log-admin.component";
+import {AuthGuard} from './auth-guard';
+import {NotMirroredGuard} from './not-mirrored-guard';
+import {RoleGuard} from './role-guard';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
   {path: 'home', component: HomeComponent, data: {title: 'Welcome to Autism DRIVE'}, canActivate: [NotMirroredGuard]},
-  {path: 'uva-education', component: UvaEducationComponent, data: {title: 'Autism DRIVE UVA Education'}, canActivate: [NotMirroredGuard]},
+  {
+    path: 'uva-education',
+    component: UvaEducationComponent,
+    data: {title: 'Autism DRIVE UVA Education'},
+    canActivate: [NotMirroredGuard]
+  },
   {
     path: 'about',
     component: AboutComponent,
@@ -88,12 +94,16 @@ const routes: Routes = [
     canActivate: [RoleGuard]
   },
   {path: 'covid19-resources', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
-  {path: 'covid19-resources/:category', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
+  {
+    path: 'covid19-resources/:category',
+    component: Covid19ResourcesComponent,
+    data: {title: 'Autism DRIVE COVID-19 Resources'}
+  },
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {
     path: 'studies/add',
     component: StudyFormComponent,
-    data: {title: 'Create an Autism DRIVE Study', roles: ['admin', ]},
+    data: {title: 'Create an Autism DRIVE Study', roles: ['admin',]},
     canActivate: [RoleGuard]
   },
   {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
@@ -101,7 +111,7 @@ const routes: Routes = [
   {
     path: 'study/edit/:studyId',
     component: StudyFormComponent,
-    data: {title: 'Edit Study', roles: ['admin', ]},
+    data: {title: 'Edit Study', roles: ['admin',]},
     canActivate: [RoleGuard]
   },
   {
@@ -116,46 +126,52 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminHomeComponent,
-    data: {title: 'Autism DRIVE Admin Home', roles: ['admin', ]},
+    data: {title: 'Autism DRIVE Admin Home', roles: ['admin',]},
     canActivate: [RoleGuard],
     children: [
-      { path: '', redirectTo: 'data-admin', pathMatch: 'full' },
+      {path: '', redirectTo: 'data-admin', pathMatch: 'full'},
       {
         path: 'data-admin',
         component: QuestionnaireDataViewComponent,
-        data: {title: 'Autism DRIVE Data Admin', roles: ['admin', ]},
+        data: {title: 'Autism DRIVE Data Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
       {
         path: 'user-admin',
         component: UserAdminComponent,
-        data: {title: 'Autism DRIVE User Admin', roles: ['admin', ]},
+        data: {title: 'Autism DRIVE User Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
       {
         path: 'participant-admin',
         component: ParticipantAdminComponent,
-        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin', ]},
+        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
       {
         path: 'taxonomy-admin',
         component: TaxonomyAdminComponent,
-        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin', ]},
+        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
       {
         path: 'import-export-status',
         component: AdminExportComponent,
-        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin', ]},
+        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
       {
         path: 'email-log',
         component: EmailLogAdminComponent,
-        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin', ]},
+        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
+      // {
+      //   path: 'skillstar-admin',
+      //   component: SkillstarAdminComponent,
+      //   data: {title: 'SkillSTAR Admin', roles: ['admin',]},
+      //   canActivate: [RoleGuard]
+      // },
     ]
   },
   {
