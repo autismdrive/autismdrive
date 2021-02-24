@@ -120,6 +120,7 @@ class ChainSessionSchema(ModelSchema):
             "completed",
             "session_type",
             "step_attempts",
+            "chain_questionnaire_id"
         )
 
     step_attempts = ma.Nested(ChainSessionStepSchema, many=True)
