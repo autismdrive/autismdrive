@@ -263,15 +263,6 @@ class ChainSessionStep(db.Model):
         passive_deletes=True
     )
 
-
-    @declared_attr
-    def participant_id(cls):
-        return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
-
-    @declared_attr
-    def user_id(cls):
-        return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
-
     def get_field_groups(self):
         field_groups = {
             "challenging_behaviors": {
@@ -312,6 +303,7 @@ class ChainSessionStepSchema(ModelSchema):
             "had_challenging_behavior",
             "reason_step_incomplete",
             "challenging_behaviors",
+            "chain_session_id"
         )
     challenging_behaviors = ma.Nested(ChallengingBehaviorSchema, many=True)
     chain_step = ma.Method('get_chain_step', dump_only=True)

@@ -166,12 +166,12 @@ const routes: Routes = [
         data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin',]},
         canActivate: [RoleGuard]
       },
-      {
-        path: 'skillstar-admin',
-        component: SkillstarAdminComponent,
-        data: {title: 'SkillSTAR Admin', roles: ['admin',]},
-        canActivate: [RoleGuard]
-      },
+      // {
+      //   path: 'skillstar-admin',
+      //   component: SkillstarAdminComponent,
+      //   data: {title: 'SkillSTAR Admin', roles: ['admin',]},
+      //   canActivate: [RoleGuard]
+      // },
     ]
   },
   {
