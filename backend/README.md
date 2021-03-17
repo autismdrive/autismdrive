@@ -16,7 +16,16 @@ sudo apt-get install python3 python3-dev
 sudo apt-get install -y libssl-dev libffi-dev
 ```
 
-#### PostgreSQL
+#### Using Docker
+You can use Docker to run the two primary dependencies for this project:  Postgres, and ElasticSearch
+
+1. create a directory at  ~/docker/volumes/stardrive
+2. chmod 777 ~/docker/volumes/stardrive/elasticsearch
+3. spin it all up, with docker-compose up
+* Optionally set up a run configuration in PyCharm
+
+####  Not Using Docker
+###### PostgreSQL
 * MacOS:
 [Download and install Postgres.app](https://postgresapp.com). This will install `postgres`, along with the command-line tools, including `psql`, `pg_ctl`, and others. Then update your `PATH` variable to look in the Postgres.app `bin` directory for the relevant Postgres CLI tools.
 ```BASH
@@ -27,28 +36,8 @@ export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 ```BASH
 apt-get install postgresql postgresql-client libpq-dev
 ```
-
-#### ElasticSearch
-We are currently using version 6, and should look at upgrading this in the future when my hair isn't on fire.
-
-* Debian/Ubuntu: https://medium.com/@pierangelo1982/how-to-install-elasticsearch-6-on-ubuntu-64316dc2de1c
-
-#### Angular
-```BASH
-npm install -g @angular/cli
-```
-
-### Project Setup
-* Please use Python 3's virtual environment setup, and install the dependencies in requirements.txt
-```bash
-cd backend
-python3 -m venv python-env
-source python-env/bin/activate
-pip3 install -r requirements.txt
-```
-
-## Database Setup
-### Create a Database
+###### Database Setup
+*NOTE:* Docker will do this automatically, only necissary if you are doing it locally.
 *NOTE:* The configuration is currently set up to use "ed_pass" as a password.  You will be promoted to enter a password when you connect.
 * MacOS:
 ```BASH
@@ -67,6 +56,29 @@ createdb stardrive_test -O ed_user ed_platform
 exit
 ```
 If you are using Ubuntu you will likely need to [enable PSQL](https://help.ubuntu.com/community/PostgreSQL#Managing_users_and_rights) to manage its own users.
+
+
+###### ElasticSearch
+We are currently using version 6, and should look at upgrading this in the future when my hair isn't on fire.
+
+* Debian/Ubuntu: https://medium.com/@pierangelo1982/how-to-install-elasticsearch-6-on-ubuntu-64316dc2de1c
+
+
+#### Angular
+You will need the angular command line utilities to run the front end.
+```BASH
+npm install -g @angular/cli
+```
+
+### Project Setup
+* Please use Python 3's virtual environment setup, and install the dependencies in requirements.txt
+```bash
+cd backend
+python3 -m venv python-env
+source python-env/bin/activate
+pip3 install -r requirements.txt
+```
+
 
 ### Update the Database
 You will need to update your database each time you return to do a pull to make sure all the migrations are run. In the `backend` directory, execute the following command:
@@ -102,34 +114,7 @@ mkdir instance && cp -r config instance/config && cp instance/config/default.py 
 ```
 
 ## Run the app
-Execute the following at the top level of the repository to start PostgreSQL, flask, and Angular all in one command:
-```BASH
-./start.sh
-```
-
-Or you can run these 3 commands separately:
-
-Database:
-```BASH
-./start-db.sh
-```
-
-Backend:
-```BASH
-./start-backend.sh
-```
-
-Frontend:
-```BASH
-./start-frontend.sh
-```
-
-Alternatively, you could start each of the services individually, using the commands below.
-
-### Start PostgreSQL
-```BASH
-pg_ctl -D /usr/local/var/postgres start
-```
+* Strongly suggest you set up run configurations for this in PyCharm and WebStorm
 
 ### Start the backend app
 In the `backend` directory, execute the following command:
@@ -142,12 +127,6 @@ In the `frontend` directory, execute the following commands:
 ```BASH
 npm install
 ng serve
-```
-
-### Stopping the app
-Execute the following at the top level of the repository to stop all running services:
-```BASH
-./stop.sh
 ```
 
 ### Setting up Mailtrap
