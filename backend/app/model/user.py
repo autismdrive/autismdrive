@@ -32,7 +32,7 @@ class User(db.Model):
                                         correlate_except(Participant)
                                         )
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
-    _password = db.Column('password', db.BINARY(60))
+    _password = db.Column('password', db.Binary(60))
     token = ''
     token_url = ''
 
