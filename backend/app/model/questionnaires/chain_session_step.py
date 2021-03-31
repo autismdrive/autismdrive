@@ -1,4 +1,4 @@
-from marshmallow import missing, pre_load
+from marshmallow import fields, missing, pre_load
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -290,6 +290,8 @@ class ChainSessionStepSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
+            "participant_id",
+            "user_id",
             "chain_step_id",
             "chain_step",
             "date",
@@ -305,6 +307,8 @@ class ChainSessionStepSchema(ModelSchema):
             "challenging_behaviors",
             "chain_session_id"
         )
+    participant_id = fields.Method('get_participant_id', dump_only=True)
+    user_id = fields.Method('get_user_id', dump_only=True)
     challenging_behaviors = ma.Nested(ChallengingBehaviorSchema, many=True)
     chain_step = ma.Method('get_chain_step', dump_only=True)
     session_type = ma.Method('get_session_type', dump_only=True)
@@ -322,3 +326,11 @@ class ChainSessionStepSchema(ModelSchema):
 
         if hasattr(obj, 'chain_session'):
             return obj.chain_session.session_type
+
+    def get_participant_id(self, obj):
+        print('get_participant_id', obj)
+        return obj.chain_session.chain_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        print('get_user_id', obj)
+        return obj.chain_session.chain_questionnaire.user_id

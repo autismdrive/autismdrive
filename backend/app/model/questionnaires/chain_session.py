@@ -115,6 +115,8 @@ class ChainSessionSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
+            "participant_id",
+            "user_id",
             "time_on_task_ms",
             "date",
             "completed",
@@ -124,3 +126,13 @@ class ChainSessionSchema(ModelSchema):
         )
 
     step_attempts = ma.Nested(ChainSessionStepSchema, many=True)
+    participant_id = fields.Method('get_participant_id', dump_only=True)
+    user_id = fields.Method('get_user_id', dump_only=True)
+
+    def get_participant_id(self, obj):
+        print('get_participant_id', obj)
+        return obj.chain_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        print('get_user_id', obj)
+        return obj.chain_questionnaire.user_id

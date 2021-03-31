@@ -1328,39 +1328,71 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
         self.assert_success(response_3)
         data_after = json.loads(response_3.get_data(as_text=True))
         self.assertNotEqual(orig_date, data_after['last_updated'])
+
+        session_before = data_before['sessions'][0]
+        session_after = data_after['sessions'][0]
         self.assertEqual(
-            data_before['sessions'][0]['step_attempts'][0]['prompt_level'],
-            data_after['sessions'][0]['step_attempts'][0]['prompt_level']
+            self._parse_date(session_before['date']) - self._parse_date(session_after['date']),
+            datetime.timedelta(0)
         )
-        self.assertFalse('chain_step' in data_before['sessions'][0]['step_attempts'][0])
-        self.assertFalse('session_type' in data_before['sessions'][0]['step_attempts'][0])
-        self.assertFalse('was_focus_step' in data_before['sessions'][0]['step_attempts'][0])
-        self.assertFalse('target_prompt_level' in data_before['sessions'][0]['step_attempts'][0])
 
-        self.assertTrue('chain_step' in data_after['sessions'][0]['step_attempts'][0])
-        self.assertTrue('session_type' in data_after['sessions'][0]['step_attempts'][0])
-        self.assertTrue('was_focus_step' in data_after['sessions'][0]['step_attempts'][0])
-        self.assertTrue('target_prompt_level' in data_after['sessions'][0]['step_attempts'][0])
+        step_attempt_before = session_before['step_attempts'][0]
+        self.assertFalse('chain_step' in step_attempt_before)
+        self.assertFalse('session_type' in step_attempt_before)
+        self.assertFalse('was_focus_step' in step_attempt_before)
+        self.assertFalse('target_prompt_level' in step_attempt_before)
 
-        print('challenging_behaviors after:', data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'])
+        step_attempt_after = session_after['step_attempts'][0]
+        self.assertTrue('chain_step' in step_attempt_after)
+        self.assertTrue('session_type' in step_attempt_after)
+        self.assertTrue('was_focus_step' in step_attempt_after)
+        self.assertTrue('target_prompt_level' in step_attempt_after)
+
+        self.assertEqual(step_attempt_before['prompt_level'], step_attempt_after['prompt_level'])
         all_cbs = db.session.query(ChallengingBehavior).all()
-        print('all_cbs', all_cbs)
+        self.assertEqual(len(all_cbs), 3)
 
         self.assertEqual(
-            self._parse_date(data_before['sessions'][0]['date']) -
-            self._parse_date(data_after['sessions'][0]['date']),
+            self._parse_date(step_attempt_before['date']) - self._parse_date(step_attempt_after['date']),
             datetime.timedelta(0)
         )
         self.assertEqual(
-            self._parse_date(data_before['sessions'][0]['step_attempts'][0]['date']) -
-            self._parse_date(data_after['sessions'][0]['step_attempts'][0]['date']),
+            self._parse_date(step_attempt_before['challenging_behaviors'][0]['time']) -
+            self._parse_date(step_attempt_after['challenging_behaviors'][0]['time']),
             datetime.timedelta(0)
         )
-        self.assertEqual(
-            self._parse_date(data_before['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time']) -
-            self._parse_date(data_after['sessions'][0]['step_attempts'][0]['challenging_behaviors'][0]['time']),
-            datetime.timedelta(0)
-        )
+
+        # Export chain questionnaire?
+        # Check for participant ID in chain session step
+        rv_export_q = self.app.get('/api/q/chain_questionnaire/export',
+                          follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv_export_q)
+        wb_q = openpyxl.load_workbook(io.BytesIO(rv_export_q.data))
+        ws_q = wb_q.active
+        self.assertEqual('participant_id', ws_q['C1'].value)
+        self.assertIsNotNone(ws_q['C2'].value)
+
+        rv_export_session = self.app.get('/api/q/chain_session/export',
+                          follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv_export_session)
+        wb_session = openpyxl.load_workbook(io.BytesIO(rv_export_session.data))
+        ws_session = wb_session.active
+        self.assertEqual('participant_id', ws_session['C1'].value)
+        self.assertIsNotNone(ws_session['C2'].value)
+
+        rv_export_step = self.app.get('/api/q/chain_session_step/export',
+                          follow_redirects=True,
+                          content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          headers=self.logged_in_headers())
+        self.assert_success(rv_export_step)
+        wb_step = openpyxl.load_workbook(io.BytesIO(rv_export_step.data))
+        ws_step = wb_step.active
+        self.assertEqual('participant_id', ws_step['C1'].value)
+        self.assertIsNotNone(ws_step['C2'].value)
 
     def test_delete_chain_session_questionnaire(self):
         sq = self.construct_chain_session_questionnaire()
