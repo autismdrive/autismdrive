@@ -1335,6 +1335,11 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
             self._parse_date(session_before['date']) - self._parse_date(session_after['date']),
             datetime.timedelta(0)
         )
+        self.assertTrue('step_attempts' in session_before)
+        self.assertGreater(len(session_before['step_attempts']), 0)
+
+        self.assertTrue('step_attempts' in session_after)
+        self.assertGreater(len(session_after['step_attempts']), 0)
 
         step_attempt_before = session_before['step_attempts'][0]
         self.assertFalse('chain_step' in step_attempt_before)
