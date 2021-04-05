@@ -25,9 +25,3 @@ export class ResizeTextareaComponent extends FieldType implements OnInit {
   }
 
 }
-
-export const textAreaAutoResizeType = {
-  name: 'textarea-auto-resize',
-  component: ResizeTextareaComponent,
-  wrappers: ['form-field']
-};
