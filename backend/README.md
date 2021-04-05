@@ -79,6 +79,11 @@ source python-env/bin/activate
 pip3 install -r requirements.txt
 ```
 
+## Add a config file
+In the `backend` directory, execute the following command:
+```BASH
+mkdir instance && cp -r config instance/config && cp instance/config/default.py instance/config.py
+```
 
 ### Update the Database
 You will need to update your database each time you return to do a pull to make sure all the migrations are run. In the `backend` directory, execute the following command:
@@ -107,11 +112,6 @@ This will pull in initial values into the database.
 flask initdb
 ```
 
-## Add a config file
-In the `backend` directory, execute the following command:
-```BASH
-mkdir instance && cp -r config instance/config && cp instance/config/default.py instance/config.py
-```
 
 ## Run the app
 * Strongly suggest you set up run configurations for this in PyCharm and WebStorm

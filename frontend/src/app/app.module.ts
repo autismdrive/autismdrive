@@ -58,6 +58,7 @@ import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component
 import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
+import {ResizeTextareaComponent} from './_forms/resize-textarea/resize-textarea.component';
 import {
   EmailMatchValidator,
   EmailMatchValidatorMessage,
@@ -158,6 +159,7 @@ import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { SkillstarAdminComponent } from './skillstar-admin/skillstar-admin.component';
+import {textAreaAutoResizeType} from './_forms/resize-textarea/resize-textarea.component';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
@@ -319,6 +321,7 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
     UvaEducationComponent,
     SkillstarAdminComponent,
+    ResizeTextareaComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
@@ -330,6 +333,11 @@ export class FormlyConfig {
     FormlyMatDatepickerModule,
     FormlyMaterialModule,
     FormlyModule.forRoot(FormlyConfig.config),
+    FormlyModule.forRoot({
+      types: [
+        textAreaAutoResizeType
+        ]
+    }),
     FormsModule,
     HttpClientModule,
     MarkdownModule.forRoot(),

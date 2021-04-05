@@ -1,5 +1,5 @@
 backend/app/TEST_DB
-
+venv/
 .idea/
 frontend/package-lock.json
 .vscode

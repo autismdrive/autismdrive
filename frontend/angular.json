@@ -221,5 +221,8 @@
       }
     }
   },
-  "defaultProject": "star-drive"
+  "defaultProject": "star-drive",
+  "cli": {
+    "analytics": false
+  }
 }

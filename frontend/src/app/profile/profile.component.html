@@ -18,6 +18,25 @@
           best describes <b>you.</b> You will have additional opportunities to create profiles for your children or
           dependents after completing your own profile</p>
 
+        <form (ngSubmit)="submitEnroll()">
+          <formly-form
+          [form]="form"
+          [model]="model"
+          [fields]="fields"
+          [options]="options"
+          >
+          </formly-form>
+          <button
+            mat-flat-button
+            color="accent"
+            type="submit"
+            class="btn btn-primary submit-button"
+            >Sign Up</button>
+        </form>
+
+
+        <!-- OLD INTAKE -->
+        <!--
         <div
           fxLayout="column"
           fxLayoutAlign="center auto"
@@ -72,10 +91,206 @@
             [subtitle]="'A student / professional with an interest in autism'"
           ></app-border-box-tile>
         </div>
-      </div>
-    </div>
-    <div>
+        -->
 
+        <!-- Old intake thing
+        <form class="example-form" >
+          <mat-form-field class="example-full-width">
+            <mat-label>Zip Code</mat-label>
+            <input matInput type="text">
+          </mat-form-field>
+        </form>
+
+        <div>
+          <span class="self">
+            <mat-checkbox class="self-checkbox" #SC>
+                          I am an autistic adult or adult with autism.
+            </mat-checkbox>
+          </span>
+          <div [hidden]="!SC.checked">
+            <br>Do you have a legal guardian?<br>
+              <span class="self-subsection">
+                  <input type="radio" id= "selfYes" name="radio" value="SelfIneligible" [(ngModel)]="radioData">
+                  <label for="selfYes">Yes</label>
+                  <input type="radio" id= "selfNo" name="radio" value="Self" [(ngModel)]="radioData">
+                  <label for="selfNo">No</label>
+              </span>
+          </div>
+        </div>
+        <div>
+          <span class="guardian">
+            <mat-checkbox class="guardian-checkbox" #GC>
+                          I am the parent of someone with autism.
+            </mat-checkbox>
+          </span>
+          <div [hidden]="!GC.checked">
+            <br>Are you their legal guardian?<br>
+              <span class="guardian-subsection">
+                  <input type="radio" id= "guarYes" name="radio" value="Guardian" [(ngModel)]="radioData">
+                  <label for="guarYes">Yes</label>
+                  <input type="radio" id= "guarNo" name="radio" value="ParentIneligible" [(ngModel)]="radioData">
+                  <label for="guarNo">No</label>
+              </span>
+          </div>
+        </div>
+        <div>
+          <input type="radio" id="professional" name="radio" value="Professional" [(ngModel)]="radioData">
+            <label for="professional">I am a professional who works with the autism community.</label><br>
+          <input type="radio" id="noneAbove" name="radio" value="Other" [(ngModel)]="radioData">
+            <label for="noneAbove">None of the above, but I am interested in autism research and resources.</label><br>
+          <mat-checkbox checked="true">I agree to sign-up for STAR E-newsletter which includes notifications of workshops, information, events, and research opportunities offered by the UVA Supporting Transformative Autism Research Initiative and partnering organizations.</mat-checkbox>
+        </div>
+
+        <button
+            mat-flat-button
+            color="accent"
+            id="signup"
+            [disabled]="false"
+            (click)="submitEnroll2()"
+        >Sign Up</button>
+        -->
+        <!-- Other broken stuff
+        <div>
+          <span class="guardian">
+            <mat-checkbox class="guardian-checkbox" #GC
+                          [indeterminate]="unChecked()"
+                          [checked]="verifyGuardianChecked()">
+                          {{guardianCheck.name}}
+            </mat-checkbox>
+          </span>
+          <div [hidden]="!GC.checked">
+            <br>Are you their legal guardian?<br>
+              <span class="self-subsection">
+                <ul>
+                  <li *ngFor="let subtask of guardianCheck.subtasks">
+                    <mat-checkbox [(ngModel)]="subtask.completed">
+                            {{subtask.name}}
+                    </mat-checkbox>
+                  </li>
+                 </ul>
+              </span>
+          </div>
+        </div>
+        -->
+
+        <!--
+        <mat-checkbox class="professional" #Professional>I am a professional who works with the autism community.</mat-checkbox>
+          <section>
+            <mat-checkbox class="other" #Other>None of the above, but I am interested in autism research
+and resources
+            </mat-checkbox>
+          </section>
+          <section class="release-section">
+            <mat-checkbox checked="true">I agree to sign-up for STAR E-newsletter which includes notifications of workshops, information, events, and research opportunities offered by the UVA Supporting Transformative Autism Research Initiative and partnering organizations.</mat-checkbox>
+          </section>
+         <button
+            mat-flat-button
+            color="accent"
+            id="signup"
+            [disabled]="!(Self.checked|| Guardian.checked|| Professional.checked || Other.checked)"
+            (click)="enrollGuardian($event)"
+        >Sign Up</button>
+        -->
+
+
+
+        <!-- END INTAKE v3.0 -->
+
+        <!-- NEW INTAKE v2.0
+        <section class="intake">
+          <span class="self">
+            <mat-checkbox class="self-checkbox"
+                          [indeterminate]="indeterminateChecked()"
+                          [checked]="verifySelfChecked()">
+                          {{selfCheck.name}}
+            </mat-checkbox>
+          </span>
+        <br>Do you have a legal guardian?<br>
+        <span class="self-subsection">
+          <ul>
+            <li *ngFor="let subtask of selfCheck.subtasks">
+              <mat-checkbox [(ngModel)]="subtask.completed">
+                            {{subtask.name}}
+              </mat-checkbox>
+            </li>
+          </ul>
+        </span>
+          <span class="guardian">
+            <mat-checkbox class="guardian-checkbox"
+                          [disabled]="!verifyGuardianChecked()"
+                          [checked]="verifyGuardianChecked()">
+                          {{guardianCheck.name}}
+            </mat-checkbox>
+            <br>Are you their legal guardian?<br>
+          </span>
+          <ul>
+            <li *ngFor="let subtask of guardianCheck.subtasks">
+              <mat-checkbox [(ngModel)]="subtask.completed">
+                            {{subtask.name}}
+              </mat-checkbox>
+            </li>
+          </ul>
+        </section>
+        -->
+        <!-- END INTAKE v2.0 -->
+
+        <!-- NEW INTAKE v1.0 -->
+        <!--
+          <section class="self-section">
+          <mat-checkbox class="example-margin" #Self checked="result" >I am an autistic adult or adult with autism.</mat-checkbox>
+            <br>Do you have a legal guardian?<br>
+            <div class="radio">
+              <label>
+                <input ngModel="result" type="radio" name="selfResult" [value]="'selfYes'">
+                  yes
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input ngModel="result" type="radio" name="selfResult" [value]="'selfNo'">
+                nos
+m
+              </label>
+            </div>
+          </section>
+         <section class="guardian-section">
+            <mat-checkbox class="example-margin" #Guardian>I am the parent of someone with autism.</mat-checkbox>
+              <br>Are you their legal guardian?<br>
+                <div class="radio">
+                  <label>
+                    <input ngModel="result" type="radio" name="guardianResult" [value]="'guardianYes'">
+                      yes
+                  </label>
+                </div>
+              <div class="radio">
+              <label>
+                <input ngModel="result" type="radio" name="guardianResult" [value]="'guardianNo'">
+                no
+              </label>
+            </div>
+          </section>
+          <section class="professional-section">
+            <mat-checkbox class="example-margin" #Professional>I am a professional who works with the autism community.</mat-checkbox>
+          </section>
+          <section class="nothing-section">
+            <mat-checkbox class="example-margin" #Other>None of the above, but I am interested in autism research
+and resources
+            </mat-checkbox>
+          </section>
+          <section class="release-section">
+            <mat-checkbox class="example-margin" checked="true">I agree to sign-up for STAR E-newsletter which includes notifications of workshops, information, events, and research opportunities offered by the UVA Supporting Transformative Autism Research Initiative and partnering organizations.</mat-checkbox>
+          </section>
+
+        <button
+            mat-flat-button
+            color="accent"
+            id="signup"
+            [disabled]="!(Self.checked|| Guardian.checked|| Professional.checked || Other.checked)"
+            (click)="enrollGuardian($event)"
+        >Sign Up</button>
+        -->
+        <!-- END NEW INTAKE v1.0 -->
+      </div>
     </div>
   </div>
 
