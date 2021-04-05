@@ -10,3 +10,4 @@ star_drive.log
 .release-it.json
 environment.prod.ts
 .stage
+/venv
