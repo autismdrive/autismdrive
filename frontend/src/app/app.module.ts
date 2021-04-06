@@ -159,6 +159,7 @@ import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { SkillstarAdminComponent } from './skillstar-admin/skillstar-admin.component';
 
+
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
 // 5000 on the local server.
@@ -202,7 +203,12 @@ export class FormlyConfig {
         name: 'autocomplete',
         component: AutocompleteSectionComponent,
         wrappers: ['form-field'],
-      }
+      },
+      {
+        name: 'textarea-auto-resize',
+        component: ResizeTextareaComponent,
+        wrappers: ['form-field']
+      },
     ],
     validators: [
       {name: 'phone', validation: PhoneValidator},
@@ -402,3 +408,4 @@ export class AppModule {
     overlayContainer.getContainerElement().classList.add('stardrive-theme');
   }
 }
+
