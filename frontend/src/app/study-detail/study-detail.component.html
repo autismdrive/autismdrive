@@ -15,15 +15,15 @@
     <h4 *ngIf="study.organization_name">{{study.organization_name}}</h4>
     <app-edit-button *ngIf="currentUser && currentUser.permissions.includes('edit_study')" [editLabel]='"Edit Study"' [editLink]='"study/edit/" + study.id.toString()' [currentUser]="currentUser"></app-edit-button>
     <p class="status">Study Status: {{ snakeToUpperCase(study.status) }}</p>
-    <p>{{study.description}}</p>
+    <markdown>{{study.description}}</markdown>
     <p *ngIf="study.results_url"><b>Click <a target="_blank" href={{study.results_url}}>here</a> for the results</b></p>
     <div *ngIf="study.status === 'currently_enrolling' && study.participant_description">
       <h2>Who We're Looking For</h2>
-      <p>{{study.participant_description}}</p>
+      <markdown>{{study.participant_description}}</markdown>
     </div>
     <div *ngIf="study.status === 'currently_enrolling' && study.benefit_description">
       <h2>Why Participate?</h2>
-      <p>{{study.benefit_description}}</p>
+      <markdown>{{study.benefit_description}}</markdown>
     </div>
     <div *ngIf="study.study_investigators.length > 0">
       <h2>About the Researchers</h2>
