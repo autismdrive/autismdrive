@@ -35,7 +35,7 @@ import {NotMirroredGuard} from './not-mirrored-guard';
 import {RoleGuard} from './role-guard';
 
 const routes: Routes = [
-  {path: '', redirectTo: 'home', pathMatch: 'full', canActivate: [NotMirroredGuard]},
+  {path: '', redirectTo: 'home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent, data: {title: 'Welcome to Autism DRIVE'}, canActivate: [NotMirroredGuard]},
   {
     path: 'uva-education',

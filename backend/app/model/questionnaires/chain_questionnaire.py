@@ -3,9 +3,9 @@ from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
 from app import db, ma
+from app.export_service import ExportService
 from app.model.questionnaires.chain_session import ChainSessionSchema, ChainSession
 from app.schema.model_schema import ModelSchema
-from app.export_service import ExportService
 
 
 class ChainQuestionnaire(db.Model):
@@ -37,18 +37,18 @@ class ChainQuestionnaire(db.Model):
 
     def get_field_groups(self):
         field_groups = {
-                "sessions": {
-                    "type": "repeat",
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "repeat_class": ChainSession,
-                    "template_options": {
-                        "label": "Chain Session",
-                        "description": "Add a session",
-                    },
-                    "expression_properties": {},
+            "sessions": {
+                "type": "repeat",
+                "display_order": 3,
+                "wrappers": ["card"],
+                "repeat_class": ChainSession,
+                "template_options": {
+                    "label": "Chain Session",
+                    "description": "Add a session",
                 },
-            }
+                "expression_properties": {},
+            },
+        }
         return field_groups
 
 
@@ -68,4 +68,5 @@ class ChainQuestionnaireSchema(ModelSchema):
             "time_on_task_ms",
             "sessions",
         )
+
     sessions = ma.Nested(ChainSessionSchema, many=True)
