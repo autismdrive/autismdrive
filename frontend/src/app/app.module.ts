@@ -204,11 +204,6 @@ export class FormlyConfig {
         component: AutocompleteSectionComponent,
         wrappers: ['form-field'],
       },
-      {
-        name: 'textarea-auto-resize',
-        component: ResizeTextareaComponent,
-        wrappers: ['form-field']
-      },
     ],
     validators: [
       {name: 'phone', validation: PhoneValidator},
