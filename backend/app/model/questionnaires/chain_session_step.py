@@ -37,16 +37,19 @@ class ChainSessionStep(db.Model):
         except:
             pass
 
-        return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'), info={
-            "display_order": 1,
-            "type": "select",
-            "template_options": {
-                "required": True,
-                "label": 'Task',
-                "options": options,
-            },
-        }
-                         )
+        return db.Column(
+            "chain_step_id",
+            db.Integer,
+            db.ForeignKey('chain_step.id'), info={
+                "display_order": 1,
+                "type": "select",
+                "template_options": {
+                    "required": True,
+                    "label": 'Task',
+                    "options": options,
+                },
+            }
+        )
 
     date = db.Column(
         db.DateTime(timezone=True),
