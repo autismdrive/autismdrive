@@ -28,9 +28,7 @@ class ChainSession(db.Model):
         db.ForeignKey('chain_questionnaire.id')
     )
 
-    @declared_attr
-    def date(cls):
-        return db.Column(
+    date = db.Column(
             db.DateTime(timezone=True),
             info={
                 "display_order": 1,
@@ -42,9 +40,7 @@ class ChainSession(db.Model):
             },
         )
 
-    @declared_attr
-    def completed(cls):
-        return db.Column(
+    completed = db.Column(
             db.Boolean,
             info={
                 "display_order": 2,
@@ -60,9 +56,7 @@ class ChainSession(db.Model):
             },
         )
 
-    @declared_attr
-    def session_type(cls):
-        return db.Column(
+    session_type = db.Column(
             db.String,
             info={
                 "display_order": 2,
@@ -79,11 +73,9 @@ class ChainSession(db.Model):
             },
         )
 
-    @declared_attr
-    def step_attempts(cls):
-        return db.relationship(
+    step_attempts = db.relationship(
             "ChainSessionStep",
-            backref=db.backref(cls.__tablename__, lazy=True),
+            backref='chain_session',
             cascade="all, delete-orphan",
             passive_deletes=True
         )
@@ -104,6 +96,7 @@ class ChainSession(db.Model):
         }
         return field_groups
 
+
 class ChainSessionSchema(ModelSchema):
     @pre_load
     def set_field_session(self, data, **kwargs):
@@ -115,12 +108,28 @@ class ChainSessionSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
+            "participant_id",
+            "user_id",
             "time_on_task_ms",
             "date",
             "completed",
             "session_type",
+            "chain_questionnaire_id",
             "step_attempts",
-            "chain_questionnaire_id"
         )
 
-    step_attempts = ma.Nested(ChainSessionStepSchema, many=True)
+    step_attempts = fields.Nested(ChainSessionStepSchema, many=True)
+    participant_id = fields.Method('get_participant_id', dump_only=True)
+    user_id = fields.Method('get_user_id', dump_only=True)
+
+    def get_participant_id(self, obj):
+        if obj is None:
+            return missing
+
+        return obj.chain_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        if obj is None:
+            return missing
+
+        return obj.chain_questionnaire.user_id

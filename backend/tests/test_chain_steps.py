@@ -72,3 +72,12 @@ class TestChainStep(BaseTest, unittest.TestCase):
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(len(chain_steps), len(response))
 
+    def test_export_chain_data(self):
+        chain_steps = self.construct_chain_steps()
+
+        for chain_step in chain_steps:
+            chain_step_id = chain_step.id
+            db.session.add(ChainSessionStep(chain_step_id=chain_step_id))
+            db.session.commit()
+
+
