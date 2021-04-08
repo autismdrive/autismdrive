@@ -75,3 +75,105 @@
       </div>
     </div>
     <div>
+
+    </div>
+  </div>
+
+  <div *ngIf="state !== possibleStates.NO_PARTICIPANT">
+    <h1>Manage Your Profiles</h1>
+    <div>
+      <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
+
+      <app-loading
+        *ngIf="loading"
+        message="Loading..."
+      ></app-loading>
+
+      <div
+        *ngIf="!loading"
+        fxLayout="column"
+        fxLayoutGap="40px grid"
+      >
+        <div
+          fxLayout="column"
+          fxLayoutGap="40px grid"
+        >
+          <div
+            fxLayout="row wrap"
+            fxLayoutGap="40px grid"
+          >
+            <app-participant-profile
+              [participant]="self"
+              [user]="user"
+              id="self_participant_{{self.id}}"
+            ></app-participant-profile>
+
+            <app-participant-profile
+              *ngFor="let participant of dependents"
+              [participant]="participant"
+              [user]="user"
+              id="dependent_participant_{{participant.id}}"
+            ></app-participant-profile>
+          </div>
+          <div fxFlex="60%">
+            <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile first</p>
+            <button
+              *ngIf="user.getSelf()"
+              mat-flat-button
+              color="primary"
+              [disabled]="selfPercentComplete < 100"
+              (click)="enrollDependent($event)"
+              id="enroll_dependent"
+            >Create another profile</button>
+          </div>
+        </div>
+        <div>
+          <mat-card>
+            <mat-tab-group>
+
+              <mat-tab label="My Studies">
+                <mat-card-title>Research Studies</mat-card-title>
+                <mat-card-content>
+                  <mat-list>
+                    <div
+                      *ngIf="studyInquiries && studyInquiries.length > 0"
+                      id="study-inquiries"
+                    >
+                      <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
+                      <mat-list-item *ngFor="let s of studyInquiries">
+                        <a
+                          mat-line
+                          href="/#/study/{{s.study.id}}"
+                        >{{ s.study.short_title }}</a>
+                        <p mat-line>{{ s.study.short_description }}</p>
+                      </mat-list-item>
+                    </div>
+                    <div
+                      *ngIf="currentStudies && currentStudies.length > 0"
+                      id="current-studies"
+                    >
+                      <mat-card-subtitle>All currently-enrolling studies</mat-card-subtitle>
+                      <mat-list-item *ngFor="let s of currentStudies">
+                        <a
+                          mat-line
+                          href="/#/study/{{s.id}}"
+                        >{{ s.short_title }}</a>
+                        <p mat-line>{{ s.short_description }}</p>
+                      </mat-list-item>
+                    </div>
+                  </mat-list>
+                </mat-card-content>
+              </mat-tab>
+              <mat-tab label="My Resources"><app-favorite-resources [favoriteResources]="favoriteResources"></app-favorite-resources></mat-tab>
+              <mat-tab label="My Topics"><app-favorite-topics
+                [currentUser]="user"
+              ></app-favorite-topics></mat-tab>
+            </mat-tab-group>
+          </mat-card>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
