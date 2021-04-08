@@ -107,3 +107,4 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['terms', ParticipantRelationship.SELF_PROFESSIONAL]);
   }
 }
+

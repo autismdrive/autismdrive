@@ -58,6 +58,7 @@ import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component
 import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
+import {ResizeTextareaComponent} from './_forms/resize-textarea/resize-textarea.component';
 import {
   EmailMatchValidator,
   EmailMatchValidatorMessage,
@@ -204,6 +205,11 @@ export class FormlyConfig {
         component: AutocompleteSectionComponent,
         wrappers: ['form-field'],
       },
+      {
+        name: 'textarea-auto-resize',
+        component: ResizeTextareaComponent,
+        wrappers: ['form-field']
+      },
     ],
     validators: [
       {name: 'phone', validation: PhoneValidator},
@@ -320,6 +326,7 @@ export class FormlyConfig {
     UserAdminDetailsComponent,
     UvaEducationComponent,
     SkillstarAdminComponent,
+    ResizeTextareaComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
