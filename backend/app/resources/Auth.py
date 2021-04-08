@@ -5,7 +5,7 @@ import datetime
 
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import func
-from app import app, RestException, db, auth, email_service
+from app import app, RestException, db, auth, email_service, session
 from app.model.email_log import EmailLog
 from app.model.user import User
 from flask import g, request, Blueprint, jsonify
@@ -24,7 +24,7 @@ def confirm_email(email_token):
     except:
         raise RestException(RestException.EMAIL_TOKEN_INVALID)
 
-    user = User.query.filter_by(email=email).first_or_404()
+    user = session.query(User).filter_by(email=email).first_or_404()
     user.email_verified = True
     db.session.add(user)
     db.session.commit()
@@ -42,7 +42,7 @@ def login_password():
         raise RestException(RestException.INVALID_INPUT)
 
     email = request_data['email']
-    user = User.query.filter(func.lower(User.email) == email.lower()).first()
+    user = session.query(User).filter(func.lower(User.email) == email.lower()).first()
     schema = UserSchema(many=False)
 
     if user is None:
@@ -71,7 +71,7 @@ def login_password():
 def forgot_password():
     request_data = request.get_json()
     email = request_data['email']
-    user = User.query.filter(func.lower(User.email) == email.lower()).first()
+    user = session.query(User).filter(func.lower(User.email) == func.lower(email)).first()
 
     if user:
         tracking_code = email_service.reset_email(user)
@@ -101,7 +101,7 @@ def reset_password():
     except BadSignature:
         raise RestException(RestException.TOKEN_INVALID)
 
-    user = User.query.filter(func.lower(User.email) == email.lower()).first_or_404()
+    user = session.query(User).filter(func.lower(User.email) == email.lower()).first_or_404()
     user.token_url = ''
     user.email_verified = True
     user.password = password
@@ -118,7 +118,7 @@ def verify_token(token):
     try:
         resp = User.decode_auth_token(token)
         if resp:
-            g.user = User.query.filter_by(id=resp).first()
+            g.user = session.query(User).filter_by(id=resp).first()
     except:
         g.user = None
 

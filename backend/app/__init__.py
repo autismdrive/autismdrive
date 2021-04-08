@@ -40,6 +40,10 @@ if "MIRRORING" in os.environ and os.environ["MIRRORING"] == "true":
 # Database Configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+""":type: sqlalchemy.orm.SQLAlchemy"""
+
+session = db.session
+""":type: sqlalchemy.orm.Session"""
 
 # Enable CORS
 if app.config["CORS_ENABLED"]:
@@ -49,6 +53,7 @@ if app.config["CORS_ENABLED"]:
 
 # Flask-Marshmallow provides HATEOAS links
 ma = Marshmallow(app)
+""":type: flask_marshmallow.Marshmallow"""
 
 # Database Migrations
 migrate = Migrate(app, db, compare_type=True)
@@ -208,6 +213,24 @@ def loadstudies():
     from app import data_loader
     data_loader = data_loader.DataLoader()
     data_loader.load_studies()
+
+
+@app.cli.command()
+def loadusers():
+    """Used for loading new users into the database"""
+    click.echo('Loading users, not clearing out existing ones')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.load_users()
+
+
+@app.cli.command()
+def loadparticipants():
+    """Used for loading new participants into the database"""
+    click.echo('Loading participants, not clearing out existing ones')
+    from app import data_loader
+    data_loader = data_loader.DataLoader()
+    data_loader.load_participants()
 
 
 @app.cli.command()

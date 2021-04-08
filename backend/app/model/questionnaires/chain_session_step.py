@@ -1,13 +1,13 @@
-from marshmallow import missing, pre_load
+from marshmallow import fields, missing
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
-from app import db, ma
-from app.schema.model_schema import ModelSchema
+from app import db
 from app.export_service import ExportService
 from app.model.chain_step import ChainStep
 from app.model.questionnaires.challenging_behavior import ChallengingBehavior, ChallengingBehaviorSchema
 from app.schema.chain_step_schema import ChainStepSchema
+from app.schema.model_schema import ModelSchema
 
 
 class ChainSessionStep(db.Model):
@@ -37,7 +37,10 @@ class ChainSessionStep(db.Model):
         except:
             pass
 
-        return db.Column("chain_step_id", db.Integer, db.ForeignKey('chain_step.id'), info={
+        return db.Column(
+            "chain_step_id",
+            db.Integer,
+            db.ForeignKey('chain_step.id'), info={
                 "display_order": 1,
                 "type": "select",
                 "template_options": {
@@ -46,7 +49,7 @@ class ChainSessionStep(db.Model):
                     "options": options,
                 },
             }
-         )
+        )
 
     date = db.Column(
         db.DateTime(timezone=True),
@@ -290,8 +293,10 @@ class ChainSessionStepSchema(ModelSchema):
         fields = (
             "id",
             "last_updated",
+            "participant_id",
+            "user_id",
+            "chain_session_id",
             "chain_step_id",
-            "chain_step",
             "date",
             "session_type",
             "was_focus_step",
@@ -303,11 +308,14 @@ class ChainSessionStepSchema(ModelSchema):
             "had_challenging_behavior",
             "reason_step_incomplete",
             "challenging_behaviors",
-            "chain_session_id"
+            "chain_step",
         )
-    challenging_behaviors = ma.Nested(ChallengingBehaviorSchema, many=True)
-    chain_step = ma.Method('get_chain_step', dump_only=True)
-    session_type = ma.Method('get_session_type', dump_only=True)
+
+    participant_id = fields.Method('get_participant_id', dump_only=True)
+    user_id = fields.Method('get_user_id', dump_only=True)
+    challenging_behaviors = fields.Nested(ChallengingBehaviorSchema, many=True)
+    chain_step = fields.Method('get_chain_step', dump_only=True)
+    session_type = fields.Method('get_session_type', dump_only=True)
 
     def get_chain_step(self, obj):
         if obj is None:
@@ -320,5 +328,16 @@ class ChainSessionStepSchema(ModelSchema):
         if obj is None:
             return missing
 
-        if hasattr(obj, 'chain_session'):
-            return obj.chain_session.session_type
+        return obj.chain_session.session_type
+
+    def get_participant_id(self, obj):
+        if obj is None:
+            return missing
+
+        return obj.chain_session.chain_questionnaire.participant_id
+
+    def get_user_id(self, obj):
+        if obj is None:
+            return missing
+
+        return obj.chain_session.chain_questionnaire.user_id
