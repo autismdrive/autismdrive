@@ -67,7 +67,7 @@ export class StudyFormComponent implements OnInit {
     },
     {
       key: 'description',
-      type: 'textarea',
+      type: 'textarea-auto-resize',
       templateOptions: {
         label: 'Description',
         placeholder: 'Please enter the description of your study',
@@ -86,7 +86,7 @@ export class StudyFormComponent implements OnInit {
     },
     {
       key: 'participant_description',
-      type: 'textarea',
+      type: 'textarea-auto-resize',
       templateOptions: {
         label: 'Participant Description',
         placeholder: 'Who are you looking for to participate in your study?',

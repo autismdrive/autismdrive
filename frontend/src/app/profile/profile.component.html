@@ -131,38 +131,38 @@
           <mat-card>
             <mat-tab-group>
 
-            <mat-tab label="My Studies">
-              <mat-card-title>Research Studies</mat-card-title>
-              <mat-card-content>
-                <mat-list>
-                  <div
-                    *ngIf="studyInquiries && studyInquiries.length > 0"
-                    id="study-inquiries"
-                  >
-                    <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
-                    <mat-list-item *ngFor="let s of studyInquiries">
-                      <a
-                        mat-line
-                        href="/#/study/{{s.study.id}}"
-                      >{{ s.study.short_title }}</a>
-                      <p mat-line>{{ s.study.short_description }}</p>
-                    </mat-list-item>
-                  </div>
-                  <div
-                    *ngIf="currentStudies && currentStudies.length > 0"
-                    id="current-studies"
-                  >
-                    <mat-card-subtitle>All currently-enrolling studies</mat-card-subtitle>
-                    <mat-list-item *ngFor="let s of currentStudies">
-                      <a
-                        mat-line
-                        href="/#/study/{{s.id}}"
-                      >{{ s.short_title }}</a>
-                      <p mat-line>{{ s.short_description }}</p>
-                    </mat-list-item>
-                  </div>
-                </mat-list>
-              </mat-card-content>
+              <mat-tab label="My Studies">
+                <mat-card-title>Research Studies</mat-card-title>
+                <mat-card-content>
+                  <mat-list>
+                    <div
+                      *ngIf="studyInquiries && studyInquiries.length > 0"
+                      id="study-inquiries"
+                    >
+                      <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
+                      <mat-list-item *ngFor="let s of studyInquiries">
+                        <a
+                          mat-line
+                          href="/#/study/{{s.study.id}}"
+                        >{{ s.study.short_title }}</a>
+                        <p mat-line>{{ s.study.short_description }}</p>
+                      </mat-list-item>
+                    </div>
+                    <div
+                      *ngIf="currentStudies && currentStudies.length > 0"
+                      id="current-studies"
+                    >
+                      <mat-card-subtitle>All currently-enrolling studies</mat-card-subtitle>
+                      <mat-list-item *ngFor="let s of currentStudies">
+                        <a
+                          mat-line
+                          href="/#/study/{{s.id}}"
+                        >{{ s.short_title }}</a>
+                        <p mat-line>{{ s.short_description }}</p>
+                      </mat-list-item>
+                    </div>
+                  </mat-list>
+                </mat-card-content>
               </mat-tab>
               <mat-tab label="My Resources"><app-favorite-resources [favoriteResources]="favoriteResources"></app-favorite-resources></mat-tab>
               <mat-tab label="My Topics"><app-favorite-topics

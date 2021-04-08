@@ -1,5 +1,5 @@
 backend/app/TEST_DB
-
+venv/
 .idea/
 frontend/package-lock.json
 .vscode
@@ -10,3 +10,5 @@ star_drive.log
 .release-it.json
 environment.prod.ts
 .stage
+/venv
+`
