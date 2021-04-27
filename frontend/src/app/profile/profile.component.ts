@@ -8,6 +8,8 @@ import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
 import { AuthenticationService } from '../_services/authentication/authentication-service';
 import { Resource } from '../_models/resource';
+import {FormGroup} from '@angular/forms';
+import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -30,6 +32,59 @@ export class ProfileComponent implements OnInit {
   dependents: Participant[];
   favoriteResources: Resource[];
   selfPercentComplete: number;
+  form = new FormGroup({});
+  model: any = {};
+  options: FormlyFormOptions = {};
+  fields: FormlyFieldConfig[] = [
+    {
+      key: 'self',
+      type: 'checkbox',
+      templateOptions: { label: 'I have autism', indeterminate: false},
+    },
+    {
+      key: 'selfradio',
+      type: 'radio',
+      templateOptions: {
+        label: ' ',
+        options: [
+          { value: 'self_notlegal', label: 'I do have a legal guardian', id: '1' },
+          { value: 'self', label: 'I do not have a legal guardian', id: '2' },
+        ]
+      },
+      hideExpression: '!model.self',
+    },
+    {
+      key: 'guardian',
+      type: 'checkbox',
+      templateOptions: { label: 'I am the caregiver of someone with autism', indeterminate: false},
+    },
+    {
+      key: 'guardianradio',
+      type: 'radio',
+      templateOptions: {
+        label: 'Are you their legal guardian?',
+        options: [
+          { value: 'guardian', label: 'I am their legal guardian', id: '3' },
+          { value: 'guardian_notlegal', label: 'I am not their legal guardian', id: '4' },
+        ]
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.guardian',
+      },
+      hideExpression: '!model.guardian',
+    },
+    {
+      key: 'professional',
+      type: 'checkbox',
+      templateOptions: { label: 'I am a professional who works in the autism community', indeterminate: false},
+    },
+    {
+      key: 'other',
+      type: 'checkbox',
+      templateOptions: { label: 'None of the above, but I am interested in autism research and resources', indeterminate: false},
+    },
+  ];
+
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
@@ -106,5 +161,18 @@ export class ProfileComponent implements OnInit {
     $event.preventDefault();
     this.router.navigate(['terms', ParticipantRelationship.SELF_PROFESSIONAL]);
   }
-}
 
+  enrollInterested($event){
+    $event.preventDefault();
+    console.log(this.model);
+    this.router.navigate(['terms', ParticipantRelationship.SELF_INTERESTED]);
+  }
+
+  //WIP here
+  enrollSubmit() {
+    if (this.form.valid) {
+      //
+    }
+  }
+
+}

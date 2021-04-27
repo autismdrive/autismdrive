@@ -14,7 +14,7 @@
       <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/guardian_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
     <div
-      *ngIf="relationship == 'self_participant' || relationship == 'self_professional'"
+      *ngIf="relationship == 'self_participant' || relationship == 'self_professional' || relationship == 'self_interested' "
       id="self-terms"
     >
       <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/adult_information_sheet.pdf"></ng2-pdfjs-viewer>

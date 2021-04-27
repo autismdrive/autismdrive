@@ -59,6 +59,8 @@ export class TermsComponent implements OnInit {
       return 'dependent_intake';
     } else if (relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
       return 'professional_intake';
+    } else if (relationship === ParticipantRelationship.SELF_INTERESTED) {
+      return 'interested_intake';
     }
   }
 

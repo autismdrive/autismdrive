@@ -36,7 +36,8 @@ export class User {
   isSelf(participant: Participant): boolean {
     if (participant.relationship === ParticipantRelationship.SELF_GUARDIAN ||
       participant.relationship === ParticipantRelationship.SELF_PARTICIPANT ||
-      participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
+      participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL ||
+      participant.relationship === ParticipantRelationship.SELF_INTERESTED) {
       return true;
     } else {
       return false;

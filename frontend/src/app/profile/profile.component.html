@@ -67,7 +67,7 @@
           ></app-border-box-tile>
           <app-border-box-tile
             fxFlex="calc(33%-20px)"
-            (click)="enrollProfessional($event)"
+            (click)="enrollInterested($event)"
             id="enroll_professional_tile"
             [subtitle]="'A student / professional with an interest in autism'"
           ></app-border-box-tile>
@@ -75,6 +75,11 @@
       </div>
     </div>
     <div>
+
+      <form [formGroup]="form" (ngSubmit)="enrollDependent($event)">
+        <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
+        <button mat-flat-button type="submit" color="accent" >Submit</button>
+      </form>
 
     </div>
   </div>
