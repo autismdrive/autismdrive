@@ -39,16 +39,16 @@ export class ProfileComponent implements OnInit {
     {
       key: 'self',
       type: 'checkbox',
-      templateOptions: { label: 'I have autism', indeterminate: false},
+      templateOptions: { label: 'I am autistic/I have autism', indeterminate: false},
     },
     {
       key: 'selfradio',
       type: 'radio',
       templateOptions: {
-        label: ' ',
+        label: 'Do you have a legal guardian that helps you make day to day decisions?',
         options: [
-          { value: 'self_notlegal', label: 'I do have a legal guardian', id: '1' },
-          { value: 'self', label: 'I do not have a legal guardian', id: '2' },
+          { value: 'self_notlegal', label: 'Yes', id: '1' },
+          { value: 'self', label: 'No', id: '2' },
         ]
       },
       hideExpression: '!model.self',
@@ -56,7 +56,7 @@ export class ProfileComponent implements OnInit {
     {
       key: 'guardian',
       type: 'checkbox',
-      templateOptions: { label: 'I am the caregiver of someone with autism', indeterminate: false},
+      templateOptions: { label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
     },
     {
       key: 'guardianradio',
@@ -64,8 +64,8 @@ export class ProfileComponent implements OnInit {
       templateOptions: {
         label: 'Are you their legal guardian?',
         options: [
-          { value: 'guardian', label: 'I am their legal guardian', id: '3' },
-          { value: 'guardian_notlegal', label: 'I am not their legal guardian', id: '4' },
+          { value: 'guardian', label: 'Yes', id: '3' },
+          { value: 'guardian_notlegal', label: 'No', id: '4' },
         ]
       },
       expressionProperties: {
@@ -76,7 +76,7 @@ export class ProfileComponent implements OnInit {
     {
       key: 'professional',
       type: 'checkbox',
-      templateOptions: { label: 'I am a professional who works in the autism community', indeterminate: false},
+      templateOptions: { label: 'I am a professional who works with the autism community', indeterminate: false},
     },
     {
       key: 'other',
