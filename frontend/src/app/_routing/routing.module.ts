@@ -33,6 +33,7 @@ import {UvaEducationComponent} from '../uva-education/uva-education.component';
 import {AuthGuard} from './auth-guard';
 import {NotMirroredGuard} from './not-mirrored-guard';
 import {RoleGuard} from './role-guard';
+import {MetaComponent} from '../meta/meta.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
@@ -118,6 +119,11 @@ const routes: Routes = [
     path: 'terms/:relationship',
     component: TermsComponent,
     data: {title: 'Agree to Terms and Conditions for an Autism DRIVE Account', hideHeader: true}
+  },
+  {
+    path: 'meta',
+    component: MetaComponent,
+    data: {title: 'User Account Information'}
   },
   {path: 'logout', component: LogoutComponent, data: {title: 'You have been logged out.', hideHeader: true}},
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},

@@ -586,3 +586,20 @@ class TestUser(BaseTest, unittest.TestCase):
                            follow_redirects=True, headers=self.logged_in_headers(u))
 
         self.assertGreater(u.percent_self_registration_complete(), 0)
+
+    def test_user_participant_count_new_enum(self):
+        u1 = self.construct_user(email='1@sartography.com')
+        u4 = self.construct_user(email='4@sartography.com')
+        self.construct_participant(user=u1, relationship=Relationship.self_guardian)
+        self.construct_participant(user=u4, relationship=Relationship.self_interested)
+
+        rv = self.app.get('api/user/%i' % u1.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response['participant_count'])
+
+        rv = self.app.get('api/user/%i' % u4.id, content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(1, response['participant_count'])
+

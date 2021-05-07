@@ -10,6 +10,7 @@ import { AuthenticationService } from '../_services/authentication/authenticatio
 import { Resource } from '../_models/resource';
 import {FormGroup} from '@angular/forms';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
+import {UserMeta} from '../_models/user_meta';
 
 enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
@@ -165,14 +166,30 @@ export class ProfileComponent implements OnInit {
   enrollInterested($event){
     $event.preventDefault();
     console.log(this.model);
-    this.router.navigate(['terms', ParticipantRelationship.SELF_INTERESTED]);
+    this.router.navigate(['meta']);
+    //this.router.navigate(['terms', ParticipantRelationship.SELF_INTERESTED]);
   }
 
-  //WIP here
+  // WIP - submit action
   enrollSubmit() {
     if (this.form.valid) {
-      //
+      this.router.navigate(['meta']);
     }
+  }
+  // WIP - route to correct meta page/add metadata
+  addUserMeta() {
+    const newUsermeta = new UserMeta({
+      user_id: this.user.id,
+      self_has_guardian: false,
+      self_own_guardian: false,
+      guardian_legal: false,
+      guardian_not_legal: false,
+      professional: false,
+      interested: false,
+    });
+    this.api.addUserMeta(newUsermeta).subscribe( usermeta => {
+      this.router.navigate(['meta']);
+    });
   }
 
 }

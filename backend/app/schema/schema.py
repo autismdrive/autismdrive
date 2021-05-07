@@ -1,3 +1,4 @@
+from flask_marshmallow.sqla import SQLAlchemyAutoSchema
 from marshmallow import fields, Schema, post_load, missing
 from marshmallow.utils import EXCLUDE
 from marshmallow_enum import EnumField
@@ -24,6 +25,7 @@ from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
 from app.model.event_user import EventUser
+from app.model.user_meta import UserMeta
 from app.model.zip_code import ZipCode
 from app.model.chain_step import ChainStep
 from app.schema.model_schema import ModelSchema
@@ -60,7 +62,6 @@ import app.model.questionnaires.registration_questionnaire
 import app.model.questionnaires.chain_questionnaire
 import app.model.questionnaires.chain_session
 import app.model.questionnaires.chain_session_step
-
 
 class InvestigatorSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
@@ -699,3 +700,11 @@ class ZipCodeSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ZipCode
         fields = ["id", "latitude", "longitude"]
+
+class UserMetaSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
+        model = UserMeta
+        #load_instance = True
+        #sqla_session = db.session
+        fields = ('user_id', 'self_has_guardian', 'self_own_guardian', 'guardian_legal', 'guardian_not_legal',
+                          'professional', 'interested')

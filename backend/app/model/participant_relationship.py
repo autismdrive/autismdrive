@@ -13,5 +13,13 @@ class Relationship(enum.Enum):
         return any(name == item.name for item in cls)
 
     @classmethod
+    def is_self(cls, name):
+        if isinstance(name, str):
+            return name != 'dependent'
+        if isinstance(name, cls):
+            return name != cls.dependent
+
+
+    @classmethod
     def options(cls):
         return [item.name for item in cls]

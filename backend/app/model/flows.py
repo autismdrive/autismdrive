@@ -111,7 +111,7 @@ class Flows:
             return Flows.get_guardian_intake_flow()
         if name == 'professional_intake':
             return Flows.get_professional_intake_flow()
-        if name == 'professional_intake':
+        if name == 'interested_intake':
             return Flows.get_interested_intake_flow()
         if name == 'registration':
             return Flows.get_registration_flow()

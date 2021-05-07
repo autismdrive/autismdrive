@@ -123,6 +123,7 @@ from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
 from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
 from app.resources.ChainStepEndpoint import ChainStepEndpoint, ChainStepListEndpoint
+from app.resources.UserMetaEndpoint import UserMetaEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -236,6 +237,7 @@ endpoints = [
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     (ResourceChangeLogByUserEndpoint, "/user/<user_id>/resource_change_log"),
     (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
+    (UserMetaEndpoint, "/user/<user_id>/usermeta"),
 
     # Participants
     (ParticipantListEndpoint, "/participant"),

@@ -29,6 +29,7 @@ import {ResourceChangeLog} from '../../_models/resource_change_log';
 import {Investigator} from '../../_models/investigator';
 import {StudyInvestigator} from '../../_models/study_investigator';
 import {UserFavorite} from '../../_models/user_favorite';
+import {UserMeta} from '../../_models/user_meta';
 
 
 @Injectable({
@@ -122,6 +123,7 @@ export class ApiService {
     userlist: '/api/user',
     userRegistration: '/api/user/registration',
     userparticipant: '/api/user_participant/<id>',
+    userMeta: '/api/user/<id>/usermeta',
     zip_code_coords: '/api/zip_code_coords/<id>',
   };
 
@@ -143,6 +145,21 @@ export class ApiService {
   sendStudyInquiryEmail(user: User, study: Study): Observable<any> {
     const email_data = {user_id: user.id, study_id: study.id};
     return this.httpClient.post<any>(this._endpointUrl('studyinquiry'), email_data)
+      .pipe(catchError(this._handleError));
+  }
+
+  /** addUserMeta */
+  addUserMeta(meta: UserMeta): Observable<UserMeta> {
+    const url = this
+      ._endpointUrl('usermeta');
+    return this.httpClient.post<UserMeta>(url, meta)
+      .pipe(
+        map(metaJson => new UserMeta(metaJson)),
+        catchError(this._handleError));
+  }
+  /** getUserMeta */
+  getUserMeta(user_id: number): Observable<UserMeta> {
+    return this.httpClient.get<UserMeta>(this._endpointUrl('usermeta').replace('<id>', user_id.toString()))
       .pipe(catchError(this._handleError));
   }
 
@@ -192,7 +209,6 @@ export class ApiService {
         map(json => new Flow(json)),
         catchError(this._handleError));
   }
-
   // Add Study
   addStudy(study: Study): Observable<Study> {
     return this.httpClient.post<Study>(this._endpointUrl('studylist'), study)
