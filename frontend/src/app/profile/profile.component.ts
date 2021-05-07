@@ -8,7 +8,7 @@ import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
 import { AuthenticationService } from '../_services/authentication/authentication-service';
 import { Resource } from '../_models/resource';
-import {FormGroup} from '@angular/forms';
+import {AbstractControl, FormControl, FormGroup, ValidationErrors} from '@angular/forms';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {UserMeta} from '../_models/user_meta';
 
@@ -16,6 +16,7 @@ enum ProfileState {
   NO_PARTICIPANT = 'NO_PARTICIPANT',
   PARTICIPANT = 'PARTICIPANT'
 }
+
 
 @Component({
   selector: 'app-profile',
@@ -36,55 +37,74 @@ export class ProfileComponent implements OnInit {
   form = new FormGroup({});
   model: any = {};
   options: FormlyFormOptions = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'self',
-      type: 'checkbox',
-      templateOptions: { label: 'I am autistic/I have autism', indeterminate: false},
+  fields: FormlyFieldConfig[] = [{
+    key: 'self',
+    validators: {
+      fieldMatch: {
+        expression: (control) => {
+          const {self, guardian, professional, other} = control.value;
+
+          // at least one checkbox should be selected.
+          if (!self && !guardian && !professional && !other) {
+            return false;
+          }
+          return true;
+        },
+        message: 'Please select at least one option.'
+      }
     },
-    {
-      key: 'selfradio',
-      type: 'radio',
-      templateOptions: {
-        label: 'Do you have a legal guardian that helps you make day to day decisions?',
-        options: [
-          { value: 'self_notlegal', label: 'Yes', id: '1' },
-          { value: 'self', label: 'No', id: '2' },
-        ]
+    wrappers: ['group-validation'],
+    fieldGroup: [
+      {
+        key: 'self',
+        type: 'checkbox',
+        templateOptions: {label: 'I am autistic/I have autism', indeterminate: false},
       },
-      hideExpression: '!model.self',
-    },
-    {
-      key: 'guardian',
-      type: 'checkbox',
-      templateOptions: { label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
-    },
-    {
-      key: 'guardianradio',
-      type: 'radio',
-      templateOptions: {
-        label: 'Are you their legal guardian?',
-        options: [
-          { value: 'guardian', label: 'Yes', id: '3' },
-          { value: 'guardian_notlegal', label: 'No', id: '4' },
-        ]
+      {
+        key: 'selfradio',
+        type: 'radio',
+        templateOptions: {
+          label: 'Do you have a legal guardian that helps you make day to day decisions?',
+          required: true,
+          options: [
+            {value: 'self_notlegal', label: 'Yes', id: '1'},
+            {value: 'self', label: 'No', id: '2'}
+          ]
+        },
+        hideExpression: '!model.self',
       },
-      expressionProperties: {
-        'templateOptions.required': 'model.guardian',
+      {
+        key: 'guardian',
+        type: 'checkbox',
+        templateOptions: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
       },
-      hideExpression: '!model.guardian',
-    },
-    {
-      key: 'professional',
-      type: 'checkbox',
-      templateOptions: { label: 'I am a professional who works with the autism community', indeterminate: false},
-    },
-    {
-      key: 'other',
-      type: 'checkbox',
-      templateOptions: { label: 'None of the above, but I am interested in autism research and resources', indeterminate: false},
-    },
-  ];
+      {
+        key: 'guardianradio',
+        type: 'radio',
+        templateOptions: {
+          label: 'Are you their legal guardian?',
+          options: [
+            {value: 'guardian', label: 'Yes', id: '3'},
+            {value: 'guardian_notlegal', label: 'No', id: '4'},
+          ]
+        },
+        expressionProperties: {
+          'templateOptions.required': 'model.guardian',
+        },
+        hideExpression: '!model.guardian',
+      },
+      {
+        key: 'professional',
+        type: 'checkbox',
+        templateOptions: {label: 'I am a professional who works with the autism community', indeterminate: false},
+      },
+      {
+        key: 'other',
+        type: 'checkbox',
+        templateOptions: {label: 'None of the above, but I am interested in autism research and resources', indeterminate: false},
+      },
+    ]
+  }];
 
 
   constructor(private authenticationService: AuthenticationService,
@@ -133,6 +153,7 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+
   getState() {
     if (!this.user) {  // can happen if user logs out from this page.
       return null;
@@ -163,16 +184,18 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['terms', ParticipantRelationship.SELF_PROFESSIONAL]);
   }
 
-  enrollInterested($event){
+  enrollInterested($event) {
     $event.preventDefault();
     console.log(this.model);
     this.router.navigate(['meta']);
-    //this.router.navigate(['terms', ParticipantRelationship.SELF_INTERESTED]);
+    // this.router.navigate(['terms', ParticipantRelationship.SELF_INTERESTED]);
   }
 
   // WIP - submit action
-  enrollSubmit() {
+  enrollSubmit($event) {
+    $event.preventDefault();
     if (this.form.valid) {
+      this.addUserMeta();
       this.router.navigate(['meta']);
     }
   }

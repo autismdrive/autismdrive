@@ -160,6 +160,7 @@ import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { SkillstarAdminComponent } from './skillstar-admin/skillstar-admin.component';
 import { MetaComponent } from './meta/meta.component';
+import { GroupValidationWrapperComponent } from './_forms/group-validation-wrapper/group-validation-wrapper.component';
 
 
 // Attempt to load the configuration from a file called config.json right next to
@@ -232,6 +233,7 @@ export class FormlyConfig {
     wrappers: [
       {name: 'help', component: HelpWrapperComponent},
       {name: 'card', component: CardWrapperComponent},
+      { name: 'group-validation', component: GroupValidationWrapperComponent },
     ]
   };
 }
@@ -329,6 +331,7 @@ export class FormlyConfig {
     SkillstarAdminComponent,
     ResizeTextareaComponent,
     MetaComponent,
+    GroupValidationWrapperComponent,
   ],
   imports: [
     AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
