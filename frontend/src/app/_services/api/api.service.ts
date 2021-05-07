@@ -151,7 +151,7 @@ export class ApiService {
   /** addUserMeta */
   addUserMeta(meta: UserMeta): Observable<UserMeta> {
     const url = this
-      ._endpointUrl('usermeta');
+      ._endpointUrl('userMeta').replace('<id>', meta.user_id.toString());
     return this.httpClient.post<UserMeta>(url, meta)
       .pipe(
         map(metaJson => new UserMeta(metaJson)),

@@ -27,7 +27,7 @@ export class UserMeta {
       return 'self_has_guardian';
     } else if (this.interested) {
       return 'interested';
-    } else return 'no_meta_data';
+    } else { return 'no_meta_data'; }
   }
 
 }

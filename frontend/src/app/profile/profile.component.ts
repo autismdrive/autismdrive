@@ -48,9 +48,12 @@ export class ProfileComponent implements OnInit {
       templateOptions: {
         label: 'Do you have a legal guardian that helps you make day to day decisions?',
         options: [
-          { value: 'self_notlegal', label: 'Yes', id: '1' },
-          { value: 'self', label: 'No', id: '2' },
+          { value: true, label: 'Yes', id: '1' },
+          { value: false, label: 'No', id: '2' },
         ]
+      },
+      expressionProperties: {
+        'templateOptions.required': 'model.self',
       },
       hideExpression: '!model.self',
     },
@@ -65,8 +68,8 @@ export class ProfileComponent implements OnInit {
       templateOptions: {
         label: 'Are you their legal guardian?',
         options: [
-          { value: 'guardian', label: 'Yes', id: '3' },
-          { value: 'guardian_notlegal', label: 'No', id: '4' },
+          { value: true, label: 'Yes', id: '3' },
+          { value: false, label: 'No', id: '4' },
         ]
       },
       expressionProperties: {
@@ -94,6 +97,7 @@ export class ProfileComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(
       user => {
         this.user = user;
+        console.log(user);
         this.self = user.getSelf();
         this.dependents = user.getDependents();
         this.state = this.getState();
@@ -173,23 +177,24 @@ export class ProfileComponent implements OnInit {
   // WIP - submit action
   enrollSubmit() {
     if (this.form.valid) {
-      this.router.navigate(['meta']);
+      const newUsermeta = new UserMeta({
+        user_id: this.user.id,
+        self_has_guardian: !!this.model.selfradio,
+        self_own_guardian: !!this.model.selfradio,
+        guardian_legal: !!this.model.guardianradio,
+        guardian_not_legal: !!this.model.guardianradio,
+        professional: !!this.model.professional,
+        interested: !!this.model.other,
+      });
+      console.log(this.model);
+
+      // Need to reroute properly
+      this.api.addUserMeta(newUsermeta).subscribe( usermeta => {
+           console.log(usermeta.user_id);
+           console.log('Navigating to meta/', usermeta.user_id);
+          // this.router.navigate(['meta']);
+      });
     }
-  }
-  // WIP - route to correct meta page/add metadata
-  addUserMeta() {
-    const newUsermeta = new UserMeta({
-      user_id: this.user.id,
-      self_has_guardian: false,
-      self_own_guardian: false,
-      guardian_legal: false,
-      guardian_not_legal: false,
-      professional: false,
-      interested: false,
-    });
-    this.api.addUserMeta(newUsermeta).subscribe( usermeta => {
-      this.router.navigate(['meta']);
-    });
   }
 
 }

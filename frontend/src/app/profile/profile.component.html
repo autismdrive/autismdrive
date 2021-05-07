@@ -76,9 +76,9 @@
     </div>
     <div>
 
-      <form [formGroup]="form" (ngSubmit)="enrollDependent($event)">
+      <form [formGroup]="form">
         <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
-        <button mat-flat-button type="submit" color="accent" >Submit</button>
+        <button mat-flat-button type="submit" color="accent" (click)="enrollSubmit()" >Submit</button>
       </form>
 
     </div>

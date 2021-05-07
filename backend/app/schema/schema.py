@@ -426,17 +426,25 @@ class UserFavoriteSchema(ModelSchema):
     resource = ma.Nested(ResourceSchema, dump_only=True)
     category = ma.Nested(CategorySchema, dump_only=True)
 
+class UserMetaSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
+        model = UserMeta
+        #load_instance = True
+        #sqla_session = db.session
+        fields = ('user_id', 'self_has_guardian', 'self_own_guardian', 'guardian_legal', 'guardian_not_legal',
+                          'professional', 'interested')
 
 class UserSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
-                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count',
+                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'user_meta', 'participant_count',
                   'created_password', 'identity', 'percent_self_registration_complete', 'email_verified')
     password = fields.String(load_only=True)
     participants = ma.Nested(ParticipantSchema, dump_only=True, many=True)
     participant_count = fields.Integer(required=False, allow_none=True)
     user_favorites = ma.Nested(UserFavoriteSchema, dump_only=True, many=True)
+    user_meta = ma.Nested(UserMetaSchema, dump_only=True)
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
     permissions = fields.Method('get_permissions', dump_only=True)
@@ -701,10 +709,4 @@ class ZipCodeSchema(ModelSchema):
         model = ZipCode
         fields = ["id", "latitude", "longitude"]
 
-class UserMetaSchema(ModelSchema):
-    class Meta(ModelSchema.Meta):
-        model = UserMeta
-        #load_instance = True
-        #sqla_session = db.session
-        fields = ('user_id', 'self_has_guardian', 'self_own_guardian', 'guardian_legal', 'guardian_not_legal',
-                          'professional', 'interested')
+

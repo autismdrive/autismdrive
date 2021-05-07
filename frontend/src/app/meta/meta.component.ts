@@ -49,4 +49,6 @@ export class MetaComponent implements OnInit {
     this.router.navigate(['search']);
   }
 
+
+
 }

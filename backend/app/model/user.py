@@ -10,6 +10,7 @@ from app import app, db, RestException, bcrypt, password_requirements
 from app.model.participant import Participant
 from app.model.role import Role
 from app.model.random_id_generator import random_integer
+from app.model.user_meta import UserMeta
 
 
 class User(db.Model):
@@ -27,6 +28,7 @@ class User(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.Enum(Role))
     participants = db.relationship(Participant, back_populates="user")
+    user_meta = db.relationship(UserMeta, backref="stardrive_user")
     participant_count = column_property(select([func.count(Participant.id)]).
                                         where(Participant.user_id==id).
                                         correlate_except(Participant)
