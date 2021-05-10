@@ -2,6 +2,8 @@ import unittest
 from datetime import datetime
 
 from flask import json
+
+from app.schema.schema import UserMetaSchema
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app.model.participant import Relationship, Participant
 from app.model.user_meta import UserMeta
@@ -293,3 +295,10 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
                           follow_redirects=True,
                           content_type="application/json", headers=self.logged_in_headers())
         self.assertEqual(404, rv.status_code)
+
+    def test_user_meta_serialize(self):
+        u = self.construct_user()
+        usermeta = UserMeta(user_id=u.id, interested=True)
+        result = usermeta.get_relationship()
+        self.assertEqual(result, "self_interested")
+        UserMetaSchema().dump(usermeta)

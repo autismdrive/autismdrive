@@ -427,12 +427,19 @@ class UserFavoriteSchema(ModelSchema):
     category = ma.Nested(CategorySchema, dump_only=True)
 
 class UserMetaSchema(ModelSchema):
+    self_relationship = fields.Function(lambda obj: obj.get_relationship(), allow_none=True)
     class Meta(ModelSchema.Meta):
         model = UserMeta
         #load_instance = True
         #sqla_session = db.session
-        fields = ('user_id', 'self_has_guardian', 'self_own_guardian', 'guardian_legal', 'guardian_not_legal',
-                          'professional', 'interested')
+        fields = ('user_id', 'self_participant', 'self_has_guardian', 'professional', 'interested',
+                  'guardian', 'guardian_has_dependent', 'self_relationship')
+    self_participant = fields.Boolean(required=False, allow_none=True)
+    self_has_guardian = fields.Boolean(required=False, allow_none=True)
+    professional = fields.Boolean(required=False, allow_none=True)
+    interested = fields.Boolean(required=False, allow_none=True)
+    guardian = fields.Boolean(required=False, allow_none=True)
+    guardian_has_dependent = fields.Boolean(required=False, allow_none=True)
 
 class UserSchema(ModelSchema):
     class Meta(ModelSchema.Meta):

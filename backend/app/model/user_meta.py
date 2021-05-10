@@ -9,17 +9,24 @@ class UserMeta(db.Model):
     __tablename__ = 'usermeta'
     __label__ = "User Meta Info"
     user_id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'), primary_key=True)
+    self_participant = db.Column(db.Boolean)
     self_has_guardian = db.Column(db.Boolean)
-    self_own_guardian = db.Column(db.Boolean)
-    guardian_legal = db.Column(db.Boolean)
-    guardian_not_legal = db.Column(db.Boolean)
+    guardian = db.Column(db.Boolean)
+    guardian_has_dependent = db.Column(db.Boolean)
     professional = db.Column(db.Boolean)
     interested = db.Column(db.Boolean)
 
-    def get_flow(self):
-        if self.self_own_guardian: return Relationship.self_participant
-        if self.guardian_legal: return Relationship.self_guardian
-        if self.professional: return Relationship.self_professional
-        elif self.guardian_not_legal or self.interested or self.self_has_guardian:
-            return Relationship.self_interested
+    def get_relationship(self):
+        if self.self_participant:
+            return Relationship.self_interested.name if self.self_has_guardian else Relationship.self_participant.name
+        if self.guardian and self.guardian_has_dependent:
+            return Relationship.self_guardian.name
+        if self.professional:
+            return Relationship.professional.name
+        # Lower Precedence Relationships
+        if self.guardian and not self.guardian_has_dependent:
+            return Relationship.self_interested.name
+        if self.interested:
+            return Relationship.self_interested.name
+        return ''
 

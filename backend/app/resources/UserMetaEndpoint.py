@@ -29,10 +29,9 @@ class UserMetaEndpoint(flask_restful.Resource):
 
         try:
             load_result = self.schema.load(request_data)
-            load_result.user = db.session.query(UserMeta).filter(user_id == request_data['user_id']).first()
-            db.session.add(load_result)
+            meta = db.session.query(UserMeta).filter(UserMeta.user_id == user_id).update(request_data)
             db.session.commit()
-            return self.schema.dump(load_result)
+            return self.schema.dump(meta)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=load_result.errors)

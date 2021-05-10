@@ -41,10 +41,10 @@ export class ProfileComponent implements OnInit {
     validators: {
       fieldMatch: {
         expression: (control) => {
-          const {self_has_autism, guardian, professional, interested} = control.value;
+          const {self_participant, guardian, professional, interested} = control.value;
 
           // at least one checkbox should be selected.
-          if (!self_has_autism && !guardian && !professional && !interested) {
+          if (!self_participant && !guardian && !professional && !interested) {
             return false;
           }
           return true;
@@ -55,7 +55,7 @@ export class ProfileComponent implements OnInit {
     wrappers: ['group-validation'],
     fieldGroup: [
       {
-        key: 'self_has_autism',
+        key: 'self_participant',
         type: 'checkbox',
         templateOptions: {label: 'I am autistic/I have autism', indeterminate: false},
       },
@@ -70,9 +70,9 @@ export class ProfileComponent implements OnInit {
         ]
       },
       expressionProperties: {
-        'templateOptions.required': 'model.self_has_autism',
+        'templateOptions.required': 'model.self_participant',
       },
-      hideExpression: '!model.self_has_autism',
+      hideExpression: '!model.self_participant',
       },
       {
         key: 'guardian',
@@ -80,8 +80,7 @@ export class ProfileComponent implements OnInit {
         templateOptions: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
       },
       {
-        model: this.model.guardian_legal,
-        key: 'guardian_legal',
+        key: 'guardian_has_dependent',
         type: 'radio',
         templateOptions: {
           label: 'Are you their legal guardian?',
@@ -200,17 +199,6 @@ export class ProfileComponent implements OnInit {
     if (this.form.valid) {
       // Need to reroute properly
       this.model.user_id = this.user.id;
-      console.log(this.model);
-      console.log();
-      //
-      const newUsermeta = new UserMeta({
-        user_id: this.user.id,
-        self_has_guardian: this.model.self_has_guardian,
-        guardian_legal: this.model.guardian_legal,
-        professional: this.model.professional,
-        interested: this.model.interested,
-      });
-      console.log(newUsermeta);
       this.api.addUserMeta(this.model).subscribe( usermeta => {
           this.router.navigate(['meta']);
       });
