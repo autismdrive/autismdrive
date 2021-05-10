@@ -28,7 +28,6 @@ class User(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.Enum(Role))
     participants = db.relationship(Participant, back_populates="user")
-    user_meta = db.relationship(UserMeta, backref="stardrive_user")
     participant_count = column_property(select([func.count(Participant.id)]).
                                         where(Participant.user_id==id).
                                         correlate_except(Participant)
