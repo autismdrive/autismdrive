@@ -1,11 +1,11 @@
 export class UserMeta {
-  user_id?: number;
-  self_has_guardian: boolean;
-  self_own_guardian: boolean;
-  guardian_legal: boolean;
-  guardian_not_legal: boolean;
-  professional: boolean;
-  interested:  boolean;
+  user_id: number;
+  self_has_guardian?: boolean;
+  self_own_guardian = false; // remove
+  guardian_legal?: boolean;
+  guardian_not_legal = false; // remove
+  professional?: boolean;
+  interested?: boolean;
 
   constructor(private _props) {
     for (const propName in this._props) {

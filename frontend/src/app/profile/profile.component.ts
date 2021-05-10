@@ -35,17 +35,17 @@ export class ProfileComponent implements OnInit {
   favoriteResources: Resource[];
   selfPercentComplete: number;
   form = new FormGroup({});
-  model: any = {};
+  model = new UserMeta({});
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [{
-    key: 'self',
+    key: 'intake',
     validators: {
       fieldMatch: {
         expression: (control) => {
-          const {self, guardian, professional, other} = control.value;
+          const {self, guardian, professional, interested} = control.value;
 
           // at least one checkbox should be selected.
-          if (!self && !guardian && !professional && !other) {
+          if (!self && !guardian && !professional && !interested) {
             return false;
           }
           return true;
@@ -61,7 +61,7 @@ export class ProfileComponent implements OnInit {
         templateOptions: {label: 'I am autistic/I have autism', indeterminate: false},
       },
     {
-      key: 'selfradio',
+      key: 'self_has_guardian',
       type: 'radio',
       templateOptions: {
         label: 'Do you have a legal guardian that helps you make day to day decisions?',
@@ -81,13 +81,13 @@ export class ProfileComponent implements OnInit {
         templateOptions: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
       },
       {
-        key: 'guardianradio',
+        key: 'guardian_legal',
         type: 'radio',
         templateOptions: {
           label: 'Are you their legal guardian?',
           options: [
-            {value: 'guardian', label: 'Yes', id: '3'},
-            {value: 'guardian_notlegal', label: 'No', id: '4'},
+            {value: true, label: 'Yes', id: '3'},
+            {value: false, label: 'No', id: '4'},
           ]
         },
         expressionProperties: {
@@ -101,7 +101,7 @@ export class ProfileComponent implements OnInit {
         templateOptions: {label: 'I am a professional who works with the autism community', indeterminate: false},
       },
       {
-        key: 'other',
+        key: 'interested',
         type: 'checkbox',
         templateOptions: {label: 'None of the above, but I am interested in autism research and resources', indeterminate: false},
       },
@@ -197,22 +197,21 @@ export class ProfileComponent implements OnInit {
   // WIP - submit action
   enrollSubmit() {
     if (this.form.valid) {
+      // Need to reroute properly
+      this.model.user_id = this.user.id;
+      console.log(this.model);
+      console.log();
+      //
       const newUsermeta = new UserMeta({
         user_id: this.user.id,
-        self_has_guardian: !!this.model.selfradio,
-        self_own_guardian: !!this.model.selfradio,
-        guardian_legal: !!this.model.guardianradio,
-        guardian_not_legal: !!this.model.guardianradio,
-        professional: !!this.model.professional,
-        interested: !!this.model.other,
+        self_has_guardian: this.model.self_has_guardian,
+        guardian_legal: this.model.guardian_legal,
+        professional: this.model.professional,
+        interested: this.model.interested,
       });
-      console.log(this.model);
-
-      // Need to reroute properly
-      this.api.addUserMeta(newUsermeta).subscribe( usermeta => {
-           console.log(usermeta.user_id);
-           console.log('Navigating to meta/', usermeta.user_id);
-          // this.router.navigate(['meta']);
+      console.log(newUsermeta);
+      this.api.addUserMeta(this.model).subscribe( usermeta => {
+          this.router.navigate(['meta']);
       });
     }
   }
