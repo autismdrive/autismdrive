@@ -195,8 +195,7 @@ export class ProfileComponent implements OnInit {
   }
 
   // WIP - submit action
-  enrollSubmit($event) {
-    $event.preventDefault();
+  enrollSubmit() {
     if (this.form.valid) {
       const newUsermeta = new UserMeta({
         user_id: this.user.id,
