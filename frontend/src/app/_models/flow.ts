@@ -1,4 +1,3 @@
-import {FormlyFieldConfig} from '@ngx-formly/core';
 import {Step} from './step';
 
 export class Flow {

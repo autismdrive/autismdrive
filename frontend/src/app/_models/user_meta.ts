@@ -1,19 +1,24 @@
-export class UserMeta {
-  user_id: number;
-  self_has_guardian?: boolean;
-  self_own_guardian = false; // remove
-  guardian_legal?: boolean;
-  guardian_not_legal = false; // remove
-  professional?: boolean;
-  interested?: boolean;
+import {ParticipantRelationship} from './participantRelationship';
 
-  constructor(private _props) {
-    for (const propName in this._props) {
-      if (this._props.hasOwnProperty(propName)) {
-        this[propName] = this._props[propName];
+export class UserMeta {
+  user_id?: number;
+  self_has_autism = false;
+  self_has_guardian = false;
+  self_own_guardian = false;
+  guardian_legal = false;
+  guardian_not_legal: boolean;
+  professional: boolean;
+  interested:  boolean;
+  self_relationship: ParticipantRelationship;
+
+  constructor(_props: {}) {
+    for (const propName in _props) {
+      if (_props.hasOwnProperty(propName)) {
+        this[propName] = _props[propName];
       }
     }
   }
+
   getMetaData(): string {
     if (this.self_own_guardian) {
       return 'self_own_guardian';

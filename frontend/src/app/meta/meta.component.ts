@@ -5,7 +5,12 @@ import {ApiService} from '../_services/api/api.service';
 import {Router} from '@angular/router';
 import {Flow} from '../_models/flow';
 import {UserMeta} from '../_models/user_meta';
+import {ParticipantRelationship} from '../_models/participantRelationship';
 
+/**
+ * Loads some metadata about the current user that we can use to suggest an appropriate flow
+ * or other alternative path as they progress through the application.
+ */
 @Component({
   selector: 'app-meta',
   templateUrl: './meta.component.html',
@@ -13,42 +18,44 @@ import {UserMeta} from '../_models/user_meta';
 })
 export class MetaComponent implements OnInit {
   user: User;
-
-  @Input()
-  flow: Flow;
   meta: UserMeta;
+  relationships = ParticipantRelationship;
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
               private router: Router
   ) {
-        this.authenticationService.currentUser.subscribe(
-            user => {
-            this.user = user;
-            }, error1 => {
-              console.error(error1);
-              this.user = null;
-            });
+        this.authenticationService.currentUser.subscribe(user => {
+          this.user = user;
+          this.meta = this.getMockMeta();
+          /*
+          this.api.getUserMeta(user.id).subscribe( meta => {
+            this.meta = meta;
+          }, error1 => {
+            console.error(error1);
+            this.meta = null;
+          });
+          */
+        }, error1 => {
+          console.error(error1);
+          this.user = null;
+        });
     }
 
+  getMockMeta() {
+    const meta = new UserMeta({});
+    meta.self_relationship = null;
+    return meta;
+    //this.meta.self_relationship = ParticipantRelationship.SELF_GUARDIAN;
+  }
+
   ngOnInit(): void {
+    this.meta = new UserMeta({});
   }
 
-  goProfile($event) {
+  goFlow($event) {
     $event.preventDefault();
-    this.router.navigate(['profile']);
+    this.router.navigate(['terms', this.meta.self_relationship]);
   }
-
-  goStudies($event) {
-    $event.preventDefault();
-    this.router.navigate(['studies']);
-  }
-
-  goResources($event) {
-    $event.preventDefault();
-    this.router.navigate(['search']);
-  }
-
-
 
 }

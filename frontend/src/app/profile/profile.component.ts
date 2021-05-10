@@ -38,14 +38,13 @@ export class ProfileComponent implements OnInit {
   model = new UserMeta({});
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [{
-    key: 'intake',
     validators: {
       fieldMatch: {
         expression: (control) => {
-          const {self, guardian, professional, interested} = control.value;
+          const {self_has_autism, guardian, professional, interested} = control.value;
 
           // at least one checkbox should be selected.
-          if (!self && !guardian && !professional && !interested) {
+          if (!self_has_autism && !guardian && !professional && !interested) {
             return false;
           }
           return true;
@@ -56,7 +55,7 @@ export class ProfileComponent implements OnInit {
     wrappers: ['group-validation'],
     fieldGroup: [
       {
-        key: 'self',
+        key: 'self_has_autism',
         type: 'checkbox',
         templateOptions: {label: 'I am autistic/I have autism', indeterminate: false},
       },
@@ -71,9 +70,9 @@ export class ProfileComponent implements OnInit {
         ]
       },
       expressionProperties: {
-        'templateOptions.required': 'model.self',
+        'templateOptions.required': 'model.self_has_autism',
       },
-      hideExpression: '!model.self',
+      hideExpression: '!model.self_has_autism',
       },
       {
         key: 'guardian',
@@ -81,6 +80,7 @@ export class ProfileComponent implements OnInit {
         templateOptions: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
       },
       {
+        model: this.model.guardian_legal,
         key: 'guardian_legal',
         type: 'radio',
         templateOptions: {
@@ -196,6 +196,7 @@ export class ProfileComponent implements OnInit {
 
   // WIP - submit action
   enrollSubmit() {
+    console.log('The Model is', this.model);
     if (this.form.valid) {
       // Need to reroute properly
       this.model.user_id = this.user.id;
