@@ -18,11 +18,11 @@ class UserMeta(db.Model):
 
     def get_relationship(self):
         if self.self_participant:
-            return Relationship.self_interested.name if self.self_has_guardian else Relationship.self_participant.name
+            return None if self.self_has_guardian else Relationship.self_participant.name
         if self.guardian and self.guardian_has_dependent:
             return Relationship.self_guardian.name
         if self.professional:
-            return Relationship.professional.name
+            return Relationship.self_professional.name
         # Lower Precedence Relationships
         if self.guardian and not self.guardian_has_dependent:
             return Relationship.self_interested.name
