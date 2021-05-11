@@ -300,15 +300,6 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         rel = usermeta.get_relationship()
         self.assertEqual(rel, '')
 
-    def test_post_invalid_user_meta(self):
-        u = self.construct_user()
-        um = {'id': u.id, 'interested': "Carrot"}
-        rv = self.app.post('/api/user/%i/usermeta' % u.id, data=self.jsonify(um), content_type="application/json",
-                           follow_redirects=True)
-        self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
-        rv = self.app.post('/api/user/%i/usermeta' % u.id, data=self.jsonify(um),
-                           content_type="application/json", headers=self.logged_in_headers(u))
-        self.assertEqual(500, rv.status_code)
 
     def test_delete_user_meta(self):
         u = self.construct_user()
