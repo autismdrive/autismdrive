@@ -8,7 +8,7 @@ from app.model.participant_relationship import Relationship
 class UserMeta(db.Model):
     __tablename__ = 'usermeta'
     __label__ = "User Meta Info"
-    user_id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'), primary_key=True)
     self_participant = db.Column(db.Boolean)
     self_has_guardian = db.Column(db.Boolean)
     guardian = db.Column(db.Boolean)
