@@ -159,7 +159,7 @@ export class ApiService {
   }
   /** getUserMeta */
   getUserMeta(user_id: number): Observable<UserMeta> {
-    return this.httpClient.get<UserMeta>(this._endpointUrl('usermeta').replace('<id>', user_id.toString()))
+    return this.httpClient.get<UserMeta>(this._endpointUrl('userMeta').replace('<id>', user_id.toString()))
       .pipe(catchError(this._handleError));
   }
 

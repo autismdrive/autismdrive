@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MetaComponent } from './meta.component';
+import { Profile_metaComponent } from './profile_meta.component';
 
 describe('MetaComponent', () => {
-  let component: MetaComponent;
-  let fixture: ComponentFixture<MetaComponent>;
+  let component: Profile_metaComponent;
+  let fixture: ComponentFixture<Profile_metaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MetaComponent ]
+      declarations: [ Profile_metaComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MetaComponent);
+    fixture = TestBed.createComponent(Profile_metaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

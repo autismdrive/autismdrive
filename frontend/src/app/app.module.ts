@@ -159,8 +159,8 @@ import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
 import { SkillstarAdminComponent } from './skillstar-admin/skillstar-admin.component';
-import { MetaComponent } from './meta/meta.component';
 import { GroupValidationWrapperComponent } from './_forms/group-validation-wrapper/group-validation-wrapper.component';
+import {ProfileMetaComponent} from './profile_meta/profile_meta.component';
 
 
 // Attempt to load the configuration from a file called config.json right next to
@@ -330,7 +330,7 @@ export class FormlyConfig {
     UvaEducationComponent,
     SkillstarAdminComponent,
     ResizeTextareaComponent,
-    MetaComponent,
+    ProfileMetaComponent,
     GroupValidationWrapperComponent,
   ],
   imports: [

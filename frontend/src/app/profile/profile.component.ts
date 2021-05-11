@@ -13,8 +13,10 @@ import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {UserMeta} from '../_models/user_meta';
 
 enum ProfileState {
-  NO_PARTICIPANT = 'NO_PARTICIPANT',
-  PARTICIPANT = 'PARTICIPANT'
+  NEEDS_USER = 'NEEDS_USER',
+  NEEDS_META = 'NEEDS_META',
+  NEEDS_PARTICIPANT = 'NEEDS_PARTICIPANT',
+  HAS_PARTICIPANT = 'PARTICIPANT'
 }
 
 
@@ -25,8 +27,8 @@ enum ProfileState {
 })
 export class ProfileComponent implements OnInit {
   user: User;
+  userMeta: UserMeta;
   possibleStates = ProfileState;
-  state = ProfileState.NO_PARTICIPANT;
   loading = true;
   studyInquiries: StudyUser[];
   currentStudies: Study[];
@@ -118,8 +120,15 @@ export class ProfileComponent implements OnInit {
         console.log(user);
         this.self = user.getSelf();
         this.dependents = user.getDependents();
-        this.state = this.getState();
-        this.loading = false;
+
+        this.api.getUserMeta(user.id).subscribe(meta => {
+          console.log('UserMeta', meta);
+          this.userMeta = meta;
+          this.loading = false;
+        }, error1 => {
+          console.error(error1);
+          this.loading = false;
+        });
       }, error1 => {
         console.error(error1);
         this.user = null;
@@ -145,12 +154,14 @@ export class ProfileComponent implements OnInit {
         const newU = new User(u);
         this.self = newU.getSelf();
         this.dependents = newU.getDependents();
-        this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(
-          f => {
-            this.selfPercentComplete = f.percentComplete();
-            console.log('selfPercentComplete', this.selfPercentComplete);
-          }
-        );
+        if (newU.getSelf()) {
+          this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(
+            f => {
+              this.selfPercentComplete = f.percentComplete();
+              console.log('selfPercentComplete', this.selfPercentComplete);
+            }
+          );
+        }
       });
     }
   }
@@ -158,48 +169,27 @@ export class ProfileComponent implements OnInit {
 
   getState() {
     if (!this.user) {  // can happen if user logs out from this page.
-      return null;
+      return ProfileState.NEEDS_USER;
+    } else if (this.userMeta === undefined) {
+      return ProfileState.NEEDS_META;
     } else if (this.user.getSelf() === undefined) {
-      return ProfileState.NO_PARTICIPANT;
+      return ProfileState.NEEDS_PARTICIPANT;
     } else {
-      return ProfileState.PARTICIPANT;
+      return ProfileState.HAS_PARTICIPANT;
     }
   }
 
-  enrollSelf($event) {
+  enroll($event) {
     $event.preventDefault();
-    this.router.navigate(['terms', ParticipantRelationship.SELF_PARTICIPANT]);
+    this.router.navigate(['terms', this.userMeta.self_relationship]);
   }
 
-  enrollGuardian($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms', ParticipantRelationship.SELF_GUARDIAN]);
-  }
 
-  enrollDependent($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms', ParticipantRelationship.DEPENDENT]);
-  }
-
-  enrollProfessional($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms', ParticipantRelationship.SELF_PROFESSIONAL]);
-  }
-
-  enrollInterested($event) {
-    $event.preventDefault();
-    console.log(this.model);
-    this.router.navigate(['meta']);
-    // this.router.navigate(['terms', ParticipantRelationship.SELF_INTERESTED]);
-  }
-
-  // WIP - submit action
-  enrollSubmit() {
-    console.log('The Model is', this.model);
+  createMeta() {
     if (this.form.valid) {
       this.model.user_id = this.user.id;
       this.api.addUserMeta(this.model).subscribe( usermeta => {
-          this.router.navigate(['meta']);
+        this.userMeta = usermeta;
       });
     }
   }
