@@ -237,7 +237,7 @@ endpoints = [
     (EmailLogEndpoint, "/user/email_log/<user_id>"),
     (ResourceChangeLogByUserEndpoint, "/user/<user_id>/resource_change_log"),
     (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
-    (UserMetaEndpoint, "/user/<user_id>/usermeta"),
+    (UserMetaEndpoint, "/user/<id>/usermeta"),
 
     # Participants
     (ParticipantListEndpoint, "/participant"),

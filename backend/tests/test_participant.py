@@ -250,7 +250,7 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_user_meta(self):
         u = self.construct_user()
-        usermeta = UserMeta(user_id=u.id, interested=True)
+        usermeta = UserMeta(id=u.id, interested=True)
         db.session.add(usermeta)
         db.session.commit()
         rv = self.app.get('/api/user/%i/usermeta' % u.id,
@@ -261,17 +261,58 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
         self.assertEqual(response["interested"], True)
 
     def test_create_user_meta(self):
-        usermeta = {'user_id': 42, 'professional': 'True'}
-        rv = self.app.post('/api/user/%i/usermeta' % usermeta.get('user_id'), data= self.jsonify(usermeta),
-                           content_type="application/json", headers=self.logged_in_headers())
+        u = self.construct_user()
+        um = {'id': u.id, 'professional': True}
+        rv = self.app.post('/api/user/%i/usermeta' % u.id, data=self.jsonify(um), content_type="application/json",
+                           follow_redirects=True)
+        self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
+        rv = self.app.post('/api/user/%i/usermeta' % u.id, data=self.jsonify(um),
+                           content_type="application/json", headers=self.logged_in_headers(u))
         self.assert_success(rv)
         response = json.loads(rv.get_data(as_text=True))
         self.assertEqual(response["professional"], True)
-        self.assertIsNotNone(response['user_id'])
+        self.assertIsNotNone(response['id'])
+
+    def test_post_self_has_guardian(self):
+        u = self.construct_user()
+        usermeta = UserMeta(id=u.id, self_participant=True, self_has_guardian=True)
+        db.session.add(usermeta)
+        db.session.commit()
+        rv = self.app.get('/api/user/%i/usermeta' % u.id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(response["self_has_guardian"], True)
+        rel = usermeta.get_relationship()
+        self.assertEqual(rel, None)
+
+    def test_post_no_metadata(self):
+        u = self.construct_user()
+        usermeta = UserMeta(id=u.id)
+        db.session.add(usermeta)
+        db.session.commit()
+        rv = self.app.get('/api/user/%i/usermeta' % u.id,
+                          follow_redirects=True,
+                          content_type="application/json", headers=self.logged_in_headers())
+        self.assert_success(rv)
+        response = json.loads(rv.get_data(as_text=True))
+        rel = usermeta.get_relationship()
+        self.assertEqual(rel, '')
+
+    def test_post_invalid_user_meta(self):
+        u = self.construct_user()
+        um = {'id': u.id, 'interested': "Carrot"}
+        rv = self.app.post('/api/user/%i/usermeta' % u.id, data=self.jsonify(um), content_type="application/json",
+                           follow_redirects=True)
+        self.assertEqual(401, rv.status_code, "you can't create a participant without an account.")
+        rv = self.app.post('/api/user/%i/usermeta' % u.id, data=self.jsonify(um),
+                           content_type="application/json", headers=self.logged_in_headers(u))
+        self.assertEqual(500, rv.status_code)
 
     def test_delete_user_meta(self):
         u = self.construct_user()
-        usermeta = UserMeta(user_id=u.id, interested=True)
+        usermeta = UserMeta(id=u.id, interested=True)
         db.session.add(usermeta)
         db.session.commit()
         rv = self.app.get('/api/user/%i/usermeta' % u.id,
@@ -298,7 +339,7 @@ class TestParticipant(BaseTestQuestionnaire, unittest.TestCase):
 
     def test_user_meta_serialize(self):
         u = self.construct_user()
-        usermeta = UserMeta(user_id=u.id, interested=True)
+        usermeta = UserMeta(id=u.id, interested=True)
         result = usermeta.get_relationship()
         self.assertEqual(result, "self_interested")
         UserMetaSchema().dump(usermeta)
