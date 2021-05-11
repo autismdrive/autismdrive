@@ -434,7 +434,7 @@ class UserMetaSchema(ModelSchema):
         model = UserMeta
         #load_instance = True
         #sqla_session = db.session
-        fields = ('id', 'self_participant', 'self_has_guardian', 'professional', 'interested',
+        fields = ('id', 'last_updated', 'self_participant', 'self_has_guardian', 'professional', 'interested',
                   'guardian', 'guardian_has_dependent', 'self_relationship')
     self_participant = fields.Boolean(required=False, allow_none=True)
     self_has_guardian = fields.Boolean(required=False, allow_none=True)
