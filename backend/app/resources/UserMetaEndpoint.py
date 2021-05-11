@@ -28,14 +28,15 @@ class UserMetaEndpoint(flask_restful.Resource):
         request_data = request.get_json()
 
         try:
-            load_result = self.schema.load(request_data)
-            meta = db.session.query(UserMeta).filter(UserMeta.user_id == user_id).update(request_data)
+            existing = db.session.query(UserMeta).filter(UserMeta.user_id == user_id).first()
+            new_meta = self.schema.load(request_data, instance=existing)
+            db.session.add(new_meta)
             db.session.commit()
-            return self.schema.dump(meta)
+            return self.schema.dump(new_meta)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+                                details=new_meta.errors)
         except exc.IntegrityError as err:
             raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+                                details=new_meta.errors)
 

@@ -1,5 +1,6 @@
 import {ParticipantRelationship} from './participantRelationship';
 
+
 export class UserMeta {
   user_id: number;
   self_participant?: boolean;
@@ -7,7 +8,7 @@ export class UserMeta {
   guardian?: boolean;
   guardian_has_dependent?: boolean;
   professional?: boolean;
-  interested?:  boolean;
+  interested?: boolean;
   self_relationship: ParticipantRelationship;
 
   constructor(_props: {}) {
@@ -17,5 +18,4 @@ export class UserMeta {
       }
     }
   }
-
 }

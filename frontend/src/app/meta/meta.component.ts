@@ -1,9 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
-import { User } from '../_models/user';
+import {Component, OnInit} from '@angular/core';
+import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {ApiService} from '../_services/api/api.service';
 import {Router} from '@angular/router';
-import {Flow} from '../_models/flow';
 import {UserMeta} from '../_models/user_meta';
 import {ParticipantRelationship} from '../_models/participantRelationship';
 
@@ -25,32 +24,34 @@ export class MetaComponent implements OnInit {
               private api: ApiService,
               private router: Router
   ) {
-        this.authenticationService.currentUser.subscribe(user => {
-          this.user = user;
-          this.meta = this.getMockMeta();
-          /*
-          this.api.getUserMeta(user.id).subscribe( meta => {
-            this.meta = meta;
-          }, error1 => {
-            console.error(error1);
-            this.meta = null;
-          });
-          */
-        }, error1 => {
-          console.error(error1);
-          this.user = null;
-        });
+    this.meta = this.getMockMeta();
+    console.log('This.meta', this.meta);
+    this.authenticationService.currentUser.subscribe(user => {
+      this.user = user;
+      /*
+      this.api.getUserMeta(user.id).subscribe( meta => {
+        this.meta = meta;
+      }, error1 => {
+        console.error(error1);
+        this.meta = null;
+      });
+      */
+    }, error1 => {
+      console.error(error1);
+      this.user = null;
+    });
     }
 
   getMockMeta() {
     const meta = new UserMeta({});
     meta.self_relationship = null;
+
     return meta;
-    //this.meta.self_relationship = ParticipantRelationship.SELF_GUARDIAN;
   }
 
   ngOnInit(): void {
-    this.meta = new UserMeta({});
+    // this.meta = new UserMeta({});
+    // this.meta = this.getMockMeta();
   }
 
   goFlow($event) {

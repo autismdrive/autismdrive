@@ -197,7 +197,6 @@ export class ProfileComponent implements OnInit {
   enrollSubmit() {
     console.log('The Model is', this.model);
     if (this.form.valid) {
-      // Need to reroute properly
       this.model.user_id = this.user.id;
       this.api.addUserMeta(this.model).subscribe( usermeta => {
           this.router.navigate(['meta']);
