@@ -29,6 +29,7 @@ export class ProfileComponent implements OnInit {
   user: User;
   userMeta: UserMeta;
   possibleStates = ProfileState;
+  relationships = ParticipantRelationship;
   loading = true;
   studyInquiries: StudyUser[];
   currentStudies: Study[];
@@ -166,7 +167,6 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-
   getState() {
     if (!this.user) {  // can happen if user logs out from this page.
       return ProfileState.NEEDS_USER;
@@ -179,11 +179,10 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  enroll($event) {
+  enrollDependent($event) {
     $event.preventDefault();
-    this.router.navigate(['terms', this.userMeta.self_relationship]);
+    this.router.navigate(['terms', ParticipantRelationship.DEPENDENT]);
   }
-
 
   createMeta() {
     if (this.form.valid) {

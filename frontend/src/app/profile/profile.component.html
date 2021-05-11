@@ -9,7 +9,6 @@
   </div>
 
   <div *ngIf="getState() === possibleStates.NEEDS_META">
-    <h1>Create Your Profile</h1>
     <div class="meta-form"
          fxLayout="row"
          fxLayout.lt-lg="column"
@@ -24,9 +23,9 @@
           describe you. If appropriate, you will have additional opportunities to create profiles for your children or
           dependents after completing your own profile. Once we have this information we can connect you to current and
           future research studies, and together, find ways to improve the lives of people living with Autism.</p>
-        <form [formGroup]="form">
+        <form [formGroup]="form" id="meta-form">
           <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
-          <button mat-flat-button type="submit" color="accent" (click)="createMeta()">Submit</button>
+          <button id="submit_meta" mat-flat-button type="submit" color="accent" (click)="createMeta()">Submit</button>
         </form>
 
       </div>
@@ -35,7 +34,6 @@
 
   <div *ngIf="getState() === possibleStates.NEEDS_PARTICIPANT">
     <!-- Display messages based on the users metadata input -->
-    <h1>Needs Participant</h1>
     <app-profile-meta [user]="user" [meta]="userMeta"></app-profile-meta>
   </div>
 
@@ -43,7 +41,20 @@
   <div *ngIf="getState() === possibleStates.HAS_PARTICIPANT">
     <h1>Manage Your Profiles</h1>
     <div>
-      <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_PROFESSIONAL">
+        You indicated that you are a profressional working in Autism research and treatment.
+        Once your profile is complete we will be able to notify you about important updates.
+      </p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_INTERESTED">
+        Once your profile is complete we will be able to notify you about important updates.
+      </p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_PARTICIPANT">
+        Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.
+      </p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_GUARDIAN">
+        Once your complete your profile and the profiles of your dependents, you’ll be able to enroll them in any relevant currently-running studies.
+      </p>
+
 
       <app-loading
         *ngIf="loading"
@@ -76,7 +87,7 @@
               id="dependent_participant_{{participant.id}}"
             ></app-participant-profile>
           </div>
-          <div fxFlex="60%">
+          <div fxFlex="60%" *ngIf="user.getSelf().relationship !== relationships.SELF_INTERESTED">
             <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile
               first</p>
             <button
