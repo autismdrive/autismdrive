@@ -27,15 +27,18 @@ class UserMetaEndpoint(flask_restful.Resource):
     @auth.login_required
     def post(self, id):
         request_data = request.get_json()
-        instance = db.session.query(UserMeta).filter(UserMeta.id == id).first()
 
         try:
-            updated = self.schema.load(request_data, instance=instance)
-        except Exception as errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
-
-        updated.last_updated = datetime.datetime.utcnow()
-        db.session.add(updated)
-        db.session.commit()
-        return self.schema.dump(updated)
+            existing = db.session.query(UserMeta).filter(UserMeta.id == id).first()
+            new_meta = self.schema.load(request_data, instance=existing)
+            new_meta.last_updated = datetime.datetime.utcnow()
+            db.session.add(new_meta)
+            db.session.commit()
+            return self.schema.dump(new_meta)
+        except ValidationError as err:
+            raise RestException(RestException.INVALID_OBJECT,
+                                details=new_meta.errors)
+        except exc.IntegrityError as err:
+            raise RestException(RestException.INVALID_OBJECT,
+                                details=new_meta.errors)
 
