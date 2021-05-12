@@ -1,5 +1,6 @@
 import enum
 
+from sqlalchemy import func
 
 from app import db
 from app.model.participant_relationship import Relationship
@@ -9,6 +10,7 @@ class UserMeta(db.Model):
     __tablename__ = 'usermeta'
     __label__ = "User Meta Info"
     id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'), primary_key=True)
+    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     self_participant = db.Column(db.Boolean)
     self_has_guardian = db.Column(db.Boolean)
     guardian = db.Column(db.Boolean)

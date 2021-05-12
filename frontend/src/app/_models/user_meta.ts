@@ -3,6 +3,7 @@ import {ParticipantRelationship} from './participantRelationship';
 
 export class UserMeta {
   user_id: number;
+  last_updated?: Date;
   self_participant?: boolean;
   self_has_guardian?: boolean;
   guardian?: boolean;

@@ -31,6 +31,7 @@ class UserMetaEndpoint(flask_restful.Resource):
         try:
             existing = db.session.query(UserMeta).filter(UserMeta.id == id).first()
             new_meta = self.schema.load(request_data, instance=existing)
+            new_meta.last_updated = datetime.datetime.utcnow()
             db.session.add(new_meta)
             db.session.commit()
             return self.schema.dump(new_meta)
@@ -40,3 +41,4 @@ class UserMetaEndpoint(flask_restful.Resource):
         except exc.IntegrityError as err:
             raise RestException(RestException.INVALID_OBJECT,
                                 details=new_meta.errors)
+
