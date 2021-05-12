@@ -17,7 +17,7 @@ export class ProfileUseCases {
   }
 
 
-  async completeProfileMetaFormAsSelf() {
+  async completeProfileMetaFormAsGuardian() {
     expect(this.page.getElements('#meta-form').count()).toEqual(1);
     // Get  'formly-field [id*="_checkbox_"],' +
     this.page.getElement( 'formly-field.guardian label').click();
@@ -37,19 +37,6 @@ export class ProfileUseCases {
 
     await this.page.clickElement('#submit_meta');
 ***/
-  }
-
-
-
-  displayProfileScreen() {
-    expect(this.page.getElements('app-profile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_self_tile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_guardian_tile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_professional_tile').count()).toEqual(1);
-  }
-
-  startGuardianFlow() {
-    this.page.clickAndExpectRoute('#enroll_guardian_tile', '/terms/self_guardian');
   }
 
   startDependentFlow() {
@@ -72,6 +59,9 @@ export class ProfileUseCases {
     await this.page.getElements('#meta-form');
   }
 
+  async joinRegistry() {
+    this.page.clickAndExpectRoute('#join', '/terms/self_guardian');
+  }
 
   async displayAvatars() {
     expect(this.page.getElements('[id^=self_participant_').count()).toBeGreaterThan(0);
