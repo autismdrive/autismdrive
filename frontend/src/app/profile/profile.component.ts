@@ -186,7 +186,7 @@ export class ProfileComponent implements OnInit {
 
   createMeta() {
     if (this.form.valid) {
-      this.model.user_id = this.user.id;
+      this.model.id = this.user.id;
       this.api.addUserMeta(this.model).subscribe( usermeta => {
         this.userMeta = usermeta;
       });

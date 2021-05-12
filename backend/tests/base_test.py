@@ -145,7 +145,7 @@ class BaseTest:
         return participant
 
     def construct_usermeta(self, user):
-        usermeta = UserMeta(user_id=user.id)
+        usermeta = UserMeta(id=user.id)
         db.session.add(usermeta)
         db.session.commit()
         return usermeta

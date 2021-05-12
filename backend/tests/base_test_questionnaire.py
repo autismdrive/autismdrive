@@ -677,6 +677,7 @@ class BaseTestQuestionnaire(BaseTest):
         if user is None:
             user = self.construct_user()
         participant = self.construct_participant(user=user, relationship=Relationship.dependent)
+        self.construct_usermeta(user=user)
         self.construct_clinical_diagnoses_questionnaire(user=user, participant=participant)
         self.construct_contact_questionnaire(user=user, participant=participant)
         self.construct_current_behaviors_dependent_questionnaire(user=user, participant=participant)
