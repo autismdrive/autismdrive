@@ -1,8 +1,40 @@
 import { AppPage } from '../app-page.po';
+import {$$, browser, by, element} from 'protractor';
 
 export class ProfileUseCases {
   constructor(private page: AppPage) {
   }
+
+  clickFormlyBox() {
+    const formlyInputs = $$('input');
+    const desiredModel = 'modelName';
+    const desiredInput = formlyInputs.filter(function (input) {
+      return input.evaluate('model[options.key]').then(function (model) {
+        return model === desiredModel;
+      });
+    }).first();
+    desiredInput.sendKeys("some text");
+  }
+
+
+  async completeProfileMetaFormAsSelf() {
+    // Get  'formly-field [id*="_checkbox_"],' +
+    const checkbox = this.page.getElement( 'formly-field.guardian [id*="_checkbox_"],');
+    checkbox.click();
+
+
+    // You want to click:  .mat-checkbox-inner-container
+
+    expect(this.page.getElements('#meta-form').count()).toEqual(1);
+
+    const self_guardian_box = element(by.css('label[for="formly_9_checkbox_guardian_2"]'));
+    self_guardian_box.click();
+    const radio = element(by.css('label[for="formly_9_radio_guardian_has_dependent_3"]'));
+    radio.click();
+    await this.page.clickElement('#submit_meta');
+  }
+
+
 
   displayProfileScreen() {
     expect(this.page.getElements('app-profile').count()).toEqual(1);
@@ -27,6 +59,12 @@ export class ProfileUseCases {
   navigateToProfile() {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
   }
+
+  navigateToProfileMeta() {
+    browser.get(browser.baseurl + '/profile?meta=true');
+    expect(this.page.getElements('#meta-form').count()).toEqual(1);
+  }
+
 
   async displayAvatars() {
     expect(this.page.getElements('[id^=self_participant_').count()).toBeGreaterThan(0);

@@ -5,7 +5,7 @@ import { ProfileUseCases } from './use-cases/profile.po';
 import { EnrollUseCases } from './use-cases/enroll.po';
 import { SearchUseCases } from './use-cases/search.po';
 
-describe('Participant (Guardian - Self)', () => {
+fdescribe('Participant (Guardian - Self)', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
@@ -53,9 +53,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
   it('should see error on bad password', () => loginUseCases.loginWithBadPassword(email));
-  it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
-  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
-  it('should stay on the profile screen on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
+  fit('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
 
   // Global Header - Logged In
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
@@ -68,7 +66,9 @@ describe('Participant (Guardian - Self)', () => {
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Profile
-  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
+  fit('should navigate to the Profile Meta screen', () => profileUseCases.navigateToProfileMeta());
+  fit('should complete user meta form as guardian', () => profileUseCases.completeProfileMetaFormAsSelf());
+
   it('should display profile screen', () => profileUseCases.displayProfileScreen());
   it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
   it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());

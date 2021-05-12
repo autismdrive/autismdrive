@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../_services/api/api.service';
 import { User } from '../_models/user';
 import { ParticipantRelationship } from '../_models/participantRelationship';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { Participant } from '../_models/participant';
 import { Study } from '../_models/study';
 import { StudyUser } from '../_models/study_user';
@@ -29,6 +29,7 @@ export class ProfileComponent implements OnInit {
   user: User;
   userMeta: UserMeta;
   possibleStates = ProfileState;
+  forceMetaFormState = false;
   relationships = ParticipantRelationship;
   loading = true;
   studyInquiries: StudyUser[];
@@ -60,7 +61,8 @@ export class ProfileComponent implements OnInit {
       {
         key: 'self_participant',
         type: 'checkbox',
-        templateOptions: {label: 'I am autistic/I have autism', indeterminate: false},
+        templateOptions: {label: 'I am autistic/I have autism', indeterminate: false,
+                          class: 'self_participant'},
       },
     {
       key: 'self_has_guardian',
@@ -80,7 +82,11 @@ export class ProfileComponent implements OnInit {
       {
         key: 'guardian',
         type: 'checkbox',
-        templateOptions: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
+        className: 'guardian',
+        templateOptions: {label: 'I am the parent/legal guardian of someone with autism',
+                          indeterminate: false
+                          },
+
       },
       {
         key: 'guardian_has_dependent',
@@ -113,7 +119,15 @@ export class ProfileComponent implements OnInit {
 
   constructor(private authenticationService: AuthenticationService,
               private api: ApiService,
-              private router: Router) {
+              private router: Router,
+              private route: ActivatedRoute) {
+
+    this.route.queryParams.subscribe(params => {
+      console.log("Params", params);
+      if (params.hasOwnProperty('meta')) {
+        this.forceMetaFormState = true;
+      }
+    });
 
     this.authenticationService.currentUser.subscribe(
       user => {
@@ -170,7 +184,7 @@ export class ProfileComponent implements OnInit {
   getState() {
     if (!this.user) {  // can happen if user logs out from this page.
       return ProfileState.NEEDS_USER;
-    } else if (this.userMeta === undefined) {
+    } else if (this.userMeta === undefined || this.forceMetaFormState) {
       return ProfileState.NEEDS_META;
     } else if (this.user.getSelf() === undefined) {
       return ProfileState.NEEDS_PARTICIPANT;
@@ -189,6 +203,7 @@ export class ProfileComponent implements OnInit {
       this.model.id = this.user.id;
       this.api.addUserMeta(this.model).subscribe( usermeta => {
         this.userMeta = usermeta;
+        this.forceMetaFormState = false;
       });
     }
   }
