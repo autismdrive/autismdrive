@@ -18,20 +18,25 @@ export class ProfileUseCases {
 
 
   async completeProfileMetaFormAsSelf() {
-    // Get  'formly-field [id*="_checkbox_"],' +
-    const checkbox = this.page.getElement( 'formly-field.guardian [id*="_checkbox_"],');
-    checkbox.click();
-
-
-    // You want to click:  .mat-checkbox-inner-container
-
     expect(this.page.getElements('#meta-form').count()).toEqual(1);
+    // Get  'formly-field [id*="_checkbox_"],' +
+    this.page.getElement( 'formly-field.guardian label').click();
+    expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
 
-    const self_guardian_box = element(by.css('label[for="formly_9_checkbox_guardian_2"]'));
-    self_guardian_box.click();
-    const radio = element(by.css('label[for="formly_9_radio_guardian_has_dependent_3"]'));
+    this.page.getElement( 'formly-field.guardian_has_dependent label').click();
+    expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
+
+    this.page.getElement('#submit_meta').click();
+
+
+    expect(this.page.getElements('#self_guardian').count()).toEqual(1);
+    /**
+    const radio = this.page.getElement( 'formly-field.guardian_has_dependent').all('mat-radio-button');
     radio.click();
+
+
     await this.page.clickElement('#submit_meta');
+***/
   }
 
 
@@ -60,9 +65,11 @@ export class ProfileUseCases {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
   }
 
-  navigateToProfileMeta() {
-    browser.get(browser.baseurl + '/profile?meta=true');
-    expect(this.page.getElements('#meta-form').count()).toEqual(1);
+  async navigateToProfileMeta() {
+    this.page.clickAndExpectRoute('#profile-button', '/profile');
+    let currentLoc = await browser.getCurrentUrl();
+    browser.get(currentLoc + '?meta=true');
+    await this.page.getElements('#meta-form');
   }
 
 

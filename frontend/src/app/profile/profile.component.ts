@@ -91,6 +91,7 @@ export class ProfileComponent implements OnInit {
       {
         key: 'guardian_has_dependent',
         type: 'radio',
+        className: 'guardian_has_dependent',
         templateOptions: {
           label: 'Are you their legal guardian?',
           options: [

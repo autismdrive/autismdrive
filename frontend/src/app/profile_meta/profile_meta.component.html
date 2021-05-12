@@ -3,7 +3,7 @@
      fxLayoutAlign="center center" fxFlexOffset="5">
 
 
-  <div *ngIf="meta.self_relationship === null">
+  <div id="null_relationship" *ngIf="meta.self_relationship === null">
     <h1>Profile complete!</h1>
     <p>
       Your account set up is complete! You may now sign up for webinars and search for resources.
@@ -14,7 +14,7 @@
     </p>
 
   </div>
-  <div *ngIf="meta.self_relationship === relationships.SELF_PARTICIPANT">
+  <div id="self_participant" *ngIf="meta.self_relationship === relationships.SELF_PARTICIPANT">
     <h1>Join the Registry!</h1>
     <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
       registry.</p>
@@ -24,7 +24,7 @@
       opportunities.</p>
   </div>
 
-  <div *ngIf="meta.self_relationship === relationships.SELF_GUARDIAN">
+  <div id="self_guardian" *ngIf="meta.self_relationship === relationships.SELF_GUARDIAN">
     <h1>Join the Registry as a Parent/Guardian!</h1>
     <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
       registry.</p>
@@ -35,7 +35,7 @@
     </p>
   </div>
 
-  <div *ngIf="meta.self_relationship === relationships.SELF_PROFESSIONAL">
+  <div id="self_profressional" *ngIf="meta.self_relationship === relationships.SELF_PROFESSIONAL">
     <h1>Join the Registry as a Professional!</h1>
     <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
       registry.</p>
