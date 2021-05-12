@@ -53,9 +53,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
   it('should see error on bad password', () => loginUseCases.loginWithBadPassword(email));
-  it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
-  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
-  it('should stay on the profile screen on refresh', () => loginUseCases.refreshAndRedirectToReturnUrl());
+  it('should log in with email and password', () => loginUseCases.loginWithCredentials(randomEmail, goodPassword));
 
   // Global Header - Logged In
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());
@@ -68,12 +66,13 @@ describe('Participant (Guardian - Self)', () => {
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
 
   // Profile
-  it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
-  it('should display profile screen', () => profileUseCases.displayProfileScreen());
-  it('should start Guardian flow when enrolling a dependent', () => profileUseCases.startGuardianFlow());
+  it('should navigate to the Profile Meta screen', () => profileUseCases.navigateToProfileMeta());
+  it('should complete user meta form as guardian', () => profileUseCases.completeProfileMetaFormAsGuardian());
+
+  it('should navigate to the terms page for guardian', () => profileUseCases.joinRegistry());
   it('should display the terms of consent to the study', () => enrollUseCases.displayGuardianTerms());
   it('should cancel out of the terms consent page', () => enrollUseCases.cancelTerms());
-  it('should navigate back to the Guardian flow', () => profileUseCases.startGuardianFlow());
+  it('should navigate back to the Guardian flow', () => profileUseCases.joinRegistry());
   it('should accept the terms for Guardian', () => enrollUseCases.acceptTerms());
   it('should navigate to the Profile screen', () => profileUseCases.navigateToProfile());
   it('should display a disabled button for adding a dependent', () => profileUseCases.checkDependentButtonDisabled());

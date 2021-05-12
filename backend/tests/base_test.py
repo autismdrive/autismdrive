@@ -2,7 +2,6 @@
 # IMPORTANT - Environment must be loaded before app, models, etc....
 import os
 
-
 os.environ["TESTING"] = "true"
 
 import base64
@@ -34,6 +33,7 @@ from app.model.study_user import StudyUser
 from app.model.user import User, Role
 from app.model.user_favorite import UserFavorite
 from app.model.zip_code import ZipCode
+from app.model.user_meta import UserMeta
 
 
 def clean_db(database):
@@ -137,13 +137,18 @@ class BaseTest:
         return db_user
 
     def construct_participant(self, user, relationship):
-
         participant = Participant(user=user, relationship=relationship)
         db.session.add(participant)
         db.session.commit()
 #        db_participant = db.session.query(Participant).filter_by(id=participant.id).first()
 #        self.assertEqual(db_participant.relationship, participant.relationship)
         return participant
+
+    def construct_usermeta(self, user):
+        usermeta = UserMeta(id=user.id)
+        db.session.add(usermeta)
+        db.session.commit()
+        return usermeta
 
     def construct_admin_note(self, user, resource, id=976, note="I think all sorts of things about this resource and I'm telling you now."):
         admin_note = AdminNote(id=id, user_id=user.id, resource_id=resource.id, note=note)

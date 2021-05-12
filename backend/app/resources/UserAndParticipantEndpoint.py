@@ -2,6 +2,7 @@ import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
 from sqlalchemy import exc
+import re
 
 from app import db, RestException, auth
 from app.model.participant import Participant, Relationship
@@ -31,10 +32,18 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
             else:
                 relationship = request_data['relationship']
                 request_data.pop('relationship', None)
+
         else:
             relationship = None
+
         if 'user_id' not in request_data:
             request_data['user_id'] = g.user.id
+
+        user = db.session.query(User).filter(User.id == request_data['user_id']).first()
+        if user.self_participant() is not None:
+            if Relationship.is_self(relationship):
+                raise RestException(RestException.NOT_YOUR_ACCOUNT)
+
         try:
             load_result = self.schema.load(request_data)
             load_result.user = db.session.query(User).filter(User.id == request_data['user_id']).first()

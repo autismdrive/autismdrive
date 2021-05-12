@@ -2,12 +2,14 @@ import { Participant } from './participant';
 import { ParticipantRelationship } from './participantRelationship';
 import { EmailLog } from './email_log';
 import { UserFavorite } from './user_favorite';
+import {UserMeta} from './user_meta';
 
 export class User {
 
   id: number;
   email: string;
   participants?: Participant[];
+  user_meta?: UserMeta;
   user_favorites?: UserFavorite[];
   last_updated?: Date;
   registration_date?: Date;
@@ -31,12 +33,16 @@ export class User {
     if (this.participants && (this.participants.length > 0)) {
       this.participants = this.participants.map(p => new Participant(p));
     }
+    if (this.user_meta) {
+      this.user_meta = new UserMeta(this.user_meta);
+    }
   }
 
   isSelf(participant: Participant): boolean {
     if (participant.relationship === ParticipantRelationship.SELF_GUARDIAN ||
       participant.relationship === ParticipantRelationship.SELF_PARTICIPANT ||
-      participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
+      participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL ||
+      participant.relationship === ParticipantRelationship.SELF_INTERESTED) {
       return true;
     } else {
       return false;

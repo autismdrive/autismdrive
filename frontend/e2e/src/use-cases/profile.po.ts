@@ -1,18 +1,42 @@
 import { AppPage } from '../app-page.po';
+import {$$, browser, by, element} from 'protractor';
 
 export class ProfileUseCases {
   constructor(private page: AppPage) {
   }
 
-  displayProfileScreen() {
-    expect(this.page.getElements('app-profile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_self_tile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_guardian_tile').count()).toEqual(1);
-    expect(this.page.getElements('#enroll_professional_tile').count()).toEqual(1);
+  clickFormlyBox() {
+    const formlyInputs = $$('input');
+    const desiredModel = 'modelName';
+    const desiredInput = formlyInputs.filter(function (input) {
+      return input.evaluate('model[options.key]').then(function (model) {
+        return model === desiredModel;
+      });
+    }).first();
+    desiredInput.sendKeys("some text");
   }
 
-  startGuardianFlow() {
-    this.page.clickAndExpectRoute('#enroll_guardian_tile', '/terms/self_guardian');
+
+  async completeProfileMetaFormAsGuardian() {
+    expect(this.page.getElements('#meta-form').count()).toEqual(1);
+    // Get  'formly-field [id*="_checkbox_"],' +
+    this.page.getElement( 'formly-field.guardian label').click();
+    expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
+
+    this.page.getElement( 'formly-field.guardian_has_dependent label').click();
+    expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
+
+    this.page.getElement('#submit_meta').click();
+
+
+    expect(this.page.getElements('#self_guardian').count()).toEqual(1);
+    /**
+    const radio = this.page.getElement( 'formly-field.guardian_has_dependent').all('mat-radio-button');
+    radio.click();
+
+
+    await this.page.clickElement('#submit_meta');
+***/
   }
 
   startDependentFlow() {
@@ -26,6 +50,17 @@ export class ProfileUseCases {
 
   navigateToProfile() {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
+  }
+
+  async navigateToProfileMeta() {
+    this.page.clickAndExpectRoute('#profile-button', '/profile');
+    let currentLoc = await browser.getCurrentUrl();
+    browser.get(currentLoc + '?meta=true');
+    await this.page.getElements('#meta-form');
+  }
+
+  async joinRegistry() {
+    this.page.clickAndExpectRoute('#join', '/terms/self_guardian');
   }
 
   async displayAvatars() {

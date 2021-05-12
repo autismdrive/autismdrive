@@ -3,86 +3,58 @@
   class="profile mat-typography"
 >
 
-  <div *ngIf="state === possibleStates.NO_PARTICIPANT">
-    <h1>Create Your Profile</h1>
-    <div
-      fxLayout="row"
-      fxLayout.lt-lg="column"
-      fxLayoutGap="2em"
+  <div *ngIf="getState() === possibleStates.NEEDS_USER">
+    <h1>Please Log in or Create an Account</h1>
+    <p>You are not currently logged in.</p>
+  </div>
+
+  <div *ngIf="getState() === possibleStates.NEEDS_META">
+    <div class="meta-form"
+         fxLayout="row"
+         fxLayout.lt-lg="column"
+         fxLayoutGap="2em"
     >
       <div
         fxFlex="100%"
       >
         <h2>Welcome!</h2>
-        <p>Thank you for creating an account on Autism DRIVE. To create your profile, select the button below that
-          best describes <b>you.</b> You will have additional opportunities to create profiles for your children or
-          dependents after completing your own profile</p>
+        <p>Thank you for creating an account on Autism DRIVE. We would like to learn a little more about you, so we can
+          connect you with the best possible resources. To create your profile, please select all the items below that
+          describe you. If appropriate, you will have additional opportunities to create profiles for your children or
+          dependents after completing your own profile. Once we have this information we can connect you to current and
+          future research studies, and together, find ways to improve the lives of people living with Autism.</p>
+        <form [formGroup]="form" id="meta-form">
+          <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
+          <button id="submit_meta" mat-flat-button type="submit" color="accent" (click)="createMeta()">Submit</button>
+        </form>
 
-        <div
-          fxLayout="column"
-          fxLayoutAlign="center auto"
-          fxLayoutGap="2em"
-          fxHide.gt-xs
-          fxShow.lt-sm
-        >
-          <button
-            mat-flat-button
-            color="accent"
-            (click)="enrollSelf($event)"
-            id="enroll_self"
-          >I am an adult with autism and I am my own legal guardian</button>
-          <button
-            mat-flat-button
-            color="accent"
-            (click)="enrollGuardian($event)"
-            id="enroll_guardian"
-          >I am the parent/legal guardian of a child or adult with autism</button>
-          <button
-            mat-flat-button
-            color="accent"
-            (click)="enrollProfessional($event)"
-            id="enroll_professional"
-          >I am a student/professional with an interest in autism</button>
-        </div>
-        <div
-          class="tiles"
-          fxLayout="row wrap"
-          fxLayoutAlign="center auto"
-          fxLayoutGap="20px"
-          fxHide.lt-sm
-          fxShow.gt-xs
-        >
-          <div fxFlex="100%"><h3>I am:</h3></div>
-          <app-border-box-tile
-            fxFlex="calc(33%-20px)"
-            (click)="enrollSelf($event)"
-            id="enroll_self_tile"
-            [subtitle]="'An adult with autism and my own legal guardian'"
-          ></app-border-box-tile>
-          <app-border-box-tile
-            fxFlex="calc(33%-20px)"
-            (click)="enrollGuardian($event)"
-            id="enroll_guardian_tile"
-            [subtitle]="'A parent / legal guardian of a child or adult with autism'"
-          ></app-border-box-tile>
-          <app-border-box-tile
-            fxFlex="calc(33%-20px)"
-            (click)="enrollProfessional($event)"
-            id="enroll_professional_tile"
-            [subtitle]="'A student / professional with an interest in autism'"
-          ></app-border-box-tile>
-        </div>
       </div>
-    </div>
-    <div>
-
     </div>
   </div>
 
-  <div *ngIf="state !== possibleStates.NO_PARTICIPANT">
+  <div *ngIf="getState() === possibleStates.NEEDS_PARTICIPANT">
+    <!-- Display messages based on the users metadata input -->
+    <app-profile-meta [user]="user" [meta]="userMeta"></app-profile-meta>
+  </div>
+
+
+  <div *ngIf="getState() === possibleStates.HAS_PARTICIPANT">
     <h1>Manage Your Profiles</h1>
     <div>
-      <p>Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.</p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_PROFESSIONAL">
+        You indicated that you are a profressional working in Autism research and treatment.
+        Once your profile is complete we will be able to notify you about important updates.
+      </p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_INTERESTED">
+        Once your profile is complete we will be able to notify you about important updates.
+      </p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_PARTICIPANT">
+        Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.
+      </p>
+      <p *ngIf="user.getSelf().relationship === relationships.SELF_GUARDIAN">
+        Once your complete your profile and the profiles of your dependents, you’ll be able to enroll them in any relevant currently-running studies.
+      </p>
+
 
       <app-loading
         *ngIf="loading"
@@ -115,8 +87,9 @@
               id="dependent_participant_{{participant.id}}"
             ></app-participant-profile>
           </div>
-          <div fxFlex="60%">
-            <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile first</p>
+          <div fxFlex="60%" *ngIf="user.getSelf().relationship !== relationships.SELF_INTERESTED">
+            <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile
+              first</p>
             <button
               *ngIf="user.getSelf()"
               mat-flat-button
@@ -124,7 +97,8 @@
               [disabled]="selfPercentComplete < 100"
               (click)="enrollDependent($event)"
               id="enroll_dependent"
-            >Create another profile</button>
+            >Create another profile
+            </button>
           </div>
         </div>
         <div>
@@ -164,10 +138,14 @@
                   </mat-list>
                 </mat-card-content>
               </mat-tab>
-              <mat-tab label="My Resources"><app-favorite-resources [favoriteResources]="favoriteResources"></app-favorite-resources></mat-tab>
-              <mat-tab label="My Topics"><app-favorite-topics
-                [currentUser]="user"
-              ></app-favorite-topics></mat-tab>
+              <mat-tab label="My Resources">
+                <app-favorite-resources [favoriteResources]="favoriteResources"></app-favorite-resources>
+              </mat-tab>
+              <mat-tab label="My Topics">
+                <app-favorite-topics
+                  [currentUser]="user"
+                ></app-favorite-topics>
+              </mat-tab>
             </mat-tab-group>
           </mat-card>
         </div>

@@ -10,6 +10,7 @@ from app import app, db, RestException, bcrypt, password_requirements
 from app.model.participant import Participant
 from app.model.role import Role
 from app.model.random_id_generator import random_integer
+from app.model.user_meta import UserMeta
 
 
 class User(db.Model):

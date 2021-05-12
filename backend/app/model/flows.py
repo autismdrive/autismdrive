@@ -3,6 +3,12 @@ from app.model.participant_relationship import Relationship
 
 
 class Flows:
+
+# WIP Method
+    @staticmethod
+    def parse_form():
+        return ""
+
     @staticmethod
     def get_self_intake_flow():
         flow = Flow(name="self_intake")
@@ -54,6 +60,14 @@ class Flows:
         return flow
 
     @staticmethod
+    def get_interested_intake_flow():
+        flow = Flow(name="interested_intake")
+        flow.relationship = Relationship.self_interested
+        flow.add_step('identification_questionnaire')
+        flow.add_step('contact_questionnaire')
+        return flow
+
+    @staticmethod
     def get_registration_flow():
         flow = Flow(name="registration")
         flow.add_step('registration_questionnaire')
@@ -81,6 +95,7 @@ class Flows:
             Flows.get_dependent_intake_flow(),
             Flows.get_guardian_intake_flow(),
             Flows.get_professional_intake_flow(),
+            Flows.get_interested_intake_flow(),
             Flows.get_registration_flow(),
             Flows.get_skillstar_flow(),
         ]
@@ -96,6 +111,8 @@ class Flows:
             return Flows.get_guardian_intake_flow()
         if name == 'professional_intake':
             return Flows.get_professional_intake_flow()
+        if name == 'interested_intake':
+            return Flows.get_interested_intake_flow()
         if name == 'registration':
             return Flows.get_registration_flow()
         if name == 'skillstar':
@@ -111,4 +128,6 @@ class Flows:
             return Flows.get_guardian_intake_flow()
         if name == Relationship.self_professional:
             return Flows.get_professional_intake_flow()
+        if name == Relationship.self_interested:
+            return Flows.get_interested_intake_flow()
 

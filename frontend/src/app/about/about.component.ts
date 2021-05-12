@@ -14,13 +14,13 @@ export class AboutComponent implements OnInit {
     private meta: Meta,
   ) {
     this.meta.updateTag(
-      { property: 'og:image', content: location.origin + '/assets/about/hero.jpg' },
+      { property: 'og:image', content: location.origin + '/assets/about/diversity.jpg' },
       `property='og:image'`);
     this.meta.updateTag(
-      { property: 'og:image:secure_url', content: location.origin + '/assets/about/hero.jpg' },
+      { property: 'og:image:secure_url', content: location.origin + '/assets/about/diversity.jpg' },
       `property='og:image:secure_url'`);
     this.meta.updateTag(
-      { name: 'twitter:image', content: location.origin + '/assets/about/hero.jpg' },
+      { name: 'twitter:image', content: location.origin + '/assets/about/diversity.jpg' },
       `name='twitter:image'`);
   }
 

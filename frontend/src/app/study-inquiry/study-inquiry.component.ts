@@ -17,6 +17,8 @@ export class StudyInquiryComponent implements OnInit {
   currentUser: User;
   @Input() study: Study;
   haveUserContact = false;
+  nonParticipant = true;
+
   inquirySent = false;
   alreadyInquired = false;
 
@@ -39,6 +41,7 @@ export class StudyInquiryComponent implements OnInit {
         const newU = new User(u);
         this.currentUser = newU;
         this.haveUserContact = newU.checkContact();
+        this.nonParticipant = newU.getSelf().relationship === ParticipantRelationship.SELF_INTERESTED;
 
       });
       this.api.getUserStudyInquiries(this.currentUser.id).subscribe(userStudyInquiries => {
@@ -76,7 +79,7 @@ export class StudyInquiryComponent implements OnInit {
     } else if (participant.relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
       $event.preventDefault();
       this.router.navigate(['flow', 'professional_intake', participant.id]);
-    } else {
+    } else if (participant.relationship === ParticipantRelationship.SELF_GUARDIAN) {
       $event.preventDefault();
       this.router.navigate(['flow', 'guardian_intake', participant.id]);
     }
