@@ -316,6 +316,7 @@ class ChainSessionStepSchema(ModelSchema):
     challenging_behaviors = fields.Nested(ChallengingBehaviorSchema, many=True)
     chain_step = fields.Method('get_chain_step', dump_only=True)
     session_type = fields.Method('get_session_type', dump_only=True)
+    session_number = fields.Method('get_session_number', dump_only=True)
 
     def get_chain_step(self, obj):
         if obj is None:
@@ -329,6 +330,12 @@ class ChainSessionStepSchema(ModelSchema):
             return missing
 
         return obj.chain_session.session_type
+
+    def get_session_number(self, obj):
+        if obj is None:
+            return missing
+
+        return obj.chain_session.session_number
 
     def get_participant_id(self, obj):
         if obj is None:
