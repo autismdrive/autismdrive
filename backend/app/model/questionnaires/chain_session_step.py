@@ -311,6 +311,7 @@ class ChainSessionStepSchema(ModelSchema):
             "reason_step_incomplete",
             "challenging_behaviors",
             "chain_step",
+            "session_number",
             "num_stars",
         )
 
@@ -338,7 +339,16 @@ class ChainSessionStepSchema(ModelSchema):
         if obj is None:
             return missing
 
-        return obj.chain_session.session_number
+        # Sort sessions by date
+        sorted_sessions = sorted(obj.chain_session.chain_questionnaire.sessions, key=lambda k: k.date)
+
+        # Find this session and return its index, incremented.
+        for i, session in enumerate(sorted_sessions):
+            if obj.chain_session.id == session.id:
+                return i + 1
+
+        # Session not found.
+        return -1
 
     def get_participant_id(self, obj):
         if obj is None:
