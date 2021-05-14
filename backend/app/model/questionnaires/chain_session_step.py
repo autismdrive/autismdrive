@@ -281,6 +281,8 @@ class ChainSessionStep(db.Model):
         }
         return field_groups
 
+    num_stars = db.Column(db.Integer, nullable=True)
+
 
 class ChainSessionStepSchema(ModelSchema):
     # @pre_load
@@ -309,6 +311,7 @@ class ChainSessionStepSchema(ModelSchema):
             "reason_step_incomplete",
             "challenging_behaviors",
             "chain_step",
+            "num_stars",
         )
 
     participant_id = fields.Method('get_participant_id', dump_only=True)
