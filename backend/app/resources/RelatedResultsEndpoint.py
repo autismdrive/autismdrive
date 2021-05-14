@@ -1,4 +1,6 @@
 import elasticsearch
+import flask.scaffold
+flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request, json, jsonify
 

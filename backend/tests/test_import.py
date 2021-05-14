@@ -79,7 +79,7 @@ class TestImportCase(BaseTestQuestionnaire, unittest.TestCase):
         self.assertIsNotNone(httpretty.last_request())
         self.assertIsNotNone(headers)
         self.assertEqual("Bearer my_token", headers['Authorization'])
-        self.assertEqual(2, len(httpretty.httpretty.latest_requests))
+        self.assertEqual(3, len(httpretty.httpretty.latest_requests))
 
     def get_data_importer_setup_auth(self):
         httpretty.register_uri(

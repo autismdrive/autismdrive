@@ -6,9 +6,8 @@ frontend/package-lock.json
 .isort.cfg
 setup.cfg
 star_drive.log
-
 .release-it.json
 environment.prod.ts
 .stage
 /venv
-`
+.DS_Store

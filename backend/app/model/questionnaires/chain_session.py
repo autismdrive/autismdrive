@@ -114,6 +114,7 @@ class ChainSessionSchema(ModelSchema):
             "date",
             "completed",
             "session_type",
+            "session_number",
             "chain_questionnaire_id",
             "step_attempts",
         )
@@ -121,6 +122,7 @@ class ChainSessionSchema(ModelSchema):
     step_attempts = fields.Nested(ChainSessionStepSchema, many=True)
     participant_id = fields.Method('get_participant_id', dump_only=True)
     user_id = fields.Method('get_user_id', dump_only=True)
+    session_number = fields.Method('get_session_number', dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -133,3 +135,18 @@ class ChainSessionSchema(ModelSchema):
             return missing
 
         return obj.chain_questionnaire.user_id
+
+    def get_session_number(self, obj):
+        if obj is None:
+            return missing
+
+        # Sort sessions by date
+        sorted_sessions = sorted(obj.chain_questionnaire.sessions, key=lambda k: k.date)
+
+        # Find this session and return its index, incremented.
+        for i, session in enumerate(sorted_sessions):
+            if obj.id == session.id:
+                return i + 1
+
+        # Session not found.
+        return -1
