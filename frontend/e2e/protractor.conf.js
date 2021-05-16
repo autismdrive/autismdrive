@@ -2,6 +2,7 @@
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
 const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
+process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 exports.config = {
   allScriptsTimeout: 30000,
@@ -11,16 +12,16 @@ exports.config = {
   capabilities: {
     chromeOptions: {
       args: [
-        // '--headless',
-        // '--disable-gpu',
+        '--headless',
+        '--disable-gpu',
         '--window-size=1440, 900',
-        // '--no-sandbox',
-        // '--disable-dev-shm-usage',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
         '--dev-server-target=',
       ],
+      binary: process.env.CHROME_BIN
     },
-    'browserName': 'chrome',
-    'binary': '/usr/bin/google-chrome-stable'
+    browserName: 'chrome',
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
