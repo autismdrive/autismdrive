@@ -309,10 +309,10 @@ class ChainSessionStepSchema(ModelSchema):
             "prompt_level",
             "had_challenging_behavior",
             "reason_step_incomplete",
-            "challenging_behaviors",
-            "chain_step",
             "session_number",
             "num_stars",
+            "challenging_behaviors",
+            "chain_step",
         )
 
     participant_id = fields.Method('get_participant_id', dump_only=True)
