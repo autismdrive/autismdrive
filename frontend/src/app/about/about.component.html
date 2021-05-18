@@ -8,11 +8,11 @@
     </div>
   </div>
 </div>
+<div fxLayoutAlign="center"  fxLayout="column">
 <div class="container about">
   <div
     class="row"
     fxLayout="row"
-    fxLayout.xs="column"
     fxLayoutGap="4%"
     fxLayoutAlign="center"
   >
@@ -41,15 +41,16 @@
         want to cancel your account at any time, you can let us know by emailing rn4ee@hscmail.mcc.virginia.edu.</p>
     </div>
   </div>
-
-  <div fxLayoutAlign="center center">
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="goRegister($event)"
-      class="btn-lg"
-    >
-      Get started now
-    </button>
-  </div>
+</div>
+<div class="row"
+     fxLayoutAlign="center center">
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="goRegister($event)"
+    class="btn-lg"
+  >
+    Get started now
+  </button>
+</div>
 </div>
