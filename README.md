@@ -8,7 +8,7 @@ Please see the individual readme files in Frontend and Backend for details.
 
 To deploy for staging:
 
-1. Have sartography ssh credentials set up. 
+1. Have sartography ssh credentials set up 
 
 2. Add remote to sartography staging server in star-drive (*NOT star-drive-dist*)
 
