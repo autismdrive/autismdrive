@@ -10,7 +10,7 @@ To deploy for staging:
 
 1. Have sartography ssh credentials set up 
 
-2. Add remote to sartography staging server in star-drive (*NOT star-drive-dist*)
+2. Add remote to sartography staging server in star-drive (*NOT star-drive-dist*) 
 
 
 ```bash 
