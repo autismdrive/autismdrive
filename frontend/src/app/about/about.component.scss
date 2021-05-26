@@ -4,7 +4,14 @@
 
 .move_up {
   position: relative;
+  width: 575px;
   top: -110px;
+}
+
+.move_up_mobile {
+  position: relative;
+  width: 400px;
+  top: -120px;
 }
 
 #hero {

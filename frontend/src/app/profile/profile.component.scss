@@ -17,6 +17,8 @@ button{
 }
 
 .meta-form {
-  max-width: 600px;
+  max-width: 80%;
+  word-break: break-all;
+  overflow: scroll;
   margin: auto;
 }
