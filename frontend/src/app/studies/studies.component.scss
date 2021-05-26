@@ -9,7 +9,7 @@
 }
 
 .studies {
-  margin: 2%;
+  padding: 5.5%;
 
   h1 {
     font-size: 2.5rem;
@@ -30,4 +30,15 @@
   p {
     max-width: 960px;
   }
+}
+
+/* desktop display */
+.mobile_device_480px {
+  display: none;
+}
+
+/* phone display */
+@media only screen and (max-device-width: 480px) {
+  .mobile_device_480px{display: block;}
+  .desktop {display: none;}
 }

@@ -25,3 +25,14 @@
   font-style: italic;
   margin-bottom: 1em;
 }
+
+/* desktop display */
+.mobile_device_480px {
+  display: none;
+}
+
+/* phone display */
+@media only screen and (max-device-width: 480px) {
+  .mobile_device_480px{display: block;}
+  .desktop {display: none;}
+}

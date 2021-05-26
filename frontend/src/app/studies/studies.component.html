@@ -7,6 +7,7 @@
     research study you are participating in or are interested in participating with. If you have any additional
     questions, don't hesitate to reach out to us at <a href="mailto:autismdrive@virginia.edu">autismdrive@virginia.edu</a>.</p>
 </div>
+<div fxLayoutAlign="center"  fxLayout="column">
 <div
   id="hero"
   class="center-center gradient-overlay container with-escaping-tiles"
@@ -15,53 +16,101 @@
   <div class="hero-content">
     <h1>Autism Research Studies</h1>
   </div>
-  <div
-    class="row escaping-tiles-1x"
-    fxLayout="row"
-    fxLayoutGap="40px"
-    fxLayoutAlign="center auto"
-    id="TopOfSearch"
-  >
-    <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
-      <mat-label>Study Status</mat-label>
-      <mat-select [(value)]="selectedStatus">
-        <mat-select-trigger>
-          <app-type-icon
-            *ngIf="selectedStatus"
-            [iconType]="selectedStatus && selectedStatus.name"
-            [size]="1"
-          ></app-type-icon>
-          <span class="type-label" *ngIf="selectedStatus">{{selectedStatus.label}}</span>
-        </mat-select-trigger>
-        <mat-option
-          *ngFor="let status of studyStatuses"
-          [value]="status"
-          (click)="selectStatus(status)"
-        >
-          <span class="type-label">{{status.label}}</span>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+  <div class="desktop">
+    <div
+      class="row escaping-tiles-1x"
+      fxLayout="row"
+      fxLayoutGap="40px"
+      fxLayoutAlign="center auto"
+      id="TopOfSearch"
+    >
+      <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+        <mat-label>Study Status</mat-label>
+        <mat-select [(value)]="selectedStatus">
+          <mat-select-trigger>
+            <app-type-icon
+              *ngIf="selectedStatus"
+              [iconType]="selectedStatus && selectedStatus.name"
+              [size]="1"
+            ></app-type-icon>
+            <span class="type-label" *ngIf="selectedStatus">{{selectedStatus.label}}</span>
+          </mat-select-trigger>
+          <mat-option
+            *ngFor="let status of studyStatuses"
+            [value]="status"
+            (click)="selectStatus(status)"
+          >
+            <span class="type-label">{{status.label}}</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <app-border-box-tile
-      *ngFor="let status of studyStatuses"
-      fxShow.md fxShow.lg fxShow.xl
-      fxHide.lt-md
-      fxFlex.gt-sm="calc(33% - 160px)"
-      fxFlex.sm="calc(50% - 120px)"
-      [iconSize]="2"
-      [iconType]="status.name"
-      [title]="status.label"
-      [linkSize]="1"
-      [isSelected]="selectedStatus.name === status.name"
-      (click)="selectStatus(status)"
-      [attr.data-study-status]="status.name"
-    ></app-border-box-tile>
+          <app-border-box-tile
+          *ngFor="let status of studyStatuses"
+          fxShow.md fxShow.lg fxShow.xl
+          fxHide.lt-md
+          fxFlex.gt-sm="calc(33% - 160px)"
+          fxFlex.sm="calc(50% - 120px)"
+          [iconSize]="2"
+          [iconType]="status.name"
+          [title]="status.label"
+          [linkSize]="1"
+          [isSelected]="selectedStatus.name === status.name"
+          (click)="selectStatus(status)"
+          [attr.data-study-status]="status.name"
+        ></app-border-box-tile>
+    </div>
   </div>
 </div>
+  <div class="mobile_device_480px">
+    <p> </p>
+    <div
+      class="row escaping-tiles-1x"
+      fxLayout="row"
+      fxLayoutGap="40px"
+      fxLayoutAlign="center auto"
+      id="TopOfSearch"
+    >
+      <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+        <mat-label>Study Status</mat-label>
+        <mat-select [(value)]="selectedStatus">
+          <mat-select-trigger>
+            <app-type-icon
+              *ngIf="selectedStatus"
+              [iconType]="selectedStatus && selectedStatus.name"
+              [size]="1"
+            ></app-type-icon>
+            <span class="type-label" *ngIf="selectedStatus">{{selectedStatus.label}}</span>
+          </mat-select-trigger>
+          <mat-option
+            *ngFor="let status of studyStatuses"
+            [value]="status"
+            (click)="selectStatus(status)"
+          >
+            <span class="type-label">{{status.label}}</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
+      <app-border-box-tile
+        *ngFor="let status of studyStatuses"
+        fxShow.md fxShow.lg fxShow.xl
+        fxHide.lt-md
+        fxFlex.gt-sm="calc(33% - 160px)"
+        fxFlex.sm="calc(50% - 120px)"
+        [iconSize]="2"
+        [iconType]="status.name"
+        [title]="status.label"
+        [linkSize]="1"
+        [isSelected]="selectedStatus.name === status.name"
+        (click)="selectStatus(status)"
+        [attr.data-study-status]="status.name"
+      ></app-border-box-tile>
+    </div>
+  </div>
+</div>
 <div
-  class="studies pad-4"
+  class="studies"
   fxLayout="column"
   fxLayoutGap="40px"
 >

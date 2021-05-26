@@ -408,6 +408,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   doSearch() {
     this.loading = true;
 
+    console.log(this.query);
     if (this.query) {
       this._loadSearchResults();
       this._loadMapResults();
@@ -571,6 +572,8 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     this.query.size = event.pageSize;
     this.pageSize = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
+    this.query.sort = this.selectedSort.sortQuery;
+    console.log('here: ', this.query);
     this.scrollToTopOfSearch();
     this.updateUrlAndDoSearch();
   }
@@ -852,7 +855,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
               q.languages = qParams.getAll(key);
               break;
             case('sort'):
-              const sortKey = qParams.get(key).toLowerCase();
+              const sortKey = qParams.get(key).toUpperCase();
               if (this.sortMethods[sortKey]) {
                 q.sort = this.sortMethods[sortKey].sortQuery;
               }
