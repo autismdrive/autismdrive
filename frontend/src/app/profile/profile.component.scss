@@ -18,7 +18,22 @@ button{
 
 .meta-form {
   max-width: 80%;
-  word-break: break-all;
-  overflow: scroll;
   margin: auto;
+}
+
+::ng-deep .mat-checkbox-label {
+  white-space: normal;
+  margin-top: -1em;
+}
+
+::ng-deep .mat-checkbox-layout {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  vertical-align: top;
+}
+
+::ng-deep .mat-checkbox-inner-container {
+  margin-top: -.7em !important;
 }
