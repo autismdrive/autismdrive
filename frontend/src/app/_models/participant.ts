@@ -33,6 +33,8 @@ export class Participant {
         return 'guardian_intake';
       case ParticipantRelationship.SELF_PROFESSIONAL:
         return 'professional_intake';
+      case ParticipantRelationship.SELF_INTERESTED:
+        return 'interested_intake';
       case ParticipantRelationship.SELF_PARTICIPANT:
         return 'self_intake';
       default:

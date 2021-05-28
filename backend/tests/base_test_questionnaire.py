@@ -1,9 +1,9 @@
 import random
-import random
 import string
 
 from dateutil import parser
 
+from tests.base_test import BaseTest
 from app import db
 from app.model.participant import Relationship
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
@@ -32,7 +32,6 @@ from app.model.questionnaires.registration_questionnaire import RegistrationQues
 from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
 from app.model.questionnaires.therapy import Therapy
 from app.model.user import User, Role
-from tests.base_test import BaseTest
 
 
 class BaseTestQuestionnaire(BaseTest):
@@ -656,7 +655,8 @@ class BaseTestQuestionnaire(BaseTest):
             was_prompted=True,
             prompt_level="partial_physical",
             had_challenging_behavior=True,
-            reason_step_incomplete="challenging_behavior"
+            reason_step_incomplete="challenging_behavior",
+            num_stars=0,
         )
         session_1 = ChainSession(date=session_date)
         session_1.step_attempts = [session_1_step_1]
@@ -671,12 +671,14 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_bq.sessions, bq.sessions)
         self.assertEqual(db_bq.sessions[0].date, session_date)
         self.assertEqual(db_bq.sessions[0].step_attempts[0].date, session_date)
+        self.assertEqual(db_bq.sessions[0].step_attempts[0].num_stars, 0)
         return db_bq
 
     def construct_all_questionnaires(self, user=None):
         if user is None:
             user = self.construct_user()
         participant = self.construct_participant(user=user, relationship=Relationship.dependent)
+        self.construct_usermeta(user=user)
         self.construct_clinical_diagnoses_questionnaire(user=user, participant=participant)
         self.construct_contact_questionnaire(user=user, participant=participant)
         self.construct_current_behaviors_dependent_questionnaire(user=user, participant=participant)

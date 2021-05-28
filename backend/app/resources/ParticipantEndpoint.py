@@ -1,5 +1,7 @@
 import datetime
 
+import flask.scaffold
+flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request, g
 from sqlalchemy import func
@@ -59,7 +61,6 @@ class ParticipantListEndpoint(flask_restful.Resource):
         participants = db.session.query(Participant).all()
         return self.schema.dump(participants)
 
-
 class ParticipantAdminListEndpoint(flask_restful.Resource):
     def count_participants(self, relationship, filter_out_test=False):
         if filter_out_test:
@@ -78,10 +79,12 @@ class ParticipantAdminListEndpoint(flask_restful.Resource):
             'num_self_guardians': self.count_participants('self_guardian'),
             'num_dependents': self.count_participants('dependent'),
             'num_self_professionals': self.count_participants('self_professional'),
+            'num_self_interested': self.count_participants('self_interested'),
             'filtered_self_participants': self.count_participants('self_participant', filter_out_test=True),
             'filtered_self_guardians': self.count_participants('self_guardian', filter_out_test=True),
             'filtered_dependents': self.count_participants('dependent', filter_out_test=True),
             'filtered_self_professionals': self.count_participants('self_professional', filter_out_test=True),
+            'filtered_self_interested': self.count_participants('self_interested', filter_out_test=True),
             'all_participants': ParticipantSchema(many=True).dump(db.session.query(Participant)
                                                                   .order_by(Participant.relationship).all(), many=True)
         }

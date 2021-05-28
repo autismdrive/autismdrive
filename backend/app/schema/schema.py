@@ -1,3 +1,4 @@
+from flask_marshmallow.sqla import SQLAlchemyAutoSchema
 from marshmallow import fields, Schema, post_load, missing
 from marshmallow.utils import EXCLUDE
 from marshmallow_enum import EnumField
@@ -24,6 +25,7 @@ from app.model.study_user import StudyUser, StudyUserStatus
 from app.model.user import User
 from app.model.user_favorite import UserFavorite
 from app.model.event_user import EventUser
+from app.model.user_meta import UserMeta
 from app.model.zip_code import ZipCode
 from app.model.chain_step import ChainStep
 from app.schema.model_schema import ModelSchema
@@ -60,7 +62,6 @@ import app.model.questionnaires.registration_questionnaire
 import app.model.questionnaires.chain_questionnaire
 import app.model.questionnaires.chain_session
 import app.model.questionnaires.chain_session_step
-
 
 class InvestigatorSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
@@ -426,16 +427,33 @@ class UserFavoriteSchema(ModelSchema):
     category = ma.Nested(CategorySchema, dump_only=True)
 
 
+class UserMetaSchema(ModelSchema):
+    self_relationship = fields.Function(lambda obj: obj.get_relationship(), allow_none=True)
+
+    class Meta(ModelSchema.Meta):
+        model = UserMeta
+        #load_instance = True
+        #sqla_session = db.session
+        fields = ('id', 'last_updated', 'self_participant', 'self_has_guardian', 'professional', 'interested',
+                  'guardian', 'guardian_has_dependent', 'self_relationship')
+    self_participant = fields.Boolean(required=False, allow_none=True)
+    self_has_guardian = fields.Boolean(required=False, allow_none=True)
+    professional = fields.Boolean(required=False, allow_none=True)
+    interested = fields.Boolean(required=False, allow_none=True)
+    guardian = fields.Boolean(required=False, allow_none=True)
+    guardian_has_dependent = fields.Boolean(required=False, allow_none=True)
+
 class UserSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = User
         fields = ('id', 'last_updated', 'registration_date', 'last_login', 'email', 'password', 'role',
-                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'participant_count',
+                  'permissions', 'participants', 'token', 'token_url', 'user_favorites', 'user_meta', 'participant_count',
                   'created_password', 'identity', 'percent_self_registration_complete', 'email_verified')
     password = fields.String(load_only=True)
     participants = ma.Nested(ParticipantSchema, dump_only=True, many=True)
     participant_count = fields.Integer(required=False, allow_none=True)
     user_favorites = ma.Nested(UserFavoriteSchema, dump_only=True, many=True)
+    user_meta = ma.Nested(UserMetaSchema, dump_only=True)
     id = fields.Integer(required=False, allow_none=True)
     role = EnumField(Role)
     permissions = fields.Method('get_permissions', dump_only=True)
@@ -699,3 +717,5 @@ class ZipCodeSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ZipCode
         fields = ["id", "latitude", "longitude"]
+
+

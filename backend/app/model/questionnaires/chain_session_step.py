@@ -281,6 +281,8 @@ class ChainSessionStep(db.Model):
         }
         return field_groups
 
+    num_stars = db.Column(db.Integer, nullable=True)
+
 
 class ChainSessionStepSchema(ModelSchema):
     # @pre_load
@@ -307,6 +309,8 @@ class ChainSessionStepSchema(ModelSchema):
             "prompt_level",
             "had_challenging_behavior",
             "reason_step_incomplete",
+            "session_number",
+            "num_stars",
             "challenging_behaviors",
             "chain_step",
         )
@@ -316,6 +320,7 @@ class ChainSessionStepSchema(ModelSchema):
     challenging_behaviors = fields.Nested(ChallengingBehaviorSchema, many=True)
     chain_step = fields.Method('get_chain_step', dump_only=True)
     session_type = fields.Method('get_session_type', dump_only=True)
+    session_number = fields.Method('get_session_number', dump_only=True)
 
     def get_chain_step(self, obj):
         if obj is None:
@@ -329,6 +334,21 @@ class ChainSessionStepSchema(ModelSchema):
             return missing
 
         return obj.chain_session.session_type
+
+    def get_session_number(self, obj):
+        if obj is None:
+            return missing
+
+        # Sort sessions by date
+        sorted_sessions = sorted(obj.chain_session.chain_questionnaire.sessions, key=lambda k: k.date)
+
+        # Find this session and return its index, incremented.
+        for i, session in enumerate(sorted_sessions):
+            if obj.chain_session.id == session.id:
+                return i + 1
+
+        # Session not found.
+        return -1
 
     def get_participant_id(self, obj):
         if obj is None:

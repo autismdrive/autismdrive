@@ -26,7 +26,7 @@
     fxLayout="column"
     fxLayoutGap="20px"
   >
-    <div *ngIf="!alreadyInquired">
+    <div *ngIf="!alreadyInquired && !nonParticipant">
       <p>Please make sure that your profile is complete before indicating your interest in this study. The researchers
         have a much better chance of determining your eligibility if they can see complete details about you and/or
         your dependant.</p>
@@ -71,6 +71,9 @@
           (click)="goEligibility()"
         >Go to screener</button>
       </div>
+    </div>
+    <div *ngIf="nonParticipant">
+      <p>Your profile is not currently eligible for enrolling in this Study.</p>
     </div>
   </div>
 </div>

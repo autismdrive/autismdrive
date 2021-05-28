@@ -103,7 +103,7 @@ const routes: Routes = [
   {
     path: 'studies/add',
     component: StudyFormComponent,
-    data: {title: 'Create an Autism DRIVE Study', roles: ['admin',]},
+    data: {title: 'Create an Autism DRIVE Study', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
   {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
@@ -111,7 +111,7 @@ const routes: Routes = [
   {
     path: 'study/edit/:studyId',
     component: StudyFormComponent,
-    data: {title: 'Edit Study', roles: ['admin',]},
+    data: {title: 'Edit Study', roles: ['admin', ]},
     canActivate: [RoleGuard]
   },
   {
@@ -126,44 +126,44 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminHomeComponent,
-    data: {title: 'Autism DRIVE Admin Home', roles: ['admin',]},
+    data: {title: 'Autism DRIVE Admin Home', roles: ['admin', ]},
     canActivate: [RoleGuard],
     children: [
       {path: '', redirectTo: 'data-admin', pathMatch: 'full'},
       {
         path: 'data-admin',
         component: QuestionnaireDataViewComponent,
-        data: {title: 'Autism DRIVE Data Admin', roles: ['admin',]},
+        data: {title: 'Autism DRIVE Data Admin', roles: ['admin', ]},
         canActivate: [RoleGuard]
       },
       {
         path: 'user-admin',
         component: UserAdminComponent,
-        data: {title: 'Autism DRIVE User Admin', roles: ['admin',]},
+        data: {title: 'Autism DRIVE User Admin', roles: ['admin', ]},
         canActivate: [RoleGuard]
       },
       {
         path: 'participant-admin',
         component: ParticipantAdminComponent,
-        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin',]},
+        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin', ]},
         canActivate: [RoleGuard]
       },
       {
         path: 'taxonomy-admin',
         component: TaxonomyAdminComponent,
-        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin',]},
+        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin', ]},
         canActivate: [RoleGuard]
       },
       {
         path: 'import-export-status',
         component: AdminExportComponent,
-        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin',]},
+        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin', ]},
         canActivate: [RoleGuard]
       },
       {
         path: 'email-log',
         component: EmailLogAdminComponent,
-        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin',]},
+        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin', ]},
         canActivate: [RoleGuard]
       },
       // {

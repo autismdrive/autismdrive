@@ -2,14 +2,19 @@
   margin: 1em;
 }
 
+.move_up {
+  position: relative;
+  top: -110px;
+}
+
 #hero {
-  background-image: url('/assets/about/hero.jpg');
-  background-position: 50% 50%;
+  background-image: url('/assets/about/diversity.jpg');
+  background-position: 50% 17%;
   height: 480px;
 }
 
 #feature {
-  background-image: url('/assets/about/feature.jpg');
+  background-image: url('/assets/about/diversity.jpg');
   background-position: 100% 20%;
   height: 480px;
 }

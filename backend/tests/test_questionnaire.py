@@ -1271,6 +1271,10 @@ class TestQuestionnaire(BaseTestQuestionnaire, unittest.TestCase):
             response["sessions"][0]["step_attempts"][0]["chain_step_id"],
             cq.sessions[0].step_attempts[0].chain_step_id
         )
+        self.assertEqual(
+            response["sessions"][0]["step_attempts"][0]["session_number"],
+            len(cq.sessions)
+        )
         self.assertTrue('chain_step' in response["sessions"][0]["step_attempts"][0])
         self.assertIsNotNone(response["sessions"][0]["step_attempts"][0]["chain_step"]["name"])
 

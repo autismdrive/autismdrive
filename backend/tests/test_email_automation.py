@@ -286,3 +286,15 @@ class TestExportCase(BaseTestQuestionnaire, unittest.TestCase):
 
         EmailPromptService(app, db, EmailLog, Study, User).send_dependent_profile_prompting_emails()
         self.assertEqual(len(TEST_MESSAGES), message_count)
+
+    def test_self_participants_that_are_not_their_own_legal_guardians_do_not_get_reminders(self):
+        u2 = self.construct_user(email='test2@sartography.com', last_login="12/4/19 10:00")
+        u2._password = b'123412'
+        user_meta = self.construct_usermeta(user=u2)
+        user_meta.self_participant = True
+        user_meta.self_has_guardian = True
+
+        # Assure no new messages to go out to this individual who is not their own legal guardian.
+        message_count = len(TEST_MESSAGES)
+        EmailPromptService(app, db, EmailLog, Study, User).send_complete_registration_prompting_emails()
+        self.assertEqual(len(TEST_MESSAGES), message_count)
