@@ -22,7 +22,7 @@
           connect you with the best possible resources. To create your profile, please select all the items below that
           describe you. If appropriate, you will have additional opportunities to create profiles for your children or
           dependents after completing your own profile. Once we have this information we can connect you to current and
-          future research studies, and together, find ways to improve the lives of people living with Autism.</p>
+          future research studies, and together, find ways to improve the lives of people living with autism.</p>
         <form [formGroup]="form" id="meta-form">
           <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
           <button id="submit_meta" mat-flat-button type="submit" color="accent" (click)="createMeta()">Submit</button>
@@ -42,7 +42,7 @@
     <h1>Manage Your Profiles</h1>
     <div>
       <p *ngIf="user.getSelf().relationship === relationships.SELF_PROFESSIONAL">
-        You indicated that you are a profressional working in Autism research and treatment.
+        You indicated that you are a professional working in Autism research and treatment.
         Once your profile is complete we will be able to notify you about important updates.
       </p>
       <p *ngIf="user.getSelf().relationship === relationships.SELF_INTERESTED">

@@ -68,7 +68,7 @@ export class ProfileComponent implements OnInit {
       key: 'self_has_guardian',
       type: 'radio',
       templateOptions: {
-        label: 'Do you have a legal guardian that helps you make day to day decisions?',
+        label: 'Do you have a legal guardian?',
         options: [
           { value: true, label: 'Yes', id: '1' },
           { value: false, label: 'No', id: '2' },

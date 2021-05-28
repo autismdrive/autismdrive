@@ -1,22 +1,37 @@
-<div
-  id="hero"
-  class="gradient-overlay container"
->
-  <div class="row move_up">
-    <div class="border-box">
-      <h1>About Autism DRIVE</h1>
+<div fxHide fxShow.gt-md>
+  <div
+    id="hero"
+    class="gradient-overlay container"
+  >
+      <div class="row move_up">
+        <div class="border-box">
+          <h1>About Autism DRIVE</h1>
+        </div>
+      </div>
+    </div>
+</div>
+<div fxShow fxHide.gt-md>
+  <div
+    id="hero"
+    class="gradient-overlay container"
+    style="background-position: 50% 0%; background-size: 980px"
+  >
+    <div class="row move_up_mobile">
+      <div class="border-box">
+        <h1>About Autism DRIVE</h1>
+      </div>
     </div>
   </div>
 </div>
+<div fxLayoutAlign="center"  fxLayout="column">
 <div class="container about">
   <div
     class="row"
     fxLayout="row"
-    fxLayout.xs="column"
     fxLayoutGap="4%"
     fxLayoutAlign="center"
   >
-    <div fxFlex="60%">
+    <div fxFlex="67%">
       <h2>About "Autism DRIVE"</h2>
       <p>The Autism DRIVE was developed by <a href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star">University
         of Virginia STAR initiative</a> to help the autism community, researchers, and resources connect. Through the
@@ -41,15 +56,16 @@
         want to cancel your account at any time, you can let us know by emailing rn4ee@hscmail.mcc.virginia.edu.</p>
     </div>
   </div>
-
-  <div fxLayoutAlign="center center">
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="goRegister($event)"
-      class="btn-lg"
-    >
-      Get started now
-    </button>
-  </div>
+</div>
+<div class="row"
+     fxLayoutAlign="center center">
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="goRegister($event)"
+    class="btn-lg"
+  >
+    Get started now
+  </button>
+</div>
 </div>
