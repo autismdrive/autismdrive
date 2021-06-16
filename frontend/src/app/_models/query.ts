@@ -20,6 +20,7 @@ export interface QueryProps {
   date?: Date;
   status?: string;
   map_data_only?: boolean;
+  geo_point: { lat: number, lon: number };
 }
 
 export class Query {
@@ -42,6 +43,7 @@ export class Query {
   date?: Date;
   status?: string;
   map_data_only = false;
+  geo_point: { lat: number, lon: number };
 
   constructor(private _props: QueryProps) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));

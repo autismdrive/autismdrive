@@ -480,3 +480,19 @@ app-search-filters-breadcrumbs {
 #show-filters-button {
   margin-bottom: 1em;
 }
+
+app-border-box-tile {
+  transition: position 3s;
+}
+
+::ng-deep .mat-tooltip {
+  font-size: 15px !important;
+}
+
+.mat-progress-bar {
+  height: 6px;
+}
+
+.loc-service {
+  margin: 2em;
+}
