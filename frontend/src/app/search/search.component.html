@@ -163,23 +163,6 @@
     [links]="videoLinks"
     fxFlexAlign="center"
   ></app-tutorial-video>
-  <app-search-filters-breadcrumbs
-    *ngIf="query"
-    (ageRangeChipClicked)="selectAgeRange()"
-    (categoryChipClicked)="removeCategory()"
-    (clearAllClicked)="clearAllFilters()"
-    (keywordChipClicked)="removeWords()"
-    (languageChipClicked)="selectLanguage()"
-    (mappedResultsChipClicked)="listMapResultsOnly($event)"
-    (typeChipClicked)="selectType()"
-    [ageLabels]="ageLabels"
-    [fxHide]="!showBreadcrumbs()"
-    [fxShow]="showBreadcrumbs()"
-    [languageLabels]="languageLabels"
-    [query]="query"
-    [restrictToMappedResults]="restrictToMappedResults"
-    [typeLabels]="typeLabels"
-  ></app-search-filters-breadcrumbs>
   <div
     class="type-tabs-container"
     fxShow
@@ -227,7 +210,7 @@
     class="search-results"
     id="results"
     fxLayout="column"
-    fxLayoutGap="40px"
+    fxLayoutGap="10px"
     fxFlex="60%"
     fxFlex.lt-md="100%"
     fxShow
@@ -260,6 +243,25 @@
             (sortMethodSelected)="reSort($event.name, true)"
           ></app-search-sort>
         </div>
+      </div>
+      <div class="sort-order" fxShow fxHide.lt-md>
+        <app-search-filters-breadcrumbs
+          *ngIf="query"
+          (ageRangeChipClicked)="selectAgeRange()"
+          (categoryChipClicked)="removeCategory()"
+          (clearAllClicked)="clearAllFilters()"
+          (keywordChipClicked)="removeWords()"
+          (languageChipClicked)="selectLanguage()"
+          (mappedResultsChipClicked)="listMapResultsOnly($event)"
+          (typeChipClicked)="selectType()"
+          [ageLabels]="ageLabels"
+          [fxHide]="!showBreadcrumbs()"
+          [fxShow]="showBreadcrumbs()"
+          [languageLabels]="languageLabels"
+          [query]="query"
+          [restrictToMappedResults]="restrictToMappedResults"
+          [typeLabels]="typeLabels"
+        ></app-search-filters-breadcrumbs>
       </div>
       <div *ngIf="hits.length > 0">
         <app-search-result
@@ -312,11 +314,13 @@
       id="set-location"
       [ngClass]="'zipCodeSetButton mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
+      [expanded]="true"
       #setLocationExpansionPanel
     >
       <mat-expansion-panel-header>
         <ng-container *ngIf="isZipCode(storedZip)">Location: {{storedZip}}</ng-container>
         <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: using GPS</ng-container>
+        <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set Location</ng-container>
       </mat-expansion-panel-header>
       <div [ngClass]="'zipCodeSet'" fxLayout="column">
         <mat-form-field class="zipCodeField">
@@ -336,6 +340,14 @@
               id="btn_save"
             >Save</button>
             <button
+              *ngIf="!gpsEnabled"
+              mat-flat-button
+              #tooltip="matTooltip"
+              matTooltip="Enable GPS in your browser's settings & reload this page"
+              matTooltipPosition="below"
+              id="btn_no_gps"
+            >GPS disabled</button>
+            <button
               *ngIf="gpsEnabled"
               mat-flat-button
               (click)="useGPSLocation($event, setLocationExpansionPanel)"
@@ -352,7 +364,7 @@
         [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
         [streetViewControl]="false"
         mapTypeId="roadmap"
-        [zoom]="7"
+        [zoom]="mapZoomLevel ? mapZoomLevel : defaultZoom"
         (mapReady)="mapLoad($event)"
         [scrollwheel]="null"
         (mapClick)="closeInfoWindow()"
@@ -462,7 +474,7 @@
       </span>
     </div>
   </div>
-  <app-border-box-tile
+  <app-border-box-tile *ngIf="!loading"
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"
@@ -474,3 +486,4 @@
 <ng-template #loadingMessage>
   <app-loading></app-loading>
 </ng-template>
+

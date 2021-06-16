@@ -233,6 +233,9 @@ class ElasticIndex:
         else:
             elastic_search = elastic_search.filter('bool', **{"should": self._default_filter()})
 
+        if search.geo_point:
+            elastic_search = elastic_search.filter('geo_distance', distance="100mi",
+                                                   geo_point={"lat": search.geo_point.lat, "lon": search.geo_point.lon})
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
 

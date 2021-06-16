@@ -39,7 +39,7 @@ export class SearchService {
 
   mapSearch(query: Query, mapDataOnly = true): Observable<Query> {
     const mapQuery = createClone({circles: true})(query);
-    mapQuery.size = 999;
+    mapQuery.size = 200;
     mapQuery.map_data_only = mapDataOnly;
     return this.search(mapQuery);
   }

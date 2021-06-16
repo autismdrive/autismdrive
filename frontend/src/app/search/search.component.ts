@@ -81,6 +81,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   };
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
+  defaultZoom: number = 7;
   mapZoomLevel: number;
   sortMethods: { [key: string]: SortMethod };
   selectedSort: SortMethod;
@@ -191,7 +192,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       },
       DISTANCE: {
         name: 'Distance',
-        label: 'Distance from me',
+        label: 'Distance',
         sortQuery: {
           field: 'geo_point',
           latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
@@ -250,6 +251,19 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
           if (navigator.geolocation) {
             this.gpsEnabled = true;
           }
+          this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || this.defaultZoom;
+          // parse lat and lng from URL
+          const qLat = qParamMap.get('lat');
+          const qLng = qParamMap.get('lng');
+          if (qLat && qLng) {
+            this.mapLoc.lat = parseFloat(qLat);
+            this.mapLoc.lng = parseFloat(qLng);
+          } else {
+            this.mapLoc.lat = this.defaultLoc.lat;
+            this.mapLoc.lng = this.defaultLoc.lng;
+          }
+          console.log(qParamMap.get('lat'));
+          console.log(qParamMap.get('lng'));
           const sortName = qParamMap.get('sort') || 'Distance';
           const forceReSort = (this.prevQuery && this.query.start === 0);
 
@@ -407,7 +421,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
   doSearch() {
     this.loading = true;
-
     console.log(this.query);
     if (this.query) {
       this._loadSearchResults();
@@ -605,8 +618,11 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
-      mapUI.setCenter(this.mapLoc || this.defaultLoc);
-      mapUI.setZoom(9);
+      this.loadMapLocation( () => {
+        mapUI.setCenter(this.mapLoc || this.defaultLoc);
+        mapUI.setZoom(9);
+        this.updateUrlAndDoSearch();
+      });
     });
 
     controlDiv.index = 1;
@@ -634,6 +650,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     this.loadMapLocation(() => {
       this.reSort('Distance', true);
     });
+    this.mapZoomLevel = this.defaultZoom;
   }
 
   useGPSLocation($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
@@ -679,6 +696,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
   updateZoom(zoomLevel: number) {
     this.mapZoomLevel = zoomLevel;
+    this.updateUrlAndDoSearch();
   }
 
   getMarkerIcon(hit: Hit) {
@@ -792,19 +810,23 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
   updateUrlAndDoSearch() {
     const qParams = this._queryToQueryParams(this.query);
-    this.router.navigate([], {
-      relativeTo: this.route,
+
+    const urlTree = this.router.createUrlTree([], {
       queryParams: qParams,
-      skipLocationChange: false,
-    }).finally(() => {
-      this.prevQuery = createClone()(this.query);
-      this.doSearch();
-      this.changeDetectorRef.detectChanges();
+      queryParamsHandling: 'merge',
+      preserveFragment: true
     });
+    this.location.go(urlTree.toString());
+       this.prevQuery = createClone()(this.query);
+       this.doSearch();
+       this.changeDetectorRef.detectChanges();
   }
 
   protected mapLoad(m: google.maps.Map) {
     this.addMyLocationControl(m);
+    m.addListener('dragend', () => {
+      this.onMapDrag();
+    });
   }
 
   private _queryToQueryParams(qBefore: Query): Params {
@@ -820,6 +842,13 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     queryParams.languages = q.languages;
     queryParams.sort = queryParams.words ? this.sortMethods.RELEVANCE.name : this.selectedSort.name;
     queryParams.pageStart = q.start || 0;
+    queryParams.zoom = this.mapZoomLevel;
+    queryParams.lat = this.mapLoc.lat;
+    queryParams.lng = this.mapLoc.lng;
+    if (q.geo_point) {
+      queryParams.lat = q.geo_point.lat;
+      queryParams.lng = q.geo_point.lon;
+    }
 
     if (q.hasOwnProperty('category') && q.category) {
       queryParams.category = q.category.id;
@@ -835,6 +864,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       sort: this.sortMethods.DISTANCE.sortQuery,
       start: 0,
       types: this.resourceTypesFilteredNames(),
+      geo_point: { lat: this.defaultLoc.lat, lon: this.defaultLoc.lng },
     });
     q.size = this.pageSize;
     if (qParams && qParams.keys) {
@@ -865,6 +895,12 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
               break;
             case('types'):
               q.types = qParams.getAll(key);
+              break;
+            case('lat'):
+              q.geo_point.lat = parseFloat(qParams.get(key));
+              break;
+            case('lng'):
+              q.geo_point.lon = parseFloat(qParams.get(key));
           }
         }
       }
@@ -879,6 +915,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       if (this.isDistanceSort) {
         this.selectedSort = this.sortMethods.DISTANCE;
         this.query.sort = this.selectedSort.sortQuery;
+        this.query.geo_point = {lat: this.selectedSort.sortQuery.latitude, lon: this.selectedSort.sortQuery.longitude};
         this.updateUrlAndDoSearch();
       }
     });
@@ -926,7 +963,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       .mapSearch(this.query, !this.restrictToMappedResults)
       .subscribe(mapQueryWithResults => {
         this.mapQuery = mapQueryWithResults;
-
         if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
           this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
           this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
@@ -961,8 +997,13 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   private _setDistanceSortLatLong() {
     const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
     const useMapLoc = !!(!this.noLocation && this.mapLoc);
-    distanceSortQuery.latitude = useMapLoc ? this.mapLoc.lat : this.defaultLoc.lat;
-    distanceSortQuery.longitude = useMapLoc ? this.mapLoc.lng : this.defaultLoc.lng;
+    if (this.restrictToMappedResults) {
+      distanceSortQuery.latitude = this.mapBounds.getCenter().lat();
+      distanceSortQuery.longitude = this.mapBounds.getCenter().lng();
+    } else {
+      distanceSortQuery.latitude = useMapLoc ? this.mapLoc.lat : this.defaultLoc.lat;
+      distanceSortQuery.longitude = useMapLoc ? this.mapLoc.lng : this.defaultLoc.lng;
+    }
   }
 
   private _updatePaginator() {
@@ -972,5 +1013,10 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     this.paginatorElement.pageIndex = pageStart / this.pageSize;
     this.expandResults = true;
     this.changeDetectorRef.detectChanges();
+  }
+
+  onMapDrag() {
+    console.log('map drag');
+    this._updateDistanceSort();
   }
 }
