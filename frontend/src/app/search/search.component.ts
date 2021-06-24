@@ -842,8 +842,8 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     queryParams.sort = queryParams.words ? this.sortMethods.RELEVANCE.name : this.selectedSort.name;
     queryParams.pageStart = q.start || 0;
     queryParams.zoom = this.mapZoomLevel;
-    queryParams.lat = this.mapLoc.lat; // ? this.mapLoc.lat : this.defaultLoc.lat;
-    queryParams.lng = this.mapLoc.lng; // ? this.mapLoc.lng : this.defaultLoc.lng;
+    queryParams.lat = this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat;
+    queryParams.lng = this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng;
     queryParams.geo_box = `${this.mapBounds.getNorthEast().lat()}|${this.mapBounds.getSouthWest().lng()}|${this.mapBounds.getSouthWest().lat()}|${this.mapBounds.getNorthEast().lng()}`;
 
     if (q.hasOwnProperty('category') && q.category) {

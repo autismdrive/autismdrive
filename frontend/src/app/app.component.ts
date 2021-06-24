@@ -50,6 +50,8 @@ export class AppComponent implements OnInit {
     .subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const title = this.route.snapshot.firstChild.data.title;
+        const bodyElement = document.querySelector('body');
+        bodyElement.classList.toggle('is-home', this.router.url === '/home');
         if (title) {
           this.meta.updateTag({ property: 'og:title', content: title }, `property='og:title'`);
           this.meta.updateTag({ name: 'twitter:text:title', content: title }, `name='twitter:text:title'`);

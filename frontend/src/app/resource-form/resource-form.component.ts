@@ -372,16 +372,6 @@ export class ResourceFormComponent implements OnInit {
       hideExpression: '!model.type',
     },
     {
-      key: 'covid19_categories',
-      type: 'multicheckbox',
-      templateOptions: {
-        label: 'COVID-19 Topics',
-        type: 'array',
-        options: this.getOptions(Covid19Categories.labels),
-      },
-      hideExpression: '!model.type',
-    },
-    {
       key: 'should_hide_related_resources',
       type: 'radio',
       defaultValue: false,
