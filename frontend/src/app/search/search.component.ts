@@ -25,6 +25,7 @@ import {AuthenticationService} from '../_services/authentication/authentication-
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {SearchService} from '../_services/search/search.service';
 import LatLngLiteral = google.maps.LatLngLiteral;
+import {getBounds} from 'geolib';
 
 
 class MapControlDiv extends HTMLDivElement {
@@ -262,8 +263,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
             this.mapLoc.lat = this.defaultLoc.lat;
             this.mapLoc.lng = this.defaultLoc.lng;
           }
-          console.log(qParamMap.get('lat'));
-          console.log(qParamMap.get('lng'));
           const sortName = qParamMap.get('sort') || 'Distance';
           const forceReSort = (this.prevQuery && this.query.start === 0);
 
@@ -843,12 +842,9 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     queryParams.sort = queryParams.words ? this.sortMethods.RELEVANCE.name : this.selectedSort.name;
     queryParams.pageStart = q.start || 0;
     queryParams.zoom = this.mapZoomLevel;
-    queryParams.lat = this.mapLoc.lat;
-    queryParams.lng = this.mapLoc.lng;
-    if (q.geo_point) {
-      queryParams.lat = q.geo_point.lat;
-      queryParams.lng = q.geo_point.lon;
-    }
+    queryParams.lat = this.mapLoc.lat; // ? this.mapLoc.lat : this.defaultLoc.lat;
+    queryParams.lng = this.mapLoc.lng; // ? this.mapLoc.lng : this.defaultLoc.lng;
+    queryParams.geo_box = `${this.mapBounds.getNorthEast().lat()}|${this.mapBounds.getSouthWest().lng()}|${this.mapBounds.getSouthWest().lat()}|${this.mapBounds.getNorthEast().lng()}`;
 
     if (q.hasOwnProperty('category') && q.category) {
       queryParams.category = q.category.id;
@@ -858,49 +854,52 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
   private _queryParamsToQuery(qParams: ParamMap): Query {
     const q = new Query({
+      geo_box: undefined,
       words: '',
       ages: [],
       languages: [],
       sort: this.sortMethods.DISTANCE.sortQuery,
       start: 0,
-      types: this.resourceTypesFilteredNames(),
-      geo_point: { lat: this.defaultLoc.lat, lon: this.defaultLoc.lng },
+      types: this.resourceTypesFilteredNames()
     });
     q.size = this.pageSize;
-    if (qParams && qParams.keys) {
-      for (const key of qParams.keys) {
-        if (qParams.get(key) !== undefined) {
-          switch (key) {
-            case ('words'):
-              q.words = qParams.get(key);
-              q.sort = this.sortMethods.RELEVANCE.sortQuery;
-              break;
-            case ('category'):
-              q.category = {id: parseInt(qParams.get(key), 10)};
-              break;
-            case('ages'):
-              q.ages = qParams.getAll(key);
-              break;
-            case('languages'):
-              q.languages = qParams.getAll(key);
-              break;
-            case('sort'):
-              const sortKey = qParams.get(key).toUpperCase();
-              if (this.sortMethods[sortKey]) {
-                q.sort = this.sortMethods[sortKey].sortQuery;
-              }
-              break;
-            case('pageStart'):
-              q.start = parseInt(qParams.get(key), 10);
-              break;
-            case('types'):
-              q.types = qParams.getAll(key);
-              break;
-            case('lat'):
-              q.geo_point.lat = parseFloat(qParams.get(key));
-              break;
-            case('lng'):
-              q.geo_point.lon = parseFloat(qParams.get(key));
+    if (qParams) {
+      if (qParams.keys) {
+        for (const key of qParams.keys) {
+          if (qParams.get(key) !== undefined) {
+            switch (key) {
+              case ('words'):
+                q.words = qParams.get(key);
+                q.sort = this.sortMethods.RELEVANCE.sortQuery;
+                break;
+              case ('category'):
+                q.category = {id: parseInt(qParams.get(key), 10)};
+                break;
+              case('ages'):
+                q.ages = qParams.getAll(key);
+                break;
+              case('languages'):
+                q.languages = qParams.getAll(key);
+                break;
+              case('sort'):
+                const sortKey = qParams.get(key).toUpperCase();
+                if (this.sortMethods[sortKey]) {
+                  q.sort = this.sortMethods[sortKey].sortQuery;
+                }
+                break;
+              case('pageStart'):
+                q.start = parseInt(qParams.get(key), 10);
+                break;
+              case('types'):
+                q.types = qParams.getAll(key);
+                break;
+              case('geo_box'):
+                const coords = qParams.get(key).split('|').map(s => parseFloat(s));
+                q.geo_box = {
+                  top_left: {lat: coords[0], lon: coords[1]},
+                  bottom_right: {lat: coords[2], lon: coords[3]}
+                };
+            }
           }
         }
       }
@@ -915,7 +914,9 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       if (this.isDistanceSort) {
         this.selectedSort = this.sortMethods.DISTANCE;
         this.query.sort = this.selectedSort.sortQuery;
-        this.query.geo_point = {lat: this.selectedSort.sortQuery.latitude, lon: this.selectedSort.sortQuery.longitude};
+        this.query.geo_box = { top_left: {lat: this.mapBounds.getNorthEast().lat(), lon: this.mapBounds.getSouthWest().lng()},
+                               bottom_right: {lat: this.mapBounds.getSouthWest().lat(), lon: this.mapBounds.getNorthEast().lng()}};
+        console.log(this.query.geo_box);
         this.updateUrlAndDoSearch();
       }
     });

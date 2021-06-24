@@ -212,6 +212,24 @@ class TestSearch(BaseTest, unittest.TestCase):
         self.assertEqual(search_results['hits'][1]['title'], location_near.title)
         self.assertEqual(search_results['hits'][2]['title'], location_far.title)
 
+    def test_geo_box_query(self):
+        location_near = self.construct_location(title='local unicorn',
+                                                description="delivering rainbows within the orbit of Uranus",
+                                                latitude=38.149595, longitude=-93)
+
+        location_not_near = self.construct_location(title='local',
+                                                description="delivering rainbows",
+                                                latitude=28.149595, longitude=-93)
+        geo_query = {
+            'geo_box': {
+                'top_left': {"lat": 39, "lon": -94},
+                          'bottom_right': {"lat": 38, "lon": -92},
+            }
+        }
+        search_results = self.search(geo_query)
+        self.assertEqual(1, len(search_results['hits']))
+
+
     def test_modify_resource_search_basics(self):
         rainbow_query = {'words': 'rainbows'}
         world_query = {'words': 'world'}

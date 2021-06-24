@@ -32,14 +32,13 @@ export class SearchService {
     return this._http
       .post<any>(url, query)
       .pipe(map(queryDict => {
-        console.log('queryDict', queryDict);
         return this._loadQuery(queryDict);
       }));
   }
 
   mapSearch(query: Query, mapDataOnly = true): Observable<Query> {
     const mapQuery = createClone({circles: true})(query);
-    mapQuery.size = 200;
+    mapQuery.size = 50;
     mapQuery.map_data_only = mapDataOnly;
     return this.search(mapQuery);
   }

@@ -24,7 +24,7 @@ class Search:
                         ['english', 'spanish', 'chinese', 'korean', 'vietnamese', 'arabic', 'tagalog']))
 
     def __init__(self, words="", types=None, ages=None, languages=None, start=0, size=10, sort=None, category=None, date=None,
-                 map_data_only=False, geo_point = None, zoom=9):
+                 map_data_only=False, geo_point = None, geo_box = None):
         self.words = words
         self.total = 0
         self.hits = []
@@ -40,7 +40,7 @@ class Search:
         self.language_counts = Search.known_language_counts()
         self.date = date
         self.map_data_only = map_data_only  # When we should return a limited set of details just for mapping.
-        self.geo_point = geo_point
+        self.geo_box = geo_box
 
     # Method called when updating a search with fresh results.
     # This should zero-out any existing data that should be overwritten.
@@ -83,6 +83,11 @@ class Geopoint:
     def __init__(self, lat, lon):
         self.lat = lat
         self.lon = lon
+
+class Geobox:
+    def __init__(self, top_left, bottom_right):
+        self.top_left = top_left
+        self.bottom_right = bottom_right
 
 class Sort:
     def __init__(self, field, latitude, longitude, order, unit):
