@@ -62,14 +62,6 @@
     }
   }
 
-  mat-toolbar-row#covid19 {
-    position: fixed;
-    background-color: $brand-accent;
-    color: white;
-    z-index: 101;
-    padding-left: 0px;
-  }
-
   mat-toolbar-row#tagline {
     position: fixed;
     z-index: 100;
@@ -150,6 +142,10 @@
 
     }
   }
+}
+
+::ng-deep :not(body.is-home) #site-header {
+  min-height: unset;
 }
 
 #site-header.mirroring, #site-header mat-toolbar.mirroring, #mobile-menu.mirroring {

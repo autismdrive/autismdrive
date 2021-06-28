@@ -7,23 +7,23 @@
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
 
-  body {
+  body.is-home {
     // XS
-    padding-top: 104px;
+    padding-top: 0px;
 
     // SM
     @media (min-width: 600px) {
-      padding-top: 104px;
+      padding-top: 0px;
     }
 
     // MD
     @media (min-width: 960px) {
-      padding-top: 120px;
+      padding-top: 80px;
     }
 
     // XL
     @media (min-width: 1280px) {
-      padding-top: 120px;
+      padding-top: 80px;
     }
   }
 

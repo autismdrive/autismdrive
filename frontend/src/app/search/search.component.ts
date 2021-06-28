@@ -924,13 +924,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
               case('types'):
                 q.types = qParams.getAll(key);
                 break;
-              case('geo_box'):
-                const coords = qParams.get(key).split('|').map(s => parseFloat(s));
-                q.geo_box = {
-                  top_left: {lat: coords[0], lon: coords[1]},
-                  bottom_right: {lat: coords[2], lon: coords[3]}
-                };
-                break;
               case('restrictToMap'):
                 this.restrictToMappedResults = qParams.get('restrictToMap') === 'y';
                 break;
