@@ -24,6 +24,10 @@
   }
 }
 
+::ng-deep .mat-form-field-wrapper{
+  margin-bottom: -1.25em;
+}
+
 .covid19-alert {
   margin: 2%;
 
@@ -37,8 +41,9 @@
   display: none;
 }
 
-/* phone display */
+/* mobile display */
 @media only screen and (max-device-width: 480px) {
   .mobile_device_480px{display: block;}
   .desktop {display: none;}
 }
+

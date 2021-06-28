@@ -1,6 +1,10 @@
 import datetime
 
 import flask.scaffold
+from sqlalchemy.dialects.postgresql import Any
+
+from app.model.age_range import AgeRange
+
 flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
@@ -77,4 +81,13 @@ class StudyByStatusListEndpoint(flask_restful.Resource):
 
     def get(self, status):
         studies = db.session.query(Study).filter_by(status=status).order_by(Study.last_updated.desc())
+        return self.studiesSchema.dump(studies)
+
+
+class StudyByAgeEndpoint(flask_restful.Resource):
+    studiesSchema = StudySchema(many=True)
+
+    def get(self, status, age):
+        # session.query(TestArr).filter(Any(2, TestArr.partners)).all()
+        studies = db.session.query(Study).filter_by(status=status).filter(Study.ages.any(age)).order_by(Study.last_updated.desc())
         return self.studiesSchema.dump(studies)

@@ -29,7 +29,7 @@ from app.resources.AdminNoteEndpoint import (
     AdminNoteListByResourceEndpoint,
     AdminNoteListEndpoint,
     AdminNoteEndpoint)
-from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint, StudyByStatusListEndpoint
+from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint, StudyByStatusListEndpoint, StudyByAgeEndpoint
 from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
 from app.resources.CategoryEndpoint import (
@@ -161,7 +161,6 @@ def root():
 
     return jsonify(output)
 
-
 endpoints = [
     # Categories
     (CategoryListEndpoint, "/category"),
@@ -205,6 +204,7 @@ endpoints = [
     # Studies
     (StudyListEndpoint, "/study"),
     (StudyByStatusListEndpoint, "/study/status/<status>"),
+    (StudyByAgeEndpoint, "/study/status/<status>/<age>"),
     (StudyEndpoint, "/study/<id>"),
     (CategoryByStudyEndpoint, "/study/<study_id>/category"),
     (StudyCategoryListEndpoint, "/study_category"),

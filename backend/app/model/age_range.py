@@ -34,4 +34,4 @@ class AgeRange:
         if clean_age in AgeRange.age_map.keys():
             return AgeRange.age_map[clean_age]
         else:
-            raise Exception('Unkown age range:"' + bad_age + '" see Age Range Class to fix it.')
+            raise Exception('Unknown age range:"' + bad_age + '" see Age Range Class to fix it.')

@@ -1,30 +1,24 @@
-<div
-  class="covid19-alert"
->
-  <h1>COVID-19 STUDY UPDATES</h1>
-  <p>To maintain social distancing due to COVID-19, there have been significant changes to many of the research
-    projects currently recruiting participants. Please see below to obtain additional information regarding any
-    research study you are participating in or are interested in participating with. If you have any additional
-    questions, don't hesitate to reach out to us at <a href="mailto:autismdrive@virginia.edu">autismdrive@virginia.edu</a>.</p>
-</div>
 <div fxLayoutAlign="center"  fxLayout="column">
-<div
-  id="hero"
-  class="center-center gradient-overlay container with-escaping-tiles"
-  ngClass.lt-md="margin-bottom-none"
->
-  <div class="hero-content">
-    <h1>Autism Research Studies</h1>
+  <div
+    id="hero"
+    class="center-center gradient-overlay container with-escaping-tiles"
+    ngClass.lt-md="margin-bottom-none"
+    ngStyle.gt-md="padding-bottom:180px; margin-bottom:10px"
+  >
+    <div class="hero-content">
+      <h1>Autism Research Studies</h1>
+    </div>
   </div>
   <div class="desktop">
     <div
       class="row escaping-tiles-1x"
       fxLayout="row"
       fxLayoutGap="40px"
-      fxLayoutAlign="center auto"
+      fxLayoutAlign="left auto"
       id="TopOfSearch"
+      style="padding-left:6em; padding-right:2em; padding-top:2em;"
     >
-      <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+      <mat-form-field style="margin-bottom:-1em">
         <mat-label>Study Status</mat-label>
         <mat-select [(value)]="selectedStatus">
           <mat-select-trigger>
@@ -45,33 +39,36 @@
         </mat-select>
       </mat-form-field>
 
-          <app-border-box-tile
-          *ngFor="let status of studyStatuses"
-          fxShow.md fxShow.lg fxShow.xl
-          fxHide.lt-md
-          fxFlex.gt-sm="calc(33% - 160px)"
-          fxFlex.sm="calc(50% - 120px)"
-          [iconSize]="2"
-          [iconType]="status.name"
-          [title]="status.label"
-          [linkSize]="1"
-          [isSelected]="selectedStatus.name === status.name"
-          (click)="selectStatus(status)"
-          [attr.data-study-status]="status.name"
-        ></app-border-box-tile>
+      <mat-form-field>
+        <mat-label>Age Range</mat-label>
+        <mat-select [(value)]="selectedAge" placeholder="All Ages">
+          <mat-select-trigger>
+            <span class="type-label" *ngIf="selectedAge">{{selectedAge.label}}</span>
+          </mat-select-trigger>
+          <mat-option [value]="undefined" (click)="selectAge(undefined)">All Ages</mat-option>
+          <mat-option
+            *ngFor="let age of Ages"
+            [value]="age"
+            (click)="selectAge(age)"
+          >
+            <span class="type-label">{{age.label}}</span>
+          </mat-option>
+        </mat-select>
+       </mat-form-field>
+      </div>
     </div>
-  </div>
-</div>
+
   <div class="mobile_device_480px">
     <p> </p>
     <div
       class="row escaping-tiles-1x"
-      fxLayout="row"
-      fxLayoutGap="40px"
+      fxLayout="column"
+      fxLayoutGap="2px"
       fxLayoutAlign="center auto"
       id="TopOfSearch"
+      style="padding-left:2em; padding-right:2em;"
     >
-      <mat-form-field fxHide.lg fxHide.xl fxHide.md fxShow.lt-md>
+      <mat-form-field style="margin-bottom:-1em">
         <mat-label>Study Status</mat-label>
         <mat-select [(value)]="selectedStatus">
           <mat-select-trigger>
@@ -92,47 +89,50 @@
         </mat-select>
       </mat-form-field>
 
-      <app-border-box-tile
-        *ngFor="let status of studyStatuses"
-        fxShow.md fxShow.lg fxShow.xl
-        fxHide.lt-md
-        fxFlex.gt-sm="calc(33% - 160px)"
-        fxFlex.sm="calc(50% - 120px)"
-        [iconSize]="2"
-        [iconType]="status.name"
-        [title]="status.label"
-        [linkSize]="1"
-        [isSelected]="selectedStatus.name === status.name"
-        (click)="selectStatus(status)"
-        [attr.data-study-status]="status.name"
-      ></app-border-box-tile>
+      <mat-form-field>
+        <mat-label>Age Range</mat-label>
+        <mat-select [(value)]="selectedAge" placeholder="All Ages">
+          <mat-select-trigger>
+            <span class="type-label" *ngIf="selectedAge">{{selectedAge.label}}</span>
+          </mat-select-trigger>
+          <mat-option [value]="undefined" (click)="selectAge(undefined)">All Ages</mat-option>
+          <mat-option
+            *ngFor="let age of Ages"
+            [value]="age"
+            (click)="selectAge(age)"
+          >
+            <span class="type-label">{{age.label}}</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
   </div>
-</div>
-<div
-  class="studies"
-  fxLayout="column"
-  fxLayoutGap="40px"
->
-  <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_study')" [addLabel]='"Add Study"' [addLink]='"studies/add"' [currentUser]=currentUser></app-add-button>
-  <h2>{{selectedStatus.label}}</h2>
-  <ng-container *ngIf="studyHits && (studyHits.length > 0)">
-    <app-search-result
-      *ngFor="let hit of studyHits"
-      [hit]="hit"
-      [attr.data-study-status]="selectedStatus.name"
-    ></app-search-result>
-  </ng-container>
-  <p
-    *ngIf="!studyHits || (studyHits.length === 0)"
-    class="no-results"
-    [attr.data-study-status]="selectedStatus.name"
+  <div
+    class="studies"
+    fxLayout="column"
+    fxLayoutGap="40px"
+    ngStyle.gt-md="padding-top:10px;"
   >
-    We don't have any Autism DRIVE studies
-    <span *ngIf="selectedStatus.name === 'currently_enrolling'">that are enrolling</span>
-    <span *ngIf="selectedStatus.name === 'study_in_progress'">that are in progress</span>
-    <span *ngIf="selectedStatus.name === 'results_being_analyzed'">where results are being analyzed</span>
-    <span *ngIf="selectedStatus.name === 'study_results_published'">where results have been published</span>
-    at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!
-  </p>
+    <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_study')" [addLabel]='"Add Study"' [addLink]='"studies/add"' [currentUser]=currentUser></app-add-button>
+    <h2>{{selectedStatus.label}}</h2>
+    <ng-container *ngIf="studyHits && (studyHits.length > 0)">
+      <app-search-result
+        *ngFor="let hit of studyHits"
+        [hit]="hit"
+        [attr.data-study-status]="selectedStatus.name"
+      ></app-search-result>
+    </ng-container>
+    <p
+      *ngIf="!studyHits || (studyHits.length === 0)"
+      class="no-results"
+      [attr.data-study-status]="selectedStatus.name"
+    >
+      We don't have any Autism DRIVE studies
+      <span *ngIf="selectedStatus.name === 'currently_enrolling'">that are enrolling</span>
+      <span *ngIf="selectedStatus.name === 'study_in_progress'">that are in progress</span>
+      <span *ngIf="selectedStatus.name === 'results_being_analyzed'">where results are being analyzed</span>
+      <span *ngIf="selectedStatus.name === 'study_results_published'">where results have been published</span>
+      at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!
+    </p>
+  </div>
 </div>
