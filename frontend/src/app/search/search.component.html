@@ -27,7 +27,7 @@
     <div fxLayout="column">
       <app-search-box
         variant="light-bg"
-        (searchUpdated)="updateUrlAndDoSearch()"
+        (searchUpdated)="querySubject.next(this.query)"
         (categorySelected)="selectCategory($event)"
         [words]="query?.words"
       ></app-search-box>
@@ -91,11 +91,10 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-
               <div id="topic-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
                 <app-search-topics
-                  *ngIf="query"
-                  [category]="query.category"
+                  *ngIf="selectedCategory"
+                  [category]="selectedCategory"
                   (categorySelected)="selectCategory($event)"
                   [ngClass]="'filter-by-topic'"
                 ></app-search-topics>
@@ -178,7 +177,6 @@
       (selectedTabChange)="selectTypeTab($event)"
       [(selectedIndex)]="selectedTypeTabIndex"
       color="accent"
-      #typeTabs
     >
       <mat-tab>
         <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
@@ -234,7 +232,7 @@
           *ngIf="paginatorElement"
         >
           <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} results</h4>
-          <h4 *ngIf="restrictToMappedResults">Showing nearest {{hits.length}} mapped results</h4>
+          <h4 *ngIf="restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} mapped results.</h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
           <app-search-sort
@@ -267,7 +265,7 @@
         <app-search-result
           *ngFor="let hit of hits; let i = index"
           [hit]="hit"
-          [mapLoc]="mapLoc"
+          [mapLoc]="loc"
           [currentUser]="currentUser"
           [ngClass]="'sort-order-' + i"
         >
@@ -281,7 +279,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
-      [ngClass]="{'ghost': (restrictToMappedResults || !query || (numTotalResults === 0))}"
+      [ngClass]="{'ghost': (!query || (numTotalResults === 0))}"
     >
     </mat-paginator>
   </div>
@@ -307,27 +305,28 @@
     >
       <mat-icon *ngIf="!restrictToMappedResults">check_box_outline_blank</mat-icon>
       <mat-icon *ngIf="restrictToMappedResults">check_box</mat-icon>
-      Search as map moves
+      Limit results to map
     </button>
     <mat-expansion-panel
-      *ngIf="showLocationButton"
+      *ngIf="shouldShowMap"
       id="set-location"
       [ngClass]="'zipCodeSetButton mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
-      [expanded]="true"
+      [expanded]="showLocationWindow()"
       #setLocationExpansionPanel
     >
       <mat-expansion-panel-header>
-        <ng-container *ngIf="isZipCode(storedZip)">Location: {{storedZip}}</ng-container>
-        <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: using GPS</ng-container>
-        <ng-container *ngIf="!gpsEnabled && !isZipCode(storedZip)">Set Location</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.default">Set Location</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.zipcode">Location: {{storedZip}}</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.gps">Your current location</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.map">Using Map's Center</ng-container>
       </mat-expansion-panel-header>
       <div [ngClass]="'zipCodeSet'" fxLayout="column">
         <mat-form-field class="zipCodeField">
           <input
             matInput
             placeholder="Enter ZIP Code"
-            [(ngModel)]="updatedZip"
+            [(ngModel)]="storedZip"
             (keyup.enter)="submitZip($event, setLocationExpansionPanel)"
             #zipCodeInput
           >
@@ -360,8 +359,8 @@
       <agm-map
         #mapTemplate
         *ngIf="shouldShowMap"
-        [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
-        [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
+        [latitude]="loc.lat"
+        [longitude]="loc.lng"
         [streetViewControl]="false"
         mapTypeId="roadmap"
         [zoom]="mapZoomLevel ? mapZoomLevel : defaultZoom"
@@ -373,9 +372,9 @@
       >
         <agm-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
           <agm-marker
-            *ngIf="mapLoc"
-            [latitude]="mapLoc.lat"
-            [longitude]="mapLoc.lng"
+            *ngIf="loc"
+            [latitude]="loc.lat"
+            [longitude]="loc.lng"
             [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
           ></agm-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
