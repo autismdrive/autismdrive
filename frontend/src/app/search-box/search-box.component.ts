@@ -93,15 +93,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.searchService.currentQuery.subscribe(q => {
-      if (q === null || (q && q.hasOwnProperty('words') && q.words === '')) {
-        if (this.searchInputElement) {
-          this.searchInputElement.value = '';
-        }
-      } else {
-        this.searchInputElement.value = q.words || this.words;
-      }
-    });
+        this.searchInputElement.value = this.words;
   }
 
   optionText(option: Category) {

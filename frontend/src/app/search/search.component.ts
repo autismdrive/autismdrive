@@ -1,20 +1,20 @@
 import {AgmMap, LatLngBounds} from '@agm/core';
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnDestroy, Renderer2, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTabChangeEvent} from '@angular/material/tabs';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, convertToParamMap, ParamMap, Params, Router} from '@angular/router';
 import createClone from 'rfdc';
-import {fromEvent} from 'rxjs';
-import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
+import {fromEvent, Subject} from 'rxjs';
+import {debounceTime, filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 import {AccordionItem} from '../_models/accordion-item';
 import {Category} from '../_models/category';
 import {AgeRange, HitType, Language} from '../_models/hit_type';
 import {NavItem} from '../_models/nav-item';
-import {Hit, Query} from '../_models/query';
+import {GeoBox, Hit, Query} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {Direction} from '../_models/scroll';
 import {SortMethod} from '../_models/sort_method';
@@ -25,11 +25,17 @@ import {AuthenticationService} from '../_services/authentication/authentication-
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {SearchService} from '../_services/search/search.service';
 import LatLngLiteral = google.maps.LatLngLiteral;
-import {getBounds} from 'geolib';
 
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
+}
+
+enum LocationMode {
+  default = 'default',
+  zipcode = 'zipcode',
+  gps = 'gps',
+  map = 'map',
 }
 
 @Component({
@@ -49,17 +55,25 @@ class MapControlDiv extends HTMLDivElement {
     ]),
   ]
 })
-export class SearchComponent implements AfterViewInit, OnDestroy {
+export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
+
   @HostBinding('@pageAnimations')
   public animatePage = true;
+
+
+
   query: Query;
-  prevQuery: Query;
-  mapQuery: Query;
+  prevQuery: Query;  // Used to tell if query parameters have changed, very unclear.  Consider removing.
+  mapQuery: Query; // The Map query is slightly different from the results query, and it returns a larger set of results.
+  querySubject: Subject<Query> = new Subject<Query>();  // Use this to update the query.
+  mapQuerySubject: Subject<Query> = new Subject<Query>(); // Use this to update the mapQuery.
+
   resourceTypes = HitType.all_resources();
   selectedMapResource: Resource;
   selectedMapHit: Hit;
   selectedType: HitType = HitType.ALL_RESOURCES;
   selectedTypeTabIndex = 0;
+
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
   typeLabels = HitType.labels;
@@ -68,21 +82,21 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   loading = true;
   pageSizeOptions = [20, 60, 100];
   pageSize = this.pageSizeOptions[0];
-  noLocation = true;
+
+
   storedZip: string;
-  updatedZip: string;
-  setLocOpen = false;
   gpsEnabled = false;
-  zipLoc: LatLngLiteral;
-  gpsLoc: LatLngLiteral;
-  mapLoc: LatLngLiteral;
   defaultLoc: LatLngLiteral = {
     lat: 37.32248,
     lng: -78.36926
   };
+  loc: LatLngLiteral = createClone()(this.defaultLoc);
+  locationModes = LocationMode;
+  locationMode = LocationMode.default;
+
   hitsWithNoAddress: Hit[] = [];
   hitsWithAddress: Hit[] = [];
-  defaultZoom: number = 7;
+  defaultZoom = 7;
   mapZoomLevel: number;
   sortMethods: { [key: string]: SortMethod };
   selectedSort: SortMethod;
@@ -133,19 +147,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   showFilters: boolean;
   expandResults: boolean;
   restrictToMappedResults: boolean;
-  showDesignOptions = false;
-  searchBgClasses = [
-    'light-gray',
-    'white',
-    'uva-blue',
-    'uva-orange',
-    'black',
-    'gray',
-    'mountain',
-    'sky',
-    'energy-burst-dark',
-    'energy-burst-light',
-  ];
   searchBgClass = 'mountain';
   videoPlacement = 'right';
   videoSize = 'medium';
@@ -165,7 +166,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/star/resources/star-family-navigation',
     },
   ];
-  expandTheme = false;
   queryParamMap: ParamMap;
   private mapBounds: LatLngBounds;
   private scrollDirection: Direction;
@@ -196,8 +196,8 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
         label: 'Distance',
         sortQuery: {
           field: 'geo_point',
-          latitude: this.mapLoc ? this.mapLoc.lat : this.defaultLoc.lat,
-          longitude: this.mapLoc ? this.mapLoc.lng : this.defaultLoc.lng,
+          latitude: this.loc.lat,
+          longitude: this.loc.lng,
           order: 'asc',
           unit: 'mi'
         }
@@ -243,29 +243,76 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `name='twitter:image'`);
 
-    this.loadMapLocation(() => {
+  }
+
+
+  ngOnInit() {
+    /**
+     * On initialization, set up two subjects that will watch for, debouce, and depulicate all queries sent to
+     * the backend.  Then attempt to run a sensible search, either based on query params or using defaults.
+     * In the even we can fall back to the users current location, we may need to run the query again, but
+     * we don't want to wait for them to grant us access, so in the worst case, we just run the query using a
+     * default location in central Virginia, and if we get GPS, we run it again.
+     */
+
+    this.querySubject
+      .pipe(debounceTime(1000))
+      .subscribe(q => {
+        this.loading = true;
+        this.searchService
+          .search(q)
+          .subscribe(queryWithResults => {
+            this.prevQuery = createClone()(this.query);
+            this.query = queryWithResults;
+            this.googleAnalyticsService.searchEvent(this.query);
+            this.updateUrl();
+            this.loading = false;
+            this.changeDetectorRef.detectChanges();
+            this._loadRelatedStudies();
+            this._updatePaginator();
+          });
+      });
+
+    this.mapQuerySubject
+      .pipe(debounceTime(1000))
+      .subscribe(q => {
+        this.loading = true;
+        const geoBox = this.geoBox();
+        this.searchService
+          .mapSearch(q, geoBox)
+          .subscribe(mapQueryWithResults => {
+            this.mapQuery = mapQueryWithResults;
+            if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
+              this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
+              this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
+            } else {
+              this.hitsWithAddress = [];
+              this.hitsWithNoAddress = [];
+            }
+            this.loading = false;
+            this.changeDetectorRef.detectChanges();
+            if (this.restrictToMappedResults) {
+              this.query.geo_box = geoBox;
+              this.querySubject.next(this.query);
+            }
+          });
+      });
+
+    this.setDefaultMapLocation(() => {
       this.route.queryParamMap
         .subscribe(qParamMap => {
           this.queryParamMap = qParamMap;
           this.query = this._queryParamsToQuery(qParamMap);
-
-          if (navigator.geolocation) {
-            this.gpsEnabled = true;
-          }
-          this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || this.defaultZoom;
+          const defaultZoomLevel = this.storedZip ? 10 : this.defaultZoom;
+          this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || defaultZoomLevel;
           // parse lat and lng from URL
           const qLat = qParamMap.get('lat');
           const qLng = qParamMap.get('lng');
           if (qLat && qLng) {
-            this.mapLoc.lat = parseFloat(qLat);
-            this.mapLoc.lng = parseFloat(qLng);
-          } else {
-            this.mapLoc.lat = this.defaultLoc.lat;
-            this.mapLoc.lng = this.defaultLoc.lng;
+            this.setLocation(LocationMode.map, { lat: parseFloat(qLat), lng: parseFloat(qLng) });
           }
           const sortName = qParamMap.get('sort') || 'Distance';
           const forceReSort = (this.prevQuery && this.query.start === 0);
-
           if (forceReSort) {
             if (sortName && this.sortMethods[sortName.toUpperCase()]) {
               this.reSort(sortName, forceReSort);
@@ -274,11 +321,51 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
             }
           } else {
             this.selectedSort = this.sortMethods[sortName.toUpperCase()];
-            this.doSearch();
+            this.querySubject.next(this.query);
+            this.mapQuerySubject.next(this.query);
           }
         });
     });
 
+  }
+
+  setLocation(mode: LocationMode, loc: LatLngLiteral) {
+    this.loc = loc;
+    this.locationMode = mode;
+  }
+
+  setZipLocation(zipCode, callback?: () => void) {
+    this.storedZip = zipCode;
+    this.api.getZipCoords(this.storedZip).subscribe(z => {
+      this.setLocation(LocationMode.zipcode, { lat: z.latitude, lng: z.longitude});
+      this.mapZoomLevel = 10;
+      if (callback) { callback(); }
+    });
+  }
+
+  setGPSLocation(callback?: () => void) {
+    if (navigator.geolocation) {
+      this.gpsEnabled = true;
+      navigator.geolocation.getCurrentPosition(p => {
+        this.setLocation(LocationMode.gps, { lat: p.coords.latitude, lng: p.coords.longitude});
+        this.mapZoomLevel = 10;
+        if (callback) { callback(); }
+      },
+        error => {
+          this.gpsEnabled = false;
+          if (callback) { callback(); }
+      });
+    } else {
+      this.gpsEnabled = false;
+      if (callback) { callback(); }
+    }
+  }
+
+  private _updateDistanceSort() {
+    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
+    distanceSortQuery.latitude = this.loc.lat;
+    distanceSortQuery.longitude = this.loc.lng;
+    this.query.sort = distanceSortQuery;
   }
 
   @ViewChild('paginator')
@@ -308,20 +395,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   }
 
   get hits(): Hit[] {
-    if (this.query && this.query.hasHits) {
-      if (this.restrictToMappedResults) {
-        return this.mapQuery.hits.filter(h => {
-          if (h.hasCoords()) {
-            const latLng = new google.maps.LatLng(h.latitude, h.longitude);
-            return (this.mapBounds && this.mapBounds.contains(latLng));
-          }
-        });
-      } else {
-        return this.query.hits;
-      }
-    }
-
-    return [];
+    return this.query.hits;
   }
 
   get isDistanceSort(): boolean {
@@ -368,22 +442,10 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     return !!localStorage.getItem('shouldHideTutorialVideo');
   }
 
-  get showLocationButton(): boolean {
-    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    return (isLocation || this.isDistanceSort);
-  }
-
-  get showLocationForm(): boolean {
-    return !this.noLocation && !this.setLocOpen;
-  }
 
   get shouldShowMap() {
-    const is_location_or_event_type = this.mapQuery &&
-      this.mapQuery.types &&
-      this.mapQuery.types.length === 1 &&
-      (this.mapQuery.types.includes('location') ||
-        this.mapQuery.types.includes('event'));
-    return is_location_or_event_type || this.isDistanceSort;
+    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
+    return (isLocation || this.isDistanceSort);
   }
 
   ngAfterViewInit() {
@@ -391,7 +453,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.searchService.reset();
   }
 
   getOptions(modelLabels) {
@@ -418,94 +479,53 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     document.getElementById('TopOfSearch').scrollIntoView();
   }
 
-  doSearch() {
-    this.loading = true;
-    console.log(this.query);
-    if (this.query) {
-      this._loadSearchResults();
-      this._loadMapResults();
-      this._loadRelatedStudies();
-      this._updatePaginator();
-    }
-  }
 
-  loadMapLocation(callback?: () => void) {
+  setDefaultMapLocation(callback?: () => void) {
+    /**
+     * If a zipcode is defined, uses the zipcode lat and long.
+     * Otherwise use the browsers gps Location if we can get it.
+     * Otherwise we just leave it as a default.
+     *
+     * This is just setting up the defaults during initial load, these will likely be overridden
+     * as users interact with the map.
+     *
+     * 1) Sets the mapLoc variable and noLocation variables
+     * 2) Calls _setDistanceSortLatLog, which updates the distanceSortQuery to use new mapLoc.
+     * 3) Finally, calls the given callback.
+     *
+     */
     this.storedZip = localStorage.getItem('zipCode');
     if (this.isZipCode(this.storedZip)) {
-      this.api.getZipCoords(this.storedZip).subscribe(z => {
-        console.log('this.api.getZipCoords subscribe callback');
-        this.noLocation = false;
-        this.zipLoc = {
-          lat: z.latitude,
-          lng: z.longitude
-        };
-        this.mapLoc = this.zipLoc;
-        this._setDistanceSortLatLong();
-        if (callback) { callback(); }
+      this.setZipLocation(this.storedZip, callback);
+    } else {
+      this.setLocation(LocationMode.default, this.defaultLoc);
+      if (callback) {
+        callback(); // Don't wait for GPS, we may not get it, just use the default location.
+      }
+      this.setGPSLocation(() => {
+        // If the call is successful, an we have a gps location, reload.
+        if (this.gpsEnabled) {
+          this.reSort('Distance', true);
+        }
       });
-    } else {
-      this.getGPSLocation(callback);
-    }
-  }
-
-  getGPSLocation(callback?: () => void) {
-    // If we already know the GPS location, then just return.
-    if (this.gpsEnabled && this.gpsLoc) {
-      this.noLocation = false;
-      this.mapLoc = this.gpsLoc;
-      this._setDistanceSortLatLong();
-      if (callback) { callback(); }
-      return;
-    } else {
-      this.noLocation = true;
-      // But don't return, go ahead and ask in the following chunk of code.
-    }
-
-    // Now, try to get the position, and if we can get it, use it.
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(p => {
-        console.log('navigator.geolocation.getCurrentPosition callback');
-        this.noLocation = false;
-        this.gpsLoc = {
-          lat: p.coords.latitude,
-          lng: p.coords.longitude
-        };
-        this.mapLoc = this.gpsLoc;
-        this._setDistanceSortLatLong();
-        if (callback) { callback(); }
-      }, error => {
-        this.gpsEnabled = false;
-        this.noLocation = true;
-        this._setDistanceSortLatLong();
-        if (callback) { callback(); }
-    });
-    } else {
-      this.noLocation = true;
-      this.gpsEnabled = false;
-      this._setDistanceSortLatLong();
-      if (callback) { callback(); }
     }
   }
 
   reSort(sortName: string, forceReSort = false) {
-    console.log(`*** reSort sortName: ${sortName} ***`);
     // Don't re-sort if the query hasn't changed.
     const qParamsHaveChanged = this._queryParamsHaveChanged(this.queryParamMap);
 
     // Don't re-sort if it's already selected, but allow override.
     if ((qParamsHaveChanged && sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
-      this.loading = true;
       this.selectedSort = this.sortMethods[sortName.toUpperCase()];
       this.query.start = 0;
       this.query.sort = this.selectedSort.sortQuery;
 
-      if (this.selectedSort.name === 'Date') {
-        this.selectType(HitType.EVENT.name);
-      } else if (this.isDistanceSort) {
+      if (this.isDistanceSort) {
         this._updateDistanceSort();
-      } else {
-        this.updateUrlAndDoSearch();
       }
+      this.mapQuerySubject.next(this.query);
+      this.querySubject.next(this.query);
     }
   }
 
@@ -533,7 +553,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   }
 
   selectType(keepType: string = null, skipUpdate = false) {
-    console.log(`=== selectType: keepType = ${keepType} ===`);
     const all = HitType.ALL_RESOURCES.name;
     const forceReSort = !(keepType && keepType !== all);
 
@@ -562,13 +581,18 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
       }
       this.query.sort = this.selectedSort.sortQuery;
     }
-
     this._goToFirstPage(skipUpdate);
     this.reSort(this.selectedSort.name, forceReSort);
   }
 
   submitResource() {
     window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
+  }
+
+  get selectedCategory() {
+    if (this.query) {
+      return this.query.category;
+    }
   }
 
   get resourceTypesFiltered(): HitType[] {
@@ -580,17 +604,15 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
   }
 
   updatePage(event: PageEvent) {
-    this.loading = true;
     this.query.size = event.pageSize;
     this.pageSize = event.pageSize;
     this.query.start = (event.pageIndex * event.pageSize) + 1;
     this.query.sort = this.selectedSort.sortQuery;
-    console.log('here: ', this.query);
     this.scrollToTopOfSearch();
-    this.updateUrlAndDoSearch();
+    this.querySubject.next(this.query);
   }
 
-  addMyLocationControl(mapUI: google.maps.Map) {
+  protected mapLoad(m: google.maps.Map) {
     const controlDiv: MapControlDiv = document.createElement('div');
 
     // Set CSS for the control border.
@@ -617,50 +639,56 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
-      this.loadMapLocation( () => {
-        mapUI.setCenter(this.mapLoc || this.defaultLoc);
-        mapUI.setZoom(9);
-        this.updateUrlAndDoSearch();
+        // fixme: maybe we should requery when clicking.
+        console.log('map clicked.');
+        this.mapQuerySubject.next(this.query);
       });
-    });
 
     controlDiv.index = 1;
-    mapUI.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+
+    m.addListener('dragend', () => {
+        this.setLocation(LocationMode.map, {lat: this.mapBounds.getCenter().lat(),
+                                                  lng: this.mapBounds.getCenter().lng()});
+        this.mapQuerySubject.next(this.query);
+        console.log('Map Dragged');
+        if (this.isDistanceSort) {
+          console.log('Map Dragged, re-sorting');
+          this._updateDistanceSort();
+          this.querySubject.next(this.query);
+      }
+
+    });
   }
 
   showBreadcrumbs(): boolean {
     return !!(this.query && this.query.hasFilters);
   }
 
-  openSetLocation() {
-    this.setLocOpen = true;
-  }
-
-  closeSetLocation() {
-    this.setLocOpen = false;
-  }
-
   submitZip($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
-    localStorage.setItem('zipCode', this.updatedZip || '');
+    localStorage.setItem('zipCode', this.storedZip);
     this.googleAnalyticsService.searchInteractionEvent('set_zip_code_location');
-    this.setLocOpen = false;
-    this.loadMapLocation(() => {
-      this.reSort('Distance', true);
-    });
-    this.mapZoomLevel = this.defaultZoom;
+    if (this.isZipCode(this.storedZip)) {
+      this.mapZoomLevel = 10;
+      this.setZipLocation(this.storedZip, () => {
+        this.reSort('Distance', true);
+      });
+    } else {
+      this.setLocation(LocationMode.default, this.defaultLoc);
+    }
   }
 
   useGPSLocation($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
     setLocationExpansionPanel.close();
     $event.stopPropagation();
-    localStorage.removeItem('zipCode');
     this.googleAnalyticsService.searchInteractionEvent('set_gps_location');
-    this.storedZip = null;
-    this.setLocOpen = false;
-    this.loadMapLocation();
-    this.reSort('Distance', true);
+    this.setGPSLocation(() => {
+      if (this.gpsEnabled) {
+        this.reSort('Distance', true);
+      }
+    });
   }
 
   isZipCode(zipCode: string): boolean {
@@ -695,14 +723,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
 
   updateZoom(zoomLevel: number) {
     this.mapZoomLevel = zoomLevel;
-    this.updateUrlAndDoSearch();
-  }
-
-  getMarkerIcon(hit: Hit) {
-    const url = `/assets/map/${hit.type}${hit.no_address ? '-no-address' : ''}.svg`;
-    const x = 16;
-    const y = hit.no_address ? 16 : 0;
-    return {url: url, anchor: {x: x, y: y}};
+    this.mapQuerySubject.next(this.query);
   }
 
   selectTypeTab($event: MatTabChangeEvent) {
@@ -714,14 +735,32 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     this.mapBounds = $event;
   }
 
+  geoBox(): GeoBox {
+    if (this.mapBounds) {
+      return ({
+        top_left: {
+          lat: this.mapBounds.getNorthEast().lat(),
+          lon: this.mapBounds.getSouthWest().lng()
+        },
+        bottom_right: {
+          lat: this.mapBounds.getSouthWest().lat(),
+          lon: this.mapBounds.getNorthEast().lng()}
+      });
+    }
+  }
+
   listMapResultsOnly(shouldRestrict: boolean, skipUpdate = false) {
+    console.log('Restricting to mapped results', shouldRestrict);
     this.restrictToMappedResults = shouldRestrict;
     if (shouldRestrict) {
       this.googleAnalyticsService.searchInteractionEvent('search_as_map_moves');
+      this.query.geo_box = this.geoBox();
+    } else {
+      this.query.geo_box = null;
     }
 
     if (!skipUpdate) {
-      this.updateUrlAndDoSearch();
+      this.querySubject.next(this.query);
     }
   }
 
@@ -731,7 +770,7 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     const footerPos = searchFooter.getBoundingClientRect();
     const scrollDirection = this.scrollDirection ? this.scrollDirection.toLowerCase() : '';
 
-    let alignClass = '';
+    let alignClass;
 
     if (this._overlaps(scrollSpyPos, headerPos)) {
       alignClass = 'align-top';
@@ -778,7 +817,8 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     this.selectLanguage(null, skipUpdate);
     this.selectType(null, skipUpdate);
     this.removeCategory(skipUpdate);
-    this.updateUrlAndDoSearch();
+    this.querySubject.next(this.query);
+    this.mapQuerySubject.next(this.query);
   }
 
   toggleShowFilters() {
@@ -802,30 +842,19 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  showVideo(className: string) {
-    this.videoPlacement = className;
-    this.hideVideo(false);
+  showLocationWindow() {
+    return this.locationMode === LocationMode.default;
+    return (!this.isZipCode(this.storedZip) && !this.gpsEnabled);
   }
 
-  updateUrlAndDoSearch() {
+  updateUrl() {
     const qParams = this._queryToQueryParams(this.query);
-
     const urlTree = this.router.createUrlTree([], {
       queryParams: qParams,
       queryParamsHandling: 'merge',
       preserveFragment: true
     });
-    this.location.go(urlTree.toString());
-       this.prevQuery = createClone()(this.query);
-       this.doSearch();
-       this.changeDetectorRef.detectChanges();
-  }
-
-  protected mapLoad(m: google.maps.Map) {
-    this.addMyLocationControl(m);
-    m.addListener('dragend', () => {
-      this.onMapDrag();
-    });
+    this.location.replaceState(urlTree.toString());
   }
 
   private _queryToQueryParams(qBefore: Query): Params {
@@ -842,9 +871,11 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     queryParams.sort = queryParams.words ? this.sortMethods.RELEVANCE.name : this.selectedSort.name;
     queryParams.pageStart = q.start || 0;
     queryParams.zoom = this.mapZoomLevel;
-    queryParams.lat = this.mapLoc.lat; // ? this.mapLoc.lat : this.defaultLoc.lat;
-    queryParams.lng = this.mapLoc.lng; // ? this.mapLoc.lng : this.defaultLoc.lng;
-    queryParams.geo_box = `${this.mapBounds.getNorthEast().lat()}|${this.mapBounds.getSouthWest().lng()}|${this.mapBounds.getSouthWest().lat()}|${this.mapBounds.getNorthEast().lng()}`;
+    queryParams.restrictToMap = this.restrictToMappedResults ? 'y' : 'n';
+    if (this.loc) {  // Only do this if there is a map location.
+      queryParams.lat = this.loc.lat; // ? this.mapLoc.lat : this.defaultLoc.lat;
+      queryParams.lng = this.loc.lng; // ? this.mapLoc.lng : this.defaultLoc.lng;
+    }
 
     if (q.hasOwnProperty('category') && q.category) {
       queryParams.category = q.category.id;
@@ -899,28 +930,19 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
                   top_left: {lat: coords[0], lon: coords[1]},
                   bottom_right: {lat: coords[2], lon: coords[3]}
                 };
+                break;
+              case('restrictToMap'):
+                this.restrictToMappedResults = qParams.get('restrictToMap') === 'y';
+                break;
             }
           }
         }
       }
     }
-
     return q;
   }
 
-  private _updateDistanceSort() {
-    this.loadMapLocation(() => {
-      this._setDistanceSortLatLong();
-      if (this.isDistanceSort) {
-        this.selectedSort = this.sortMethods.DISTANCE;
-        this.query.sort = this.selectedSort.sortQuery;
-        this.query.geo_box = { top_left: {lat: this.mapBounds.getNorthEast().lat(), lon: this.mapBounds.getSouthWest().lng()},
-                               bottom_right: {lat: this.mapBounds.getSouthWest().lat(), lon: this.mapBounds.getNorthEast().lng()}};
-        console.log(this.query.geo_box);
-        this.updateUrlAndDoSearch();
-      }
-    });
-  }
+
 
   private _goToFirstPage(skipUpdate = false) {
     this.query.start = 0;
@@ -929,11 +951,12 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     }
 
     if (!skipUpdate) {
-      this.updateUrlAndDoSearch();
+      this.querySubject.next(this.query);
+      this.mapQuerySubject.next(this.query);
     }
   }
 
-  private _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
+  private  _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
     return (
       ((b.top < a.top) && (b.bottom > a.top)) ||      // b overlaps top edge of a
       ((b.top > a.top) && (b.bottom < a.bottom)) ||   // b inside a
@@ -947,35 +970,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     return (!this.prevQuery || qBefore.equals(qAfter));
   }
 
-  private _loadSearchResults() {
-    console.log('=== _loadSearchResults ===');
-    this.searchService
-      .search(this.query)
-      .subscribe(queryWithResults => {
-        this.query = queryWithResults;
-        this.googleAnalyticsService.searchEvent(this.query);
-        this.loading = false;
-        this.changeDetectorRef.detectChanges();
-      });
-  }
-
-  private _loadMapResults() {
-    this.searchService
-      .mapSearch(this.query, !this.restrictToMappedResults)
-      .subscribe(mapQueryWithResults => {
-        this.mapQuery = mapQueryWithResults;
-        if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
-          this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
-          this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
-        } else {
-          this.hitsWithAddress = [];
-          this.hitsWithNoAddress = [];
-        }
-
-        this.loading = false;
-        this.changeDetectorRef.detectChanges();
-      });
-  }
 
   private _loadRelatedStudies() {
     const studyQuery = createClone()(this.query);
@@ -995,17 +989,6 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private _setDistanceSortLatLong() {
-    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
-    const useMapLoc = !!(!this.noLocation && this.mapLoc);
-    if (this.restrictToMappedResults) {
-      distanceSortQuery.latitude = this.mapBounds.getCenter().lat();
-      distanceSortQuery.longitude = this.mapBounds.getCenter().lng();
-    } else {
-      distanceSortQuery.latitude = useMapLoc ? this.mapLoc.lat : this.defaultLoc.lat;
-      distanceSortQuery.longitude = useMapLoc ? this.mapLoc.lng : this.defaultLoc.lng;
-    }
-  }
 
   private _updatePaginator() {
     const queryStart = this.query && (this.query.start - 1);
@@ -1016,8 +999,4 @@ export class SearchComponent implements AfterViewInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
   }
 
-  onMapDrag() {
-    console.log('map drag');
-    this._updateDistanceSort();
-  }
 }
