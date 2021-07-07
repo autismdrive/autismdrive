@@ -5,7 +5,7 @@ services:
     volumes:
       - $HOME/docker/volumes/stardrive/postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     environment:
       - POSTGRES_USER=ed_user
       - POSTGRES_PASSWORD=ed_pass
@@ -17,7 +17,28 @@ services:
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
-      - $HOME/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
+      - /home/elad/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
-      - 9300:9300
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9300:9300
+
+  backend:
+    image: stardrive-test-backend:latest
+    ports:
+      - 127.0.0.1:5000:5000
+    restart: unless-stopped
+    depends_on:
+      - es
+      - db
+
+
+  frontend:
+    image: stardrive-test-frontend:latest
+    environment:
+      - "API_URL=http://star-drive_backend_1:5000"
+    ports:
+      - 127.0.0.1:4200:4200
+    depends_on:
+      - es
+      - db
+      - backend
