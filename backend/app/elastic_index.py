@@ -233,6 +233,18 @@ class ElasticIndex:
         else:
             elastic_search = elastic_search.filter('bool', **{"should": self._default_filter()})
 
+        if search.geo_box:
+            elastic_search = elastic_search.filter('geo_bounding_box', **{"geo_point": {
+                        "top_left" : {
+                            "lat" : search.geo_box.top_left.lat,
+                            "lon" : search.geo_box.top_left.lon
+                        },
+                        "bottom_right" : {
+                            "lat" : search.geo_box.bottom_right.lat,
+                            "lon" : search.geo_box.bottom_right.lon
+                        }
+                    }})
+
         if sort is not None:
             elastic_search = elastic_search.sort(sort)
 

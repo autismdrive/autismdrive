@@ -27,7 +27,7 @@
     <div fxLayout="column">
       <app-search-box
         variant="light-bg"
-        (searchUpdated)="updateUrlAndDoSearch()"
+        (searchUpdated)="querySubject.next(this.query)"
         (categorySelected)="selectCategory($event)"
         [words]="query?.words"
       ></app-search-box>
@@ -91,11 +91,10 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-
               <div id="topic-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
                 <app-search-topics
-                  *ngIf="query"
-                  [category]="query.category"
+                  *ngIf="selectedCategory"
+                  [category]="selectedCategory"
                   (categorySelected)="selectCategory($event)"
                   [ngClass]="'filter-by-topic'"
                 ></app-search-topics>
@@ -163,23 +162,6 @@
     [links]="videoLinks"
     fxFlexAlign="center"
   ></app-tutorial-video>
-  <app-search-filters-breadcrumbs
-    *ngIf="query"
-    (ageRangeChipClicked)="selectAgeRange()"
-    (categoryChipClicked)="removeCategory()"
-    (clearAllClicked)="clearAllFilters()"
-    (keywordChipClicked)="removeWords()"
-    (languageChipClicked)="selectLanguage()"
-    (mappedResultsChipClicked)="listMapResultsOnly($event)"
-    (typeChipClicked)="selectType()"
-    [ageLabels]="ageLabels"
-    [fxHide]="!showBreadcrumbs()"
-    [fxShow]="showBreadcrumbs()"
-    [languageLabels]="languageLabels"
-    [query]="query"
-    [restrictToMappedResults]="restrictToMappedResults"
-    [typeLabels]="typeLabels"
-  ></app-search-filters-breadcrumbs>
   <div
     class="type-tabs-container"
     fxShow
@@ -195,7 +177,6 @@
       (selectedTabChange)="selectTypeTab($event)"
       [(selectedIndex)]="selectedTypeTabIndex"
       color="accent"
-      #typeTabs
     >
       <mat-tab>
         <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
@@ -227,7 +208,7 @@
     class="search-results"
     id="results"
     fxLayout="column"
-    fxLayoutGap="40px"
+    fxLayoutGap="10px"
     fxFlex="60%"
     fxFlex.lt-md="100%"
     fxShow
@@ -251,7 +232,7 @@
           *ngIf="paginatorElement"
         >
           <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} results</h4>
-          <h4 *ngIf="restrictToMappedResults">Showing nearest {{hits.length}} mapped results</h4>
+          <h4 *ngIf="restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} mapped results.</h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
           <app-search-sort
@@ -261,11 +242,30 @@
           ></app-search-sort>
         </div>
       </div>
+      <div class="sort-order" fxShow fxHide.lt-md>
+        <app-search-filters-breadcrumbs
+          *ngIf="query"
+          (ageRangeChipClicked)="selectAgeRange()"
+          (categoryChipClicked)="removeCategory()"
+          (clearAllClicked)="clearAllFilters()"
+          (keywordChipClicked)="removeWords()"
+          (languageChipClicked)="selectLanguage()"
+          (mappedResultsChipClicked)="listMapResultsOnly($event)"
+          (typeChipClicked)="selectType()"
+          [ageLabels]="ageLabels"
+          [fxHide]="!showBreadcrumbs()"
+          [fxShow]="showBreadcrumbs()"
+          [languageLabels]="languageLabels"
+          [query]="query"
+          [restrictToMappedResults]="restrictToMappedResults"
+          [typeLabels]="typeLabels"
+        ></app-search-filters-breadcrumbs>
+      </div>
       <div *ngIf="hits.length > 0">
         <app-search-result
           *ngFor="let hit of hits; let i = index"
           [hit]="hit"
-          [mapLoc]="mapLoc"
+          [mapLoc]="loc"
           [currentUser]="currentUser"
           [ngClass]="'sort-order-' + i"
         >
@@ -279,7 +279,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
-      [ngClass]="{'ghost': (restrictToMappedResults || !query || (numTotalResults === 0))}"
+      [ngClass]="{'ghost': (!query || (numTotalResults === 0))}"
     >
     </mat-paginator>
   </div>
@@ -305,25 +305,28 @@
     >
       <mat-icon *ngIf="!restrictToMappedResults">check_box_outline_blank</mat-icon>
       <mat-icon *ngIf="restrictToMappedResults">check_box</mat-icon>
-      Search as map moves
+      Limit results to map
     </button>
     <mat-expansion-panel
-      *ngIf="showLocationButton"
+      *ngIf="shouldShowMap"
       id="set-location"
       [ngClass]="'zipCodeSetButton mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
+      [expanded]="showLocationWindow()"
       #setLocationExpansionPanel
     >
       <mat-expansion-panel-header>
-        <ng-container *ngIf="isZipCode(storedZip)">Location: {{storedZip}}</ng-container>
-        <ng-container *ngIf="gpsEnabled && !isZipCode(storedZip)">Location: using GPS</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.default">Set Location</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.zipcode">Location: {{storedZip}}</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.gps">Your current location</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.map">Using Map's Center</ng-container>
       </mat-expansion-panel-header>
       <div [ngClass]="'zipCodeSet'" fxLayout="column">
         <mat-form-field class="zipCodeField">
           <input
             matInput
             placeholder="Enter ZIP Code"
-            [(ngModel)]="updatedZip"
+            [(ngModel)]="storedZip"
             (keyup.enter)="submitZip($event, setLocationExpansionPanel)"
             #zipCodeInput
           >
@@ -340,7 +343,7 @@
               mat-flat-button
               (click)="useGPSLocation($event, setLocationExpansionPanel)"
               id="btn_gps"
-            >Use GPS instead</button>
+            >Current Location</button>
         </div>
       </div>
     </mat-expansion-panel>
@@ -348,11 +351,11 @@
       <agm-map
         #mapTemplate
         *ngIf="shouldShowMap"
-        [latitude]="mapLoc ? mapLoc.lat : defaultLoc.lat"
-        [longitude]="mapLoc ? mapLoc.lng : defaultLoc.lng"
+        [latitude]="loc.lat"
+        [longitude]="loc.lng"
         [streetViewControl]="false"
         mapTypeId="roadmap"
-        [zoom]="7"
+        [zoom]="mapZoomLevel ? mapZoomLevel : defaultZoom"
         (mapReady)="mapLoad($event)"
         [scrollwheel]="null"
         (mapClick)="closeInfoWindow()"
@@ -361,9 +364,9 @@
       >
         <agm-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
           <agm-marker
-            *ngIf="mapLoc"
-            [latitude]="mapLoc.lat"
-            [longitude]="mapLoc.lng"
+            *ngIf="loc"
+            [latitude]="loc.lat"
+            [longitude]="loc.lng"
             [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
           ></agm-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
@@ -462,7 +465,7 @@
       </span>
     </div>
   </div>
-  <app-border-box-tile
+  <app-border-box-tile *ngIf="!loading"
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"
@@ -474,3 +477,4 @@
 <ng-template #loadingMessage>
   <app-loading></app-loading>
 </ng-template>
+

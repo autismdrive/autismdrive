@@ -6,7 +6,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-In some circumstances you may want to run the server in "mirror" mode to debug the system running in this configuration.  You can do this with
+In some circumstances you may want to run the server in "mirror" mode to debug the system running in this configuration. You can do this with
 ```
 ng serve -c mirror --port 4201 --optimization=false
 ```

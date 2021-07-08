@@ -16,7 +16,7 @@ from app.model.resource import Resource
 from app.model.resource_category import ResourceCategory
 from app.model.resource_change_log import ResourceChangeLog
 from app.model.role import Role
-from app.model.search import Search, Sort
+from app.model.search import Search, Sort, Geopoint, Geobox
 from app.model.step_log import StepLog
 from app.model.study import Study, Status
 from app.model.study_category import StudyCategory
@@ -610,6 +610,13 @@ class StudyInvestigatorSchema(ModelSchema):
         'study': ma.URLFor('api.studyendpoint', id='<study_id>')
     })
 
+class GeopointSchema(ma.Schema):
+    lat = fields.Float(missing=None)
+    lon = fields.Float(missing=None)
+
+    @post_load
+    def make_geo_point(self, data, **kwargs):
+        return Geopoint(**data)
 
 class SearchSchema(ma.Schema):
     class Meta:
@@ -648,6 +655,14 @@ class SearchSchema(ma.Schema):
         count = fields.Integer()
         is_selected = fields.Boolean()
 
+    class GeoboxSchema(ma.Schema):
+        top_left = ma.Nested(GeopointSchema)
+        bottom_right= ma.Nested(GeopointSchema)
+
+        @post_load
+        def make_geo_box(self, data, **kwargs):
+            return Geobox(**data)
+
     words = fields.Str()
     start = fields.Integer()
     size = fields.Integer()
@@ -664,6 +679,8 @@ class SearchSchema(ma.Schema):
     ordered = True
     date = fields.DateTime(allow_none=True)
     map_data_only = fields.Boolean()
+    geo_box = ma.Nested(GeoboxSchema, allow_none=True, default=None)
+
 
     @post_load
     def make_search(self, data, **kwargs):

@@ -23,14 +23,14 @@ class Search:
         return list(map(lambda age_name: (AggCount(age_name, 0, False)),
                         ['english', 'spanish', 'chinese', 'korean', 'vietnamese', 'arabic', 'tagalog']))
 
-    def __init__(self, words="", types=[], ages=[], languages=[], start=0, size=10, sort=None, category=None, date=None,
-                 map_data_only=False):
+    def __init__(self, words="", types=None, ages=None, languages=None, start=0, size=10, sort=None, category=None, date=None,
+                 map_data_only=False, geo_point = None, geo_box = None):
         self.words = words
         self.total = 0
         self.hits = []
-        self.types = types
-        self.ages = ages
-        self.languages = languages
+        self.types = [] if types is None else types
+        self.ages = [] if ages is None else ages
+        self.languages = [] if languages is None else languages
         self.start = start
         self.size = size
         self.sort = sort
@@ -40,6 +40,7 @@ class Search:
         self.language_counts = Search.known_language_counts()
         self.date = date
         self.map_data_only = map_data_only  # When we should return a limited set of details just for mapping.
+        self.geo_box = geo_box
 
     # Method called when updating a search with fresh results.
     # This should zero-out any existing data that should be overwritten.
@@ -78,6 +79,15 @@ class Search:
     def has_language():
         return next((ac for ac in Search.known_language_counts() if ac.value == 'value'), None) is not None
 
+class Geopoint:
+    def __init__(self, lat, lon):
+        self.lat = lat
+        self.lon = lon
+
+class Geobox:
+    def __init__(self, top_left, bottom_right):
+        self.top_left = top_left
+        self.bottom_right = bottom_right
 
 class Sort:
     def __init__(self, field, latitude, longitude, order, unit):

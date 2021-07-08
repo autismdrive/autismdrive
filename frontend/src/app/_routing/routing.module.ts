@@ -107,6 +107,7 @@ const routes: Routes = [
     canActivate: [RoleGuard]
   },
   {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
+  {path: 'studies/:studyStatus/:age', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {path: 'study/:studyId', component: StudyDetailComponent, data: {title: 'Autism DRIVE Study Details'}},
   {
     path: 'study/edit/:studyId',

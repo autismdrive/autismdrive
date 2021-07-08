@@ -8,7 +8,6 @@ export class GlobalHeaderUseCases {
   displaySitewideHeader() {
     expect(this.page.getElements('#menu-bar').count()).toEqual(1);
     expect(this.page.getElements('app-logo').count()).toEqual(1);
-    expect(this.page.getElements('#uva-header').count()).toEqual(1);
   }
 
   displayLoggedOutState() {

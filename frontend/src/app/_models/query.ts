@@ -2,6 +2,15 @@ import {Category} from './category';
 import {GeoLocation} from './geolocation';
 import {HitType} from './hit_type';
 
+export interface GeoPoint {
+  lat: number;
+  lon: number;
+}
+
+export interface GeoBox {
+  top_left: GeoPoint;
+  bottom_right: GeoPoint;
+}
 
 export interface QueryProps {
   words?: string;
@@ -20,6 +29,7 @@ export interface QueryProps {
   date?: Date;
   status?: string;
   map_data_only?: boolean;
+  geo_box: GeoBox;
 }
 
 export class Query {
@@ -42,6 +52,8 @@ export class Query {
   date?: Date;
   status?: string;
   map_data_only = false;
+  geo_box: GeoBox;
+
 
   constructor(private _props: QueryProps) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));

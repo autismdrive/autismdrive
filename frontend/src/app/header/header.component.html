@@ -1,13 +1,17 @@
 <div
-  [@toggleBackground]="headerViewportState"
+  [@toggleBackground]="onHomeScreen() && headerViewportState"
   id="header-bg"
+  *ngIf = "onHomeScreen()"
 ></div>
 <mat-toolbar
   [ngClass]="{'mirroring': config.mirroring}"
+  ngStyle.lt-md="min-height: unset;"
   id="site-header"
 >
   <mat-toolbar-row
+    *ngIf = "onHomeScreen()"
     [@toggleUvaHeader]="headerExpandedState"
+    fxHide.lt-md fxShow
     fxLayout="row"
     fxLayoutAlign="center center"
     id="uva-header"
@@ -32,25 +36,14 @@
     </a></div>
     <span fxFlex></span>
     <div *ngIf="config.mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
-    <a
-      *ngIf="currentUser && currentUser.role == 'admin'"
-      [routerLink]="[ '/admin' ]"
-      color="accent"
-      fxHide
-      fxShow.gt-sm
-      id="admin-button"
-      mat-button
-      routerLinkActive="selected"
-    >
-      <mat-icon>build</mat-icon>
-      Admin
-    </a>
   </mat-toolbar-row>
   <mat-toolbar-row
-    [@toggleMenuBar]="menuState"
+    [@toggleMenuBar]= "onHomeScreen() && menuState"
     fxLayout="row"
     fxLayoutAlign="start center"
     id="menu-bar"
+    [ngStyle]="onHomeScreen() ? {} : {top:0}"
+    [ngStyle.lt-md]="{top:0, minHeight:'64px'}"
   >
     <app-logo variant="light"></app-logo>
     <span fxFlex></span>
@@ -156,6 +149,18 @@
           <mat-icon>exit_to_app</mat-icon>
           Logout
         </a></li>
+        <li *ngIf="currentUser && currentUser.role == 'admin'"><a
+          [routerLink]="[ '/admin' ]"
+          color="accent"
+          fxHide
+          fxShow.gt-sm
+          id="admin-button"
+          mat-button
+          routerLinkActive="selected"
+        >
+          <mat-icon>build</mat-icon>
+          Admin
+        </a></li>
 
       </ul>
     </div>
@@ -171,28 +176,8 @@
     </button>
   </mat-toolbar-row>
   <mat-toolbar-row
-    [@toggleCovid19Toolbar]="headerExpandedState"
-    id="covid19"
-    fxHide.lt-md
-  >
-    <button
-      [routerLink]="[ '/studies' ]"
-      id="covid19-studies-button"
-      mat-button
-      routerLinkActive="selected"
-    >
-      COVID-19 STUDY UPDATES
-    </button>
-    <button
-      [routerLink]="[ '/covid19-resources' ]"
-      id="covid19-resources-button"
-      mat-button
-      routerLinkActive="selected"
-    >
-      COVID-19 RESOURCES
-    </button>
-  </mat-toolbar-row>
-  <mat-toolbar-row
+    *ngIf="onHomeScreen()"
+    fxHide.lt-md fxShow
     [@toggleTaglineToolbar]="taglineToolbarState"
     id="tagline"
   >
@@ -241,14 +226,6 @@
     mat-button
     routerLinkActive="selected"
   >Webinars</a>
-  <a
-    (click)="toggleMenu()"
-    [routerLink]="[ '/covid19-resources' ]"
-    color="accent"
-    id="covid19-resources-button-mobile"
-    mat-button
-    routerLinkActive="selected"
-  >COVID-19 Resources</a>
   <a
     (click)="toggleMenu()"
     *ngIf="!currentUser"

@@ -1,0 +1,5 @@
+@import '../_config';
+
+::ng-deep :not(body.is-home) .content {
+  padding-top: $site-header-height;
+}

@@ -2,6 +2,8 @@
 
 #hero {
   background-color: $brand-gray-tint-4;
+  padding-top:  $site-header-height;
+  margin-top: -$site-header-height;
   padding-left: 16px;
   padding-right: 16px;
 
@@ -479,4 +481,20 @@ app-search-filters-breadcrumbs {
 
 #show-filters-button {
   margin-bottom: 1em;
+}
+
+app-border-box-tile {
+  transition: position 3s;
+}
+
+::ng-deep .mat-tooltip {
+  font-size: 15px !important;
+}
+
+.mat-progress-bar {
+  height: 6px;
+}
+
+.loc-service {
+  margin: 2em;
 }
