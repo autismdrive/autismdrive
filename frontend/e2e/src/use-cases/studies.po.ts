@@ -10,20 +10,22 @@ export class StudiesUseCases {
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
   }
 
+  async filterBy(selectStatus?: string) {
+    const menuSelector = '#set-status';
+    const optionSelector = `.mat-option.sort-by-${selectStatus}`;
+    this.page.clickElement(menuSelector);
+    await this.page.waitForVisible(optionSelector);
+    this.page.clickElement(optionSelector);
+    await this.page.waitForNotVisible(optionSelector);
+    await this.page.waitForAnimations();
+  }
   async filterByStatus(selectStatus?: string) {
-    const tiles = await this.page.getElements('#hero app-border-box-tile');
-    expect(tiles.length).toEqual(4);
-
-    for (const tile of tiles) {
-      const selectedStatus = await tile.getAttribute('data-study-status');
-      expect(selectedStatus).toBeTruthy();
-
-      // If no specific status was given, click each tile in sequence
-      // Otherwise, only click the one we care about.
-      if (!selectStatus || (selectStatus && (selectStatus === selectedStatus))) {
-        tile.click();
-        await this.checkResultsMatchStatus(selectedStatus);
-      }
+    await this.filterBy(selectStatus);
+    const selectedStatus = this.page.getElement('data-study-status');
+    expect(selectedStatus).toBeTruthy();
+    if (!selectStatus || (selectStatus && (selectStatus === await selectedStatus))) {
+      this.filterBy(selectStatus);
+      await this.checkResultsMatchStatus(selectStatus);
     }
   }
 

@@ -18,7 +18,7 @@
       id="TopOfSearch"
       style="padding-left:6em; padding-right:2em; padding-top:2em;"
     >
-      <mat-form-field style="margin-bottom:-1em">
+      <mat-form-field style="margin-bottom:-1em" id="set-status">
         <mat-label>Study Status</mat-label>
         <mat-select [(value)]="selectedStatus">
           <mat-select-trigger>
@@ -33,6 +33,7 @@
             *ngFor="let status of studyStatuses"
             [value]="status"
             (click)="selectStatus(status)"
+            [ngClass]="'sort-by-' + status.name.toLowerCase()"
           >
             <span class="type-label">{{status.label}}</span>
           </mat-option>
@@ -104,7 +105,7 @@
             <span class="type-label">{{age.label}}</span>
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field>c
     </div>
   </div>
   <div
