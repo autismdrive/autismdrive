@@ -36,19 +36,6 @@
     </a></div>
     <span fxFlex></span>
     <div *ngIf="config.mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
-    <a
-      *ngIf="currentUser && currentUser.role == 'admin'"
-      [routerLink]="[ '/admin' ]"
-      color="accent"
-      fxHide
-      fxShow.gt-sm
-      id="admin-button"
-      mat-button
-      routerLinkActive="selected"
-    >
-      <mat-icon>build</mat-icon>
-      Admin
-    </a>
   </mat-toolbar-row>
   <mat-toolbar-row
     [@toggleMenuBar]= "onHomeScreen() && menuState"
@@ -161,6 +148,18 @@
         >
           <mat-icon>exit_to_app</mat-icon>
           Logout
+        </a></li>
+        <li *ngIf="currentUser && currentUser.role == 'admin'"><a
+          [routerLink]="[ '/admin' ]"
+          color="accent"
+          fxHide
+          fxShow.gt-sm
+          id="admin-button"
+          mat-button
+          routerLinkActive="selected"
+        >
+          <mat-icon>build</mat-icon>
+          Admin
         </a></li>
 
       </ul>
