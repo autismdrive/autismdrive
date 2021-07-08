@@ -548,7 +548,8 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   selectCategory(newCategory: Category) {
-    this.query.category = newCategory;
+    // When selecting a category, clean it down to just what we need to do a search
+    this.query.category = {id: newCategory.id, name: newCategory.name};
     this._goToFirstPage();
   }
 
