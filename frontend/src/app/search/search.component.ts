@@ -85,7 +85,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
 
   storedZip: string;
-  gpsEnabled = false;
+  gpsEnabled = true;
   defaultLoc: LatLngLiteral = {
     lat: 37.32248,
     lng: -78.36926

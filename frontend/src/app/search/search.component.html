@@ -339,19 +339,11 @@
               id="btn_save"
             >Save</button>
             <button
-              *ngIf="!gpsEnabled"
-              mat-flat-button
-              #tooltip="matTooltip"
-              matTooltip="Enable GPS in your browser's settings & reload this page"
-              matTooltipPosition="below"
-              id="btn_no_gps"
-            >GPS disabled</button>
-            <button
               *ngIf="gpsEnabled"
               mat-flat-button
               (click)="useGPSLocation($event, setLocationExpansionPanel)"
               id="btn_gps"
-            >Use GPS instead</button>
+            >Current Location</button>
         </div>
       </div>
     </mat-expansion-panel>
