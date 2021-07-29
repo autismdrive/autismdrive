@@ -247,6 +247,11 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
 
   ngOnInit() {
+    if (localStorage.noFirstVisit === 'true') {
+      this.hideVideo();
+    }
+    localStorage.noFirstVisit = true;
+
     /**
      * On initialization, set up two subjects that will watch for, debouce, and depulicate all queries sent to
      * the backend.  Then attempt to run a sensible search, either based on query params or using defaults.

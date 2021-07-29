@@ -61,11 +61,6 @@ export class TutorialVideoComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('visit? ', localStorage.noFirstVisit);
-    if (localStorage.noFirstVisit === 'true') {
-      this.hideVideo();
-    }
-    localStorage.noFirstVisit = true;
   }
 
   hideVideo() {
