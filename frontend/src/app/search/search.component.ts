@@ -592,7 +592,11 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   submitResource() {
-    window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
+    const popUp = window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
+    if (popUp == null || typeof(popUp) === 'undefined') {
+    alert('Please disable your pop-up blocker and try again. \nYou can also use following link to submit your resource: ' +
+      'https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP');
+    }
   }
 
   get selectedCategory() {
