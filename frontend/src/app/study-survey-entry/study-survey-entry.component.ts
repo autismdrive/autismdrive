@@ -4,6 +4,9 @@ import {Study} from '../_models/study';
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {MatDialog} from '@angular/material/dialog';
 import {RegisterDialogComponent} from '../register-dialog/register-dialog.component';
+import {User} from '../_models/user';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-study-survey-entry',
@@ -12,16 +15,25 @@ import {RegisterDialogComponent} from '../register-dialog/register-dialog.compon
 })
 export class StudySurveyEntryComponent implements OnInit {
   @Input() study: Study;
-  @Input() currentUser = false;
+  @Input() currentUser;
   @Input() surveyLink: string;
 
   constructor(
+    private api: ApiService,
     private router: Router,
     private googleAnalytics: GoogleAnalyticsService,
+    private authenticationService: AuthenticationService,
     public dialog: MatDialog
-  ) { }
+  ) {
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+  }
 
   ngOnInit() {
+     if (this.currentUser) {
+       this.api.getUser(this.currentUser.id).subscribe(u => {
+         this.currentUser = new User(u);
+       });
+     }
   }
 
   goLogin() {
@@ -30,9 +42,15 @@ export class StudySurveyEntryComponent implements OnInit {
 
   goSurvey() {
     if (this.surveyLink) {
+      this.sendInquiry();
       this.googleAnalytics.studySurveyEvent(this.study);
       window.open(this.surveyLink, '_blank');
     }
+  }
+
+  sendInquiry() {
+    this.api.sendStudyInquiryEmail(this.currentUser, this.study).subscribe();
+    this.googleAnalytics.studyInquiryEvent(this.study);
   }
 
   openDialog(): void {

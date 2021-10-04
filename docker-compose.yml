@@ -17,7 +17,7 @@ services:
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
-      - /home/elad/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
+      - $HOME/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
     ports:
       - 127.0.0.1:9200:9200
       - 127.0.0.1:9300:9300

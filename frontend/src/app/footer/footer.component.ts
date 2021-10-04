@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {ConfigService} from '../_services/config/config.service';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-footer',
@@ -8,6 +9,9 @@ import {ConfigService} from '../_services/config/config.service';
 })
 export class FooterComponent {
 
-  constructor(public config: ConfigService) { }
+  constructor(
+    public config: ConfigService,
+    public router: Router,
+  ) {}
 
 }
