@@ -189,6 +189,22 @@
       individuals, families & professionals.
     </p>
   </mat-toolbar-row>
+   <mat-toolbar-row
+    *ngIf="onResourceScreen()"
+    fxHide.lt-md fxShow
+    [@toggleResourceBar]="onResourceScreen() && resourceToolbarState"
+    id="searchtag"
+  >
+     <p style="margin-right: 10px; margin-left: 10px; margin-top: 20px;" fxHide.lt-md fxShow>
+       <a style="color: white"
+      href="https://www.youtube.com/watch?v=aRaat1lSoVg"
+      target="_blank"
+      >
+       Learn how to use the Resource directory
+       </a>
+     </p>
+     <mat-icon style="margin-top: 20px;">play_circle_outline</mat-icon>
+  </mat-toolbar-row>
 </mat-toolbar>
 <div
   [@toggleMobileMenu]="menuState"

@@ -1,3 +1,4 @@
+/// <reference types="@types/youtube" />
 import {Component, Input, OnInit} from '@angular/core';
 import {NavItem} from '../_models/nav-item';
 import ClosedCaptionsLoadPolicy = YT.ClosedCaptionsLoadPolicy;
