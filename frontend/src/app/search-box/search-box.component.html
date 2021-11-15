@@ -10,7 +10,6 @@
     fxLayoutGap="0px"
   >
     <h1 [fxFlex]="videoIsVisible ? 'calc(100% - 66px)' : '100%'">Find Autism Resources</h1>
-    <h5 [fxFlex]="videoIsVisible ? 'calc(100% - 66px)' : '100%'">Type a search term and/or use filters below</h5>
   </div>
   <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center center">
     <mat-form-field
@@ -23,7 +22,7 @@
         #searchInput
         (keyup.enter)="updateSearch(false)"
         (keyup.escape)="updateSearch(true)"
-        placeholder="Search for Autism Resources"
+        placeholder="Type a search term and/or use filters below"
         type="text"
         [formControl]="searchBoxControl"
         [matAutocomplete]="auto"
