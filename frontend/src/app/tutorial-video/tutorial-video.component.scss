@@ -22,6 +22,9 @@ $video-padding-width: $video-padding * 2;
 .video-preview {
   position: relative;
   display: block;
+  // margin-top: 3.5em;
+  //margin-bottom: 0em;
+  //margin-left: 2em;
   margin: 2em;
   padding: $video-padding;
   background-color: $brand-primary;
@@ -51,20 +54,28 @@ $video-padding-width: $video-padding * 2;
 
   &.medium {
     // XS
+    margin: 2em;
     width: (($video-width-medium * $xs-factor) + $video-padding-width);
 
     // SM
     @media (min-width: 600px) {
+      margin: 2em;
       width: (($video-width-medium * $sm-factor) + $video-padding-width);
     }
 
     // MD
     @media (min-width: 960px) {
+      margin-top: 3.5em;
+      margin-bottom: 0em;
+      margin-left: 2em;
       width: (($video-width-medium * $md-factor) + $video-padding-width);
     }
 
     // XL
     @media (min-width: 1280px) {
+      margin-top: 3.5em;
+      margin-bottom: 0em;
+      margin-left: 2em;
       width: (($video-width-medium * $lg-factor) + $video-padding-width);
     }
   }

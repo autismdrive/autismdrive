@@ -1,3 +1,4 @@
+/// <reference types="@types/googlemaps" />
 import {formatDate} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';

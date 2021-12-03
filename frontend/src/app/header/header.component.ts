@@ -1,31 +1,13 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger
-} from '@angular/animations';
-import { MediaMatcher } from '@angular/cdk/layout';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  OnDestroy,
-} from '@angular/core';
-import { Router } from '@angular/router';
-import { fromEvent } from 'rxjs';
-import {
-  filter,
-  map,
-  pairwise,
-  share,
-  throttleTime
-} from 'rxjs/operators';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+import {MediaMatcher} from '@angular/cdk/layout';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy,} from '@angular/core';
+import {Router} from '@angular/router';
+import {fromEvent} from 'rxjs';
+import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '../_models/scroll';
-import { User } from '../_models/user';
-import { AuthenticationService } from '../_services/authentication/authentication-service';
-import { ApiService } from '../_services/api/api.service';
+import {User} from '../_models/user';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {ApiService} from '../_services/api/api.service';
 import {ConfigService} from '../_services/config/config.service';
 
 const boxShadow = '0px 5px 5px 0px rgba(0, 0, 0, 0.3)';
@@ -89,7 +71,16 @@ const easing = '500ms ease-in-out';
       state(HeaderState.Expanded + '-' + ViewportWidth.Medium, style({ top: '0px', height: '144px' })),
       state(HeaderState.Collapsed + '-' + ViewportWidth.Large, style({ top: '0px', height: '64px' })),
       state(HeaderState.Expanded + '-' + ViewportWidth.Large, style({ top: '0px', height: '144px' })),
-      transition('* => *', animate('500ms ease-out'))
+      transition('* => *', animate(easing))
+    ]),
+    trigger('toggleResourceBar', [
+      state(stateHiddenCollapsed + '-' + ViewportWidth.Small, style({ top: '0px', height: '64px', 'box-shadow': boxShadow })),
+      state(stateHiddenExpanded + '-' + ViewportWidth.Small, style({ top: '0px', height: '64px', 'box-shadow': 'none' })),
+      state(stateHiddenCollapsed + '-' + ViewportWidth.Medium, style({ top: '0px', height: '64px', 'box-shadow': boxShadow })),
+      state(stateHiddenExpanded + '-' + ViewportWidth.Medium, style({ top: '40px', height: '64px', 'box-shadow': 'none' })),
+      state(stateHiddenCollapsed + '-' + ViewportWidth.Large, style({ top: '0px', height: '64px', 'box-shadow': boxShadow })),
+      state(stateHiddenExpanded + '-' + ViewportWidth.Large, style({ top: '40px', height: '64px', 'box-shadow': 'none' })),
+      transition('* => *', animate(easing))
     ]),
   ]
 })
@@ -128,6 +119,12 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
 
   get taglineToolbarState(): string {
     const menuState = this.menuVisible ? MenuState.Visible : MenuState.Hidden;
+    const headerState = this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
+    return `${menuState}-${headerState}-${this.viewportWidth}`;
+  }
+
+  get resourceToolbarState(): string {
+    const menuState =  MenuState.Hidden;
     const headerState = this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
     return `${menuState}-${headerState}-${this.viewportWidth}`;
   }
@@ -196,8 +193,11 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   onHomeScreen() {
-    const onHomeScreen = /^\/home/.test(this.router.url);
-    return onHomeScreen;
+    return /^\/home/.test(this.router.url);
+  }
+
+  onResourceScreen() {
+    return /^\/search/.test(this.router.url);
   }
 
   watchScrollEvents() {

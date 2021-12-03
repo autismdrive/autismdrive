@@ -73,6 +73,16 @@
     }
   }
 
+   mat-toolbar-row#searchtag {
+     background-color: $brand-accent;
+    z-index: 100;
+    box-shadow: 40px 20px 40px -40px rgba(0, 0, 0, 0.1);
+    p {
+      font-style: italic;
+      margin: 0;
+    }
+  }
+
   #primary-nav {
     ul {
       list-style: none;
