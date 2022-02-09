@@ -278,6 +278,37 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           });
       });
 
+     this.setDefaultMapLocation(() => {
+      this.route.queryParamMap
+        .subscribe(qParamMap => {
+          this.queryParamMap = qParamMap;
+          this.query = this._queryParamsToQuery(qParamMap);
+          const defaultZoomLevel = this.storedZip ? 10 : this.defaultZoom;
+          this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || defaultZoomLevel;
+          // parse lat and lng from URL
+          const qLat = qParamMap.get('lat');
+          const qLng = qParamMap.get('lng');
+          if (qLat && qLng) {
+            const lat = parseFloat(qLat);
+            const lng = parseFloat(qLng);
+            this.setLocation(LocationMode.map, { lat: lat, lng: lng });
+          }
+          const sortName = qParamMap.get('sort') || 'Distance';
+          const forceReSort = (this.prevQuery && this.query.start === 0);
+          if (forceReSort) {
+            if (sortName && this.sortMethods[sortName.toUpperCase()]) {
+              this.reSort(sortName, forceReSort);
+            } else {
+              this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
+            }
+          } else {
+            this.reSort(sortName,  true);
+            this.selectedSort = this.sortMethods[sortName.toUpperCase()];
+            this.querySubject.next(this.query);
+            this.mapQuerySubject.next(this.query);
+          }
+        });
+    });
     this.mapQuerySubject
       .pipe(debounceTime(1000))
       .subscribe(q => {
@@ -302,35 +333,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
             }
           });
       });
-
-    this.setDefaultMapLocation(() => {
-      this.route.queryParamMap
-        .subscribe(qParamMap => {
-          this.queryParamMap = qParamMap;
-          this.query = this._queryParamsToQuery(qParamMap);
-          const defaultZoomLevel = this.storedZip ? 10 : this.defaultZoom;
-          this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || defaultZoomLevel;
-          // parse lat and lng from URL
-          const qLat = qParamMap.get('lat');
-          const qLng = qParamMap.get('lng');
-          if (qLat && qLng) {
-            this.setLocation(LocationMode.map, { lat: parseFloat(qLat), lng: parseFloat(qLng) });
-          }
-          const sortName = qParamMap.get('sort') || 'Distance';
-          const forceReSort = (this.prevQuery && this.query.start === 0);
-          if (forceReSort) {
-            if (sortName && this.sortMethods[sortName.toUpperCase()]) {
-              this.reSort(sortName, forceReSort);
-            } else {
-              this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
-            }
-          } else {
-            this.selectedSort = this.sortMethods[sortName.toUpperCase()];
-            this.querySubject.next(this.query);
-            this.mapQuerySubject.next(this.query);
-          }
-        });
-    });
 
   }
 
