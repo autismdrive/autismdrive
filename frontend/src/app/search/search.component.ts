@@ -114,7 +114,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         Fluvanna, Louisa, and Nelson counties.
       `,
       image: '/assets/partners/craag.png',
-      url: 'https://cahumanservices.org/advocating-change/community-organization-engagement/autism-action-groups/',
+      url: 'https://www.cahumanservices.org/craag/',
     },
     {
       name: 'The Faison Center',
