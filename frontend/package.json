@@ -35,7 +35,7 @@
     "@yellowspot/ng-truncate": "^1.5.2",
     "core-js": "^3.6.5",
     "flat": "^5.0.2",
-    "geolib": "^3.3.1",
+    "geolib": "^3.3.4",
     "js-marker-clusterer": "^1.0.0",
     "ng2-pdfjs-viewer": "github:intbot/ng2-pdfjs-viewer#master",
     "ngx-device-detector": "^2.0.0",
