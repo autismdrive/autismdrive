@@ -9,7 +9,7 @@ click==8.0.0
 elasticsearch~=6.8.2
 elasticsearch-dsl==6.4.0
 et-xmlfile==1.1.0
-Flask==2.0.0
+Flask==2.2.5
 Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.9
 Flask-HTTPAuth==4.1.0
