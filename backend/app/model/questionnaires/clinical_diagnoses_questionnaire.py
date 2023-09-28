@@ -1,11 +1,12 @@
-from sqlalchemy import func
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, BigInteger, ARRAY
 
-from app import db, ma
+from app.database import Base
 from app.export_service import ExportService
 from app.schema.model_schema import ModelSchema
 
 
-class ClinicalDiagnosesQuestionnaire(db.Model):
+class ClinicalDiagnosesQuestionnaire(Base):
     __tablename__ = "clinical_diagnoses_questionnaire"
     __label__ = "Clinical Diagnosis"
     __question_type__ = ExportService.TYPE_SENSITIVE
@@ -15,18 +16,14 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
     medical_other_hide_expression = '!(model.medical && model.medical.includes("medicalOther"))'
     genetic_other_hide_expression = '!(model.genetic && model.genetic.includes("geneticOther"))'
 
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
-    user_id = db.Column(
-        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-    developmental = db.Column(
-        db.ARRAY(db.String),
+    participant_id = Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    user_id = Column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    developmental = Column(
+        ARRAY(String),
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
@@ -48,8 +45,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             },
         },
     )
-    developmental_other = db.Column(
-        db.String,
+    developmental_other = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "input",
@@ -57,15 +54,12 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "label": "Enter developmental condition",
                 "required": True,
             },
-
             "hide_expression": developmental_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + developmental_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + developmental_other_hide_expression},
         },
     )
-    mental_health = db.Column(
-        db.ARRAY(db.String),
+    mental_health = Column(
+        ARRAY(String),
         info={
             "display_order": 2,
             "type": "multicheckbox",
@@ -88,8 +82,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             },
         },
     )
-    mental_health_other = db.Column(
-        db.String,
+    mental_health_other = Column(
+        String,
         info={
             "display_order": 2.2,
             "type": "input",
@@ -98,13 +92,11 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": mental_health_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + mental_health_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + mental_health_other_hide_expression},
         },
     )
-    medical = db.Column(
-        db.ARRAY(db.String),
+    medical = Column(
+        ARRAY(String),
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
@@ -124,8 +116,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             },
         },
     )
-    medical_other = db.Column(
-        db.String,
+    medical_other = Column(
+        String,
         info={
             "display_order": 3.2,
             "type": "input",
@@ -134,13 +126,11 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": medical_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + medical_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + medical_other_hide_expression},
         },
     )
-    genetic = db.Column(
-        db.ARRAY(db.String),
+    genetic = Column(
+        ARRAY(String),
         info={
             "display_order": 4.1,
             "type": "multicheckbox",
@@ -161,8 +151,8 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
             },
         },
     )
-    genetic_other = db.Column(
-        db.String,
+    genetic_other = Column(
+        String,
         info={
             "display_order": 4.2,
             "type": "input",
@@ -171,64 +161,62 @@ class ClinicalDiagnosesQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": genetic_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + genetic_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + genetic_other_hide_expression},
         },
     )
 
     def get_field_groups(self):
         return {
-                "intro": {
-                    "fields": [],
-                    "display_order": 0,
-                    "wrappers": ["help"],
-                    "template_options": {
-                        "label": "",
-                        "description": "",
+            "intro": {
+                "fields": [],
+                "display_order": 0,
+                "wrappers": ["help"],
+                "template_options": {
+                    "label": "",
+                    "description": "",
+                },
+                "expression_properties": {
+                    "template_options.label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
+                            "self_guardian": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
+                            "dependent": '"Does " + (formState.preferredName || "your child") + " CURRENTLY have any of the following diagnoses? (please check all that apply)"',
+                        }
                     },
-                    "expression_properties": {
-                        "template_options.label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
-                                "self_guardian": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
-                                "dependent": '"Does " + (formState.preferredName || "your child") + " CURRENTLY have any of the following diagnoses? (please check all that apply)"',
-                            }
-                        },
-                        "template_options.description": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": '"You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies."',
-                                "self_guardian": '"You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies."',
-                                "dependent": '"You may choose not to disclose confidential health information, however, this may cause " + (formState.preferredName || "your child") + " to be excluded from some studies."',
-                            }
-                        },
-                    }
+                    "template_options.description": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies."',
+                            "self_guardian": '"You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies."',
+                            "dependent": '"You may choose not to disclose confidential health information, however, this may cause " + (formState.preferredName || "your child") + " to be excluded from some studies."',
+                        }
+                    },
                 },
-                "developmental_group": {
-                    "fields": ["developmental", "developmental_other"],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Developmental"},
-                },
-                "mental_health_group": {
-                    "fields": ["mental_health", "mental_health_other"],
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Mental health"},
-                },
-                "medical_group": {
-                    "fields": ["medical", "medical_other"],
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Medical"},
-                },
-                "genetic_group": {
-                    "fields": ["genetic", "genetic_other"],
-                    "display_order": 4,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Genetic Conditions"},
-                },
-            }
+            },
+            "developmental_group": {
+                "fields": ["developmental", "developmental_other"],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {"label": "Developmental"},
+            },
+            "mental_health_group": {
+                "fields": ["mental_health", "mental_health_other"],
+                "display_order": 2,
+                "wrappers": ["card"],
+                "template_options": {"label": "Mental health"},
+            },
+            "medical_group": {
+                "fields": ["medical", "medical_other"],
+                "display_order": 3,
+                "wrappers": ["card"],
+                "template_options": {"label": "Medical"},
+            },
+            "genetic_group": {
+                "fields": ["genetic", "genetic_other"],
+                "display_order": 4,
+                "wrappers": ["card"],
+                "template_options": {"label": "Genetic Conditions"},
+            },
+        }
 
 
 class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
@@ -236,6 +224,7 @@ class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
         model = ClinicalDiagnosesQuestionnaire
 
         include_fk = True
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name="clinical_diagnoses_questionnaire", id='<id>')
-    })
+
+    _links = Hyperlinks(
+        {"self": URLFor("api.questionnaireendpoint", name="clinical_diagnoses_questionnaire", id="<id>")}
+    )

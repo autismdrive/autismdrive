@@ -1,25 +1,27 @@
 from marshmallow import fields, missing
-from sqlalchemy import func
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime
 
-from app import db
+from app.database import Base
 from app.schema.model_schema import ModelSchema
 
 
-class AssistiveDevice(db.Model):
+class AssistiveDevice(Base):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
     __no_export__ = True  # This will be transferred as a part of a parent class
-    type_other_hide_expression = '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))'
-
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    supports_questionnaire_id = db.Column(
-        "supports_questionnaire_id",
-        db.Integer,
-        db.ForeignKey("supports_questionnaire.id"),
+    type_other_hide_expression = (
+        '!((model.type_group && (model.type_group === "other")) || (model.type && (model.type === "other")))'
     )
-    type_group = db.Column(
-        db.String,
+
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    supports_questionnaire_id = Column(
+        "supports_questionnaire_id",
+        Integer,
+        ForeignKey("supports_questionnaire.id"),
+    )
+    type_group = Column(
+        String,
         info={
             "display_order": 1.1,
             "type": "select",
@@ -47,13 +49,13 @@ class AssistiveDevice(db.Model):
                     {
                         "value": "other",
                         "label": "Others",
-                    }
-                ]
+                    },
+                ],
             },
-        }
+        },
     )
-    type = db.Column(
-        db.String,
+    type = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "select",
@@ -156,17 +158,17 @@ class AssistiveDevice(db.Model):
                         "value": "other",
                         "label": "Other assistive device",
                         "groupValue": "other",
-                    }
-                ]
+                    },
+                ],
             },
             "expression_properties": {
-                'template_options.options': 'field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
-                'model.type': 'model.type_group === "other" ? "other" : (field.templateOptions.options.find(o => o.value === model.type) ? model.type : null)',
+                "template_options.options": 'field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
+                "model.type": 'model.type_group === "other" ? "other" : (field.templateOptions.options.find(o => o.value === model.type) ? model.type : null)',
             },
-        }
+        },
     )
-    type_other = db.Column(
-        db.String,
+    type_other = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -175,13 +177,11 @@ class AssistiveDevice(db.Model):
                 "required": True,
             },
             "hide_expression": type_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + type_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
         },
     )
-    timeframe = db.Column(
-        db.String,
+    timeframe = Column(
+        String,
         info={
             "display_order": 3,
             "type": "radio",
@@ -196,8 +196,8 @@ class AssistiveDevice(db.Model):
             },
         },
     )
-    notes = db.Column(
-        db.String,
+    notes = Column(
+        String,
         info={
             "display_order": 4,
             "type": "textarea",
@@ -222,10 +222,21 @@ class AssistiveDevice(db.Model):
 class AssistiveDeviceSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = AssistiveDevice
-        fields = ("id", "last_updated", "supports_questionnaire_id", "type_group", "type", "type_other", "timeframe", "notes",
-                  "participant_id", "user_id")
-    participant_id = fields.Method('get_participant_id', dump_only=True)
-    user_id = fields.Method('get_user_id', dump_only=True)
+        fields = (
+            "id",
+            "last_updated",
+            "supports_questionnaire_id",
+            "type_group",
+            "type",
+            "type_other",
+            "timeframe",
+            "notes",
+            "participant_id",
+            "user_id",
+        )
+
+    participant_id = fields.Method("get_participant_id", dump_only=True)
+    user_id = fields.Method("get_user_id", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:

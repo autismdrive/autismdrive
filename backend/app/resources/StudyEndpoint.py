@@ -1,20 +1,13 @@
 import datetime
 
-import flask.scaffold
-from sqlalchemy.dialects.postgresql import Any
-
-from app.model.age_range import AgeRange
-
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
 
-from app import RestException, db, elastic_index
-from app.model.study import Study
-from app.model.study_category import StudyCategory
-from app.model.study_investigator import StudyInvestigator
-from app.model.study_user import StudyUser
+from app.database import session
+from app.elastic_index import elastic_index
+from app.model.study import Study, StudyInvestigator, StudyCategory, StudyUser
+from app.rest_exception import RestException
 from app.schema.schema import StudySchema
 
 
@@ -23,34 +16,35 @@ class StudyEndpoint(flask_restful.Resource):
     schema = StudySchema()
 
     def get(self, id):
-        model = db.session.query(Study).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+        model = session.query(Study).filter_by(id=id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        study = db.session.query(Study).filter_by(id=id).first()
+        study = session.query(Study).filter_by(id=id).first()
 
         if study is not None:
-            elastic_index.remove_document(study, 'Study')
+            elastic_index.remove_document(study, "Study")
 
-        db.session.query(StudyUser).filter_by(study_id=id).delete()
-        db.session.query(StudyInvestigator).filter_by(study_id=id).delete()
-        db.session.query(StudyCategory).filter_by(study_id=id).delete()
-        db.session.query(Study).filter_by(id=id).delete()
-        db.session.commit()
+        session.query(StudyUser).filter_by(study_id=id).delete()
+        session.query(StudyInvestigator).filter_by(study_id=id).delete()
+        session.query(StudyCategory).filter_by(study_id=id).delete()
+        session.query(Study).filter_by(id=id).delete()
+        session.commit()
         return None
 
     def put(self, id):
         request_data = request.get_json()
-        instance = db.session.query(Study).filter_by(id=id).first()
+        instance = session.query(Study).filter_by(id=id).first()
         try:
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
         updated.last_updated = datetime.datetime.utcnow()
-        db.session.add(updated)
-        db.session.commit()
-        elastic_index.update_document(updated, 'Study')
+        session.add(updated)
+        session.commit()
+        elastic_index.update_document(document=updated)
         return self.schema.dump(updated)
 
 
@@ -60,27 +54,26 @@ class StudyListEndpoint(flask_restful.Resource):
     studySchema = StudySchema()
 
     def get(self):
-        studies = db.session.query(Study).all()
+        studies = session.query(Study).all()
         return self.studiesSchema.dump(studies)
 
     def post(self):
         request_data = request.get_json()
         try:
             load_result = self.studySchema.load(request_data)
-            db.session.add(load_result)
-            db.session.commit()
-            elastic_index.add_document(load_result, 'Study')
+            session.add(load_result)
+            session.commit()
+            elastic_index.add_document(load_result, "Study")
             return self.studySchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
 
 
 class StudyByStatusListEndpoint(flask_restful.Resource):
     studiesSchema = StudySchema(many=True)
 
     def get(self, status):
-        studies = db.session.query(Study).filter_by(status=status).order_by(Study.last_updated.desc())
+        studies = session.query(Study).filter_by(status=status).order_by(Study.last_updated.desc())
         return self.studiesSchema.dump(studies)
 
 
@@ -89,5 +82,10 @@ class StudyByAgeEndpoint(flask_restful.Resource):
 
     def get(self, status, age):
         # session.query(TestArr).filter(Any(2, TestArr.partners)).all()
-        studies = db.session.query(Study).filter_by(status=status).filter(Study.ages.any(age)).order_by(Study.last_updated.desc())
+        studies = (
+            session.query(Study)
+            .filter_by(status=status)
+            .filter(Study.ages.any(age))
+            .order_by(Study.last_updated.desc())
+        )
         return self.studiesSchema.dump(studies)

@@ -1,17 +1,18 @@
 import datetime
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
-import flask_restful
-import os
 
+import flask_restful
 from flask import request
 from sqlalchemy.exc import IntegrityError
-from app import app, db, RestException, auth
+
+from app.auth import auth
+from app.database import session
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
 from app.model.export_info import ExportInfoSchema
 from app.model.role import Permission
+from app.rest_exception import RestException
 from app.wrappers import requires_permission
+
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -23,7 +24,6 @@ from app.wrappers import requires_permission
 
 
 class QuestionnaireEndpoint(flask_restful.Resource):
-
     @auth.login_required
     def get(self, name, id):
         """
@@ -41,7 +41,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         """
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
-        instance = db.session.query(class_ref).filter(class_ref.id == id).first()
+        instance = session.query(class_ref).filter(class_ref.id == id).first()
         if instance is None:
             raise RestException(RestException.NOT_FOUND)
         schema = ExportService.get_schema(name)
@@ -63,10 +63,10 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         try:
             name = ExportService.camel_case_it(name)
             class_ref = ExportService.get_class(name)
-            instance = db.session.query(class_ref).filter(class_ref.id == id).first()
-            db.session.delete(instance)
-#            db.session.query(class_ref).filter(class_ref.id == id).delete()
-            db.session.commit()
+            instance = session.query(class_ref).filter(class_ref.id == id).first()
+            session.delete(instance)
+            #            session.query(class_ref).filter(class_ref.id == id).delete()
+            session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)
         return
@@ -88,8 +88,8 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         """
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
-        instance = db.session.query(class_ref).filter(class_ref.id == id).first()
-        schema = ExportService.get_schema(name, session=db.session)
+        instance = session.query(class_ref).filter(class_ref.id == id).first()
+        schema = ExportService.get_schema(name, session=session)
         request_data = request.get_json()
         if "_links" in request_data:
             request_data.pop("_links")
@@ -100,20 +100,19 @@ class QuestionnaireEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT, details=errors)
 
         updated.last_updated = datetime.datetime.utcnow()
-        db.session.add(updated)
-        db.session.commit()
+        session.add(updated)
+        session.commit()
         return schema.dump(updated)
 
 
 class QuestionnaireListEndpoint(flask_restful.Resource):
-
     @auth.login_required
     @requires_permission(Permission.data_admin)
     def get(self, name):
         name = ExportService.camel_case_it(name)
         class_ref = ExportService.get_class(name)
         schema = ExportService.get_schema(name, many=True)
-        questionnaires = db.session.query(class_ref).all()
+        questionnaires = session.query(class_ref).all()
         return schema.dump(questionnaires)
 
 
@@ -145,7 +144,7 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
         questionnaire = class_ref()
         meta = {"table": {}}
         try:
-            meta["table"]['question_type'] = questionnaire.__question_type__
+            meta["table"]["question_type"] = questionnaire.__question_type__
             meta["table"]["label"] = questionnaire.__label__
         except:
             pass  # If these fields don't exist, just keep going.
@@ -155,22 +154,21 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
         # the base meta object if they are not contained within a group.
         for c in questionnaire.__table__.columns:
             if c.info:
-                c.info['name'] = c.name
-                c.info['key'] = c.name
-                meta['fields'].append(c.info)
+                c.info["name"] = c.name
+                c.info["key"] = c.name
+                meta["fields"].append(c.info)
             elif c.type.python_type == datetime.datetime:
-                meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0, 'type': 'DATETIME'})
+                meta["fields"].append({"name": c.name, "key": c.name, "display_order": 0, "type": "DATETIME"})
             else:
-                meta['fields'].append({'name': c.name, 'key': c.name, 'display_order': 0})
+                meta["fields"].append({"name": c.name, "key": c.name, "display_order": 0})
 
         # Sort the fields
-        meta['fields'] = sorted(meta['fields'], key=lambda field: field['display_order'])
+        meta["fields"] = sorted(meta["fields"], key=lambda field: field["display_order"])
 
         return meta
 
 
 class QuestionnaireInfoEndpoint(flask_restful.Resource):
-
     def get(self):
         """
         Lists available questionnaires. Used for data export to get meta without specifying flow and relationship.
@@ -192,42 +190,38 @@ class QuestionnaireInfoEndpoint(flask_restful.Resource):
 
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):
-
     @staticmethod
     def request_wants_json():
-        best = request.accept_mimetypes \
-            .best_match(['application/json', 'text/html'])
-        return best == 'application/json' and \
-               request.accept_mimetypes[best] > \
-               request.accept_mimetypes['text/html']
+        best = request.accept_mimetypes.best_match(["application/json", "text/html"])
+        return best == "application/json" and request.accept_mimetypes[best] > request.accept_mimetypes["text/html"]
 
     @auth.login_required
     @requires_permission(Permission.data_admin)
     def get(self, name):
+        from flask import current_app
+
         name = ExportService.camel_case_it(name)
         if self.request_wants_json():
             schema = ExportService.get_schema(name, many=True)
             return schema.dump(ExportService().get_data(name))
         else:
-            return ExportXlsService.export_xls(name=name, app=app)
+            return ExportXlsService.export_xls(name=name, app=current_app)
 
 
 class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
-
     @staticmethod
     def request_wants_json():
-        best = request.accept_mimetypes \
-            .best_match(['application/json', 'text/html'])
-        return best == 'application/json' and \
-               request.accept_mimetypes[best] > \
-               request.accept_mimetypes['text/html']
+        best = request.accept_mimetypes.best_match(["application/json", "text/html"])
+        return best == "application/json" and request.accept_mimetypes[best] > request.accept_mimetypes["text/html"]
 
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, name, user_id):
+        from flask import current_app
+
         name = ExportService.camel_case_it(name)
         if self.request_wants_json():
             schema = ExportService.get_schema(name, many=True)
             return schema.dump(ExportService().get_data(name))
         else:
-            return ExportXlsService.export_xls(name=name, user_id=user_id, app=app)
+            return ExportXlsService.export_xls(name=name, user_id=user_id, app=current_app)

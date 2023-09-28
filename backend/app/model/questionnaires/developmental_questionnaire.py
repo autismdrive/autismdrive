@@ -1,28 +1,25 @@
-from sqlalchemy import func
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, Boolean, BigInteger
 
-from app import db, ma
+from app.database import Base
 from app.export_service import ExportService
 from app.schema.model_schema import ModelSchema
 
 
-class DevelopmentalQuestionnaire(db.Model):
+class DevelopmentalQuestionnaire(Base):
     __tablename__ = "developmental_questionnaire"
     __label__ = "Birth and Developmental History"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
 
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
-    user_id = db.Column(
-        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-    had_birth_complications = db.Column(
-        db.Boolean,
+    participant_id = Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    user_id = Column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    had_birth_complications = Column(
+        Boolean,
         info={
             "display_order": 1,
             "type": "radio",
@@ -36,8 +33,8 @@ class DevelopmentalQuestionnaire(db.Model):
             },
         },
     )
-    birth_complications_description = db.Column(
-        db.String,
+    birth_complications_description = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -45,11 +42,11 @@ class DevelopmentalQuestionnaire(db.Model):
                 "label": "Please describe:",
                 "required": False,
             },
-            'hide_expression': '!model.had_birth_complications',
-        }
+            "hide_expression": "!model.had_birth_complications",
+        },
     )
-    when_motor_milestones = db.Column(
-        db.String,
+    when_motor_milestones = Column(
+        String,
         info={
             "display_order": 2,
             "type": "radio",
@@ -71,8 +68,8 @@ class DevelopmentalQuestionnaire(db.Model):
             },
         },
     )
-    when_language_milestones = db.Column(
-        db.String,
+    when_language_milestones = Column(
+        String,
         info={
             "display_order": 3,
             "type": "radio",
@@ -94,8 +91,8 @@ class DevelopmentalQuestionnaire(db.Model):
             },
         },
     )
-    when_toileting_milestones = db.Column(
-        db.String,
+    when_toileting_milestones = Column(
+        String,
         info={
             "display_order": 4,
             "type": "radio",
@@ -124,6 +121,9 @@ class DevelopmentalQuestionnaire(db.Model):
 class DevelopmentalQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = DevelopmentalQuestionnaire
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name='developmental_questionnaire', id='<id>'),
-    })
+
+    _links = Hyperlinks(
+        {
+            "self": URLFor("api.questionnaireendpoint", name="developmental_questionnaire", id="<id>"),
+        }
+    )

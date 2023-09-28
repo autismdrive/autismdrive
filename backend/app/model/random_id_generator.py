@@ -1,6 +1,6 @@
 from random import randint
 
-from app import db
+from app.database import session
 
 
 # Generates a random integer for use as ids for users, participants and the like
@@ -14,7 +14,7 @@ def random_integer(context):
 
     # possibility of same random number is very low.
     # but if you want to make sure, here you can check id exists in database.
-    while db.session.query(context.current_column.table).filter(id == rand).limit(1).first() is not None:
+    while session.query(context.current_column.table).filter(id == rand).limit(1).first() is not None:
         rand = randint(min_, max_)
 
     return rand

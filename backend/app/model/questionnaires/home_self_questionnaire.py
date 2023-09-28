@@ -1,20 +1,26 @@
+from flask_sqlalchemy.model import Model
 from marshmallow import pre_load
+from marshmallow.fields import Nested
+from sqlalchemy import Column, String, ARRAY
 
-from app import db, ma
-from app.model.questionnaires.housemate import HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
+from app.model.questionnaires.housemate import HousemateSchema
 from app.schema.model_schema import ModelSchema
 
 
-class HomeSelfQuestionnaire(db.Model, HomeMixin):
+class HomeSelfQuestionnaire(Model, HomeMixin):
     __tablename__ = "home_self_questionnaire"
     __label__ = "Home"
-    self_living_other_hide_expression = '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))'
+    self_living_other_hide_expression = (
+        '!(model.self_living_situation && model.self_living_situation.includes("livingOther"))'
+    )
 
-    struggle_to_afford_desc = '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
+    struggle_to_afford_desc = (
+        '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
+    )
 
-    self_living_situation = db.Column(
-        db.ARRAY(db.String),
+    self_living_situation = Column(
+        ARRAY(String),
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
@@ -35,8 +41,8 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
             },
         },
     )
-    self_living_other = db.Column(
-        db.String,
+    self_living_other = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "input",
@@ -45,9 +51,7 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
                 "required": True,
             },
             "hide_expression": self_living_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + self_living_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + self_living_other_hide_expression},
         },
     )
 
@@ -55,18 +59,18 @@ class HomeSelfQuestionnaire(db.Model, HomeMixin):
         field_groups = super().get_field_groups()
         field_groups["housemates"]["template_options"]["label"] = "Who else lives with you?"
         field_groups["self_living"] = {
-                    "fields": ["self_living_situation", "self_living_other"],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Where do you currently live?"},
-                }
+            "fields": ["self_living_situation", "self_living_other"],
+            "display_order": 1,
+            "wrappers": ["card"],
+            "template_options": {"label": "Where do you currently live?"},
+        }
         return field_groups
 
 
 class HomeSelfQuestionnaireSchema(ModelSchema):
     @pre_load
     def set_field_session(self, data, **kwargs):
-        self.fields['housemates'].schema.session = self.session
+        self.fields["housemates"].schema.session = self.session
         return data
 
     class Meta(ModelSchema.Meta):
@@ -82,4 +86,5 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
-    housemates = ma.Nested(HousemateSchema, many=True)
+
+    housemates = Nested(HousemateSchema, many=True)

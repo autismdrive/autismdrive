@@ -1,7 +1,6 @@
-from marshmallow import missing
-from marshmallow_enum import EnumField
+from flask_marshmallow import fields as ma_fields
+from marshmallow import missing, fields
 
-from app import ma
 from app.model.participant import Participant, Relationship
 from app.model.user import User, Role
 from app.schema.model_schema import ModelSchema
@@ -19,33 +18,42 @@ this file.
 
 
 class UserExportSchema(ModelSchema):
-    """ Used exclusively for data export, removes identifying information"""
+    """Used exclusively for data export, removes identifying information"""
+
     class Meta(ModelSchema.Meta):
         model = User
-        fields = ('id', 'last_updated', 'role', 'email_verified', 'email', '_links')
-    role = EnumField(Role)
-    email = ma.Function(lambda obj: missing if obj is None else str(obj.id))
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.userendpoint', id='<id>'),
-    })
+        fields = ("id", "last_updated", "role", "email_verified", "email", "_links")
+
+    role = fields.Enum(Role)
+    email = fields.Function(lambda obj: missing if obj is None else str(obj.id))
+    _links = ma_fields.Hyperlinks(
+        {
+            "self": ma_fields.URLFor("api.userendpoint", id="<id>"),
+        }
+    )
 
 
 class AdminExportSchema(ModelSchema):
     """Allows the full details of an admin account to be exported, so that administrators
     can continue to log into the secondary private server with their normal credentials."""
+
     class Meta(ModelSchema.Meta):
         model = User
-        fields = ('id', 'last_updated', 'email', '_password', 'role',
-                  'participants', 'token', 'email_verified')
-    role = EnumField(Role)
+        fields = ("id", "last_updated", "email", "_password", "role", "participants", "token", "email_verified")
+
+    role = fields.Enum(Role)
 
 
 class ParticipantExportSchema(ModelSchema):
-    """ Used exclusively for data export, removes identifying information"""
+    """Used exclusively for data export, removes identifying information"""
+
     class Meta(ModelSchema.Meta):
         model = Participant
-        fields = ('id', 'last_updated', 'user_id', 'relationship', 'avatar_icon', 'avatar_color', '_links')
-    relationship = EnumField(Relationship)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.participantendpoint', id='<id>'),
-    })
+        fields = ("id", "last_updated", "user_id", "relationship", "avatar_icon", "avatar_color", "_links")
+
+    relationship = fields.Enum(Relationship)
+    _links = ma_fields.Hyperlinks(
+        {
+            "self": ma_fields.URLFor("api.participantendpoint", id="<id>"),
+        }
+    )

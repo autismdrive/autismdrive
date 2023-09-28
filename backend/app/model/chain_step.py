@@ -1,11 +1,11 @@
-from sqlalchemy import func
+from sqlalchemy import func, Column, String, Integer, DateTime
 
-from app import db
+from app.database import Base
 
 
-class ChainStep(db.Model):
-    __tablename__ = 'chain_step'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    instruction = db.Column(db.String)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
+class ChainStep(Base):
+    __tablename__ = "chain_step"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    instruction = Column(String)
+    last_updated = Column(DateTime(timezone=True), default=func.now())

@@ -1,9 +1,11 @@
-from app import db
+from flask_sqlalchemy.model import Model
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
+from sqlalchemy.orm import relationship
 from app.model.questionnaires.education_mixin import EducationMixin
 from app.schema.model_schema import ModelSchema
 
 
-class EducationSelfQuestionnaire(db.Model, EducationMixin):
+class EducationSelfQuestionnaire(Model, EducationMixin):
     __tablename__ = "education_self_questionnaire"
     __label__ = "Education"
 
@@ -13,8 +15,8 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
     placement_other_hide_expression = '!(model.self_placement && model.self_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.self_placement && model.self_placement === "highSchool")'
 
-    self_placement = db.Column(
-        db.String,
+    self_placement = Column(
+        String,
         info={
             "display_order": 4.1,
             "type": "select",
@@ -30,17 +32,13 @@ class EducationSelfQuestionnaire(db.Model, EducationMixin):
                     {"value": "schoolOther", "label": "Other"},
                 ],
             },
-            "hide_expression": '!(model.attends_school)',
+            "hide_expression": "!(model.attends_school)",
         },
     )
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
-        field_groups["placement_group"]["fields"] = [
-            "self_placement",
-            "placement_other",
-            "current_grade"
-        ]
+        field_groups["placement_group"]["fields"] = ["self_placement", "placement_other", "current_grade"]
         return field_groups
 
 

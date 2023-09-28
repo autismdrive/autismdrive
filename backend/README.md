@@ -27,9 +27,9 @@ You can use Docker to run the two primary dependencies for this project:  Postgr
 ####  Not Using Docker
 ###### PostgreSQL
 * MacOS:
-[Download and install Postgres.app](https://postgresapp.com). This will install `postgres`, along with the command-line tools, including `psql`, `pg_ctl`, and others. Then update your `PATH` variable to look in the Postgres.app `bin` directory for the relevant Postgres CLI tools.
+Install postgresql via brew:
 ```BASH
-export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+brew install postgresql@14
 ```
 
 * Debian/Ubuntu:
@@ -37,7 +37,7 @@ export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 apt-get install postgresql postgresql-client libpq-dev
 ```
 ###### Database Setup
-*NOTE:* Docker will do this automatically, only necissary if you are doing it locally.
+*NOTE:* Docker will do this automatically, only necessary if you are doing it locally.
 *NOTE:* The configuration is currently set up to use "ed_pass" as a password.  You will be promoted to enter a password when you connect.
 * MacOS:
 ```BASH
@@ -78,6 +78,16 @@ python3 -m venv python-env
 source python-env/bin/activate
 pip3 install -r requirements.txt
 ```
+
+If you are on MacOS, you may get an error while building wheels for psycopg2. If so, you may need to make sure postgresql is installed locally (even if you are running the database via Docker) and reinstall and re-link openssl:
+```bash
+brew install postgresql@14
+xcode-select --install
+brew reinstall openssl
+echo 'export PATH="/usr/local/Cellar/openssl@3/3.1.2/bin:$PATH"' >> ~/.zshrc
+echo 'export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/Cellar/openssl@3/3.1.2/lib/' >> ~/.zshrc
+```
+
 
 ## Add a config file
 In the `backend` directory, execute the following command:
@@ -175,9 +185,9 @@ Don't commit code that doesn't have at least some basic testing of the new funct
 
 
 ### Database calls
-* Favor db.session.query over using the models for these calls.
+* Favor session.query over using the models for these calls.
 ```
-db.session.query( ...
+session.query( ...
 ```
 not
 ```
@@ -214,13 +224,13 @@ token, and then redirect again to the front end, passing that token along as a G
 
 ### Run backend tests
 Make sure you have set up your test database (see Database Setup above)
-You can use nose2 to execute all of tests, or you can run them individually using
+You can use pytest to execute all of tests, or you can run them individually using
 Pycharm or other IDE.
 In the `backend` directory, execute the following command:
 ```BASH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
-nose2
+pytest
 ```
 
 ### Run frontend tests

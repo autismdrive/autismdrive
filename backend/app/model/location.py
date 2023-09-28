@@ -1,21 +1,22 @@
-from app import db
+from sqlalchemy import Column, Integer, String, ForeignKey, Float
+
 from app.model.resource import Resource
 
 
 class Location(Resource):
-    __tablename__ = 'location'
+    __tablename__ = "location"
     __label__ = "Local Services"
-    id = db.Column(db.Integer, db.ForeignKey('resource.id'), primary_key=True)
-    primary_contact = db.Column(db.String)
-    street_address1 = db.Column(db.String)
-    street_address2 = db.Column(db.String)
-    city = db.Column(db.String)
-    state = db.Column(db.String)
-    zip = db.Column(db.String)
-    email = db.Column(db.String)
-    latitude = db.Column(db.Float, nullable=True)
-    longitude = db.Column(db.Float, nullable=True)
+    id = Column(Integer, ForeignKey("resource.id"), primary_key=True)
+    primary_contact = Column(String)
+    street_address1 = Column(String)
+    street_address2 = Column(String)
+    city = Column(String)
+    state = Column(String)
+    zip = Column(String)
+    email = Column(String)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'location',
+        "polymorphic_identity": "location",
     }

@@ -1,25 +1,23 @@
-from sqlalchemy import func
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 
-from app import db
-from sqlalchemy.ext.declarative import declarative_base
-
-from app.model.user import User
-from app.model.resource import Resource
+from app.database import Base
 from app.model.category import Category
-Base = declarative_base()
+from app.model.resource import Resource
+from app.model.user import User
 
 
-class UserFavorite(db.Model):
-    __tablename__ = 'user_favorite'
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    type = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    resource_id = db.Column(db.Integer, db.ForeignKey(Resource.id))
-    category_id = db.Column(db.Integer, db.ForeignKey(Category.id))
-    age_range = db.Column(db.String)
-    language = db.Column(db.String)
-    covid19_category = db.Column(db.String)
-    user = db.relationship(User, backref='user_favorites')
-    resource = db.relationship(Resource, backref='user_favorites')
-    category = db.relationship(Category, backref='user_favorites')
+class UserFavorite(Base):
+    __tablename__ = "user_favorite"
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    type = Column(String)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    resource_id = Column(Integer, ForeignKey(Resource.id))
+    category_id = Column(Integer, ForeignKey(Category.id))
+    age_range = Column(String)
+    language = Column(String)
+    covid19_category = Column(String)
+    user = relationship(User, backref="user_favorites")
+    resource = relationship(Resource, backref="user_favorites")
+    category = relationship(Category, backref="user_favorites")

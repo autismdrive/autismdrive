@@ -1,14 +1,14 @@
-from sqlalchemy import func
+from sqlalchemy import func, Column, Integer, String, DateTime
 
-from app import db
+from app.database import Base
 
 
-class ResourceChangeLog(db.Model):
-    __tablename__ = 'resource_change_log'
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String)
-    user_id = db.Column(db.Integer)
-    user_email = db.Column(db.String)
-    resource_id = db.Column(db.Integer)
-    resource_title = db.Column(db.String)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
+class ResourceChangeLog(Base):
+    __tablename__ = "resource_change_log"
+    id = Column(Integer, primary_key=True)
+    type = Column(String)
+    user_id = Column(Integer)
+    user_email = Column(String)
+    resource_id = Column(Integer)
+    resource_title = Column(String)
+    last_updated = Column(DateTime(timezone=True), default=func.now())

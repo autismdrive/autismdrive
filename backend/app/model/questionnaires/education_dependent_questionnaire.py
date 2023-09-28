@@ -1,9 +1,11 @@
-from app import db
+from flask_sqlalchemy.model import Model
+from sqlalchemy import Column, String
+
 from app.model.questionnaires.education_mixin import EducationMixin
 from app.schema.model_schema import ModelSchema
 
 
-class EducationDependentQuestionnaire(db.Model, EducationMixin):
+class EducationDependentQuestionnaire(Model, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
     __label__ = "Education"
 
@@ -13,13 +15,13 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
     placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
-    dependent_placement = db.Column(
-        db.String,
+    dependent_placement = Column(
+        String,
         info={
             "display_order": 4.2,
             "type": "select",
             "template_options": {
-                "label": '',
+                "label": "",
                 "placeholder": "Please select placement",
                 "required": False,
                 "options": [
@@ -35,19 +37,15 @@ class EducationDependentQuestionnaire(db.Model, EducationMixin):
             },
             "expression_properties": {
                 "template_options.label": '"What is " + (formState.preferredName || "your child") + "\'s '
-                                          'current grade/school placement?"',
+                'current grade/school placement?"',
             },
-            "hide_expression": '!(model.attends_school)',
+            "hide_expression": "!(model.attends_school)",
         },
     )
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
-        field_groups["placement_group"]["fields"] = [
-            "dependent_placement",
-            "placement_other",
-            "current_grade"
-        ]
+        field_groups["placement_group"]["fields"] = ["dependent_placement", "placement_other", "current_grade"]
         return field_groups
 
 

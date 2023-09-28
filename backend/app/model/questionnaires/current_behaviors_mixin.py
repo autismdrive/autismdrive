@@ -1,33 +1,35 @@
-from sqlalchemy import func
+from flask_sqlalchemy.model import Model
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, Boolean, BigInteger, ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 
-from app import db
 from app.export_service import ExportService
 
 
-class CurrentBehaviorsMixin(object):
+class CurrentBehaviorsMixin(Model):
     info = {}
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __label__ = "Current Behaviors"
     __estimated_duration_minutes__ = 5
-    academic_difficulty_other_hide_expression = '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))'
+    academic_difficulty_other_hide_expression = (
+        '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))'
+    )
 
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
 
     @declared_attr
     def participant_id(cls):
-        return db.Column("participant_id", db.Integer, db.ForeignKey("stardrive_participant.id"))
+        return Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
 
     @declared_attr
     def user_id(cls):
-        return db.Column("user_id", db.Integer, db.ForeignKey("stardrive_user.id"))
+        return Column("user_id", Integer, ForeignKey("stardrive_user.id"))
 
     @declared_attr
     def has_academic_difficulties(cls):
-        return db.Column(
-            db.Boolean,
+        return Column(
+            Boolean,
             info={
                 "display_order": 3,
                 "type": "radio",
@@ -47,8 +49,8 @@ class CurrentBehaviorsMixin(object):
 
     @declared_attr
     def academic_difficulty_areas(cls):
-        return db.Column(
-            db.ARRAY(db.String),
+        return Column(
+            ARRAY(String),
             info={
                 "display_order": 4,
                 "type": "multicheckbox",
@@ -65,28 +67,26 @@ class CurrentBehaviorsMixin(object):
                 },
                 "expression_properties": {
                     "template_options.description": cls.academic_difficulty_areas_desc,
-                    "template_options.required": "model.has_academic_difficulties"
+                    "template_options.required": "model.has_academic_difficulties",
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
                 "validators": {"required": "multicheckbox"},
             },
         )
 
-    academic_difficulty_other = db.Column(
-        db.String,
+    academic_difficulty_other = Column(
+        String,
         info={
             "display_order": 4.2,
             "type": "input",
-            "template_options": {
-                "label": "Enter area of academic difficulty",
-                "required": True
-            },
+            "template_options": {"label": "Enter area of academic difficulty", "required": True},
             "hide_expression": academic_difficulty_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + academic_difficulty_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + academic_difficulty_other_hide_expression},
         },
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def get_field_groups(self):
         return {}

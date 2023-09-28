@@ -1,40 +1,39 @@
+from flask_marshmallow.fields import Hyperlinks, URLFor
 from marshmallow import pre_load
-from sqlalchemy import func
+from marshmallow.fields import Nested
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, BigInteger
+from sqlalchemy.orm import relationship, backref
 
-from app import db, ma
-from app.schema.model_schema import ModelSchema
+from app.database import Base
 from app.export_service import ExportService
-from app.model.questionnaires.therapy import Therapy, TherapySchema
-from app.model.questionnaires.medication import Medication, MedicationSchema
-from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
 from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative, AlternativeAugmentativeSchema
+from app.model.questionnaires.assistive_device import AssistiveDevice, AssistiveDeviceSchema
+from app.model.questionnaires.medication import Medication, MedicationSchema
+from app.model.questionnaires.therapy import Therapy, TherapySchema
+from app.schema.model_schema import ModelSchema
 
 
-class SupportsQuestionnaire(db.Model):
+class SupportsQuestionnaire(Base):
     __tablename__ = "supports_questionnaire"
     __label__ = "Supports"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 5
     alternative_med_other_hide_expression = '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))'
 
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
-    user_id = db.Column(
-        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-    medications = db.relationship(
+    participant_id = Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    user_id = Column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    medications = relationship(
         "Medication",
-        backref=db.backref("supports_questionnaire", lazy=True),
+        backref=backref("supports_questionnaire", lazy=True),
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
     )
-    alternative_med = db.Column(
-        db.String,
+    alternative_med = Column(
+        String,
         info={
             "display_order": 1,
             "type": "multicheckbox",
@@ -51,10 +50,10 @@ class SupportsQuestionnaire(db.Model):
                 ],
                 "description": "(select all that apply)",
             },
-        }
+        },
     )
-    alternative_med_other = db.Column(
-        db.String,
+    alternative_med_other = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -63,28 +62,26 @@ class SupportsQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": alternative_med_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + alternative_med_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + alternative_med_other_hide_expression},
         },
     )
-    therapies = db.relationship(
+    therapies = relationship(
         "Therapy",
-        backref=db.backref("supports_questionnaire", lazy=True),
+        backref=backref("supports_questionnaire", lazy=True),
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
     )
-    assistive_devices = db.relationship(
+    assistive_devices = relationship(
         "AssistiveDevice",
-        backref=db.backref("supports_questionnaire", lazy=True),
+        backref=backref("supports_questionnaire", lazy=True),
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
     )
-    alternative_augmentative = db.relationship(
+    alternative_augmentative = relationship(
         "AlternativeAugmentative",
-        backref=db.backref("supports_questionnaire", lazy=True),
+        backref=backref("supports_questionnaire", lazy=True),
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
     )
 
     def get_field_groups(self):
@@ -106,22 +103,20 @@ class SupportsQuestionnaire(db.Model):
                             "dependent": '"Does " + (formState.preferredName || "your child")  + " take any medications and/or vitamins?"',
                         }
                     }
-                }
+                },
             },
             "alternative_med_group": {
                 "fields": ["alternative_med", "alternative_med_other"],
                 "display_order": 2,
                 "wrappers": ["card"],
-                "template_options": {
-                    "label": ""
-                },
+                "template_options": {"label": ""},
                 "expression_properties": {
                     "template_options.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Are you receiving any complementary or alternative treatments?"',
                             "self_guardian": '"Are you receiving any complementary or alternative treatments?"',
                             "self_professional": '"Are you receiving any complementary or alternative treatments?"',
-                            "dependent": '"Is " + (formState.preferredName || "your child") + " receiving any complementary or alternative treatments?"'
+                            "dependent": '"Is " + (formState.preferredName || "your child") + " receiving any complementary or alternative treatments?"',
                         }
                     }
                 },
@@ -143,7 +138,7 @@ class SupportsQuestionnaire(db.Model):
                             "dependent": '"What kinds of therapies and services does " + (formState.preferredName || "your child")  + " currently receive?"',
                         }
                     }
-                }
+                },
             },
             "assistive_devices": {
                 "type": "repeat",
@@ -151,18 +146,18 @@ class SupportsQuestionnaire(db.Model):
                 "wrappers": ["card"],
                 "repeat_class": AssistiveDevice,
                 "template_options": {
-                    "label": '',
+                    "label": "",
                     "description": "Add an assistive device",
                 },
                 "expression_properties": {
                     "template_options.label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": '"Do you use an assistive device?"',
-                                "self_guardian": '"Do you use an assistive device?"',
-                                "dependent": '"Does " + (formState.preferredName || "your child")  + " use an assistive device?"',
-                            }
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"Do you use an assistive device?"',
+                            "self_guardian": '"Do you use an assistive device?"',
+                            "dependent": '"Does " + (formState.preferredName || "your child")  + " use an assistive device?"',
                         }
-                }
+                    }
+                },
             },
             "alternative_augmentative": {
                 "type": "repeat",
@@ -170,39 +165,52 @@ class SupportsQuestionnaire(db.Model):
                 "wrappers": ["card"],
                 "repeat_class": AlternativeAugmentative,
                 "template_options": {
-                    "label": '',
+                    "label": "",
                     "description": "Add AAC",
                 },
                 "expression_properties": {
                     "template_options.label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": '"Do you use an AAC (alternative & augmentative communication) system?"',
-                                "self_guardian": '"Do you use an AAC (alternative & augmentative communication) system?"',
-                                "dependent": '"Does " + (formState.preferredName || "your child")  + " use an AAC (alternative & augmentative communication) system?"',
-                            }
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": '"Do you use an AAC (alternative & augmentative communication) system?"',
+                            "self_guardian": '"Do you use an AAC (alternative & augmentative communication) system?"',
+                            "dependent": '"Does " + (formState.preferredName || "your child")  + " use an AAC (alternative & augmentative communication) system?"',
                         }
-                }
-            }
+                    }
+                },
+            },
         }
 
 
 class SupportsQuestionnaireSchema(ModelSchema):
     @pre_load
     def set_field_session(self, data, **kwargs):
-        self.fields['medications'].schema.session = self.session
-        self.fields['therapies'].schema.session = self.session
-        self.fields['alternative_augmentative'].schema.session = self.session
-        self.fields['assistive_devices'].schema.session = self.session
+        self.fields["medications"].schema.session = self.session
+        self.fields["therapies"].schema.session = self.session
+        self.fields["alternative_augmentative"].schema.session = self.session
+        self.fields["assistive_devices"].schema.session = self.session
         return data
 
     class Meta(ModelSchema.Meta):
         model = SupportsQuestionnaire
-        fields = ("id", "last_updated", "time_on_task_ms", "participant_id", "user_id", "medications", "therapies",
-                  "assistive_devices", "alternative_augmentative", "_links")
-    medications = ma.Nested(MedicationSchema, many=True)
-    therapies = ma.Nested(TherapySchema, many=True)
-    assistive_devices = ma.Nested(AssistiveDeviceSchema, many=True)
-    alternative_augmentative = ma.Nested(AlternativeAugmentativeSchema, many=True)
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name='supports_questionnaire', id='<id>'),
-    })
+        fields = (
+            "id",
+            "last_updated",
+            "time_on_task_ms",
+            "participant_id",
+            "user_id",
+            "medications",
+            "therapies",
+            "assistive_devices",
+            "alternative_augmentative",
+            "_links",
+        )
+
+    medications = Nested(MedicationSchema, many=True)
+    therapies = Nested(TherapySchema, many=True)
+    assistive_devices = Nested(AssistiveDeviceSchema, many=True)
+    alternative_augmentative = Nested(AlternativeAugmentativeSchema, many=True)
+    _links = Hyperlinks(
+        {
+            "self": URLFor("api.questionnaireendpoint", name="supports_questionnaire", id="<id>"),
+        }
+    )

@@ -1,11 +1,12 @@
-from sqlalchemy import func
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, BigInteger, ARRAY
 
-from app import db, ma
+from app.database import Base
 from app.export_service import ExportService
 from app.schema.model_schema import ModelSchema
 
 
-class DemographicsQuestionnaire(db.Model):
+class DemographicsQuestionnaire(Base):
     __tablename__ = "demographics_questionnaire"
     __label__ = "Demographics"
     __question_type__ = ExportService.TYPE_SENSITIVE
@@ -13,18 +14,14 @@ class DemographicsQuestionnaire(db.Model):
     gender_identity_other_hide_expression = '!(model.gender_identity && (model.gender_identity === "genderOther"))'
     race_ethnicity_other_hide_expression = '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))'
 
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
-    user_id = db.Column(
-        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-    birth_sex = db.Column(
-        db.String,
+    participant_id = Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    user_id = Column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    birth_sex = Column(
+        String,
         info={
             "display_order": 1,
             "type": "radio",
@@ -32,10 +29,10 @@ class DemographicsQuestionnaire(db.Model):
                 "required": True,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "Your sex at birth",
-                                "self_guardian": "Your sex at birth",
-                                "self_professional": "Your sex at birth"
-                            }
+                        "self_participant": "Your sex at birth",
+                        "self_guardian": "Your sex at birth",
+                        "self_professional": "Your sex at birth",
+                    }
                 },
                 "options": [
                     {"value": "male", "label": "Male"},
@@ -46,15 +43,14 @@ class DemographicsQuestionnaire(db.Model):
             "expression_properties": {
                 "template_options.label": {
                     "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '(formState.preferredName || "your child") + "\'s" '
-                                             '+ " sex at birth"',
-                            }
+                        "dependent": '(formState.preferredName || "your child") + "\'s" ' '+ " sex at birth"',
+                    }
                 },
             },
         },
     )
-    gender_identity = db.Column(
-        db.String,
+    gender_identity = Column(
+        String,
         info={
             "display_order": 2.1,
             "type": "select",
@@ -80,12 +76,12 @@ class DemographicsQuestionnaire(db.Model):
                     "RELATIONSHIP_SPECIFIC": {
                         "dependent": '"Please select " + (formState.preferredName || "your child") + "\'s gender"',
                     }
-                }
+                },
             },
         },
     )
-    gender_identity_other = db.Column(
-        db.String,
+    gender_identity_other = Column(
+        String,
         info={
             "display_order": 2.2,
             "type": "input",
@@ -94,13 +90,11 @@ class DemographicsQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": gender_identity_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + gender_identity_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + gender_identity_other_hide_expression},
         },
     )
-    race_ethnicity = db.Column(
-        db.ARRAY(db.String),
+    race_ethnicity = Column(
+        ARRAY(String),
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
@@ -118,13 +112,13 @@ class DemographicsQuestionnaire(db.Model):
                     {"value": "raceNoAnswer", "label": "Prefer not to answer"},
                     {"value": "raceOther", "label": "Other"},
                 ],
-                "description": "(select all that apply)"
+                "description": "(select all that apply)",
             },
             "validators": {"required": "multicheckbox"},
         },
     )
-    race_ethnicity_other = db.Column(
-        db.String,
+    race_ethnicity_other = Column(
+        String,
         info={
             "display_order": 3.2,
             "type": "input",
@@ -133,50 +127,45 @@ class DemographicsQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": race_ethnicity_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + race_ethnicity_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + race_ethnicity_other_hide_expression},
         },
     )
 
     def get_field_groups(self):
         return {
-                "gender": {
-                    "fields": ["birth_sex", "gender_identity", "gender_identity_other"],
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": "Gender"
+            "gender": {
+                "fields": ["birth_sex", "gender_identity", "gender_identity_other"],
+                "display_order": 2,
+                "wrappers": ["card"],
+                "template_options": {"label": "Gender"},
+            },
+            "race": {
+                "fields": ["race_ethnicity", "race_ethnicity_other"],
+                "display_order": 3,
+                "wrappers": ["card"],
+                "template_options": {
+                    "label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "self_participant": "What is your race/ethnicity?",
+                            "self_guardian": "What is your race/ethnicity?",
+                            "self_professional": "What is your race/ethnicity?",
+                        }
                     }
                 },
-                "race": {
-                    "fields": ["race_ethnicity", "race_ethnicity_other"],
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "self_participant": "What is your race/ethnicity?",
-                                "self_guardian": "What is your race/ethnicity?",
-                                "self_professional": "What is your race/ethnicity?",
-                            }
+                "expression_properties": {
+                    "template_options.label": {
+                        "RELATIONSHIP_SPECIFIC": {
+                            "dependent": '"What is " + (formState.preferredName || "your child") + "\'s" + '
+                            '" race/ethnicity?"',
                         }
                     },
-                    "expression_properties": {
-                        "template_options.label": {
-                            "RELATIONSHIP_SPECIFIC": {
-                                "dependent": '"What is " + (formState.preferredName || "your child") + "\'s" + '
-                                             '" race/ethnicity?"',
-                            }
-                        },
-                    },
                 },
-            }
+            },
+        }
 
 
 class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = DemographicsQuestionnaire
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name="demographics_questionnaire", id='<id>')
-    })
+
+    _links = Hyperlinks({"self": URLFor("api.questionnaireendpoint", name="demographics_questionnaire", id="<id>")})

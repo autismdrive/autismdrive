@@ -1,17 +1,18 @@
-from app import db, ma
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import Column, String, ARRAY
+
 from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMixin
 from app.schema.model_schema import ModelSchema
 
 
-class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
+class CurrentBehaviorsSelfQuestionnaire(CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_self_questionnaire"
 
     has_academic_difficulties_desc = '"Do you have any difficulties with academics?"'
     academic_difficulty_areas_desc = '"What areas of academics are difficult for you?"'
 
-
-    self_verbal_ability = db.Column(
-        db.ARRAY(db.String),
+    self_verbal_ability = Column(
+        ARRAY(String),
         info={
             "display_order": 1,
             "type": "multicheckbox",
@@ -32,6 +33,9 @@ class CurrentBehaviorsSelfQuestionnaire(db.Model, CurrentBehaviorsMixin):
         },
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def get_field_groups(self):
         return super().get_field_groups()
 
@@ -49,8 +53,11 @@ class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
             "has_academic_difficulties",
             "academic_difficulty_areas",
             "academic_difficulty_other",
-            "_links"
+            "_links",
         )
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name='current_behaviors_dependent_questionnaire', id='<id>'),
-    })
+
+    _links = Hyperlinks(
+        {
+            "self": URLFor("api.questionnaireendpoint", name="current_behaviors_dependent_questionnaire", id="<id>"),
+        }
+    )

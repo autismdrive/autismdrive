@@ -1,10 +1,10 @@
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
 
-from app import db, RestException, auth
+from app.auth import auth
+from app.database import session
 from app.model.user_favorite import UserFavorite
+from app.rest_exception import RestException
 from app.schema.schema import UserFavoriteSchema
 
 
@@ -14,9 +14,7 @@ class FavoritesByUserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, user_id):
-        user_favorites = db.session.query(UserFavorite)\
-            .filter(UserFavorite.user_id == user_id)\
-            .all()
+        user_favorites = session.query(UserFavorite).filter(UserFavorite.user_id == user_id).all()
         return self.schema.dump(user_favorites, many=True)
 
 
@@ -26,10 +24,12 @@ class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, user_id, favorite_type):
-        user_favorites = db.session.query(UserFavorite)\
-            .filter(UserFavorite.user_id == user_id)\
-            .filter(UserFavorite.type == favorite_type)\
+        user_favorites = (
+            session.query(UserFavorite)
+            .filter(UserFavorite.user_id == user_id)
+            .filter(UserFavorite.type == favorite_type)
             .all()
+        )
         return self.schema.dump(user_favorites, many=True)
 
 
@@ -38,14 +38,15 @@ class UserFavoriteEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, id):
-        model = db.session.query(UserFavorite).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+        model = session.query(UserFavorite).filter_by(id=id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     def delete(self, id):
-        db.session.query(UserFavorite).filter_by(id=id).delete()
-        db.session.commit()
+        session.query(UserFavorite).filter_by(id=id).delete()
+        session.commit()
         return None
 
 
@@ -54,15 +55,15 @@ class UserFavoriteListEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self):
-        resources = db.session.query(UserFavorite).all()
+        resources = session.query(UserFavorite).all()
         return self.schema.dump(resources)
 
     @auth.login_required
     def post(self):
         request_data = request.get_json()
         load_result = self.schema.load(request_data, many=True)
-        if load_result[0].type != 'resource':
-            db.session.query(UserFavorite).filter_by(user_id=load_result[0].user_id, resource_id=None).delete()
-        db.session.add_all(load_result)
-        db.session.commit()
+        if load_result[0].type != "resource":
+            session.query(UserFavorite).filter_by(user_id=load_result[0].user_id, resource_id=None).delete()
+        session.add_all(load_result)
+        session.commit()
         return self.schema.dump(load_result)

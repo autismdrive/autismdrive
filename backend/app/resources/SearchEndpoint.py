@@ -1,15 +1,13 @@
-import datetime
-
 import elasticsearch
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request, json
 from marshmallow import ValidationError
 
-from app import elastic_index, RestException, db
+from app.database import session
+from app.elastic_index import elastic_index
 from app.model.category import Category
 from app.model.search import Hit, MapHit
+from app.rest_exception import RestException
 from app.schema.schema import SearchSchema
 
 
@@ -18,8 +16,8 @@ class SearchEndpoint(flask_restful.Resource):
         request_data = request.get_json()
 
         # Handle some sloppy category data.
-        if 'category' in request_data and (not request_data['category'] or not request_data['category']['id']):
-            del request_data['category']
+        if "category" in request_data and (not request_data["category"] or not request_data["category"]["id"]):
+            del request_data["category"]
 
         try:
             search = SearchSchema().load(request_data)
@@ -52,9 +50,23 @@ class SearchEndpoint(flask_restful.Resource):
             if "highlight" in hit.meta:
                 highlights = "... ".join(hit.meta.highlight.content)
 
-            search_hit = Hit(hit.id, hit.content, hit.description, hit.title, hit.type, hit.label, hit.date,
-                             hit.last_updated, highlights, hit.latitude, hit.longitude, hit.status, hit.no_address,
-                             hit.is_draft, hit.post_event_description)
+            search_hit = Hit(
+                hit.id,
+                hit.content,
+                hit.description,
+                hit.title,
+                hit.type,
+                hit.label,
+                hit.date,
+                hit.last_updated,
+                highlights,
+                hit.latitude,
+                hit.longitude,
+                hit.status,
+                hit.no_address,
+                hit.is_draft,
+                hit.post_event_description,
+            )
             search.hits.append(search_hit)
 
         return SearchSchema().jsonify(search)
@@ -63,7 +75,7 @@ class SearchEndpoint(flask_restful.Resource):
         search.hits = []
         for hit in results:
             if hit.longitude and hit.latitude:
-                search_hit = MapHit(hit.id,  hit.type, hit.latitude, hit.longitude, hit.no_address)
+                search_hit = MapHit(hit.id, hit.type, hit.latitude, hit.longitude, hit.no_address)
                 search.hits.append(search_hit)
         return SearchSchema().jsonify(search)
 
@@ -80,11 +92,13 @@ class SearchEndpoint(flask_restful.Resource):
     def update_category_counts(self, category, results):
         if not category:
             category = Category(name="Topics")
-            category.children = db.session.query(Category)\
-                .filter(Category.parent_id == None)\
-                .order_by(Category.display_order)\
-                .order_by(Category.name.desc())\
+            category.children = (
+                session.query(Category)
+                .filter(Category.parent_id == None)
+                .order_by(Category.display_order)
+                .order_by(Category.name.desc())
                 .all()
+            )
         else:
             c = category
             while c.parent:

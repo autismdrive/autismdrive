@@ -1,21 +1,27 @@
+from flask_sqlalchemy.model import Model
 from marshmallow import pre_load
+from marshmallow.fields import Nested
+from sqlalchemy import Column, String, ARRAY
 
-from app import db, ma
-from app.model.questionnaires.housemate import HousemateSchema
 from app.model.questionnaires.home_mixin import HomeMixin
+from app.model.questionnaires.housemate import HousemateSchema
 from app.schema.model_schema import ModelSchema
 
 
-class HomeDependentQuestionnaire(db.Model, HomeMixin):
+class HomeDependentQuestionnaire(Model, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
-    dependent_living_other_hide_expression = '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))'
+    dependent_living_other_hide_expression = (
+        '!(model.dependent_living_situation && model.dependent_living_situation.includes("livingOther"))'
+    )
 
-    struggle_to_afford_desc = '"Do you or " + (formState.preferredName || "your child") + "\'s other caregivers ever struggle with being ' \
-                               'able to afford to pay for household needs, food, or security for the family?"'
+    struggle_to_afford_desc = (
+        '"Do you or " + (formState.preferredName || "your child") + "\'s other caregivers ever struggle with being '
+        'able to afford to pay for household needs, food, or security for the family?"'
+    )
 
-    dependent_living_situation = db.Column(
-        db.ARRAY(db.String),
+    dependent_living_situation = Column(
+        ARRAY(String),
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
@@ -35,8 +41,8 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "validators": {"required": "multicheckbox"},
         },
     )
-    dependent_living_other = db.Column(
-        db.String,
+    dependent_living_other = Column(
+        String,
         info={
             "display_order": 2.2,
             "type": "input",
@@ -47,7 +53,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "hide_expression": dependent_living_other_hide_expression,
             "expression_properties": {
                 "template_options.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"',
-                "template_options.required": '!' + dependent_living_other_hide_expression
+                "template_options.required": "!" + dependent_living_other_hide_expression,
             },
         },
     )
@@ -61,10 +67,12 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
             "template_options": {"label": "Current Living Situation"},
             "expression_properties": {
                 "template_options.label": '"Where does " + (formState.preferredName || "your child") + " currently '
-                                          'live (select all that apply)?"'
-            }
+                'live (select all that apply)?"'
+            },
         }
-        field_groups["housemates"]["hide_expression"] = '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
+        field_groups["housemates"][
+            "hide_expression"
+        ] = '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
 
         field_groups["housemates"]["expression_properties"] = {
             "template_options.label": '"Who else lives with " + (formState.preferredName || "your child") + "?"'
@@ -76,7 +84,7 @@ class HomeDependentQuestionnaire(db.Model, HomeMixin):
 class HomeDependentQuestionnaireSchema(ModelSchema):
     @pre_load
     def set_field_session(self, data, **kwargs):
-        self.fields['housemates'].schema.session = self.session
+        self.fields["housemates"].schema.session = self.session
         return data
 
     class Meta(ModelSchema.Meta):
@@ -92,4 +100,5 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "housemates",
             "struggle_to_afford",
         )
-    housemates = ma.Nested(HousemateSchema, many=True)
+
+    housemates = Nested(HousemateSchema, many=True)

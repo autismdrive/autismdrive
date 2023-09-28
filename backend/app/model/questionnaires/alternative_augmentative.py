@@ -1,24 +1,24 @@
 from marshmallow import fields, missing
-from sqlalchemy import func
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime
 
-from app import db
+from app.database import Base
 from app.schema.model_schema import ModelSchema
 
 
-class AlternativeAugmentative(db.Model):
+class AlternativeAugmentative(Base):
     __tablename__ = "alternative_augmentative"
     __label__ = "Alternative and Augmentative Communication"
     __no_export__ = True  # This will be transferred as a part of a parent class
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    supports_questionnaire_id = db.Column(
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    supports_questionnaire_id = Column(
         "supports_questionnaire_id",
-        db.Integer,
-        db.ForeignKey("supports_questionnaire.id"),
+        Integer,
+        ForeignKey("supports_questionnaire.id"),
     )
-    type = db.Column(
-        db.String,
+    type = Column(
+        String,
         info={
             "display_order": 1.1,
             "type": "radio",
@@ -49,8 +49,8 @@ class AlternativeAugmentative(db.Model):
             },
         },
     )
-    type_other = db.Column(
-        db.String,
+    type_other = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -59,13 +59,11 @@ class AlternativeAugmentative(db.Model):
                 "required": True,
             },
             "hide_expression": type_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + type_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
         },
     )
-    timeframe = db.Column(
-        db.String,
+    timeframe = Column(
+        String,
         info={
             "display_order": 3,
             "type": "radio",
@@ -80,8 +78,8 @@ class AlternativeAugmentative(db.Model):
             },
         },
     )
-    notes = db.Column(
-        db.String,
+    notes = Column(
+        String,
         info={
             "display_order": 4,
             "type": "textarea",
@@ -106,10 +104,20 @@ class AlternativeAugmentative(db.Model):
 class AlternativeAugmentativeSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = AlternativeAugmentative
-        fields = ("id", "last_updated", "supports_questionnaire_id", "type", "type_other", "timeframe", "notes",
-                  "participant_id", "user_id")
-    participant_id = fields.Method('get_participant_id', dump_only=True)
-    user_id = fields.Method('get_user_id', dump_only=True)
+        fields = (
+            "id",
+            "last_updated",
+            "supports_questionnaire_id",
+            "type",
+            "type_other",
+            "timeframe",
+            "notes",
+            "participant_id",
+            "user_id",
+        )
+
+    participant_id = fields.Method("get_participant_id", dump_only=True)
+    user_id = fields.Method("get_user_id", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:

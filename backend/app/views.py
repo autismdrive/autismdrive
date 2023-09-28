@@ -1,58 +1,52 @@
-import urllib
-
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
-from flask import Blueprint, jsonify, url_for
-from flask_restful import reqparse
+from flask import jsonify
 
-from app import app
-from app.resources.ConfigEndpoint import ConfigEndpoint
-from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
-from app.resources.Auth import auth_blueprint
-from app.resources.SearchEndpoint import SearchEndpoint
-from app.resources.SearchResourcesEndpoint import SearchResourcesEndpoint
-from app.resources.SearchStudiesEndpoint import SearchStudiesEndpoint
-from app.resources.StepLogEndpoint import StepLogListEndpoint
-from app.resources.Tracking import tracking_blueprint
-from app.resources.FlowEndpoint import (
-    FlowEndpoint,
-    FlowListEndpoint,
-    FlowQuestionnaireEndpoint,
-    FlowQuestionnaireMetaEndpoint)
-from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint, UserRegistrationEndpoint
-from app.resources.EmailLogEndpoint import EmailLogEndpoint, EmailLogListEndpoint
-from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByUserEndpoint, ResourceChangeLogByResourceEndpoint
-from app.resources.StepLogEndpoint import StepLogEndpoint
 from app.resources.AdminNoteEndpoint import (
     AdminNoteListByUserEndpoint,
     AdminNoteListByResourceEndpoint,
     AdminNoteListEndpoint,
-    AdminNoteEndpoint)
-from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint, StudyByStatusListEndpoint, StudyByAgeEndpoint
-from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
-from app.resources.SessionEndpoint import SessionEndpoint
+    AdminNoteEndpoint,
+)
 from app.resources.CategoryEndpoint import (
     CategoryEndpoint,
     CategoryListEndpoint,
     RootCategoryListEndpoint,
-    CategoryNamesListEndpoint
+    CategoryNamesListEndpoint,
 )
-from app.resources.EventEndpoint import (
-    EventEndpoint,
-    EventListEndpoint
+from app.resources.ChainStepEndpoint import ChainStepEndpoint, ChainStepListEndpoint
+from app.resources.ConfigEndpoint import ConfigEndpoint
+from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
+from app.resources.EmailLogEndpoint import EmailLogEndpoint, EmailLogListEndpoint
+from app.resources.EventAndCategoryEndpoint import (
+    EventCategoryEndpoint,
+    CategoryByEventEndpoint,
+    EventByCategoryEndpoint,
+    EventCategoryListEndpoint,
 )
-from app.resources.LocationEndpoint import (
-    LocationEndpoint,
-    LocationListEndpoint
+from app.resources.EventAndUserEndpoint import (
+    EventByUserEndpoint,
+    EventUserEndpoint,
+    UserByEventEndpoint,
+    EventUserListEndpoint,
 )
-from app.resources.ResourceEndpoint import (
-    ResourceEndpoint,
-    ResourceListEndpoint,
-    EducationResourceListEndpoint,
-    Covid19ResourceListEndpoint
+from app.resources.EventEndpoint import EventEndpoint, EventListEndpoint
+from app.resources.ExportEndpoint import ExportEndpoint, ExportListEndpoint
+from app.resources.FlowEndpoint import (
+    FlowEndpoint,
+    FlowListEndpoint,
+    FlowQuestionnaireEndpoint,
+    FlowQuestionnaireMetaEndpoint,
 )
+from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
+from app.resources.LocationAndCategoryEndpoint import (
+    LocationCategoryEndpoint,
+    CategoryByLocationEndpoint,
+    LocationByCategoryEndpoint,
+    LocationCategoryListEndpoint,
+)
+from app.resources.LocationEndpoint import LocationEndpoint, LocationListEndpoint
 from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint, ParticipantAdminListEndpoint
+from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
 from app.resources.QuestionnaireAndParticipantEndpoint import QuestionnaireByParticipantEndpoint
 from app.resources.QuestionnaireEndpoint import (
     QuestionnaireEndpoint,
@@ -60,72 +54,59 @@ from app.resources.QuestionnaireEndpoint import (
     QuestionnaireListMetaEndpoint,
     QuestionnaireDataExportEndpoint,
     QuestionnaireUserDataExportEndpoint,
-    QuestionnaireInfoEndpoint)
-from app.resources.SessionStatusEndpoint import SessionStatusEndpoint
+    QuestionnaireInfoEndpoint,
+)
+from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
+from app.resources.ResourceAndCategoryEndpoint import (
+    ResourceCategoryEndpoint,
+    CategoryByResourceEndpoint,
+    ResourceByCategoryEndpoint,
+    ResourceCategoryListEndpoint,
+)
+from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByUserEndpoint, ResourceChangeLogByResourceEndpoint
+from app.resources.ResourceEndpoint import (
+    ResourceEndpoint,
+    ResourceListEndpoint,
+    EducationResourceListEndpoint,
+    Covid19ResourceListEndpoint,
+)
+from app.resources.SearchEndpoint import SearchEndpoint
+from app.resources.SearchResourcesEndpoint import SearchResourcesEndpoint
+from app.resources.SearchStudiesEndpoint import SearchStudiesEndpoint
+from app.resources.SessionEndpoint import SessionEndpoint
+from app.resources.StepLogEndpoint import StepLogEndpoint
+from app.resources.StepLogEndpoint import StepLogListEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
     StudyCategoryEndpoint,
     CategoryByStudyEndpoint,
     StudyByCategoryEndpoint,
-    StudyCategoryListEndpoint
+    StudyCategoryListEndpoint,
 )
 from app.resources.StudyAndInvestigatorEndpoint import (
     StudyByInvestigatorEndpoint,
     StudyInvestigatorEndpoint,
     InvestigatorByStudyEndpoint,
-    StudyInvestigatorListEndpoint
+    StudyInvestigatorListEndpoint,
 )
 from app.resources.StudyAndUserEndpoint import (
     StudyInquiryByUserEndpoint,
     StudyEnrolledByUserEndpoint,
     StudyUserEndpoint,
     UserByStudyEndpoint,
-    StudyUserListEndpoint
+    StudyUserListEndpoint,
 )
-from app.resources.StudyInquiryEndpoint import (
-    StudyInquiryEndpoint
-)
-from app.resources.UserAndParticipantEndpoint import (
-    ParticipantBySessionEndpoint
-)
-from app.resources.EventAndCategoryEndpoint import (
-    EventCategoryEndpoint,
-    CategoryByEventEndpoint,
-    EventByCategoryEndpoint,
-    EventCategoryListEndpoint
-)
-from app.resources.LocationAndCategoryEndpoint import (
-    LocationCategoryEndpoint,
-    CategoryByLocationEndpoint,
-    LocationByCategoryEndpoint,
-    LocationCategoryListEndpoint
-)
-from app.resources.ResourceAndCategoryEndpoint import (
-    ResourceCategoryEndpoint,
-    CategoryByResourceEndpoint,
-    ResourceByCategoryEndpoint,
-    ResourceCategoryListEndpoint
-)
-from app.resources.EventAndUserEndpoint import (
-    EventByUserEndpoint,
-    EventUserEndpoint,
-    UserByEventEndpoint,
-    EventUserListEndpoint
-)
+from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint, StudyByStatusListEndpoint, StudyByAgeEndpoint
+from app.resources.StudyInquiryEndpoint import StudyInquiryEndpoint
+from app.resources.UserAndParticipantEndpoint import ParticipantBySessionEndpoint
+from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint, UserRegistrationEndpoint
 from app.resources.UserFavoriteEndpoint import (
     UserFavoriteEndpoint,
     UserFavoriteListEndpoint,
     FavoritesByUserEndpoint,
-    FavoritesByUserAndTypeEndpoint
+    FavoritesByUserAndTypeEndpoint,
 )
-from app.resources.ExportEndpoint import (
-    ExportEndpoint,
-    ExportListEndpoint
-)
-from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
-from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
-from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
-from app.resources.ChainStepEndpoint import ChainStepEndpoint, ChainStepListEndpoint
 from app.resources.UserMetaEndpoint import UserMetaEndpoint
+from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
 
 
 class StarDriveApi(flask_restful.Api):
@@ -137,30 +118,6 @@ class StarDriveApi(flask_restful.Api):
         flask_restful.abort(e.status_code, response)
 
 
-api_blueprint = Blueprint("api", __name__, url_prefix="/api")
-api = StarDriveApi(api_blueprint)
-app.register_blueprint(api_blueprint)
-app.register_blueprint(auth_blueprint)
-app.register_blueprint(tracking_blueprint)
-
-parser = flask_restful.reqparse.RequestParser()
-parser.add_argument("resource")
-
-
-@app.route("/", methods=["GET"])
-def root():
-    output = {}
-    for rule in app.url_map.iter_rules():
-        options = {}
-        for arg in rule.arguments:
-            options[arg] = "<{0}>".format(arg)
-
-        methods = ",".join(rule.methods)
-        url = url_for(rule.endpoint, **options)
-        output[rule.endpoint] = urllib.parse.unquote(url)
-
-    return jsonify(output)
-
 endpoints = [
     # Categories
     (CategoryListEndpoint, "/category"),
@@ -171,7 +128,6 @@ endpoints = [
     (LocationByCategoryEndpoint, "/category/<category_id>/location"),
     (ResourceByCategoryEndpoint, "/category/<category_id>/resource"),
     (StudyByCategoryEndpoint, "/category/<category_id>/study"),
-
     # Events
     (EventListEndpoint, "/event"),
     (EventEndpoint, "/event/<id>"),
@@ -182,14 +138,12 @@ endpoints = [
     (UserByEventEndpoint, "/event/<event_id>/user"),
     (EventUserEndpoint, "/event_user/<id>"),
     (EventUserListEndpoint, "/event_user"),
-
     # Locations
     (LocationListEndpoint, "/location"),
     (LocationEndpoint, "/location/<id>"),
     (CategoryByLocationEndpoint, "/location/<location_id>/category"),
     (LocationCategoryListEndpoint, "/location_category"),
     (LocationCategoryEndpoint, "/location_category/<id>"),
-
     # Resources
     (ResourceListEndpoint, "/resource"),
     (ResourceEndpoint, "/resource/<id>"),
@@ -200,7 +154,6 @@ endpoints = [
     (ResourceCategoryEndpoint, "/resource_category/<id>"),
     (ResourceChangeLogByResourceEndpoint, "/resource/<resource_id>/change_log"),
     (AdminNoteListByResourceEndpoint, "/resource/<resource_id>/admin_note"),
-
     # Studies
     (StudyListEndpoint, "/study"),
     (StudyByStatusListEndpoint, "/study/status/<status>"),
@@ -216,16 +169,13 @@ endpoints = [
     (StudyUserListEndpoint, "/study_user"),
     (StudyUserEndpoint, "/study_user/<id>"),
     (StudyInquiryEndpoint, "/study_inquiry"),
-
     # Investigators
     (InvestigatorListEndpoint, "/investigator"),
     (InvestigatorEndpoint, "/investigator/<id>"),
     (StudyByInvestigatorEndpoint, "/investigator/<investigator_id>/study"),
-
     # User Sessions
     (SessionEndpoint, "/session"),
     (ParticipantBySessionEndpoint, "/session/participant"),
-
     # User Schema, Admin endpoints
     (UserListEndpoint, "/user"),
     (UserRegistrationEndpoint, "/user/registration"),
@@ -240,13 +190,11 @@ endpoints = [
     (ResourceChangeLogByUserEndpoint, "/user/<user_id>/resource_change_log"),
     (AdminNoteListByUserEndpoint, "/user/<user_id>/admin_note"),
     (UserMetaEndpoint, "/user/<id>/usermeta"),
-
     # Participants
     (ParticipantListEndpoint, "/participant"),
     (ParticipantEndpoint, "/participant/<id>"),
     (ParticipantAdminListEndpoint, "/participant_admin_list"),
     (StepLogEndpoint, "/participant/step_log/<participant_id>"),
-
     # Questionnaires
     (QuestionnaireInfoEndpoint, "/q"),
     (QuestionnaireListEndpoint, "/q/<string:name>"),
@@ -255,19 +203,16 @@ endpoints = [
     (QuestionnaireEndpoint, "/q/<string:name>/<string:id>"),
     (QuestionnaireDataExportEndpoint, "/q/<string:name>/export"),
     (QuestionnaireUserDataExportEndpoint, "/q/<string:name>/export/user/<string:user_id>"),
-
     # Flows
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),
     (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
     (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
-
     # Search
     (SearchEndpoint, "/search"),
     (SearchResourcesEndpoint, "/search/resources"),
     (SearchStudiesEndpoint, "/search/studies"),
     (RelatedResultsEndpoint, "/related"),
-
     # Admin
     (ExportListEndpoint, "/export"),
     (ExportEndpoint, "/export/<string:name>"),
@@ -277,19 +222,11 @@ endpoints = [
     (AdminNoteEndpoint, "/admin_note/<string:id>"),
     (ConfigEndpoint, "/config"),
     (DataTransferLogEndpoint, "/data_transfer_log"),
-
     # ZIP Code Endpoint
     (ZipCodeCoordsEndpoint, "/zip_code_coords/<id>"),
-
     # Password Requirements Endpoint
     (PasswordRequirementsEndpoint, "/password_requirements/<role>"),
-
     # SkillSTAR
     (ChainStepListEndpoint, "/chain_step"),
     (ChainStepEndpoint, "/chain_step/<chain_step_id>"),
-
 ]
-
-# Add all endpoints to the API
-for endpoint in endpoints:
-    api.add_resource(endpoint[0], endpoint[1])

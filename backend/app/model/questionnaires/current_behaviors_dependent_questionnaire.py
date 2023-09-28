@@ -1,22 +1,30 @@
-from app import db, ma
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import Column, String, ARRAY
+
 from app.model.questionnaires.current_behaviors_mixin import CurrentBehaviorsMixin
 from app.schema.model_schema import ModelSchema
 
 
-class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
+class CurrentBehaviorsDependentQuestionnaire(CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_dependent_questionnaire"
 
-    has_academic_difficulties_desc = '"Does " + (formState.preferredName || "your child") + " have any difficulties with academics?"'
-    academic_difficulty_areas_desc = '"What areas of academics are difficult for " + (formState.preferredName || "your child")'
-    concerning_behaviors_other_hide_expression = '!(model.concerning_behaviors && model.concerning_behaviors.includes("concerningOther"))'
+    has_academic_difficulties_desc = (
+        '"Does " + (formState.preferredName || "your child") + " have any difficulties with academics?"'
+    )
+    academic_difficulty_areas_desc = (
+        '"What areas of academics are difficult for " + (formState.preferredName || "your child")'
+    )
+    concerning_behaviors_other_hide_expression = (
+        '!(model.concerning_behaviors && model.concerning_behaviors.includes("concerningOther"))'
+    )
 
-    dependent_verbal_ability = db.Column(
-        db.String,
+    dependent_verbal_ability = Column(
+        String,
         info={
             "display_order": 1,
             "type": "radio",
             "template_options": {
-                "label": '',
+                "label": "",
                 "required": False,
                 "options": [
                     {"value": "nonVerbal", "label": "Non-verbal"},
@@ -24,22 +32,21 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                     {"value": "phraseSpeech", "label": "Phrase Speech"},
                     {"value": "fluentErrors", "label": "Fluent Speech with grammatical errors"},
                     {"value": "fluent", "label": "Fluent Speech"},
-                ]
+                ],
             },
             "expression_properties": {
-                "template_options.label": '(formState.preferredName || "Your child") + "\'s current '
-                                          'verbal ability:"'
+                "template_options.label": '(formState.preferredName || "Your child") + "\'s current ' 'verbal ability:"'
             },
-        }
+        },
     )
-    concerning_behaviors = db.Column(
-        db.ARRAY(db.String),
+    concerning_behaviors = Column(
+        ARRAY(String),
         info={
             "display_order": 2,
             "type": "multicheckbox",
             "template_options": {
                 "type": "array",
-                "label": '',
+                "label": "",
                 "required": False,
                 "options": [
                     {"value": "aggression", "label": "Aggression"},
@@ -66,12 +73,12 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
             },
             "expression_properties": {
                 "template_options.label": '"Does " + (formState.preferredName || "your child") + '
-                                          '" currently engage in the following behaviors of concern?"'
+                '" currently engage in the following behaviors of concern?"'
             },
         },
     )
-    concerning_behaviors_other = db.Column(
-        db.String,
+    concerning_behaviors_other = Column(
+        String,
         info={
             "display_order": 2.2,
             "type": "input",
@@ -80,11 +87,12 @@ class CurrentBehaviorsDependentQuestionnaire(db.Model, CurrentBehaviorsMixin):
                 "required": True,
             },
             "hide_expression": concerning_behaviors_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + concerning_behaviors_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + concerning_behaviors_other_hide_expression},
         },
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def get_field_groups(self):
         return super().get_field_groups()
@@ -105,8 +113,11 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "has_academic_difficulties",
             "academic_difficulty_areas",
             "academic_difficulty_other",
-            "_links"
+            "_links",
         )
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name='current_behaviors_dependent_questionnaire', id='<id>'),
-    })
+
+    _links = Hyperlinks(
+        {
+            "self": URLFor("api.questionnaireendpoint", name="current_behaviors_dependent_questionnaire", id="<id>"),
+        }
+    )

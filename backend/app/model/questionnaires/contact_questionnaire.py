@@ -1,29 +1,26 @@
-from sqlalchemy import func
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, Boolean, BigInteger
 
-from app import db, ma
+from app.database import Base
 from app.export_service import ExportService
 from app.schema.model_schema import ModelSchema
 
 
-class ContactQuestionnaire(db.Model):
+class ContactQuestionnaire(Base):
     __tablename__ = "contact_questionnaire"
     __label__ = "Contact Information"
     __question_type__ = ExportService.TYPE_IDENTIFYING
     __estimated_duration_minutes__ = 5
     marketing_other_hide_expression = '!(model.marketing_channel && (model.marketing_channel === "other"))'
 
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
 
-    participant_id = db.Column(
-        "participant_id", db.Integer, db.ForeignKey("stardrive_participant.id")
-    )
-    user_id = db.Column(
-        "user_id", db.Integer, db.ForeignKey("stardrive_user.id")
-    )
-    phone = db.Column(
-        db.String,
+    participant_id = Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    user_id = Column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    phone = Column(
+        String,
         info={
             "display_order": 1.1,
             "type": "input",
@@ -32,13 +29,13 @@ class ContactQuestionnaire(db.Model):
                 "type": "tel",
                 "label": "Preferred number",
                 "description": "(including area code)",
-                "placeholder": "555-555-5555"
+                "placeholder": "555-555-5555",
             },
             "validators": {"validation": ["phone"]},
         },
     )
-    phone_type = db.Column(
-        db.String,
+    phone_type = Column(
+        String,
         info={
             "display_order": 1.2,
             "type": "radio",
@@ -54,8 +51,8 @@ class ContactQuestionnaire(db.Model):
             },
         },
     )
-    can_leave_voicemail = db.Column(
-        db.Boolean,
+    can_leave_voicemail = Column(
+        Boolean,
         info={
             "display_order": 1.3,
             "type": "radio",
@@ -70,8 +67,8 @@ class ContactQuestionnaire(db.Model):
             },
         },
     )
-    contact_times = db.Column(
-        db.String,
+    contact_times = Column(
+        String,
         info={
             "display_order": 1.4,
             "type": "textarea",
@@ -84,8 +81,8 @@ class ContactQuestionnaire(db.Model):
             },
         },
     )
-    email = db.Column(
-        db.String,
+    email = Column(
+        String,
         info={
             "display_order": 2,
             "type": "input",
@@ -97,32 +94,32 @@ class ContactQuestionnaire(db.Model):
             "validators": {"validation": ["email"]},
         },
     )
-    street_address = db.Column(
-        db.String,
+    street_address = Column(
+        String,
         info={
             "display_order": 3.1,
             "type": "input",
             "template_options": {"label": "Street Address", "required": True},
         },
     )
-    city = db.Column(
-        db.String,
+    city = Column(
+        String,
         info={
             "display_order": 3.2,
             "type": "input",
             "template_options": {"label": "Town/City", "required": False},
         },
     )
-    state = db.Column(
-        db.String,
+    state = Column(
+        String,
         info={
             "display_order": 3.3,
             "type": "input",
             "template_options": {"label": "State", "required": False},
         },
     )
-    zip = db.Column(
-        db.Integer,
+    zip = Column(
+        Integer,
         info={
             "display_order": 3.4,
             "type": "input",
@@ -136,8 +133,8 @@ class ContactQuestionnaire(db.Model):
             },
         },
     )
-    marketing_channel = db.Column(
-        db.String,
+    marketing_channel = Column(
+        String,
         info={
             "display_order": 4.1,
             "type": "select",
@@ -159,8 +156,8 @@ class ContactQuestionnaire(db.Model):
             },
         },
     )
-    marketing_other = db.Column(
-        db.String,
+    marketing_other = Column(
+        String,
         info={
             "display_order": 4.2,
             "type": "input",
@@ -169,51 +166,46 @@ class ContactQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": marketing_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + marketing_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + marketing_other_hide_expression},
         },
     )
 
     def get_field_groups(self):
         return {
-                "phone_group": {
-                    "fields": [
-                        "phone",
-                        "phone_type",
-                        "can_leave_voicemail",
-                        "contact_times",
-                    ],
-                    "display_order": 1,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Phone"},
-                },
-                "address": {
-                    "fields": ["street_address", "city", "state", "zip"],
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Address"},
-                },
-                "email": {
-                    "fields": ["email"],
-                    "display_order": 4,
-                    "wrappers": ["card"],
-                    "template_options": {"label": "Email"},
-                },
-                "marketing": {
-                    "fields": ["marketing_channel", "marketing_other"],
-                    "display_order": 5,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": "How did you hear about us?"
-                    },
-                },
-            }
+            "phone_group": {
+                "fields": [
+                    "phone",
+                    "phone_type",
+                    "can_leave_voicemail",
+                    "contact_times",
+                ],
+                "display_order": 1,
+                "wrappers": ["card"],
+                "template_options": {"label": "Phone"},
+            },
+            "address": {
+                "fields": ["street_address", "city", "state", "zip"],
+                "display_order": 3,
+                "wrappers": ["card"],
+                "template_options": {"label": "Address"},
+            },
+            "email": {
+                "fields": ["email"],
+                "display_order": 4,
+                "wrappers": ["card"],
+                "template_options": {"label": "Email"},
+            },
+            "marketing": {
+                "fields": ["marketing_channel", "marketing_other"],
+                "display_order": 5,
+                "wrappers": ["card"],
+                "template_options": {"label": "How did you hear about us?"},
+            },
+        }
 
 
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ContactQuestionnaire
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name="contact_questionnaire", id='<id>')
-    })
+
+    _links = Hyperlinks({"self": URLFor("api.questionnaireendpoint", name="contact_questionnaire", id="<id>")})

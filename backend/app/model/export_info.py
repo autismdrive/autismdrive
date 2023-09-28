@@ -2,9 +2,8 @@ import re
 
 from flask_marshmallow import Schema
 from marshmallow import post_load, fields
+from marshmallow.fields import Nested
 from marshmallow.utils import EXCLUDE
-
-from app import ma
 
 
 class ExportInfo:
@@ -30,8 +29,8 @@ class ExportInfo:
 
     def pretty_title_from_snakecase(self, title):
         # Capitalizes, removes '_', drops 'Questionnaire' and limits to 30 chars.
-        title = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', title)
-        title = re.sub('([a-z0-9])([A-Z])', r'\1 \2', title)
+        title = re.sub("(.)([A-Z][a-z]+)", r"\1 \2", title)
+        title = re.sub("([a-z0-9])([A-Z])", r"\1 \2", title)
         return title.replace("Questionnaire", "").strip()[:30]
 
 
@@ -44,7 +43,7 @@ class ExportInfoSchema(Schema):
         ordered = True
         fields = ["table_name", "class_name", "display_name", "size", "url", "question_type", "sub_tables"]
 
-    sub_tables = ma.Nested(lambda: ExportInfoSchema(), default=None, many=True, dump_only=True)
+    sub_tables = Nested(lambda: ExportInfoSchema, default=None, many=True, dump_only=True)
     display_name = fields.String(dump_only=True)
 
     @post_load

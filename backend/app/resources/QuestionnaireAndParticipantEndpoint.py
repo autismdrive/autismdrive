@@ -1,11 +1,11 @@
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 
-from app import db, auth
+from app.auth import auth
+from app.database import session
 from app.export_service import ExportService
 from app.model.role import Permission
 from app.wrappers import requires_permission
+
 
 # The Questionnaire by Participant Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:
@@ -17,14 +17,10 @@ from app.wrappers import requires_permission
 
 
 class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
-
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, name, participant_id):
         class_ref = ExportService.get_class(name)
         schema = ExportService.get_schema(name, many=True)
-        questionnaires = db.session.query(class_ref)\
-            .filter(class_ref.participant_id == participant_id)\
-            .all()
+        questionnaires = session.query(class_ref).filter(class_ref.participant_id == participant_id).all()
         return schema.dump(questionnaires)
-

@@ -1,24 +1,27 @@
-from sqlalchemy import func
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship, backref
 
-from app import db
+from app.database import Base
 
 
-class Category(db.Model):
-    __tablename__ = 'category'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    parent_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    display_order = db.Column(db.Integer, nullable=True)
-    children = db.relationship("Category",
-                               backref=db.backref('parent', remote_side=[id]),
-                               lazy="joined",
-                               join_depth=2,
-                               order_by="Category.display_order,Category.name")
+class Category(Base):
+    __tablename__ = "category"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    parent_id = Column(Integer, ForeignKey("category.id"), nullable=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    display_order = Column(Integer, nullable=True)
+    children = relationship(
+        "Category",
+        backref=backref("parent", remote_side=[id]),
+        lazy="joined",
+        join_depth=2,
+        order_by="Category.display_order,Category.name",
+    )
     hit_count = 0  # when returning categories in the context of a search.
 
     def calculate_level(self):
-        """Provide the depth of the category """
+        """Provide the depth of the category"""
         level = 0
         cat = self
         while cat.parent and isinstance(cat, Category):

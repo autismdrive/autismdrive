@@ -1,22 +1,20 @@
-import enum
+from sqlalchemy import func, Column, Integer, ForeignKey, DateTime, Boolean
 
-from sqlalchemy import func
-
-from app import db
+from app.database import Base
 from app.model.participant_relationship import Relationship
 
 
-class UserMeta(db.Model):
-    __tablename__ = 'usermeta'
+class UserMeta(Base):
+    __tablename__ = "usermeta"
     __label__ = "User Meta Info"
-    id = db.Column(db.Integer, db.ForeignKey('stardrive_user.id'), primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    self_participant = db.Column(db.Boolean)
-    self_has_guardian = db.Column(db.Boolean)
-    guardian = db.Column(db.Boolean)
-    guardian_has_dependent = db.Column(db.Boolean)
-    professional = db.Column(db.Boolean)
-    interested = db.Column(db.Boolean)
+    id = Column(Integer, ForeignKey("stardrive_user.id"), primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    self_participant = Column(Boolean)
+    self_has_guardian = Column(Boolean)
+    guardian = Column(Boolean)
+    guardian_has_dependent = Column(Boolean)
+    professional = Column(Boolean)
+    interested = Column(Boolean)
 
     def get_relationship(self):
         if self.self_participant:
@@ -30,5 +28,4 @@ class UserMeta(db.Model):
             return Relationship.self_interested.name
         if self.interested:
             return Relationship.self_interested.name
-        return ''
-
+        return ""

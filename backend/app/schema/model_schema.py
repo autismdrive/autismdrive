@@ -1,6 +1,6 @@
 from marshmallow.utils import EXCLUDE
 
-from app import ma
+from app.schema.ma import ma
 
 
 class ModelSchema(ma.SQLAlchemyAutoSchema):

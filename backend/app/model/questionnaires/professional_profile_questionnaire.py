@@ -1,39 +1,36 @@
-from sqlalchemy import func
+from flask_marshmallow.fields import Hyperlinks, URLFor
+from sqlalchemy import func, Column, Integer, String, ForeignKey, DateTime, Boolean, BigInteger, ARRAY
 
-from app import db, ma
+from app.database import Base
 from app.export_service import ExportService
 from app.schema.model_schema import ModelSchema
 
 
-class ProfessionalProfileQuestionnaire(db.Model):
-    __tablename__ = 'professional_profile_questionnaire'
+class ProfessionalProfileQuestionnaire(Base):
+    __tablename__ = "professional_profile_questionnaire"
     __label__ = "Professional Profile"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
     __estimated_duration_minutes__ = 2
-    professional_identity_other_hide_expression = '!(model.professional_identity && model.professional_identity.includes("profOther"))'
-    learning_interests_other_hide_expression = '!(model.learning_interests && model.learning_interests.includes("learnOther"))'
-
-    id = db.Column(db.Integer, primary_key=True)
-    last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
-    time_on_task_ms = db.Column(db.BigInteger, default=0)
-
-    participant_id = db.Column(
-        'participant_id',
-        db.Integer,
-        db.ForeignKey('stardrive_participant.id')
+    professional_identity_other_hide_expression = (
+        '!(model.professional_identity && model.professional_identity.includes("profOther"))'
     )
-    user_id = db.Column(
-        'user_id',
-        db.Integer,
-        db.ForeignKey('stardrive_user.id')
+    learning_interests_other_hide_expression = (
+        '!(model.learning_interests && model.learning_interests.includes("learnOther"))'
     )
-    purpose = db.Column(
-        db.String,
+
+    id = Column(Integer, primary_key=True)
+    last_updated = Column(DateTime(timezone=True), default=func.now())
+    time_on_task_ms = Column(BigInteger, default=0)
+
+    participant_id = Column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    user_id = Column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    purpose = Column(
+        String,
         info={
             "display_order": 1,
             "type": "select",
             "template_options": {
-                "label": 'For what purposes are you interested in accessing the Autism DRIVE?',
+                "label": "For what purposes are you interested in accessing the Autism DRIVE?",
                 "placeholder": "Please select",
                 "options": [
                     {"value": "profResources", "label": "To learn more about Autism and Autism Resources available"},
@@ -43,8 +40,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
             },
         },
     )
-    professional_identity = db.Column(
-        db.ARRAY(db.String),
+    professional_identity = Column(
+        ARRAY(String),
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
@@ -63,7 +60,10 @@ class ProfessionalProfileQuestionnaire(db.Model):
                     {"value": "diet", "label": "Dietician"},
                     {"value": "directSupp", "label": "Direct Support Professional"},
                     {"value": "dramaTher", "label": "Drama Therapist"},
-                    {"value": "earlyInter", "label": "Early Intervention Specialist/Early Intervention Special Educator"},
+                    {
+                        "value": "earlyInter",
+                        "label": "Early Intervention Specialist/Early Intervention Special Educator",
+                    },
                     {"value": "inHomeCare", "label": "In-home caregiver"},
                     {"value": "interp", "label": "Interpreter"},
                     {"value": "jobCoach", "label": "Job coach"},
@@ -92,8 +92,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
             },
         },
     )
-    professional_identity_other = db.Column(
-        db.String,
+    professional_identity_other = Column(
+        String,
         info={
             "display_order": 2.2,
             "type": "input",
@@ -102,13 +102,11 @@ class ProfessionalProfileQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": professional_identity_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + professional_identity_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + professional_identity_other_hide_expression},
         },
     )
-    learning_interests = db.Column(
-        db.ARRAY(db.String),
+    learning_interests = Column(
+        ARRAY(String),
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
@@ -147,8 +145,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
             },
         },
     )
-    learning_interests_other = db.Column(
-        db.String,
+    learning_interests_other = Column(
+        String,
         info={
             "display_order": 3.2,
             "type": "input",
@@ -157,13 +155,11 @@ class ProfessionalProfileQuestionnaire(db.Model):
                 "required": True,
             },
             "hide_expression": learning_interests_other_hide_expression,
-            "expression_properties": {
-                "template_options.required": '!' + learning_interests_other_hide_expression
-            }
+            "expression_properties": {"template_options.required": "!" + learning_interests_other_hide_expression},
         },
     )
-    currently_work_with_autistic = db.Column(
-        db.Boolean,
+    currently_work_with_autistic = Column(
+        Boolean,
         info={
             "display_order": 4,
             "type": "radio",
@@ -177,8 +173,8 @@ class ProfessionalProfileQuestionnaire(db.Model):
             },
         },
     )
-    previous_work_with_autistic = db.Column(
-        db.Boolean,
+    previous_work_with_autistic = Column(
+        Boolean,
         info={
             "display_order": 4,
             "type": "radio",
@@ -192,42 +188,41 @@ class ProfessionalProfileQuestionnaire(db.Model):
             },
         },
     )
-    length_work_with_autistic = db.Column(
-        db.String,
+    length_work_with_autistic = Column(
+        String,
         info={
             "display_order": 5,
             "type": "input",
             "template_options": {
                 "label": "In total, how long have you worked with someone/people who have autism? ",
-                "required": False
+                "required": False,
             },
         },
     )
 
     def get_field_groups(self):
         return {
-                "professional_identity": {
-                    "fields": ["professional_identity", "professional_identity_other"],
-                    "display_order": 2,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": 'I am a(n):'
-                    },
-                },
-                "learning_interests": {
-                    "fields": ["learning_interests", "learning_interests_other"],
-                    "display_order": 3,
-                    "wrappers": ["card"],
-                    "template_options": {
-                        "label": 'What topics or areas are you interested in learning about? '
-                    },
-                },
+            "professional_identity": {
+                "fields": ["professional_identity", "professional_identity_other"],
+                "display_order": 2,
+                "wrappers": ["card"],
+                "template_options": {"label": "I am a(n):"},
+            },
+            "learning_interests": {
+                "fields": ["learning_interests", "learning_interests_other"],
+                "display_order": 3,
+                "wrappers": ["card"],
+                "template_options": {"label": "What topics or areas are you interested in learning about? "},
+            },
         }
 
 
 class ProfessionalProfileQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ProfessionalProfileQuestionnaire
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('api.questionnaireendpoint', name='professional_profile_questionnaire', id='<id>'),
-    })
+
+    _links = Hyperlinks(
+        {
+            "self": URLFor("api.questionnaireendpoint", name="professional_profile_questionnaire", id="<id>"),
+        }
+    )
