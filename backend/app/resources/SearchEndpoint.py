@@ -5,10 +5,10 @@ from marshmallow import ValidationError
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.category import Category
-from app.model.search import Hit, MapHit
+from app.models import Category, Hit, MapHit
+from app.models import MapHit
 from app.rest_exception import RestException
-from app.schema.schema import SearchSchema
+from app.schemas import SearchSchema
 
 
 class SearchEndpoint(flask_restful.Resource):

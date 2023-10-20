@@ -2,10 +2,10 @@ import flask_restful
 from flask import request
 
 from app.database import session
-from app.model.event import Event, EventUser
-from app.model.user import User
+from app.models import EventUser
+from app.models import Event, EventUser, User
 from app.rest_exception import RestException
-from app.schema.schema import EventUserSchema
+from app.schemas import EventUserSchema
 
 
 class EventByUserEndpoint(flask_restful.Resource):

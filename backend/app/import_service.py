@@ -7,11 +7,11 @@ import logging
 import requests
 from sqlalchemy import desc
 
-from app.database import session
+from app.database import session, get_class
 from app.export_service import ExportService
-from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
-from app.model.export_info import ExportInfoSchema
-from app.schema.export_schema import AdminExportSchema
+from app.models import DataTransferLog, DataTransferLogDetail
+from app.schemas import ExportInfoSchema
+from app.schemas import ExportSchemas
 from config.load import settings
 
 
@@ -67,7 +67,7 @@ class ImportService:
         if response.status_code != 200:
             self.logger.error("Authentication to Primary Server Failed." + str(response))
         else:
-            data = response.json
+            data = response.json()
             self.token = data["token"]
 
     def get_headers(self):
@@ -127,7 +127,7 @@ class ImportService:
         if len(export_info.json_data) < 1:
             return  # Nothing to do here.
         schema = ExportService.get_schema(export_info.class_name, many=False, is_import=True)
-        model_class = ExportService.get_class(export_info.class_name)
+        model_class = get_class(export_info.class_name)
         log_detail = DataTransferLogDetail(
             class_name=export_info.class_name,
             date_started=log.date_started,
@@ -201,7 +201,7 @@ class ImportService:
     def load_admin(self):
         url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
         response = requests.get(url, headers=self.get_headers())
-        schema = AdminExportSchema()
+        schema = ExportSchemas.AdminExportSchema()
         json_response = response.json()
         for json_admin in json_response:
             try:

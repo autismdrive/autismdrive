@@ -3,11 +3,11 @@ from flask import request
 
 from app.auth import auth
 from app.database import session
-from app.model.role import Role
-from app.model.study import Study, StudyUserStatus, StudyUser
-from app.model.user import User
+from app.enums import Role, StudyUserStatus
+from app.models import StudyUser
+from app.models import Study, StudyUser, User
 from app.rest_exception import RestException
-from app.schema.schema import StudyUserSchema, UserStudiesSchema, StudyUsersSchema
+from app.schemas import StudyUserSchema, UserStudiesSchema, StudyUsersSchema
 from app.wrappers import requires_roles
 
 

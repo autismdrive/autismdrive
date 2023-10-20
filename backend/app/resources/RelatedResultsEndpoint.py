@@ -4,10 +4,9 @@ from flask import request, json, jsonify
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.resource import Resource
-from app.model.study import Study
+from app.models import Resource, Study
 from app.rest_exception import RestException
-from app.schema.schema import ResourceSchema, StudySchema
+from app.schemas import ResourceSchema, StudySchema
 
 
 class RelatedResultsEndpoint(flask_restful.Resource):

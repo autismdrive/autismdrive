@@ -5,10 +5,9 @@ from flask import request
 from marshmallow import ValidationError
 
 from app.database import session
-from app.model.investigator import Investigator
-from app.model.study import StudyInvestigator
+from app.models import Investigator, StudyInvestigator
 from app.rest_exception import RestException
-from app.schema.schema import InvestigatorSchema
+from app.schemas import InvestigatorSchema
 
 
 class InvestigatorEndpoint(flask_restful.Resource):

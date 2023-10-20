@@ -2,7 +2,8 @@ import flask_restful
 from flask import jsonify, request
 
 from app.auth import password_requirements
-from app.model.user import Role, User
+from app.models import User
+from app.enums import Role
 from app.rest_exception import RestException
 
 

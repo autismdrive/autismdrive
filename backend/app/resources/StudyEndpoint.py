@@ -6,9 +6,10 @@ from marshmallow import ValidationError
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.study import Study, StudyInvestigator, StudyCategory, StudyUser
+from app.models import StudyUser
+from app.models import Study, StudyInvestigator, StudyCategory, StudyUser
 from app.rest_exception import RestException
-from app.schema.schema import StudySchema
+from app.schemas import StudySchema
 
 
 class StudyEndpoint(flask_restful.Resource):

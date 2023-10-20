@@ -9,12 +9,10 @@ from sqlalchemy import func
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
-from app.model.email_log import EmailLog
-from app.model.user import User
 from flask import g, request, Blueprint, jsonify
 
 from app.rest_exception import RestException
-from app.schema.schema import UserSchema
+from app.schemas import UserSchema
 from config.load import settings
 
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
@@ -23,6 +21,8 @@ auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
 def confirm_email(email_token):
     """When users create a new account with an email and a password, this
     allows the front end to confirm their email and log them into the system."""
+    from app.models import User
+
     try:
         ts = URLSafeTimedSerializer(settings.SECRET_KEY)
         email = ts.loads(email_token, salt="email-confirm-key", max_age=86400)
@@ -41,6 +41,8 @@ def confirm_email(email_token):
 
 @auth_blueprint.route("/login_password", methods=["GET", "POST"])
 def login_password():
+    from app.models import User
+
     request_data = request.get_json()
 
     if request_data is None:
@@ -74,6 +76,9 @@ def login_password():
 
 @auth_blueprint.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
+    from app.models import User
+    from app.models import EmailLog
+
     request_data = request.get_json()
     email = request_data["email"]
     user = session.query(User).filter(func.lower(User.email) == func.lower(email)).first()
@@ -95,6 +100,8 @@ def forgot_password():
 
 @auth_blueprint.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
+    from app.models import User
+
     request_data = request.get_json()
     password = request_data["password"]
     email_token = request_data["email_token"]
@@ -120,6 +127,8 @@ def reset_password():
 
 @auth.verify_token
 def verify_token(token):
+    from app.models import User
+
     try:
         resp = User.decode_auth_token(token)
         if resp:

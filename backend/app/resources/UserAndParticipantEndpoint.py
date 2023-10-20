@@ -5,10 +5,10 @@ from sqlalchemy import exc
 
 from app.auth import auth
 from app.database import session
-from app.model.participant import Participant, Relationship
-from app.model.user import User
+from app.models import Participant, User
+from app.enums import Relationship
 from app.rest_exception import RestException
-from app.schema.schema import ParticipantSchema
+from app.schemas import ParticipantSchema
 
 
 class ParticipantBySessionEndpoint(flask_restful.Resource):

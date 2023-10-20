@@ -2,9 +2,9 @@ import flask_restful
 
 from app.auth import auth
 from app.database import session
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.role import Role, Permission
-from app.schema.schema import ResourceChangeLogSchema
+from app.models import ResourceChangeLog
+from app.enums import Permission, Role
+from app.schemas import ResourceChangeLogSchema
 from app.wrappers import requires_roles, requires_permission
 
 

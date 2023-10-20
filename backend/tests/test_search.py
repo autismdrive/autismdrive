@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import dateutil.parser
 
 from app.elastic_index import elastic_index
-from app.model.category import Category
-from app.model.role import Role
+from app.models import Category
+from app.enums import Role
 from tests.base_test import BaseTest
 
 

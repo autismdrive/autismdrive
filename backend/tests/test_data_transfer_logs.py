@@ -1,4 +1,5 @@
-from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail, DataTransferLogSchema
+from app.models import DataTransferLogSchema
+from app.models import DataTransferLog, DataTransferLogDetail, DataTransferLogSchema
 from tests.base_test import BaseTest
 
 

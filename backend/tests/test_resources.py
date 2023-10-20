@@ -1,7 +1,7 @@
 from app.elastic_index import elastic_index
-from app.model.resource import Resource, ResourceCategory
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.user import Role
+from app.models import ResourceCategory
+from app.models import Resource, ResourceCategory, ResourceChangeLog
+from app.enums import Role
 from tests.base_test import BaseTest
 
 

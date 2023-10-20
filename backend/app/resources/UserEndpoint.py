@@ -10,15 +10,10 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from app.auth import auth
 from app.database import session
 from app.email_service import EmailService, email_service
-from app.model.email_log import EmailLog
-from app.model.event import EventUser
-from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaireSchema
-from app.model.role import Permission, Role
-from app.model.study import Study, StudyUser
-from app.model.user import User
-from app.model.user_favorite import UserFavorite
+from app.enums import Permission, Role
+from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser
 from app.rest_exception import RestException
-from app.schema.schema import UserSchema, UserSearchSchema
+from app.schemas import UserSchema, UserSearchSchema, RegistrationQuestionnaireSchema
 from app.wrappers import requires_permission
 from config.load import settings
 

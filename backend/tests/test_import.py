@@ -3,13 +3,15 @@ import datetime
 import httpretty
 import requests
 
+from app.enums import Role
 from app.import_service import ImportService
-from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
-from app.model.export_info import ExportInfo, ExportInfoSchema
-from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaireSchema
-from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaireSchema
-from app.model.user import User, Role
-from app.schema.export_schema import UserExportSchema, AdminExportSchema
+from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo, User
+from app.schemas import (
+    ExportInfoSchema,
+    ExportSchemas,
+    ClinicalDiagnosesQuestionnaireSchema,
+    EmploymentQuestionnaireSchema,
+)
 from config.load import settings
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
@@ -106,8 +108,8 @@ class TestImportCase(BaseTestQuestionnaire):
             email_verified=True,
             _password="m@kerspace",
         )
-        user_json = self.jsonify(UserExportSchema(many=True).dump([user]))
-        admin_json = self.jsonify(AdminExportSchema(many=True).dump([user]))
+        user_json = self.jsonify(ExportSchemas.UserExportSchema(many=True).dump([user]))
+        admin_json = self.jsonify(ExportSchemas.AdminExportSchema(many=True).dump([user]))
 
         httpretty.register_uri(httpretty.GET, "http://na.edu/api/export", body=info_json, status=200)
         httpretty.register_uri(httpretty.GET, "http://na.edu/api/export/user", body=user_json, status=200)
@@ -191,7 +193,7 @@ class TestImportCase(BaseTestQuestionnaire):
             id=4, last_updated=datetime.datetime.now(), email="dan@test.com", role=Role.admin, email_verified=True
         )
         user.password = password
-        user_json = self.jsonify(AdminExportSchema(many=True).dump([user]))
+        user_json = self.jsonify(ExportSchemas.AdminExportSchema(many=True).dump([user]))
         httpretty.register_uri(httpretty.GET, "http://na.edu/api/export/admin", body=user_json, status=200)
         data_importer.load_admin()
 

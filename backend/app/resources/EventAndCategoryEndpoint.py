@@ -3,11 +3,9 @@ from flask import request
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.category import Category
-from app.model.event import Event
-from app.model.resource import ResourceCategory
+from app.models import Category, ResourceCategory, Event
 from app.rest_exception import RestException
-from app.schema.schema import EventCategorySchema, CategoryEventsSchema, EventCategoriesSchema
+from app.schemas import EventCategorySchema, CategoryEventsSchema, EventCategoriesSchema
 
 
 class EventByCategoryEndpoint(flask_restful.Resource):

@@ -19,8 +19,8 @@ class BaseTestQuestionnaire(BaseTest):
                 return field
 
     def construct_admin_user(self, email="rmond@virginia.gov"):
-        from app.model.user import User
-        from app.model.role import Role
+        from app.models import User
+        from app.enums import Role
 
         user = User(email=email, role=Role.admin)
         self.session.add(user)
@@ -38,7 +38,7 @@ class BaseTestQuestionnaire(BaseTest):
         notes="I love my new leg!",
         supports_questionnaire=None,
     ):
-        from app.model.questionnaires.assistive_device import AssistiveDevice
+        from app.models import AssistiveDevice
 
         ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
@@ -57,7 +57,7 @@ class BaseTestQuestionnaire(BaseTest):
         self, type="lowTechAAC", timeframe="current", notes="We use pen and paper", supports_questionnaire=None
     ):
 
-        from app.model.questionnaires.alternative_augmentative import AlternativeAugmentative
+        from app.models import AlternativeAugmentative
 
         aac = AlternativeAugmentative(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
@@ -84,7 +84,7 @@ class BaseTestQuestionnaire(BaseTest):
         medical = ["insomnia"] if medical is None else medical
         genetic = ["corneliaDeLange"] if genetic is None else genetic
 
-        from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
+        from app.models import ClinicalDiagnosesQuestionnaire
 
         cdq = ClinicalDiagnosesQuestionnaire(
             developmental=developmental, mental_health=mental_health, medical=medical, genetic=genetic
@@ -97,7 +97,7 @@ class BaseTestQuestionnaire(BaseTest):
             cdq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             cdq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
@@ -114,7 +114,7 @@ class BaseTestQuestionnaire(BaseTest):
         self, phone="123-456-7890", zip=55678, marketing_channel="Zine Ad", participant=None, user=None
     ):
 
-        from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+        from app.models import ContactQuestionnaire
 
         cq = ContactQuestionnaire(phone=phone, zip=zip, marketing_channel=marketing_channel)
         if user is None:
@@ -125,7 +125,7 @@ class BaseTestQuestionnaire(BaseTest):
             cq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             cq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
@@ -152,9 +152,7 @@ class BaseTestQuestionnaire(BaseTest):
             ["math", "writing"] if academic_difficulty_areas is None else academic_difficulty_areas
         )
 
-        from app.model.questionnaires.current_behaviors_dependent_questionnaire import (
-            CurrentBehaviorsDependentQuestionnaire,
-        )
+        from app.models import CurrentBehaviorsDependentQuestionnaire
 
         cb = CurrentBehaviorsDependentQuestionnaire(
             dependent_verbal_ability=dependent_verbal_ability,
@@ -170,7 +168,7 @@ class BaseTestQuestionnaire(BaseTest):
             cb.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.dependent)
             cb.participant_id = p.id
@@ -198,7 +196,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
+        from app.models import CurrentBehaviorsSelfQuestionnaire
 
         cb = CurrentBehaviorsSelfQuestionnaire(
             self_verbal_ability=self_verbal_ability,
@@ -213,7 +211,7 @@ class BaseTestQuestionnaire(BaseTest):
             cb.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.self_participant)
             cb.participant_id = p.id
@@ -234,7 +232,7 @@ class BaseTestQuestionnaire(BaseTest):
         self, birth_sex="intersex", gender_identity="intersex", race_ethnicity="raceBlack", participant=None, user=None
     ):
 
-        from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+        from app.models import DemographicsQuestionnaire
 
         dq = DemographicsQuestionnaire(
             birth_sex=birth_sex, gender_identity=gender_identity, race_ethnicity=race_ethnicity
@@ -247,7 +245,7 @@ class BaseTestQuestionnaire(BaseTest):
             dq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             dq.participant_id = self.construct_participant(user=u, relationship=Relationship.self_participant).id
         else:
@@ -270,7 +268,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
+        from app.models import DevelopmentalQuestionnaire
 
         dq = DevelopmentalQuestionnaire(
             had_birth_complications=had_birth_complications,
@@ -286,7 +284,7 @@ class BaseTestQuestionnaire(BaseTest):
             dq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             dq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
@@ -309,7 +307,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
+        from app.models import EducationDependentQuestionnaire
 
         eq = EducationDependentQuestionnaire(
             attends_school=attends_school,
@@ -325,7 +323,7 @@ class BaseTestQuestionnaire(BaseTest):
             eq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.dependent)
             eq.participant_id = p.id
@@ -350,7 +348,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
+        from app.models import EducationSelfQuestionnaire
 
         eq = EducationSelfQuestionnaire(
             attends_school=attends_school,
@@ -367,7 +365,7 @@ class BaseTestQuestionnaire(BaseTest):
             eq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.self_participant)
             eq.participant_id = p.id
@@ -391,7 +389,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
+        from app.models import EmploymentQuestionnaire
 
         eq = EmploymentQuestionnaire(
             is_currently_employed=is_currently_employed,
@@ -406,7 +404,7 @@ class BaseTestQuestionnaire(BaseTest):
             eq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             eq.participant_id = self.construct_participant(user=u, relationship=Relationship.self_participant).id
         else:
@@ -429,7 +427,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.evaluation_history_dependent_questionnaire import (
+        from app.models import (
             EvaluationHistoryDependentQuestionnaire,
         )
 
@@ -447,7 +445,7 @@ class BaseTestQuestionnaire(BaseTest):
             ehq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.dependent)
             ehq.participant_id = p.id
@@ -476,7 +474,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
+        from app.models import EvaluationHistorySelfQuestionnaire
 
         ehq = EvaluationHistorySelfQuestionnaire(
             self_identifies_autistic=self_identifies_autistic,
@@ -492,7 +490,7 @@ class BaseTestQuestionnaire(BaseTest):
             ehq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.self_participant)
             ehq.participant_id = p.id
@@ -518,7 +516,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
+        from app.models import HomeDependentQuestionnaire
 
         hq = HomeDependentQuestionnaire(
             dependent_living_situation=dependent_living_situation, struggle_to_afford=struggle_to_afford
@@ -532,7 +530,7 @@ class BaseTestQuestionnaire(BaseTest):
             hq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.dependent)
             hq.participant_id = p.id
@@ -556,7 +554,7 @@ class BaseTestQuestionnaire(BaseTest):
         self, self_living_situation="alone", housemates=None, struggle_to_afford=False, participant=None, user=None
     ):
 
-        from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
+        from app.models import HomeSelfQuestionnaire
 
         hq = HomeSelfQuestionnaire(self_living_situation=self_living_situation, struggle_to_afford=struggle_to_afford)
 
@@ -568,7 +566,7 @@ class BaseTestQuestionnaire(BaseTest):
             hq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.self_participant)
             hq.participant_id = p.id
@@ -598,7 +596,7 @@ class BaseTestQuestionnaire(BaseTest):
         home_self_questionnaire=None,
     ):
 
-        from app.model.questionnaires.housemate import Housemate
+        from app.models import Housemate
 
         h = Housemate(name=name, relationship=relationship, age=age, has_autism=has_autism)
         if home_dependent_questionnaire is not None:
@@ -625,7 +623,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+        from app.models import IdentificationQuestionnaire
 
         iq = IdentificationQuestionnaire(
             relationship_to_participant=relationship_to_participant,
@@ -643,7 +641,7 @@ class BaseTestQuestionnaire(BaseTest):
             iq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             iq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
@@ -671,7 +669,7 @@ class BaseTestQuestionnaire(BaseTest):
     ):
         professional_identity = ["artTher", "profOther"] if professional_identity is None else professional_identity
         learning_interests = ["insuranceCov", "learnOther"] if learning_interests is None else learning_interests
-        from app.model.questionnaires.professional_profile_questionnaire import ProfessionalProfileQuestionnaire
+        from app.models import ProfessionalProfileQuestionnaire
 
         pq = ProfessionalProfileQuestionnaire(
             purpose=purpose,
@@ -691,7 +689,7 @@ class BaseTestQuestionnaire(BaseTest):
             pq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             pq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
@@ -716,7 +714,7 @@ class BaseTestQuestionnaire(BaseTest):
         event=None,
     ):
 
-        from app.model.questionnaires.registration_questionnaire import RegistrationQuestionnaire
+        from app.models import RegistrationQuestionnaire
 
         rq = RegistrationQuestionnaire(
             first_name=first_name,
@@ -759,7 +757,7 @@ class BaseTestQuestionnaire(BaseTest):
         supports_questionnaire=None,
     ):
 
-        from app.model.questionnaires.medication import Medication
+        from app.models import Medication
 
         m = Medication(symptom=symptom, name=name, notes=notes)
         if supports_questionnaire is not None:
@@ -776,7 +774,7 @@ class BaseTestQuestionnaire(BaseTest):
         self, type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire=None
     ):
 
-        from app.model.questionnaires.therapy import Therapy
+        from app.models import Therapy
 
         t = Therapy(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire is not None:
@@ -799,7 +797,7 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
+        from app.models import SupportsQuestionnaire
 
         sq = SupportsQuestionnaire()
         if user is None:
@@ -810,7 +808,7 @@ class BaseTestQuestionnaire(BaseTest):
             sq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             sq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
         else:
@@ -846,11 +844,11 @@ class BaseTestQuestionnaire(BaseTest):
     def construct_chain_session_questionnaire(self, participant=None, user=None):
         self.construct_chain_steps()
 
-        from app.model.questionnaires.chain_session import ChainQuestionnaire
+        from app.models import ChainQuestionnaire
 
         bq = ChainQuestionnaire()
         if user is None:
-            from app.model.role import Role
+            from app.enums import Role
 
             u = self.construct_user(email="edudep@questionnaire.com", role=Role.researcher)
             bq.user_id = u.id
@@ -859,7 +857,7 @@ class BaseTestQuestionnaire(BaseTest):
             bq.user_id = u.id
 
         if participant is None:
-            from app.model.participant_relationship import Relationship
+            from app.enums import Relationship
 
             p = self.construct_participant(user=u, relationship=Relationship.dependent)
             bq.participant_id = p.id
@@ -868,7 +866,7 @@ class BaseTestQuestionnaire(BaseTest):
             bq.participant_id = p.id
 
         session_date = parser.parse("2020-12-14T17:46:14.030Z")
-        from app.model.questionnaires.chain_session import ChainSessionStep
+        from app.models import ChainSessionStep
 
         session_1_step_1 = ChainSessionStep(
             date=session_date,
@@ -881,7 +879,7 @@ class BaseTestQuestionnaire(BaseTest):
             reason_step_incomplete="challenging_behavior",
             num_stars=0,
         )
-        from app.model.questionnaires.chain_session import ChainSession
+        from app.models import ChainSession
 
         session_1 = ChainSession(date=session_date)
         session_1.step_attempts = [session_1_step_1]
@@ -902,7 +900,7 @@ class BaseTestQuestionnaire(BaseTest):
     def construct_all_questionnaires(self, user=None):
         if user is None:
             user = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         participant = self.construct_participant(user=user, relationship=Relationship.dependent)
         self.construct_usermeta(user=user)

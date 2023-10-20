@@ -5,20 +5,18 @@ os.environ["TESTING"] = "true"
 os.environ["ENV_NAME"] = "testing"
 
 from app.import_service import ImportService
-from app.model.data_transfer_log import DataTransferLog
-from app.model.export_info import ExportInfoSchema
-
+from app.models import DataTransferLog, Participant, User
+from app.schemas import ExportInfoSchema
 
 from flask import json
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 from app.email_service import TEST_MESSAGES
 from app.export_service import ExportService
-from app.model.participant import Relationship, Participant
-from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+from app.enums import Relationship, Role
+from app.models import IdentificationQuestionnaire
 
-from app.model.user import Role, User
-from app.schema.schema import UserSchema, ParticipantSchema
+from app.schemas import UserSchema, ParticipantSchema
 
 
 class TestExportCase(BaseTestQuestionnaire):

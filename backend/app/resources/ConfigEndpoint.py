@@ -1,7 +1,8 @@
 import flask_restful
 from flask import jsonify
 
-from app.model.frontend_config import FrontendConfigSchema, FrontendConfig
+from app.models import FrontendConfig
+from app.schemas import FrontendConfigSchema
 
 
 class ConfigEndpoint(flask_restful.Resource):

@@ -5,7 +5,7 @@ import datetime
 from flask import Blueprint, send_file
 
 from app.database import session
-from app.model.email_log import EmailLog
+from app.models import EmailLog
 
 tracking_blueprint = Blueprint("track", __name__, url_prefix="/api/track")
 

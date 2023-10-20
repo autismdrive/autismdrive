@@ -11,31 +11,38 @@ import click
 from flask import json
 from flask.ctx import RequestContext
 from flask.testing import FlaskClient
-from werkzeug.test import TestResponse
 from sqlalchemy.orm import scoped_session, close_all_sessions
-from sqlalchemy_utils import database_exists, create_database, drop_database
+from sqlalchemy_utils import database_exists, create_database
+from werkzeug.test import TestResponse
 
 from app.api_app import APIApp
 from app.create_app import create_app
 from app.data_loader import DataLoader
-from app.database import session
 from app.elastic_index import elastic_index
-from app.model.admin_note import AdminNote
-from app.model.category import Category
-from app.model.chain_step import ChainStep
-from app.model.email_log import EmailLog
-from app.model.event import Event, EventUser
-from app.model.investigator import Investigator
-from app.model.location import Location
-from app.model.participant import Participant
-from app.model.resource import Resource, ResourceCategory
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.step_log import StepLog
-from app.model.study import Study, Status, StudyInvestigator, StudyCategory, StudyUser
-from app.model.user import User, Role
-from app.model.user_favorite import UserFavorite
-from app.model.user_meta import UserMeta
-from app.model.zip_code import ZipCode
+from app.enums import Status, Role
+from app.models import (
+    AdminNote,
+    Category,
+    ChainStep,
+    EmailLog,
+    Resource,
+    Location,
+    Event,
+    Study,
+    StudyInvestigator,
+    StudyCategory,
+)
+from app.models import EventUser
+from app.models import Investigator
+from app.models import Participant
+from app.models import ResourceCategory
+from app.models import ResourceChangeLog
+from app.models import StepLog
+from app.models import StudyUser
+from app.models import User
+from app.models import UserFavorite
+from app.models import UserMeta
+from app.models import ZipCode
 
 
 class BaseTest(TestCase):
@@ -53,88 +60,47 @@ class BaseTest(TestCase):
 
         cls.app = _app
         cls.ctx = _app.test_request_context()
+        cls.ctx.push()
+
         cls.session = _app.session
         cls.client = _app.test_client()
         cls.reset_db()
+        cls.reset_indices()
 
-        cls.ctx.push()
-        from flask_migrate import upgrade
+        from app.database import upgrade_db
+
+        upgrade_db()
 
         current_dir = os.path.dirname(getsourcefile(lambda: 0))
-        migrations_dir = current_dir + "/../migrations"
-        upgrade(directory=migrations_dir)
-        #
-        # # Run database migrations on test database
-        # from alembic.config import Config
-        # from alembic.command import upgrade
-        #
-        # alembic_cfg = Config(current_dir + "/../migrations/alembic.ini")
-        # alembic_cfg.set_main_option("script_location", current_dir + "/../migrations")
-        # upgrade(config=alembic_cfg, revision="head")
         cls.loader = DataLoader(directory=current_dir + "/../example_data")
-        cls.ctx.pop()
 
     @classmethod
     def tearDownClass(cls):
         cls.reset_db()
-        cls.session.remove()
-        elastic_index.clear()
+        cls.reset_indices()
+        cls.ctx.pop()
 
     def setUp(self):
-        self.ctx.push()
         self.reset_db()
-        elastic_index.clear()
+        self.reset_indices()
         self.auths = {}
 
     def tearDown(self):
-        self.session.rollback()
+        from app.database import session
+
+        session.rollback()
         close_all_sessions()
-        self.ctx.pop()
+
+    @classmethod
+    def reset_indices(cls):
+        elastic_index.clear()
 
     @classmethod
     def reset_db(cls):
-        cls.ctx.push()
-        from app.database import engine, Base
+        from app.database import clear_db
 
-        if not database_exists(engine.url):
-            try:
-                create_database(engine.url)
-            except Exception as e:
-                click.secho(f"Error creating database: {e}")
-                raise e
-
-        else:
-
-            # Delete all tables in reverse dependency order
-            Base.metadata.bind = engine
-
-            cls.session.commit()
-
-            # Clear out any tables that may have been created
-            for table in reversed(Base.metadata.sorted_tables):
-                try:
-                    # Delete all rows in the table
-                    # engine.execute(table.delete())
-                    cls.session.execute(table.delete())
-                    cls.session.commit()
-                except Exception as e:
-                    click.secho(f"Error cleaning table {table.name}: {e}")
-
-            # Delete the database itself
-            try:
-                # Base.metadata.drop_all(bind=engine)
-                cls.app.db.drop_all(app=cls.app)
-            except Exception as e:
-                click.secho(f"Error deleting database: {e}")
-
-        try:
-            # Recreate the database
-            # Base.metadata.create_all(bind=engine)
-            cls.app.db.create_all(app=cls.app)
-        except Exception as e:
-            click.secho(f"Error connecting to database: {e}")
-
-        cls.ctx.pop()
+        # Clear out any tables that may have been created
+        clear_db()
 
     def logged_in_headers(self, user=None) -> dict[str, str]:
 

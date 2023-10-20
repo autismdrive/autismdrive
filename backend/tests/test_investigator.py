@@ -1,5 +1,4 @@
-from app.model.investigator import Investigator
-from app.model.study import StudyInvestigator
+from app.models import Investigator, StudyInvestigator
 from tests.base_test import BaseTest
 
 

@@ -2,10 +2,8 @@ import datetime
 
 from app.email_prompt_service import EmailPromptService
 from app.email_service import TEST_MESSAGES
-from app.model.email_log import EmailLog
-from app.model.participant import Relationship
-from app.model.study import Study
-from app.model.user import User
+from app.models import EmailLog, Study, User
+from app.enums import Relationship
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 

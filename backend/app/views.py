@@ -1,6 +1,3 @@
-import flask_restful
-from flask import jsonify
-
 from app.resources.AdminNoteEndpoint import (
     AdminNoteListByUserEndpoint,
     AdminNoteListByResourceEndpoint,
@@ -107,15 +104,6 @@ from app.resources.UserFavoriteEndpoint import (
 )
 from app.resources.UserMetaEndpoint import UserMetaEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
-
-
-class StarDriveApi(flask_restful.Api):
-    # Define a custom error handler for all rest endpoints that
-    # properly handles the RestException status.
-    def handle_error(self, e):
-        response = jsonify(e.to_dict())
-        response.status_code = e.status_code
-        flask_restful.abort(e.status_code, response)
 
 
 endpoints = [

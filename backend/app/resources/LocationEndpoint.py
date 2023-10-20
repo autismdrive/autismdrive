@@ -7,13 +7,10 @@ from marshmallow import ValidationError
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.event import Event
-from app.model.geocode import Geocode
-from app.model.location import Location
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.role import Permission
+from app.models import Location, Event, Geocode, ResourceChangeLog
+from app.enums import Permission
 from app.rest_exception import RestException
-from app.schema.schema import LocationSchema
+from app.schemas import LocationSchema
 from app.wrappers import requires_permission
 
 

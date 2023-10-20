@@ -5,13 +5,10 @@ from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
-from app.model.category import Category
-from app.model.resource import ResourceCategory
-from app.model.role import Permission
-from app.model.study import StudyCategory
-from app.model.user_favorite import UserFavorite
+from app.models import Category, ResourceCategory, StudyCategory, UserFavorite
+from app.enums import Permission
 from app.rest_exception import RestException
-from app.schema.schema import CategorySchema, ParentCategorySchema
+from app.schemas import CategorySchema, ParentCategorySchema
 from app.wrappers import requires_permission
 
 

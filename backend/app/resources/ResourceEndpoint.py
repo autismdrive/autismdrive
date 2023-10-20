@@ -8,15 +8,11 @@ from marshmallow import ValidationError
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.admin_note import AdminNote
-from app.model.event import Event
-from app.model.location import Location
-from app.model.resource import Resource, ResourceCategory
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.role import Permission
-from app.model.user_favorite import UserFavorite
+from app.models import AdminNote, Resource, ResourceCategory, Location, Event, UserFavorite, ResourceChangeLog
+from app.models import ResourceCategory
+from app.enums import Permission
 from app.rest_exception import RestException
-from app.schema.schema import ResourceSchema
+from app.schemas import ResourceSchema
 from app.wrappers import requires_permission
 
 

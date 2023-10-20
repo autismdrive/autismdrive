@@ -1,9 +1,9 @@
 import flask_restful
 
 from app.auth import auth
-from app.database import session
+from app.database import session, get_class
+from app.enums import Permission
 from app.export_service import ExportService
-from app.model.role import Permission
 from app.wrappers import requires_permission
 
 
@@ -20,7 +20,7 @@ class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, name, participant_id):
-        class_ref = ExportService.get_class(name)
+        class_ref = get_class(name)
         schema = ExportService.get_schema(name, many=True)
         questionnaires = session.query(class_ref).filter(class_ref.participant_id == participant_id).all()
         return schema.dump(questionnaires)

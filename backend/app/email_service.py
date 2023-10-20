@@ -79,12 +79,12 @@ class EmailService:
         ga_link = self.generate_google_analytics_link_content("reset_password", days)
         studies_ga_link = self.generate_google_analytics_link_content("reset_password_studies", days)
         subject = "Autism DRIVE: Confirm Email"
-        confirm_url = settings.FRONTEND_EMAIL_RESET + role + token + ga_link
+        confirm_url = settings.SITE_URL + settings.FRONTEND_EMAIL_RESET + role + token + ga_link
         text_body = render_template(
             "confirm_email.txt",
             user=user,
             confirm_url=confirm_url,
-            forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD + ga_link,
+            forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD + ga_link,
             tracking_code=tracking_code,
             current_studies=current_studies,
             studies_url=self.site_url + "/#/studies/currently_enrolling" + studies_ga_link,
@@ -94,7 +94,7 @@ class EmailService:
             "confirm_email.html",
             user=user,
             confirm_url=confirm_url,
-            forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD + ga_link,
+            forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD + ga_link,
             logo_url=logo_url,
             tracking_code=tracking_code,
             current_studies=current_studies,
@@ -125,13 +125,13 @@ class EmailService:
         tracking_code = self.tracking_code()
 
         subject = "Autism DRIVE: Password Reset Email"
-        reset_url = settings.FRONTEND_EMAIL_RESET + role + token
+        reset_url = settings.SITE_URL + settings.FRONTEND_EMAIL_RESET + role + token
         logo_url = url_for("track.logo", user_id=user.id, code=tracking_code, _external=True)
         text_body = render_template(
             "reset_email.txt",
             user=user,
             reset_url=reset_url,
-            forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD,
+            forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD,
             tracking_code=tracking_code,
         )
 
@@ -139,7 +139,7 @@ class EmailService:
             "reset_email.html",
             user=user,
             reset_url=reset_url,
-            forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD,
+            forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD,
             logo_url=logo_url,
             tracking_code=tracking_code,
         )
@@ -208,7 +208,7 @@ class EmailService:
             text_body = render_template(
                 "complete_registration_email.txt",
                 profile_url=settings.SITE_URL + "/#/profile" + ga_link,
-                forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD + ga_link,
+                forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD + ga_link,
                 current_studies=current_studies,
                 studies_url=self.site_url + "/#/studies/currently_enrolling" + studies_ga_link,
             )
@@ -216,7 +216,7 @@ class EmailService:
             html_body = render_template(
                 "complete_registration_email.html",
                 profile_url=settings.SITE_URL + "/#/profile" + ga_link,
-                forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD + ga_link,
+                forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD + ga_link,
                 logo_url=logo_url,
                 tracking_code=tracking_code,
                 current_studies=current_studies,
@@ -240,7 +240,7 @@ class EmailService:
             text_body = render_template(
                 "complete_dependent_profile_email.txt",
                 profile_url=settings.SITE_URL + "/#/profile" + ga_link,
-                forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD + ga_link,
+                forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD + ga_link,
                 current_studies=current_studies,
                 studies_url=self.site_url + "/#/studies/currently_enrolling" + studies_ga_link,
             )
@@ -248,7 +248,7 @@ class EmailService:
             html_body = render_template(
                 "complete_dependent_profile_email.html",
                 profile_url=settings.SITE_URL + "/#/profile" + ga_link,
-                forgot_pass_url=settings.FRONTEND_FORGOT_PASSWORD + ga_link,
+                forgot_pass_url=settings.SITE_URL + settings.FRONTEND_FORGOT_PASSWORD + ga_link,
                 logo_url=logo_url,
                 tracking_code=tracking_code,
                 current_studies=current_studies,

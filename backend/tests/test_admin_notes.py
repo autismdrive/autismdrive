@@ -1,4 +1,4 @@
-from app.model.admin_note import AdminNote
+from app.models import AdminNote
 from tests.base_test import BaseTest
 
 

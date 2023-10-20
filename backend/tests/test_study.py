@@ -1,9 +1,8 @@
 from app.email_service import TEST_MESSAGES
-from app.model.email_log import EmailLog
-from app.model.participant import Relationship
-from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
-from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
-from app.model.study import Study, StudyInvestigator, StudyCategory
+from app.models import EmailLog, Study, StudyInvestigator, StudyCategory, ContactQuestionnaire
+from app.enums import Relationship
+from app.models import IdentificationQuestionnaire
+from app.models import StudyCategory
 from tests.base_test import BaseTest
 
 

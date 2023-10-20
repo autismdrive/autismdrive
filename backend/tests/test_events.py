@@ -1,9 +1,7 @@
 from unittest.mock import patch
 
-from app.model.event import Event
-from app.model.resource import ResourceCategory
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.user import Role
+from app.models import ResourceCategory, Event, ResourceChangeLog
+from app.enums import Role
 from tests.base_test import BaseTest
 from utils import MockGoogleMapsClient
 

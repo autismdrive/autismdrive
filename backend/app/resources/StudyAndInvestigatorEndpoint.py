@@ -2,10 +2,10 @@ import flask_restful
 from flask import request
 
 from app.database import session
-from app.model.investigator import Investigator
-from app.model.study import Study, StudyInvestigator
+from app.models import Investigator, Study, StudyInvestigator
+from app.models import StudyInvestigator
 from app.rest_exception import RestException
-from app.schema.schema import StudyInvestigatorSchema, InvestigatorStudiesSchema, StudyInvestigatorsSchema
+from app.schemas import StudyInvestigatorSchema, InvestigatorStudiesSchema, StudyInvestigatorsSchema
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):

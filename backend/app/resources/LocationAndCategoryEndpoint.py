@@ -3,11 +3,9 @@ from flask import request
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.category import Category
-from app.model.location import Location
-from app.model.resource import ResourceCategory
+from app.models import Category, ResourceCategory, Location
 from app.rest_exception import RestException
-from app.schema.schema import LocationCategorySchema, CategoryLocationsSchema, LocationCategoriesSchema
+from app.schemas import LocationCategorySchema, CategoryLocationsSchema, LocationCategoriesSchema
 
 
 class LocationByCategoryEndpoint(flask_restful.Resource):

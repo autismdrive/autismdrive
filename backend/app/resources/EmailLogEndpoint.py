@@ -1,12 +1,11 @@
-import flask.scaffold
 import flask_restful
 
 from app.auth import auth
 from app.database import session
-from app.model.email_log import EmailLog
-from app.model.email_log import EmailLogSchema
-from app.model.role import Role, Permission
-from app.schema.schema import EmailLogSchema
+from app.models import EmailLog
+from app.schemas import EmailLogSchema
+from app.enums import Permission, Role
+from app.schemas import EmailLogSchema
 from app.wrappers import requires_roles, requires_permission
 
 

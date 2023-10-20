@@ -5,22 +5,9 @@ import googlemaps
 from sqlalchemy import Sequence
 
 from app.elastic_index import elastic_index
-from app.model.admin_note import AdminNote
-from app.model.age_range import AgeRange
-from app.model.category import Category
-from app.model.chain_step import ChainStep
-from app.model.event import Event, EventUser
-from app.model.investigator import Investigator
-from app.model.location import Location
-from app.model.participant import Participant
-from app.model.questionnaires.chain_session import ChainSessionStep
-from app.model.resource import Resource, ResourceCategory
-from app.model.study import Study, Status, StudyInvestigator, StudyCategory, StudyUser
-from app.model.user import User
-from app.model.user_favorite import UserFavorite
-from app.model.zip_code import ZipCode
+from app.enums import Status
 from config.load import settings
-from .database import session, engine, Base
+from .database import session
 
 
 class DataLoader:
@@ -55,6 +42,8 @@ class DataLoader:
         print("Data loader initialized")
 
     def load_categories(self):
+        from .models import Category
+
         with open(self.category_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -69,6 +58,12 @@ class DataLoader:
         print("Categories loaded.  There are now %i categories in the database." % session.query(Category).count())
 
     def load_events(self):
+        from .models import AgeRange
+        from .models import EventUser
+        from .models import Event
+        from .models import ResourceCategory
+        from .models import Resource
+
         with open(self.event_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -138,6 +133,11 @@ class DataLoader:
         print("There are now %i links between events and users in the database." % session.query(EventUser).count())
 
     def load_locations(self):
+        from .models import AgeRange
+        from .models import Location
+        from .models import ResourceCategory
+        from .models import Resource
+
         with open(self.location_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -196,6 +196,10 @@ class DataLoader:
         )
 
     def load_resources(self):
+        from .models import AgeRange
+        from .models import ResourceCategory
+        from .models import Resource
+
         with open(self.resource_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -238,6 +242,12 @@ class DataLoader:
         )
 
     def load_studies(self):
+        from .models import AgeRange
+        from .models import Investigator
+        from .models import StudyCategory
+        from .models import StudyInvestigator
+        from .models import Study
+
         with open(self.study_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -306,6 +316,8 @@ class DataLoader:
         session.commit()
 
     def load_users(self):
+        from .models import User
+
         with open(self.user_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -317,6 +329,8 @@ class DataLoader:
         session.commit()
 
     def load_participants(self):
+        from .models import Participant
+
         with open(self.participant_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
             next(reader, None)  # skip the headers
@@ -332,6 +346,8 @@ class DataLoader:
         session.commit()
 
     def load_zip_codes(self):
+        from .models import ZipCode
+
         items = []
         with open(self.zip_code_coords_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -344,6 +360,8 @@ class DataLoader:
         print("ZIP codes loaded.  There are now %i ZIP codes in the database." % session.query(ZipCode).count())
 
     def load_partial_zip_codes(self):
+        from .models import ZipCode
+
         items = []
         with open(self.zip_code_coords_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -357,6 +375,8 @@ class DataLoader:
         print("ZIP codes loaded.  There are now %i ZIP codes in the database." % session.query(ZipCode).count())
 
     def load_chain_steps(self):
+        from .models import ChainStep
+
         items = []
         with open(self.chain_steps_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -372,6 +392,8 @@ class DataLoader:
         )
 
     def get_category_by_name(self, category_name, parent=None, create_missing=False):
+        from .models import Category
+
         category = session.query(Category).filter(Category.name == category_name).first()
         if category is None:
             if create_missing:
@@ -411,6 +433,9 @@ class DataLoader:
         return {"lat": lat, "lng": lng}
 
     def build_index(self):
+        from .models import Resource
+        from .models import Study
+
         elastic_index.load_documents(
             resources=session.query(Resource).filter(Resource.type == "resource").all(),
             events=session.query(Resource).filter(Resource.type == "event").all(),
@@ -423,12 +448,28 @@ class DataLoader:
         elastic_index.clear()
 
     def clear(self):
-        Base.metadata.bind = engine
-        for table in reversed(Base.metadata.sorted_tables):
-            session.execute(table.delete())
-        session.commit()
+        from .database import clear_db
+
+        clear_db()
 
     def clear_resources(self):
+        from .models import AdminNote
+        from .models import Category
+        from .models import ChainStep
+        from .models import EventUser
+        from .models import Event
+        from .models import Investigator
+        from .models import Location
+        from app.models import ChainSessionStep
+        from .models import ResourceCategory
+        from .models import Resource
+        from .models import StudyUser
+        from .models import StudyCategory
+        from .models import StudyInvestigator
+        from .models import Study
+        from .models import UserFavorite
+        from .models import ZipCode
+
         session.query(AdminNote).delete()
         session.query(ResourceCategory).delete()
         session.query(UserFavorite).delete()

@@ -5,12 +5,13 @@ from flask import request
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
-from app.database import session
+from app.database import session, get_class
+from app.enums import Permission
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
-from app.model.export_info import ExportInfoSchema
-from app.model.role import Permission
 from app.rest_exception import RestException
+from app.schemas import ExportInfoSchema
+from app.utils import camel_case_it
 from app.wrappers import requires_permission
 
 
@@ -39,8 +40,8 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
         Returns: A single questionnaire record.
         """
-        name = ExportService.camel_case_it(name)
-        class_ref = ExportService.get_class(name)
+        name = camel_case_it(name)
+        class_ref = get_class(name)
         instance = session.query(class_ref).filter(class_ref.id == id).first()
         if instance is None:
             raise RestException(RestException.NOT_FOUND)
@@ -61,8 +62,8 @@ class QuestionnaireEndpoint(flask_restful.Resource):
             id (int): ID of the questionnaire record to delete
         """
         try:
-            name = ExportService.camel_case_it(name)
-            class_ref = ExportService.get_class(name)
+            name = camel_case_it(name)
+            class_ref = get_class(name)
             instance = session.query(class_ref).filter(class_ref.id == id).first()
             session.delete(instance)
             #            session.query(class_ref).filter(class_ref.id == id).delete()
@@ -86,10 +87,10 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
         Returns: The updated questionnaire record.
         """
-        name = ExportService.camel_case_it(name)
-        class_ref = ExportService.get_class(name)
+        name = camel_case_it(name)
+        class_ref = get_class(name)
         instance = session.query(class_ref).filter(class_ref.id == id).first()
-        schema = ExportService.get_schema(name, session=session)
+        schema = ExportService.get_schema(name)
         request_data = request.get_json()
         if "_links" in request_data:
             request_data.pop("_links")
@@ -109,8 +110,8 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.data_admin)
     def get(self, name):
-        name = ExportService.camel_case_it(name)
-        class_ref = ExportService.get_class(name)
+        name = camel_case_it(name)
+        class_ref = get_class(name)
         schema = ExportService.get_schema(name, many=True)
         questionnaires = session.query(class_ref).all()
         return schema.dump(questionnaires)
@@ -139,8 +140,8 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
                 ]
             }
         """
-        name = ExportService.camel_case_it(name)
-        class_ref = ExportService.get_class(name)
+        name = camel_case_it(name)
+        class_ref = get_class(name)
         questionnaire = class_ref()
         meta = {"table": {}}
         try:
@@ -200,7 +201,7 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
     def get(self, name):
         from flask import current_app
 
-        name = ExportService.camel_case_it(name)
+        name = camel_case_it(name)
         if self.request_wants_json():
             schema = ExportService.get_schema(name, many=True)
             return schema.dump(ExportService().get_data(name))
@@ -219,7 +220,7 @@ class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
     def get(self, name, user_id):
         from flask import current_app
 
-        name = ExportService.camel_case_it(name)
+        name = camel_case_it(name)
         if self.request_wants_json():
             schema = ExportService.get_schema(name, many=True)
             return schema.dump(ExportService().get_data(name))

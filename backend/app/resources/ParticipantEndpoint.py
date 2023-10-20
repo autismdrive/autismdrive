@@ -6,11 +6,10 @@ from sqlalchemy import func
 
 from app.auth import auth
 from app.database import session
-from app.model.participant import Participant
-from app.model.role import Role, Permission
-from app.model.user import User
+from app.models import Participant, User
+from app.enums import Permission, Role
 from app.rest_exception import RestException
-from app.schema.schema import ParticipantSchema
+from app.schemas import ParticipantSchema
 from app.wrappers import requires_roles, requires_permission
 
 

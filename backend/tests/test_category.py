@@ -1,4 +1,4 @@
-from app.model.category import Category
+from app.models import Category
 from tests.base_test import BaseTest
 
 

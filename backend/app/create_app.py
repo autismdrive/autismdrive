@@ -2,10 +2,10 @@ import logging.config
 from urllib.parse import unquote
 
 import click
+import flask_restful
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import jsonify, url_for, Blueprint
 from flask_cors import CORS
-from flask_migrate import Migrate
 from flask_restful.reqparse import RequestParser
 
 from app.api_app import APIApp
@@ -16,7 +16,7 @@ from app.email_service import EmailService
 from app.resources.Auth import auth_blueprint
 from app.resources.Tracking import tracking_blueprint
 from app.rest_exception import RestException
-from app.views import StarDriveApi, endpoints
+from app.views import endpoints
 from config.logging import logging_config
 
 
@@ -31,29 +31,20 @@ def create_app(settings=None):
 
     _app.config.from_object(settings)
 
-    # Database Configuration
-    from app.database import db
-
-    _app.db = db
-    _app.db.init_app(_app)
-    _app.session = _app.db.session
-
     # Enable CORS
     if settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
         origins_re = [r"^https?:\/\/%s(.*)" % o.replace(".", "\.") for o in settings.CORS_ALLOW_ORIGINS]
-        cors = CORS(_app, origins=origins_re)
+        CORS(_app, origins=origins_re)
 
-    # Flask-Marshmallow provides HATEOAS links
-    from app.schema.ma import ma
+    from app.schemas import ma
+    from app.database import session
 
+    _app.session = session
     _app.ma = ma
     _app.ma.init_app(_app)
-    _app.ma.SQLAlchemySchema.OPTIONS_CLASS.session = _app.db.session
-    _app.ma.SQLAlchemyAutoSchema.OPTIONS_CLASS.session = _app.db.session
-
-    # Database Migrations
-    _app.migrate = Migrate(_app, _app.db, compare_type=True)
+    _app.ma.SQLAlchemySchema.OPTIONS_CLASS.session = session
+    _app.ma.SQLAlchemyAutoSchema.OPTIONS_CLASS.session = session
 
     # email service
     _app.email_service = EmailService()
@@ -124,9 +115,10 @@ def create_app(settings=None):
     @_app.cli.command()
     def cleardb():
         """Delete all information from the database."""
-        click.echo("Clearing out the database")
+        from app.database import clear_db
 
-        data_loader.clear()
+        click.echo("Clearing out the database")
+        clear_db()
 
     @_app.cli.command()
     def initindex():
@@ -144,9 +136,11 @@ def create_app(settings=None):
     @_app.cli.command()
     def reset():
         """Remove all data and recreate it from the example data files"""
+        from app.database import clear_db
+
         click.echo("Rebuilding the databases from the example data files")
         data_loader.clear_index()
-        data_loader.clear()
+        clear_db()
         _load_data()
         data_loader.build_index()
 
@@ -200,9 +194,9 @@ def create_app(settings=None):
             click.echo("This system is not configured to run exports. Ingoring.")
 
     def schedule_tasks():
-        from app.model.user import User
-        from app.model.study import Study
-        from app.model.email_log import EmailLog
+        from app.models import User
+        from app.models import Study
+        from app.models import EmailLog
         from app.export_service import ExportService
         from app.import_service import ImportService
 
@@ -236,7 +230,7 @@ def create_app(settings=None):
             )
 
     api_blueprint = Blueprint("api", __name__, url_prefix="/api")
-    api = StarDriveApi(api_blueprint)
+    api = flask_restful.Api(api_blueprint)
     _app.register_blueprint(api_blueprint)
     _app.register_blueprint(auth_blueprint)
     _app.register_blueprint(tracking_blueprint)
@@ -263,7 +257,15 @@ def create_app(settings=None):
         api.add_resource(endpoint[0], endpoint[1])
 
     # Cron scheduler
-    if not _app.got_first_request:
-        schedule_tasks()
+    schedule_tasks()
+
+    @_app.teardown_appcontext
+    def shutdown_session(exception=None):
+        """Enable Flask to automatically remove database sessions at the
+        end of the request or when the application shuts down.
+        """
+        from app.database import session
+
+        session.remove()
 
     return _app

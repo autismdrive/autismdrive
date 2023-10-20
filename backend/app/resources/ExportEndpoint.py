@@ -6,12 +6,11 @@ from sqlalchemy import desc
 
 from app.auth import auth
 from app.database import session
+from app.enums import Role
 from app.export_service import ExportService
-from app.model.data_transfer_log import DataTransferLog, DataTransferLogDetail
-from app.model.export_info import ExportInfoSchema
-from app.model.role import Role
-from app.model.user import User
-from app.schema.export_schema import AdminExportSchema
+from app.models import DataTransferLog, DataTransferLogDetail, User
+from app.schemas import ExportSchemas, ExportInfoSchema
+from app.utils import camel_case_it
 from app.wrappers import requires_roles
 
 
@@ -31,13 +30,13 @@ class ExportEndpoint(flask_restful.Resource):
         if name == "admin":
             return self.get_admin()
 
-        name = ExportService.camel_case_it(name)
+        name = camel_case_it(name)
         schema = ExportService.get_schema(name, many=True)
         return schema.dump(ExportService().get_data(name, last_updated=get_date_arg()))
 
     def get_admin(self):
         query = session.query(User).filter(User.role == Role.admin)
-        schema = AdminExportSchema(many=True)
+        schema = ExportSchemas.AdminExportSchema(many=True)
         return schema.dump(query.all())
 
 

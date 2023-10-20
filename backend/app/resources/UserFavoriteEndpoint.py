@@ -3,9 +3,9 @@ from flask import request
 
 from app.auth import auth
 from app.database import session
-from app.model.user_favorite import UserFavorite
+from app.models import UserFavorite
 from app.rest_exception import RestException
-from app.schema.schema import UserFavoriteSchema
+from app.schemas import UserFavoriteSchema
 
 
 class FavoritesByUserEndpoint(flask_restful.Resource):

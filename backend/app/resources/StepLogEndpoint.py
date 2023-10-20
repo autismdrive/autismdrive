@@ -2,9 +2,9 @@ import flask_restful
 
 from app.auth import auth
 from app.database import session
-from app.model.role import Role, Permission
-from app.model.step_log import StepLog
-from app.schema.schema import StepLogSchema
+from app.enums import Permission, Role
+from app.models import StepLog
+from app.schemas import StepLogSchema
 from app.wrappers import requires_roles, requires_permission
 
 

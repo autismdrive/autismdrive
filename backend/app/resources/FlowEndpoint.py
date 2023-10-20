@@ -5,13 +5,12 @@ from flask import request, g
 from marshmallow import ValidationError
 
 from app.auth import auth
-from app.database import session
+from app.database import session, get_class
 from app.export_service import ExportService
-from app.model.flows import Flows
-from app.model.participant import Participant
-from app.model.step_log import StepLog
+from app.models import Flows, Participant, StepLog
 from app.rest_exception import RestException
-from app.schema.schema import FlowSchema
+from app.schemas import FlowSchema
+from app.utils import camel_case_it
 
 
 class FlowEndpoint(flask_restful.Resource):
@@ -40,11 +39,11 @@ class FlowListEndpoint(flask_restful.Resource):
 
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
     def get(self, flow, questionnaire_name):
-        questionnaire_name = ExportService.camel_case_it(questionnaire_name)
+        questionnaire_name = camel_case_it(questionnaire_name)
         flow = Flows.get_flow_by_name(flow)
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
-        class_ref = ExportService.get_class(questionnaire_name)
+        class_ref = get_class(questionnaire_name)
         questionnaire = class_ref()
         return ExportService.get_meta(questionnaire, flow.relationship)
 
@@ -63,7 +62,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         request_data["user_id"] = g.user.id
         if "_links" in request_data:
             request_data.pop("_links")
-        schema = ExportService.get_schema(ExportService.camel_case_it(questionnaire_name))
+        schema = ExportService.get_schema(camel_case_it(questionnaire_name))
 
         try:
             new_quest = schema.load(request_data, session=session)

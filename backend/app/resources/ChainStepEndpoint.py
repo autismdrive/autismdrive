@@ -6,11 +6,10 @@ from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
 from app.database import session
-from app.model.chain_step import ChainStep
-from app.model.questionnaires.chain_session import ChainSessionStep
-from app.model.role import Permission
+from app.models import ChainStep, ChainSessionStep
+from app.enums import Permission
 from app.rest_exception import RestException
-from app.schema.chain_step_schema import ChainStepSchema
+from app.schemas import ChainStepSchema
 from app.wrappers import requires_permission
 
 

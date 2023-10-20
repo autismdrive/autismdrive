@@ -7,9 +7,9 @@ from sqlalchemy import exc
 
 from app.auth import auth
 from app.database import session
-from app.model.user_meta import UserMeta
+from app.models import UserMeta
 from app.rest_exception import RestException
-from app.schema.schema import UserMetaSchema
+from app.schemas import UserMetaSchema
 
 
 class UserMetaEndpoint(flask_restful.Resource):

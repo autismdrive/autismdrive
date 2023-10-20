@@ -1,9 +1,9 @@
 import flask_restful
 
 from app.database import session
-from app.model.zip_code import ZipCode
+from app.models import ZipCode
 from app.rest_exception import RestException
-from app.schema.schema import ZipCodeSchema
+from app.schemas import ZipCodeSchema
 
 
 class ZipCodeCoordsEndpoint(flask_restful.Resource):

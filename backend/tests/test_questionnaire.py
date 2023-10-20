@@ -106,7 +106,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_questionnionare_post_creates_log_record(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -120,7 +120,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=headers,
         )
         self.assert_success(rv)
-        from app.model.step_log import StepLog
+        from app.models import StepLog
 
         log = self.session.query(StepLog).all()
         self.assertIsNotNone(log)
@@ -128,7 +128,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
-        from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
+        from app.models import ClinicalDiagnosesQuestionnaire
 
         cq = self.session.query(ClinicalDiagnosesQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -147,7 +147,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
-        from app.model.questionnaires.clinical_diagnoses_questionnaire import ClinicalDiagnosesQuestionnaire
+        from app.models import ClinicalDiagnosesQuestionnaire
 
         cq = self.session.query(ClinicalDiagnosesQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -209,7 +209,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_clinical_diagnoses_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -230,7 +230,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
-        from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+        from app.models import ContactQuestionnaire
 
         cq = self.session.query(ContactQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -249,7 +249,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
-        from app.model.questionnaires.contact_questionnaire import ContactQuestionnaire
+        from app.models import ContactQuestionnaire
 
         cq = self.session.query(ContactQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -300,7 +300,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_contact_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -321,9 +321,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_current_behaviors_dependent_questionnaire_basics(self):
         self.construct_current_behaviors_dependent_questionnaire()
-        from app.model.questionnaires.current_behaviors_dependent_questionnaire import (
-            CurrentBehaviorsDependentQuestionnaire,
-        )
+        from app.models import CurrentBehaviorsDependentQuestionnaire
 
         cbdq = self.session.query(CurrentBehaviorsDependentQuestionnaire).first()
         self.assertIsNotNone(cbdq)
@@ -342,9 +340,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_current_behaviors_dependent_questionnaire_basics(self):
         self.construct_current_behaviors_dependent_questionnaire()
-        from app.model.questionnaires.current_behaviors_dependent_questionnaire import (
-            CurrentBehaviorsDependentQuestionnaire,
-        )
+        from app.models import CurrentBehaviorsDependentQuestionnaire
 
         cbdq = self.session.query(CurrentBehaviorsDependentQuestionnaire).first()
         self.assertIsNotNone(cbdq)
@@ -405,7 +401,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_current_behaviors_dependent_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.dependent)
         headers = self.logged_in_headers(u)
@@ -430,7 +426,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_current_behaviors_self_questionnaire_basics(self):
         self.construct_current_behaviors_self_questionnaire()
-        from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
+        from app.models import CurrentBehaviorsSelfQuestionnaire
 
         cbsq = self.session.query(CurrentBehaviorsSelfQuestionnaire).first()
         self.assertIsNotNone(cbsq)
@@ -448,7 +444,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_current_behaviors_self_questionnaire_basics(self):
         self.construct_current_behaviors_self_questionnaire()
-        from app.model.questionnaires.current_behaviors_self_questionnaire import CurrentBehaviorsSelfQuestionnaire
+        from app.models import CurrentBehaviorsSelfQuestionnaire
 
         cbsq = self.session.query(CurrentBehaviorsSelfQuestionnaire).first()
         self.assertIsNotNone(cbsq)
@@ -509,7 +505,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_current_behaviors_self_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -534,7 +530,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_demographics_questionnaire_basics(self):
         self.construct_demographics_questionnaire()
-        from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+        from app.models import DemographicsQuestionnaire
 
         dq = self.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -553,7 +549,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_demographics_questionnaire_basics(self):
         self.construct_demographics_questionnaire()
-        from app.model.questionnaires.demographics_questionnaire import DemographicsQuestionnaire
+        from app.models import DemographicsQuestionnaire
 
         dq = self.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -615,7 +611,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_demographics_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -636,7 +632,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_developmental_questionnaire_basics(self):
         self.construct_developmental_questionnaire()
-        from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
+        from app.models import DevelopmentalQuestionnaire
 
         dq = self.session.query(DevelopmentalQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -655,7 +651,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_developmental_questionnaire_basics(self):
         self.construct_developmental_questionnaire()
-        from app.model.questionnaires.developmental_questionnaire import DevelopmentalQuestionnaire
+        from app.models import DevelopmentalQuestionnaire
 
         dq = self.session.query(DevelopmentalQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -719,7 +715,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_developmental_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.dependent)
         headers = self.logged_in_headers(u)
@@ -744,7 +740,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_education_dependent_questionnaire_basics(self):
         self.construct_education_dependent_questionnaire()
-        from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
+        from app.models import EducationDependentQuestionnaire
 
         eq = self.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -763,7 +759,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_education_dependent_questionnaire_basics(self):
         self.construct_education_dependent_questionnaire()
-        from app.model.questionnaires.education_dependent_questionnaire import EducationDependentQuestionnaire
+        from app.models import EducationDependentQuestionnaire
 
         eq = self.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -827,7 +823,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_education_dependent_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -852,7 +848,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_education_self_questionnaire_basics(self):
         self.construct_education_self_questionnaire()
-        from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
+        from app.models import EducationSelfQuestionnaire
 
         eq = self.session.query(EducationSelfQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -871,7 +867,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_education_self_questionnaire_basics(self):
         self.construct_education_self_questionnaire()
-        from app.model.questionnaires.education_self_questionnaire import EducationSelfQuestionnaire
+        from app.models import EducationSelfQuestionnaire
 
         eq = self.session.query(EducationSelfQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -935,7 +931,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_education_self_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -960,7 +956,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_employment_questionnaire_basics(self):
         self.construct_employment_questionnaire()
-        from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
+        from app.models import EmploymentQuestionnaire
 
         eq = self.session.query(EmploymentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -980,7 +976,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_employment_questionnaire_basics(self):
         self.construct_employment_questionnaire()
-        from app.model.questionnaires.employment_questionnaire import EmploymentQuestionnaire
+        from app.models import EmploymentQuestionnaire
 
         eq = self.session.query(EmploymentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -1044,7 +1040,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_employment_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1069,7 +1065,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_evaluation_history_dependent_questionnaire_basics(self):
         self.construct_evaluation_history_dependent_questionnaire()
-        from app.model.questionnaires.evaluation_history_dependent_questionnaire import (
+        from app.models import (
             EvaluationHistoryDependentQuestionnaire,
         )
 
@@ -1090,7 +1086,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_evaluation_history_dependent_questionnaire_basics(self):
         self.construct_evaluation_history_dependent_questionnaire()
-        from app.model.questionnaires.evaluation_history_dependent_questionnaire import (
+        from app.models import (
             EvaluationHistoryDependentQuestionnaire,
         )
 
@@ -1153,7 +1149,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_evaluation_history_dependent_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
@@ -1178,7 +1174,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_evaluation_history_self_questionnaire_basics(self):
         self.construct_evaluation_history_self_questionnaire()
-        from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
+        from app.models import EvaluationHistorySelfQuestionnaire
 
         ehq = self.session.query(EvaluationHistorySelfQuestionnaire).first()
         self.assertIsNotNone(ehq)
@@ -1197,7 +1193,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_evaluation_history_self_questionnaire_basics(self):
         self.construct_evaluation_history_self_questionnaire()
-        from app.model.questionnaires.evaluation_history_self_questionnaire import EvaluationHistorySelfQuestionnaire
+        from app.models import EvaluationHistorySelfQuestionnaire
 
         ehq = self.session.query(EvaluationHistorySelfQuestionnaire).first()
         self.assertIsNotNone(ehq)
@@ -1258,7 +1254,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_evaluation_history_self_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
@@ -1283,7 +1279,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_home_dependent_questionnaire_basics(self):
         self.construct_home_dependent_questionnaire()
-        from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
+        from app.models import HomeDependentQuestionnaire
 
         hq = self.session.query(HomeDependentQuestionnaire).first()
         self.assertIsNotNone(hq)
@@ -1305,7 +1301,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_home_dependent_questionnaire_basics(self):
         self.construct_home_dependent_questionnaire()
-        from app.model.questionnaires.home_dependent_questionnaire import HomeDependentQuestionnaire
+        from app.models import HomeDependentQuestionnaire
 
         hq = self.session.query(HomeDependentQuestionnaire).first()
         self.assertIsNotNone(hq)
@@ -1316,7 +1312,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=self.logged_in_headers(),
         )
         response = rv.json
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         response["participant_id"] = self.construct_participant(
             user=self.construct_user(), relationship=Relationship.dependent
@@ -1371,7 +1367,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_home_dependent_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1397,7 +1393,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_home_self_questionnaire_basics(self):
         self.construct_home_self_questionnaire()
-        from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
+        from app.models import HomeSelfQuestionnaire
 
         hq = self.session.query(HomeSelfQuestionnaire).first()
         self.assertIsNotNone(hq)
@@ -1419,7 +1415,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_home_self_questionnaire_basics(self):
         self.construct_home_self_questionnaire()
-        from app.model.questionnaires.home_self_questionnaire import HomeSelfQuestionnaire
+        from app.models import HomeSelfQuestionnaire
 
         hq = self.session.query(HomeSelfQuestionnaire).first()
         self.assertIsNotNone(hq)
@@ -1430,7 +1426,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=self.logged_in_headers(),
         )
         response = rv.json
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         response["participant_id"] = self.construct_participant(
             user=self.construct_user(), relationship=Relationship.self_participant
@@ -1485,7 +1481,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_home_self_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1511,7 +1507,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_identification_questionnaire_basics(self):
         self.construct_identification_questionnaire()
-        from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+        from app.models import IdentificationQuestionnaire
 
         iq = self.session.query(IdentificationQuestionnaire).first()
         self.assertIsNotNone(iq)
@@ -1531,7 +1527,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_identification_questionnaire_basics(self):
         self.construct_identification_questionnaire()
-        from app.model.questionnaires.identification_questionnaire import IdentificationQuestionnaire
+        from app.models import IdentificationQuestionnaire
 
         iq = self.session.query(IdentificationQuestionnaire).first()
         self.assertIsNotNone(iq)
@@ -1595,7 +1591,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_identification_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1616,7 +1612,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_supports_questionnaire_basics(self):
         self.construct_supports_questionnaire()
-        from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
+        from app.models import SupportsQuestionnaire
 
         sq = self.session.query(SupportsQuestionnaire).first()
         self.assertIsNotNone(sq)
@@ -1638,7 +1634,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_supports_questionnaire_basics(self):
         self.construct_supports_questionnaire()
-        from app.model.questionnaires.supports_questionnaire import SupportsQuestionnaire
+        from app.models import SupportsQuestionnaire
 
         sq = self.session.query(SupportsQuestionnaire).first()
         self.assertIsNotNone(sq)
@@ -1649,7 +1645,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=self.logged_in_headers(),
         )
         response = rv.json
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         response["participant_id"] = self.construct_participant(
             user=self.construct_user(), relationship=Relationship.self_participant
@@ -1705,7 +1701,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_supports_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1725,7 +1721,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_get_chain_steps(self):
         self.construct_chain_steps()
-        from app.model.chain_step import ChainStep
+        from app.models import ChainStep
 
         chain_step = self.session.query(ChainStep).first()
         self.assertIsNotNone(chain_step)
@@ -1746,7 +1742,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_chain_session_questionnaire_basics(self):
         self.construct_chain_session_questionnaire()
-        from app.model.questionnaires.chain_session import ChainQuestionnaire
+        from app.models import ChainQuestionnaire
 
         cq = self.session.query(ChainQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -1773,11 +1769,11 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_chain_session_questionnaire_basics(self):
         user = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         participant = self.construct_participant(user=user, relationship=Relationship.self_participant)
         self.construct_chain_session_questionnaire()
-        from app.model.questionnaires.chain_session import ChainQuestionnaire
+        from app.models import ChainQuestionnaire
 
         cq = self.session.query(ChainQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -1858,7 +1854,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertTrue("target_prompt_level" in step_attempt_after)
 
         self.assertEqual(step_attempt_before["prompt_level"], step_attempt_after["prompt_level"])
-        from app.model.questionnaires.chain_session import ChallengingBehavior
+        from app.models import ChallengingBehavior
 
         all_cbs = self.session.query(ChallengingBehavior).all()
         self.assertEqual(len(all_cbs), 3)
@@ -1931,7 +1927,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_create_chain_session_questionnaire(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1978,7 +1974,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_self_intake_flow_with_user(self):
         u = self.construct_user()
-        from app.model.participant_relationship import Relationship
+        from app.enums import Relationship
 
         p = self.construct_participant(user=u, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
@@ -1991,7 +1987,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertTrue(len(response["steps"]) > 0)
         self.assertEqual("identification_questionnaire", response["steps"][0]["name"])
         self.assertEqual(ExportService.TYPE_IDENTIFYING, response["steps"][0]["type"])
-        from app.model.flow import Step
+        from app.models import Step
 
         self.assertEqual(Step.STATUS_INCOMPLETE, response["steps"][0]["status"])
 

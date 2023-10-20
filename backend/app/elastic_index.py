@@ -1,5 +1,7 @@
+from __future__ import annotations
 import logging
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from dateutil import tz
 from elasticsearch import RequestError, Elasticsearch
@@ -23,14 +25,13 @@ from elasticsearch_dsl import (
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
 
-from app.model.event import Event
-from app.model.location import Location
-from app.model.resource import Resource
-from app.model.role import Permission
-from app.model.study import Study
 from config.load import settings
 
-DatabaseObject = Event | Resource | Location | Study
+if TYPE_CHECKING:
+    from app.models import Resource, Location, Event, Study
+    from app.enums import Permission
+
+    DatabaseObject = Event | Resource | Location | Study
 
 autocomplete = analyzer(
     "autocomplete",

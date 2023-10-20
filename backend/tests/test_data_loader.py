@@ -3,16 +3,24 @@ from datetime import datetime
 from unittest.mock import patch
 
 from app.elastic_index import elastic_index
-from app.model.category import Category
-from app.model.chain_step import ChainStep
-from app.model.event import Event
-from app.model.location import Location
-from app.model.participant import Participant
-from app.model.resource import Resource, ResourceCategory
-from app.model.search import Search
-from app.model.study import Study, StudyCategory
-from app.model.user import User
-from app.model.zip_code import ZipCode
+from app.models import (
+    Category,
+    ChainStep,
+    Resource,
+    ResourceCategory,
+    Location,
+    Event,
+    Participant,
+    Search,
+    Study,
+    StudyCategory,
+    User,
+    ZipCode,
+)
+from app.models import ResourceCategory
+from app.models import StudyCategory
+from app.models import User
+from app.models import ZipCode
 from tests.base_test import BaseTest
 from utils import MockGoogleMapsClient
 

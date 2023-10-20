@@ -3,10 +3,10 @@ from flask import request
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.model.category import Category
-from app.model.resource import Resource, ResourceCategory
+from app.models import Category, Resource, ResourceCategory
+from app.models import ResourceCategory
 from app.rest_exception import RestException
-from app.schema.schema import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
+from app.schemas import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
 
 
 class ResourceByCategoryEndpoint(flask_restful.Resource):

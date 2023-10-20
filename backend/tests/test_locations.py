@@ -1,7 +1,5 @@
-from app.model.location import Location
-from app.model.resource import ResourceCategory
-from app.model.resource_change_log import ResourceChangeLog
-from app.model.user import Role
+from app.models import ResourceCategory, Location, ResourceChangeLog
+from app.enums import Role
 from tests.base_test import BaseTest
 
 

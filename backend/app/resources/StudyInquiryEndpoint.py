@@ -4,9 +4,9 @@ from flask import request
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
-from app.model.email_log import EmailLog
-from app.model.study import Study, StudyUserStatus, StudyUser
-from app.model.user import User
+from app.models import EmailLog, Study, StudyUser, User
+from app.enums import StudyUserStatus
+from app.models import StudyUser
 from app.rest_exception import RestException
 
 

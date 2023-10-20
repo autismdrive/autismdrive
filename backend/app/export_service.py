@@ -1,15 +1,13 @@
 import datetime
 import importlib
 import logging
-import re
 
 from flask import url_for
 from sqlalchemy import func, desc
 
-from app.database import session, Base
+from app.database import session, Base, get_class_for_table, get_class
 from app.email_service import email_service
-from app.model.data_transfer_log import DataTransferLog
-from app.model.export_info import ExportInfo
+from app.utils import snake_case_it
 
 
 class ExportService:
@@ -17,9 +15,8 @@ class ExportService:
     logger = logging.getLogger("ExportService")
 
     QUESTION_PACKAGE = "app.model.questionnaires"
-    SCHEMA_PACKAGE = "app.schema.schema"
-    APP_PACKAGE = "app.schema"
-    EXPORT_SCHEMA_PACKAGE = "app.schema.export_schema"
+    SCHEMA_PACKAGE = "app.schemas"
+    EXPORT_SCHEMA_CLASS = "ExportSchema"
 
     TYPE_SENSITIVE = "sensitive"
     TYPE_IDENTIFYING = "identifying"
@@ -29,25 +26,10 @@ class ExportService:
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
     @staticmethod
-    def get_class_for_table(table):
-        # Get Python class matching the table name
-
-        for c in Base.registry._class_registry.values():
-            if hasattr(c, "__tablename__") and c.__tablename__ == table.name:
-                return c
-
-    @staticmethod
-    def get_class(class_name):
-        # class_name = ExportService.camel_case_it(name)
-        for c in Base.registry._class_registry.values():
-            if hasattr(c, "__name__") and c.__name__ == class_name:
-                return c
-
-    @staticmethod
-    def get_schema(name, many=False, session=None, is_import=False):
-        model = ExportService.get_class(name)
+    def get_schema(name, many=False, is_import=False):
+        schema_module = importlib.import_module(ExportService.SCHEMA_PACKAGE)
+        model = get_class(name)
         class_name = None if model is None else model.__name__
-        schema_name = ""
         schema_class = None
 
         if class_name is None:
@@ -55,24 +37,15 @@ class ExportService:
 
         if not is_import:
             # Check for an 'ExportSchema'
-            schema_name = class_name + "ExportSchema"
-            schema_class = ExportService.str_to_class(ExportService.EXPORT_SCHEMA_PACKAGE, schema_name)
+            schema_name = f"{class_name}ExportSchema"
+            export_class = getattr(schema_module, ExportService.EXPORT_SCHEMA_CLASS)
+            schema_class = getattr(export_class, schema_name, None)
+
+        schema_name = class_name + "Schema"
 
         # If that doesn't work, then look in the resources schema file.
         if schema_class is None:
-            schema_name = class_name + "Schema"
-            schema_class = ExportService.str_to_class(ExportService.SCHEMA_PACKAGE, schema_name)
-
-        # If that doesn't work, then look in the app.schema package.
-        if schema_class is None:
-            schema_name = class_name + "Schema"
-            package = ExportService.APP_PACKAGE + "." + model.__tablename__ + "_schema"
-            schema_class = ExportService.str_to_class(package, schema_name)
-
-        # If that doesn't work, check for a general schema in the class itself.
-        if schema_class is None:
-            schema_name = class_name + "Schema"
-            schema_class = ExportService.str_to_class(model.__module__, schema_name)
+            schema_class = getattr(schema_module, schema_name, None)
 
         if schema_class is None:
             raise Exception("Unable to locate schema for class " + class_name)
@@ -80,18 +53,8 @@ class ExportService:
         return schema_class(many=many, session=session)
 
     @staticmethod
-    def camel_case_it(name):
-        first, *rest = name.split("_")
-        return first.capitalize() + "".join(word.capitalize() for word in rest)
-
-    @staticmethod
-    def snake_case_it(name):
-        s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
-        return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
-
-    @staticmethod
     def get_data(name, user_id=None, last_updated=None):
-        model = ExportService.get_class(name)
+        model = get_class(name)
         query = session.query(model)
         if last_updated:
             query = query.filter(model.last_updated > last_updated)
@@ -117,12 +80,14 @@ class ExportService:
         sorted_tables.append(sorted_tables.pop(sorted_tables.index(rc)))
 
         for table in sorted_tables:
-            db_model = ExportService.get_class_for_table(table)
+            db_model = get_class_for_table(table)
             export_infos.append(ExportService.get_single_table_info(db_model, last_updated))
         return export_infos
 
     @staticmethod
     def get_single_table_info(db_model, last_updated):
+        from .models import ExportInfo
+
         export_info = ExportInfo(table_name=db_model.__tablename__, class_name=db_model.__name__)
         query = session.query(func.count(db_model.id))
         if last_updated:
@@ -131,7 +96,7 @@ class ExportService:
             query = query.filter(db_model.type == db_model.__mapper_args__["polymorphic_identity"])
 
         export_info.size = query.all()[0][0]
-        export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
+        export_info.url = url_for("api.exportendpoint", name=snake_case_it(db_model.__name__))
         if hasattr(db_model, "__question_type__"):
             export_info.question_type = db_model.__question_type__
         # Do not include sub-tables that will fall through from quiestionnaire schemas,
@@ -148,22 +113,6 @@ class ExportService:
                     export_info.sub_tables.append(ExportService.get_single_table_info(c, last_updated))
 
         return export_info
-
-    @staticmethod
-    def class_exists(module_name, class_name):
-        try:
-            module_ = importlib.import_module(module_name)
-            try:
-                return getattr(module_, class_name)
-            except AttributeError:
-                return None
-        except ImportError:
-            return None
-
-    # Given a string, creates an instance of that class
-    @staticmethod
-    def str_to_class(module_name, class_name):
-        return ExportService.class_exists(module_name, class_name)
 
     @staticmethod
     def get_meta(questionnaire, relationship):
@@ -266,6 +215,8 @@ class ExportService:
         hours, the PI will also be emailed notifications every 8 hours until the fault is corrected or the system
         taken down.
         """
+        from .models import DataTransferLog
+
         alert_principal_investigator = False
         last_log = (
             session.query(DataTransferLog)

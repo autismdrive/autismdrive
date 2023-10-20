@@ -1,12 +1,9 @@
 from flask import json
 
 from app.email_service import TEST_MESSAGES
-from app.model.email_log import EmailLog
-from app.model.participant import Relationship
-from app.model.role import Permission
-from app.model.study import StudyUserStatus, StudyUser
-from app.model.user import User, Role
-from app.model.user_favorite import UserFavorite
+from app.models import EmailLog, StudyUser, User, UserFavorite
+from app.enums import Relationship, Permission, Role, StudyUserStatus
+from app.models import StudyUser
 from app.rest_exception import RestException
 from tests.base_test import BaseTest
 

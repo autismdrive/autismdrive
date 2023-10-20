@@ -6,10 +6,10 @@ from marshmallow import ValidationError
 
 from app.auth import auth
 from app.database import session
-from app.model.admin_note import AdminNote
-from app.model.role import Permission
+from app.models import AdminNote
+from app.enums import Permission
 from app.rest_exception import RestException
-from app.schema.schema import AdminNoteSchema
+from app.schemas import AdminNoteSchema
 from app.wrappers import requires_permission
 
 
