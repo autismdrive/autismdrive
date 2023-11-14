@@ -62,4 +62,4 @@ class InvestigatorListEndpoint(flask_restful.Resource):
                 session.commit()
             return self.investigatorSchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err.messages)

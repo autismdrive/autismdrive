@@ -25,36 +25,38 @@ class TestCategory(BaseTest):
         parent_name_after = "Ned Stark"
         parent_cat_1 = self.construct_category(name=parent_name_before)
         parent_cat_2 = self.construct_category(name=parent_name_after)
+        parent_cat_2_id = parent_cat_2.id
 
         child_name_before = "Aegon Targaryen"
         child_name_after = "Jon Snow"
         child_cat = self.construct_category(name=child_name_before, parent=parent_cat_1)
+        child_cat_id = child_cat.id
 
-        db_child = self.session.query(Category).filter_by(id=child_cat.id).first()
+        db_child = self.session.query(Category).filter_by(id=child_cat_id).first()
         self.assertIsNotNone(db_child)
         self.assertIsNotNone(db_child.name, child_name_before)
         self.assertEqual(db_child.parent.name, parent_name_before)
 
-        rv = self.client.get("/api/category/%i" % child_cat.id, content_type="application/json")
-        self.assert_success(rv)
-        child_dict = rv.json
+        rv1 = self.client.get("/api/category/%i" % child_cat_id, content_type="application/json")
+        self.assert_success(rv1)
+        child_dict = rv1.json.copy()
         child_dict["name"] = child_name_after
-        child_dict["parent_id"] = parent_cat_2.id
+        child_dict["parent_id"] = parent_cat_2_id
 
-        rv = self.client.put(
-            "/api/category/%i" % child_cat.id,
+        rv2 = self.client.put(
+            "/api/category/%i" % child_cat_id,
             data=self.jsonify(child_dict),
             content_type="application/json",
             follow_redirects=True,
             headers=self.logged_in_headers(),
         )
-        self.assert_success(rv)
+        self.assert_success(rv2)
 
-        rv = self.client.get("/api/category/%i" % child_cat.id, content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(response["name"], child_name_after)
-        self.assertEqual(response["parent"]["name"], parent_name_after)
+        rv3 = self.client.get("/api/category/%i" % child_cat_id, content_type="application/json")
+        self.assert_success(rv3)
+        rv3_dict = rv3.json
+        self.assertEqual(rv3_dict["name"], child_name_after)
+        self.assertEqual(rv3_dict["parent"]["name"], parent_name_after)
 
     def test_delete_category(self):
         self.construct_category(name="Unicorns")

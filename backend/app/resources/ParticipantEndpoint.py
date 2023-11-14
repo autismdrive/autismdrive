@@ -73,7 +73,7 @@ class ParticipantAdminListEndpoint(flask_restful.Resource):
             )
         else:
             query = session.query(Participant).filter(Participant.relationship == relationship)
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
 
     @auth.login_required

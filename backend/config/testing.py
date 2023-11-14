@@ -1,6 +1,8 @@
 from config.base import Settings
 
+
 settings = Settings(
+    ENV_NAME="testing",
     SQLALCHEMY_DATABASE_URI="postgresql://ed_user:ed_pass@localhost/stardrive_test",
     TESTING=True,
     CORS_ENABLED=True,

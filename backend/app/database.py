@@ -4,29 +4,80 @@ import typing
 from random import randint
 
 import click
+from icecream import ic
 from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session
-from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy_utils import database_exists
 
 from config.load import settings
 
-engine: Engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, echo=settings.SQLALCHEMY_TRACK_MODIFICATIONS)
+engine: Engine = create_engine(
+    settings.SQLALCHEMY_DATABASE_URI,
+    echo=settings.SQLALCHEMY_TRACK_MODIFICATIONS,
+    pool_pre_ping=True,
+)
 
-if not database_exists(engine.url):
+
+def _create_db(engine_: Engine):
+    from sqlalchemy_utils import create_database
+
     try:
-        create_database(engine.url)
+        click.secho(f"Recreating database...")
+        create_database(engine_.url)
+        click.secho(f"\n*** Database {engine_.url.database} created. ***\n")
+
     except Exception as e:
         click.secho(f"Error creating database: {e}")
         raise e
 
-session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=True, expire_on_commit=False))
-inspector = inspect(engine)
+
+def _create_tables(base_metadata: MetaData, engine_: Engine):
+    try:
+        click.secho(f"Adding tables from the model...")
+        with engine_.begin() as conn:
+            click.secho(f"Creating tables...")
+            base_metadata.create_all(bind=conn)
+            click.secho(f"Done.")
+
+        click.secho(f"Tables added:")
+        for table in base_metadata.sorted_tables:
+            click.secho(f"- {table.name}")
+    except Exception as e:
+        click.secho(f"Error connecting to database: {e}")
+
+
+def _delete_tables(base_metadata: MetaData, engine_: Engine):
+    # Delete all tables in reverse dependency order
+
+    # Clear out any tables that may have been created
+    click.secho(f"Deleting tables from database {engine_.url.database}...")
+    for table in reversed(base_metadata.sorted_tables):
+        try:
+            # Delete all rows in the table
+            with engine.begin() as conn:
+                # Check if table exists
+                if engine.dialect.has_table(conn, table.name):
+                    conn.execute(table.delete())
+                    click.secho(f"x {table.name}")
+        except Exception as e:
+            click.secho(f"Error cleaning table {table.name}: {e}")
+
+
+def _delete_db(base_metadata: MetaData, engine_: Engine):
+    """Deletes the database to reset any auto-increment id values"""
+    from sqlalchemy_utils import drop_database
+
+    try:
+        click.secho(f"Dropping database: {engine.url.database}...")
+        drop_database(engine.url)
+        click.secho(f"Dropped database: {engine.url.database}.")
+    except Exception as e:
+        click.secho(f"Error deleting database: {e}")
 
 
 class Base(DeclarativeBase):
     __allow_unmapped__ = True
-
     type_annotation_map = {
         enum.Enum: Enum(enum.Enum, native_enum=False),
         typing.Literal: Enum(enum.Enum, native_enum=False),
@@ -35,40 +86,38 @@ class Base(DeclarativeBase):
 
 
 Base.metadata.bind = engine
+
+
+if not database_exists(engine.url):
+
+    _create_db(engine)
+    _create_tables(Base.metadata, engine)
+
+ic.configureOutput(includeContext=True, contextAbsPath=True)
+ic(settings.SQLALCHEMY_DATABASE_URI)
+
+session = scoped_session(
+    sessionmaker(
+        bind=engine,
+        autoflush=True,
+        expire_on_commit=False,
+    )
+)
 inspector = inspect(engine)
 
 
 def clear_db(base_metadata: MetaData = Base.metadata):
-    if not database_exists(engine.url):
-        try:
-            create_database(engine.url)
-        except Exception as e:
-            click.secho(f"Error creating database: {e}")
-            raise e
+    base_metadata.bind = engine
 
-    # Delete all tables in reverse dependency order
-    Base.metadata.bind = engine
+    if database_exists(engine.url):
+        # Delete all tables in reverse dependency order
+        _delete_tables(base_metadata, engine)
 
-    # Clear out any tables that may have been created
-    for table in reversed(base_metadata.sorted_tables):
-        try:
-            # Delete all rows in the table
-            with engine.begin() as conn:
-                conn.execute(table.delete())
-        except Exception as e:
-            click.secho(f"Error cleaning table {table.name}: {e}")
+        # Delete the database itself to reset any auto-increment id values
+        _delete_db(base_metadata, engine)
 
-    # Delete the database itself to reset any auto-increment id values
-    try:
-        base_metadata.drop_all(bind=engine, checkfirst=False)
-    except Exception as e:
-        click.secho(f"Error deleting database: {e}")
-
-    try:
-        # Recreate the database
-        base_metadata.create_all(bind=engine)
-    except Exception as e:
-        click.secho(f"Error connecting to database: {e}")
+    _create_db(engine)
+    _create_tables(base_metadata, engine)
 
 
 def migrate_db():

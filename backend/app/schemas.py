@@ -1,10 +1,21 @@
-from __future__ import annotations
-
-from flask_marshmallow import fields as fma_fields, Marshmallow
 from flask_marshmallow.fields import Hyperlinks, URLFor
-from marshmallow import fields, Schema, post_load, missing, pre_load
-from marshmallow.fields import Nested
+from marshmallow import Schema, post_load, missing, pre_load
+from marshmallow.fields import (
+    Boolean,
+    DateTime,
+    Enum,
+    Float,
+    Function,
+    Integer,
+    List,
+    Method,
+    Nested,
+    Number,
+    Str,
+    String,
+)
 from marshmallow.utils import EXCLUDE
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
 
 from app.database import session
@@ -67,13 +78,31 @@ from app.models import (
     DataTransferLogDetail,
 )
 
-# Import the questionnaires and their related models in order to include them when auto-generating migrations (and to
-# ensure that the tables don't get accidentally dropped!)
-ma = Marshmallow()
+_category_list_url = lambda: URLFor("api.categorylistendpoint")
+_category_self_url = lambda: URLFor("api.categoryendpoint", values={"id": "<id>"})
+_category_url = lambda: URLFor("api.categoryendpoint", values={"id": "<category_id>"})
+_event_category_self_url = lambda: URLFor("api.eventcategoryendpoint", values={"id": "<id>"})
+_event_url = lambda: URLFor("api.eventendpoint", values={"id": "<resource_id>"})
+_investigator_url = lambda: URLFor("api.investigatorendpoint", values={"id": "<investigator_id>"})
+_location_category_self_url = lambda: URLFor("api.locationcategoryendpoint", values={"id": "<id>"})
+_location_url = lambda: URLFor("api.locationendpoint", values={"id": "<resource_id>"})
+_participant_self_url = lambda: URLFor("api.participantendpoint", values={"id": "<id>"})
+_resource_category_self_url = lambda: URLFor("api.resourcecategoryendpoint", values={"id": "<id>"})
+_resource_url = lambda: URLFor("api.resourceendpoint", values={"id": "<resource_id>"})
+_study_category_self_url = lambda: URLFor("api.studycategoryendpoint", values={"id": "<id>"})
+_study_investigator_self_url = lambda: URLFor("api.studyinvestigatorendpoint", values={"id": "<id>"})
+_study_url = lambda: URLFor("api.studyendpoint", values={"id": "<study_id>"})
+_study_user_self_url = lambda: URLFor("api.studyuserendpoint", values={"id": "<id>"})
+_user_url = lambda: URLFor("api.userendpoint", values={"id": "<user_id>"})
 
 
-class ModelSchema(ma.SQLAlchemyAutoSchema):
+def _questionnaire_url(name):
+    return URLFor("api.questionnaireendpoint", values={"name": f"{name}", "id": "<id>"})
+
+
+class ModelSchema(SQLAlchemyAutoSchema):
     class Meta:
+        sqla_session = session
         include_relationships = True
         load_instance = True
         unknown = EXCLUDE
@@ -86,10 +115,10 @@ class InvestigatorSchema(ModelSchema):
         model = Investigator
         fields = ("id", "last_updated", "name", "title", "organization_name", "bio_link", "_links")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.investigatorendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.investigatorlistendpoint"),
+            "self": URLFor("api.investigatorendpoint", values={"id": "<id>"}),
+            "collection": URLFor("api.investigatorlistendpoint"),
         }
     )
 
@@ -101,12 +130,12 @@ class ParentCategorySchema(ModelSchema):
         model = Category
         fields = ("id", "name", "parent", "level", "_links", "display_order")
 
-    parent = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
-    _links = fma_fields.Hyperlinks(
+    parent = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.categoryendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.categorylistendpoint"),
+            "self": _category_self_url(),
+            "collection": _category_list_url(),
         }
     )
 
@@ -118,10 +147,10 @@ class ChildCategoryInSearchSchema(ModelSchema):
         model = Category
         fields = ("id", "name", "_links", "hit_count", "display_order")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.categoryendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.categorylistendpoint"),
+            "self": _category_self_url(),
+            "collection": _category_list_url(),
         }
     )
 
@@ -133,10 +162,10 @@ class CategoryInSearchSchema(ModelSchema):
         model = Category
         fields = ("id", "name", "children", "parent_id", "parent", "level", "display_order")
 
-    parent_id = fields.Number(required=False, allow_none=True)
-    parent = fields.Nested(lambda: ParentCategorySchema(), dump_only=True, required=False, allow_none=True)
-    children = fields.Nested(lambda: ChildCategoryInSearchSchema(), many=True, dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
+    parent_id = Number(required=False, allow_none=True)
+    parent = Nested(lambda: ParentCategorySchema(), dump_only=True, required=False, allow_none=True)
+    children = Nested(lambda: ChildCategoryInSearchSchema(), many=True, dump_only=True)
+    level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
 
 
 class CategorySchema(ModelSchema):
@@ -162,20 +191,20 @@ class CategorySchema(ModelSchema):
             "display_order",
         )
 
-    id = fields.Integer(required=False, allow_none=True)
-    parent_id = fields.Integer(required=False, allow_none=True)
-    children = fields.Nested(lambda: CategorySchema(), many=True, dump_only=True, exclude=("parent", "color"))
-    parent = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    level = fields.Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
-    event_count = fields.Method("get_event_count", dump_only=True)
-    location_count = fields.Method("get_location_count", dump_only=True)
-    resource_count = fields.Method("get_resource_count", dump_only=True)
-    all_resource_count = fields.Method("get_all_resource_count", dump_only=True)
-    study_count = fields.Method("get_study_count", dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    id = Integer(required=False, allow_none=True)
+    parent_id = Integer(required=False, allow_none=True)
+    children = Nested(lambda: CategorySchema(), many=True, dump_only=True, exclude=("parent", "color"))
+    parent = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
+    event_count = Method("get_event_count", dump_only=True)
+    location_count = Method("get_location_count", dump_only=True)
+    resource_count = Method("get_resource_count", dump_only=True)
+    all_resource_count = Method("get_all_resource_count", dump_only=True)
+    study_count = Method("get_study_count", dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.categoryendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.categorylistendpoint"),
+            "self": _category_self_url(),
+            "collection": _category_list_url(),
         }
     )
 
@@ -187,7 +216,7 @@ class CategorySchema(ModelSchema):
             .filter(ResourceCategory.type == "event")
             .filter(ResourceCategory.category_id == obj.id)
         )
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
 
     def get_location_count(self, obj):
@@ -198,7 +227,7 @@ class CategorySchema(ModelSchema):
             .filter(ResourceCategory.type == "location")
             .filter(ResourceCategory.category_id == obj.id)
         )
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
 
     def get_resource_count(self, obj):
@@ -209,7 +238,7 @@ class CategorySchema(ModelSchema):
             .filter(ResourceCategory.type == "resource")
             .filter(ResourceCategory.category_id == obj.id)
         )
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
 
     def get_all_resource_count(self, obj):
@@ -220,15 +249,27 @@ class CategorySchema(ModelSchema):
             .join(ResourceCategory.resource)
             .filter(ResourceCategory.category_id == obj.id)
         )
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
 
     def get_study_count(self, obj):
         if obj is None:
             return missing
         query = session.query(StudyCategory).join(StudyCategory.study).filter(StudyCategory.category_id == obj.id)
-        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
+
+
+class CategoryUpdateSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
+        model = Category
+        fields = ("id", "name", "parent_id", "display_order", "hit_count")
+
+    # id = Integer(required=True, allow_none=False)
+    # parent_id = Integer(required=False, allow_none=True)
+    # display_order = Integer(required=False)
+    # name = String(required=False, allow_none=False)
+    # hit_count = Integer(required=False)
 
 
 class CategoriesOnEventSchema(ModelSchema):
@@ -236,12 +277,12 @@ class CategoriesOnEventSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category")
 
-    category = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.eventcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "event": fma_fields.URLFor("api.eventendpoint", id="<resource_id>"),
+            "self": _event_category_self_url(),
+            "category": _category_url(),
+            "event": _event_url(),
         }
     )
 
@@ -251,12 +292,12 @@ class CategoriesOnLocationSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category")
 
-    category = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.locationcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "location": fma_fields.URLFor("api.locationendpoint", id="<resource_id>"),
+            "self": _location_category_self_url(),
+            "category": _category_url(),
+            "location": _location_url(),
         }
     )
 
@@ -266,12 +307,12 @@ class CategoriesOnResourceSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category")
 
-    category = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.resourcecategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "resource": fma_fields.URLFor("api.resourceendpoint", id="<resource_id>"),
+            "self": _resource_category_self_url(),
+            "category": _category_url(),
+            "resource": _resource_url(),
         }
     )
 
@@ -281,12 +322,12 @@ class CategoriesOnStudySchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id", "category")
 
-    category = fields.Nested(lambda: ParentCategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studycategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_category_self_url(),
+            "category": _category_url(),
+            "study": _study_url(),
         }
     )
 
@@ -296,12 +337,12 @@ class InvestigatorsOnStudySchema(ModelSchema):
         model = StudyInvestigator
         fields = ("id", "_links", "study_id", "investigator_id", "investigator")
 
-    investigator = fields.Nested(lambda: InvestigatorSchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    investigator = Nested(lambda: InvestigatorSchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyinvestigatorendpoint", id="<id>"),
-            "investigator": fma_fields.URLFor("api.investigatorendpoint", id="<investigator_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_investigator_self_url(),
+            "investigator": _investigator_url(),
+            "study": _study_url(),
         }
     )
 
@@ -332,12 +373,12 @@ class ResourceSchema(ModelSchema):
             "_links",
         )
 
-    resource_categories = fields.Nested(lambda: CategoriesOnResourceSchema(), many=True, dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    resource_categories = Nested(lambda: CategoriesOnResourceSchema(), many=True, dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.resourceendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.resourcelistendpoint"),
-            "categories": fma_fields.URLFor("api.categorybyresourceendpoint", resource_id="<id>"),
+            "self": URLFor("api.resourceendpoint", values={"id": "<id>"}),
+            "collection": URLFor("api.resourcelistendpoint"),
+            "categories": URLFor("api.categorybyresourceendpoint", values={"resource_id": "<id>"}),
         }
     )
 
@@ -347,12 +388,12 @@ class ResourceCategoriesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category")
 
-    category = fields.Nested(lambda: CategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: CategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.resourcecategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "resource": fma_fields.URLFor("api.resourceendpoint", id="<resource_id>"),
+            "self": _resource_category_self_url(),
+            "category": _category_url(),
+            "resource": _resource_url(),
         }
     )
 
@@ -362,12 +403,12 @@ class CategoryResourcesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "resource")
 
-    resource = fields.Nested(lambda: ResourceSchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    resource = Nested(lambda: ResourceSchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.resourcecategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "resource": fma_fields.URLFor("api.resourceendpoint", id="<resource_id>"),
+            "self": _resource_category_self_url(),
+            "category": _category_url(),
+            "resource": _resource_url(),
         }
     )
 
@@ -377,11 +418,11 @@ class ResourceCategorySchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "type")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.resourcecategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "resource": fma_fields.URLFor("api.resourceendpoint", id="<resource_id>"),
+            "self": _resource_category_self_url(),
+            "category": _category_url(),
+            "resource": _resource_url(),
         }
     )
 
@@ -391,10 +432,10 @@ class EventUserSchema(ModelSchema):
         model = EventUser
         fields = ("id", "last_updated", "event_id", "event", "user_id", "user")
 
-    event_id = fields.Integer(required=False, allow_none=True)
-    user_id = fields.Integer(required=False, allow_none=True)
-    event = fields.Nested(lambda: ResourceSchema(), dump_only=True)
-    user = fields.Nested(lambda: CategorySchema(), dump_only=True)
+    event_id = Integer(required=False, allow_none=True)
+    user_id = Integer(required=False, allow_none=True)
+    event = Nested(lambda: ResourceSchema(), dump_only=True)
+    user = Nested(lambda: CategorySchema(), dump_only=True)
 
 
 class EventSchema(ModelSchema):
@@ -443,14 +484,14 @@ class EventSchema(ModelSchema):
             "_links",
         )
 
-    id = fields.Integer(required=False, allow_none=True)
-    resource_categories = fields.Nested(lambda: CategoriesOnEventSchema(), many=True, dump_only=True)
-    registered_users = fields.Nested(lambda: EventUserSchema(), many=True, dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    id = Integer(required=False, allow_none=True)
+    resource_categories = Nested(lambda: CategoriesOnEventSchema(), many=True, dump_only=True)
+    registered_users = Nested(lambda: EventUserSchema(), many=True, dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.eventendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.eventlistendpoint"),
-            "categories": fma_fields.URLFor("api.categorybyeventendpoint", event_id="<id>"),
+            "self": URLFor("api.eventendpoint", values={"id": "<id>"}),
+            "collection": URLFor("api.eventlistendpoint"),
+            "categories": URLFor("api.categorybyeventendpoint", values={"event_id": "<id>"}),
         }
     )
 
@@ -460,12 +501,12 @@ class EventCategoriesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category")
 
-    category = fields.Nested(lambda: CategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: CategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.eventcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "event": fma_fields.URLFor("api.eventendpoint", id="<resource_id>"),
+            "self": _event_category_self_url(),
+            "category": _category_url(),
+            "event": _event_url(),
         }
     )
 
@@ -475,12 +516,12 @@ class CategoryEventsSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "resource")
 
-    resource = fields.Nested(lambda: EventSchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    resource = Nested(lambda: EventSchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.eventcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "event": fma_fields.URLFor("api.eventendpoint", id="<resource_id>"),
+            "self": _event_category_self_url(),
+            "category": _category_url(),
+            "event": _event_url(),
         }
     )
 
@@ -490,11 +531,11 @@ class EventCategorySchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.eventcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "event": fma_fields.URLFor("api.eventendpoint", id="<resource_id>"),
+            "self": _event_category_self_url(),
+            "category": _category_url(),
+            "event": _event_url(),
         }
     )
 
@@ -534,12 +575,12 @@ class LocationSchema(ModelSchema):
             "should_hide_related_resources",
         )
 
-    id = fields.Integer(required=False, allow_none=True)
-    resource_categories = fields.Nested(lambda: CategoriesOnLocationSchema(), many=True, dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    id = Integer(required=False, allow_none=True)
+    resource_categories = Nested(lambda: CategoriesOnLocationSchema(), many=True, dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.locationendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.locationlistendpoint"),
+            "self": URLFor("api.locationendpoint", values={"id": "<id>"}),
+            "collection": URLFor("api.locationlistendpoint"),
         }
     )
 
@@ -549,12 +590,12 @@ class LocationCategoriesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category")
 
-    category = fields.Nested(lambda: CategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: CategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.locationcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "location": fma_fields.URLFor("api.locationendpoint", id="<resource_id>"),
+            "self": _location_category_self_url(),
+            "category": _category_url(),
+            "location": _location_url(),
         }
     )
 
@@ -564,12 +605,12 @@ class CategoryLocationsSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "resource")
 
-    resource = fields.Nested(lambda: LocationSchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    resource = Nested(lambda: LocationSchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.locationcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "location": fma_fields.URLFor("api.locationendpoint", id="<resource_id>"),
+            "self": _location_category_self_url(),
+            "category": _category_url(),
+            "location": _location_url(),
         }
     )
 
@@ -579,11 +620,11 @@ class LocationCategorySchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.locationcategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "location": fma_fields.URLFor("api.locationendpoint", id="<resource_id>"),
+            "self": _location_category_self_url(),
+            "category": _category_url(),
+            "location": _location_url(),
         }
     )
 
@@ -606,17 +647,17 @@ class ParticipantSchema(ModelSchema):
             "percent_complete",
         )
 
-    id = fields.Integer(required=False, allow_none=True)
-    name = fields.Function(lambda obj: missing if obj is None else obj.get_name())
-    relationship = fields.Enum(Relationship)
-    user_id = fields.Integer(required=False, allow_none=True)
-    percent_complete = fields.Function(lambda obj: missing if obj is None else obj.get_percent_complete())
-    contact = fields.Nested(lambda: ContactQuestionnaireSchema(), dump_only=True)
-    identification = fields.Nested(lambda: IdentificationQuestionnaireSchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    id = Integer(required=False, allow_none=True)
+    name = Function(lambda obj: missing if obj is None else obj.get_name())
+    relationship = Enum(Relationship)
+    user_id = Integer(required=False, allow_none=True)
+    percent_complete = Function(lambda obj: missing if obj is None else obj.get_percent_complete())
+    contact = Nested(lambda: ContactQuestionnaireSchema(), dump_only=True)
+    identification = Nested(lambda: IdentificationQuestionnaireSchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.participantendpoint", id="<id>"),
-            "user": fma_fields.URLFor("api.userendpoint", id="<user_id>"),
+            "self": _participant_self_url(),
+            "user": _user_url(),
         }
     )
 
@@ -638,14 +679,14 @@ class UserFavoriteSchema(ModelSchema):
             "covid19_category",
         )
 
-    resource_id = fields.Integer(required=False, allow_none=True)
-    category_id = fields.Integer(required=False, allow_none=True)
-    resource = fields.Nested(lambda: ResourceSchema(), dump_only=True)
-    category = fields.Nested(lambda: CategorySchema(), dump_only=True)
+    resource_id = Integer(required=False, allow_none=True)
+    category_id = Integer(required=False, allow_none=True)
+    resource = Nested(lambda: ResourceSchema(), dump_only=True)
+    category = Nested(lambda: CategorySchema(), dump_only=True)
 
 
 class UserMetaSchema(ModelSchema):
-    self_relationship = fields.Function(lambda obj: obj.get_relationship(), allow_none=True)
+    self_relationship = Function(lambda obj: obj.get_relationship(), allow_none=True)
 
     class Meta(ModelSchema.Meta):
         model = UserMeta
@@ -663,12 +704,12 @@ class UserMetaSchema(ModelSchema):
             "self_relationship",
         )
 
-    self_participant = fields.Boolean(required=False, allow_none=True)
-    self_has_guardian = fields.Boolean(required=False, allow_none=True)
-    professional = fields.Boolean(required=False, allow_none=True)
-    interested = fields.Boolean(required=False, allow_none=True)
-    guardian = fields.Boolean(required=False, allow_none=True)
-    guardian_has_dependent = fields.Boolean(required=False, allow_none=True)
+    self_participant = Boolean(required=False, allow_none=True)
+    self_has_guardian = Boolean(required=False, allow_none=True)
+    professional = Boolean(required=False, allow_none=True)
+    interested = Boolean(required=False, allow_none=True)
+    guardian = Boolean(required=False, allow_none=True)
+    guardian_has_dependent = Boolean(required=False, allow_none=True)
 
 
 class UserSchema(ModelSchema):
@@ -695,19 +736,19 @@ class UserSchema(ModelSchema):
             "email_verified",
         )
 
-    password = fields.String(load_only=True)
-    participants = fields.Nested(lambda: ParticipantSchema(), dump_only=True, many=True)
-    participant_count = fields.Integer(required=False, allow_none=True)
-    user_favorites = fields.Nested(lambda: UserFavoriteSchema(), dump_only=True, many=True)
-    user_meta = fields.Nested(lambda: UserMetaSchema(), dump_only=True)
-    id = fields.Integer(required=False, allow_none=True)
-    role = fields.Enum(Role)
-    permissions = fields.Method("get_permissions", dump_only=True)
-    percent_self_registration_complete = fields.Function(
+    password = String(load_only=True)
+    participants = Nested(lambda: ParticipantSchema(), dump_only=True, many=True)
+    participant_count = Integer(required=False, allow_none=True)
+    user_favorites = Nested(lambda: UserFavoriteSchema(), dump_only=True, many=True)
+    user_meta = Nested(lambda: UserMetaSchema(), dump_only=True)
+    id = Integer(required=False, allow_none=True)
+    role = Enum(Role)
+    permissions = Method("get_permissions", dump_only=True)
+    percent_self_registration_complete = Function(
         lambda obj: missing if obj is None else obj.percent_self_registration_complete(), dump_only=True
     )
-    created_password = fields.Function(lambda obj: missing if obj is None else obj.created_password(), dump_only=True)
-    identity = fields.Function(lambda obj: missing if obj is None else obj.identity(), dump_only=True)
+    created_password = Function(lambda obj: missing if obj is None else obj.created_password(), dump_only=True)
+    identity = Function(lambda obj: missing if obj is None else obj.identity(), dump_only=True)
 
     def get_permissions(self, obj):
         if obj is None:
@@ -723,13 +764,13 @@ class UsersOnStudySchema(ModelSchema):
         model = StudyUser
         fields = ("id", "_links", "status", "study_id", "user_id", "user")
 
-    user = fields.Nested(lambda: UserSchema(), dump_only=True)
-    status = fields.Enum(StudyUserStatus, allow_none=True)
-    _links = fma_fields.Hyperlinks(
+    user = Nested(lambda: UserSchema(), dump_only=True)
+    status = Enum(StudyUserStatus, allow_none=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyuserendpoint", id="<id>"),
-            "user": fma_fields.URLFor("api.userendpoint", id="<user_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_user_self_url(),
+            "user": _user_url(),
+            "study": _study_url(),
         }
     )
 
@@ -739,13 +780,13 @@ class StudyUsersSchema(ModelSchema):
         model = StudyUser
         fields = ("id", "_links", "status", "study_id", "user_id", "user")
 
-    user = fields.Nested(lambda: UserSchema(), dump_only=True)
-    status = fields.Enum(StudyUserStatus, allow_none=True)
-    _links = fma_fields.Hyperlinks(
+    user = Nested(lambda: UserSchema(), dump_only=True)
+    status = Enum(StudyUserStatus, allow_none=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyuserendpoint", id="<id>"),
-            "user": fma_fields.URLFor("api.userendpoint", id="<user_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_user_self_url(),
+            "user": _user_url(),
+            "study": _study_url(),
         }
     )
 
@@ -755,12 +796,12 @@ class StudyUserSchema(ModelSchema):
         model = StudyUser
         fields = ("id", "_links", "status", "study_id", "user_id")
 
-    status = fields.Enum(StudyUserStatus, allow_none=True)
-    _links = fma_fields.Hyperlinks(
+    status = Enum(StudyUserStatus, allow_none=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyuserendpoint", id="<id>"),
-            "user": fma_fields.URLFor("api.userendpoint", id="<user_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_user_self_url(),
+            "user": _user_url(),
+            "study": _study_url(),
         }
     )
 
@@ -793,14 +834,14 @@ class StudySchema(ModelSchema):
             "_links",
         )
 
-    status = fields.Enum(Status)
-    study_categories = fields.Nested(lambda: CategoriesOnStudySchema(), many=True, dump_only=True)
-    study_investigators = fields.Nested(lambda: InvestigatorsOnStudySchema(), many=True, dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    status = Enum(Status)
+    study_categories = Nested(lambda: CategoriesOnStudySchema(), many=True, dump_only=True)
+    study_investigators = Nested(lambda: InvestigatorsOnStudySchema(), many=True, dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyendpoint", id="<id>"),
-            "collection": fma_fields.URLFor("api.studylistendpoint"),
-            "categories": fma_fields.URLFor("api.categorybystudyendpoint", study_id="<id>"),
+            "self": URLFor("api.studyendpoint", values={"id": "<id>"}),
+            "collection": URLFor("api.studylistendpoint"),
+            "categories": URLFor("api.categorybystudyendpoint", values={"study_id": "<id>"}),
         }
     )
 
@@ -810,13 +851,13 @@ class UserStudiesSchema(ModelSchema):
         model = StudyUser
         fields = ("id", "_links", "status", "study_id", "user_id", "study")
 
-    study = fields.Nested(lambda: StudySchema(), dump_only=True)
-    status = fields.Enum(StudyUserStatus, allow_none=True)
-    _links = fma_fields.Hyperlinks(
+    study = Nested(lambda: StudySchema(), dump_only=True)
+    status = Enum(StudyUserStatus, allow_none=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyuserendpoint", id="<id>"),
-            "user": fma_fields.URLFor("api.userendpoint", id="<user_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_user_self_url(),
+            "user": _user_url(),
+            "study": _study_url(),
         }
     )
 
@@ -826,12 +867,12 @@ class StudyCategoriesSchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id", "category")
 
-    category = fields.Nested(lambda: CategorySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    category = Nested(lambda: CategorySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studycategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_category_self_url(),
+            "category": _category_url(),
+            "study": _study_url(),
         }
     )
 
@@ -841,12 +882,12 @@ class CategoryStudiesSchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id", "study")
 
-    study = fields.Nested(lambda: StudySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    study = Nested(lambda: StudySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studycategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_category_self_url(),
+            "category": _category_url(),
+            "study": _study_url(),
         }
     )
 
@@ -856,11 +897,11 @@ class StudyCategorySchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studycategoryendpoint", id="<id>"),
-            "category": fma_fields.URLFor("api.categoryendpoint", id="<category_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_category_self_url(),
+            "category": _category_url(),
+            "study": _study_url(),
         }
     )
 
@@ -870,12 +911,12 @@ class StudyInvestigatorsSchema(ModelSchema):
         model = StudyInvestigator
         fields = ("id", "_links", "study_id", "investigator_id", "investigator")
 
-    investigator = fields.Nested(lambda: InvestigatorSchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    investigator = Nested(lambda: InvestigatorSchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyinvestigatorendpoint", id="<id>"),
-            "investigator": fma_fields.URLFor("api.investigatorendpoint", id="<investigator_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_investigator_self_url(),
+            "investigator": _investigator_url(),
+            "study": _study_url(),
         }
     )
 
@@ -885,12 +926,12 @@ class InvestigatorStudiesSchema(ModelSchema):
         model = StudyInvestigator
         fields = ("id", "_links", "study_id", "investigator_id", "study")
 
-    study = fields.Nested(lambda: StudySchema(), dump_only=True)
-    _links = fma_fields.Hyperlinks(
+    study = Nested(lambda: StudySchema(), dump_only=True)
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyinvestigatorendpoint", id="<id>"),
-            "investigator": fma_fields.URLFor("api.investigatorendpoint", id="<investigator_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_investigator_self_url(),
+            "investigator": _investigator_url(),
+            "study": _study_url(),
         }
     )
 
@@ -900,18 +941,18 @@ class StudyInvestigatorSchema(ModelSchema):
         model = StudyInvestigator
         fields = ("id", "_links", "study_id", "investigator_id")
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.studyinvestigatorendpoint", id="<id>"),
-            "investigator": fma_fields.URLFor("api.investigatorendpoint", id="<investigator_id>"),
-            "study": fma_fields.URLFor("api.studyendpoint", id="<study_id>"),
+            "self": _study_investigator_self_url(),
+            "investigator": _investigator_url(),
+            "study": _study_url(),
         }
     )
 
 
 class GeopointSchema(Schema):
-    lat = fields.Float(missing=None)
-    lon = fields.Float(missing=None)
+    lat = Float(missing=None)
+    lon = Float(missing=None)
 
     @post_load
     def make_geo_point(self, data, **kwargs):
@@ -923,63 +964,63 @@ class SearchSchema(Schema):
         unknown = EXCLUDE
 
     class HitSchema(Schema):
-        id = fields.Integer()
-        content = fields.Str(missing=None)
-        description = fields.Str(missing=None)
-        post_event_description = fields.Str(missing=None)
-        title = fields.Str(missing=None)
-        type = fields.Str()
-        label = fields.Str(missing=None)
-        last_updated = fields.DateTime(missing=None)
-        highlights = fields.Str(missing=None)
-        latitude = fields.Float()
-        longitude = fields.Float()
-        date = fields.DateTime(missing=None)
-        status = fields.Str(missing=None)
-        no_address = fields.Boolean(missing=None)
-        is_draft = fields.Boolean(missing=None)
+        id = Integer()
+        content = Str(missing=None)
+        description = Str(missing=None)
+        post_event_description = Str(missing=None)
+        title = Str(missing=None)
+        type = Str()
+        label = Str(missing=None)
+        last_updated = DateTime(missing=None)
+        highlights = Str(missing=None)
+        latitude = Float()
+        longitude = Float()
+        date = DateTime(missing=None)
+        status = Str(missing=None)
+        no_address = Boolean(missing=None)
+        is_draft = Boolean(missing=None)
 
     class SortSchema(Schema):
-        field = fields.Str(allow_null=True)
-        latitude = fields.Float(missing=None)
-        longitude = fields.Float(missing=None)
-        order = fields.Str(missing="asc")
-        unit = fields.Str(missing="mi")
+        field = Str(allow_null=True)
+        latitude = Float(missing=None)
+        longitude = Float(missing=None)
+        order = Str(missing="asc")
+        unit = Str(missing="mi")
 
         @post_load
         def make_sort(self, data, **kwargs):
             return Sort(**data)
 
     class AggCountSchema(Schema):
-        value = fields.String()
-        count = fields.Integer()
-        is_selected = fields.Boolean()
+        value = String()
+        count = Integer()
+        is_selected = Boolean()
 
     class GeoboxSchema(Schema):
-        top_left = fields.Nested(lambda: GeopointSchema())
-        bottom_right = fields.Nested(lambda: GeopointSchema())
+        top_left = Nested(lambda: GeopointSchema())
+        bottom_right = Nested(lambda: GeopointSchema())
 
         @post_load
         def make_geo_box(self, data, **kwargs):
             return Geobox(**data)
 
-    words = fields.Str()
-    start = fields.Integer()
-    size = fields.Integer()
-    sort = fields.Nested(lambda: SearchSchema.SortSchema(), allow_none=True, default=None)
-    types = fields.List(fields.Str())
-    ages = fields.List(fields.Str())
-    languages = fields.List(fields.Str())
-    age_counts = fields.List(fields.Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
-    language_counts = fields.List(fields.Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
-    type_counts = fields.List(fields.Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
-    total = fields.Integer(dump_only=True)
-    hits = fields.Nested(lambda: SearchSchema.HitSchema(), many=True, dump_only=True)
-    category = fields.Nested(lambda: CategoryInSearchSchema())
+    words = Str()
+    start = Integer()
+    size = Integer()
+    sort = Nested(lambda: SearchSchema.SortSchema(), allow_none=True, default=None)
+    types = List(Str())
+    ages = List(Str())
+    languages = List(Str())
+    age_counts = List(Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
+    language_counts = List(Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
+    type_counts = List(Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
+    total = Integer(dump_only=True)
+    hits = Nested(lambda: SearchSchema.HitSchema(), many=True, dump_only=True)
+    category = Nested(lambda: CategoryInSearchSchema())
     ordered = True
-    date = fields.DateTime(allow_none=True)
-    map_data_only = fields.Boolean()
-    geo_box = fields.Nested(lambda: SearchSchema.GeoboxSchema(), allow_none=True, default=None)
+    date = DateTime(allow_none=True)
+    map_data_only = Boolean()
+    geo_box = Nested(lambda: SearchSchema.GeoboxSchema(), allow_none=True, default=None)
 
     @post_load
     def make_search(self, data, **kwargs):
@@ -987,23 +1028,23 @@ class SearchSchema(Schema):
 
 
 class UserSearchSchema(Schema):
-    pages = fields.Integer()
-    total = fields.Integer()
-    items = fields.List(fields.Nested(lambda: UserSchema()))
+    pages = Integer()
+    total = Integer()
+    items = List(Nested(lambda: UserSchema()))
 
 
 class StepSchema(Schema):
-    name = fields.Str()
-    type = fields.Str()
-    label = fields.Str()
-    status = fields.Str()
-    date_completed = fields.DateTime()
-    questionnaire_id = fields.Integer()
+    name = Str()
+    type = Str()
+    label = Str()
+    status = Str()
+    date_completed = DateTime()
+    questionnaire_id = Integer()
 
 
 class FlowSchema(Schema):
-    name = fields.Str()
-    steps = fields.Nested(lambda: StepSchema(), many=True)
+    name = Str()
+    steps = Nested(lambda: StepSchema(), many=True)
 
 
 # class EmailLogSchema(ModelSchema):
@@ -1021,8 +1062,8 @@ class AdminNoteSchema(ModelSchema):
         model = AdminNote
         fields = ("id", "resource_id", "user_id", "resource", "user", "last_updated", "note")
 
-    user = fields.Nested(lambda: UserSchema(), dump_only=True)
-    resource = fields.Nested(lambda: ResourceSchema(), dump_only=True)
+    user = Nested(lambda: UserSchema(), dump_only=True)
+    resource = Nested(lambda: ResourceSchema(), dump_only=True)
 
 
 class StepLogSchema(ModelSchema):
@@ -1059,11 +1100,11 @@ class ExportSchemas:
             model = User
             fields = ("id", "last_updated", "role", "email_verified", "email", "_links")
 
-        role = fields.Enum(Role)
-        email = fields.Function(lambda obj: missing if obj is None else str(obj.id))
-        _links = fma_fields.Hyperlinks(
+        role = Enum(Role)
+        email = Function(lambda obj: missing if obj is None else str(obj.id))
+        _links = Hyperlinks(
             {
-                "self": fma_fields.URLFor("api.userendpoint", id="<id>"),
+                "self": URLFor("api.userendpoint", values={"id": "<id>"}),
             }
         )
 
@@ -1075,7 +1116,7 @@ class ExportSchemas:
             model = User
             fields = ("id", "last_updated", "email", "_password", "role", "participants", "token", "email_verified")
 
-        role = fields.Enum(Role)
+        role = Enum(Role)
 
     class ParticipantExportSchema(ModelSchema):
         """Used exclusively for data export, removes identifying information"""
@@ -1084,10 +1125,10 @@ class ExportSchemas:
             model = Participant
             fields = ("id", "last_updated", "user_id", "relationship", "avatar_icon", "avatar_color", "_links")
 
-        relationship = fields.Enum(Relationship)
-        _links = fma_fields.Hyperlinks(
+        relationship = Enum(Relationship)
+        _links = Hyperlinks(
             {
-                "self": fma_fields.URLFor("api.participantendpoint", id="<id>"),
+                "self": _participant_self_url(),
             }
         )
 
@@ -1107,7 +1148,7 @@ class ExportInfoSchema(Schema):
         fields = ["table_name", "class_name", "display_name", "size", "url", "question_type", "sub_tables"]
 
     sub_tables = Nested(lambda: ExportInfoSchema(), default=None, many=True, dump_only=True)
-    display_name = fields.String(dump_only=True)
+    display_name = String(dump_only=True)
 
     @post_load
     def make_info(self, data, **kwargs):
@@ -1135,8 +1176,8 @@ class AlternativeAugmentativeSchema(ModelSchema):
             "user_id",
         )
 
-    participant_id = fields.Method("get_participant_id", dump_only=True)
-    user_id = fields.Method("get_user_id", dump_only=True)
+    participant_id = Method("get_participant_id", dump_only=True)
+    user_id = Method("get_user_id", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1165,8 +1206,8 @@ class AssistiveDeviceSchema(ModelSchema):
             "user_id",
         )
 
-    participant_id = fields.Method("get_participant_id", dump_only=True)
-    user_id = fields.Method("get_user_id", dump_only=True)
+    participant_id = Method("get_participant_id", dump_only=True)
+    user_id = Method("get_user_id", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1201,10 +1242,10 @@ class ChainSessionSchema(ModelSchema):
             "step_attempts",
         )
 
-    step_attempts = fields.Nested(lambda: ChainSessionStepSchema(), many=True)
-    participant_id = fields.Method("get_participant_id", dump_only=True)
-    user_id = fields.Method("get_user_id", dump_only=True)
-    session_number = fields.Method("get_session_number", dump_only=True)
+    step_attempts = Nested(lambda: ChainSessionStepSchema(), many=True)
+    participant_id = Method("get_participant_id", dump_only=True)
+    user_id = Method("get_user_id", dump_only=True)
+    session_number = Method("get_session_number", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1266,12 +1307,12 @@ class ChainSessionStepSchema(ModelSchema):
             "chain_step",
         )
 
-    participant_id = fields.Method("get_participant_id", dump_only=True)
-    user_id = fields.Method("get_user_id", dump_only=True)
-    challenging_behaviors = fields.Nested(lambda: ChallengingBehaviorSchema(), many=True)
-    chain_step = fields.Method("get_chain_step", dump_only=True)
-    session_type = fields.Method("get_session_type", dump_only=True)
-    session_number = fields.Method("get_session_number", dump_only=True)
+    participant_id = Method("get_participant_id", dump_only=True)
+    user_id = Method("get_user_id", dump_only=True)
+    challenging_behaviors = Nested(lambda: ChallengingBehaviorSchema(), many=True)
+    chain_step = Method("get_chain_step", dump_only=True)
+    session_type = Method("get_session_type", dump_only=True)
+    session_number = Method("get_session_number", dump_only=True)
 
     def get_chain_step(self, obj):
         if obj is None:
@@ -1331,7 +1372,7 @@ class ChainQuestionnaireSchema(ModelSchema):
             "sessions",
         )
 
-    sessions = fields.Nested(lambda: ChainSessionSchema(), many=True)
+    sessions = Nested(lambda: ChainSessionSchema(), many=True)
 
 
 class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
@@ -1340,16 +1381,14 @@ class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
 
         include_fk = True
 
-    _links = Hyperlinks(
-        {"self": URLFor("api.questionnaireendpoint", name="clinical_diagnoses_questionnaire", id="<id>")}
-    )
+    _links = Hyperlinks({"self": _questionnaire_url("clinical_diagnoses_questionnaire")})
 
 
 class ContactQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ContactQuestionnaire
 
-    _links = Hyperlinks({"self": URLFor("api.questionnaireendpoint", name="contact_questionnaire", id="<id>")})
+    _links = Hyperlinks({"self": _questionnaire_url("contact_questionnaire")})
 
 
 class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
@@ -1372,7 +1411,7 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="current_behaviors_dependent_questionnaire", id="<id>"),
+            "self": _questionnaire_url("current_behaviors_dependent_questionnaire"),
         }
     )
 
@@ -1395,7 +1434,7 @@ class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="current_behaviors_dependent_questionnaire", id="<id>"),
+            "self": _questionnaire_url("current_behaviors_dependent_questionnaire"),
         }
     )
 
@@ -1404,7 +1443,7 @@ class DemographicsQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = DemographicsQuestionnaire
 
-    _links = Hyperlinks({"self": URLFor("api.questionnaireendpoint", name="demographics_questionnaire", id="<id>")})
+    _links = Hyperlinks({"self": _questionnaire_url("demographics_questionnaire")})
 
 
 class DevelopmentalQuestionnaireSchema(ModelSchema):
@@ -1413,7 +1452,7 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="developmental_questionnaire", id="<id>"),
+            "self": _questionnaire_url("developmental_questionnaire"),
         }
     )
 
@@ -1464,7 +1503,7 @@ class EmploymentQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="employment_questionnaire", id="<id>"),
+            "self": _questionnaire_url("employment_questionnaire"),
         }
     )
 
@@ -1494,7 +1533,7 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="evaluation_history_dependent_questionnaire", id="<id>"),
+            "self": _questionnaire_url("evaluation_history_dependent_questionnaire"),
         }
     )
 
@@ -1524,7 +1563,7 @@ class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="evaluation_history_self_questionnaire", id="<id>"),
+            "self": _questionnaire_url("evaluation_history_self_questionnaire"),
         }
     )
 
@@ -1579,7 +1618,7 @@ class IdentificationQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = IdentificationQuestionnaire
 
-    _links = Hyperlinks({"self": URLFor("api.questionnaireendpoint", name="identification_questionnaire", id="<id>")})
+    _links = Hyperlinks({"self": _questionnaire_url("identification_questionnaire")})
 
 
 class ProfessionalProfileQuestionnaireSchema(ModelSchema):
@@ -1588,7 +1627,7 @@ class ProfessionalProfileQuestionnaireSchema(ModelSchema):
 
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="professional_profile_questionnaire", id="<id>"),
+            "self": _questionnaire_url("professional_profile_questionnaire"),
         }
     )
 
@@ -1599,9 +1638,9 @@ class RegistrationQuestionnaireSchema(ModelSchema):
         ordered = True
         include_fk = True
 
-    _links = fma_fields.Hyperlinks(
+    _links = Hyperlinks(
         {
-            "self": fma_fields.URLFor("api.questionnaireendpoint", name="registration_questionnaire", id="<id>"),
+            "self": _questionnaire_url("registration_questionnaire"),
         }
     )
 
@@ -1636,7 +1675,7 @@ class SupportsQuestionnaireSchema(ModelSchema):
     alternative_augmentative = Nested(lambda: AlternativeAugmentativeSchema(), many=True)
     _links = Hyperlinks(
         {
-            "self": URLFor("api.questionnaireendpoint", name="supports_questionnaire", id="<id>"),
+            "self": _questionnaire_url("supports_questionnaire"),
         }
     )
 
@@ -1656,8 +1695,8 @@ class TherapySchema(ModelSchema):
             "user_id",
         )
 
-    participant_id = fields.Method("get_participant_id", dump_only=True)
-    user_id = fields.Method("get_user_id", dump_only=True)
+    participant_id = Method("get_participant_id", dump_only=True)
+    user_id = Method("get_user_id", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1687,14 +1726,12 @@ class HousemateSchema(ModelSchema):
             "user_id",
         )
 
-    participant_id = fields.Method("get_participant_id")
-    user_id = fields.Method("get_user_id")
-    home_dependent_questionnaire_id = fields.Integer(required=False, allow_none=True)
-    home_self_questionnaire_id = fields.Integer(required=False, allow_none=True)
-    home_dependent_questionnaire = fields.Nested(
-        lambda: HomeDependentQuestionnaireSchema(), required=False, allow_none=True
-    )
-    home_self_questionnaire = fields.Nested(lambda: HomeSelfQuestionnaireSchema(), required=False, allow_none=True)
+    participant_id = Method("get_participant_id")
+    user_id = Method("get_user_id")
+    home_dependent_questionnaire_id = Integer(required=False, allow_none=True)
+    home_self_questionnaire_id = Integer(required=False, allow_none=True)
+    home_dependent_questionnaire = Nested(lambda: HomeDependentQuestionnaireSchema(), required=False, allow_none=True)
+    home_self_questionnaire = Nested(lambda: HomeSelfQuestionnaireSchema(), required=False, allow_none=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1728,8 +1765,8 @@ class MedicationSchema(ModelSchema):
             "user_id",
         )
 
-    participant_id = fields.Method("get_participant_id", dump_only=True)
-    user_id = fields.Method("get_user_id", dump_only=True)
+    participant_id = Method("get_participant_id", dump_only=True)
+    user_id = Method("get_user_id", dump_only=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1753,10 +1790,10 @@ class DataTransferLogSchema(ModelSchema):
         fields = ("id", "type", "date_started", "last_updated", "total_records", "alerts_sent", "details", "_links")
 
     details = Nested(lambda: DataTransferLogDetailSchema(), dump_only=True, many=True)
-    _links = Hyperlinks({"self": URLFor("api.datatransferlogendpoint", id="<id>")})
+    _links = Hyperlinks({"self": URLFor("api.datatransferlogendpoint", values={"id": "<id>"})})
 
 
 class DataTransferLogPageSchema(Schema):
-    pages = fields.Integer()
-    total = fields.Integer()
-    items = fields.List(Nested(lambda: DataTransferLogSchema()))
+    pages = Integer()
+    total = Integer()
+    items = List(Nested(lambda: DataTransferLogSchema()))

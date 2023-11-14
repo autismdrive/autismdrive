@@ -1,18 +1,24 @@
+# Prevent Black from reformatting these lines, so the testing environment variable can be set before importing anything:
+# fmt: off
+import os
+
+os.environ.setdefault("ENV_NAME", "testing")
+os.putenv("ENV_NAME", "testing")
+
+# Turn Black back on:
+# fmt: on
 import base64
 import datetime
-import os
 import quopri
 import re
 from inspect import getsourcefile
 from json import JSONEncoder
 from unittest import TestCase
 
-import click
 from flask import json
 from flask.ctx import RequestContext
 from flask.testing import FlaskClient
 from sqlalchemy.orm import scoped_session, close_all_sessions
-from sqlalchemy_utils import database_exists, create_database
 from werkzeug.test import TestResponse
 
 from app.api_app import APIApp
@@ -56,6 +62,9 @@ class BaseTest(TestCase):
     def setUpClass(cls):
         from config.testing import settings
 
+        cls.reset_db()
+        cls.reset_indices()
+
         _app = create_app(settings)
 
         cls.app = _app
@@ -64,12 +73,6 @@ class BaseTest(TestCase):
 
         cls.session = _app.session
         cls.client = _app.test_client()
-        cls.reset_db()
-        cls.reset_indices()
-
-        from app.database import upgrade_db
-
-        upgrade_db()
 
         current_dir = os.path.dirname(getsourcefile(lambda: 0))
         cls.loader = DataLoader(directory=current_dir + "/../example_data")
@@ -183,9 +186,9 @@ class BaseTest(TestCase):
         return usermeta
 
     def construct_admin_note(
-        self, user, resource, id=976, note="I think all sorts of things about this resource and I'm telling you now."
+        self, user, resource, note="I think all sorts of things about this resource and I'm telling you now."
     ):
-        admin_note = AdminNote(id=id, user_id=user.id, resource_id=resource.id, note=note)
+        admin_note = AdminNote(user_id=user.id, resource_id=resource.id, note=note)
         self.session.add(admin_note)
         self.session.commit()
         db_admin_note = self.session.query(AdminNote).filter_by(id=admin_note.id).first()

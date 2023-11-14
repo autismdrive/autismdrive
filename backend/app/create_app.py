@@ -3,6 +3,7 @@ from urllib.parse import unquote
 
 import click
 import flask_restful
+import traceback_with_variables
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import jsonify, url_for, Blueprint
 from flask_cors import CORS
@@ -12,7 +13,6 @@ from app.api_app import APIApp
 from app.data_loader import data_loader
 from app.elastic_index import elastic_index
 from app.email_prompt_service import EmailPromptService
-from app.email_service import EmailService
 from app.resources.Auth import auth_blueprint
 from app.resources.Tracking import tracking_blueprint
 from app.rest_exception import RestException
@@ -21,32 +21,37 @@ from config.logging import logging_config
 
 
 def create_app(settings=None):
+    click.secho(f"\n*** create_app > settings.ENV_NAME = {settings.ENV_NAME} ***\n")
+
     from config.load import settings as loaded_settings
 
-    settings = loaded_settings if settings is None else settings
+    click.secho(f"\n*** create_app > loaded_settings.ENV_NAME = {loaded_settings.ENV_NAME} ***\n")
+
+    _settings = loaded_settings if settings is None else settings
+
+    click.secho(f"\n*** create_app > _settings.ENV_NAME = {_settings.ENV_NAME} ***\n")
 
     logging.config.dictConfig(logging_config)
 
     _app = APIApp(__name__, instance_relative_config=True)
 
-    _app.config.from_object(settings)
+    _app.config.from_object(_settings)
+    _app.settings = _settings
 
     # Enable CORS
-    if settings.CORS_ENABLED:
+    if _settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
         origins_re = [r"^https?:\/\/%s(.*)" % o.replace(".", "\.") for o in settings.CORS_ALLOW_ORIGINS]
         CORS(_app, origins=origins_re)
 
-    from app.schemas import ma
+    # Database
     from app.database import session
 
     _app.session = session
-    _app.ma = ma
-    _app.ma.init_app(_app)
-    _app.ma.SQLAlchemySchema.OPTIONS_CLASS.session = session
-    _app.ma.SQLAlchemyAutoSchema.OPTIONS_CLASS.session = session
 
-    # email service
+    # Email service
+    from app.email_service import EmailService
+
     _app.email_service = EmailService()
 
     # Token Authentication
@@ -74,18 +79,21 @@ def create_app(settings=None):
     # Handle errors consistently
     @_app.errorhandler(RestException)
     def handle_invalid_usage(error):
-        error_dict = {}
-        if hasattr(error, "to_dict"):
-            error_dict = error.to_dict()
-        elif hasattr(error, "__dict__"):
-            error_dict = error.__dict__
 
-        if "details" in error_dict:
-            details = error_dict["details"]
-            if hasattr(details, "to_dict"):
-                error_dict["details"] = details.to_dict()
-            elif hasattr(details, "__dict__"):
-                error_dict["details"] = details.__dict__
+        try:
+            if hasattr(error, "to_dict"):
+                error_dict = error.to_dict()
+            elif hasattr(error, "__dict__"):
+                error_dict = error.__dict__
+
+            if "details" in error_dict:
+                details = error_dict["details"]
+                if hasattr(details, "to_dict"):
+                    error_dict["details"] = details.to_dict()
+                elif hasattr(details, "__dict__"):
+                    error_dict["details"] = details.__dict__
+        except Exception as _:
+            error_dict = {"details": traceback_with_variables.format_exc(error)}
 
         response = jsonify(error_dict)
         response.status_code = error.status_code
@@ -193,6 +201,7 @@ def create_app(settings=None):
         else:
             click.echo("This system is not configured to run exports. Ingoring.")
 
+    @_app.cli.command()
     def schedule_tasks():
         from app.models import User
         from app.models import Study
@@ -255,9 +264,6 @@ def create_app(settings=None):
     # Add all endpoints to the API
     for endpoint in endpoints:
         api.add_resource(endpoint[0], endpoint[1])
-
-    # Cron scheduler
-    schedule_tasks()
 
     @_app.teardown_appcontext
     def shutdown_session(exception=None):

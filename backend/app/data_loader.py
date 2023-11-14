@@ -124,7 +124,7 @@ class DataLoader:
                 session.add(EventUser(event_id=event.id, user_id=4))
                 session.add(EventUser(event_id=event.id, user_id=5))
 
-        session.commit()
+            session.commit()
         print("Events loaded.  There are now %i events in the database." % session.query(Event).count())
         print(
             "There are now %i links between events and categories in the database."
@@ -185,7 +185,7 @@ class DataLoader:
                         category_id = category.id
                         session.add(ResourceCategory(resource_id=location_id, category_id=category_id, type="location"))
 
-        session.commit()
+            session.commit()
         print(
             "Locations loaded.  There are now %i locations in the database."
             % session.query(Location).filter(Location.type == "location").count()
@@ -231,7 +231,7 @@ class DataLoader:
                         category_id = category.id
                         session.add(ResourceCategory(resource_id=resource_id, category_id=category_id, type="resource"))
 
-        session.commit()
+            session.commit()
         print(
             "Resources loaded.  There are now %i resources in the database."
             % session.query(Resource).filter(Resource.type == "resource").count()
@@ -307,13 +307,13 @@ class DataLoader:
                         study_investigator = StudyInvestigator(study_id=study.id, investigator_id=investigator.id)
                         session.add(study_investigator)
                         session.commit()
-            print("Studies loaded.  There are now %i studies in the database." % session.query(Study).count())
-            print(
-                "There are now %i links between studies and categories in the database."
-                % session.query(StudyCategory).count()
-            )
-            print("There are now %i study investigators in the database." % session.query(Investigator).count())
-        session.commit()
+            session.commit()
+        print("Studies loaded.  There are now %i studies in the database." % session.query(Study).count())
+        print(
+            "There are now %i links between studies and categories in the database."
+            % session.query(StudyCategory).count()
+        )
+        print("There are now %i study investigators in the database." % session.query(Investigator).count())
 
     def load_users(self):
         from .models import User
@@ -325,8 +325,10 @@ class DataLoader:
                 user = User(id=row[0], email=row[1], role=row[3], email_verified=True)
                 user.password = row[2]
                 session.add(user)
-            print("Users loaded.  There are now %i users in the database." % session.query(User).count())
-        session.commit()
+            session.commit()
+
+        session.close()
+        print("Users loaded.  There are now %i users in the database." % session.query(User).count())
 
     def load_participants(self):
         from .models import Participant
@@ -339,11 +341,11 @@ class DataLoader:
                 session.add(participant)
                 # Users no longer have an id_sequence but are randomly assigned., safe to not increment this.
                 # self.__increment_id_sequence(Participant)
-            print(
-                "Participants loaded.  There are now %i participants in the database."
-                % session.query(Participant).count()
-            )
         session.commit()
+        session.close()
+        print(
+            "Participants loaded.  There are now %i participants in the database." % session.query(Participant).count()
+        )
 
     def load_zip_codes(self):
         from .models import ZipCode

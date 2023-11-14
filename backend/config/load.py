@@ -1,5 +1,8 @@
 import os
 
+import click
+
+click.secho(f"\n*** config.load > ENV_NAME = {os.getenv('ENV_NAME', default='???')} ***\n")
 
 ENV_NAME = os.getenv("ENV_NAME", default="local")
 
@@ -16,4 +19,5 @@ match ENV_NAME:
     case _:
         from config.default import settings as _settings
 
+click.secho(f"\n*** Loading configuration for {ENV_NAME} environment. ***\n")
 settings = _settings

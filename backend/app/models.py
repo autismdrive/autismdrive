@@ -1,15 +1,13 @@
-import datetime
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Literal
 
 import googlemaps
 import jwt
-from flask_sqlalchemy.model import Model
 from sqlalchemy import ForeignKey, TEXT, func, ARRAY, select, Integer, Boolean, String
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr
-from sqlalchemy.dialects.postgresql import ARRAY
 
 from app.auth import bcrypt, password_requirements
 from app.database import Base, session, random_integer, get_class
@@ -22,11 +20,11 @@ from config.load import settings
 class AdminNote(Base):
     __tablename__ = "admin_note"
     id: Mapped[int] = mapped_column(primary_key=True)
-    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
+    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
     resource: Mapped["Resource"] = relationship(back_populates="admin_notes")
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="admin_notes")
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     note: Mapped[str]
 
 
@@ -70,18 +68,14 @@ class Category(Base):
     __tablename__ = "category"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    parent_id: Mapped[int] = mapped_column(ForeignKey("category.id"), primary_key=True)
-    parent: Mapped["Category"] = relationship(back_populates="children")
-    last_updated: Mapped[datetime]
+    parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("category.id"))
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     display_order: Mapped[Optional[int]]
+    parent: Mapped["Category"] = relationship(back_populates="children", remote_side=[id])
     children: Mapped[list["Category"]] = relationship(
-        remote_side=[id],
-        back_populates="parent",
-        lazy="joined",
-        join_depth=2,
-        order_by="Category.display_order,Category.name",
+        back_populates="parent", order_by="Category.display_order,Category.name"
     )
-    hit_count: Mapped[int] = mapped_column(default=0)  # when returning categories in the context of a search.
+    hit_count: Mapped[Optional[int]] = mapped_column(default=0)  # when returning categories in the context of a search.
     resources: Mapped[list["Resource"]] = relationship(
         secondary="resource_category", back_populates="categories", viewonly=True
     )
@@ -126,7 +120,7 @@ class ChainStep(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     instruction: Mapped[str]
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
 DataTransferLogType = Literal["importing", "exporting"]
@@ -140,8 +134,8 @@ class DataTransferLog(Base):
     __no_export__ = True  # Don't export this logging information.
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[DataTransferLogType]  # Either importing or exporting
-    date_started: Mapped[datetime]
-    last_updated: Mapped[datetime]
+    date_started: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     total_records: Mapped[int]
     alerts_sent: Mapped[int] = mapped_column(default=0)
     details: Mapped["DataTransferLogDetail"] = relationship()
@@ -159,9 +153,9 @@ class DataTransferLogDetail(Base):
     __tablename__ = "data_transfer_log_detail"
     __no_export__ = True  # Don't export this logging information.
     id: Mapped[int] = mapped_column(primary_key=True)
-    data_transfer_log_id: Mapped[int] = mapped_column(ForeignKey("data_transfer_log.id"), primary_key=True)
-    date_started: Mapped[datetime]
-    last_updated: Mapped[datetime]
+    data_transfer_log_id: Mapped[int] = mapped_column(ForeignKey("data_transfer_log.id"))
+    date_started: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     class_name: Mapped[str]
     successful: Mapped[bool]
     success_count: Mapped[int] = mapped_column(default=0)
@@ -182,12 +176,12 @@ class DataTransferLogDetail(Base):
 class EmailLog(Base):
     __tablename__ = "email_log"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     type: Mapped[str]
     tracking_code: Mapped[str]
     viewed: Mapped[bool]
-    date_viewed: Mapped[datetime]
-    last_updated: Mapped[datetime]
+    date_viewed: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
 class Resource(Base):
@@ -196,20 +190,20 @@ class Resource(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str]
     title: Mapped[str]
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     description: Mapped[str]
-    insurance: Mapped[str]
+    insurance: Mapped[Optional[str]]
     organization_name: Mapped[str]
     phone: Mapped[str]
-    phone_extension: Mapped[str]
+    phone_extension: Mapped[Optional[str]]
     website: Mapped[str]
-    contact_email: Mapped[str]
-    video_code: Mapped[str]
-    is_uva_education_content: Mapped[bool]
+    contact_email: Mapped[Optional[str]]
+    video_code: Mapped[Optional[str]]
+    is_uva_education_content: Mapped[Optional[bool]]
     is_draft: Mapped[bool]
-    ages: Mapped[list[str]] = mapped_column(ARRAY(String))
-    languages: Mapped[list[str]] = mapped_column(ARRAY(String))
-    covid19_categories: Mapped[list[str]] = mapped_column(ARRAY(String))
+    ages: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String))
+    languages: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String))
+    covid19_categories: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String))
     should_hide_related_resources: Mapped[bool] = mapped_column(default=False)
 
     __mapper_args__ = {"polymorphic_identity": "resource", "polymorphic_on": "type"}
@@ -251,10 +245,10 @@ class Resource(Base):
 class ResourceCategory(Base):
     __tablename__ = "resource_category"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     type: Mapped[str]
-    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), primary_key=True)
+    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     resource: Mapped["Resource"] = relationship(back_populates="resource_categories")
     category: Mapped["Category"] = relationship(back_populates="category_resources")
 
@@ -263,15 +257,15 @@ class Location(Resource):
     __tablename__ = "location"
     __label__ = "Local Services"
     id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
-    primary_contact: Mapped[str]
+    primary_contact: Mapped[Optional[str]]
     street_address1: Mapped[str]
     street_address2: Mapped[str]
     city: Mapped[str]
     state: Mapped[str]
     zip: Mapped[str]
-    email: Mapped[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
+    email: Mapped[Optional[str]]
+    latitude: Mapped[Optional[float]]
+    longitude: Mapped[Optional[float]]
 
     __mapper_args__ = {
         "polymorphic_identity": "location",
@@ -282,10 +276,10 @@ class Event(Location):
     __tablename__ = "event"
     __label__ = "Events and Training"
     id: Mapped[int] = mapped_column(ForeignKey("location.id"), primary_key=True)
-    date: Mapped[datetime]
-    time: Mapped[str]
-    ticket_cost: Mapped[str]
-    location_name: Mapped[str]
+    date: Mapped[datetime] = mapped_column(default=func.now())
+    time: Mapped[Optional[str]]
+    ticket_cost: Mapped[Optional[str]]
+    location_name: Mapped[Optional[str]]
     includes_registration: Mapped[bool]
     webinar_link: Mapped[str]
     post_survey_link: Mapped[str]
@@ -318,9 +312,9 @@ class Event(Location):
 class EventUser(Base):
     __tablename__ = "event_user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    event_id: Mapped[int] = mapped_column(ForeignKey("event.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    event_id: Mapped[int] = mapped_column(ForeignKey("event.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     event: Mapped["Event"] = relationship(back_populates="registered_users")
     user: Mapped["User"] = relationship(back_populates="user_events")
 
@@ -385,12 +379,12 @@ class Flow:
                 step.date_completed = step_log.date_completed
                 step.questionnaire_id = step_log.questionnaire_id
 
-    def add_step(self, questionnaireName):
-        if not self.has_step(questionnaireName):
-            class_name = camel_case_it(questionnaireName)
+    def add_step(self, questionnaire_name):
+        if not self.has_step(questionnaire_name):
+            class_name = camel_case_it(questionnaire_name)
             cls = get_class(class_name)
             q = cls()
-            step = Step(questionnaireName, q.__question_type__, q.__label__)
+            step = Step(questionnaire_name, q.__question_type__, q.__label__)
             self.steps.append(step)
 
 
@@ -575,11 +569,11 @@ class Geocode:
 class Investigator(Base):
     __tablename__ = "investigator"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     name: Mapped[str]
     title: Mapped[str]
-    organization_name: Mapped[str]
-    bio_link: Mapped[str]
+    organization_name: Mapped[Optional[str]]
+    bio_link: Mapped[Optional[str]]
     studies: Mapped[list["Study"]] = relationship(
         secondary="study_investigator", back_populates="investigators", viewonly=True
     )
@@ -596,11 +590,11 @@ class IdentificationQuestionnaire(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    relationship_to_participant: Mapped[str] = mapped_column(
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    relationship_to_participant: Mapped[Optional[str]] = mapped_column(
         info={
             "RELATIONSHIP_REQUIRED": ["dependent"],
             "display_order": 1.1,
@@ -618,7 +612,7 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    relationship_to_participant_other: Mapped[str] = mapped_column(
+    relationship_to_participant_other: Mapped[Optional[str]] = mapped_column(
         info={
             "RELATIONSHIP_REQUIRED": ["dependent"],
             "display_order": 1.2,
@@ -633,14 +627,14 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    first_name: Mapped[str] = mapped_column(
+    first_name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "input",
             "template_options": {"label": "First name", "required": True},
         },
     )
-    middle_name: Mapped[str] = mapped_column(
+    middle_name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "input",
@@ -649,7 +643,7 @@ class IdentificationQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!model.no_middle_name"},
         },
     )
-    no_middle_name: Mapped[bool] = mapped_column(
+    no_middle_name: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 3.5,
             "type": "checkbox",
@@ -660,14 +654,14 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    last_name: Mapped[str] = mapped_column(
+    last_name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4,
             "type": "input",
             "template_options": {"label": "Last name", "required": True},
         },
     )
-    is_first_name_preferred: Mapped[bool] = mapped_column(
+    is_first_name_preferred: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 5,
             "type": "radio",
@@ -689,7 +683,7 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    nickname: Mapped[str] = mapped_column(
+    nickname: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 6,
             "type": "input",
@@ -701,6 +695,7 @@ class IdentificationQuestionnaire(Base):
         },
     )
     birthdate: Mapped[datetime] = mapped_column(
+        default=func.now(),
         info={
             "display_order": 7,
             "type": "datepicker",
@@ -718,7 +713,7 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    birth_city: Mapped[str] = mapped_column(
+    birth_city: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 8,
             "type": "input",
@@ -736,7 +731,7 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    birth_state: Mapped[str] = mapped_column(
+    birth_state: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 9,
             "type": "input",
@@ -754,7 +749,7 @@ class IdentificationQuestionnaire(Base):
             },
         },
     )
-    is_english_primary: Mapped[bool] = mapped_column(
+    is_english_primary: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 10,
             "type": "radio",
@@ -823,14 +818,14 @@ class ContactQuestionnaire(Base):
     marketing_other_hide_expression = '!(model.marketing_channel && (model.marketing_channel === "other"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     participant: Mapped["Participant"] = relationship(back_populates="contact")
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship()
-    phone: Mapped[str] = mapped_column(
+    phone: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.1,
             "type": "input",
@@ -844,7 +839,7 @@ class ContactQuestionnaire(Base):
             "validators": {"validation": ["phone"]},
         },
     )
-    phone_type: Mapped[str] = mapped_column(
+    phone_type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "radio",
@@ -860,7 +855,7 @@ class ContactQuestionnaire(Base):
             },
         },
     )
-    can_leave_voicemail: Mapped[bool] = mapped_column(
+    can_leave_voicemail: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 1.3,
             "type": "radio",
@@ -875,7 +870,7 @@ class ContactQuestionnaire(Base):
             },
         },
     )
-    contact_times: Mapped[str] = mapped_column(
+    contact_times: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.4,
             "type": "textarea",
@@ -888,7 +883,7 @@ class ContactQuestionnaire(Base):
             },
         },
     )
-    email: Mapped[str] = mapped_column(
+    email: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "input",
@@ -900,28 +895,28 @@ class ContactQuestionnaire(Base):
             "validators": {"validation": ["email"]},
         },
     )
-    street_address: Mapped[str] = mapped_column(
+    street_address: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.1,
             "type": "input",
             "template_options": {"label": "Street Address", "required": True},
         },
     )
-    city: Mapped[str] = mapped_column(
+    city: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "input",
             "template_options": {"label": "Town/City", "required": False},
         },
     )
-    state: Mapped[str] = mapped_column(
+    state: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.3,
             "type": "input",
             "template_options": {"label": "State", "required": False},
         },
     )
-    zip: Mapped[int] = mapped_column(
+    zip: Mapped[Optional[int]] = mapped_column(
         info={
             "display_order": 3.4,
             "type": "input",
@@ -935,7 +930,7 @@ class ContactQuestionnaire(Base):
             },
         },
     )
-    marketing_channel: Mapped[str] = mapped_column(
+    marketing_channel: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4.1,
             "type": "select",
@@ -957,7 +952,7 @@ class ContactQuestionnaire(Base):
             },
         },
     )
-    marketing_other: Mapped[str] = mapped_column(
+    marketing_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4.2,
             "type": "input",
@@ -1009,15 +1004,15 @@ class Participant(Base):
     # with a user account; sometimes that of themselves and sometimes that of their guardian.
     __tablename__ = "stardrive_participant"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    last_updated: Mapped[datetime]
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="participants")
     identification: Mapped["IdentificationQuestionnaire"] = relationship()
     contact: Mapped["ContactQuestionnaire"] = relationship()
     relationship: Mapped["Relationship"]
-    avatar_icon: Mapped[str]
-    avatar_color: Mapped[str]
-    has_consented: Mapped[bool]
+    avatar_icon: Mapped[Optional[str]]
+    avatar_color: Mapped[Optional[str]]
+    has_consented: Mapped[Optional[bool]]
 
     def get_name(self):
         if self.identification:
@@ -1221,11 +1216,11 @@ class StepLog(Base):
     questionnaire_name: Mapped[str]
     questionnaire_id: Mapped[int]
     flow: Mapped[str]
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    date_completed: Mapped[datetime]
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    date_completed: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int]
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
 class Study(Base):
@@ -1233,23 +1228,23 @@ class Study(Base):
     __label__ = "Research Studies"
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str]
-    short_title: Mapped[str]
-    short_description: Mapped[str]
-    image_url: Mapped[str]
-    last_updated: Mapped[datetime]
+    short_title: Mapped[Optional[str]]
+    short_description: Mapped[Optional[str]]
+    image_url: Mapped[Optional[str]]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     description: Mapped[str]
     participant_description: Mapped[str]
     benefit_description: Mapped[str]
     coordinator_email: Mapped[str]
-    eligibility_url: Mapped[str]
-    survey_url: Mapped[str]
-    results_url: Mapped[str]
+    eligibility_url: Mapped[Optional[str]]
+    survey_url: Mapped[Optional[str]]
+    results_url: Mapped[Optional[str]]
     organization_name: Mapped[str]
-    location: Mapped[str]
-    num_visits: Mapped[int]
+    location: Mapped[Optional[str]]
+    num_visits: Mapped[Optional[int]]
     status: Mapped[Status]
-    ages: Mapped[list[str]] = mapped_column(ARRAY(String))
-    languages: Mapped[list[str]] = mapped_column(ARRAY(String))
+    ages: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String))
+    languages: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String))
     categories: Mapped[list["Category"]] = relationship(
         secondary="study_category", back_populates="studies", viewonly=True
     )
@@ -1293,30 +1288,30 @@ class Study(Base):
 class StudyInvestigator(Base):
     __tablename__ = "study_investigator"
     id: Mapped[int] = mapped_column(primary_key=True)
-    study_id: Mapped[int] = mapped_column(ForeignKey("study.id"), primary_key=True)
-    investigator_id: Mapped[int] = mapped_column(ForeignKey("investigator.id"), primary_key=True)
+    study_id: Mapped[int] = mapped_column(ForeignKey("study.id"))
+    investigator_id: Mapped[int] = mapped_column(ForeignKey("investigator.id"))
     study: Mapped["Study"] = relationship(back_populates="study_investigators")
     investigator: Mapped["Investigator"] = relationship(back_populates="investigator_studies")
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
 class StudyCategory(Base):
     __tablename__ = "study_category"
     id: Mapped[int] = mapped_column(primary_key=True)
-    study_id: Mapped[int] = mapped_column(ForeignKey("study.id"), primary_key=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), primary_key=True)
+    study_id: Mapped[int] = mapped_column(ForeignKey("study.id"))
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     study: Mapped["Study"] = relationship(back_populates="study_categories")
     category: Mapped["Category"] = relationship(back_populates="category_studies")
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
 class StudyUser(Base):
     __tablename__ = "study_user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     status: Mapped["StudyUserStatus"]
-    study_id: Mapped[int] = mapped_column(ForeignKey("study.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    study_id: Mapped[int] = mapped_column(ForeignKey("study.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     study: Mapped["Study"] = relationship(back_populates="study_users")
 
 
@@ -1331,9 +1326,9 @@ class User(Base):
 
     __tablename__ = "stardrive_user"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    last_updated: Mapped[datetime]
-    registration_date: Mapped[datetime]
-    last_login: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    registration_date: Mapped[datetime] = mapped_column(default=func.now())
+    last_login: Mapped[datetime] = mapped_column(default=func.now())
     email: Mapped[Optional[str]] = mapped_column(unique=True)
     role: Mapped[Role]
     participants: Mapped[list["Participant"]] = relationship(back_populates="user")
@@ -1344,7 +1339,7 @@ class User(Base):
         .scalar_subquery()
     )
     email_verified: Mapped[Optional[bool]] = mapped_column(default=False)
-    _password: Mapped[bytes] = mapped_column("password")
+    _password: Mapped[Optional[bytes]] = mapped_column("password")
     token: Mapped[str] = mapped_column(default="")
     token_url: Mapped[str] = mapped_column(default="")
     events: Mapped[list["Event"]] = relationship(secondary="event_user", back_populates="users", viewonly=True)
@@ -1405,8 +1400,8 @@ class User(Base):
     def encode_auth_token(self):
         try:
             payload = {
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2, minutes=0, seconds=0),
-                "iat": datetime.datetime.utcnow(),
+                "exp": datetime.utcnow() + timedelta(hours=2, minutes=0, seconds=0),
+                "iat": datetime.utcnow(),
                 "sub": self.id,
             }
             return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
@@ -1445,11 +1440,11 @@ class User(Base):
 class UserFavorite(Base):
     __tablename__ = "user_favorite"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     type: Mapped[str]
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     age_range: Mapped[str]
     language: Mapped[str]
     covid19_category: Mapped[str]
@@ -1462,7 +1457,7 @@ class UserMeta(Base):
     __tablename__ = "usermeta"
     __label__ = "User Meta Info"
     id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     self_participant: Mapped[bool]
     self_has_guardian: Mapped[bool]
     guardian: Mapped[bool]
@@ -1490,7 +1485,7 @@ class ZipCode(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     latitude: Mapped[float]
     longitude: Mapped[float]
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
 class AlternativeAugmentative(Base):
@@ -1499,9 +1494,9 @@ class AlternativeAugmentative(Base):
     __no_export__ = True  # This will be transferred as a part of a parent class
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"), primary_key=True)
-    type: Mapped[str] = mapped_column(
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.1,
             "type": "radio",
@@ -1532,7 +1527,7 @@ class AlternativeAugmentative(Base):
             },
         },
     )
-    type_other: Mapped[str] = mapped_column(
+    type_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -1544,7 +1539,7 @@ class AlternativeAugmentative(Base):
             "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
         },
     )
-    timeframe: Mapped[str] = mapped_column(
+    timeframe: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
@@ -1559,7 +1554,7 @@ class AlternativeAugmentative(Base):
             },
         },
     )
-    notes: Mapped[str] = mapped_column(
+    notes: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4,
             "type": "textarea",
@@ -1590,9 +1585,9 @@ class AssistiveDevice(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"), primary_key=True)
-    type_group: Mapped[str] = mapped_column(
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    type_group: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.1,
             "type": "select",
@@ -1625,7 +1620,7 @@ class AssistiveDevice(Base):
             },
         },
     )
-    type: Mapped[str] = mapped_column(
+    type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "select",
@@ -1737,7 +1732,7 @@ class AssistiveDevice(Base):
             },
         },
     )
-    type_other: Mapped[str] = mapped_column(
+    type_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -1749,7 +1744,7 @@ class AssistiveDevice(Base):
             "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
         },
     )
-    timeframe: Mapped[str] = mapped_column(
+    timeframe: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
@@ -1764,7 +1759,7 @@ class AssistiveDevice(Base):
             },
         },
     )
-    notes: Mapped[str] = mapped_column(
+    notes: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4,
             "type": "textarea",
@@ -1793,25 +1788,11 @@ class ChainQuestionnaire(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
-
-    @declared_attr
-    def participant_id(cls):
-        return mapped_column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
-
-    @declared_attr
-    def user_id(cls):
-        return mapped_column("user_id", Integer, ForeignKey("stardrive_user.id"))
-
-    @declared_attr
-    def sessions(cls):
-        return relationship(
-            "ChainSession",
-            backref=backref(cls.__tablename__, lazy="joined"),
-            cascade="all, delete-orphan",
-            passive_deletes=True,
-        )
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    sessions: Mapped[list["ChainSession"]] = relationship(back_populates="chain_questionnaire")
 
 
 class ChainSession(Base):
@@ -1826,10 +1807,12 @@ class ChainSession(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
-    chain_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("chain_questionnaire.id"), primary_key=True)
+    chain_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("chain_questionnaire.id"))
+    chain_questionnaire: Mapped["ChainQuestionnaire"] = relationship(back_populates="sessions")
     date: Mapped[datetime] = mapped_column(
+        default=func.now(),
         info={
             "display_order": 1,
             "type": "datepicker",
@@ -1840,7 +1823,7 @@ class ChainSession(Base):
         },
     )
 
-    completed: Mapped[bool] = mapped_column(
+    completed: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 2,
             "type": "radio",
@@ -1855,7 +1838,7 @@ class ChainSession(Base):
         },
     )
 
-    session_type: Mapped[str] = mapped_column(
+    session_type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "radio",
@@ -1878,9 +1861,10 @@ class ChallengingBehavior(Base):
     __no_export__ = True  # This will be transferred as a part of a parent class
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    chain_session_step_id: Mapped[int] = mapped_column(ForeignKey("chain_session_step.id"), primary_key=True)
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    chain_session_step_id: Mapped[int] = mapped_column(ForeignKey("chain_session_step.id"))
     time: Mapped[datetime] = mapped_column(
+        default=func.now(),
         info={
             "display_order": 1,
             "type": "datepicker",
@@ -1905,35 +1889,48 @@ class ChainSessionStep(Base):
     focus_step_hide_expression = "!model.was_focus_step"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    chain_session_id: Mapped[int] = mapped_column(ForeignKey("chain_session.id"), primary_key=True)
-
-    @declared_attr
-    def chain_step_id(cls):
-        options = []
-        try:
-            chain_steps = session.query(ChainStep).all()
-            sorted_steps = sorted(chain_steps, key=lambda chain_step: chain_step.id)
-            options = [{"value": s.id, "label": s.instruction} for s in sorted_steps]
-        except:
-            pass
-
-        return mapped_column(
-            "chain_step_id",
-            Integer,
-            ForeignKey("chain_step.id"),
-            info={
-                "display_order": 1,
-                "type": "select",
-                "template_options": {
-                    "required": True,
-                    "label": "Task",
-                    "options": options,
-                },
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    chain_session_id: Mapped[Optional[int]] = mapped_column(ForeignKey("chain_session.id"))
+    chain_step_id: Mapped[int] = mapped_column(
+        ForeignKey("chain_step.id"),
+        info={
+            "display_order": 1,
+            "type": "select",
+            "template_options": {
+                "required": True,
+                "label": "Task",
+                "options": [],
             },
-        )
+        },
+    )
+
+    # @declared_attr
+    # def chain_step_id(self) -> Mapped[int]:
+    #     options = []
+    #     try:
+    #         chain_steps = session.query(ChainStep).all()
+    #         sorted_steps = sorted(chain_steps, key=lambda chain_step: chain_step.id)
+    #         options = [{"value": s.id, "label": s.instruction} for s in sorted_steps]
+    #     except:
+    #         pass
+    #
+    #     return mapped_column(
+    #         "chain_step_id",
+    #         Integer,
+    #         ForeignKey("chain_step.id"),
+    #         info={
+    #             "display_order": 1,
+    #             "type": "select",
+    #             "template_options": {
+    #                 "required": True,
+    #                 "label": "Task",
+    #                 "options": options,
+    #             },
+    #         },
+    #     )
 
     date: Mapped[datetime] = mapped_column(
+        default=func.now(),
         info={
             "display_order": 2,
             "type": "datepicker",
@@ -1944,7 +1941,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    was_focus_step: Mapped[bool] = mapped_column(
+    was_focus_step: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
@@ -1962,7 +1959,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    target_prompt_level: Mapped[str] = mapped_column(
+    target_prompt_level: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4,
             "type": "radio",
@@ -1982,7 +1979,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    status: Mapped[str] = mapped_column(
+    status: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 5,
             "type": "radio",
@@ -2002,7 +1999,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    completed: Mapped[bool] = mapped_column(
+    completed: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 6,
             "type": "radio",
@@ -2018,7 +2015,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    was_prompted: Mapped[bool] = mapped_column(
+    was_prompted: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 7,
             "type": "radio",
@@ -2034,7 +2031,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    prompt_level: Mapped[str] = mapped_column(
+    prompt_level: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 8,
             "type": "radio",
@@ -2052,7 +2049,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    had_challenging_behavior: Mapped[bool] = mapped_column(
+    had_challenging_behavior: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 9,
             "type": "radio",
@@ -2068,7 +2065,7 @@ class ChainSessionStep(Base):
         },
     )
 
-    reason_step_incomplete: Mapped[str] = mapped_column(
+    reason_step_incomplete: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 10,
             "type": "radio",
@@ -2166,12 +2163,12 @@ class ClinicalDiagnosesQuestionnaire(Base):
     genetic_other_hide_expression = '!(model.genetic && model.genetic.includes("geneticOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    developmental: Mapped[list[str]] = mapped_column(
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    developmental: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 1.1,
@@ -2194,7 +2191,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             },
         },
     )
-    developmental_other: Mapped[str] = mapped_column(
+    developmental_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "input",
@@ -2206,7 +2203,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!" + developmental_other_hide_expression},
         },
     )
-    mental_health: Mapped[list[str]] = mapped_column(
+    mental_health: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 2,
@@ -2230,7 +2227,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             },
         },
     )
-    mental_health_other: Mapped[str] = mapped_column(
+    mental_health_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2.2,
             "type": "input",
@@ -2242,7 +2239,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!" + mental_health_other_hide_expression},
         },
     )
-    medical: Mapped[list[str]] = mapped_column(
+    medical: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 3.1,
@@ -2263,7 +2260,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             },
         },
     )
-    medical_other: Mapped[str] = mapped_column(
+    medical_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "input",
@@ -2275,7 +2272,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!" + medical_other_hide_expression},
         },
     )
-    genetic: Mapped[list[str]] = mapped_column(
+    genetic: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 4.1,
@@ -2297,7 +2294,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
             },
         },
     )
-    genetic_other: Mapped[str] = mapped_column(
+    genetic_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4.2,
             "type": "input",
@@ -2372,21 +2369,18 @@ class CurrentBehaviorsMixin(object):
     academic_difficulty_other_hide_expression = (
         '!(model.academic_difficulty_areas && model.academic_difficulty_areas.includes("other"))'
     )
+    has_academic_difficulties_desc = ""
+    academic_difficulty_areas_desc = ""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    @declared_attr
-    def participant_id(cls):
-        return mapped_column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
-    def user_id(cls):
-        return mapped_column("user_id", Integer, ForeignKey("stardrive_user.id"))
-
-    @declared_attr
-    def has_academic_difficulties(cls):
+    def has_academic_difficulties(self):
         return mapped_column(
             Boolean,
             info={
@@ -2401,13 +2395,13 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.has_academic_difficulties_desc,
+                    "template_options.description": self.has_academic_difficulties_desc,
                 },
             },
         )
 
     @declared_attr
-    def academic_difficulty_areas(cls):
+    def academic_difficulty_areas(self):
         return mapped_column(
             ARRAY(String),
             info={
@@ -2425,7 +2419,7 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.academic_difficulty_areas_desc,
+                    "template_options.description": self.academic_difficulty_areas_desc,
                     "template_options.required": "model.has_academic_difficulties",
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
@@ -2433,7 +2427,7 @@ class CurrentBehaviorsMixin(object):
             },
         )
 
-    academic_difficulty_other: Mapped[str] = mapped_column(
+    academic_difficulty_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4.2,
             "type": "input",
@@ -2463,7 +2457,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, CurrentBehaviorsMixin):
         '!(model.concerning_behaviors && model.concerning_behaviors.includes("concerningOther"))'
     )
 
-    dependent_verbal_ability: Mapped[str] = mapped_column(
+    dependent_verbal_ability: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
             "type": "radio",
@@ -2483,7 +2477,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, CurrentBehaviorsMixin):
             },
         },
     )
-    concerning_behaviors: Mapped[list[str]] = mapped_column(
+    concerning_behaviors: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 2,
@@ -2521,7 +2515,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, CurrentBehaviorsMixin):
             },
         },
     )
-    concerning_behaviors_other: Mapped[str] = mapped_column(
+    concerning_behaviors_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2.2,
             "type": "input",
@@ -2547,7 +2541,7 @@ class CurrentBehaviorsSelfQuestionnaire(Base, CurrentBehaviorsMixin):
     has_academic_difficulties_desc = '"Do you have any difficulties with academics?"'
     academic_difficulty_areas_desc = '"What areas of academics are difficult for you?"'
 
-    self_verbal_ability: Mapped[list[str]] = mapped_column(
+    self_verbal_ability: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 1,
@@ -2585,12 +2579,12 @@ class DemographicsQuestionnaire(Base):
     race_ethnicity_other_hide_expression = '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    birth_sex: Mapped[str] = mapped_column(
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    birth_sex: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
             "type": "radio",
@@ -2618,7 +2612,7 @@ class DemographicsQuestionnaire(Base):
             },
         },
     )
-    gender_identity: Mapped[str] = mapped_column(
+    gender_identity: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2.1,
             "type": "select",
@@ -2648,7 +2642,7 @@ class DemographicsQuestionnaire(Base):
             },
         },
     )
-    gender_identity_other: Mapped[str] = mapped_column(
+    gender_identity_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2.2,
             "type": "input",
@@ -2660,7 +2654,7 @@ class DemographicsQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!" + gender_identity_other_hide_expression},
         },
     )
-    race_ethnicity: Mapped[list[str]] = mapped_column(
+    race_ethnicity: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 3.1,
@@ -2684,7 +2678,7 @@ class DemographicsQuestionnaire(Base):
             "validators": {"required": "multicheckbox"},
         },
     )
-    race_ethnicity_other: Mapped[str] = mapped_column(
+    race_ethnicity_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "input",
@@ -2737,12 +2731,12 @@ class DevelopmentalQuestionnaire(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    had_birth_complications: Mapped[bool] = mapped_column(
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    had_birth_complications: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 1,
             "type": "radio",
@@ -2756,7 +2750,7 @@ class DevelopmentalQuestionnaire(Base):
             },
         },
     )
-    birth_complications_description: Mapped[str] = mapped_column(
+    birth_complications_description: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -2767,7 +2761,7 @@ class DevelopmentalQuestionnaire(Base):
             "hide_expression": "!model.had_birth_complications",
         },
     )
-    when_motor_milestones: Mapped[str] = mapped_column(
+    when_motor_milestones: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "radio",
@@ -2789,7 +2783,7 @@ class DevelopmentalQuestionnaire(Base):
             },
         },
     )
-    when_language_milestones: Mapped[str] = mapped_column(
+    when_language_milestones: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
@@ -2811,7 +2805,7 @@ class DevelopmentalQuestionnaire(Base):
             },
         },
     )
-    when_toileting_milestones: Mapped[str] = mapped_column(
+    when_toileting_milestones: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4,
             "type": "radio",
@@ -2843,21 +2837,17 @@ class EducationMixin(object):
     school_services_other_hide_expression = (
         '!(model.school_services && model.school_services.includes("servicesOther"))'
     )
+    attends_school_desc = ""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    @declared_attr
-    def participant_id(cls):
-        return mapped_column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
-    def user_id(cls):
-        return mapped_column("user_id", Integer, ForeignKey("stardrive_user.id"))
-
-    @declared_attr
-    def attends_school(cls):
+    def attends_school(self):
         return mapped_column(
             Boolean,
             info={
@@ -2872,12 +2862,12 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.attends_school_desc,
+                    "template_options.label": self.attends_school_desc,
                 },
             },
         )
 
-    school_name: Mapped[str] = mapped_column(
+    school_name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "input",
@@ -2985,7 +2975,7 @@ class EducationMixin(object):
             },
         )
 
-    school_services_other: Mapped[str] = mapped_column(
+    school_services_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 6.2,
             "type": "input",
@@ -3026,7 +3016,7 @@ class EducationDependentQuestionnaire(Base, EducationMixin):
     placement_other_hide_expression = '!(model.dependent_placement && model.dependent_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.dependent_placement && model.dependent_placement === "grades1to12")'
 
-    dependent_placement: Mapped[str] = mapped_column(
+    dependent_placement: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4.2,
             "type": "select",
@@ -3069,7 +3059,7 @@ class EducationSelfQuestionnaire(Base, EducationMixin):
     placement_other_hide_expression = '!(model.self_placement && model.self_placement === "schoolOther")'
     current_grade_hide_expression = '!(model.self_placement && model.self_placement === "highSchool")'
 
-    self_placement: Mapped[str] = mapped_column(
+    self_placement: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4.1,
             "type": "select",
@@ -3102,12 +3092,12 @@ class EmploymentQuestionnaire(Base):
     __estimated_duration_minutes__ = 2
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    is_currently_employed: Mapped[bool] = mapped_column(
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    is_currently_employed: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 1.1,
             "type": "radio",
@@ -3118,7 +3108,7 @@ class EmploymentQuestionnaire(Base):
             },
         },
     )
-    employment_capacity: Mapped[str] = mapped_column(
+    employment_capacity: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "radio",
@@ -3134,7 +3124,7 @@ class EmploymentQuestionnaire(Base):
             "hide_expression": "!(model.is_currently_employed)",
         },
     )
-    has_employment_support: Mapped[str] = mapped_column(
+    has_employment_support: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "radio",
@@ -3163,16 +3153,10 @@ class EvaluationHistoryMixin(object):
     where_diagnosed_other_hide_expression = '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
-
-    @declared_attr
-    def participant_id(cls):
-        return mapped_column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
-
-    @declared_attr
-    def user_id(cls):
-        return mapped_column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
     def has_autism_diagnosis(cls):
@@ -3269,7 +3253,7 @@ class EvaluationHistoryMixin(object):
             },
         )
 
-    who_diagnosed_other: Mapped[str] = mapped_column(
+    who_diagnosed_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 5,
             "type": "input",
@@ -3337,7 +3321,7 @@ class EvaluationHistoryMixin(object):
             },
         )
 
-    where_diagnosed_other: Mapped[str] = mapped_column(
+    where_diagnosed_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 7,
             "type": "input",
@@ -3350,7 +3334,7 @@ class EvaluationHistoryMixin(object):
         },
     )
 
-    partner_centers_evaluation: Mapped[list[str]] = mapped_column(
+    partner_centers_evaluation: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 8.1,
@@ -3499,16 +3483,10 @@ class HomeMixin(object):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
-
-    @declared_attr
-    def participant_id(cls):
-        return mapped_column("participant_id", Integer, ForeignKey("stardrive_participant.id"))
-
-    @declared_attr
-    def user_id(cls):
-        return mapped_column("user_id", Integer, ForeignKey("stardrive_user.id"))
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
     def housemates(cls):
@@ -3567,7 +3545,7 @@ class HomeDependentQuestionnaire(Base, HomeMixin):
         'able to afford to pay for household needs, food, or security for the family?"'
     )
 
-    dependent_living_situation: Mapped[list[str]] = mapped_column(
+    dependent_living_situation: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 2.1,
@@ -3588,7 +3566,7 @@ class HomeDependentQuestionnaire(Base, HomeMixin):
             "validators": {"required": "multicheckbox"},
         },
     )
-    dependent_living_other: Mapped[str] = mapped_column(
+    dependent_living_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2.2,
             "type": "input",
@@ -3634,19 +3612,19 @@ class Housemate(Base):
     relationship_other_hide_expression = '!(model.relationship && (model.relationship === "relationOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     home_dependent_questionnaire_id: Mapped[int] = mapped_column(
         ForeignKey("home_dependent_questionnaire.id"), primary_key=True
     )
-    home_self_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("home_self_questionnaire.id"), primary_key=True)
-    name: Mapped[str] = mapped_column(
+    home_self_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("home_self_questionnaire.id"))
+    name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.1,
             "type": "input",
             "template_options": {"label": "Name", "required": True},
         },
     )
-    relationship: Mapped[str] = mapped_column(
+    relationship: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "select",
@@ -3684,7 +3662,7 @@ class Housemate(Base):
             },
         },
     )
-    relationship_other: Mapped[str] = mapped_column(
+    relationship_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.3,
             "type": "input",
@@ -3713,7 +3691,7 @@ class Housemate(Base):
             },
         },
     )
-    has_autism: Mapped[bool] = mapped_column(
+    has_autism: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 3.5,
             "type": "radio",
@@ -3743,7 +3721,7 @@ class HomeSelfQuestionnaire(Base, HomeMixin):
         '"Do you ever struggle with being able to afford to pay for household needs, food, or security?"'
     )
 
-    self_living_situation: Mapped[list[str]] = mapped_column(
+    self_living_situation: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 1.1,
@@ -3765,7 +3743,7 @@ class HomeSelfQuestionnaire(Base, HomeMixin):
             },
         },
     )
-    self_living_other: Mapped[str] = mapped_column(
+    self_living_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "input",
@@ -3797,9 +3775,9 @@ class Medication(Base):
     symptom_other_hide_expression = '!(model.symptom && (model.symptom === "symptomOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"), primary_key=True)
-    symptom: Mapped[str] = mapped_column(
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    symptom: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
             "type": "select",
@@ -3817,7 +3795,7 @@ class Medication(Base):
             },
         },
     )
-    symptom_other: Mapped[str] = mapped_column(
+    symptom_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -3829,7 +3807,7 @@ class Medication(Base):
             "expression_properties": {"template_options.required": "!" + symptom_other_hide_expression},
         },
     )
-    name: Mapped[str] = mapped_column(
+    name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "textarea",
@@ -3838,7 +3816,7 @@ class Medication(Base):
             },
         },
     )
-    notes: Mapped[str] = mapped_column(
+    notes: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "textarea",
@@ -3884,12 +3862,12 @@ class ProfessionalProfileQuestionnaire(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    purpose: Mapped[str] = mapped_column(
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    purpose: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
             "type": "select",
@@ -3904,7 +3882,7 @@ class ProfessionalProfileQuestionnaire(Base):
             },
         },
     )
-    professional_identity: Mapped[list[str]] = mapped_column(
+    professional_identity: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 2.1,
@@ -3956,7 +3934,7 @@ class ProfessionalProfileQuestionnaire(Base):
             },
         },
     )
-    professional_identity_other: Mapped[str] = mapped_column(
+    professional_identity_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2.2,
             "type": "input",
@@ -3968,7 +3946,7 @@ class ProfessionalProfileQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!" + professional_identity_other_hide_expression},
         },
     )
-    learning_interests: Mapped[list[str]] = mapped_column(
+    learning_interests: Mapped[Optional[list[str]]] = mapped_column(
         ARRAY(String),
         info={
             "display_order": 3.1,
@@ -4008,7 +3986,7 @@ class ProfessionalProfileQuestionnaire(Base):
             },
         },
     )
-    learning_interests_other: Mapped[str] = mapped_column(
+    learning_interests_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "input",
@@ -4020,7 +3998,7 @@ class ProfessionalProfileQuestionnaire(Base):
             "expression_properties": {"template_options.required": "!" + learning_interests_other_hide_expression},
         },
     )
-    currently_work_with_autistic: Mapped[bool] = mapped_column(
+    currently_work_with_autistic: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 4,
             "type": "radio",
@@ -4034,7 +4012,7 @@ class ProfessionalProfileQuestionnaire(Base):
             },
         },
     )
-    previous_work_with_autistic: Mapped[bool] = mapped_column(
+    previous_work_with_autistic: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 4,
             "type": "radio",
@@ -4048,7 +4026,7 @@ class ProfessionalProfileQuestionnaire(Base):
             },
         },
     )
-    length_work_with_autistic: Mapped[str] = mapped_column(
+    length_work_with_autistic: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 5,
             "type": "input",
@@ -4083,12 +4061,12 @@ class RegistrationQuestionnaire(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    event_id: Mapped[int] = mapped_column(ForeignKey("event.id"), primary_key=True)
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    event_id: Mapped[int] = mapped_column(ForeignKey("event.id"))
     first_name: Mapped[str]
     last_name: Mapped[str]
     email: Mapped[str]
@@ -4111,18 +4089,18 @@ class SupportsQuestionnaire(Base):
     alternative_med_other_hide_expression = '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     medications = relationship(
         "Medication",
         backref=backref("supports_questionnaire", lazy="joined"),
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
-    alternative_med: Mapped[str] = mapped_column(
+    alternative_med: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
             "type": "multicheckbox",
@@ -4141,7 +4119,7 @@ class SupportsQuestionnaire(Base):
             },
         },
     )
-    alternative_med_other: Mapped[str] = mapped_column(
+    alternative_med_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -4276,9 +4254,9 @@ class Therapy(Base):
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime]
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"), primary_key=True)
-    type: Mapped[str] = mapped_column(
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
             "type": "radio",
@@ -4339,7 +4317,7 @@ class Therapy(Base):
             },
         },
     )
-    type_other: Mapped[str] = mapped_column(
+    type_other: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.2,
             "type": "textarea",
@@ -4351,7 +4329,7 @@ class Therapy(Base):
             "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
         },
     )
-    timeframe: Mapped[str] = mapped_column(
+    timeframe: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
@@ -4366,7 +4344,7 @@ class Therapy(Base):
             },
         },
     )
-    notes: Mapped[str] = mapped_column(
+    notes: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 4,
             "type": "textarea",
@@ -4397,4 +4375,4 @@ class ResourceChangeLog(Base):
     user_email: Mapped[str]
     resource_id: Mapped[int]
     resource_title: Mapped[str]
-    last_updated: Mapped[datetime]
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())

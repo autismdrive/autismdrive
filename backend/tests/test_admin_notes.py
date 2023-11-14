@@ -1,14 +1,17 @@
-from app.models import AdminNote
 from tests.base_test import BaseTest
+from app.models import AdminNote
 
 
 class TestAdminNote(BaseTest):
     def test_admin_note_basics(self):
         u = self.construct_user()
         l = self.construct_location()
-        self.construct_admin_note(id=377, user=u, resource=l, note="This resource is related to an event record")
-        an = self.session.query(AdminNote).first()
+        an = self.construct_admin_note(user=u, resource=l, note="This resource is related to an event record")
         self.assertIsNotNone(an)
+
+        db_an = self.session.query(AdminNote).first()
+        self.assertIsNotNone(db_an)
+
         headers = self.logged_in_headers()
         rv = self.client.get(
             f"/api/admin_note/{an.id}",
@@ -24,7 +27,7 @@ class TestAdminNote(BaseTest):
     def test_modify_admin_note_basics(self):
         u = self.construct_user()
         e = self.construct_event()
-        self.construct_admin_note(id=342, user=u, resource=e, note="This event is related to a location record")
+        self.construct_admin_note(user=u, resource=e, note="This event is related to a location record")
         an = self.session.query(AdminNote).first()
         self.assertIsNotNone(an)
         rv = self.client.get(
@@ -87,7 +90,7 @@ class TestAdminNote(BaseTest):
     def test_admin_note_by_user_basics(self):
         u = self.construct_user()
         r = self.construct_resource()
-        self.construct_admin_note(id=467, user=u, resource=r, note="Lotsa stuff to say about this resource")
+        self.construct_admin_note(user=u, resource=r, note="Lotsa stuff to say about this resource")
         an = self.session.query(AdminNote).first()
         self.assertIsNotNone(an)
         rv = self.client.get(
@@ -99,7 +102,6 @@ class TestAdminNote(BaseTest):
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response[0]["id"], an.id)
-        self.assertEqual(response[0]["id"], 467)
         self.assertEqual(response[0]["note"], "Lotsa stuff to say about this resource")
 
     def test_admin_note_by_resource_basics(self):
@@ -126,13 +128,11 @@ class TestAdminNote(BaseTest):
         r2 = self.construct_resource(title="R2")
         r3 = self.construct_resource(title="R3")
         r4 = self.construct_resource(title="R4")
-        self.construct_admin_note(id=324, user=u1, resource=r1, note="This resource is a duplicate")
-        self.construct_admin_note(id=249, user=u1, resource=r3, note="This is my favorite resource")
-        self.construct_admin_note(
-            id=569, user=u2, resource=r1, note="I don't agree - I think this is a separate resource"
-        )
-        self.construct_admin_note(id=208, user=u2, resource=r2, note="Their hours have changed to 3-4PM Sundays")
-        self.construct_admin_note(id=796, user=u2, resource=r4, note="They have a waiting list of 20 as of today.")
+        self.construct_admin_note(user=u1, resource=r1, note="This resource is a duplicate")
+        self.construct_admin_note(user=u1, resource=r3, note="This is my favorite resource")
+        self.construct_admin_note(user=u2, resource=r1, note="I don't agree - I think this is a separate resource")
+        self.construct_admin_note(user=u2, resource=r2, note="Their hours have changed to 3-4PM Sundays")
+        self.construct_admin_note(user=u2, resource=r4, note="They have a waiting list of 20 as of today.")
         rv = self.client.get(
             "/api/admin_note", follow_redirects=True, content_type="application/json", headers=self.logged_in_headers()
         )

@@ -9,3 +9,4 @@ from app.main import app
 
 print("Running on port " + str(port))
 app.run(host="0.0.0.0", threaded=True, port=port)
+app.schedule_tasks()

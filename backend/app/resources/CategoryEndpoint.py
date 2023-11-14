@@ -1,14 +1,15 @@
 import flask_restful
 from flask import request
+from sqlalchemy import update, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
-from app.database import session
-from app.models import Category, ResourceCategory, StudyCategory, UserFavorite
+from app.database import session, engine
 from app.enums import Permission
+from app.models import Category, ResourceCategory, StudyCategory, UserFavorite
 from app.rest_exception import RestException
-from app.schemas import CategorySchema, ParentCategorySchema
+from app.schemas import CategorySchema, ParentCategorySchema, CategoryUpdateSchema
 from app.wrappers import requires_permission
 
 
@@ -38,14 +39,26 @@ class CategoryEndpoint(flask_restful.Resource):
     @requires_permission(Permission.taxonomy_admin)
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(Category).filter_by(id=id).first()
+        get_statement = select(Category).where(Category.id == id)
+        old_cat = session.execute(get_statement).unique().scalar_one_or_none()
+
+        if old_cat is None:
+            raise RestException(RestException.NOT_FOUND)
+
         try:
-            updated = self.schema.load(data=request_data, session=session, instance=instance)
+            schema = CategoryUpdateSchema()
+            updated_cat = schema.load(data=request_data, session=session, instance=old_cat)
+            updated_dict = schema.dump(updated_cat)
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e)
-        session.add(updated)
+
+        update_statement = update(Category).where(Category.id == id).values(updated_dict)
+        session.execute(update_statement)
         session.commit()
-        return self.schema.dump(updated)
+        session.close()
+
+        db_updated = session.execute(get_statement).unique().scalar_one()
+        return self.schema.dump(db_updated)
 
 
 class CategoryListEndpoint(flask_restful.Resource):

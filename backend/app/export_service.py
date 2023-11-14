@@ -16,7 +16,7 @@ class ExportService:
 
     QUESTION_PACKAGE = "app.model.questionnaires"
     SCHEMA_PACKAGE = "app.schemas"
-    EXPORT_SCHEMA_CLASS = "ExportSchema"
+    EXPORT_SCHEMA_CLASS = "ExportSchemas"
 
     TYPE_SENSITIVE = "sensitive"
     TYPE_IDENTIFYING = "identifying"
