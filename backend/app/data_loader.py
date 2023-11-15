@@ -7,7 +7,7 @@ from sqlalchemy import Sequence
 from app.elastic_index import elastic_index
 from app.enums import Status
 from config.load import settings
-from .database import session
+from .database import session, engine
 
 
 class DataLoader:
@@ -325,9 +325,9 @@ class DataLoader:
                 user = User(id=row[0], email=row[1], role=row[3], email_verified=True)
                 user.password = row[2]
                 session.add(user)
-            session.commit()
+                session.commit()
+            session.close()
 
-        session.close()
         print("Users loaded.  There are now %i users in the database." % session.query(User).count())
 
     def load_participants(self):
@@ -341,8 +341,8 @@ class DataLoader:
                 session.add(participant)
                 # Users no longer have an id_sequence but are randomly assigned., safe to not increment this.
                 # self.__increment_id_sequence(Participant)
-        session.commit()
-        session.close()
+                session.commit()
+                session.close()
         print(
             "Participants loaded.  There are now %i participants in the database." % session.query(Participant).count()
         )
@@ -494,7 +494,8 @@ class DataLoader:
         session.commit()
 
     def __increment_id_sequence(self, model):
-        session.execute(Sequence(model.__tablename__ + "_id_seq"))
+        with engine.begin() as conn:
+            conn.execute(Sequence(model.__tablename__ + "_id_seq"))
 
 
 data_loader = DataLoader()

@@ -1,6 +1,6 @@
 import re
 from datetime import datetime, timedelta
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
 
 import googlemaps
 import jwt
@@ -184,6 +184,22 @@ class EmailLog(Base):
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
 
+def _category_names(obj: Union["Resource", "Study"]):
+    cat_text = ""
+    for cat in obj.categories:
+        cat_text = cat_text + " " + cat.name
+
+    fields = ["ages", "languages", "covid19_categories"]
+
+    for field in fields:
+        if hasattr(obj, field):
+            value = getattr(obj, field)
+            if value is not None and len(value) > 0:
+                cat_text += " " + " ".join(value)
+
+    return cat_text
+
+
 class Resource(Base):
     __tablename__ = "resource"
     __label__ = "Online Information"
@@ -193,7 +209,7 @@ class Resource(Base):
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
     description: Mapped[str]
     insurance: Mapped[Optional[str]]
-    organization_name: Mapped[str]
+    organization_name: Mapped[Optional[str]]
     phone: Mapped[str]
     phone_extension: Mapped[Optional[str]]
     website: Mapped[str]
@@ -228,18 +244,7 @@ class Resource(Base):
         )
 
     def category_names(self):
-        cat_text = ""
-        for cat in self.categories:
-            cat_text = cat_text + " " + cat.category.name
-
-        if self.ages is not None and len(self.ages) > 0:
-            cat_text = cat_text + " " + " ".join(self.ages)
-        if self.languages is not None and len(self.languages) > 0:
-            cat_text = cat_text + " " + " ".join(self.languages)
-        if self.covid19_categories is not None and len(self.covid19_categories) > 0:
-            cat_text = cat_text + " " + " ".join(self.covid19_categories)
-
-        return cat_text
+        return _category_names(self)
 
 
 class ResourceCategory(Base):
@@ -280,10 +285,10 @@ class Event(Location):
     time: Mapped[Optional[str]]
     ticket_cost: Mapped[Optional[str]]
     location_name: Mapped[Optional[str]]
-    includes_registration: Mapped[bool]
-    webinar_link: Mapped[str]
-    post_survey_link: Mapped[str]
-    max_users: Mapped[int]
+    includes_registration: Mapped[Optional[bool]]
+    webinar_link: Mapped[Optional[str]]
+    post_survey_link: Mapped[Optional[str]]
+    max_users: Mapped[Optional[int]]
     registration_url: Mapped[Optional[str]]
     image_url: Mapped[Optional[str]]
     post_event_description: Mapped[Optional[str]]
@@ -1239,7 +1244,7 @@ class Study(Base):
     eligibility_url: Mapped[Optional[str]]
     survey_url: Mapped[Optional[str]]
     results_url: Mapped[Optional[str]]
-    organization_name: Mapped[str]
+    organization_name: Mapped[Optional[str]]
     location: Mapped[Optional[str]]
     num_visits: Mapped[Optional[int]]
     status: Mapped[Status]
@@ -1273,16 +1278,7 @@ class Study(Base):
         )
 
     def category_names(self):
-        cat_text = ""
-        for cat in self.categories:
-            cat_text = cat_text + " " + cat.category.name
-
-        if self.ages is not None and len(self.ages) > 0:
-            cat_text = cat_text + " " + " ".join(self.ages)
-        if self.languages is not None and len(self.languages) > 0:
-            cat_text = cat_text + " " + " ".join(self.languages)
-
-        return cat_text
+        return _category_names(self)
 
 
 class StudyInvestigator(Base):

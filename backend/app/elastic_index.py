@@ -186,7 +186,7 @@ class ElasticIndex:
         doc.meta.id = self._get_id(document)
 
         for cat in document.categories:
-            doc.category.extend(cat.category.all_search_paths())
+            doc.category.extend(cat.all_search_paths())
 
         if document.__tablename__ == "study":
             doc.title = document.short_title
@@ -299,21 +299,33 @@ class ElasticIndex:
         else:
             elastic_search = elastic_search.filter(Q("bool", must_not=[Q("match", is_draft=True)]))
 
+        category_agg_args = {
+            "name_or_agg": "terms",
+            "field": "category.keyword",
+            "exclude": ".*\\,.*",
+            "size": 25,
+        }
         if search.category and search.category.id:
             elastic_search = elastic_search.filter("terms", category=[str(search.category.search_path())])
-            if search.category.calculate_level() == 0:
-                exclude = ".*\\,.*\\,.*"
-                include = str(search.category.id) + "\\,.*"
-                aggregation = A("terms", field="category", exclude=exclude, include=include, size=25)
-            elif search.category.calculate_level() == 1:
-                include = ".*\\,.*\\,.*"
-                aggregation = A("terms", field="category", include=include, size=25)
-            else:
-                aggregation = A("terms", field="category", size=25)
-        else:
-            aggregation = A("terms", field="category", exclude=".*\\,.*", size=25)
 
-        elastic_search.aggs.bucket("terms", aggregation)
+            # Include all subcategories of the given root-level category.
+            if search.category.calculate_level() == 0:
+                category_agg_args.update(
+                    {
+                        "exclude": ".*\\,.*\\,.*",  # Exclude other root-level categories.
+                        "include": f"{search.category.id}\\,.*",  # Include root-level category's children.
+                    }
+                )
+
+            else:
+                # All categories.
+                category_agg_args.pop("exclude")
+
+                # Include only children of the given 2nd-level category.
+                if search.category.calculate_level() == 1:
+                    category_agg_args.update({"include": ".*\\,.*\\,.*"})
+
+        elastic_search.aggs.bucket("terms", A(**category_agg_args))
         elastic_search.aggs.bucket("type", A("terms", field="type"))
         elastic_search.aggs.bucket("ages", A("terms", field="ages"))
         elastic_search.aggs.bucket("languages", A("terms", field="languages"))
