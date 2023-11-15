@@ -1,28 +1,35 @@
 import flask_restful
+import math
 from flask import request
-from sqlalchemy import desc
+from sqlalchemy import select, desc
 
 from app.auth import auth
+from app.database import session
+from app.enums import Role
 from app.models import DataTransferLog
 from app.schemas import DataTransferLogPageSchema
-from app.enums import Role
 from app.wrappers import requires_roles
 
 
 class DataTransferLogEndpoint(flask_restful.Resource):
-
-    logs_schema = DataTransferLogPageSchema()
-
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self):
-        from flask import current_app
 
-        db = getattr(current_app, "db")
+        logs_schema = DataTransferLogPageSchema()
 
         args = request.args
-        page_number = eval(args["pageNumber"]) if ("pageNumber" in args) else 0
-        per_page = eval(args["pageSize"]) if ("pageSize" in args) else 20
-        query = db.select(DataTransferLog).order_by(desc(DataTransferLog.last_updated))
-        page = db.paginate(query, page=page_number + 1, per_page=per_page, error_out=False)
-        return self.logs_schema.dump(page)
+        page_number = int(args["pageNumber"]) if ("pageNumber" in args) else 0
+        per_page = int(args["pageSize"]) if ("pageSize" in args) else 20
+
+        q = session.query(DataTransferLog)
+        num_items = q.count()
+        num_pages = math.ceil(num_items / per_page)
+        items = q.order_by(desc(DataTransferLog.last_updated)).limit(per_page).offset(page_number + 1).all()
+        return logs_schema.dump(
+            {
+                "items": items,
+                "pages": num_pages,
+                "total": num_items,
+            }
+        )

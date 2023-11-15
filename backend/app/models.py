@@ -133,12 +133,12 @@ class DataTransferLog(Base):
     __tablename__ = "data_transfer_log"
     __no_export__ = True  # Don't export this logging information.
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[DataTransferLogType]  # Either importing or exporting
+    type: Mapped[DataTransferLogType] = mapped_column(default="exporting")  # Either importing or exporting
     date_started: Mapped[datetime] = mapped_column(default=func.now())
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
-    total_records: Mapped[int]
+    total_records: Mapped[int] = mapped_column(default=0)
     alerts_sent: Mapped[int] = mapped_column(default=0)
-    details: Mapped["DataTransferLogDetail"] = relationship()
+    details: Mapped[list["DataTransferLogDetail"]] = relationship(back_populates="data_transfer_log")
 
     def successful(self):
         return next((x for x in self.details if not x.successful), None) is None
@@ -156,11 +156,12 @@ class DataTransferLogDetail(Base):
     data_transfer_log_id: Mapped[int] = mapped_column(ForeignKey("data_transfer_log.id"))
     date_started: Mapped[datetime] = mapped_column(default=func.now())
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
-    class_name: Mapped[str]
-    successful: Mapped[bool]
+    class_name: Mapped[str] = mapped_column(default="")
+    successful: Mapped[bool] = mapped_column(default=False)
     success_count: Mapped[int] = mapped_column(default=0)
     failure_count: Mapped[int] = mapped_column(default=0)
     errors = mapped_column(TEXT, default="")
+    data_transfer_log: Mapped["DataTransferLog"] = relationship(back_populates="details")
 
     def handle_failure(self, error):
         if not self.errors:

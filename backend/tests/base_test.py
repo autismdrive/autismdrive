@@ -160,7 +160,11 @@ class BaseTest(TestCase):
         except:
             self.assertTrue(200 <= rv.status_code < 300, f"BAD Response: {rv.status_code}. {msg}")
 
-    def construct_user(self, email="stan@staunton.com", role=Role.user, last_login=datetime.datetime.now()) -> User:
+    def construct_user(
+        self, email="stan@staunton.com", role=Role.user, last_login: datetime.datetime | str = datetime.datetime.now()
+    ) -> User:
+        if isinstance(last_login, str):
+            last_login = datetime.datetime.strptime(last_login, "%m/%d/%y %H:%M")
         db_user = self.session.query(User).filter_by(email=email).first()
         if db_user:
             return db_user
