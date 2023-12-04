@@ -69,7 +69,7 @@ class SearchEndpoint(flask_restful.Resource):
             )
             search.hits.append(search_hit)
 
-        return SearchSchema().jsonify(search)
+        return SearchSchema().dump(search)
 
     def map_data_only_search_results(self, search, results):
         search.hits = []
@@ -77,7 +77,7 @@ class SearchEndpoint(flask_restful.Resource):
             if hit.longitude and hit.latitude:
                 search_hit = MapHit(hit.id, hit.type, hit.latitude, hit.longitude, hit.no_address)
                 search.hits.append(search_hit)
-        return SearchSchema().jsonify(search)
+        return SearchSchema().dump(search)
 
     def update_aggregations(self, search, aggregations):
         for bucket in aggregations.ages.buckets:

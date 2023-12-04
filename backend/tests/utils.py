@@ -1,4 +1,10 @@
+import logging
 import uuid
+
+from faker import Faker
+
+fake = Faker()
+logging.getLogger("faker").setLevel(logging.ERROR)
 
 
 def get_new_uuid():
@@ -7,5 +13,13 @@ def get_new_uuid():
 
 
 class MockGoogleMapsClient:
-    def geocode(self, address):
-        return [{"geometry": {"location": {"lat": 0, "lng": 0}}}]
+    def geocode(self, address: dict = None):
+        lat, lng = 0, 0
+
+        if address:
+            # Use address hash value to create a seed for the fake lat/long
+            # so that the same address always returns the same lat/long
+            Faker.seed(hash(address))
+            lat, lng = fake.latlng()
+
+        return [{"geometry": {"location": {"lat": lat, "lng": lng}}}]

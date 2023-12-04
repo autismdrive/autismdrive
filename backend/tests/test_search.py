@@ -4,7 +4,8 @@ import dateutil.parser
 
 from app.elastic_index import elastic_index
 from app.models import Category
-from app.enums import Role
+from app.enums import Role, Status
+from fixtures.study import MockStudy
 from tests.base_test import BaseTest
 
 
@@ -741,15 +742,15 @@ class TestSearch(BaseTest):
         self.assertFalse("highlights" in search_results["hits"][0])
 
     def test_study_search_record_updates(self):
-        umbrella_query = {"words": "umbrellas"}
+        from fixtures.fixure_utils import fake
+
+        keyword = fake.word()
+        kw_query = {"words": keyword}
 
         # test that elastic resource is created with post
-        study = {
-            "status": "currently_enrolling",
-            "title": "space platypus",
-            "description": "delivering umbrellas",
-            "organization_name": "Study Org",
-        }
+        study = MockStudy(
+            description=f"{fake.sentence()} {keyword} {fake.sentence()}", status=Status.currently_enrolling.name
+        )
         rv = self.client.post(
             "api/study", data=self.jsonify(study), content_type="application/json", follow_redirects=True
         )
@@ -757,12 +758,12 @@ class TestSearch(BaseTest):
         response = rv.json
         s_id = response["id"]
 
-        search_results = self.search(umbrella_query)
+        search_results = self.search(kw_query)
         self.assertEqual(1, len(search_results["hits"]))
         self.assertEqual(search_results["hits"][0]["id"], s_id)
-        self.assertEqual(search_results["hits"][0]["status"], "Currently enrolling")
+        self.assertEqual(search_results["hits"][0]["status"], Status.currently_enrolling.value)
 
-        response["status"] = "study_in_progress"
+        response["status"] = Status.study_in_progress.name
         rv = self.client.put(
             "/api/study/%i" % s_id, data=self.jsonify(response), content_type="application/json", follow_redirects=True
         )
@@ -770,10 +771,10 @@ class TestSearch(BaseTest):
         rv = self.client.get("/api/study/%i" % s_id, content_type="application/json")
         self.assert_success(rv)
 
-        search_results = self.search(umbrella_query)
+        search_results = self.search(kw_query)
         self.assertEqual(1, len(search_results["hits"]))
         self.assertEqual(search_results["hits"][0]["id"], s_id)
-        self.assertEqual(search_results["hits"][0]["status"], "Study in progress")
+        self.assertEqual(search_results["hits"][0]["status"], Status.study_in_progress.value)
 
     def test_search_with_drafts(self):
         resource_query = {"words": "resource"}

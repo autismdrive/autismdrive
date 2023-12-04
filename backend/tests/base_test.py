@@ -1,6 +1,7 @@
 # Prevent Black from reformatting these lines, so the testing environment variable can be set before importing anything:
 # fmt: off
 import os
+from typing import MutableMapping
 
 os.environ.setdefault("ENV_NAME", "testing")
 os.putenv("ENV_NAME", "testing")
@@ -12,8 +13,8 @@ import datetime
 import quopri
 import re
 from inspect import getsourcefile
-from json import JSONEncoder
 from unittest import TestCase
+from json import JSONEncoder
 
 from flask import json
 from flask.ctx import RequestContext
@@ -49,6 +50,19 @@ from app.models import User
 from app.models import UserFavorite
 from app.models import UserMeta
 from app.models import ZipCode
+
+
+class DateTimeEncoder(JSONEncoder):
+    def encode(self, obj):
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return obj.isoformat()
+
+        if isinstance(obj, MutableMapping):
+            for key, value in list(obj.items()):
+                if isinstance(value, (datetime.date, datetime.datetime)):
+                    obj[key] = value.isoformat()
+
+        return super().encode(obj)
 
 
 class BaseTest(TestCase):
@@ -143,10 +157,9 @@ class BaseTest(TestCase):
         Returns given data as JSON string, converting dates to ISO format.
         """
 
-        class DateTimeEncoder(JSONEncoder):
-            def default(self, obj):
-                if isinstance(obj, (datetime.date, datetime.datetime)):
-                    return obj.isoformat()
+        # Convert the object to a dict first if possible
+        if not isinstance(data, dict) and hasattr(data, "__dict__"):
+            data = data.__dict__
 
         return json.dumps(data, cls=DateTimeEncoder)
 
@@ -268,6 +281,8 @@ class BaseTest(TestCase):
         latitude=38.98765,
         longitude=-93.12345,
         organization_name="Location Org",
+        primary_contact="John Doe",
+        email="a@b.c",
     ):
 
         location = Location(
@@ -284,6 +299,8 @@ class BaseTest(TestCase):
             longitude=longitude,
             is_draft=is_draft,
             organization_name=organization_name,
+            primary_contact=primary_contact,
+            email=email,
         )
         self.session.add(location)
         self.session.commit()
@@ -441,7 +458,7 @@ class BaseTest(TestCase):
         return self.session.query(ChainStep).all()
 
     def construct_chain_step(
-        self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=datetime.datetime.now()
+        self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=datetime.datetime.utcnow()
     ):
         self.session.add(ChainStep(id=id, name=name, instruction=instruction, last_updated=last_updated))
         self.session.commit()

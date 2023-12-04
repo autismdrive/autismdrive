@@ -115,9 +115,9 @@ class UserListEndpoint(flask_restful.Resource):
             self.send_confirm_email(new_user)
             return self.userSchema.dump(new_user)
         except IntegrityError as ie:
-            raise RestException(RestException.INVALID_OBJECT)
+            raise RestException(RestException.INVALID_OBJECT, details=ie)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=new_user.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err)
 
     @staticmethod
     def send_confirm_email(user):

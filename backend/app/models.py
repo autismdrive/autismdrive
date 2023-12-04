@@ -180,7 +180,7 @@ class EmailLog(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     type: Mapped[str]
     tracking_code: Mapped[str]
-    viewed: Mapped[bool]
+    viewed: Mapped[bool] = mapped_column(default=False)
     date_viewed: Mapped[datetime] = mapped_column(default=func.now())
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
 
@@ -211,7 +211,7 @@ class Resource(Base):
     description: Mapped[str]
     insurance: Mapped[Optional[str]]
     organization_name: Mapped[Optional[str]]
-    phone: Mapped[str]
+    phone: Mapped[Optional[str]]
     phone_extension: Mapped[Optional[str]]
     website: Mapped[str]
     contact_email: Mapped[Optional[str]]
@@ -265,7 +265,7 @@ class Location(Resource):
     id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
     primary_contact: Mapped[Optional[str]]
     street_address1: Mapped[str]
-    street_address2: Mapped[str]
+    street_address2: Mapped[Optional[str]]
     city: Mapped[str]
     state: Mapped[str]
     zip: Mapped[str]
@@ -541,7 +541,7 @@ class Geocode:
     @staticmethod
     def get_geocode(address_dict):
 
-        if "TESTING" in settings and settings.TESTING:
+        if settings.TESTING:
             z = session.query(ZipCode).order_by(func.random()).first()
             print("TEST:  Pretending to get the geocode and setting lat/lng to  %s - %s" % (z.latitude, z.longitude))
             return {"lat": z.latitude, "lng": z.longitude}
@@ -1260,6 +1260,7 @@ class Study(Base):
     )
     study_investigators: Mapped[list["StudyInvestigator"]] = relationship(back_populates="study")
     study_users: Mapped[list["StudyUser"]] = relationship(back_populates="study")
+    users: Mapped[list["User"]] = relationship(secondary="study_user", back_populates="studies", viewonly=True)
 
     def indexable_content(self):
         return " ".join(
@@ -1306,10 +1307,11 @@ class StudyUser(Base):
     __tablename__ = "study_user"
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
-    status: Mapped["StudyUserStatus"]
+    status: Mapped[Optional["StudyUserStatus"]]
     study_id: Mapped[int] = mapped_column(ForeignKey("study.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     study: Mapped["Study"] = relationship(back_populates="study_users")
+    user: Mapped["User"] = relationship(back_populates="user_studies")
 
 
 class User(Base):
@@ -1325,7 +1327,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
     registration_date: Mapped[datetime] = mapped_column(default=func.now())
-    last_login: Mapped[datetime] = mapped_column(default=func.now())
+    last_login: Mapped[Optional[datetime]]
     email: Mapped[Optional[str]] = mapped_column(unique=True)
     role: Mapped[Role]
     participants: Mapped[list["Participant"]] = relationship(back_populates="user")
@@ -1342,6 +1344,8 @@ class User(Base):
     events: Mapped[list["Event"]] = relationship(secondary="event_user", back_populates="users", viewonly=True)
     user_events: Mapped[list["EventUser"]] = relationship(back_populates="user")
     admin_notes: Mapped[list["AdminNote"]] = relationship(back_populates="user")
+    studies: Mapped[list["Study"]] = relationship(secondary="study_user", back_populates="users", viewonly=True)
+    user_studies: Mapped[list["StudyUser"]] = relationship(back_populates="user")
 
     def related_to_participant(self, participant_id):
         for p in self.participants:
@@ -1440,11 +1444,11 @@ class UserFavorite(Base):
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
     type: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
-    resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
-    age_range: Mapped[str]
-    language: Mapped[str]
-    covid19_category: Mapped[str]
+    resource_id: Mapped[Optional[int]] = mapped_column(ForeignKey("resource.id"))
+    category_id: Mapped[Optional[int]] = mapped_column(ForeignKey("category.id"))
+    age_range: Mapped[Optional[str]]
+    language: Mapped[Optional[str]]
+    covid19_category: Mapped[Optional[str]]
     user = relationship(User, backref=backref("user_favorites", lazy="joined"))
     resource = relationship(Resource, backref=backref("user_favorites", lazy="joined"))
     category = relationship(Category, backref=backref("user_favorites", lazy="joined"))
@@ -1455,12 +1459,12 @@ class UserMeta(Base):
     __label__ = "User Meta Info"
     id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
-    self_participant: Mapped[bool]
-    self_has_guardian: Mapped[bool]
-    guardian: Mapped[bool]
-    guardian_has_dependent: Mapped[bool]
-    professional: Mapped[bool]
-    interested: Mapped[bool]
+    self_participant: Mapped[Optional[bool]]
+    self_has_guardian: Mapped[Optional[bool]]
+    guardian: Mapped[Optional[bool]]
+    guardian_has_dependent: Mapped[Optional[bool]]
+    professional: Mapped[Optional[bool]]
+    interested: Mapped[Optional[bool]]
 
     def get_relationship(self):
         if self.self_participant:

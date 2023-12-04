@@ -27,6 +27,7 @@ class StudyInquiryEndpoint(flask_restful.Resource):
             session.add(log)
             session.add(su)
             session.commit()
+            session.close()
             return ""
         else:
             raise RestException(RestException.STUDY_INQUIRY_ERROR)

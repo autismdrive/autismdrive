@@ -1,14 +1,16 @@
 from app.email_service import TEST_MESSAGES
-from app.models import EmailLog, Study, StudyInvestigator, StudyCategory, ContactQuestionnaire
+from app.models import EmailLog, Study, StudyInvestigator, StudyCategory, ContactQuestionnaire, StudyUser
 from app.enums import Relationship
 from app.models import IdentificationQuestionnaire
 from app.models import StudyCategory
+from fixtures.study import MockStudy, MockStudyWithMoreFields
 from tests.base_test import BaseTest
 
 
 class TestStudy(BaseTest):
     def test_study_basics(self):
-        self.construct_study()
+        mock_study = MockStudy()
+        self.construct_study(**mock_study.__dict__)
         s = self.session.query(Study).first()
         self.assertIsNotNone(s)
         s_id = s.id
@@ -16,8 +18,8 @@ class TestStudy(BaseTest):
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], s_id)
-        self.assertEqual(response["title"], "Fantastic Study")
-        self.assertEqual(response["description"], "A study that will go down in history")
+        self.assertEqual(response["title"], mock_study.title)
+        self.assertEqual(response["description"], mock_study.description)
         self.assertNotIn("study_users", response, "Never include info about other users in a non-protected endpoint")
         self.assertNotIn("users", response, "Never include info about other users in a non-protected endpoint")
 
@@ -27,29 +29,28 @@ class TestStudy(BaseTest):
         self.assertIsNotNone(s)
         s_id = s.id
         rv = self.client.get("/api/study/%i" % s_id, content_type="application/json")
-        response = rv.json
-        response["title"] = "Edwarardos Lemonade and Oil Change"
-        response["description"] = "Better fluids for you and your car."
-        response["benefit_description"] = "Better fluids for you and your car, Duh."
-        response["short_title"] = "Edwardos"
-        response["short_description"] = "Better fluids yada yada."
-        response["image_url"] = "/some/url"
-        response["coordinator_email"] = "hello@study.com"
-        orig_date = response["last_updated"]
+        modified_study = rv.json.copy()
+        orig_date = modified_study["last_updated"]
+        mock_study = MockStudyWithMoreFields()
+        modified_study.update(mock_study.__dict__)
+
         rv = self.client.put(
-            "/api/study/%i" % s_id, data=self.jsonify(response), content_type="application/json", follow_redirects=True
+            "/api/study/%i" % s_id,
+            data=self.jsonify(modified_study),
+            content_type="application/json",
+            follow_redirects=True,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/study/%i" % s_id, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["title"], "Edwarardos Lemonade and Oil Change")
-        self.assertEqual(response["description"], "Better fluids for you and your car.")
-        self.assertEqual(response["benefit_description"], "Better fluids for you and your car, Duh.")
-        self.assertEqual(response["short_title"], "Edwardos")
-        self.assertEqual(response["short_description"], "Better fluids yada yada.")
-        self.assertEqual(response["image_url"], "/some/url")
-        self.assertEqual(response["coordinator_email"], "hello@study.com")
+        self.assertEqual(response["title"], mock_study.title)
+        self.assertEqual(response["description"], mock_study.description)
+        self.assertEqual(response["benefit_description"], mock_study.benefit_description)
+        self.assertEqual(response["short_title"], mock_study.short_title)
+        self.assertEqual(response["short_description"], mock_study.short_description)
+        self.assertEqual(response["image_url"], mock_study.image_url)
+        self.assertEqual(response["coordinator_email"], mock_study.coordinator_email)
         self.assertNotEqual(orig_date, response["last_updated"])
 
     def test_delete_study(self):
@@ -65,18 +66,14 @@ class TestStudy(BaseTest):
         self.assertEqual(404, rv.status_code)
 
     def test_create_study(self):
-        study = {
-            "title": "Study of Studies",
-            "benefit_description": "This study will change your life.",
-            "organization_name": "Study Org",
-        }
+        study = MockStudy()
         rv = self.client.post(
             "api/study", data=self.jsonify(study), content_type="application/json", follow_redirects=True
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["title"], "Study of Studies")
-        self.assertEqual(response["benefit_description"], "This study will change your life.")
+        self.assertEqual(response["title"], study.title)
+        self.assertEqual(response["benefit_description"], study.benefit_description)
         self.assertIsNotNone(response["id"])
 
     def test_get_study_by_category(self):
@@ -256,7 +253,7 @@ class TestStudy(BaseTest):
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-    def test_study_inquiry_creates_StudyUser(self):
+    def test_study_inquiry_creates_study_user(self):
         s = self.construct_study(title="The Best Study")
         u = self.construct_user()
 
@@ -276,7 +273,11 @@ class TestStudy(BaseTest):
         )
         self.assert_success(rv)
 
-        self.assertEquals(1, len(s.study_users))
+        db_study = self.session.query(Study).filter(Study.id == s.id).first()
+        self.assertEqual(1, len(db_study.study_users))
+        su = db_study.study_users[0]
+        self.assertEqual(u.id, su.user_id)
+        self.assertEqual(s.id, su.study_id)
 
     def test_study_inquiry_fails_without_valid_study_or_user(self):
         s = self.construct_study(title="The Best Study")

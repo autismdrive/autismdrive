@@ -1,16 +1,15 @@
 # Login
 # *****************************
-from functools import wraps
 import datetime
+from functools import wraps
 
+from flask import g, request, Blueprint, jsonify
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import func
 
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
-from flask import g, request, Blueprint, jsonify
-
 from app.rest_exception import RestException
 from app.schemas import UserSchema
 from config.load import settings
@@ -63,13 +62,13 @@ def login_password():
             user.last_login = datetime.datetime.utcnow()
             session.add(user)
             session.commit()
-            return schema.jsonify(user)
+            return jsonify(schema.dump(user))
         else:
             raise RestException(RestException.LOGIN_FAILURE)
     else:
         if "email_token" in request_data:
             g.user = confirm_email(request_data["email_token"])
-            return schema.jsonify(user)
+            return jsonify(schema.dump(user))
         else:
             raise RestException(RestException.CONFIRM_EMAIL)
 
@@ -122,7 +121,7 @@ def reset_password():
     session.commit()
     auth_token = user.encode_auth_token()
     user.token = auth_token
-    return UserSchema().jsonify(user)
+    return jsonify(UserSchema().dump(user))
 
 
 @auth.verify_token

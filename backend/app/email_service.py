@@ -58,7 +58,7 @@ class EmailService:
             ical_attachment.add_header("Content-Disposition", "attachment; filename=event.ics")
             msg_root.attach(ical_attachment)
 
-        if "TESTING" in settings and settings.TESTING:
+        if settings.TESTING:
             print("TEST:  Recording Emails, not sending - %s - to:%s" % (subject, recipients))
             TEST_MESSAGES.append(msg_root)
             return
@@ -115,7 +115,7 @@ class EmailService:
             tracking_code = self.tracking_code()
             logo_url = self.api_url + "/api/track/" + str(user.id) + "/" + tracking_code + "/UVA_STAR-logo.png"
 
-            self.confirm_email(user, current_studies, tracking_code, logo_url, days)
+            return self.confirm_email(user, current_studies, tracking_code, logo_url, days)
 
     def reset_email(self, user):
         user.token_url = ""

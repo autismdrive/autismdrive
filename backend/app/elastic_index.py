@@ -326,9 +326,9 @@ class ElasticIndex:
                     category_agg_args.update({"include": ".*\\,.*\\,.*"})
 
         elastic_search.aggs.bucket("terms", A(**category_agg_args))
-        elastic_search.aggs.bucket("type", A("terms", field="type"))
-        elastic_search.aggs.bucket("ages", A("terms", field="ages"))
-        elastic_search.aggs.bucket("languages", A("terms", field="languages"))
+        elastic_search.aggs.bucket("type", A("terms", field="type.keyword"))
+        elastic_search.aggs.bucket("ages", A("terms", field="ages.keyword"))
+        elastic_search.aggs.bucket("languages", A("terms", field="languages.keyword"))
 
         # KEEPING FOR NOW - THESE WERE THE ORIGINAL FACETS WE HAD SET UP.  WILL NEED TO CONVERT TO AGGREGATIONS
         # IF WE WANT TO KEEP ANY OF THESE.

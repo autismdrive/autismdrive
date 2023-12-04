@@ -120,10 +120,10 @@ class TestDataLoader(BaseTest):
         es_studies = elastic_index.search(Search(types=[Study.__tablename__]))
 
         # Verify that the number of items in the database match the number of items in the search index
-        self.assertEqual(num_db_resources, es_resources.hits.total)
-        self.assertEqual(num_db_events, es_events.hits.total)
-        self.assertEqual(num_db_locations, es_locations.hits.total)
-        self.assertEqual(num_db_studies, es_studies.hits.total)
+        self.assertEqual(num_db_resources, es_resources.hits.total["value"])
+        self.assertEqual(num_db_events, es_events.hits.total["value"])
+        self.assertEqual(num_db_locations, es_locations.hits.total["value"])
+        self.assertEqual(num_db_studies, es_studies.hits.total["value"])
 
         # Assure there are not age related categories.
         self.assertEqual(0, self.session.query(Category).filter(Category.name == "Age Range").count())

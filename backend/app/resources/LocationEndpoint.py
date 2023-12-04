@@ -117,7 +117,7 @@ class LocationListEndpoint(flask_restful.Resource):
             self.log_update(location_id=load_result.id, location_title=load_result.title, change_type="create")
             return self.locationSchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err)
 
     @staticmethod
     def log_update(location_id, location_title, change_type):

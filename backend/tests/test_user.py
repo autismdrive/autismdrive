@@ -9,6 +9,12 @@ from tests.base_test import BaseTest
 
 
 class TestUser(BaseTest):
+    def _verify_email(self, user: User):
+        user.email_verified = True
+        self.session.add(user)
+        self.session.commit()
+        self.session.close()
+
     def test_user_basics(self):
         self.construct_user()
         u = self.session.query(User).first()
@@ -169,7 +175,7 @@ class TestUser(BaseTest):
             # Should raise exception
             user.password = "badpass"
 
-    def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user):
+    def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user) -> User:
         data = {"id": id, "email": email}
         rv = self.client.post(
             "/api/user",
@@ -189,6 +195,7 @@ class TestUser(BaseTest):
 
         self.session.add(user)
         self.session.commit()
+        self.session.close()
 
         rv = self.client.get(
             "/api/user/%i" % user.id, content_type="application/json", headers=self.logged_in_headers()
@@ -197,7 +204,7 @@ class TestUser(BaseTest):
         response = rv.json
         self.assertEqual(email, response["email"])
         self.assertEqual(role.name, response["role"])
-        self.assertEqual(True, user.is_correct_password(password))
+        self.assertEqual(True, user.is_correct_password(plaintext=password))
 
         return user
 
@@ -208,7 +215,9 @@ class TestUser(BaseTest):
         rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
         self.assertEqual(400, rv.status_code)
 
-        user.email_verified = True
+        # Set email_verified to True so login will work
+        self._verify_email(user)
+
         rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
         self.assert_success(rv)
         response = rv.json
@@ -391,7 +400,12 @@ class TestUser(BaseTest):
         self.assertIsNone(user.last_login)
         data = {"email": "tyrion@got.com", "password": "Wowbagger the Infinitely Prolonged !@#%$12354"}
 
+        # Set email_verified to True so login will work
         user.email_verified = True
+        self.session.add(user)
+        self.session.commit()
+        self.session.close()
+
         rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
         self.assert_success(rv)
         response = rv.json

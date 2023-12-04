@@ -54,12 +54,10 @@ class EmailPromptService:
             )
             if len(email_logs) > 0:
                 most_recent = email_logs[-1]
-                days_since_most_recent = (
-                    datetime.datetime.now(tz=UTC) - most_recent.last_updated
-                ).total_seconds() / 86400
+                days_since_most_recent = (datetime.datetime.utcnow() - most_recent.last_updated).total_seconds() / 86400
             if (len(email_logs) == 0) and (log_type != "confirm_email"):
                 if (rec.last_login is not None) and (
-                    (datetime.datetime.now(tz=UTC) - rec.last_login).total_seconds() > (2 * 86400)
+                    (datetime.datetime.utcnow() - rec.last_login).total_seconds() > (2 * 86400)
                 ):
                     self.__send_prompting_email(rec, send_method, log_type, "0days")
             elif 0 < len(email_logs) <= 2:

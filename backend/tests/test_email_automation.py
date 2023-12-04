@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from app.email_prompt_service import EmailPromptService
 from app.email_service import TEST_MESSAGES
@@ -18,6 +19,7 @@ class TestExportCase(BaseTestQuestionnaire):
                 last_updated=datetime.datetime.now() - datetime.timedelta(days=days_removed),
                 user_id=user.id,
                 type=log_type,
+                tracking_code=str(uuid.uuid4())[:16],
             )
             self.session.add(log)
             self.session.commit()
@@ -344,8 +346,12 @@ class TestExportCase(BaseTestQuestionnaire):
         u2 = self.construct_user(email="test2@sartography.com", last_login="12/4/19 10:00")
         u2._password = b"123412"
         user_meta = self.construct_usermeta(user=u2)
+
         user_meta.self_participant = True
         user_meta.self_has_guardian = True
+        self.session.add(user_meta)
+        self.session.commit()
+        self.session.close()
 
         # Assure no new messages to go out to this individual who is not their own legal guardian.
         message_count = len(TEST_MESSAGES)

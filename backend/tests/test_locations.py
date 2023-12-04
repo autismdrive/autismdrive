@@ -1,6 +1,10 @@
+from unittest.mock import patch
+
 from app.models import ResourceCategory, Location, ResourceChangeLog
 from app.enums import Role
+from fixtures.location import MockLocation
 from tests.base_test import BaseTest
+from utils import MockGoogleMapsClient
 
 
 class TestLocations(BaseTest):
@@ -63,13 +67,10 @@ class TestLocations(BaseTest):
         rv = self.client.get("api/location/%i" % r_id, content_type="application/json")
         self.assertEqual(404, rv.status_code)
 
-    def test_create_location(self):
+    @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
+    def test_create_location(self, mock_gmaps_client):
         self.loader.load_partial_zip_codes()
-        location = {
-            "title": "location of locations",
-            "description": "You need this location in your life.",
-            "organization_name": "Location Org",
-        }
+        location = MockLocation()
         rv = self.client.post(
             "api/location",
             data=self.jsonify(location),
@@ -79,8 +80,8 @@ class TestLocations(BaseTest):
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["title"], "location of locations")
-        self.assertEqual(response["description"], "You need this location in your life.")
+        self.assertEqual(response["title"], location.title)
+        self.assertEqual(response["description"], location.description)
         self.assertIsNotNone(response["id"])
 
     def test_get_location_by_category(self):
@@ -135,7 +136,7 @@ class TestLocations(BaseTest):
         c = self.construct_category()
         loc = self.construct_location()
 
-        rc_data = {"resource_id": loc.id, "category_id": c.id}
+        rc_data = {"resource_id": loc.id, "category_id": c.id, "type": "location"}
 
         rv = self.client.post("/api/resource_category", data=self.jsonify(rc_data), content_type="application/json")
         self.assert_success(rv)
@@ -227,9 +228,11 @@ class TestLocations(BaseTest):
         response = rv.json
         self.assertEqual(response[-1]["resource_id"], l.id)
 
-    def test_geocode_setting(self):
+    @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
+    def test_geocode_setting(self, mock_gmaps_client):
         self.loader.load_partial_zip_codes()
-        location = {"title": "Some super place", "description": "You should go here every day."}
+        location = MockLocation()
+
         rv = self.client.post(
             "api/location",
             data=self.jsonify(location),

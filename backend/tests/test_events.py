@@ -1,7 +1,10 @@
 from unittest.mock import patch
 
+from flask import jsonify
+
 from app.models import ResourceCategory, Event, ResourceChangeLog
 from app.enums import Role
+from fixtures.event import MockEvent
 from tests.base_test import BaseTest
 from utils import MockGoogleMapsClient
 
@@ -65,13 +68,7 @@ class TestEvents(BaseTest):
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_create_event(self, mock_gmaps_client):
         self.loader.load_partial_zip_codes()
-        event = {
-            "title": "event of events",
-            "description": "You need this event in your life.",
-            "time": "4PM sharp",
-            "ticket_cost": "$500 suggested donation",
-            "organization_name": "Event Org",
-        }
+        event = MockEvent()
         rv = self.client.post(
             "api/event",
             data=self.jsonify(event),
@@ -81,10 +78,10 @@ class TestEvents(BaseTest):
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["title"], "event of events")
-        self.assertEqual(response["description"], "You need this event in your life.")
-        self.assertEqual(response["time"], "4PM sharp")
-        self.assertEqual(response["ticket_cost"], "$500 suggested donation")
+        self.assertEqual(response["title"], event.title)
+        self.assertEqual(response["description"], event.description)
+        self.assertEqual(response["time"], event.time)
+        self.assertEqual(response["ticket_cost"], event.ticket_cost)
         self.assertIsNotNone(response["id"])
 
     def test_get_event_by_category(self):

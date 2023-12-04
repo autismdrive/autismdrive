@@ -67,7 +67,7 @@ class StudyListEndpoint(flask_restful.Resource):
             elastic_index.add_document(load_result, "Study")
             return self.studySchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err)
 
 
 class StudyByStatusListEndpoint(flask_restful.Resource):
