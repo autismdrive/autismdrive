@@ -3,7 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists, desc
+from sqlalchemy import exists, desc, cast, Integer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
@@ -26,7 +26,7 @@ class UserEndpoint(flask_restful.Resource):
     def get(self, id):
         if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
-        model = session.query(User).filter_by(id=id).first()
+        model = session.query(User).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
@@ -34,10 +34,10 @@ class UserEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.delete_user)
     def delete(self, id):
-        session.query(EventUser).filter_by(user_id=id).delete()
-        session.query(StudyUser).filter_by(user_id=id).delete()
-        session.query(UserFavorite).filter_by(user_id=id).delete()
-        session.query(User).filter_by(id=id).delete()
+        session.query(EventUser).filter_by(user_id=cast(id, Integer)).delete()
+        session.query(StudyUser).filter_by(user_id=cast(id, Integer)).delete()
+        session.query(UserFavorite).filter_by(user_id=cast(id, Integer)).delete()
+        session.query(User).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 
@@ -51,7 +51,7 @@ class UserEndpoint(flask_restful.Resource):
                 request_data["role"] = "admin"
             else:
                 request_data["role"] = "user"
-        instance = session.query(User).filter_by(id=id).first()
+        instance = session.query(User).filter_by(id=cast(id, Integer)).first()
         try:
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:

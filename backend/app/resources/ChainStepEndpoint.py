@@ -2,12 +2,13 @@ import datetime
 
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
 from app.database import session
-from app.models import ChainStep, ChainSessionStep
 from app.enums import Permission
+from app.models import ChainStep, ChainSessionStep
 from app.rest_exception import RestException
 from app.schemas import ChainStepSchema
 from app.wrappers import requires_permission
@@ -29,7 +30,7 @@ class ChainStepEndpoint(flask_restful.Resource):
     def put(self, chain_step_id):
         """Modifies an existing Chain Step, or adds one if none exists."""
         request_data = request.get_json()
-        instance = session.query(ChainStep).filter_by(id=chain_step_id).first()
+        instance = session.query(ChainStep).filter_by(id=cast(chain_step_id, Integer)).first()
         try:
             if instance is None:
                 # New step
@@ -49,7 +50,9 @@ class ChainStepEndpoint(flask_restful.Resource):
     def delete(self, chain_step_id):
         """Deletes existing Chain Step, but only if there are no Chain Session Steps that refer to it."""
         chain_session_step = (
-            session.query(ChainSessionStep).filter(ChainSessionStep.chain_step_id == chain_step_id).first()
+            session.query(ChainSessionStep)
+            .filter(ChainSessionStep.chain_step_id == cast(chain_step_id, Integer))
+            .first()
         )
 
         if chain_session_step is not None:
@@ -59,7 +62,7 @@ class ChainStepEndpoint(flask_restful.Resource):
             )
 
         try:
-            session.query(ChainStep).filter_by(id=chain_step_id).delete()
+            session.query(ChainStep).filter_by(id=cast(chain_step_id, Integer)).delete()
             session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)

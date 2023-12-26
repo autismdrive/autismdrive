@@ -1,21 +1,23 @@
 import datetime
 import os
 
+from sqlalchemy import cast, Integer
+
 os.environ["TESTING"] = "true"
 os.environ["ENV_NAME"] = "testing"
 
-from app.import_service import ImportService
-from app.models import DataTransferLog, Participant, User
-from app.schemas import ExportInfoSchema
 
 from flask import json
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 
+from tests.base_test_questionnaire import BaseTestQuestionnaire
+from app.import_service import ImportService
+from app.email_prompt_service import now
+from app.models import DataTransferLog, Participant, User
+from app.schemas import ExportInfoSchema
 from app.email_service import TEST_MESSAGES
 from app.export_service import ExportService
 from app.enums import Relationship, Role
 from app.models import IdentificationQuestionnaire
-
 from app.schemas import UserSchema, ParticipantSchema
 
 
@@ -111,7 +113,7 @@ class TestExportCase(BaseTestQuestionnaire):
         response = rv.json
         exports = ExportInfoSchema(many=True).load(response)
         importer = ImportService()
-        log = importer.log_for_export(exports, datetime.datetime.utcnow())
+        log = importer.log_for_export(exports, now())
         for export in exports:
             export.json_data = all_data[export.class_name]
             importer.load_data(export, log)
@@ -160,7 +162,7 @@ class TestExportCase(BaseTestQuestionnaire):
         self.session.commit()
         self.load_database(data)
 
-        db_user = self.session.query(User).filter_by(id=id).first()
+        db_user = self.session.query(User).filter_by(id=cast(id, Integer)).first()
         self.assertFalse(db_user.email_verified, msg="Email should start off unverified")
 
         # Modify the exported data slightly, and reload
@@ -168,7 +170,7 @@ class TestExportCase(BaseTestQuestionnaire):
             user["email_verified"] = True
         self.load_database(data)
 
-        db_user = self.session.query(User).filter_by(id=id).first()
+        db_user = self.session.query(User).filter_by(id=cast(id, Integer)).first()
         self.assertTrue(db_user.email_verified, msg="Email should now be verified.")
 
     def test_identifying_questionnaire_does_not_export(self):
@@ -229,7 +231,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-        date = datetime.datetime.utcnow() + datetime.timedelta(seconds=1)  # One second in the future
+        date = now() + datetime.timedelta(seconds=1)  # One second in the future
         exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         for export in exports:
@@ -244,7 +246,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        date = datetime.datetime.utcnow() + datetime.timedelta(seconds=1)
+        date = now() + datetime.timedelta(seconds=1)
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
 
         rv = self.client.get("/api/export", headers=self.logged_in_headers())
@@ -288,7 +290,7 @@ class TestExportCase(BaseTestQuestionnaire):
             "/api/export", follow_redirects=True, content_type="application/json", headers=self.logged_in_headers()
         )
         self.assert_success(rv)
-        export_logs = self.session.query(DataTransferLog).filter(DataTransferLog.type == "export").all()
+        export_logs = self.session.query(DataTransferLog).filter(DataTransferLog.type == "exporting").all()
         self.assertEqual(1, len(export_logs))
         self.assertIsNotNone(export_logs[0].last_updated)
         self.assertTrue(
@@ -306,9 +308,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
         message_count = len(TEST_MESSAGES)
 
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=28), total_records=2, type="export"
-        )
+        log = DataTransferLog(last_updated=now() - datetime.timedelta(minutes=28), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -321,9 +321,7 @@ class TestExportCase(BaseTestQuestionnaire):
         """
         message_count = len(TEST_MESSAGES)
 
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=45), total_records=2, type="export"
-        )
+        log = DataTransferLog(last_updated=now() - datetime.timedelta(minutes=45), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
 
@@ -345,9 +343,7 @@ class TestExportCase(BaseTestQuestionnaire):
         """
         message_count = len(TEST_MESSAGES)
 
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=30), total_records=2, type="export"
-        )
+        log = DataTransferLog(last_updated=now() - datetime.timedelta(minutes=30), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -357,7 +353,7 @@ class TestExportCase(BaseTestQuestionnaire):
             "Autism DRIVE: Error - 30 minutes since last successful export", self.decode(TEST_MESSAGES[-1]["subject"])
         )
 
-        log.last_updated = datetime.datetime.utcnow() - datetime.timedelta(minutes=120)
+        log.last_updated = now() - datetime.timedelta(minutes=120)
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -373,8 +369,8 @@ class TestExportCase(BaseTestQuestionnaire):
         sent to an administrative email address at the 30 minute and then every 2 hours after that.
         """
         message_count = len(TEST_MESSAGES)
-        date = datetime.datetime.utcnow() - datetime.timedelta(hours=22)
-        log = DataTransferLog(last_updated=date, total_records=2, type="export")
+        date = now() - datetime.timedelta(hours=22)
+        log = DataTransferLog(last_updated=date, total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         for i in range(12):
@@ -383,9 +379,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=2), total_records=2, type="export"
-        )
+        log = DataTransferLog(last_updated=now() - datetime.timedelta(days=2), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         for i in range(20):
@@ -394,9 +388,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(TEST_MESSAGES)
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(hours=24), total_records=2, type="export"
-        )
+        log = DataTransferLog(last_updated=now() - datetime.timedelta(hours=24), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()

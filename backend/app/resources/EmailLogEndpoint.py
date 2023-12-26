@@ -1,4 +1,5 @@
 import flask_restful
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -25,5 +26,5 @@ class EmailLogEndpoint(flask_restful.Resource):
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
         schema = EmailLogSchema(many=True)
-        logs = session.query(EmailLog).filter(EmailLog.user_id == user_id).all()
+        logs = session.query(EmailLog).filter(EmailLog.user_id == cast(user_id, Integer)).all()
         return schema.dump(logs)

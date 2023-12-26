@@ -29,8 +29,8 @@ class SearchEndpoint(flask_restful.Resource):
             if not search.types and result_types:
                 search.types = result_types
             results = elastic_index.search(search)
-        except elasticsearch.ElasticsearchException as e:
-            raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e.info))
+        except elasticsearch.ApiError as e:
+            raise RestException(RestException.ELASTIC_ERROR, details=e.body)
 
         search.reset()  # zero out any existing counts or data on the search prior to populating.
         search.total = results.hits.total
@@ -90,8 +90,9 @@ class SearchEndpoint(flask_restful.Resource):
     # given a results of a search, creates the appropriate category.
     # Also assures that there is a category at the top called "TOP".
     def update_category_counts(self, category, results):
+        topic_category = Category(name="Topics")
         if not category:
-            category = Category(name="Topics")
+            category = topic_category
             category.children = (
                 session.query(Category)
                 .filter(Category.parent_id == None)
@@ -103,11 +104,14 @@ class SearchEndpoint(flask_restful.Resource):
             c = category
             while c.parent:
                 c = c.parent
-            c.parent = Category(name="Topics")
+            c.parent = topic_category
 
         for child in category.children:
-            for bucket in results.aggregations.terms.buckets:
-                if bucket.key == child.search_path():
+            for bucket in results.aggregations.category.buckets:
+                # Remove topic category id from child search path
+                child_key: str = child.search_path().replace(f"{topic_category.id},", "")
+
+                if bucket.key == child_key:
                     child.hit_count = bucket.doc_count
         return category
 

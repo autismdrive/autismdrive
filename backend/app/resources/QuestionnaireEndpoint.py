@@ -2,6 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
@@ -42,7 +43,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         """
         name = camel_case_it(name)
         class_ref = get_class(name)
-        instance = session.query(class_ref).filter(class_ref.id == id).first()
+        instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
         if instance is None:
             raise RestException(RestException.NOT_FOUND)
         schema = ExportService.get_schema(name)
@@ -64,12 +65,11 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         try:
             name = camel_case_it(name)
             class_ref = get_class(name)
-            instance = session.query(class_ref).filter(class_ref.id == id).first()
+            instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
             session.delete(instance)
-            #            session.query(class_ref).filter(class_ref.id == id).delete()
             session.commit()
         except IntegrityError as error:
-            raise RestException(RestException.CAN_NOT_DELETE)
+            raise RestException(RestException.CAN_NOT_DELETE, details=error)
         return
 
     @auth.login_required
@@ -89,7 +89,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         """
         name = camel_case_it(name)
         class_ref = get_class(name)
-        instance = session.query(class_ref).filter(class_ref.id == id).first()
+        instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
         schema = ExportService.get_schema(name)
         request_data = request.get_json()
         if "_links" in request_data:

@@ -1,4 +1,5 @@
 from flask import json
+from sqlalchemy import cast, Integer
 
 from app.email_service import TEST_MESSAGES
 from app.models import EmailLog, StudyUser, User, UserFavorite
@@ -168,7 +169,7 @@ class TestUser(BaseTest):
             content_type="application/json",
         )
         self.assert_success(rv)
-        user = self.session.query(User).filter_by(id=id).first()
+        user = self.session.query(User).filter_by(id=cast(id, Integer)).first()
         user.role = role
 
         with self.assertRaises(RestException):
@@ -185,7 +186,7 @@ class TestUser(BaseTest):
             content_type="application/json",
         )
         self.assert_success(rv)
-        user = self.session.query(User).filter_by(id=id).first()
+        user = self.session.query(User).filter_by(id=cast(id, Integer)).first()
         self.assertIsNotNone(user)
         self.assertIsNotNone(user.token_url)
 

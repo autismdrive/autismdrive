@@ -1,6 +1,7 @@
 import datetime
 
-from dateutil.tz import UTC
+import tzlocal
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.email_service import EmailService
@@ -47,14 +48,16 @@ class EmailPromptService:
         for rec in recipients:
             email_logs = (
                 session.query(self.email_log_model)
-                .filter_by(user_id=rec.id)
+                .filter_by(user_id=cast(rec.id, Integer))
                 .filter_by(type=log_type)
                 .order_by(self.email_log_model.last_updated)
                 .all()
             )
             if len(email_logs) > 0:
                 most_recent = email_logs[-1]
-                days_since_most_recent = (datetime.datetime.utcnow() - most_recent.last_updated).total_seconds() / 86400
+                days_since_most_recent = (
+                    datetime.datetime.now(tz=tzlocal.get_localzone()) - most_recent.last_updated
+                ).total_seconds() / 86400
             if (len(email_logs) == 0) and (log_type != "confirm_email"):
                 if (rec.last_login is not None) and (
                     (datetime.datetime.utcnow() - rec.last_login).total_seconds() > (2 * 86400)

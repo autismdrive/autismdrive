@@ -21,11 +21,7 @@ from config.logging import logging_config
 
 
 def create_app(settings=None):
-    click.secho(f"\n*** create_app > settings.ENV_NAME = {settings.ENV_NAME} ***\n")
-
     from config.load import settings as loaded_settings
-
-    click.secho(f"\n*** create_app > loaded_settings.ENV_NAME = {loaded_settings.ENV_NAME} ***\n")
 
     _settings = loaded_settings if settings is None else settings
 
@@ -41,7 +37,7 @@ def create_app(settings=None):
     # Enable CORS
     if _settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
-        origins_re = [r"^https?:\/\/%s(.*)" % o.replace(".", "\.") for o in settings.CORS_ALLOW_ORIGINS]
+        origins_re = [r"^https?:\/\/%s(.*)" % o.replace(".", "\.") for o in _settings.CORS_ALLOW_ORIGINS]
         CORS(_app, origins=origins_re)
 
     # Database

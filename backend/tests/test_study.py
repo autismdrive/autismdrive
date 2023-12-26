@@ -1,3 +1,5 @@
+from sqlalchemy import cast, Integer
+
 from app.email_service import TEST_MESSAGES
 from app.models import EmailLog, Study, StudyInvestigator, StudyCategory, ContactQuestionnaire, StudyUser
 from app.enums import Relationship
@@ -273,7 +275,7 @@ class TestStudy(BaseTest):
         )
         self.assert_success(rv)
 
-        db_study = self.session.query(Study).filter(Study.id == s.id).first()
+        db_study = self.session.query(Study).filter(Study.id == cast(s.id, Integer)).first()
         self.assertEqual(1, len(db_study.study_users))
         su = db_study.study_users[0]
         self.assertEqual(u.id, su.user_id)
@@ -340,7 +342,11 @@ class TestStudy(BaseTest):
         self.session.add(iq)
         self.session.commit()
 
-        db_iq = self.session.query(IdentificationQuestionnaire).filter_by(participant_id=iq.participant_id).first()
+        db_iq = (
+            self.session.query(IdentificationQuestionnaire)
+            .filter_by(participant_id=cast(iq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_iq.nickname, iq.nickname)
         return db_iq
 

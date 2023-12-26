@@ -3,7 +3,7 @@ from config.base import Settings
 
 settings = Settings(
     ENV_NAME="testing",
-    SQLALCHEMY_DATABASE_URI="postgresql://ed_user:ed_pass@localhost/stardrive_test",
+    SQLALCHEMY_DATABASE_URI="postgresql+psycopg://ed_user:ed_pass@localhost/stardrive_test",
     TESTING=True,
     CORS_ENABLED=True,
     DEBUG=False,
@@ -15,8 +15,7 @@ settings = Settings(
     DELETE_RECORDS=False,
     ELASTIC_SEARCH={
         "index_prefix": "stardrive_test",
-        "hosts": ["localhost"],
-        "port": 9200,
+        "hosts": ["http://localhost:9200"],
         "timeout": 20,
         "verify_certs": False,
         "use_ssl": False,

@@ -3,6 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session, get_class
@@ -19,7 +20,7 @@ class FlowEndpoint(flask_restful.Resource):
     @auth.login_required
     def get(self, name, participant_id):
         flow = Flows.get_flow_by_name(name)
-        participant = session.query(Participant).filter_by(id=participant_id).first()
+        participant = session.query(Participant).filter_by(id=cast(participant_id, Integer)).first()
         if participant is None:
             raise RestException(RestException.NOT_FOUND)
         if g.user.related_to_participant(participant_id) and not g.user.role == "Admin":

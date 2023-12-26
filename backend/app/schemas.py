@@ -16,7 +16,7 @@ from marshmallow.fields import (
 )
 from marshmallow.utils import EXCLUDE
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from sqlalchemy import func
+from sqlalchemy import func, cast, Integer as SqlalchemyInteger
 
 from app.database import session
 from app.enums import Relationship, Status, Role
@@ -166,6 +166,7 @@ class CategoryInSearchSchema(ModelSchema):
     parent = Nested(lambda: ParentCategorySchema(), dump_only=True, required=False, allow_none=True)
     children = Nested(lambda: ChildCategoryInSearchSchema(), many=True, dump_only=True)
     level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
+    name = String(required=False, dump_only=True)
 
 
 class CategorySchema(ModelSchema):
@@ -214,7 +215,7 @@ class CategorySchema(ModelSchema):
         query = (
             session.query(ResourceCategory)
             .filter(ResourceCategory.type == "event")
-            .filter(ResourceCategory.category_id == obj.id)
+            .filter(ResourceCategory.category_id == cast(obj.id, SqlalchemyInteger))
         )
         count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
@@ -225,7 +226,7 @@ class CategorySchema(ModelSchema):
         query = (
             session.query(ResourceCategory)
             .filter(ResourceCategory.type == "location")
-            .filter(ResourceCategory.category_id == obj.id)
+            .filter(ResourceCategory.category_id == cast(obj.id, SqlalchemyInteger))
         )
         count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
@@ -236,7 +237,7 @@ class CategorySchema(ModelSchema):
         query = (
             session.query(ResourceCategory)
             .filter(ResourceCategory.type == "resource")
-            .filter(ResourceCategory.category_id == obj.id)
+            .filter(ResourceCategory.category_id == cast(obj.id, SqlalchemyInteger))
         )
         count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
@@ -247,7 +248,7 @@ class CategorySchema(ModelSchema):
         query = (
             session.query(ResourceCategory)
             .join(ResourceCategory.resource)
-            .filter(ResourceCategory.category_id == obj.id)
+            .filter(ResourceCategory.category_id == cast(obj.id, SqlalchemyInteger))
         )
         count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
@@ -255,7 +256,11 @@ class CategorySchema(ModelSchema):
     def get_study_count(self, obj):
         if obj is None:
             return missing
-        query = session.query(StudyCategory).join(StudyCategory.study).filter(StudyCategory.category_id == obj.id)
+        query = (
+            session.query(StudyCategory)
+            .join(StudyCategory.study)
+            .filter(StudyCategory.category_id == cast(obj.id, SqlalchemyInteger))
+        )
         count_q = query.statement.with_only_columns(func.count()).order_by(None)
         return query.session.execute(count_q).scalar()
 
@@ -950,6 +955,47 @@ class StudyInvestigatorSchema(ModelSchema):
     )
 
 
+class HitSchema(Schema):
+    id = Integer()
+    content = Str(missing=None)
+    description = Str(missing=None)
+    post_event_description = Str(missing=None)
+    title = Str(missing=None)
+    type = Str()
+    label = Str(missing=None)
+    last_updated = DateTime(missing=None)
+    highlights = Str(missing=None)
+    latitude = Float()
+    longitude = Float()
+    date = DateTime(missing=None)
+    status = Str(missing=None)
+    no_address = Boolean(missing=None)
+    is_draft = Boolean(missing=None)
+
+
+class SortSchema(Schema):
+    field = Str(allow_null=True)
+    latitude = Float(missing=None)
+    longitude = Float(missing=None)
+    order = Str(missing="asc")
+    unit = Str(missing="mi")
+
+    @post_load
+    def make_sort(self, data, **kwargs):
+        return Sort(**data)
+
+
+class AggCountSchema(Schema):
+    value = String()
+    count = Integer()
+    is_selected = Boolean()
+
+
+class TotalSchema(Schema):
+    relation = String()
+    value = Integer()
+
+
 class GeopointSchema(Schema):
     lat = Float(missing=None)
     lon = Float(missing=None)
@@ -959,68 +1005,36 @@ class GeopointSchema(Schema):
         return Geopoint(**data)
 
 
+class GeoboxSchema(Schema):
+    top_left = Nested(lambda: GeopointSchema())
+    bottom_right = Nested(lambda: GeopointSchema())
+
+    @post_load
+    def make_geo_box(self, data, **kwargs):
+        return Geobox(**data)
+
+
 class SearchSchema(Schema):
     class Meta(ModelSchema.Meta):
         unknown = EXCLUDE
 
-    class HitSchema(Schema):
-        id = Integer()
-        content = Str(missing=None)
-        description = Str(missing=None)
-        post_event_description = Str(missing=None)
-        title = Str(missing=None)
-        type = Str()
-        label = Str(missing=None)
-        last_updated = DateTime(missing=None)
-        highlights = Str(missing=None)
-        latitude = Float()
-        longitude = Float()
-        date = DateTime(missing=None)
-        status = Str(missing=None)
-        no_address = Boolean(missing=None)
-        is_draft = Boolean(missing=None)
-
-    class SortSchema(Schema):
-        field = Str(allow_null=True)
-        latitude = Float(missing=None)
-        longitude = Float(missing=None)
-        order = Str(missing="asc")
-        unit = Str(missing="mi")
-
-        @post_load
-        def make_sort(self, data, **kwargs):
-            return Sort(**data)
-
-    class AggCountSchema(Schema):
-        value = String()
-        count = Integer()
-        is_selected = Boolean()
-
-    class GeoboxSchema(Schema):
-        top_left = Nested(lambda: GeopointSchema())
-        bottom_right = Nested(lambda: GeopointSchema())
-
-        @post_load
-        def make_geo_box(self, data, **kwargs):
-            return Geobox(**data)
-
     words = Str()
     start = Integer()
     size = Integer()
-    sort = Nested(lambda: SearchSchema.SortSchema(), allow_none=True, default=None)
+    sort = Nested(lambda: SortSchema(), allow_none=True, default=None)
     types = List(Str())
     ages = List(Str())
     languages = List(Str())
-    age_counts = List(Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
-    language_counts = List(Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
-    type_counts = List(Nested(lambda: SearchSchema.AggCountSchema()), dump_only=True)
-    total = Integer(dump_only=True)
-    hits = Nested(lambda: SearchSchema.HitSchema(), many=True, dump_only=True)
+    age_counts = List(Nested(lambda: AggCountSchema()), dump_only=True)
+    language_counts = List(Nested(lambda: AggCountSchema()), dump_only=True)
+    type_counts = List(Nested(lambda: AggCountSchema()), dump_only=True)
+    total = Nested(lambda: TotalSchema(), allow_none=True, default=None)
+    hits = Nested(lambda: HitSchema(), many=True, dump_only=True)
     category = Nested(lambda: CategoryInSearchSchema())
     ordered = True
     date = DateTime(allow_none=True)
     map_data_only = Boolean()
-    geo_box = Nested(lambda: SearchSchema.GeoboxSchema(), allow_none=True, default=None)
+    geo_box = Nested(lambda: GeoboxSchema(), allow_none=True, default=None)
 
     @post_load
     def make_search(self, data, **kwargs):

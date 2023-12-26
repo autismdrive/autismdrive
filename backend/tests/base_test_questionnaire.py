@@ -2,6 +2,7 @@ import random
 import string
 
 from dateutil import parser
+from sqlalchemy import cast, Integer
 
 from tests.base_test import BaseTest
 
@@ -106,7 +107,9 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(cdq)
         self.session.commit()
 
-        db_cdq = self.session.query(ClinicalDiagnosesQuestionnaire).filter_by(user_id=cdq.user_id).first()
+        db_cdq = (
+            self.session.query(ClinicalDiagnosesQuestionnaire).filter_by(user_id=cast(cdq.user_id, Integer)).first()
+        )
         self.assertEqual(db_cdq.participant_id, cdq.participant_id)
         return db_cdq
 
@@ -181,7 +184,7 @@ class BaseTestQuestionnaire(BaseTest):
 
         db_cbd = (
             self.session.query(CurrentBehaviorsDependentQuestionnaire)
-            .filter_by(participant_id=cb.participant_id)
+            .filter_by(participant_id=cast(cb.participant_id, Integer))
             .first()
         )
         self.assertEqual(db_cbd.concerning_behaviors, cb.concerning_behaviors)
@@ -223,7 +226,9 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.commit()
 
         db_cb = (
-            self.session.query(CurrentBehaviorsSelfQuestionnaire).filter_by(participant_id=cb.participant_id).first()
+            self.session.query(CurrentBehaviorsSelfQuestionnaire)
+            .filter_by(participant_id=cast(cb.participant_id, Integer))
+            .first()
         )
         self.assertEqual(db_cb.academic_difficulty_areas, cb.academic_difficulty_areas)
         return db_cb
@@ -293,7 +298,11 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(dq)
         self.session.commit()
 
-        db_dq = self.session.query(DevelopmentalQuestionnaire).filter_by(participant_id=dq.participant_id).first()
+        db_dq = (
+            self.session.query(DevelopmentalQuestionnaire)
+            .filter_by(participant_id=cast(dq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_dq.when_language_milestones, dq.when_language_milestones)
         return db_dq
 
@@ -334,7 +343,11 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(eq)
         self.session.commit()
 
-        db_eq = self.session.query(EducationDependentQuestionnaire).filter_by(participant_id=eq.participant_id).first()
+        db_eq = (
+            self.session.query(EducationDependentQuestionnaire)
+            .filter_by(participant_id=cast(eq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_eq.school_name, eq.school_name)
         return db_eq
 
@@ -376,7 +389,11 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(eq)
         self.session.commit()
 
-        db_eq = self.session.query(EducationSelfQuestionnaire).filter_by(participant_id=eq.participant_id).first()
+        db_eq = (
+            self.session.query(EducationSelfQuestionnaire)
+            .filter_by(participant_id=cast(eq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_eq.school_name, eq.school_name)
         return db_eq
 
@@ -413,7 +430,11 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(eq)
         self.session.commit()
 
-        db_eq = self.session.query(EmploymentQuestionnaire).filter_by(participant_id=eq.participant_id).first()
+        db_eq = (
+            self.session.query(EmploymentQuestionnaire)
+            .filter_by(participant_id=cast(eq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_eq.employment_capacity, eq.employment_capacity)
         return db_eq
 
@@ -458,7 +479,7 @@ class BaseTestQuestionnaire(BaseTest):
 
         db_ehq = (
             self.session.query(EvaluationHistoryDependentQuestionnaire)
-            .filter_by(participant_id=ehq.participant_id)
+            .filter_by(participant_id=cast(ehq.participant_id, Integer))
             .first()
         )
         self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
@@ -502,7 +523,9 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.commit()
 
         db_ehq = (
-            self.session.query(EvaluationHistorySelfQuestionnaire).filter_by(participant_id=ehq.participant_id).first()
+            self.session.query(EvaluationHistorySelfQuestionnaire)
+            .filter_by(participant_id=cast(ehq.participant_id, Integer))
+            .first()
         )
         self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
         return db_ehq
@@ -546,7 +569,11 @@ class BaseTestQuestionnaire(BaseTest):
         else:
             hq.housemates = housemates
 
-        db_hq = self.session.query(HomeDependentQuestionnaire).filter_by(participant_id=hq.participant_id).first()
+        db_hq = (
+            self.session.query(HomeDependentQuestionnaire)
+            .filter_by(participant_id=cast(hq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_hq.dependent_living_situation, hq.dependent_living_situation)
         return db_hq
 
@@ -582,7 +609,9 @@ class BaseTestQuestionnaire(BaseTest):
         else:
             hq.housemates = housemates
 
-        db_hq = self.session.query(HomeSelfQuestionnaire).filter_by(participant_id=hq.participant_id).first()
+        db_hq = (
+            self.session.query(HomeSelfQuestionnaire).filter_by(participant_id=cast(hq.participant_id, Integer)).first()
+        )
         self.assertEqual(db_hq.self_living_situation, hq.self_living_situation)
         return db_hq
 
@@ -650,7 +679,11 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(iq)
         self.session.commit()
 
-        db_iq = self.session.query(IdentificationQuestionnaire).filter_by(participant_id=iq.participant_id).first()
+        db_iq = (
+            self.session.query(IdentificationQuestionnaire)
+            .filter_by(participant_id=cast(iq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_iq.nickname, iq.nickname)
         return db_iq
 
@@ -698,7 +731,11 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(pq)
         self.session.commit()
 
-        db_pq = self.session.query(ProfessionalProfileQuestionnaire).filter_by(participant_id=pq.participant_id).first()
+        db_pq = (
+            self.session.query(ProfessionalProfileQuestionnaire)
+            .filter_by(participant_id=cast(pq.participant_id, Integer))
+            .first()
+        )
         self.assertEqual(db_pq.learning_interests, pq.learning_interests)
         return db_pq
 
@@ -745,7 +782,7 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(rq)
         self.session.commit()
 
-        db_rq = self.session.query(RegistrationQuestionnaire).filter_by(user_id=rq.user_id).first()
+        db_rq = self.session.query(RegistrationQuestionnaire).filter_by(user_id=cast(rq.user_id, Integer)).first()
         self.assertEqual(db_rq.email, rq.email)
         return db_rq
 
@@ -837,7 +874,9 @@ class BaseTestQuestionnaire(BaseTest):
         else:
             sq.therapies = therapies
 
-        db_sq = self.session.query(SupportsQuestionnaire).filter_by(participant_id=sq.participant_id).first()
+        db_sq = (
+            self.session.query(SupportsQuestionnaire).filter_by(participant_id=cast(sq.participant_id, Integer)).first()
+        )
         self.assertEqual(db_sq.last_updated, sq.last_updated)
         return db_sq
 
@@ -888,7 +927,9 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(bq)
         self.session.commit()
 
-        db_bq = self.session.query(ChainQuestionnaire).filter_by(participant_id=bq.participant_id).first()
+        db_bq = (
+            self.session.query(ChainQuestionnaire).filter_by(participant_id=cast(bq.participant_id, Integer)).first()
+        )
         self.assertEqual(db_bq.participant_id, bq.participant_id)
         self.assertEqual(db_bq.user_id, bq.user_id)
         self.assertEqual(db_bq.sessions, bq.sessions)

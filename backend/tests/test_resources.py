@@ -66,7 +66,7 @@ class TestResources(BaseTest):
         self.assert_success(rv)
 
         self.construct_admin_note(user=self.construct_user(), resource=r)
-        elastic_index.remove_document(r, "Resource")
+        elastic_index.remove_document(r)
         rv = self.client.delete(
             "api/resource/%i" % r_id, content_type="application/json", headers=self.logged_in_headers()
         )

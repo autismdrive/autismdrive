@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import json
 import logging
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -29,9 +31,11 @@ from config.load import settings
 
 if TYPE_CHECKING:
     from app.models import Resource, Location, Event, Study
-    from app.enums import Permission
 
     DatabaseObject = Event | Resource | Location | Study
+
+from app.enums import Permission
+
 
 autocomplete = analyzer(
     "autocomplete",
@@ -70,8 +74,15 @@ class StarDocument(Document):
     is_draft = Boolean()
 
 
-def _start_of_day(date=datetime.utcnow().date()):
-    return datetime(date.year, date.month, date.day, tzinfo=tz.tzutc())
+def _start_of_day(date=datetime.utcnow().date()) -> str:
+    return datetime(date.year, date.month, date.day, tzinfo=tz.tzutc()).isoformat()
+
+
+def _refresh_and_flush(es_index: Index, flush=True):
+    es_index.refresh()
+
+    if flush:
+        es_index.flush(force=True, wait_if_ongoing=True)
 
 
 class ElasticIndex:
@@ -86,7 +97,8 @@ class ElasticIndex:
 
         self.index_name = "%s_resources" % self.index_prefix
         self.index = Index(self.index_name)
-        self.index.doc_type = StarDocument
+        self.index.document(StarDocument)
+
         try:
             self.index.create()
         except RequestError as requestError:
@@ -114,25 +126,24 @@ class ElasticIndex:
             # get a cryptic message that is darn near ungoogleable.
             self.connection = connections.create_connection(
                 hosts=es_settings["hosts"],
-                port=es_settings["port"],
                 timeout=es_settings["timeout"],
                 verify_certs=es_settings["verify_certs"],
-                use_ssl=es_settings["use_ssl"],
+                ssl_show_warn=es_settings["use_ssl"],
             )
 
     def clear(self):
         try:
             self.logger.info("Clearing the index.")
-            self.index.delete(ignore=404)
+            self.index.delete(ignore_unavailable=True)
             self.index.create()
         except:
             self.logger.error("Failed to delete the indices. They might not exist.")
 
-    def remove_document(self, document: DatabaseObject, flush=True):
+    def remove_document(self, document: DatabaseObject, flush: bool = True):
         obj = self.get_document(document)
         obj.delete(version=None)
-        if flush:
-            self.index.flush()
+
+        _refresh_and_flush(self.index, flush)
 
     @staticmethod
     def _get_id(document: DatabaseObject):
@@ -147,7 +158,12 @@ class ElasticIndex:
         self.add_document(document, flush, latitude, longitude)
 
     def add_document(
-        self, document: DatabaseObject, flush=True, latitude=None, longitude=None, post_event_description=None
+        self,
+        document: DatabaseObject,
+        flush: bool = True,
+        latitude: float = None,
+        longitude: float = None,
+        post_event_description: str = None,
     ):
         doc = StarDocument(
             id=document.id,
@@ -199,8 +215,8 @@ class ElasticIndex:
             doc.no_address = not document.street_address1
 
         StarDocument.save(doc, index=self.index_name)
-        if flush:
-            self.index.flush()
+
+        _refresh_and_flush(self.index, flush)
 
     def load_documents(
         self, resources: list[Resource], events: list[Event], locations: list[Location], studies: list[Study]
@@ -224,7 +240,8 @@ class ElasticIndex:
             self.add_document(loc, flush=False, latitude=loc.latitude, longitude=loc.longitude)
         for s in studies:
             self.add_document(s, flush=False)
-        self.index.flush()
+
+        _refresh_and_flush(self.index)
 
     def search(self, search):
         from flask import g
@@ -301,7 +318,7 @@ class ElasticIndex:
 
         category_agg_args = {
             "name_or_agg": "terms",
-            "field": "category.keyword",
+            "field": "category",
             "exclude": ".*\\,.*",
             "size": 25,
         }
@@ -325,10 +342,10 @@ class ElasticIndex:
                 if search.category.calculate_level() == 1:
                     category_agg_args.update({"include": ".*\\,.*\\,.*"})
 
-        elastic_search.aggs.bucket("terms", A(**category_agg_args))
-        elastic_search.aggs.bucket("type", A("terms", field="type.keyword"))
-        elastic_search.aggs.bucket("ages", A("terms", field="ages.keyword"))
-        elastic_search.aggs.bucket("languages", A("terms", field="languages.keyword"))
+        elastic_search.aggs.bucket("category", A(**category_agg_args))
+        elastic_search.aggs.bucket("type", A("terms", field="type"))
+        elastic_search.aggs.bucket("ages", A("terms", field="ages"))
+        elastic_search.aggs.bucket("languages", A("terms", field="languages"))
 
         # KEEPING FOR NOW - THESE WERE THE ORIGINAL FACETS WE HAD SET UP.  WILL NEED TO CONVERT TO AGGREGATIONS
         # IF WE WANT TO KEEP ANY OF THESE.
@@ -339,6 +356,12 @@ class ElasticIndex:
         # 'Organization': elasticsearch_dsl.TermsFacet(field='organization'),
         # 'Status': elasticsearch_dsl.TermsFacet(field='status'),
         # 'Topic': elasticsearch_dsl.TermsFacet(field='topic'),
+
+        from icecream import ic
+
+        ic.configureOutput(includeContext=True, contextAbsPath=True)
+
+        ic(f"{json.dumps(elastic_search.to_dict())}")
 
         return elastic_search.execute()
 
@@ -351,9 +374,9 @@ class ElasticIndex:
                 item.indexable_content(),
                 item.category_names(),
             ],
-            min_term_freq=1,
-            min_doc_freq=2,
-            max_query_terms=12,
+            # min_term_freq=1,
+            # min_doc_freq=2,
+            # max_query_terms=12,
             fields=["title", "content", "description", "location", "category", "organization_name", "website"],
         )
 

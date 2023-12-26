@@ -63,7 +63,7 @@ class ExportService:
         query = query.order_by(model.id)
         if user_id:
             if hasattr(model, "user_id"):
-                return query.filter(model.user_id == user_id)
+                return query.filter(model.user_id == cast(user_id, Integer))
             else:
                 return []
         else:

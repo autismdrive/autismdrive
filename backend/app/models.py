@@ -1,10 +1,12 @@
 import re
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Optional, Literal, Union
+from typing import Optional, Literal, Union, TypedDict
 
 import googlemaps
 import jwt
-from sqlalchemy import ForeignKey, TEXT, func, ARRAY, select, Integer, Boolean, String
+from elasticsearch_dsl.response import Hit
+from sqlalchemy import ForeignKey, TEXT, func, ARRAY, select, Integer, Boolean, String, cast
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr
@@ -24,7 +26,7 @@ class AdminNote(Base):
     resource: Mapped["Resource"] = relationship(back_populates="admin_notes")
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="admin_notes")
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     note: Mapped[str]
 
 
@@ -69,7 +71,7 @@ class Category(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("category.id"))
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     display_order: Mapped[Optional[int]]
     parent: Mapped["Category"] = relationship(back_populates="children", remote_side=[id])
     children: Mapped[list["Category"]] = relationship(
@@ -106,7 +108,7 @@ class Category(Base):
             paths.append(cat.search_path())
         return paths
 
-    def search_path(self):
+    def search_path(self) -> str:
         cat = self
         path = str(cat.id)
         while cat.parent and cat.parent.id:
@@ -120,7 +122,7 @@ class ChainStep(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     instruction: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 DataTransferLogType = Literal["importing", "exporting"]
@@ -135,7 +137,7 @@ class DataTransferLog(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[DataTransferLogType] = mapped_column(default="exporting")  # Either importing or exporting
     date_started: Mapped[datetime] = mapped_column(default=func.now())
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     total_records: Mapped[int] = mapped_column(default=0)
     alerts_sent: Mapped[int] = mapped_column(default=0)
     details: Mapped[list["DataTransferLogDetail"]] = relationship(back_populates="data_transfer_log")
@@ -155,7 +157,7 @@ class DataTransferLogDetail(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     data_transfer_log_id: Mapped[int] = mapped_column(ForeignKey("data_transfer_log.id"))
     date_started: Mapped[datetime] = mapped_column(default=func.now())
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     class_name: Mapped[str] = mapped_column(default="")
     successful: Mapped[bool] = mapped_column(default=False)
     success_count: Mapped[int] = mapped_column(default=0)
@@ -182,7 +184,7 @@ class EmailLog(Base):
     tracking_code: Mapped[str]
     viewed: Mapped[bool] = mapped_column(default=False)
     date_viewed: Mapped[datetime] = mapped_column(default=func.now())
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 def _category_names(obj: Union["Resource", "Study"]):
@@ -207,7 +209,7 @@ class Resource(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str]
     title: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     description: Mapped[str]
     insurance: Mapped[Optional[str]]
     organization_name: Mapped[Optional[str]]
@@ -251,7 +253,7 @@ class Resource(Base):
 class ResourceCategory(Base):
     __tablename__ = "resource_category"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     type: Mapped[str]
     resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
@@ -318,7 +320,7 @@ class Event(Location):
 class EventUser(Base):
     __tablename__ = "event_user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     event_id: Mapped[int] = mapped_column(ForeignKey("event.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     event: Mapped["Event"] = relationship(back_populates="registered_users")
@@ -575,7 +577,7 @@ class Geocode:
 class Investigator(Base):
     __tablename__ = "investigator"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     name: Mapped[str]
     title: Mapped[str]
     organization_name: Mapped[Optional[str]]
@@ -596,7 +598,7 @@ class IdentificationQuestionnaire(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -824,7 +826,7 @@ class ContactQuestionnaire(Base):
     marketing_other_hide_expression = '!(model.marketing_channel && (model.marketing_channel === "other"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -1010,7 +1012,7 @@ class Participant(Base):
     # with a user account; sometimes that of themselves and sometimes that of their guardian.
     __tablename__ = "stardrive_participant"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="participants")
     identification: Mapped["IdentificationQuestionnaire"] = relationship()
@@ -1029,7 +1031,10 @@ class Participant(Base):
     def get_percent_complete(self):
         flow = Flows.get_flow_by_relationship(self.relationship)
         step_logs = (
-            session.query(StepLog).filter(StepLog.participant_id == self.id).filter(StepLog.flow == flow.name).all()
+            session.query(StepLog)
+            .filter(StepLog.participant_id == cast(self.id, Integer))
+            .filter(StepLog.flow == flow.name)
+            .all()
         )
         complete_steps = 0
         for log in step_logs:
@@ -1053,7 +1058,36 @@ class AggCount:
         self.is_selected = is_selected
 
 
+class GeoPointType(TypedDict):
+    lat: float
+    lon: float
+
+
+class GeoBoxType(TypedDict):
+    top_left: GeoPointType
+    bottom_right: GeoPointType
+
+
+@dataclass
 class Search:
+    words: str = ""
+    total: int = 0
+    hits: list[Hit] = field(default_factory=list)
+    types: list[AggCount] = field(default_factory=list)
+    ages: list[str] = field(default_factory=list)
+    languages: list[str] = field(default_factory=list)
+    start: int = 0
+    size: int = 10
+    type_counts: list[AggCount] = field(default_factory=list)
+    age_counts: list[AggCount] = field(default_factory=lambda: Search.known_age_counts())
+    language_counts: list[AggCount] = field(default_factory=lambda: Search.known_language_counts())
+    sort: Optional[str] = None
+    category: Optional[any] = None
+    date: Optional[datetime] = None
+    map_data_only: str = False  # When we should return a limited set of details just for mapping.
+    geo_box: Optional[GeoBoxType] = None
+    geo_point: Optional[GeoPointType] = None
+
     # Creates a pre ordered list of aggregation counts based on order in Age Range class.
     @staticmethod
     def known_age_counts():
@@ -1067,38 +1101,6 @@ class Search:
                 ["english", "spanish", "chinese", "korean", "vietnamese", "arabic", "tagalog"],
             )
         )
-
-    def __init__(
-        self,
-        words="",
-        types=None,
-        ages=None,
-        languages=None,
-        start=0,
-        size=10,
-        sort=None,
-        category=None,
-        date=None,
-        map_data_only=False,
-        geo_point=None,
-        geo_box=None,
-    ):
-        self.words = words
-        self.total = 0
-        self.hits = []
-        self.types = [] if types is None else types
-        self.ages = [] if ages is None else ages
-        self.languages = [] if languages is None else languages
-        self.start = start
-        self.size = size
-        self.sort = sort
-        self.category = category
-        self.type_counts = []
-        self.age_counts = Search.known_age_counts()
-        self.language_counts = Search.known_language_counts()
-        self.date = date
-        self.map_data_only = map_data_only  # When we should return a limited set of details just for mapping.
-        self.geo_box = geo_box
 
     # Method called when updating a search with fresh results.
     # This should zero-out any existing data that should be overwritten.
@@ -1226,7 +1228,7 @@ class StepLog(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     date_completed: Mapped[datetime] = mapped_column(default=func.now())
     time_on_task_ms: Mapped[int]
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 class Study(Base):
@@ -1237,7 +1239,7 @@ class Study(Base):
     short_title: Mapped[Optional[str]]
     short_description: Mapped[Optional[str]]
     image_url: Mapped[Optional[str]]
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     description: Mapped[str]
     participant_description: Mapped[str]
     benefit_description: Mapped[str]
@@ -1290,7 +1292,7 @@ class StudyInvestigator(Base):
     investigator_id: Mapped[int] = mapped_column(ForeignKey("investigator.id"))
     study: Mapped["Study"] = relationship(back_populates="study_investigators")
     investigator: Mapped["Investigator"] = relationship(back_populates="investigator_studies")
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 class StudyCategory(Base):
@@ -1300,13 +1302,13 @@ class StudyCategory(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     study: Mapped["Study"] = relationship(back_populates="study_categories")
     category: Mapped["Category"] = relationship(back_populates="category_studies")
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 class StudyUser(Base):
     __tablename__ = "study_user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     status: Mapped[Optional["StudyUserStatus"]]
     study_id: Mapped[int] = mapped_column(ForeignKey("study.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -1325,7 +1327,7 @@ class User(Base):
 
     __tablename__ = "stardrive_user"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     registration_date: Mapped[datetime] = mapped_column(default=func.now())
     last_login: Mapped[Optional[datetime]]
     email: Mapped[Optional[str]] = mapped_column(unique=True)
@@ -1441,7 +1443,7 @@ class User(Base):
 class UserFavorite(Base):
     __tablename__ = "user_favorite"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     type: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     resource_id: Mapped[Optional[int]] = mapped_column(ForeignKey("resource.id"))
@@ -1458,7 +1460,7 @@ class UserMeta(Base):
     __tablename__ = "usermeta"
     __label__ = "User Meta Info"
     id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     self_participant: Mapped[Optional[bool]]
     self_has_guardian: Mapped[Optional[bool]]
     guardian: Mapped[Optional[bool]]
@@ -1486,7 +1488,7 @@ class ZipCode(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     latitude: Mapped[float]
     longitude: Mapped[float]
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 class AlternativeAugmentative(Base):
@@ -1495,7 +1497,7 @@ class AlternativeAugmentative(Base):
     __no_export__ = True  # This will be transferred as a part of a parent class
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
     type: Mapped[Optional[str]] = mapped_column(
         info={
@@ -1586,7 +1588,7 @@ class AssistiveDevice(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
     type_group: Mapped[Optional[str]] = mapped_column(
         info={
@@ -1789,7 +1791,7 @@ class ChainQuestionnaire(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -1808,7 +1810,7 @@ class ChainSession(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     chain_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("chain_questionnaire.id"))
     chain_questionnaire: Mapped["ChainQuestionnaire"] = relationship(back_populates="sessions")
@@ -1862,7 +1864,7 @@ class ChallengingBehavior(Base):
     __no_export__ = True  # This will be transferred as a part of a parent class
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     chain_session_step_id: Mapped[int] = mapped_column(ForeignKey("chain_session_step.id"))
     time: Mapped[datetime] = mapped_column(
         default=func.now(),
@@ -1890,7 +1892,7 @@ class ChainSessionStep(Base):
     focus_step_hide_expression = "!model.was_focus_step"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     chain_session_id: Mapped[Optional[int]] = mapped_column(ForeignKey("chain_session.id"))
     chain_step_id: Mapped[int] = mapped_column(
         ForeignKey("chain_step.id"),
@@ -2164,7 +2166,7 @@ class ClinicalDiagnosesQuestionnaire(Base):
     genetic_other_hide_expression = '!(model.genetic && model.genetic.includes("geneticOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2374,7 +2376,7 @@ class CurrentBehaviorsMixin(object):
     academic_difficulty_areas_desc = ""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2580,7 +2582,7 @@ class DemographicsQuestionnaire(Base):
     race_ethnicity_other_hide_expression = '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2732,7 +2734,7 @@ class DevelopmentalQuestionnaire(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2841,7 +2843,7 @@ class EducationMixin(object):
     attends_school_desc = ""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -3093,7 +3095,7 @@ class EmploymentQuestionnaire(Base):
     __estimated_duration_minutes__ = 2
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -3154,7 +3156,7 @@ class EvaluationHistoryMixin(object):
     where_diagnosed_other_hide_expression = '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -3484,7 +3486,7 @@ class HomeMixin(object):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -3613,7 +3615,7 @@ class Housemate(Base):
     relationship_other_hide_expression = '!(model.relationship && (model.relationship === "relationOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     home_dependent_questionnaire_id: Mapped[int] = mapped_column(
         ForeignKey("home_dependent_questionnaire.id"), primary_key=True
     )
@@ -3776,7 +3778,7 @@ class Medication(Base):
     symptom_other_hide_expression = '!(model.symptom && (model.symptom === "symptomOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
     symptom: Mapped[Optional[str]] = mapped_column(
         info={
@@ -3863,7 +3865,7 @@ class ProfessionalProfileQuestionnaire(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -4062,7 +4064,7 @@ class RegistrationQuestionnaire(Base):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -4090,7 +4092,7 @@ class SupportsQuestionnaire(Base):
     alternative_med_other_hide_expression = '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -4255,7 +4257,7 @@ class Therapy(Base):
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
     type: Mapped[Optional[str]] = mapped_column(
         info={
@@ -4376,4 +4378,4 @@ class ResourceChangeLog(Base):
     user_email: Mapped[str]
     resource_id: Mapped[int]
     resource_title: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())

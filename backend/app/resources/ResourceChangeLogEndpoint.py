@@ -1,4 +1,5 @@
 import flask_restful
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -24,7 +25,7 @@ class ResourceChangeLogByUserEndpoint(flask_restful.Resource):
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
         schema = ResourceChangeLogSchema(many=True)
-        logs = session.query(ResourceChangeLog).filter(ResourceChangeLog.user_id == user_id).all()
+        logs = session.query(ResourceChangeLog).filter(ResourceChangeLog.user_id == cast(user_id, Integer)).all()
         return schema.dump(logs)
 
 
@@ -33,5 +34,7 @@ class ResourceChangeLogByResourceEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def get(self, resource_id):
         schema = ResourceChangeLogSchema(many=True)
-        logs = session.query(ResourceChangeLog).filter(ResourceChangeLog.resource_id == resource_id).all()
+        logs = (
+            session.query(ResourceChangeLog).filter(ResourceChangeLog.resource_id == cast(resource_id, Integer)).all()
+        )
         return schema.dump(logs)

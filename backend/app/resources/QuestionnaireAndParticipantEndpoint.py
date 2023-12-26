@@ -1,4 +1,5 @@
 import flask_restful
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session, get_class
@@ -22,5 +23,7 @@ class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
     def get(self, name, participant_id):
         class_ref = get_class(name)
         schema = ExportService.get_schema(name, many=True)
-        questionnaires = session.query(class_ref).filter(class_ref.participant_id == participant_id).all()
+        questionnaires = (
+            session.query(class_ref).filter(class_ref.participant_id == cast(participant_id, Integer)).all()
+        )
         return schema.dump(questionnaires)

@@ -1,4 +1,5 @@
 import flask_restful
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -24,5 +25,5 @@ class StepLogEndpoint(flask_restful.Resource):
     @requires_permission(Permission.user_detail_admin)
     def get(self, participant_id):
         schema = StepLogSchema(many=True)
-        logs = session.query(StepLog).filter(StepLog.participant_id == participant_id).all()
+        logs = session.query(StepLog).filter(StepLog.participant_id == cast(participant_id, Integer)).all()
         return schema.dump(logs)

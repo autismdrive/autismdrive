@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request
-from sqlalchemy import update, select
+from sqlalchemy import update, select, cast, Integer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
@@ -17,7 +17,7 @@ class CategoryEndpoint(flask_restful.Resource):
     schema = CategorySchema()
 
     def get(self, id):
-        category = session.query(Category).filter(Category.id == id).first()
+        category = session.query(Category).filter(Category.id == cast(id, Integer)).first()
         if category is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(category)
@@ -26,10 +26,10 @@ class CategoryEndpoint(flask_restful.Resource):
     @requires_permission(Permission.taxonomy_admin)
     def delete(self, id):
         try:
-            session.query(StudyCategory).filter_by(category_id=id).delete()
-            session.query(ResourceCategory).filter_by(category_id=id).delete()
-            session.query(UserFavorite).filter_by(category_id=id).delete()
-            session.query(Category).filter_by(id=id).delete()
+            session.query(StudyCategory).filter_by(category_id=cast(id, Integer)).delete()
+            session.query(ResourceCategory).filter_by(category_id=cast(id, Integer)).delete()
+            session.query(UserFavorite).filter_by(category_id=cast(id, Integer)).delete()
+            session.query(Category).filter_by(id=cast(id, Integer)).delete()
             session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE)
@@ -39,7 +39,7 @@ class CategoryEndpoint(flask_restful.Resource):
     @requires_permission(Permission.taxonomy_admin)
     def put(self, id):
         request_data = request.get_json()
-        get_statement = select(Category).where(Category.id == id)
+        get_statement = select(Category).where(Category.id == cast(id, Integer))
         old_cat = session.execute(get_statement).unique().scalar_one_or_none()
 
         if old_cat is None:
@@ -52,7 +52,7 @@ class CategoryEndpoint(flask_restful.Resource):
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e)
 
-        update_statement = update(Category).where(Category.id == id).values(updated_dict)
+        update_statement = update(Category).where(Category.id == cast(id, Integer)).values(updated_dict)
         session.execute(update_statement)
         session.commit()
         session.close()

@@ -10,7 +10,6 @@ class SettingsDictElasticsearch(TypedDict):
     http_auth_pass: str
     http_auth_user: str
     index_prefix: str
-    port: int
     timeout: int
     use_ssl: bool
     verify_certs: bool
@@ -31,13 +30,12 @@ class Settings(BaseSettings):
     EXPORT_CHECK_INTERNAL_MINUTES: int = 1
     IMPORT_INTERVAL_MINUTES: int = 1
 
-    SQLALCHEMY_DATABASE_URI: str = "postgresql://ed_user:ed_pass@localhost/stardrive"
+    SQLALCHEMY_DATABASE_URI: str = "postgresql+psycopg://ed_user:ed_pass@localhost/stardrive"
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
     ELASTIC_SEARCH: SettingsDictElasticsearch = {
         "index_prefix": "stardrive",
-        "hosts": ["localhost"],
-        "port": 9200,
+        "hosts": ["http://localhost:9200"],
         "timeout": 20,
         "verify_certs": False,
         "use_ssl": False,

@@ -4,6 +4,7 @@ import flask_restful
 from elasticsearch import NotFoundError
 from flask import request, g
 from marshmallow import ValidationError
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -21,7 +22,7 @@ class ResourceEndpoint(flask_restful.Resource):
     schema = ResourceSchema()
 
     def get(self, id):
-        model = session.query(Resource).filter_by(id=id).first()
+        model = session.query(Resource).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
@@ -29,21 +30,21 @@ class ResourceEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.delete_resource)
     def delete(self, id):
-        resource = session.query(Resource).filter_by(id=id).first()
+        resource = session.query(Resource).filter_by(id=cast(id, Integer)).first()
         resource_id = resource.id
         resource_title = resource.title
 
         try:
-            elastic_index.remove_document(resource, "Resource")
+            elastic_index.remove_document(resource)
         except NotFoundError:
             pass
 
-        session.query(AdminNote).filter_by(resource_id=id).delete()
-        session.query(Event).filter_by(id=id).delete()
-        session.query(Location).filter_by(id=id).delete()
-        session.query(ResourceCategory).filter_by(resource_id=id).delete()
-        session.query(UserFavorite).filter_by(resource_id=id).delete()
-        session.query(Resource).filter_by(id=id).delete()
+        session.query(AdminNote).filter_by(resource_id=cast(id, Integer)).delete()
+        session.query(Event).filter_by(id=cast(id, Integer)).delete()
+        session.query(Location).filter_by(id=cast(id, Integer)).delete()
+        session.query(ResourceCategory).filter_by(resource_id=cast(id, Integer)).delete()
+        session.query(UserFavorite).filter_by(resource_id=cast(id, Integer)).delete()
+        session.query(Resource).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         self.log_update(resource_id=resource_id, resource_title=resource_title, change_type="delete")
         return None
@@ -52,7 +53,7 @@ class ResourceEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(Resource).filter_by(id=id).first()
+        instance = session.query(Resource).filter_by(id=cast(id, Integer)).first()
         try:
             updated = self.schema.load(request_data, instance=instance, session=session)
         except Exception as e:
@@ -93,11 +94,12 @@ class ResourceListEndpoint(flask_restful.Resource):
             load_result = self.resourceSchema.load(request_data)
             session.add(load_result)
             session.commit()
-            elastic_index.add_document(load_result, "Resource")
-            self.log_update(resource_id=load_result.id, resource_title=load_result.title, change_type="create")
-            return self.resourceSchema.dump(load_result)
+            db_resource = session.query(Resource).filter(Resource.id == cast(load_result.id, Integer)).first()
+            elastic_index.add_document(document=db_resource)
+            self.log_update(resource_id=db_resource.id, resource_title=db_resource.title, change_type="create")
+            return self.resourceSchema.dump(db_resource)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err)
 
     def log_update(self, resource_id, resource_title, change_type):
         log = ResourceChangeLog(

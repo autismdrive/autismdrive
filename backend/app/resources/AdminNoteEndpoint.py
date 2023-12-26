@@ -3,6 +3,7 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -20,7 +21,7 @@ class AdminNoteEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def get(self, id):
-        model = session.query(AdminNote).filter(AdminNote.id == id).first()
+        model = session.query(AdminNote).filter(AdminNote.id == cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
@@ -28,7 +29,7 @@ class AdminNoteEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def delete(self, id):
-        session.query(AdminNote).filter(AdminNote.id == id).delete()
+        session.query(AdminNote).filter(AdminNote.id == cast(id, Integer)).delete()
         session.commit()
         return None
 
@@ -36,7 +37,7 @@ class AdminNoteEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(AdminNote).filter(AdminNote.id == id).first()
+        instance = session.query(AdminNote).filter(AdminNote.id == cast(id, Integer)).first()
         try:
             updated = self.schema.load(data=request_data, instance=instance, session=session)
         except ValidationError as e:
@@ -76,7 +77,7 @@ class AdminNoteListByUserEndpoint(flask_restful.Resource):
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
         schema = AdminNoteSchema(many=True)
-        logs = session.query(AdminNote).filter(AdminNote.user_id == user_id).all()
+        logs = session.query(AdminNote).filter(AdminNote.user_id == cast(user_id, Integer)).all()
         return schema.dump(logs)
 
 
@@ -85,5 +86,5 @@ class AdminNoteListByResourceEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def get(self, resource_id):
         schema = AdminNoteSchema(many=True)
-        logs = session.query(AdminNote).filter(AdminNote.resource_id == resource_id).all()
+        logs = session.query(AdminNote).filter(AdminNote.resource_id == cast(resource_id, Integer)).all()
         return schema.dump(logs)

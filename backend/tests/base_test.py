@@ -1,7 +1,13 @@
 # Prevent Black from reformatting these lines, so the testing environment variable can be set before importing anything:
 # fmt: off
 import os
-from typing import MutableMapping
+from typing import MutableMapping, Unpack, TypedDict, get_type_hints
+
+from sqlalchemy import cast, Integer, select
+
+from fixtures.location import MockLocationWithLatLong
+from fixtures.resource import MockResource
+from fixtures.study import MockStudy
 
 os.environ.setdefault("ENV_NAME", "testing")
 os.putenv("ENV_NAME", "testing")
@@ -19,14 +25,14 @@ from json import JSONEncoder
 from flask import json
 from flask.ctx import RequestContext
 from flask.testing import FlaskClient
-from sqlalchemy.orm import scoped_session, close_all_sessions
+from sqlalchemy.orm import scoped_session, close_all_sessions, joinedload
 from werkzeug.test import TestResponse
 
 from app.api_app import APIApp
 from app.create_app import create_app
 from app.data_loader import DataLoader
-from app.elastic_index import elastic_index
-from app.enums import Status, Role
+from app.elastic_index import ElasticIndex
+from app.enums import Role
 from app.models import (
     AdminNote,
     Category,
@@ -52,6 +58,28 @@ from app.models import UserMeta
 from app.models import ZipCode
 
 
+class ResourceParams(TypedDict):
+    pass
+
+
+class EventParams(TypedDict):
+    pass
+
+
+class LocationParams(TypedDict):
+    pass
+
+
+class StudyParams(TypedDict):
+    pass
+
+
+ResourceParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Resource).items()}
+EventParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Event).items()}
+LocationParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Location).items()}
+StudyParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Study).items()}
+
+
 class DateTimeEncoder(JSONEncoder):
     def encode(self, obj):
         if isinstance(obj, (datetime.date, datetime.datetime)):
@@ -71,6 +99,7 @@ class BaseTest(TestCase):
     ctx: RequestContext
     client: FlaskClient
     session: scoped_session
+    elastic_index: ElasticIndex
 
     @classmethod
     def setUpClass(cls):
@@ -86,6 +115,7 @@ class BaseTest(TestCase):
         cls.ctx.push()
 
         cls.session = _app.session
+        cls.elastic_index = _app.elastic_index
         cls.client = _app.test_client()
 
         current_dir = os.path.dirname(getsourcefile(lambda: 0))
@@ -107,10 +137,12 @@ class BaseTest(TestCase):
 
         session.rollback()
         close_all_sessions()
+        self.elastic_index.connection.close()
 
     @classmethod
     def reset_indices(cls):
-        elastic_index.clear()
+        cls.elastic_index = ElasticIndex()
+        cls.elastic_index.clear()
 
     @classmethod
     def reset_db(cls):
@@ -212,102 +244,86 @@ class BaseTest(TestCase):
         self.assertEqual(db_admin_note.note, admin_note.note)
         return db_admin_note
 
-    def construct_category(self, name="Ultimakers", parent=None):
+    def construct_category(self, name="Ultimakers", parent=None) -> Category:
         category = Category(name=name)
         if parent is not None:
-            category.parent = parent
+            category.parent_id = parent.id
         self.session.add(category)
         self.session.commit()
-        db_category = self.session.query(Category).filter_by(name=category.name).first()
+        category_id = category.id
+        self.session.close()
+
+        db_category = (
+            self.session.execute(select(Category).options(joinedload(Category.parent)).filter_by(id=category_id))
+            .unique()
+            .scalar_one()
+        )
         self.assertIsNotNone(db_category.id)
+        self.assertEqual(db_category.name, name)
         return db_category
 
     def construct_resource(
         self,
-        title="A+ Resource",
-        description="A delightful Resource destined to create rejoicing",
-        phone="555-555-5555",
-        website="http://stardrive.org",
-        is_draft=False,
-        organization_name="Some Org",
-        categories=None,
-        ages=None,
-        languages=None,
-        covid19_categories=None,
-        is_uva_education_content=False,
+        **kwargs: Unpack[ResourceParams],
     ):
-        categories = [] if categories is None else categories
-        ages = [] if ages is None else ages
-        languages = [] if languages is None else languages
-        covid19_categories = [] if covid19_categories is None else covid19_categories
+        mock_resource = MockResource()
 
-        resource = Resource(
-            title=title,
-            description=description,
-            phone=phone,
-            website=website,
-            ages=ages,
-            organization_name=organization_name,
-            is_draft=is_draft,
-            languages=languages,
-            covid19_categories=covid19_categories,
-            is_uva_education_content=is_uva_education_content,
-        )
+        # Override any fields that were passed in
+        for key in ResourceParams.__annotations__.keys():
+            if key in kwargs and kwargs[key] is not None:
+                mock_resource.__setattr__(key, kwargs[key])
+
+        resource = Resource(**mock_resource.__dict__)
         self.session.add(resource)
         self.session.commit()
-        for category in categories:
-            rc = ResourceCategory(resource_id=resource.id, category=category, type="resource")
+        resource_id = resource.id
+        category_ids = [c.id for c in resource.categories]
+        self.session.close()
+
+        for category_id in category_ids:
+            rc = ResourceCategory(resource_id=resource_id, category_id=category_id, type="resource")
             self.session.add(rc)
 
         self.session.commit()
-        db_resource = self.session.query(Resource).filter_by(title=resource.title).first()
+        self.session.close()
+
+        db_resource = self.session.execute(select(Resource).filter(Resource.id == resource_id)).unique().scalar_one()
         self.assertEqual(db_resource.website, resource.website)
 
-        elastic_index.add_document(db_resource, "Resource")
+        self.elastic_index.add_document(db_resource)
         return db_resource
 
     def construct_location(
         self,
-        title="A+ location",
-        description="A delightful location destined to create rejoicing",
-        street_address1="123 Some Pl",
-        street_address2="Apt. 45",
-        is_draft=False,
-        city="Stauntonville",
-        state="QX",
-        zip="99775",
-        phone="555-555-5555",
-        website="http://stardrive.org",
-        latitude=38.98765,
-        longitude=-93.12345,
-        organization_name="Location Org",
-        primary_contact="John Doe",
-        email="a@b.c",
+        **kwargs: Unpack[LocationParams],
     ):
+        mock_location = MockLocationWithLatLong()
 
-        location = Location(
-            title=title,
-            description=description,
-            street_address1=street_address1,
-            street_address2=street_address2,
-            city=city,
-            state=state,
-            zip=zip,
-            phone=phone,
-            website=website,
-            latitude=latitude,
-            longitude=longitude,
-            is_draft=is_draft,
-            organization_name=organization_name,
-            primary_contact=primary_contact,
-            email=email,
-        )
+        # Override any fields that were passed in
+        for key in LocationParams.__annotations__.keys():
+            if key in kwargs and kwargs[key] is not None:
+                mock_location.__setattr__(key, kwargs[key])
+
+        location = Location(**mock_location.__dict__)
         self.session.add(location)
         self.session.commit()
+        location_id = location.id
+        category_ids = [c.id for c in location.categories]
+        self.session.close()
 
-        db_location = self.session.query(Location).filter_by(title=location.title).first()
+        for category_id in category_ids:
+            rc = ResourceCategory(location_id=location_id, category_id=category_id, type="location")
+            self.session.add(rc)
+
+        self.session.commit()
+        self.session.close()
+
+        db_location = self.session.execute(select(Location).filter(Location.id == location_id)).unique().scalar_one()
         self.assertEqual(db_location.website, location.website)
-        elastic_index.add_document(document=db_location, flush=True, latitude=latitude, longitude=longitude)
+
+        self.elastic_index.add_document(
+            document=db_location, latitude=db_location.latitude, longitude=db_location.longitude
+        )
         return db_location
 
     def construct_location_category(self, location_id, category_name):
@@ -326,40 +342,34 @@ class BaseTest(TestCase):
 
     def construct_study(
         self,
-        title="Fantastic Study",
-        description="A study that will go down in history",
-        participant_description="Even your pet hamster could benefit from participating in this study",
-        benefit_description="You can expect to have your own rainbow following you around afterwards",
-        coordinator_email="hello@study.com",
-        categories=None,
-        organization_name="Study Org",
+        **kwargs: Unpack[StudyParams],
     ):
-        categories = [] if categories is None else categories
+        mock_study = MockStudy()
 
-        study = Study(
-            title=title,
-            description=description,
-            participant_description=participant_description,
-            benefit_description=benefit_description,
-            status=Status.currently_enrolling,
-            coordinator_email=coordinator_email,
-            organization_name=organization_name,
-        )
+        # Override any fields that were passed in
+        for key in StudyParams.__annotations__.keys():
+            if key in kwargs and kwargs[key] is not None:
+                mock_study.__setattr__(key, kwargs[key])
 
+        study = Study(**mock_study.__dict__)
         self.session.add(study)
         self.session.commit()
-        db_study = self.session.query(Study).filter_by(title=study.title).first()
-        self.assertEqual(db_study.description, description)
+        study_id = study.id
+        category_ids = [c.id for c in study.categories]
+        self.session.close()
 
-        for category in categories:
-            sc = StudyCategory(study_id=db_study.id, category_id=category.id)
-            self.session.add(sc)
+        for category_id in category_ids:
+            rc = StudyCategory(study_id=study_id, category_id=category_id)
+            self.session.add(rc)
 
         self.session.commit()
-        elastic_index.add_document(db_study, "Study")
+        self.session.close()
 
-        db_study = self.session.query(Study).filter_by(id=db_study.id).first()
-        self.assertEqual(len(db_study.categories), len(categories))
+        db_study: Study = self.session.execute(select(Study).filter(Study.id == study_id)).unique().scalars().first()
+        self.assertEqual(db_study.eligibility_url, study.eligibility_url)
+
+        self.elastic_index.add_document(db_study)
+        self.assertEqual(len(db_study.categories), len(category_ids))
 
         return db_study
 
@@ -423,7 +433,9 @@ class BaseTest(TestCase):
         self.session.add(event)
         self.session.commit()
 
-        db_event = self.session.query(Event).filter_by(title=event.title).first()
+        db_event = self.session.query(Event).filter(Event.id == event.id).first()
+        self.session.close()
+
         self.assertEqual(db_event.website, event.website)
 
         for user in registered_users:
@@ -431,8 +443,10 @@ class BaseTest(TestCase):
             self.session.add(eu)
 
         self.session.commit()
+        self.session.close()
 
-        elastic_index.add_document(db_event, "Event")
+        db_event = self.session.query(Event).filter(Event.id == event.id).first()
+        self.elastic_index.add_document(db_event)
         return db_event
 
     def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):
@@ -440,7 +454,7 @@ class BaseTest(TestCase):
         self.session.add(z)
         self.session.commit()
 
-        db_z = self.session.query(ZipCode).filter_by(id=id).first()
+        db_z = self.session.query(ZipCode).filter_by(id=cast(id, Integer)).first()
         self.assertEqual(db_z.id, z.id)
         self.assertEqual(db_z.latitude, z.latitude)
         self.assertEqual(db_z.longitude, z.longitude)
@@ -462,7 +476,7 @@ class BaseTest(TestCase):
     ):
         self.session.add(ChainStep(id=id, name=name, instruction=instruction, last_updated=last_updated))
         self.session.commit()
-        return self.session.query(ChainStep).filter(ChainStep.id == id).first()
+        return self.session.query(ChainStep).filter(ChainStep.id == cast(id, Integer)).first()
 
     def construct_everything(self):
         if hasattr(self, "construct_all_questionnaires"):

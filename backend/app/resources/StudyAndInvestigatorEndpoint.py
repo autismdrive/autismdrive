@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.models import Investigator, Study, StudyInvestigator
@@ -16,7 +17,7 @@ class StudyByInvestigatorEndpoint(flask_restful.Resource):
         study_investigators = (
             session.query(StudyInvestigator)
             .join(StudyInvestigator.study)
-            .filter(StudyInvestigator.investigator_id == investigator_id)
+            .filter(StudyInvestigator.investigator_id == cast(investigator_id, Integer))
             .order_by(Study.title)
             .all()
         )
@@ -31,7 +32,7 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
         study_investigators = (
             session.query(StudyInvestigator)
             .join(StudyInvestigator.investigator)
-            .filter(StudyInvestigator.study_id == study_id)
+            .filter(StudyInvestigator.study_id == cast(study_id, Integer))
             .order_by(Investigator.name)
             .all()
         )
@@ -44,7 +45,7 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
             item["study_id"] = study_id
 
         study_investigators = self.schema.load(request_data, many=True)
-        session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
+        session.query(StudyInvestigator).filter_by(study_id=cast(study_id, Integer)).delete()
         for c in study_investigators:
             session.add(StudyInvestigator(study_id=study_id, investigator_id=c.investigator_id))
         session.commit()
@@ -55,13 +56,13 @@ class StudyInvestigatorEndpoint(flask_restful.Resource):
     schema = StudyInvestigatorSchema()
 
     def get(self, id):
-        model = session.query(StudyInvestigator).filter_by(id=id).first()
+        model = session.query(StudyInvestigator).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        session.query(StudyInvestigator).filter_by(id=id).delete()
+        session.query(StudyInvestigator).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 

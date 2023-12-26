@@ -3,6 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -19,7 +20,7 @@ class LocationEndpoint(flask_restful.Resource):
     schema = LocationSchema()
 
     def get(self, id):
-        model = session.query(Location).filter_by(id=id).first()
+        model = session.query(Location).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
@@ -27,15 +28,15 @@ class LocationEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.delete_resource)
     def delete(self, id):
-        location = session.query(Location).filter_by(id=id).first()
+        location = session.query(Location).filter_by(id=cast(id, Integer)).first()
         location_id = location.id
         location_title = location.title
 
         if location is not None:
-            elastic_index.remove_document(location, "Location")
+            elastic_index.remove_document(location)
 
-        session.query(Event).filter_by(id=id).delete()
-        session.query(Location).filter_by(id=id).delete()
+        session.query(Event).filter_by(id=cast(id, Integer)).delete()
+        session.query(Location).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         self.log_update(location_id=location_id, location_title=location_title, change_type="delete")
         return None
@@ -44,7 +45,7 @@ class LocationEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(Location).filter_by(id=id).first()
+        instance = session.query(Location).filter_by(id=cast(id, Integer)).first()
         if (
             instance.zip != request_data["zip"]
             or instance.street_address1 != request_data["street_address1"]
@@ -112,7 +113,7 @@ class LocationListEndpoint(flask_restful.Resource):
             session.add(load_result)
             session.commit()
             elastic_index.add_document(
-                load_result, "Location", latitude=load_result.latitude, longitude=load_result.longitude
+                document=load_result, latitude=load_result.latitude, longitude=load_result.longitude
             )
             self.log_update(location_id=load_result.id, location_title=load_result.title, change_type="create")
             return self.locationSchema.dump(load_result)

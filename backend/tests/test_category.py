@@ -1,3 +1,5 @@
+from sqlalchemy import cast, Integer, select
+
 from app.models import Category
 from tests.base_test import BaseTest
 
@@ -32,7 +34,7 @@ class TestCategory(BaseTest):
         child_cat = self.construct_category(name=child_name_before, parent=parent_cat_1)
         child_cat_id = child_cat.id
 
-        db_child = self.session.query(Category).filter_by(id=child_cat_id).first()
+        db_child = self.session.query(Category).filter_by(id=cast(child_cat_id, Integer)).first()
         self.assertIsNotNone(db_child)
         self.assertIsNotNone(db_child.name, child_name_before)
         self.assertEqual(db_child.parent.name, parent_name_before)
@@ -159,16 +161,20 @@ class TestCategory(BaseTest):
         c2_path = str(c1.id) + "," + str(c2.id)
         c3_path = str(c1.id) + "," + str(c2.id) + "," + str(c3.id)
 
-        self.assertEqual(1, len(c1.all_search_paths()))
-        self.assertEqual(2, len(c2.all_search_paths()))
-        self.assertEqual(3, len(c3.all_search_paths()))
+        db_c1 = self.session.execute(select(Category).where(Category.id == c1.id)).unique().scalar_one()
+        db_c2 = self.session.execute(select(Category).where(Category.id == c2.id)).unique().scalar_one()
+        db_c3 = self.session.execute(select(Category).where(Category.id == c3.id)).unique().scalar_one()
 
-        self.assertIn(c3_path, c3.all_search_paths())
-        self.assertIn(c2_path, c3.all_search_paths())
-        self.assertIn(c1_path, c3.all_search_paths())
-        self.assertIn(c2_path, c2.all_search_paths())
-        self.assertIn(c1_path, c2.all_search_paths())
-        self.assertIn(c1_path, c1.all_search_paths())
+        self.assertEqual(1, len(db_c1.all_search_paths()))
+        self.assertEqual(2, len(db_c2.all_search_paths()))
+        self.assertEqual(3, len(db_c3.all_search_paths()))
+
+        self.assertIn(c3_path, db_c3.all_search_paths())
+        self.assertIn(c2_path, db_c3.all_search_paths())
+        self.assertIn(c1_path, db_c3.all_search_paths())
+        self.assertIn(c2_path, db_c2.all_search_paths())
+        self.assertIn(c1_path, db_c2.all_search_paths())
+        self.assertIn(c1_path, db_c1.all_search_paths())
 
     # def test_category_depth_is_limited(self):
     #     c1 = self.construct_category()

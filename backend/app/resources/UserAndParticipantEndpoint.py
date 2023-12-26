@@ -1,7 +1,7 @@
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exc
+from sqlalchemy import exc, cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -18,7 +18,10 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
     @auth.login_required
     def get(self):
         participants = (
-            session.query(Participant).filter(Participant.user_id == g.user.id).order_by(Participant.id).all()
+            session.query(Participant)
+            .filter(Participant.user_id == cast(g.user.id, Integer))
+            .order_by(Participant.id)
+            .all()
         )
         return self.schema.dump(participants, many=True)
 
@@ -52,7 +55,5 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
             session.add(load_result)
             session.commit()
             return self.schema.dump(load_result)
-        except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
-        except exc.IntegrityError as err:
-            raise RestException(RestException.INVALID_OBJECT, details=load_result.errors)
+        except (ValidationError, exc.IntegrityError) as err:
+            raise RestException(RestException.INVALID_OBJECT, details=err)

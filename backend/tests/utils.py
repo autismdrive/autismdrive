@@ -1,10 +1,6 @@
-import logging
 import uuid
 
-from faker import Faker
-
-fake = Faker()
-logging.getLogger("faker").setLevel(logging.ERROR)
+from fixtures.fixure_utils import fake
 
 
 def get_new_uuid():
@@ -19,7 +15,7 @@ class MockGoogleMapsClient:
         if address:
             # Use address hash value to create a seed for the fake lat/long
             # so that the same address always returns the same lat/long
-            Faker.seed(hash(address))
+            fake.seed_instance(hash(address))
             lat, lng = fake.latlng()
 
         return [{"geometry": {"location": {"lat": lat, "lng": lng}}}]

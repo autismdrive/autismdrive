@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
@@ -16,7 +17,7 @@ class EventByCategoryEndpoint(flask_restful.Resource):
         event_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.resource)
-            .filter(ResourceCategory.category_id == category_id)
+            .filter(ResourceCategory.category_id == cast(category_id, Integer))
             .order_by(Event.title)
             .all()
         )
@@ -31,7 +32,7 @@ class CategoryByEventEndpoint(flask_restful.Resource):
         event_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.category)
-            .filter(ResourceCategory.resource_id == event_id)
+            .filter(ResourceCategory.resource_id == cast(event_id, Integer))
             .order_by(Category.name)
             .all()
         )
@@ -44,11 +45,11 @@ class CategoryByEventEndpoint(flask_restful.Resource):
             item["resource_id"] = event_id
 
         event_categories = self.schema.load(data=request_data, session=session, many=True)
-        session.query(ResourceCategory).filter_by(resource_id=event_id).delete()
+        session.query(ResourceCategory).filter_by(resource_id=cast(event_id, Integer)).delete()
         for c in event_categories:
             session.add(ResourceCategory(resource_id=event_id, category_id=c.category_id, type="event"))
         session.commit()
-        instance = session.query(Event).filter_by(id=event_id).first()
+        instance = session.query(Event).filter_by(id=cast(event_id, Integer)).first()
         elastic_index.update_document(document=instance, latitude=instance.latitude, longitude=instance.longitude)
         return self.get(event_id)
 
@@ -57,13 +58,13 @@ class EventCategoryEndpoint(flask_restful.Resource):
     schema = EventCategorySchema()
 
     def get(self, id):
-        model = session.query(ResourceCategory).filter_by(id=id).first()
+        model = session.query(ResourceCategory).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        session.query(ResourceCategory).filter_by(id=id).delete()
+        session.query(ResourceCategory).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 

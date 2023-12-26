@@ -3,6 +3,7 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
@@ -17,27 +18,27 @@ class StudyEndpoint(flask_restful.Resource):
     schema = StudySchema()
 
     def get(self, id):
-        model = session.query(Study).filter_by(id=id).first()
+        model = session.query(Study).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        study = session.query(Study).filter_by(id=id).first()
+        study = session.query(Study).filter_by(id=cast(id, Integer)).first()
 
         if study is not None:
-            elastic_index.remove_document(study, "Study")
+            elastic_index.remove_document(study)
 
-        session.query(StudyUser).filter_by(study_id=id).delete()
-        session.query(StudyInvestigator).filter_by(study_id=id).delete()
-        session.query(StudyCategory).filter_by(study_id=id).delete()
-        session.query(Study).filter_by(id=id).delete()
+        session.query(StudyUser).filter_by(study_id=cast(id, Integer)).delete()
+        session.query(StudyInvestigator).filter_by(study_id=cast(id, Integer)).delete()
+        session.query(StudyCategory).filter_by(study_id=cast(id, Integer)).delete()
+        session.query(Study).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(Study).filter_by(id=id).first()
+        instance = session.query(Study).filter_by(id=cast(id, Integer)).first()
         try:
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:
@@ -64,8 +65,12 @@ class StudyListEndpoint(flask_restful.Resource):
             load_result = self.studySchema.load(request_data)
             session.add(load_result)
             session.commit()
-            elastic_index.add_document(load_result, "Study")
-            return self.studySchema.dump(load_result)
+            study_id = load_result.id
+            session.close()
+
+            db_study = session.query(Study).filter_by(id=cast(study_id, Integer)).first()
+            elastic_index.add_document(document=db_study)
+            return self.studySchema.dump(db_study)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 

@@ -1,6 +1,7 @@
 import elasticsearch
 import flask_restful
 from flask import request, json, jsonify
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
@@ -19,7 +20,7 @@ class RelatedResultsEndpoint(flask_restful.Resource):
             is_resource = "resource_id" in request_data.keys()
             item_id = request_data["resource_id"] if is_resource else request_data["study_id"]
             model = Resource if is_resource else Study
-            item = session.query(model).filter_by(id=item_id).first()
+            item = session.query(model).filter_by(id=cast(item_id, Integer)).first()
             results = elastic_index.more_like_this(item, max_hits=30)
         except elasticsearch.ElasticsearchException as e:
             raise RestException(RestException.ELASTIC_ERROR, details=json.dumps(e))

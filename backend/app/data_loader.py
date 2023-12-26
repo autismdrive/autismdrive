@@ -2,7 +2,7 @@ import csv
 import os
 
 import googlemaps
-from sqlalchemy import Sequence
+from sqlalchemy import Sequence, select, func
 
 from app.elastic_index import elastic_index
 from app.enums import Status
@@ -494,8 +494,8 @@ class DataLoader:
         session.commit()
 
     def __increment_id_sequence(self, model):
-        with engine.begin() as conn:
-            conn.execute(Sequence(model.__tablename__ + "_id_seq"))
+        with engine.connect() as connection:
+            connection.execute(select(func.nextval(model.__tablename__ + "_id_seq"))).scalar()
 
 
 data_loader = DataLoader()

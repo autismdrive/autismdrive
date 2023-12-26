@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.models import Category, Study, StudyCategory
@@ -16,7 +17,7 @@ class StudyByCategoryEndpoint(flask_restful.Resource):
         study_categories = (
             session.query(StudyCategory)
             .join(StudyCategory.study)
-            .filter(StudyCategory.category_id == category_id)
+            .filter(StudyCategory.category_id == cast(category_id, Integer))
             .order_by(Study.title)
             .all()
         )
@@ -31,7 +32,7 @@ class CategoryByStudyEndpoint(flask_restful.Resource):
         study_categories = (
             session.query(StudyCategory)
             .join(StudyCategory.category)
-            .filter(StudyCategory.study_id == study_id)
+            .filter(StudyCategory.study_id == cast(study_id, Integer))
             .order_by(Category.name)
             .all()
         )
@@ -44,7 +45,7 @@ class CategoryByStudyEndpoint(flask_restful.Resource):
             item["study_id"] = study_id
 
         study_categories = self.schema.load(request_data, many=True)
-        session.query(StudyCategory).filter_by(study_id=study_id).delete()
+        session.query(StudyCategory).filter_by(study_id=cast(study_id, Integer)).delete()
         for c in study_categories:
             session.add(StudyCategory(study_id=study_id, category_id=c.category_id))
         session.commit()
@@ -55,13 +56,13 @@ class StudyCategoryEndpoint(flask_restful.Resource):
     schema = StudyCategorySchema()
 
     def get(self, id):
-        model = session.query(StudyCategory).filter_by(id=id).first()
+        model = session.query(StudyCategory).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        session.query(StudyCategory).filter_by(id=id).delete()
+        session.query(StudyCategory).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 

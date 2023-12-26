@@ -2,7 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request, g
-from sqlalchemy import func
+from sqlalchemy import func, cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -19,7 +19,7 @@ class ParticipantEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, id):
-        model = session.query(Participant).filter_by(id=id).first()
+        model = session.query(Participant).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         if not model and (g.user.related_to_participant(model.id) and not g.user.role == Role.admin):
@@ -31,13 +31,13 @@ class ParticipantEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def delete(self, id):
-        session.query(Participant).filter_by(id=id).delete()
+        session.query(Participant).filter_by(id=cast(id, Integer)).delete()
         return None
 
     @auth.login_required
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(Participant).filter_by(id=id).first()
+        instance = session.query(Participant).filter_by(id=cast(id, Integer)).first()
         if not g.user.related_to_participant(instance.id) and not g.user.role == Role.admin:
             raise RestException(RestException.UNRELATED_PARTICIPANT)
 

@@ -39,10 +39,6 @@ def _create_tables(base_metadata: MetaData, engine_: Engine):
             click.secho(f"Creating tables...")
             base_metadata.create_all(bind=conn)
             click.secho(f"Done.")
-
-        click.secho(f"Tables added:")
-        for table in base_metadata.sorted_tables:
-            click.secho(f"- {table.name}")
     except Exception as e:
         click.secho(f"Error connecting to database: {e}")
 
@@ -59,7 +55,6 @@ def _delete_tables(base_metadata: MetaData, engine_: Engine):
                 # Check if table exists
                 if engine.dialect.has_table(conn, table.name):
                     conn.execute(table.delete())
-                    click.secho(f"x {table.name}")
         except Exception as e:
             click.secho(f"Error cleaning table {table.name}: {e}")
 

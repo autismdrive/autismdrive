@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -14,7 +15,7 @@ class FavoritesByUserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, user_id):
-        user_favorites = session.query(UserFavorite).filter(UserFavorite.user_id == user_id).all()
+        user_favorites = session.query(UserFavorite).filter(UserFavorite.user_id == cast(user_id, Integer)).all()
         return self.schema.dump(user_favorites, many=True)
 
 
@@ -26,7 +27,7 @@ class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
     def get(self, user_id, favorite_type):
         user_favorites = (
             session.query(UserFavorite)
-            .filter(UserFavorite.user_id == user_id)
+            .filter(UserFavorite.user_id == cast(user_id, Integer))
             .filter(UserFavorite.type == favorite_type)
             .all()
         )
@@ -38,14 +39,14 @@ class UserFavoriteEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, id):
-        model = session.query(UserFavorite).filter_by(id=id).first()
+        model = session.query(UserFavorite).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     def delete(self, id):
-        session.query(UserFavorite).filter_by(id=id).delete()
+        session.query(UserFavorite).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 

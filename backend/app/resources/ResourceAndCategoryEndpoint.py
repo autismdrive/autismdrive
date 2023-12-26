@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
@@ -17,7 +18,7 @@ class ResourceByCategoryEndpoint(flask_restful.Resource):
         resource_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.resource)
-            .filter(ResourceCategory.category_id == category_id)
+            .filter(ResourceCategory.category_id == cast(category_id, Integer))
             .order_by(Resource.title)
             .all()
         )
@@ -32,7 +33,7 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
         resource_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.category)
-            .filter(ResourceCategory.resource_id == resource_id)
+            .filter(ResourceCategory.resource_id == cast(resource_id, Integer))
             .order_by(Category.name)
             .all()
         )
@@ -45,11 +46,11 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
             item["resource_id"] = resource_id
 
         resource_categories = self.schema.load(request_data, many=True)
-        session.query(ResourceCategory).filter_by(resource_id=resource_id).delete()
+        session.query(ResourceCategory).filter_by(resource_id=cast(resource_id, Integer)).delete()
         for c in resource_categories:
             session.add(ResourceCategory(resource_id=resource_id, category_id=c.category_id, type="resource"))
         session.commit()
-        instance = session.query(Resource).filter_by(id=resource_id).first()
+        instance = session.query(Resource).filter_by(id=cast(resource_id, Integer)).first()
         elastic_index.update_document(document=instance)
         return self.get(resource_id)
 
@@ -58,13 +59,13 @@ class ResourceCategoryEndpoint(flask_restful.Resource):
     schema = ResourceCategorySchema()
 
     def get(self, id):
-        model = session.query(ResourceCategory).filter_by(id=id).first()
+        model = session.query(ResourceCategory).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     def delete(self, id):
-        session.query(ResourceCategory).filter_by(id=id).delete()
+        session.query(ResourceCategory).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 

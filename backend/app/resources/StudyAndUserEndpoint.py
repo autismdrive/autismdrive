@@ -1,5 +1,6 @@
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -20,7 +21,7 @@ class StudyInquiryByUserEndpoint(flask_restful.Resource):
         study_users = (
             session.query(StudyUser)
             .join(StudyUser.study)
-            .filter(StudyUser.user_id == user_id)
+            .filter(StudyUser.user_id == cast(user_id, Integer))
             .filter(StudyUser.status == StudyUserStatus.inquiry_sent)
             .order_by(Study.title)
             .all()
@@ -37,7 +38,7 @@ class StudyEnrolledByUserEndpoint(flask_restful.Resource):
         study_users = (
             session.query(StudyUser)
             .join(StudyUser.study)
-            .filter(StudyUser.user_id == user_id)
+            .filter(StudyUser.user_id == cast(user_id, Integer))
             .filter(StudyUser.status == StudyUserStatus.enrolled)
             .order_by(Study.title)
             .all()
@@ -55,7 +56,7 @@ class UserByStudyEndpoint(flask_restful.Resource):
         study_users = (
             session.query(StudyUser)
             .join(StudyUser.user)
-            .filter(StudyUser.study_id == study_id)
+            .filter(StudyUser.study_id == cast(study_id, Integer))
             .order_by(User.email)
             .all()
         )
@@ -70,7 +71,7 @@ class UserByStudyEndpoint(flask_restful.Resource):
             item["study_id"] = study_id
 
         study_users = self.schema.load(request_data, many=True)
-        session.query(StudyUser).filter_by(study_id=study_id).delete()
+        session.query(StudyUser).filter_by(study_id=cast(study_id, Integer)).delete()
         for c in study_users:
             session.add(StudyUser(study_id=study_id, user_id=c.user_id))
         session.commit()
@@ -82,14 +83,14 @@ class StudyUserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, id):
-        model = session.query(StudyUser).filter_by(id=id).first()
+        model = session.query(StudyUser).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     def delete(self, id):
-        session.query(StudyUser).filter_by(id=id).delete()
+        session.query(StudyUser).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         return None
 

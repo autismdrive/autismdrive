@@ -3,6 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
+from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
@@ -20,7 +21,7 @@ class EventEndpoint(flask_restful.Resource):
     schema = EventSchema()
 
     def get(self, id):
-        model = session.query(Event).filter_by(id=id).first()
+        model = session.query(Event).filter_by(id=cast(id, Integer)).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
@@ -28,15 +29,15 @@ class EventEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.delete_resource)
     def delete(self, id):
-        event = session.query(Event).filter_by(id=id).first()
+        event = session.query(Event).filter_by(id=cast(id, Integer)).first()
         event_id = event.id
         event_title = event.title
 
         if event is not None:
-            elastic_index.remove_document(event, "Event")
+            elastic_index.remove_document(event)
 
-        session.query(EventUser).filter_by(event_id=id).delete()
-        session.query(Event).filter_by(id=id).delete()
+        session.query(EventUser).filter_by(event_id=cast(id, Integer)).delete()
+        session.query(Event).filter_by(id=cast(id, Integer)).delete()
         session.commit()
         self.log_update(event_id=event_id, event_title=event_title, change_type="delete")
         return None
@@ -45,7 +46,7 @@ class EventEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def put(self, id):
         request_data = request.get_json()
-        instance = session.query(Event).filter_by(id=id).first()
+        instance = session.query(Event).filter_by(id=cast(id, Integer)).first()
         if (
             instance.zip != request_data["zip"]
             or instance.street_address1 != request_data["street_address1"]
@@ -111,7 +112,7 @@ class EventListEndpoint(flask_restful.Resource):
             session.add(load_result)
             session.commit()
             elastic_index.add_document(
-                load_result, "Event", latitude=load_result.latitude, longitude=load_result.longitude
+                document=load_result, latitude=load_result.latitude, longitude=load_result.longitude
             )
             self.log_update(event_id=load_result.id, event_title=load_result.title, change_type="create")
             return self.eventSchema.dump(load_result)
