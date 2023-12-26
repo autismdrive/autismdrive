@@ -19,6 +19,8 @@ jobs:
           sudo sysctl -w vm.swappiness=1
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
+      - name: Start Elasticsearch and PostgreSQL
+        run: docker-compose up -d db es
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
