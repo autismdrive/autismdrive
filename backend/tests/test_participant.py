@@ -9,11 +9,11 @@ from tests.base_test_questionnaire import BaseTestQuestionnaire
 class TestParticipant(BaseTestQuestionnaire):
     def test_participant_relationships(self):
         u = self.construct_user()
-        participant = self.construct_participant(user=u, relationship=Relationship.self_participant)
-        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
-        dependent = self.construct_participant(user=u, relationship=Relationship.dependent)
-        professional = self.construct_participant(user=u, relationship=Relationship.self_professional)
-        interested = self.construct_participant(user=u, relationship=Relationship.self_interested)
+        participant = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
+        guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
+        dependent = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
+        professional = self.construct_participant(user_id=u.id, relationship=Relationship.self_professional)
+        interested = self.construct_participant(user_id=u.id, relationship=Relationship.self_interested)
         rv = self.client.get(
             "/api/user/%i" % u.id,
             follow_redirects=True,
@@ -36,7 +36,8 @@ class TestParticipant(BaseTestQuestionnaire):
         self.assertEqual(response["participants"][4]["relationship"], "self_interested")
 
     def test_participant_basics(self):
-        self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent)
+        u = self.construct_user()
+        self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
         p = self.session.query(Participant).first()
         self.assertIsNotNone(p)
         p_id = p.id
@@ -53,7 +54,7 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_modify_participant_you_do_not_own(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         good_headers = self.logged_in_headers(u)
 
         p = self.session.query(Participant).first()
@@ -87,7 +88,7 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_modify_participant_you_do_own(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
         participant = {"id": 567}
         rv = self.client.put(
@@ -102,7 +103,8 @@ class TestParticipant(BaseTestQuestionnaire):
         self.assertEqual(567, p.id)
 
     def test_modify_participant_basics_admin(self):
-        self.construct_participant(user=self.construct_user(), relationship=Relationship.dependent)
+        user1 = self.construct_user()
+        self.construct_participant(user_id=user1.id, relationship=Relationship.dependent)
         user2 = self.construct_user(email="theotherguy@stuff.com")
         logged_in_headers = self.logged_in_headers()
         p = self.session.query(Participant).first()
@@ -129,7 +131,7 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_delete_participant(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.dependent)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
         p_id = p.id
         rv = self.client.get("api/participant/%i" % p_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
@@ -210,7 +212,7 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_get_participant_by_user(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         self.session.commit()
         rv = self.client.get("/api/user/%i" % u.id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -221,9 +223,9 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_participant_ids_are_not_sequential(self):
         u = self.construct_user()
-        p1 = self.construct_participant(user=u, relationship=Relationship.self_participant)
-        p2 = self.construct_participant(user=u, relationship=Relationship.dependent)
-        p3 = self.construct_participant(user=u, relationship=Relationship.dependent)
+        p1 = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
+        p2 = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
+        p3 = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
 
         self.assertNotEqual(p1.id + 1, p2.id)
         self.assertNotEqual(p2.id + 1, p3.id)
@@ -231,11 +233,11 @@ class TestParticipant(BaseTestQuestionnaire):
     def test_participant_admin_list(self):
         u1 = self.construct_user(email="test1@sartography.com")
         u2 = self.construct_user(email="test2@sartography.com")
-        self.construct_participant(user=u1, relationship=Relationship.self_participant)
-        self.construct_participant(user=u2, relationship=Relationship.self_participant)
-        self.construct_participant(user=u1, relationship=Relationship.self_guardian)
-        self.construct_participant(user=u1, relationship=Relationship.dependent)
-        self.construct_participant(user=u2, relationship=Relationship.self_professional)
+        self.construct_participant(user_id=u1.id, relationship=Relationship.self_participant)
+        self.construct_participant(user_id=u2.id, relationship=Relationship.self_participant)
+        self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
+        self.construct_participant(user_id=u1.id, relationship=Relationship.dependent)
+        self.construct_participant(user_id=u2.id, relationship=Relationship.self_professional)
         rv = self.client.get(
             "/api/participant_admin_list", content_type="application/json", headers=self.logged_in_headers()
         )
@@ -249,7 +251,7 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_participant_percent_complete(self):
         u = self.construct_user()
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
 
         rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -271,7 +273,8 @@ class TestParticipant(BaseTestQuestionnaire):
         self.assertGreater(response[0]["percent_complete"], 0)
 
     def test_participant_name(self):
-        p = self.construct_participant(user=self.construct_user(), relationship=Relationship.self_participant)
+        u = self.construct_user()
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
         response = rv.json

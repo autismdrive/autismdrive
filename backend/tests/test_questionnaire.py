@@ -108,7 +108,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         cq = {"first_name": "Darah", "marketing_channel": "Subway sign", "participant_id": p.id}
@@ -211,7 +211,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         clinical_diagnoses_questionnaire = {"medical": ["seizure"], "genetic": ["fragileX"], "participant_id": p.id}
@@ -302,7 +302,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         contact_questionnaire = {"phone": "123-456-7890", "marketing_channel": "Subway sign", "participant_id": p.id}
@@ -403,7 +403,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.dependent)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
         headers = self.logged_in_headers(u)
 
         current_behaviors_dependent_questionnaire = {
@@ -507,7 +507,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         current_behaviors_self_questionnaire = {
@@ -613,7 +613,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         demographics_questionnaire = {"birth_sex": "female", "gender_identity": "genderOther", "participant_id": p.id}
@@ -717,7 +717,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.dependent)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
         headers = self.logged_in_headers(u)
 
         developmental_questionnaire = {
@@ -825,7 +825,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         education_dependent_questionnaire = {
@@ -933,7 +933,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         education_self_questionnaire = {
@@ -1042,7 +1042,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         employment_questionnaire = {
@@ -1151,7 +1151,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
 
         evaluation_history_dependent_questionnaire = {
@@ -1256,7 +1256,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         headers = self.logged_in_headers(u)
 
         evaluation_history_self_questionnaire = {
@@ -1314,9 +1314,8 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         response = rv.json
         from app.enums import Relationship
 
-        response["participant_id"] = self.construct_participant(
-            user=self.construct_user(), relationship=Relationship.dependent
-        ).id
+        u = self.construct_user()
+        response["participant_id"] = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
         response["dependent_living_situation"] = ["caregiver"]
         response["struggle_to_afford"] = True
         orig_date = response["last_updated"]
@@ -1369,7 +1368,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         home_dependent_questionnaire = {
@@ -1428,8 +1427,9 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         response = rv.json
         from app.enums import Relationship
 
+        u = self.construct_user()
         response["participant_id"] = self.construct_participant(
-            user=self.construct_user(), relationship=Relationship.self_participant
+            user_id=u.id, relationship=Relationship.self_participant
         ).id
         response["self_living_situation"] = ["caregiver"]
         response["struggle_to_afford"] = True
@@ -1483,7 +1483,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         home_self_questionnaire = {
@@ -1593,7 +1593,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         identification_questionnaire = {"first_name": "Eloise", "middle_name": "Elora", "participant_id": p.id}
@@ -1647,8 +1647,9 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         response = rv.json
         from app.enums import Relationship
 
+        u = self.construct_user()
         response["participant_id"] = self.construct_participant(
-            user=self.construct_user(), relationship=Relationship.self_participant
+            user_id=u.id, relationship=Relationship.self_participant
         ).id
         orig_date = response["last_updated"]
         rv = self.client.put(
@@ -1703,7 +1704,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         supports_questionnaire = {"participant_id": p.id}
@@ -1771,7 +1772,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         user = self.construct_user()
         from app.enums import Relationship
 
-        participant = self.construct_participant(user=user, relationship=Relationship.self_participant)
+        participant = self.construct_participant(user_id=user.id, relationship=Relationship.self_participant)
         self.construct_chain_session_questionnaire()
         from app.models import ChainQuestionnaire
 
@@ -1929,7 +1930,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
 
         cq = {"participant_id": p.id}
@@ -1976,7 +1977,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u = self.construct_user()
         from app.enums import Relationship
 
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         headers = self.logged_in_headers(u)
         rv = self.client.get("api/flow/self_intake/%i" % p.id, content_type="application/json", headers=headers)
         self.assertEqual(200, rv.status_code)

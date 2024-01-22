@@ -1,7 +1,7 @@
 from flask import json
 from sqlalchemy import cast, Integer
 
-from app.email_service import TEST_MESSAGES
+from app.email_service import EmailService
 from app.models import EmailLog, StudyUser, User, UserFavorite
 from app.enums import Relationship, Permission, Role, StudyUserStatus
 from app.models import StudyUser
@@ -236,22 +236,22 @@ class TestUser(BaseTest):
         return json.loads(response.data.decode())
 
     def test_register_sends_email(self):
-        message_count = len(TEST_MESSAGES)
+        message_count = len(EmailService.TEST_MESSAGES)
         self.test_create_user_with_password()
-        self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(TEST_MESSAGES[-1]["subject"]))
+        self.assertGreater(len(EmailService.TEST_MESSAGES), message_count)
+        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
 
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
     def test_forgot_password_sends_email(self):
         user = self.test_create_user_with_password(id=10101, email="forgot_password_sends_email@test.com")
-        message_count = len(TEST_MESSAGES)
+        message_count = len(EmailService.TEST_MESSAGES)
         data = {"email": user.email}
         rv = self.client.post("/api/forgot_password", data=self.jsonify(data), content_type="application/json")
         self.assert_success(rv)
-        self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Password Reset Email", self.decode(TEST_MESSAGES[-1]["subject"]))
+        self.assertGreater(len(EmailService.TEST_MESSAGES), message_count)
+        self.assertEqual("Autism DRIVE: Password Reset Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
 
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
@@ -426,7 +426,7 @@ class TestUser(BaseTest):
         fav2 = UserFavorite(category_id=c.id, user=u, type="category")
         self.session.add_all([fav1, fav2])
         self.session.commit()
-        rv = self.client.get(
+        rv = self.client.__mapper_args__get(
             "/api/user/%i/favorite" % u.id, content_type="application/json", headers=self.logged_in_headers()
         )
         self.assert_success(rv)
@@ -556,9 +556,9 @@ class TestUser(BaseTest):
         u1 = self.construct_user(email="1@sartography.com")
         u2 = self.construct_user(email="2@sartography.com")
         u3 = self.construct_user(email="3@sartography.com")
-        self.construct_participant(user=u1, relationship=Relationship.self_guardian)
-        self.construct_participant(user=u1, relationship=Relationship.dependent)
-        self.construct_participant(user=u2, relationship=Relationship.self_participant)
+        self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
+        self.construct_participant(user_id=u1.id, relationship=Relationship.dependent)
+        self.construct_participant(user_id=u2.id, relationship=Relationship.self_participant)
 
         rv = self.client.get("api/user/%i" % u1.id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -583,15 +583,15 @@ class TestUser(BaseTest):
 
     def test_user_identity(self):
         u = self.construct_user(email="superuser@sartography.com")
-        self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.assertEqual(u.identity(), "self_guardian")
         u2 = self.construct_user(email="superuser2@sartography.com")
-        self.construct_participant(user=u2, relationship=Relationship.self_professional)
+        self.construct_participant(user_id=u2.id, relationship=Relationship.self_professional)
         self.assertEqual(u2.identity(), "self_professional")
 
     def test_percent_self_registration_complete(self):
         u = self.construct_user(email="prof@sartography.com")
-        p = self.construct_participant(user=u, relationship=Relationship.self_participant)
+        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         iq = self.get_identification_questionnaire(p.id)
         self.client.post(
             "api/flow/self_intake/identification_questionnaire",
@@ -606,8 +606,8 @@ class TestUser(BaseTest):
     def test_user_participant_count_new_enum(self):
         u1 = self.construct_user(email="1@sartography.com")
         u4 = self.construct_user(email="4@sartography.com")
-        self.construct_participant(user=u1, relationship=Relationship.self_guardian)
-        self.construct_participant(user=u4, relationship=Relationship.self_interested)
+        self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
+        self.construct_participant(user_id=u4.id, relationship=Relationship.self_interested)
 
         rv = self.client.get("api/user/%i" % u1.id, content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)

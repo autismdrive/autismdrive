@@ -123,9 +123,16 @@ class ImportService:
         for export_info in export_list:
             self.load_data(export_info, log)
 
-    def load_data(self, export_info, log):
-        if len(export_info.json_data) < 1:
-            return  # Nothing to do here.
+    def load_data(self, export_info, log) -> int:
+        num_items = 0
+
+        if not (
+            export_info
+            and hasattr(export_info, "json_data")
+            and export_info.json_data
+            and len(export_info.json_data) > 0
+        ):
+            return num_items  # Nothing to do here.
         schema = ExportService.get_schema(export_info.class_name, many=False, is_import=True)
         model_class = get_class(export_info.class_name)
         log_detail = DataTransferLogDetail(
@@ -151,6 +158,7 @@ class ImportService:
                     session.add(model)
                     session.commit()
                     log_detail.handle_success()
+                    num_items += 1
                     session.add(log_detail)
                     if hasattr(model, "__question_type__") and model.__question_type__ == ExportService.TYPE_SENSITIVE:
                         print("Sensitive Data.  Calling Delete.")
@@ -178,6 +186,7 @@ class ImportService:
                 raise e
 
         session.commit()
+        return num_items
 
     def delete_record(self, item):
         if not "_links" in item or not "self" in item["_links"]:

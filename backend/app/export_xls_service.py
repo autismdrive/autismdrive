@@ -9,7 +9,7 @@ from flask import Response
 from werkzeug.datastructures import Headers
 
 from app.export_service import ExportService
-from app.utils import camel_case_it
+from app.utils import pascal_case_it
 from app.database import get_class
 
 
@@ -24,7 +24,7 @@ class ExportXlsService:
                 pass
             else:
                 f = file_name.replace(".py", "")
-                questionnaire_file_names.append(camel_case_it(f))
+                questionnaire_file_names.append(pascal_case_it(f))
         return sorted(questionnaire_file_names)
 
     @staticmethod

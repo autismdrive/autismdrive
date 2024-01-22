@@ -23,6 +23,7 @@ certifi==2022.12.7
 cffi==1.15.0
 chardet==4.0.0
 click==8.1.7
+coverage==7.4.0
 elasticsearch-dsl==8.11.0
 elasticsearch==8.11.0
 et-xmlfile==1.1.0

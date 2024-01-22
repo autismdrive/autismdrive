@@ -3,7 +3,7 @@ import importlib
 import logging
 
 from flask import url_for
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, cast, Integer
 
 from app.database import session, Base, get_class_for_table, get_class
 from app.email_service import email_service
@@ -220,7 +220,7 @@ class ExportService:
         alert_principal_investigator = False
         last_log = (
             session.query(DataTransferLog)
-            .filter(DataTransferLog.type == "export")
+            .filter(DataTransferLog.type == "exporting")
             .order_by(desc(DataTransferLog.last_updated))
             .limit(1)
             .first()

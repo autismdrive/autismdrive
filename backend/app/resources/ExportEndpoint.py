@@ -10,7 +10,7 @@ from app.enums import Role
 from app.export_service import ExportService
 from app.models import DataTransferLog, DataTransferLogDetail, User
 from app.schemas import ExportSchemas, ExportInfoSchema
-from app.utils import camel_case_it
+from app.utils import pascal_case_it
 from app.wrappers import requires_roles
 
 
@@ -30,7 +30,7 @@ class ExportEndpoint(flask_restful.Resource):
         if name == "admin":
             return self.get_admin()
 
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         schema = ExportService.get_schema(name, many=True)
         return schema.dump(ExportService().get_data(name, last_updated=get_date_arg()))
 
@@ -56,7 +56,7 @@ class ExportListEndpoint(flask_restful.Resource):
         info_list = [item for item in info_list if item.question_type != ExportService.TYPE_IDENTIFYING]
 
         # Get a count of the records, and log it.
-        log = DataTransferLog(type="export")
+        log = DataTransferLog(type="exporting")
         total_records_for_export = 0
         for item in info_list:
             total_records_for_export += item.size
@@ -71,13 +71,13 @@ class ExportListEndpoint(flask_restful.Resource):
         if total_records_for_export == 0:
             log = (
                 session.query(DataTransferLog)
-                .filter(DataTransferLog.type == "export")
+                .filter(DataTransferLog.type == "exporting")
                 .order_by(desc(DataTransferLog.last_updated))
                 .limit(1)
                 .first()
             )
             if log is None:
-                log = DataTransferLog(type="export", total_records=0)
+                log = DataTransferLog(type="exporting", total_records=0)
             log.last_updated = datetime.datetime.utcnow()
         session.add(log)
         session.commit()

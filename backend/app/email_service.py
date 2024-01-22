@@ -10,14 +10,13 @@ from itsdangerous import URLSafeTimedSerializer
 
 from config.load import settings
 
-TEST_MESSAGES = []
-
 
 class EmailService:
     api_url: str = settings.API_URL
     site_url: str = settings.SITE_URL
     admin_email: str = settings.ADMIN_EMAIL
     principal_investigator_email: str = settings.PRINCIPAL_INVESTIGATOR_EMAIL
+    TEST_MESSAGES = []
 
     def tracking_code(self):
         return str(uuid.uuid4())[:16]
@@ -60,7 +59,7 @@ class EmailService:
 
         if settings.TESTING:
             print("TEST:  Recording Emails, not sending - %s - to:%s" % (subject, recipients))
-            TEST_MESSAGES.append(msg_root)
+            self.TEST_MESSAGES.append(msg_root)
             return
 
         server = self.email_server()

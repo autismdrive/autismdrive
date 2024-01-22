@@ -15,7 +15,7 @@ from app.auth import bcrypt, password_requirements
 from app.database import Base, session, random_integer, get_class
 from app.enums import Relationship, Status, Role, StudyUserStatus
 from app.export_service import ExportService
-from app.utils import camel_case_it
+from app.utils import pascal_case_it
 from config.load import settings
 
 
@@ -207,7 +207,7 @@ class Resource(Base):
     __tablename__ = "resource"
     __label__ = "Online Information"
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[str]
+    type: Mapped[str] = mapped_column(default="resource")
     title: Mapped[str]
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     description: Mapped[str]
@@ -265,6 +265,7 @@ class Location(Resource):
     __tablename__ = "location"
     __label__ = "Local Services"
     id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
+    type: Mapped[str] = mapped_column(default="location")
     primary_contact: Mapped[Optional[str]]
     street_address1: Mapped[str]
     street_address2: Mapped[Optional[str]]
@@ -284,6 +285,7 @@ class Event(Location):
     __tablename__ = "event"
     __label__ = "Events and Training"
     id: Mapped[int] = mapped_column(ForeignKey("location.id"), primary_key=True)
+    type: Mapped[str] = mapped_column(default="event")
     date: Mapped[datetime] = mapped_column(default=func.now())
     time: Mapped[Optional[str]]
     ticket_cost: Mapped[Optional[str]]
@@ -389,7 +391,7 @@ class Flow:
 
     def add_step(self, questionnaire_name):
         if not self.has_step(questionnaire_name):
-            class_name = camel_case_it(questionnaire_name)
+            class_name = pascal_case_it(questionnaire_name)
             cls = get_class(class_name)
             q = cls()
             step = Step(questionnaire_name, q.__question_type__, q.__label__)
@@ -1012,7 +1014,8 @@ class Participant(Base):
     # with a user account; sometimes that of themselves and sometimes that of their guardian.
     __tablename__ = "stardrive_participant"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+    # last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="participants")
     identification: Mapped["IdentificationQuestionnaire"] = relationship()
@@ -1327,7 +1330,8 @@ class User(Base):
 
     __tablename__ = "stardrive_user"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+    # last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+    last_updated: Mapped[datetime] = mapped_column(default=func.now())
     registration_date: Mapped[datetime] = mapped_column(default=func.now())
     last_login: Mapped[Optional[datetime]]
     email: Mapped[Optional[str]] = mapped_column(unique=True)
@@ -3617,9 +3621,9 @@ class Housemate(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     home_dependent_questionnaire_id: Mapped[int] = mapped_column(
-        ForeignKey("home_dependent_questionnaire.id"), primary_key=True
+        ForeignKey("home_dependent_questionnaire.id"), nullable=True
     )
-    home_self_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("home_self_questionnaire.id"))
+    home_self_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("home_self_questionnaire.id"), nullable=True)
     name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.1,
@@ -4075,10 +4079,10 @@ class RegistrationQuestionnaire(Base):
     email: Mapped[str]
     zip_code: Mapped[int]
     relationship_to_autism: Mapped[list[str]] = mapped_column(ARRAY(String))
-    relationship_other: Mapped[str]
+    relationship_other: Mapped[Optional[str]]
     marketing_channel: Mapped[list[str]] = mapped_column(ARRAY(String))
-    marketing_other: Mapped[str]
-    newsletter_consent: Mapped[bool]
+    marketing_other: Mapped[Optional[str]]
+    newsletter_consent: Mapped[bool] = mapped_column(default=False)
 
     def get_field_groups(self):
         return {}

@@ -148,7 +148,7 @@ class TestEvents(BaseTest):
         c = self.construct_category()
         event = self.construct_event()
 
-        evcat_data = {"resource_id": event.id, "category_id": c.id}
+        evcat_data = {"resource_id": event.id, "category_id": c.id, "type": event.type}
 
         rv = self.client.post("/api/resource_category", data=self.jsonify(evcat_data), content_type="application/json")
         self.assert_success(rv)

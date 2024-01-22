@@ -11,7 +11,7 @@ from app.export_service import ExportService
 from app.models import Flows, Participant, StepLog
 from app.rest_exception import RestException
 from app.schemas import FlowSchema
-from app.utils import camel_case_it
+from app.utils import pascal_case_it
 
 
 class FlowEndpoint(flask_restful.Resource):
@@ -40,7 +40,7 @@ class FlowListEndpoint(flask_restful.Resource):
 
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
     def get(self, flow, questionnaire_name):
-        questionnaire_name = camel_case_it(questionnaire_name)
+        questionnaire_name = pascal_case_it(questionnaire_name)
         flow = Flows.get_flow_by_name(flow)
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
@@ -63,7 +63,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         request_data["user_id"] = g.user.id
         if "_links" in request_data:
             request_data.pop("_links")
-        schema = ExportService.get_schema(camel_case_it(questionnaire_name))
+        schema = ExportService.get_schema(pascal_case_it(questionnaire_name))
 
         try:
             new_quest = schema.load(request_data, session=session)

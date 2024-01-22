@@ -133,9 +133,7 @@ class BaseTest(TestCase):
         self.auths = {}
 
     def tearDown(self):
-        from app.database import session
-
-        session.rollback()
+        self.session.rollback()
         close_all_sessions()
         self.elastic_index.connection.close()
 
@@ -210,18 +208,18 @@ class BaseTest(TestCase):
     ) -> User:
         if isinstance(last_login, str):
             last_login = datetime.datetime.strptime(last_login, "%m/%d/%y %H:%M")
-        db_user = self.session.query(User).filter_by(email=email).first()
+        db_user = self.session.execute(select(User).filter(User.email == email)).unique().scalar_one_or_none()
         if db_user:
             return db_user
         user = User(email=email, role=role, last_login=last_login)
         self.session.add(user)
         self.session.commit()
-        db_user = self.session.query(User).filter_by(email=user.email).first()
+        db_user = self.session.execute(select(User).filter(User.email == email)).unique().scalar_one_or_none()
         self.assertEqual(db_user.email, user.email)
         return db_user
 
-    def construct_participant(self, user, relationship):
-        participant = Participant(user=user, relationship=relationship)
+    def construct_participant(self, user_id: int, relationship):
+        participant = Participant(user_id=user_id, relationship=relationship)
         self.session.add(participant)
         self.session.commit()
         #        db_participant = self.session.query(Participant).filter_by(id=participant.id).first()
@@ -437,6 +435,7 @@ class BaseTest(TestCase):
         self.session.close()
 
         self.assertEqual(db_event.website, event.website)
+        self.assertEqual(db_event.type, "event")
 
         for user in registered_users:
             eu = EventUser(event_id=db_event.id, user_id=user.id)
@@ -479,25 +478,48 @@ class BaseTest(TestCase):
         return self.session.query(ChainStep).filter(ChainStep.id == cast(id, Integer)).first()
 
     def construct_everything(self):
+        questionnaires = None
         if hasattr(self, "construct_all_questionnaires"):
-            self.construct_all_questionnaires()
+            questionnaires = self.construct_all_questionnaires()
         cat = self.construct_category()
-        self.construct_resource()
+        resource = self.construct_resource()
         study = self.construct_study()
         location = self.construct_location()
+        user = self.construct_user()
+        participant = self.construct_participant(user.id, "self_participant")
         self.construct_event()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
-        investigator = Investigator(name="Sam I am")
+        investigator = self.construct_investigator(name="Sam I am")
         self.session.add(StudyInvestigator(study=study, investigator=investigator))
         self.session.add(StudyUser(study=study, user=self.construct_user()))
         self.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=""))
-        self.session.add(UserFavorite(user_id=self.construct_user().id))
-        self.session.add(investigator)
-        self.session.add(EmailLog())
-        self.session.add(ResourceChangeLog())
-        self.session.add(StepLog())
+        self.session.add(
+            UserFavorite(user_id=self.construct_user().id, type="resource", resource_id=self.construct_resource().id)
+        )
+        self.session.add(EmailLog(user_id=self.construct_user().id, type="test", tracking_code="test"))
+        self.session.add(
+            ResourceChangeLog(
+                type="edit",
+                user_id=user.id,
+                user_email=user.email,
+                resource_id=resource.id,
+                resource_title=resource.title,
+            )
+        )
+        if questionnaires and "identification" in questionnaires:
+            q = questionnaires["identification"]
+            self.session.add(
+                StepLog(
+                    questionnaire_name="Identification",
+                    questionnaire_id=q.id,
+                    flow="registration",
+                    participant_id=participant.id,
+                    user_id=participant.user_id,
+                    time_on_task_ms=999999,
+                )
+            )
         self.session.commit()
 
     def get_identification_questionnaire(self, participant_id):

@@ -12,7 +12,7 @@ from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
 from app.rest_exception import RestException
 from app.schemas import ExportInfoSchema
-from app.utils import camel_case_it
+from app.utils import pascal_case_it
 from app.wrappers import requires_permission
 
 
@@ -41,7 +41,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
         Returns: A single questionnaire record.
         """
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         class_ref = get_class(name)
         instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
         if instance is None:
@@ -63,7 +63,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
             id (int): ID of the questionnaire record to delete
         """
         try:
-            name = camel_case_it(name)
+            name = pascal_case_it(name)
             class_ref = get_class(name)
             instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
             session.delete(instance)
@@ -87,7 +87,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
 
         Returns: The updated questionnaire record.
         """
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         class_ref = get_class(name)
         instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
         schema = ExportService.get_schema(name)
@@ -110,7 +110,7 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.data_admin)
     def get(self, name):
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         class_ref = get_class(name)
         schema = ExportService.get_schema(name, many=True)
         questionnaires = session.query(class_ref).all()
@@ -140,7 +140,7 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
                 ]
             }
         """
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         class_ref = get_class(name)
         questionnaire = class_ref()
         meta = {"table": {}}
@@ -201,7 +201,7 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
     def get(self, name):
         from flask import current_app
 
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         if self.request_wants_json():
             schema = ExportService.get_schema(name, many=True)
             return schema.dump(ExportService().get_data(name))
@@ -220,7 +220,7 @@ class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
     def get(self, name, user_id):
         from flask import current_app
 
-        name = camel_case_it(name)
+        name = pascal_case_it(name)
         if self.request_wants_json():
             schema = ExportService.get_schema(name, many=True)
             return schema.dump(ExportService().get_data(name))

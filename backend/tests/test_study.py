@@ -1,6 +1,6 @@
 from sqlalchemy import cast, Integer
 
-from app.email_service import TEST_MESSAGES
+from app.email_service import EmailService
 from app.models import EmailLog, Study, StudyInvestigator, StudyCategory, ContactQuestionnaire, StudyUser
 from app.enums import Relationship
 from app.models import IdentificationQuestionnaire
@@ -229,11 +229,11 @@ class TestStudy(BaseTest):
         self.assertEqual(0, len(response))
 
     def test_study_inquiry_sends_email(self):
-        message_count = len(TEST_MESSAGES)
+        message_count = len(EmailService.TEST_MESSAGES)
         s = self.construct_study(title="The Best Study")
         u = self.construct_user()
-        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
-        dependent1 = self.construct_participant(user=u, relationship=Relationship.dependent)
+        guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
+        dependent1 = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
         self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
         self.construct_identification_questionnaire(
@@ -249,8 +249,8 @@ class TestStudy(BaseTest):
             headers=self.logged_in_headers(),
         )
         self.assert_success(rv)
-        self.assertGreater(len(TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Study Inquiry Email", self.decode(TEST_MESSAGES[-1]["subject"]))
+        self.assertGreater(len(EmailService.TEST_MESSAGES), message_count)
+        self.assertEqual("Autism DRIVE: Study Inquiry Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
 
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
@@ -261,7 +261,7 @@ class TestStudy(BaseTest):
 
         self.assertEquals(0, len(s.study_users))
 
-        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
         self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
 
@@ -284,7 +284,7 @@ class TestStudy(BaseTest):
     def test_study_inquiry_fails_without_valid_study_or_user(self):
         s = self.construct_study(title="The Best Study")
         u = self.construct_user()
-        guardian = self.construct_participant(user=u, relationship=Relationship.self_guardian)
+        guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
         self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
 
@@ -335,7 +335,7 @@ class TestStudy(BaseTest):
             iq.user_id = u.id
 
         if participant is None:
-            iq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
+            iq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
         else:
             iq.participant_id = participant.id
 
@@ -371,7 +371,7 @@ class TestStudy(BaseTest):
             cq.user_id = u.id
 
         if participant is None:
-            cq.participant_id = self.construct_participant(user=u, relationship=Relationship.dependent).id
+            cq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
         else:
             cq.participant_id = participant.id
 
