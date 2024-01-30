@@ -1,6 +1,8 @@
 import os
 import time
 
+from sqlalchemy.orm import close_all_sessions
+
 os.environ["TESTING"] = "true"
 os.environ["ENV_NAME"] = "testing"
 
@@ -177,8 +179,12 @@ class TestExportCase(BaseTestQuestionnaire):
         self.session.close()
 
         data = self.get_export()
-        self.reset_db()
-        self.session.commit()
+
+        # Run teardown and setup to clear out the database
+        self.tearDown()
+        self.setUp()
+
+        # Load the exported data into the database
         self.load_database(data)
 
         db_user_before = self.session.execute(select(User).filter(User.id == user_id)).unique().scalar_one_or_none()
@@ -201,8 +207,10 @@ class TestExportCase(BaseTestQuestionnaire):
         id = u.id
         self.session.commit()
         data = self.get_export()
-        self.reset_db()
-        self.session.commit()
+
+        # Run teardown and setup to clear out the database
+        self.tearDown()
+        self.setUp()
 
         self.load_database(data)
         self.assertEqual(ExportService.TYPE_IDENTIFYING, IdentificationQuestionnaire().__question_type__)
@@ -282,11 +290,11 @@ class TestExportCase(BaseTestQuestionnaire):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.
         self.construct_everything()
         data = self.get_export()
-        self.session.commit()
-        self.session.close()
-        self.reset_db()
-        self.session.commit()
-        self.session.close()
+
+        # Run teardown and setup to clear out the database
+        self.tearDown()
+        self.setUp()
+
         self.load_database(data)
 
     def test_export_admin_details(self):

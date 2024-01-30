@@ -270,78 +270,82 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_dependent_profile_does_not_send_prompt_with_complete_dependent(self):
         u1 = self.create_complete_guardian()
+        u1_id = u1.id
         d1 = self.construct_participant(user_id=u1.id, relationship=Relationship.dependent)
-        q1 = {"user_id": u1.id, "participant_id": d1.id}
+        d1_id = d1.id
+        q1 = {"user_id": u1_id, "participant_id": d1_id}
+        q1_json = self.jsonify(q1)
+        headers = self.logged_in_headers(u1)
         rv = self.client.post(
             "api/flow/dependent_intake/identification_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/demographics_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/home_dependent_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/evaluation_history_dependent_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/clinical_diagnoses_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/developmental_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/current_behaviors_dependent_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/education_dependent_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.post(
             "api/flow/dependent_intake/supports_questionnaire",
-            data=self.jsonify(q1),
+            data=q1_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers,
         )
         self.assert_success(rv)
 

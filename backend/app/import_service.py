@@ -153,33 +153,32 @@ class ImportService:
                     model = schema.load(data=item_copy, session=session, instance=existing_model)
                 else:
                     model = schema.load(data=item_copy, session=session)
-
-                try:
-                    session.add(model)
-                    session.commit()
-                    log_detail.handle_success()
-                    num_items += 1
-                    session.add(log_detail)
-                    if hasattr(model, "__question_type__") and model.__question_type__ == ExportService.TYPE_SENSITIVE:
-                        print("Sensitive Data.  Calling Delete.")
-                        self.delete_record(item)
-                except Exception as e:
-                    session.rollback()
-                    self.logger.error(
-                        "Error processing "
-                        + export_info.class_name
-                        + " with id of "
-                        + str(item["id"])
-                        + ".  Error: "
-                        + str(e)
-                    )
-                    log_detail.handle_failure(e)
-                    session.add(log)
-                    session.add(log_detail)
-                    raise e
-
             except Exception as e:
                 e = Exception("Failed to parse model " + export_info.class_name + ". " + str(e))
+                log_detail.handle_failure(e)
+                session.add(log)
+                session.add(log_detail)
+                raise e
+
+            try:
+                session.add(model)
+                session.commit()
+                log_detail.handle_success()
+                num_items += 1
+                session.add(log_detail)
+                if hasattr(model, "__question_type__") and model.__question_type__ == ExportService.TYPE_SENSITIVE:
+                    print("Sensitive Data.  Calling Delete.")
+                    self.delete_record(item)
+            except Exception as e:
+                session.rollback()
+                self.logger.error(
+                    "Error processing "
+                    + export_info.class_name
+                    + " with id of "
+                    + str(item["id"])
+                    + ".  Error: "
+                    + str(e)
+                )
                 log_detail.handle_failure(e)
                 session.add(log)
                 session.add(log_detail)

@@ -1,30 +1,17 @@
-# Prevent Black from reformatting these lines, so the testing environment variable can be set before importing anything:
-# fmt: off
-import os
-from typing import MutableMapping, Unpack, TypedDict, get_type_hints
-
-from sqlalchemy import cast, Integer, select
-
-from fixtures.location import MockLocationWithLatLong
-from fixtures.resource import MockResource
-from fixtures.study import MockStudy
-
-os.environ.setdefault("ENV_NAME", "testing")
-os.putenv("ENV_NAME", "testing")
-
-# Turn Black back on:
-# fmt: on
 import base64
 import datetime
+import os
 import quopri
 import re
 from inspect import getsourcefile
-from unittest import TestCase
 from json import JSONEncoder
+from typing import MutableMapping, Unpack, TypedDict, get_type_hints
+from unittest import TestCase
 
 from flask import json
 from flask.ctx import RequestContext
 from flask.testing import FlaskClient
+from sqlalchemy import cast, Integer, select
 from sqlalchemy.orm import scoped_session, close_all_sessions, joinedload
 from werkzeug.test import TestResponse
 
@@ -56,6 +43,12 @@ from app.models import User
 from app.models import UserFavorite
 from app.models import UserMeta
 from app.models import ZipCode
+from fixtures.location import MockLocationWithLatLong
+from fixtures.resource import MockResource
+from fixtures.study import MockStudy
+
+os.environ.setdefault("ENV_NAME", "testing")
+os.putenv("ENV_NAME", "testing")
 
 
 class ResourceParams(TypedDict):
@@ -222,9 +215,13 @@ class BaseTest(TestCase):
         participant = Participant(user_id=user_id, relationship=relationship)
         self.session.add(participant)
         self.session.commit()
-        #        db_participant = self.session.query(Participant).filter_by(id=participant.id).first()
-        #        self.assertEqual(db_participant.relationship, participant.relationship)
-        return participant
+
+        participant_id = participant.id
+        db_participant = self.session.query(Participant).filter_by(id=participant_id).filter_by(user_id=user_id).first()
+        self.assertEqual(db_participant.relationship, participant.relationship)
+        self.session.close()
+
+        return db_participant
 
     def construct_usermeta(self, user):
         usermeta = UserMeta(id=user.id)
@@ -482,7 +479,7 @@ class BaseTest(TestCase):
         if hasattr(self, "construct_all_questionnaires"):
             questionnaires = self.construct_all_questionnaires()
         cat = self.construct_category()
-        resource = self.construct_resource()
+        resource = self.construct_resource(**MockResource().__dict__, categories=[cat])
         study = self.construct_study()
         location = self.construct_location()
         user = self.construct_user()

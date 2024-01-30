@@ -254,7 +254,7 @@ class ResourceCategory(Base):
     __tablename__ = "resource_category"
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    type: Mapped[str]
+    type: Mapped[str] = mapped_column(default="resource")
     resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     resource: Mapped["Resource"] = relationship(back_populates="resource_categories")
@@ -340,7 +340,7 @@ class ExportInfo:
     display_name = ""
     sub_tables = []
 
-    def __init__(self, table_name, class_name, size=0, url="", question_type="", export=True):
+    def __init__(self, table_name, class_name, size=0, url="", question_type="", export=True, sub_tables=None):
         self.table_name = table_name
         self.class_name = class_name
         self.size = size
@@ -348,7 +348,7 @@ class ExportInfo:
         self.question_type = question_type
         self.export = export
         self.display_name = self.pretty_title_from_snakecase(class_name)
-        self.sub_tables = []
+        self.sub_tables = sub_tables or []
 
     def pretty_title_from_snakecase(self, title):
         # Capitalizes, removes '_', drops 'Questionnaire' and limits to 30 chars.
