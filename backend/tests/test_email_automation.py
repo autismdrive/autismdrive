@@ -1,6 +1,8 @@
 import datetime
 import uuid
 
+from sqlalchemy import select
+
 from app.email_prompt_service import EmailPromptService
 from app.email_service import EmailService
 from app.models import EmailLog, Study, User
@@ -53,8 +55,10 @@ class TestExportCase(BaseTestQuestionnaire):
             headers=self.logged_in_headers(u1),
         )
 
-        self.assertTrue(u1.self_registration_complete())
-        return u1
+        db_user = self.session.execute(select(User).filter_by(id=u1.id)).unique().scalar_one()
+        self.assertTrue(db_user.self_registration_complete())
+        self.session.close()
+        return db_user
 
     def test_prompting_emails_sent_after_7_days(self):
         message_count = len(EmailService.TEST_MESSAGES)
@@ -154,14 +158,17 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_self_registration_prompting_email(self):
         u1 = self.construct_user(email="test1@sartography.com")
-        p1 = self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
-        q1 = {"user_id": u1.id, "participant_id": p1.id}
+        headers_u1 = self.logged_in_headers(user=u1)
+        u1_id = u1.id
+        p1 = self.construct_participant(user_id=u1_id, relationship=Relationship.self_guardian)
+        p1_id = p1.id
+        q1 = {"user_id": u1_id, "participant_id": p1_id}
         self.client.post(
             "api/flow/guardian_intake/identification_questionnaire",
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers_u1,
         )
 
         self.client.post(
@@ -169,7 +176,7 @@ class TestExportCase(BaseTestQuestionnaire):
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers_u1,
         )
 
         self.client.post(
@@ -177,31 +184,39 @@ class TestExportCase(BaseTestQuestionnaire):
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=headers_u1,
         )
 
-        self.assertTrue(u1.self_registration_complete())
+        db_u1 = self.session.execute(select(User).filter_by(id=u1_id)).unique().scalar_one()
+        self.assertTrue(db_u1.self_registration_complete())
+        self.session.close()
 
         u2 = self.construct_user(email="test2@sartography.com", last_login="12/4/19 10:00")
+        headers_u2 = self.logged_in_headers(user=u2)
+        u2_id = u2.id
         p2 = self.construct_participant(user_id=u2.id, relationship=Relationship.self_guardian)
-        q2 = {"user_id": u2.id, "participant_id": p2.id}
+        p2_id = p2.id
+        q2 = {"user_id": u2_id, "participant_id": p2_id}
+        q2_json = self.jsonify(q2)
         self.client.post(
             "api/flow/guardian_intake/identification_questionnaire",
-            data=self.jsonify(q2),
+            data=q2_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u2),
+            headers=headers_u2,
         )
 
         self.client.post(
             "api/flow/guardian_intake/contact_questionnaire",
-            data=self.jsonify(q2),
+            data=q2_json,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u2),
+            headers=headers_u2,
         )
 
-        self.assertFalse(u2.self_registration_complete())
+        db_u2 = self.session.execute(select(User).filter_by(id=u2_id)).unique().scalar_one()
+        self.assertFalse(db_u2.self_registration_complete())
+        self.session.close()
 
         message_count = len(EmailService.TEST_MESSAGES)
 

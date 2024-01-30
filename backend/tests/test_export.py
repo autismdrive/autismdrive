@@ -3,6 +3,8 @@ import time
 
 from sqlalchemy.orm import close_all_sessions
 
+from app.utils import get_local_now
+
 os.environ["TESTING"] = "true"
 os.environ["ENV_NAME"] = "testing"
 
@@ -21,9 +23,6 @@ from app.schemas import ExportInfoSchema, UserSchema, ParticipantSchema
 
 
 class TestExportCase(BaseTestQuestionnaire):
-    def get_local_now(self):
-        return datetime.datetime.now(tz=tzlocal.get_localzone())
-
     def test_get_list_of_exportables_requires_admin(self):
         rv = self.client.get("/api/export")
         self.assertEqual(401, rv.status_code)
@@ -115,7 +114,7 @@ class TestExportCase(BaseTestQuestionnaire):
         response = rv.json
         exports = ExportInfoSchema(many=True).load(response)
         importer = ImportService()
-        log = importer.log_for_export(exports, self.get_local_now())
+        log = importer.log_for_export(exports, get_local_now())
         results = {}
         for export in exports:
             export.json_data = all_data[export.class_name]
@@ -258,7 +257,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-        date = self.get_local_now() + datetime.timedelta(seconds=1)  # One second in the future
+        date = get_local_now() + datetime.timedelta(seconds=1)  # One second in the future
         exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         for export in exports:
@@ -273,7 +272,7 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        future_date = self.get_local_now() + datetime.timedelta(days=1)
+        future_date = get_local_now() + datetime.timedelta(days=1)
         params = "?after=" + future_date.strftime(ExportService.DATE_FORMAT)
 
         rv = self.client.get("/api/export", headers=self.logged_in_headers())
@@ -339,7 +338,7 @@ class TestExportCase(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(
-            last_updated=self.get_local_now() - datetime.timedelta(minutes=28), total_records=2, type="exporting"
+            last_updated=get_local_now() - datetime.timedelta(minutes=28), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -354,7 +353,7 @@ class TestExportCase(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(
-            last_updated=self.get_local_now() - datetime.timedelta(minutes=45), total_records=2, type="exporting"
+            last_updated=get_local_now() - datetime.timedelta(minutes=45), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -379,7 +378,7 @@ class TestExportCase(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(
-            last_updated=self.get_local_now() - datetime.timedelta(minutes=30), total_records=2, type="exporting"
+            last_updated=get_local_now() - datetime.timedelta(minutes=30), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -391,7 +390,7 @@ class TestExportCase(BaseTestQuestionnaire):
             self.decode(EmailService.TEST_MESSAGES[-1]["subject"]),
         )
 
-        log.last_updated = self.get_local_now() - datetime.timedelta(minutes=120)
+        log.last_updated = get_local_now() - datetime.timedelta(minutes=120)
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -408,7 +407,7 @@ class TestExportCase(BaseTestQuestionnaire):
         sent to an administrative email address at the 30 minute and then every 2 hours after that.
         """
         message_count = len(EmailService.TEST_MESSAGES)
-        date = self.get_local_now() - datetime.timedelta(hours=22)
+        date = get_local_now() - datetime.timedelta(hours=22)
         log = DataTransferLog(last_updated=date, total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
@@ -419,7 +418,7 @@ class TestExportCase(BaseTestQuestionnaire):
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(EmailService.TEST_MESSAGES)
         log = DataTransferLog(
-            last_updated=self.get_local_now() - datetime.timedelta(days=2), total_records=2, type="exporting"
+            last_updated=get_local_now() - datetime.timedelta(days=2), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -430,7 +429,7 @@ class TestExportCase(BaseTestQuestionnaire):
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(EmailService.TEST_MESSAGES)
         log = DataTransferLog(
-            last_updated=self.get_local_now() - datetime.timedelta(hours=24), total_records=2, type="exporting"
+            last_updated=get_local_now() - datetime.timedelta(hours=24), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()

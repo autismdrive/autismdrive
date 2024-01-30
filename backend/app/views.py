@@ -194,8 +194,8 @@ endpoints = [
     # Flows
     (FlowEndpoint, "/flow/<string:name>/<string:participant_id>"),
     (FlowListEndpoint, "/flow"),
-    (FlowQuestionnaireEndpoint, "/flow/<string:flow>/<string:questionnaire_name>"),
-    (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow>/<string:questionnaire_name>/meta"),
+    (FlowQuestionnaireEndpoint, "/flow/<string:flow_name>/<string:questionnaire_name>"),
+    (FlowQuestionnaireMetaEndpoint, "/flow/<string:flow_name>/<string:questionnaire_name>/meta"),
     # Search
     (SearchEndpoint, "/search"),
     (SearchResourcesEndpoint, "/search/resources"),

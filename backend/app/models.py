@@ -1,3 +1,4 @@
+import copy
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -5,11 +6,10 @@ from typing import Optional, Literal, Union, TypedDict
 
 import googlemaps
 import jwt
-from elasticsearch_dsl.response import Hit
 from sqlalchemy import ForeignKey, TEXT, func, ARRAY, select, Integer, Boolean, String, cast
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr
+from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr, joinedload
 
 from app.auth import bcrypt, password_requirements
 from app.database import Base, session, random_integer, get_class
@@ -370,7 +370,22 @@ class Step:
         self.questionnaire_id = None
 
 
+class StepLog(Base):
+    __tablename__ = "step_log"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    questionnaire_name: Mapped[str]
+    questionnaire_id: Mapped[int]
+    flow: Mapped[str]
+    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
+    date_completed: Mapped[datetime] = mapped_column(default=func.now())
+    time_on_task_ms: Mapped[int]
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+
 class Flow:
+    steps: list[Step]
+
     def __init__(self, name):
         self.name = name
         self.steps = []
@@ -382,12 +397,16 @@ class Flow:
                 return True
         return False
 
-    def update_step_progress(self, step_log):
-        for step in self.steps:
+    def update_step_progress(self, step_log: StepLog) -> list[Step]:
+        updated_steps = copy.deepcopy(self.steps)
+        for step in updated_steps:
             if step.name == step_log.questionnaire_name:
                 step.status = step.STATUS_COMPLETE
                 step.date_completed = step_log.date_completed
                 step.questionnaire_id = step_log.questionnaire_id
+
+        self.steps = updated_steps
+        return self.steps
 
     def add_step(self, questionnaire_name):
         if not self.has_step(questionnaire_name):
@@ -406,7 +425,7 @@ class Flows:
         return ""
 
     @staticmethod
-    def get_self_intake_flow():
+    def get_self_intake_flow() -> Flow:
         flow = Flow(name="self_intake")
         flow.relationship = Relationship.self_participant
         flow.add_step("identification_questionnaire")
@@ -422,7 +441,7 @@ class Flows:
         return flow
 
     @staticmethod
-    def get_dependent_intake_flow():
+    def get_dependent_intake_flow() -> Flow:
         flow = Flow(name="dependent_intake")
         flow.relationship = Relationship.dependent
         flow.add_step("identification_questionnaire")
@@ -437,7 +456,7 @@ class Flows:
         return flow
 
     @staticmethod
-    def get_guardian_intake_flow():
+    def get_guardian_intake_flow() -> Flow:
         flow = Flow(name="guardian_intake")
         flow.relationship = Relationship.self_guardian
         flow.add_step("identification_questionnaire")
@@ -446,7 +465,7 @@ class Flows:
         return flow
 
     @staticmethod
-    def get_professional_intake_flow():
+    def get_professional_intake_flow() -> Flow:
         flow = Flow(name="professional_intake")
         flow.relationship = Relationship.self_professional
         flow.add_step("identification_questionnaire")
@@ -456,7 +475,7 @@ class Flows:
         return flow
 
     @staticmethod
-    def get_interested_intake_flow():
+    def get_interested_intake_flow() -> Flow:
         flow = Flow(name="interested_intake")
         flow.relationship = Relationship.self_interested
         flow.add_step("identification_questionnaire")
@@ -464,28 +483,28 @@ class Flows:
         return flow
 
     @staticmethod
-    def get_registration_flow():
+    def get_registration_flow() -> Flow:
         flow = Flow(name="registration")
         flow.add_step("registration_questionnaire")
         return flow
 
     # SkillStar Flows
     @staticmethod
-    def get_skillstar_flow():
+    def get_skillstar_flow() -> Flow:
         flow = Flow(name="skillstar")
         flow.relationship = Relationship.self_professional
         flow.add_step("chain_questionnaire")
         return flow
 
     @staticmethod
-    def get_skillstar_flows():
+    def get_skillstar_flows() -> list[Flow]:
         flows = [
             Flows.get_skillstar_flow(),
         ]
         return flows
 
     @staticmethod
-    def get_all_flows():
+    def get_all_flows() -> list[Flow]:
         flows = [
             Flows.get_self_intake_flow(),
             Flows.get_dependent_intake_flow(),
@@ -498,7 +517,7 @@ class Flows:
         return flows
 
     @staticmethod
-    def get_flow_by_name(name):
+    def get_flow_by_name(name) -> Flow:
         if name == "self_intake":
             return Flows.get_self_intake_flow()
         if name == "dependent_intake":
@@ -515,7 +534,7 @@ class Flows:
             return Flows.get_skillstar_flow()
 
     @staticmethod
-    def get_flow_by_relationship(name):
+    def get_flow_by_relationship(name) -> Flow:
         if name == Relationship.self_participant:
             return Flows.get_self_intake_flow()
         if name == Relationship.dependent:
@@ -1033,12 +1052,19 @@ class Participant(Base):
 
     def get_percent_complete(self):
         flow = Flows.get_flow_by_relationship(self.relationship)
+        num_steps = len(flow.steps)
         step_logs = (
-            session.query(StepLog)
-            .filter(StepLog.participant_id == cast(self.id, Integer))
-            .filter(StepLog.flow == flow.name)
+            session.execute(
+                select(StepLog)
+                .filter(StepLog.participant_id == cast(self.id, Integer))
+                .filter(StepLog.flow == flow.name)
+            )
+            .unique()
+            .scalars()
             .all()
         )
+        session.close()
+
         complete_steps = 0
         for log in step_logs:
             flow.update_step_progress(log)
@@ -1047,7 +1073,7 @@ class Participant(Base):
             if step.status == step.STATUS_COMPLETE:
                 complete_steps += 1
 
-        return complete_steps / len(flow.steps)
+        return complete_steps / num_steps
 
 
 class AggCount:
@@ -1071,6 +1097,51 @@ class GeoBoxType(TypedDict):
     bottom_right: GeoPointType
 
 
+class Hit:
+    def __init__(
+        self,
+        result_id,
+        content,
+        description,
+        title,
+        doc_type,
+        label,
+        date,
+        last_updated,
+        highlights,
+        latitude,
+        longitude,
+        status,
+        no_address,
+        is_draft,
+        post_event_description,
+    ):
+        self.id = result_id
+        self.content = content
+        self.description = description
+        self.post_event_description = post_event_description
+        self.title = title
+        self.type = doc_type
+        self.label = label
+        self.date = date
+        self.last_updated = last_updated
+        self.highlights = highlights
+        self.latitude = latitude
+        self.longitude = longitude
+        self.status = status
+        self.no_address = no_address
+        self.is_draft = is_draft
+
+
+@dataclass
+class MapHit:
+    id: int
+    latitude: int
+    longitude: int
+    type: str
+    no_address: bool
+
+
 @dataclass
 class Search:
     words: str = ""
@@ -1087,7 +1158,7 @@ class Search:
     sort: Optional[str] = None
     category: Optional[any] = None
     date: Optional[datetime] = None
-    map_data_only: str = False  # When we should return a limited set of details just for mapping.
+    map_data_only: bool = False  # When we should return a limited set of details just for mapping.
     geo_box: Optional[GeoBoxType] = None
     geo_point: Optional[GeoPointType] = None
 
@@ -1135,7 +1206,7 @@ class Search:
     # can be used to verify that a given age range is supported.
     @staticmethod
     def has_age_range():
-        return next((ac for ac in Search.known_age_counts if ac.value == "value"), None) is not None
+        return next((ac for ac in Search.known_age_counts() if ac.value == "value"), None) is not None
 
     # can be used to verify that a given language is supported.
     @staticmethod
@@ -1174,64 +1245,6 @@ class Sort:
             }
         else:
             return {self.field: {"order": self.order}}
-
-
-class Hit:
-    def __init__(
-        self,
-        result_id,
-        content,
-        description,
-        title,
-        doc_type,
-        label,
-        date,
-        last_updated,
-        highlights,
-        latitude,
-        longitude,
-        status,
-        no_address,
-        is_draft,
-        post_event_description,
-    ):
-        self.id = result_id
-        self.content = content
-        self.description = description
-        self.post_event_description = post_event_description
-        self.title = title
-        self.type = doc_type
-        self.label = label
-        self.date = date
-        self.last_updated = last_updated
-        self.highlights = highlights
-        self.latitude = latitude
-        self.longitude = longitude
-        self.status = status
-        self.no_address = no_address
-        self.is_draft = is_draft
-
-
-class MapHit:
-    def __init__(self, result_id, doc_type, latitude, longitude, no_address):
-        self.id = result_id
-        self.latitude = latitude
-        self.longitude = longitude
-        self.type = doc_type
-        self.no_address = no_address
-
-
-class StepLog(Base):
-    __tablename__ = "step_log"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    questionnaire_name: Mapped[str]
-    questionnaire_id: Mapped[int]
-    flow: Mapped[str]
-    participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
-    date_completed: Mapped[datetime] = mapped_column(default=func.now())
-    time_on_task_ms: Mapped[int]
-    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
 class Study(Base):
@@ -1333,7 +1346,7 @@ class User(Base):
     # last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     last_updated: Mapped[datetime] = mapped_column(default=func.now())
     registration_date: Mapped[datetime] = mapped_column(default=func.now())
-    last_login: Mapped[Optional[datetime]]
+    last_login: Mapped[Optional[datetime]] = mapped_column(onupdate=func.now())
     email: Mapped[Optional[str]] = mapped_column(unique=True)
     role: Mapped[Role]
     participants: Mapped[list["Participant"]] = relationship(back_populates="user")
@@ -1359,14 +1372,38 @@ class User(Base):
                 return True
 
     def self_participant(self):
-        if len(self.participants) > 0:
-            for p in self.participants:
-                if "self" in p.relationship.name:
-                    return p
+        db_self = (
+            session.execute(select(User).options(joinedload(User.participants)).filter_by(id=self.id))
+            .unique()
+            .scalar_one()
+        )
+        participants = db_self.participants
+        session.close()
+
+        if len(participants) > 0:
+            for p in participants:
+                p_id = p.id
+                db_p = (
+                    session.execute(
+                        select(Participant)
+                        .options(
+                            joinedload(Participant.identification),
+                            joinedload(Participant.contact),
+                            joinedload(Participant.user),
+                        )
+                        .filter(Participant.id == p_id)
+                    )
+                    .unique()
+                    .scalar()
+                )
+                session.close()
+                if "self" in db_p.relationship.name:
+                    return db_p
 
     def self_registration_complete(self):
-        if self.self_participant() is not None:
-            return self.self_participant().get_percent_complete() == 1
+        self_participant = self.self_participant()
+        if self_participant is not None:
+            return self_participant.get_percent_complete() == 1
 
     @hybrid_property
     def password(self):

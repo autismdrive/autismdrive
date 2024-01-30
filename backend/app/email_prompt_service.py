@@ -1,10 +1,8 @@
-import datetime
-
-import tzlocal
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
 
 from app.database import session
 from app.email_service import EmailService
+from app.utils import get_local_now
 from config.load import settings
 
 
@@ -21,8 +19,14 @@ class EmailPromptService:
         self.__send_prompts(recipients, self.email_service.async_confirm_email, "confirm_email")
 
     def send_complete_registration_prompting_emails(self):
-        confirmed_users = session.query(self.user_model).filter(self.user_model.password is not None).all()
+        confirmed_users = (
+            session.execute(select(self.user_model).filter(self.user_model.password is not None))
+            .unique()
+            .scalars()
+            .all()
+        )
         recipients = [u for u in confirmed_users if u.self_registration_complete() is False]
+        session.close()
         self.__send_prompts(
             recipients, self.email_service.complete_registration_prompt_email, "complete_registration_prompt"
         )
@@ -53,15 +57,12 @@ class EmailPromptService:
                 .order_by(self.email_log_model.last_updated)
                 .all()
             )
+            days_since_most_recent = -1
             if len(email_logs) > 0:
                 most_recent = email_logs[-1]
-                days_since_most_recent = (
-                    datetime.datetime.now(tz=tzlocal.get_localzone()) - most_recent.last_updated
-                ).total_seconds() / 86400
+                days_since_most_recent = (get_local_now() - most_recent.last_updated).total_seconds() / 86400
             if (len(email_logs) == 0) and (log_type != "confirm_email"):
-                if (rec.last_login is not None) and (
-                    (datetime.datetime.utcnow() - rec.last_login).total_seconds() > (2 * 86400)
-                ):
+                if (rec.last_login is not None) and ((get_local_now() - rec.last_login).total_seconds() > (2 * 86400)):
                     self.__send_prompting_email(rec, send_method, log_type, "0days")
             elif 0 < len(email_logs) <= 2:
                 days = "7days" if len(email_logs) == 1 else "14days"

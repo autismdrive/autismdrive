@@ -1,18 +1,19 @@
 import elasticsearch
 import flask_restful
-from flask import request, json
+from elasticsearch_dsl.response import Response as ElasticsearchResponse, AggResponse
+from elasticsearch_dsl.utils import HitMeta
+from flask import request
 from marshmallow import ValidationError
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import Category, Hit, MapHit
-from app.models import MapHit
+from app.models import Category, Hit, MapHit, Search
 from app.rest_exception import RestException
 from app.schemas import SearchSchema
 
 
 class SearchEndpoint(flask_restful.Resource):
-    def __post__(self, result_types=None):
+    def __post__(self, result_types=None) -> Search:
         request_data = request.get_json()
 
         # Handle some sloppy category data.
@@ -20,7 +21,7 @@ class SearchEndpoint(flask_restful.Resource):
             del request_data["category"]
 
         try:
-            search = SearchSchema().load(request_data)
+            search: Search = SearchSchema().load(request_data)
         except ValidationError as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.messages)
 
@@ -28,7 +29,7 @@ class SearchEndpoint(flask_restful.Resource):
             # Overwrite the result types if requested.
             if not search.types and result_types:
                 search.types = result_types
-            results = elastic_index.search(search)
+            results: ElasticsearchResponse = elastic_index.search(search)
         except elasticsearch.ApiError as e:
             raise RestException(RestException.ELASTIC_ERROR, details=e.body)
 
@@ -36,42 +37,24 @@ class SearchEndpoint(flask_restful.Resource):
         search.total = results.hits.total
 
         if search.map_data_only:
-            return self.map_data_only_search_results(search, results)
+            return self.map_data_only_search_results(search, results.hits)
         else:
             return self.full_search_results(search, results)
 
-    def full_search_results(self, search, results):
+    def highlights_str(self, hit_meta: HitMeta) -> str:
+        highlights = ""
+        if "highlight" in hit_meta:
+            highlights = "... ".join(hit_meta.highlight.content)
+
+        return highlights
+
+    def full_search_results(self, search: Search, results: ElasticsearchResponse) -> Search:
         search.category = self.update_category_counts(search.category, results)
         self.update_aggregations(search, results.aggregations)
-
-        search.hits = []
-        for hit in results:
-            highlights = ""
-            if "highlight" in hit.meta:
-                highlights = "... ".join(hit.meta.highlight.content)
-
-            search_hit = Hit(
-                hit.id,
-                hit.content,
-                hit.description,
-                hit.title,
-                hit.type,
-                hit.label,
-                hit.date,
-                hit.last_updated,
-                highlights,
-                hit.latitude,
-                hit.longitude,
-                hit.status,
-                hit.no_address,
-                hit.is_draft,
-                hit.post_event_description,
-            )
-            search.hits.append(search_hit)
-
+        search.hits = [Hit(highlights=self.highlights_str(h.meta), **h.to_dict()) for h in results.hits]
         return SearchSchema().dump(search)
 
-    def map_data_only_search_results(self, search, results):
+    def map_data_only_search_results(self, search: Search, results: list[Hit]) -> Search:
         search.hits = []
         for hit in results:
             if hit.longitude and hit.latitude:
@@ -79,7 +62,8 @@ class SearchEndpoint(flask_restful.Resource):
                 search.hits.append(search_hit)
         return SearchSchema().dump(search)
 
-    def update_aggregations(self, search, aggregations):
+    def update_aggregations(self, search: Search, aggregations: AggResponse):
+        """Mutates given SearchSchema object with counts for the given aggregations."""
         for bucket in aggregations.ages.buckets:
             search.add_aggregation("ages", bucket.key, bucket.doc_count, bucket.key in search.ages)
         for bucket in aggregations.languages.buckets:
@@ -89,7 +73,7 @@ class SearchEndpoint(flask_restful.Resource):
 
     # given a results of a search, creates the appropriate category.
     # Also assures that there is a category at the top called "TOP".
-    def update_category_counts(self, category, results):
+    def update_category_counts(self, category: Category, results: ElasticsearchResponse):
         topic_category = Category(name="Topics")
         if not category:
             category = topic_category

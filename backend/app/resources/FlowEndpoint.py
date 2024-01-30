@@ -1,9 +1,11 @@
+import copy
 import datetime
 
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
+from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session, get_class
@@ -19,15 +21,22 @@ class FlowEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, name, participant_id):
-        flow = Flows.get_flow_by_name(name)
+        flow = copy.deepcopy(Flows.get_flow_by_name(name))
         participant = session.query(Participant).filter_by(id=cast(participant_id, Integer)).first()
         if participant is None:
             raise RestException(RestException.NOT_FOUND)
         if g.user.related_to_participant(participant_id) and not g.user.role == "Admin":
             raise RestException(RestException.UNRELATED_PARTICIPANT)
-        step_logs = session.query(StepLog).filter_by(participant_id=participant_id, flow=name)
+        step_logs = (
+            session.execute(select(StepLog).filter_by(participant_id=participant_id, flow=name))
+            .unique()
+            .scalars()
+            .all()
+        )
+        session.close()
+
         for log in step_logs:
-            flow.update_step_progress(log)
+            flow.steps = flow.update_step_progress(log)
         return self.schema.dump(flow)
 
 
@@ -39,9 +48,9 @@ class FlowListEndpoint(flask_restful.Resource):
 
 
 class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
-    def get(self, flow, questionnaire_name):
+    def get(self, flow_name: str, questionnaire_name: str):
         questionnaire_name = pascal_case_it(questionnaire_name)
-        flow = Flows.get_flow_by_name(flow)
+        flow = Flows.get_flow_by_name(flow_name)
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
         class_ref = get_class(questionnaire_name)
@@ -53,8 +62,8 @@ class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
 
 class FlowQuestionnaireEndpoint(flask_restful.Resource):
     @auth.login_required
-    def post(self, flow, questionnaire_name):
-        flow = Flows.get_flow_by_name(flow)
+    def post(self, flow_name: str, questionnaire_name: str):
+        flow = Flows.get_flow_by_name(flow_name)
         if flow is None:
             raise RestException(RestException.NOT_FOUND)
         if not flow.has_step(questionnaire_name):
@@ -63,10 +72,13 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         request_data["user_id"] = g.user.id
         if "_links" in request_data:
             request_data.pop("_links")
-        schema = ExportService.get_schema(pascal_case_it(questionnaire_name))
+
+        class_name = pascal_case_it(questionnaire_name)
+        model_class = get_class(class_name)
+        schema = ExportService.get_schema(class_name)
 
         try:
-            new_quest = schema.load(request_data, session=session)
+            new_quest: model_class = schema.load(request_data, session=session)
         except ValidationError as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.messages)
 
@@ -80,8 +92,21 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
 
         session.add(new_quest)
         session.commit()
-        self.log_progress(flow, questionnaire_name, new_quest)
-        return schema.dump(new_quest)
+        new_q_id = new_quest.id
+        session.close()
+
+        statement = select(model_class)
+
+        if hasattr(model_class, "participant"):
+            statement = statement.options(joinedload(model_class.participant))
+        if hasattr(model_class, "user"):
+            statement = statement.options(joinedload(model_class.user))
+
+        db_new_q = session.execute(statement.filter_by(id=new_q_id)).unique().scalar()
+        session.close()
+
+        self.log_progress(flow, questionnaire_name, db_new_q)
+        return schema.dump(db_new_q)
 
     def log_progress(self, flow, questionnaire_name, questionnaire):
         log = StepLog(
@@ -95,3 +120,4 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         )
         session.add(log)
         session.commit()
+        session.close()
