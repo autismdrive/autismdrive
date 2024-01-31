@@ -3,15 +3,21 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
+from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
-from app.models import AdminNote
+from app.models import AdminNote, Resource, User
 from app.enums import Permission
 from app.rest_exception import RestException
 from app.schemas import AdminNoteSchema
 from app.wrappers import requires_permission
+
+select_admin_notes_with_joins = select(AdminNote).options(
+    joinedload(AdminNote.resource).options(joinedload(Resource.resource_categories)),
+    joinedload(AdminNote.user).options(joinedload(User.participants)),
+)
 
 
 class AdminNoteEndpoint(flask_restful.Resource):
@@ -56,7 +62,7 @@ class AdminNoteListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def get(self):
-        admin_notes = session.query(AdminNote).all()
+        admin_notes = session.execute(select_admin_notes_with_joins).unique().scalars().all()
         return self.adminNotesSchema.dump(admin_notes)
 
     @auth.login_required
@@ -65,11 +71,16 @@ class AdminNoteListEndpoint(flask_restful.Resource):
         request_data = request.get_json()
         try:
             new_note = self.adminNoteSchema.load(data=request_data, session=session)
-            session.add(new_note)
-            session.commit()
-            return self.adminNoteSchema.dump(new_note)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
+
+        session.add(new_note)
+        session.commit()
+        note_id = new_note.id
+        session.close()
+
+        db_note = session.execute(select_admin_notes_with_joins.filter_by(id=note_id)).unique().scalar_one()
+        return self.adminNoteSchema.dump(db_note)
 
 
 class AdminNoteListByUserEndpoint(flask_restful.Resource):
@@ -77,7 +88,12 @@ class AdminNoteListByUserEndpoint(flask_restful.Resource):
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
         schema = AdminNoteSchema(many=True)
-        logs = session.query(AdminNote).filter(AdminNote.user_id == cast(user_id, Integer)).all()
+        logs = (
+            session.execute(select_admin_notes_with_joins.filter(AdminNote.user_id == cast(user_id, Integer)))
+            .unique()
+            .scalars()
+            .all()
+        )
         return schema.dump(logs)
 
 
@@ -86,5 +102,10 @@ class AdminNoteListByResourceEndpoint(flask_restful.Resource):
     @requires_permission(Permission.edit_resource)
     def get(self, resource_id):
         schema = AdminNoteSchema(many=True)
-        logs = session.query(AdminNote).filter(AdminNote.resource_id == cast(resource_id, Integer)).all()
+        logs = (
+            session.execute(select_admin_notes_with_joins.filter(AdminNote.resource_id == cast(resource_id, Integer)))
+            .unique()
+            .scalars()
+            .all()
+        )
         return schema.dump(logs)

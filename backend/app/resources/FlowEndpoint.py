@@ -95,14 +95,13 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
         new_q_id = new_quest.id
         session.close()
 
-        statement = select(model_class)
+        select_statement = select(model_class)
 
-        if hasattr(model_class, "participant"):
-            statement = statement.options(joinedload(model_class.participant))
-        if hasattr(model_class, "user"):
-            statement = statement.options(joinedload(model_class.user))
+        # Create joinedload for all relationships
+        for relationship in model_class.__mapper__.relationships:
+            select_statement = select_statement.options(joinedload(getattr(model_class, relationship.key)))
 
-        db_new_q = session.execute(statement.filter_by(id=new_q_id)).unique().scalar()
+        db_new_q = session.execute(select_statement.filter_by(id=new_q_id)).unique().scalar()
         session.close()
 
         self.log_progress(flow, questionnaire_name, db_new_q)

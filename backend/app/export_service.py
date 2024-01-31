@@ -1,9 +1,11 @@
 import datetime
 import importlib
 import logging
+import typing
 
 from flask import url_for
-from sqlalchemy import func, desc, cast, Integer
+from sqlalchemy import func, desc, select
+from sqlalchemy.orm import joinedload
 
 from app.database import session, Base, get_class_for_table, get_class
 from app.email_service import email_service
@@ -53,21 +55,34 @@ class ExportService:
         return schema_class(many=many, session=session)
 
     @staticmethod
-    def get_data(name, user_id=None, last_updated=None):
-        model = get_class(name)
-        query = session.query(model)
+    def get_data(name, user_id=None, last_updated: datetime.datetime = None):
+        model_class = get_class(name)
+        select_with_joins = select(model_class)
+
+        for relationship in model_class.__mapper__.relationships:
+            select_with_joins = select_with_joins.options(joinedload(getattr(model_class, relationship.key)))
+
         if last_updated:
-            query = query.filter(model.last_updated > last_updated)
-        if hasattr(model, "__mapper_args__") and "polymorphic_identity" in model.__mapper_args__:
-            query = query.filter(model.type == model.__mapper_args__["polymorphic_identity"])
-        query = query.order_by(model.id)
+            select_with_joins = select_with_joins.where(
+                typing.cast("ColumnElement[bool]", model_class.last_updated > last_updated)
+            )
+        if hasattr(model_class, "__mapper_args__") and "polymorphic_identity" in model_class.__mapper_args__:
+            select_with_joins = select_with_joins.where(
+                typing.cast(
+                    "ColumnElement[bool]", model_class.type == model_class.__mapper_args__["polymorphic_identity"]
+                )
+            )
+        select_with_joins = select_with_joins.order_by(model_class.id)
         if user_id:
-            if hasattr(model, "user_id"):
-                return query.filter(model.user_id == cast(user_id, Integer))
+            if hasattr(model_class, "user_id"):
+                user_id = int(user_id)
+                select_with_joins = select_with_joins.where(
+                    typing.cast("ColumnElement[bool]", model_class.user_id == user_id)
+                )
             else:
                 return []
-        else:
-            return query.all()
+
+        return session.execute(select_with_joins).unique().scalars().all()
 
     # Returns a list of classes/tables with information about how they should be exported.
     @staticmethod
@@ -195,7 +210,7 @@ class ExportService:
                 meta_copy[k] = []
                 for sv in v:
                     if type(sv) is dict:
-                        if "RELATIONSHIP_REQUIRED" in sv and not relationship.name in sv["RELATIONSHIP_REQUIRED"]:
+                        if "RELATIONSHIP_REQUIRED" in sv and relationship.name not in sv["RELATIONSHIP_REQUIRED"]:
                             # skip it.
                             pass
                         else:
@@ -219,22 +234,27 @@ class ExportService:
 
         alert_principal_investigator = False
         last_log = (
-            session.query(DataTransferLog)
-            .filter(DataTransferLog.type == "exporting")
-            .order_by(desc(DataTransferLog.last_updated))
-            .limit(1)
-            .first()
+            session.execute(
+                select(DataTransferLog)
+                .options(joinedload(DataTransferLog.details))
+                .where(DataTransferLog.type == "exporting")
+                .order_by(desc(DataTransferLog.last_updated))
+            )
+            .unique()
+            .scalar_one_or_none()
         )
+        session.close()
+
         if not last_log:
             # If the export logs are empty, create one with the current date.
             seed_log = DataTransferLog(total_records=0)
             session.add(seed_log)
             session.commit()
+            session.close()
         else:
             msg = None
             subject = "Autism DRIVE: Error - "
-            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)  # Make date timezone aware
-            time_difference = now - last_log.last_updated
+            time_difference = datetime.datetime.utcnow() - last_log.last_updated
             hours = int(time_difference.total_seconds() / 3600)
             minutes = int(time_difference.total_seconds() / 60)
             if hours >= 24 and hours % 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
@@ -269,6 +289,8 @@ class ExportService:
                 )
             if msg:
                 email_service.admin_alert_email(subject, msg, alert_principal_investigator=alert_principal_investigator)
+
                 last_log.alerts_sent = last_log.alerts_sent + 1
                 session.add(last_log)
                 session.commit()
+                session.close()

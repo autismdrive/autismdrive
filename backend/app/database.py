@@ -76,7 +76,7 @@ class Base(DeclarativeBase):
     type_annotation_map = {
         enum.Enum: Enum(enum.Enum, native_enum=False),
         typing.Literal: Enum(enum.Enum, native_enum=False),
-        datetime.datetime: DateTime(timezone=True),
+        datetime.datetime: DateTime(),
     }
 
 

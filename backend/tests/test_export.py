@@ -1,28 +1,23 @@
+import datetime
 import os
 import time
 
-from sqlalchemy.orm import close_all_sessions
-
-from app.utils import get_local_now
-
-os.environ["TESTING"] = "true"
-os.environ["ENV_NAME"] = "testing"
-
-import datetime
-import tzlocal
 from flask import json
-from sqlalchemy import cast, Integer, select
+from sqlalchemy import select
 
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app.email_service import EmailService
 from app.enums import Relationship, Role
 from app.export_service import ExportService
 from app.import_service import ImportService
 from app.models import DataTransferLog, Participant, User, IdentificationQuestionnaire
 from app.schemas import ExportInfoSchema, UserSchema, ParticipantSchema
+from tests.base_test_questionnaire import BaseTestQuestionnaire
+
+os.environ["ENV_NAME"] = "testing"
+os.environ["TESTING"] = "true"
 
 
-class TestExportCase(BaseTestQuestionnaire):
+class TestExportService(BaseTestQuestionnaire):
     def test_get_list_of_exportables_requires_admin(self):
         rv = self.client.get("/api/export")
         self.assertEqual(401, rv.status_code)
@@ -114,14 +109,15 @@ class TestExportCase(BaseTestQuestionnaire):
         response = rv.json
         exports = ExportInfoSchema(many=True).load(response)
         importer = ImportService()
-        log = importer.log_for_export(exports, get_local_now())
+        log = importer.log_for_export(exports, datetime.datetime.utcnow())
         results = {}
         for export in exports:
             export.json_data = all_data[export.class_name]
             results[export.class_name] = importer.load_data(export, log)
 
-        for class_name, count in all_data.items():
-            self.assertEqual(len(count), results[class_name], msg=f"Failed to load all {count} items in {class_name}")
+        for class_name, class_items in all_data.items():
+            count = len(class_items) if class_items else 0
+            self.assertEqual(count, results[class_name], msg=f"Failed to load all {count} items in {class_name}")
 
     def test_insert_user_with_participant(self):
         u = self.construct_user()
@@ -257,22 +253,24 @@ class TestExportCase(BaseTestQuestionnaire):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-        date = get_local_now() + datetime.timedelta(seconds=1)  # One second in the future
+        date = datetime.datetime.utcnow() + datetime.timedelta(seconds=1)  # One second in the future
         exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
+        headers = self.logged_in_headers()
         for export in exports:
+            url = export.url + params
             rv = self.client.get(
-                export.url + params,
+                url,
                 follow_redirects=True,
                 content_type="application/json",
-                headers=self.logged_in_headers(),
+                headers=headers,
             )
             data = rv.json
             self.assertEqual(0, len(data), msg=export.url + " does not respect 'after' param in get request.")
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        future_date = get_local_now() + datetime.timedelta(days=1)
+        future_date = datetime.datetime.utcnow() + datetime.timedelta(days=1)
         params = "?after=" + future_date.strftime(ExportService.DATE_FORMAT)
 
         rv = self.client.get("/api/export", headers=self.logged_in_headers())
@@ -285,7 +283,7 @@ class TestExportCase(BaseTestQuestionnaire):
         for export in response:
             self.assertEqual(export["size"], 0, msg=export["class_name"] + " should have a count of 0")
 
-    def test_it_all_crazy_madness_wohoo(self):
+    def test_export_and_reimport_all(self):
         # Sanity check, can we load everything, export it, delete, and reload it all without error.
         self.construct_everything()
         data = self.get_export()
@@ -338,7 +336,7 @@ class TestExportCase(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(
-            last_updated=get_local_now() - datetime.timedelta(minutes=28), total_records=2, type="exporting"
+            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=28), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -353,7 +351,7 @@ class TestExportCase(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(
-            last_updated=get_local_now() - datetime.timedelta(minutes=45), total_records=2, type="exporting"
+            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=45), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -378,7 +376,7 @@ class TestExportCase(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(
-            last_updated=get_local_now() - datetime.timedelta(minutes=30), total_records=2, type="exporting"
+            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=30), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -390,7 +388,7 @@ class TestExportCase(BaseTestQuestionnaire):
             self.decode(EmailService.TEST_MESSAGES[-1]["subject"]),
         )
 
-        log.last_updated = get_local_now() - datetime.timedelta(minutes=120)
+        log.last_updated = datetime.datetime.utcnow() - datetime.timedelta(minutes=120)
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -407,18 +405,21 @@ class TestExportCase(BaseTestQuestionnaire):
         sent to an administrative email address at the 30 minute and then every 2 hours after that.
         """
         message_count = len(EmailService.TEST_MESSAGES)
-        date = get_local_now() - datetime.timedelta(hours=22)
-        log = DataTransferLog(last_updated=date, total_records=2, type="exporting")
+        last_updated = datetime.datetime.utcnow() - datetime.timedelta(hours=22)
+        log = DataTransferLog(last_updated=last_updated, total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
+        self.session.close()
+
         for i in range(12):
             ExportService.send_alert_if_exports_not_running()
+
         self.assertEqual(message_count + 12, len(EmailService.TEST_MESSAGES), msg="12 emails should have gone out.")
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(EmailService.TEST_MESSAGES)
         log = DataTransferLog(
-            last_updated=get_local_now() - datetime.timedelta(days=2), total_records=2, type="exporting"
+            last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=2), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()
@@ -429,7 +430,7 @@ class TestExportCase(BaseTestQuestionnaire):
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(EmailService.TEST_MESSAGES)
         log = DataTransferLog(
-            last_updated=get_local_now() - datetime.timedelta(hours=24), total_records=2, type="exporting"
+            last_updated=datetime.datetime.utcnow() - datetime.timedelta(hours=24), total_records=2, type="exporting"
         )
         self.session.add(log)
         self.session.commit()

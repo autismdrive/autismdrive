@@ -217,7 +217,16 @@ class BaseTest(TestCase):
         self.session.commit()
 
         participant_id = participant.id
-        db_participant = self.session.query(Participant).filter_by(id=participant_id).filter_by(user_id=user_id).first()
+        db_participant = (
+            self.session.execute(
+                select(Participant)
+                .options(joinedload(Participant.identification), joinedload(Participant.contact))
+                .filter_by(id=participant_id)
+                .filter_by(user_id=user_id)
+            )
+            .unique()
+            .scalar_one()
+        )
         self.assertEqual(db_participant.relationship, participant.relationship)
         self.session.close()
 

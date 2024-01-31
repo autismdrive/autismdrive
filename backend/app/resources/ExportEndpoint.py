@@ -15,12 +15,16 @@ from app.wrappers import requires_roles
 
 
 def get_date_arg():
+    """
+    Returns a UTC datetime object from the "after" URL parameter in the request args,
+    or None if not present. The date string is assumed to be in the UTC timezone.
+    """
     date_arg = request.args.get("after")
-    after_date = None
-    if date_arg:
-        after_date = datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT)
-
-    return after_date
+    return (
+        datetime.datetime.strptime(date_arg, ExportService.DATE_FORMAT).replace(tzinfo=datetime.timezone.utc)
+        if date_arg
+        else None
+    )
 
 
 class ExportEndpoint(flask_restful.Resource):
@@ -47,7 +51,6 @@ class ExportListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self):
-
         date_started = datetime.datetime.utcnow()
         info_list = ExportService.get_table_info(get_date_arg())
 

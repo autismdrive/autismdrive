@@ -10,7 +10,7 @@ from app.enums import Relationship
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
-class TestExportCase(BaseTestQuestionnaire):
+class TestEmailPromptService(BaseTestQuestionnaire):
     email_prompt_service = EmailPromptService(EmailLog, Study, User)
 
     def create_email_log_records(self, num_records, days_removed, log_type, user=None):

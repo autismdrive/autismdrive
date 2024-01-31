@@ -23,9 +23,9 @@ class AdminNote(Base):
     __tablename__ = "admin_note"
     id: Mapped[int] = mapped_column(primary_key=True)
     resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
-    resource: Mapped["Resource"] = relationship(back_populates="admin_notes")
+    resource: Mapped["Resource"] = relationship(back_populates="admin_notes", lazy="joined")
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
-    user: Mapped["User"] = relationship(back_populates="admin_notes")
+    user: Mapped["User"] = relationship(back_populates="admin_notes", lazy="joined")
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     note: Mapped[str]
 
@@ -137,7 +137,7 @@ class DataTransferLog(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[DataTransferLogType] = mapped_column(default="exporting")  # Either importing or exporting
     date_started: Mapped[datetime] = mapped_column(default=func.now())
-    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now())
     total_records: Mapped[int] = mapped_column(default=0)
     alerts_sent: Mapped[int] = mapped_column(default=0)
     details: Mapped[list["DataTransferLogDetail"]] = relationship(back_populates="data_transfer_log")
@@ -1045,10 +1045,10 @@ class Participant(Base):
     has_consented: Mapped[Optional[bool]]
 
     def get_name(self):
-        if self.identification:
-            return self.identification.get_name()
-        else:
-            return ""
+        db_self = session.execute(select(Participant).filter(Participant.id == self.id)).unique().scalar_one()
+        name = db_self.identification.get_name() if db_self.identification else ""
+        session.close()
+        return name
 
     def get_percent_complete(self):
         flow = Flows.get_flow_by_relationship(self.relationship)
