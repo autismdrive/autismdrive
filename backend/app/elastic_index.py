@@ -116,7 +116,7 @@ class ElasticIndex:
             self.connection = connections.create_connection(
                 hosts=es_settings["hosts"],
                 port=es_settings["port"],
-                timeout=es_settings["timeout"],
+                request_timeout=es_settings["timeout"],
                 verify_certs=es_settings["verify_certs"],
                 use_ssl=es_settings["use_ssl"],
                 http_auth=(es_settings["http_auth_user"], es_settings["http_auth_pass"]),
@@ -126,7 +126,7 @@ class ElasticIndex:
             # get a cryptic message that is darn near ungoogleable.
             self.connection = connections.create_connection(
                 hosts=es_settings["hosts"],
-                timeout=es_settings["timeout"],
+                request_timeout=es_settings["timeout"],
                 verify_certs=es_settings["verify_certs"],
                 ssl_show_warn=es_settings["use_ssl"],
             )

@@ -1,4 +1,7 @@
+import json
 import logging.config
+import sys
+from inspect import getframeinfo, getargvalues
 from urllib.parse import unquote
 
 import click
@@ -91,7 +94,27 @@ def create_app(settings=None):
         except Exception as _:
             error_dict = {"details": traceback_with_variables.format_exc(error)}
 
-        response = jsonify(error_dict)
+        error_location = None
+        error_context = None
+
+        # if settings.ENV_NAME in ["local", "dev", "testing"]:
+        try:
+            frame = sys._getframe(1)
+            frameinfo = getframeinfo(frame)
+            arg_vals = getargvalues(frame)
+            error_location = f"{frameinfo.filename}:{frameinfo.lineno}"
+            error_context = json.loads(
+                json.dumps(arg_vals.locals, ensure_ascii=True, indent=4, sort_keys=True, default=str)
+            )
+        finally:
+            del frame  # Prevents memory leak (https://docs.python.org/3/library/inspect.html#:~:text=handle_stackframe_without_leak)
+
+        response_dict = error_dict | {
+            "error_location": error_location,
+            "error_context": error_context,
+        }
+
+        response = jsonify(response_dict)
         response.status_code = error.status_code
         return response
 

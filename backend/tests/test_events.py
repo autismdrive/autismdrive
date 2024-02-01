@@ -1,9 +1,7 @@
 from unittest.mock import patch
 
-from flask import jsonify
-
-from app.models import ResourceCategory, Event, ResourceChangeLog
 from app.enums import Role
+from app.models import ResourceCategory, Event, ResourceChangeLog
 from fixtures.event import MockEvent
 from tests.base_test import BaseTest
 from utils import MockGoogleMapsClient
