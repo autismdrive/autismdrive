@@ -1367,7 +1367,12 @@ class User(Base):
     user_studies: Mapped[list["StudyUser"]] = relationship(back_populates="user")
 
     def related_to_participant(self, participant_id):
-        for p in self.participants:
+        db_self = (
+            session.execute(select(User).options(joinedload(User.participants)).filter(User.id == self.id))
+            .unique()
+            .scalar_one()
+        )
+        for p in db_self.participants:
             if participant_id == p.id:
                 return True
 

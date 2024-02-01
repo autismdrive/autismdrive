@@ -1,11 +1,11 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
+from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
 from app.enums import Role, StudyUserStatus
-from app.models import StudyUser
 from app.models import Study, StudyUser, User
 from app.rest_exception import RestException
 from app.schemas import StudyUserSchema, UserStudiesSchema, StudyUsersSchema
@@ -53,29 +53,39 @@ class UserByStudyEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, study_id):
+        s_id = cast(study_id, Integer)
         study_users = (
-            session.query(StudyUser)
-            .join(StudyUser.user)
-            .filter(StudyUser.study_id == cast(study_id, Integer))
-            .order_by(User.email)
+            session.execute(
+                select(StudyUser)
+                .options(joinedload(StudyUser.user).options(joinedload(User.participants)))
+                .filter(StudyUser.study_id == s_id)
+            )
+            .unique()
+            .scalars()
             .all()
         )
+        session.close()
+
+        # Sort the study_users by user email
+        study_users.sort(key=lambda x: x.user.email)
+
         return self.schema.dump(study_users, many=True)
 
     @auth.login_required
     @requires_roles(Role.admin)
     def post(self, study_id):
         request_data = request.get_json()
+        s_id = int(study_id)
 
         for item in request_data:
-            item["study_id"] = study_id
+            item["study_id"] = s_id
 
         study_users = self.schema.load(request_data, many=True)
-        session.query(StudyUser).filter_by(study_id=cast(study_id, Integer)).delete()
+        session.query(StudyUser).filter_by(study_id=cast(s_id, Integer)).delete()
         for c in study_users:
-            session.add(StudyUser(study_id=study_id, user_id=c.user_id))
+            session.add(StudyUser(study_id=s_id, user_id=c.user_id))
         session.commit()
-        return self.get(study_id)
+        return self.get(s_id)
 
 
 class StudyUserEndpoint(flask_restful.Resource):

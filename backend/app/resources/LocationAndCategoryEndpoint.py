@@ -14,10 +14,11 @@ class LocationByCategoryEndpoint(flask_restful.Resource):
     schema = CategoryLocationsSchema()
 
     def get(self, category_id):
+        c_id = cast(category_id, Integer)
         location_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.resource)
-            .filter(ResourceCategory.category_id == category_id, ResourceCategory.type == "location")
+            .filter(ResourceCategory.category_id == c_id, ResourceCategory.type == "location")
             .order_by(Location.title)
             .all()
         )

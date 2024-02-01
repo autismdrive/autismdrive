@@ -1,11 +1,16 @@
+import datetime
+import random
+
 from flask import json
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
+from sqlalchemy.orm import joinedload
 
 from app.email_service import EmailService
-from app.models import EmailLog, StudyUser, User, UserFavorite
 from app.enums import Relationship, Permission, Role, StudyUserStatus
+from app.models import EmailLog, User, UserFavorite
 from app.models import StudyUser
 from app.rest_exception import RestException
+from fixtures.fixure_utils import fake
 from tests.base_test import BaseTest
 
 
@@ -176,8 +181,15 @@ class TestUser(BaseTest):
             # Should raise exception
             user.password = "badpass"
 
-    def test_create_user_with_password(self, id=8, email="tyrion@got.com", role=Role.user) -> User:
-        data = {"id": id, "email": email}
+    def test_create_user_with_password(
+        self, user_id: int = None, email: str = None, role: Role = None, password: str = None
+    ) -> User:
+        role = role or Role.user
+        password = password or fake.password(length=32)
+        user_id = user_id or random.randint(10000, 99999)
+        email = email or fake.email()
+        data = {"id": user_id, "email": email}
+
         rv = self.client.post(
             "/api/user",
             data=self.jsonify(data),
@@ -186,12 +198,12 @@ class TestUser(BaseTest):
             content_type="application/json",
         )
         self.assert_success(rv)
-        user = self.session.query(User).filter_by(id=cast(id, Integer)).first()
+        user = self.session.query(User).filter_by(id=cast(user_id, Integer)).first()
+
         self.assertIsNotNone(user)
         self.assertIsNotNone(user.token_url)
 
         user.role = role
-        password = "Wowbagger the Infinitely Prolonged !@#%$12354"
         user.password = password
 
         self.session.add(user)
@@ -199,19 +211,33 @@ class TestUser(BaseTest):
         self.session.close()
 
         rv = self.client.get(
-            "/api/user/%i" % user.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i" % user_id, content_type="application/json", headers=self.logged_in_headers()
         )
         self.assert_success(rv)
         response = rv.json
+
+        db_user = (
+            self.session.execute(
+                select(User).options(joinedload(User.participants)).filter(User.id == cast(user_id, Integer))
+            )
+            .unique()
+            .scalar_one()
+        )
+
         self.assertEqual(email, response["email"])
         self.assertEqual(role.name, response["role"])
         self.assertEqual(True, user.is_correct_password(plaintext=password))
+        self.session.close()
 
-        return user
+        return db_user
 
     def test_login_user(self):
-        user = self.test_create_user_with_password()
-        data = {"email": "tyrion@got.com", "password": "Wowbagger the Infinitely Prolonged !@#%$12354"}
+        user_email = fake.email()
+        user_password = fake.password(length=32)
+        user_id = random.randint(10000, 99999)
+        user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
+        data = {"email": user_email, "password": user_password}
+
         # Login shouldn't work with email not yet verified
         rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
         self.assertEqual(400, rv.status_code)
@@ -245,7 +271,7 @@ class TestUser(BaseTest):
         self.assertIsNotNone(logs[-1].tracking_code)
 
     def test_forgot_password_sends_email(self):
-        user = self.test_create_user_with_password(id=10101, email="forgot_password_sends_email@test.com")
+        user = self.test_create_user_with_password(user_id=10101, email="forgot_password_sends_email@test.com")
         message_count = len(EmailService.TEST_MESSAGES)
         data = {"email": user.email}
         rv = self.client.post("/api/forgot_password", data=self.jsonify(data), content_type="application/json")
@@ -317,9 +343,9 @@ class TestUser(BaseTest):
         self.assertEqual(s.id, response["study_id"])
 
     def test_set_all_users_on_study(self):
-        u1 = self.construct_user(email="u1@sartography.com")
-        u2 = self.construct_user(email="u2@sartography.com")
-        u3 = self.construct_user(email="u3@sartography.com")
+        u1 = self.construct_user()
+        u2 = self.construct_user()
+        u3 = self.construct_user()
         s = self.construct_study()
 
         us_data = [
@@ -397,9 +423,14 @@ class TestUser(BaseTest):
         self.assertTrue(Permission.user_roles not in researcher.role.permissions())
 
     def test_login_tracks_login_date(self):
-        user = self.test_create_user_with_password()
-        self.assertIsNone(user.last_login)
-        data = {"email": "tyrion@got.com", "password": "Wowbagger the Infinitely Prolonged !@#%$12354"}
+        user_email = fake.email()
+        user_password = fake.password(length=32)
+        user_id = random.randint(10000, 99999)
+        time_before_create = datetime.datetime.utcnow()
+        user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
+        last_login = user.last_login
+        self.assertAlmostEqual(time_before_create, last_login, delta=datetime.timedelta(seconds=10))
+        data = {"email": user_email, "password": user_password}
 
         # Set email_verified to True so login will work
         user.email_verified = True
@@ -407,16 +438,18 @@ class TestUser(BaseTest):
         self.session.commit()
         self.session.close()
 
-        rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertIsNotNone(response["last_login"])
-        first_login = response["last_login"]
+        rv1 = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
+        self.assert_success(rv1)
+        response_1 = rv1.json
+        self.assertIsNotNone(response_1["last_login"])
+        time_after_1st_login = response_1["last_login"]
 
-        rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertNotEqual(response["last_login"], first_login)
+        rv2 = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
+        self.assert_success(rv2)
+        response_2 = rv2.json
+        self.assertIsNotNone(response_2["last_login"])
+        time_after_2nd_login = response_2["last_login"]
+        self.assertGreater(time_after_2nd_login, time_after_1st_login)
 
     def test_get_favorites_by_user(self):
         u = self.construct_user()
@@ -426,7 +459,7 @@ class TestUser(BaseTest):
         fav2 = UserFavorite(category_id=c.id, user=u, type="category")
         self.session.add_all([fav1, fav2])
         self.session.commit()
-        rv = self.client.__mapper_args__get(
+        rv = self.client.get(
             "/api/user/%i/favorite" % u.id, content_type="application/json", headers=self.logged_in_headers()
         )
         self.assert_success(rv)

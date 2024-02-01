@@ -43,6 +43,7 @@ from app.models import User
 from app.models import UserFavorite
 from app.models import UserMeta
 from app.models import ZipCode
+from fixtures.fixure_utils import fake
 from fixtures.location import MockLocationWithLatLong
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy
@@ -197,8 +198,9 @@ class BaseTest(TestCase):
             self.assertTrue(200 <= rv.status_code < 300, f"BAD Response: {rv.status_code}. {msg}")
 
     def construct_user(
-        self, email="stan@staunton.com", role=Role.user, last_login: datetime.datetime | str = datetime.datetime.now()
+        self, email=None, role=Role.user, last_login: datetime.datetime | str = datetime.datetime.now()
     ) -> User:
+        email = email or fake.email()
         if isinstance(last_login, str):
             last_login = datetime.datetime.strptime(last_login, "%m/%d/%y %H:%M")
         db_user = self.session.execute(select(User).filter(User.email == email)).unique().scalar_one_or_none()
@@ -322,7 +324,15 @@ class BaseTest(TestCase):
         self.session.commit()
         self.session.close()
 
-        db_location = self.session.execute(select(Location).filter(Location.id == location_id)).unique().scalar_one()
+        db_location = (
+            self.session.execute(
+                select(Location)
+                .options(joinedload(Location.categories), joinedload(Location.resource_categories))
+                .filter(Location.id == location_id)
+            )
+            .unique()
+            .scalar_one()
+        )
         self.assertEqual(db_location.website, location.website)
 
         self.elastic_index.add_document(
@@ -332,10 +342,24 @@ class BaseTest(TestCase):
 
     def construct_location_category(self, location_id, category_name):
         c = self.construct_category(name=category_name)
-        rc = ResourceCategory(resource_id=location_id, category=c, type="location")
+        c_id = c.id
+        rc = ResourceCategory(resource_id=location_id, category_id=c_id, type="location")
         self.session.add(rc)
         self.session.commit()
-        return c
+        self.session.close()
+
+        db_c = (
+            self.session.execute(
+                select(Category)
+                .options(joinedload(Category.parent), joinedload(Category.children))
+                .filter(Category.id == c_id)
+            )
+            .unique()
+            .scalar_one()
+        )
+        self.assertEqual(db_c.name, category_name)
+        self.session.close()
+        return db_c
 
     def construct_study_category(self, study_id, category_name):
         c = self.construct_category(name=category_name)

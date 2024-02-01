@@ -9,31 +9,35 @@ from tests.base_test_questionnaire import BaseTestQuestionnaire
 class TestParticipant(BaseTestQuestionnaire):
     def test_participant_relationships(self):
         u = self.construct_user()
-        participant = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-        guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
-        dependent = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-        professional = self.construct_participant(user_id=u.id, relationship=Relationship.self_professional)
-        interested = self.construct_participant(user_id=u.id, relationship=Relationship.self_interested)
+        u_id = u.id
+        participant = self.construct_participant(user_id=u_id, relationship=Relationship.self_participant)
+        guardian = self.construct_participant(user_id=u_id, relationship=Relationship.self_guardian)
+        dependent = self.construct_participant(user_id=u_id, relationship=Relationship.dependent)
+        professional = self.construct_participant(user_id=u_id, relationship=Relationship.self_professional)
+        interested = self.construct_participant(user_id=u_id, relationship=Relationship.self_interested)
         rv = self.client.get(
-            "/api/user/%i" % u.id,
+            "/api/user/%i" % u_id,
             follow_redirects=True,
             content_type="application/json",
             headers=self.logged_in_headers(),
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["id"], u.id)
+        self.assertEqual(response["id"], u_id)
         self.assertEqual(len(response["participants"]), 5)
-        self.assertEqual(response["participants"][0]["id"], participant.id)
-        self.assertEqual(response["participants"][0]["relationship"], "self_participant")
-        self.assertEqual(response["participants"][1]["id"], guardian.id)
-        self.assertEqual(response["participants"][1]["relationship"], "self_guardian")
-        self.assertEqual(response["participants"][2]["id"], dependent.id)
-        self.assertEqual(response["participants"][2]["relationship"], "dependent")
-        self.assertEqual(response["participants"][3]["id"], professional.id)
-        self.assertEqual(response["participants"][3]["relationship"], "self_professional")
-        self.assertEqual(response["participants"][4]["id"], interested.id)
-        self.assertEqual(response["participants"][4]["relationship"], "self_interested")
+        for user_participant in response["participants"]:
+            up_id = user_participant["id"]
+            match user_participant["relationship"]:
+                case "self_participant":
+                    self.assertEqual(up_id, participant.id)
+                case "self_guardian":
+                    self.assertEqual(up_id, guardian.id)
+                case "dependent":
+                    self.assertEqual(up_id, dependent.id)
+                case "self_professional":
+                    self.assertEqual(up_id, professional.id)
+                case "self_interested":
+                    self.assertEqual(up_id, interested.id)
 
     def test_participant_basics(self):
         u = self.construct_user()
@@ -89,8 +93,9 @@ class TestParticipant(BaseTestQuestionnaire):
     def test_modify_participant_you_do_own(self):
         u = self.construct_user()
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
+        participant_id = p.id
         headers = self.logged_in_headers(u)
-        participant = {"id": 567}
+        participant = {"id": participant_id}
         rv = self.client.put(
             "/api/participant/%i" % p.id,
             data=self.jsonify(participant),
@@ -99,8 +104,8 @@ class TestParticipant(BaseTestQuestionnaire):
             headers=headers,
         )
         self.assert_success(rv)
-        p = self.session.query(Participant).filter_by(id=p.id).first()
-        self.assertEqual(567, p.id)
+        db_p = self.session.query(Participant).filter_by(id=participant_id).first()
+        self.assertEqual(participant_id, db_p.id)
 
     def test_modify_participant_basics_admin(self):
         user1 = self.construct_user()

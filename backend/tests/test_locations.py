@@ -11,16 +11,20 @@ class TestLocations(BaseTest):
     def test_location_basics(self):
         self.construct_location()
         r = self.session.query(Location).first()
+        expected_title = r.title
+        expected_description = r.description
+        expected_latitude = r.latitude
+        expected_longitude = r.longitude
         self.assertIsNotNone(r)
         r_id = r.id
         rv = self.client.get("/api/location/%i" % r_id, follow_redirects=True, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], r_id)
-        self.assertEqual(response["title"], "A+ location")
-        self.assertEqual(response["description"], "A delightful location destined to create rejoicing")
-        self.assertEqual(response["latitude"], 38.98765)
-        self.assertEqual(response["longitude"], -93.12345)
+        self.assertEqual(response["title"], expected_title)
+        self.assertEqual(response["description"], expected_description)
+        self.assertEqual(response["latitude"], expected_latitude)
+        self.assertEqual(response["longitude"], expected_longitude)
 
     def test_modify_location_basics(self):
         self.construct_location()

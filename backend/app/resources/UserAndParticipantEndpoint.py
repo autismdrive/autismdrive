@@ -1,7 +1,8 @@
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exc, cast, Integer
+from sqlalchemy import exc, cast, Integer, select
+from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
@@ -43,17 +44,42 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
         if "user_id" not in request_data:
             request_data["user_id"] = g.user.id
 
-        user = session.query(User).filter(User.id == request_data["user_id"]).first()
+        user_id = cast(request_data["user_id"], Integer)
+        user = session.query(User).filter(User.id == user_id).first()
         if user.self_participant() is not None:
             if Relationship.is_self(relationship):
                 raise RestException(RestException.NOT_YOUR_ACCOUNT)
 
         try:
             load_result = self.schema.load(request_data)
-            load_result.user = session.query(User).filter(User.id == request_data["user_id"]).first()
+            db_user = session.query(User).filter(User.id == user_id).first()
+
+            if db_user is None:
+                raise RestException(
+                    RestException.NOT_FOUND, details=f"User with id {request_data['user_id']} not found."
+                )
+
+            load_result.user_id = db_user.id
             load_result.relationship = relationship
             session.add(load_result)
             session.commit()
-            return self.schema.dump(load_result)
+            participant_id = load_result.id
+            session.close()
+
+            db_participant = (
+                session.execute(
+                    select(Participant)
+                    .options(
+                        joinedload(Participant.user),
+                        joinedload(Participant.identification),
+                        joinedload(Participant.contact),
+                    )
+                    .filter(Participant.id == participant_id)
+                )
+                .unique()
+                .scalar_one()
+            )
+
+            return self.schema.dump(db_participant)
         except (ValidationError, exc.IntegrityError) as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)

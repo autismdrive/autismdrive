@@ -3,15 +3,16 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists, desc, cast, Integer
+from sqlalchemy import exists, desc, cast, Integer, select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from app.auth import auth
 from app.database import session
 from app.email_service import EmailService, email_service
 from app.enums import Permission, Role
-from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser
+from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser, Participant
 from app.rest_exception import RestException
 from app.schemas import UserSchema, UserSearchSchema, RegistrationQuestionnaireSchema
 from app.wrappers import requires_permission
@@ -26,7 +27,26 @@ class UserEndpoint(flask_restful.Resource):
     def get(self, id):
         if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
-        model = session.query(User).filter_by(id=cast(id, Integer)).first()
+        model = (
+            session.execute(
+                select(User)
+                .options(
+                    joinedload(User.participants).options(
+                        joinedload(Participant.identification),
+                        joinedload(Participant.contact),
+                    ),
+                    joinedload(User.events),
+                    joinedload(User.user_events),
+                    joinedload(User.admin_notes),
+                    joinedload(User.studies),
+                    joinedload(User.user_studies),
+                )
+                .filter_by(id=cast(id, Integer))
+            )
+            .unique()
+            .scalar_one_or_none()
+        )
+        session.close()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
