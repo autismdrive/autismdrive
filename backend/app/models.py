@@ -329,29 +329,21 @@ class EventUser(Base):
     user: Mapped["User"] = relationship(back_populates="user_events")
 
 
+@dataclass
 class ExportInfo:
-    table_name = ""
-    class_name = ""
-    size = 0
-    url = ""
-    question_type = ""
-    exportable = True
-    json_data = {}
-    display_name = ""
-    sub_tables = []
+    table_name: str
+    class_name: str
+    size: Optional[int] = 0
+    url: Optional[str] = ""
+    question_type: Optional[str] = ""
+    export: Optional[bool] = True
+    json_data: dict | list[dict] = field(default_factory=dict)
+    sub_tables: Optional[list["ExportInfo"]] = field(default_factory=list)
 
-    def __init__(self, table_name, class_name, size=0, url="", question_type="", export=True, sub_tables=None):
-        self.table_name = table_name
-        self.class_name = class_name
-        self.size = size
-        self.url = url
-        self.question_type = question_type
-        self.export = export
-        self.display_name = self.pretty_title_from_snakecase(class_name)
-        self.sub_tables = sub_tables or []
-
-    def pretty_title_from_snakecase(self, title):
+    @property
+    def display_name(self):
         # Capitalizes, removes '_', drops 'Questionnaire' and limits to 30 chars.
+        title = self.class_name
         title = re.sub("(.)([A-Z][a-z]+)", r"\1 \2", title)
         title = re.sub("([a-z0-9])([A-Z])", r"\1 \2", title)
         return title.replace("Questionnaire", "").strip()[:30]
@@ -1424,6 +1416,8 @@ class User(Base):
         else:
             message = "Please enter a valid password. " + password_requirements[role_name]["instructions"]
             raise RestException(RestException.INVALID_INPUT, details=message)
+
+        session.close()
 
     def role_name(self):
         return self.role if isinstance(self.role, str) else self.role.name

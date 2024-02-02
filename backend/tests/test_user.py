@@ -22,7 +22,8 @@ class TestUser(BaseTest):
         self.session.close()
 
     def test_user_basics(self):
-        self.construct_user()
+        u_email = fake.email()
+        self.construct_user(email=u_email)
         u = self.session.query(User).first()
         self.assertIsNotNone(u)
         u_id = u.id
@@ -33,34 +34,40 @@ class TestUser(BaseTest):
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], u_id)
-        self.assertEqual(response["email"], "stan@staunton.com")
+        self.assertEqual(response["email"], u_email)
 
     def test_modify_user_basics(self):
-        self.construct_user()
-        u = self.session.query(User).first()
+        old_email = fake.email()
+        self.construct_user(email=old_email)
+        u = self.session.execute(select(User).filter(User.email == old_email)).unique().scalar_one_or_none()
+        self.assertIsNotNone(u)
+        u_id = u.id
         admin_headers = self.logged_in_headers()
         user_headers = self.logged_in_headers(u)
-        self.assertIsNotNone(u)
+        self.session.close()
 
         # A user should be able to access and modify their user record, with the exception of making themselves Admin
-        rv = self.client.get("/api/user/%i" % u.id, content_type="application/json", headers=user_headers)
+        rv = self.client.get("/api/user/%i" % u_id, content_type="application/json", headers=user_headers)
         self.assert_success(rv)
         response = rv.json
-        response["email"] = "ed@edwardos.com"
+        new_email = fake.email()
+        response["email"] = new_email
         orig_date = response["last_updated"]
         rv = self.client.put(
-            "/api/user/%i" % u.id,
+            "/api/user/%i" % u_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
             headers=user_headers,
         )
         self.assert_success(rv)
+        response = rv.json
+        self.assertEqual(new_email, response["email"])
 
         # Only Admin users can make other admin users
         response["role"] = "admin"
         rv = self.client.put(
-            "/api/user/%i" % u.id,
+            "/api/user/%i" % u_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
@@ -68,10 +75,10 @@ class TestUser(BaseTest):
         )
         self.assert_success(rv)
 
-        rv = self.client.get("/api/user/%i" % u.id, content_type="application/json", headers=user_headers)
+        rv = self.client.get("/api/user/%i" % u_id, content_type="application/json", headers=user_headers)
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["email"], "ed@edwardos.com")
+        self.assertEqual(new_email, response["email"])
         self.assertEqual(response["role"], "admin")
         self.assertNotEqual(orig_date, response["last_updated"])
 

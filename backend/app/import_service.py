@@ -5,14 +5,22 @@ import datetime
 import logging
 
 import requests
-from sqlalchemy import desc
+from marshmallow import ValidationError
+from sqlalchemy import desc, select
+from sqlalchemy.orm import joinedload
 
 from app.database import session, get_class
 from app.export_service import ExportService
-from app.models import DataTransferLog, DataTransferLogDetail
+from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo
+from app.rest_exception import RestException
 from app.schemas import ExportInfoSchema
 from app.schemas import ExportSchemas
 from config.load import settings
+
+
+from icecream import ic
+
+ic.configureOutput(includeContext=True, contextAbsPath=True)
 
 
 class ImportService:
@@ -32,7 +40,7 @@ class ImportService:
         date_started = datetime.datetime.utcnow()
         exportables = self.get_export_list(full_backup)
         # Note:  We request data THEN create the next log.  We depend on this order to get data since
-        # the last log was recorded, but besure and set the start date from the moment this was called.
+        # the last log was recorded, but be sure and set the start date from the moment this was called.
         data = self.request_data(exportables, full_backup=full_backup)
         log = self.log_for_export(exportables, date_started)
         session.add(log)
@@ -49,16 +57,20 @@ class ImportService:
         for e in exportables:
             total += e.size
         if total > 0:
-            log = DataTransferLog(type="import", total_records=total)
+            log = DataTransferLog(type="importing", total_records=total)
         else:
             log = (
-                session.query(DataTransferLog)
-                .filter(DataTransferLog.type == "import")
-                .order_by(desc(DataTransferLog.last_updated))
-                .limit(1)
-                .first()
+                session.execute(
+                    select(DataTransferLog)
+                    .options(joinedload(DataTransferLog.details))
+                    .filter_by(type="importing")
+                    .order_by(desc(DataTransferLog.last_updated))
+                )
+                .unique()
+                .scalar_one()
             )
             log.last_updated = date_started
+            session.close()
         return log
 
     def login(self):
@@ -80,50 +92,57 @@ class ImportService:
             headers = {"Authorization": "Bearer {}".format(self.token)}
         return headers
 
-    def get_export_list(self, full_backup=False):
-
+    def get_export_list(self, full_backup=False) -> list[ExportInfo]:
         url = self.master_url + self.EXPORT_ENDPOINT
         last_log = (
-            session.query(DataTransferLog)
-            .filter(DataTransferLog.type == "import")
-            .order_by(desc(DataTransferLog.last_updated))
-            .limit(1)
-            .first()
+            session.execute(
+                select(DataTransferLog)
+                .options(joinedload(DataTransferLog.details))
+                .filter_by(type="importing")
+                .order_by(desc(DataTransferLog.last_updated))
+            )
+            .unique()
+            .scalar_one_or_none()
         )
         if last_log and last_log.successful() and not full_backup:
             date_string = last_log.date_started.strftime(ExportService.DATE_FORMAT)
             url += "?after=" + date_string
+
+        session.close()
         response = requests.get(url, headers=self.get_headers())
-        exportables = ExportInfoSchema(many=True).load(response.json())
-        return exportables
+        return ExportInfoSchema().load(response.json(), many=True)
 
     def request_data(self, export_list, full_backup=False):
         for export in export_list:
             if export.size == 0:
                 continue
             last_detail_log = (
-                session.query(DataTransferLogDetail)
-                .filter(DataTransferLogDetail.class_name == export.class_name)
-                .order_by(desc(DataTransferLogDetail.date_started))
-                .limit(1)
-                .first()
+                session.execute(
+                    select(DataTransferLogDetail)
+                    .filter(DataTransferLogDetail.class_name == export.class_name)
+                    .order_by(desc(DataTransferLogDetail.date_started))
+                )
+                .unique()
+                .scalar_one_or_none()
             )
             if last_detail_log and not full_backup:
                 date_string = last_detail_log.date_started.strftime(ExportService.DATE_FORMAT)
                 url = export.url + "?after=" + date_string
             else:
                 url = export.url
+
+            session.close()
             url = self.master_url + url
             print("Calling: " + url)
             response = requests.get(url, headers=self.get_headers())
             export.json_data = response.json()
         return export_list
 
-    def load_all_data(self, export_list, log):
+    def load_all_data(self, export_list: list[ExportInfo], log):
         for export_info in export_list:
             self.load_data(export_info, log)
 
-    def load_data(self, export_info, log) -> int:
+    def load_data(self, export_info: ExportInfo, log) -> int:
         num_items = 0
 
         if not (
@@ -133,6 +152,7 @@ class ImportService:
             and len(export_info.json_data) > 0
         ):
             return num_items  # Nothing to do here.
+
         schema = ExportService.get_schema(export_info.class_name, many=False, is_import=True)
         model_class = get_class(export_info.class_name)
         log_detail = DataTransferLogDetail(
@@ -143,10 +163,12 @@ class ImportService:
             failure_count=0,
         )
         log.details.append(log_detail)
+
         for item in export_info.json_data:
             item_copy = dict(item)
             if "_links" in item_copy:
                 links = item_copy.pop("_links")
+
             existing_model = session.query(model_class).filter_by(id=item["id"]).first()
             try:
                 if existing_model:
@@ -158,6 +180,8 @@ class ImportService:
                 log_detail.handle_failure(e)
                 session.add(log)
                 session.add(log_detail)
+                session.commit()
+                session.close()
                 raise e
 
             try:
@@ -166,6 +190,8 @@ class ImportService:
                 log_detail.handle_success()
                 num_items += 1
                 session.add(log_detail)
+                session.commit()
+
                 if hasattr(model, "__question_type__") and model.__question_type__ == ExportService.TYPE_SENSITIVE:
                     print("Sensitive Data.  Calling Delete.")
                     self.delete_record(item)
@@ -182,9 +208,12 @@ class ImportService:
                 log_detail.handle_failure(e)
                 session.add(log)
                 session.add(log_detail)
+                session.commit()
+                session.close()
                 raise e
 
         session.commit()
+        session.close()
         return num_items
 
     def delete_record(self, item):
@@ -204,7 +233,7 @@ class ImportService:
             response = requests.get(url)
             return response.json()
         except requests.exceptions.ConnectionError as err:
-            self.logger.error("Uable to contact the master instance at " + url)
+            self.logger.error("Unable to contact the master instance at " + url)
 
     def load_admin(self):
         url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
@@ -217,6 +246,6 @@ class ImportService:
                 admin = schema.load(json_admin, session=session)
                 admin._password = password
                 session.add(admin)
-            except:
-                print("Failed to import admin user :" + json_admin["id"])
+            except (ValidationError, RestException) as e:
+                ic(f"Failed to import admin user: {json_admin['id']}", e)
         session.commit()
