@@ -1,22 +1,25 @@
+from collections import Counter
+
+from sqlalchemy import select
+
 from app.elastic_index import elastic_index
-from app.models import ResourceCategory
-from app.models import Resource, ResourceCategory, ResourceChangeLog
 from app.enums import Role
+from app.models import Resource, ResourceCategory, ResourceChangeLog
+from fixtures.fixure_utils import fake
+from fixtures.resource import MockResource
 from tests.base_test import BaseTest
 
 
 class TestResources(BaseTest):
     def test_resource_basics(self):
-        self.construct_resource()
-        r = self.session.query(Resource).first()
-        self.assertIsNotNone(r)
+        r = self.construct_resource()
         r_id = r.id
         rv = self.client.get("/api/resource/%i" % r_id, follow_redirects=True, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], r_id)
-        self.assertEqual(response["title"], "A+ Resource")
-        self.assertEqual(response["description"], "A delightful Resource destined to create rejoicing")
+        self.assertEqual(response["title"], r.title)
+        self.assertEqual(response["description"], r.description)
 
     def test_modify_resource_basics(self):
         self.construct_resource()
@@ -76,11 +79,7 @@ class TestResources(BaseTest):
         self.assertEqual(404, rv.status_code)
 
     def test_create_resource(self):
-        resource = {
-            "title": "Resource of Resources",
-            "description": "You need this resource in your life.",
-            "organization_name": "Resource Org",
-        }
+        resource = MockResource()
         rv = self.client.post(
             "api/resource",
             data=self.jsonify(resource),
@@ -90,8 +89,8 @@ class TestResources(BaseTest):
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["title"], "Resource of Resources")
-        self.assertEqual(response["description"], "You need this resource in your life.")
+        self.assertEqual(response["title"], resource.title)
+        self.assertEqual(response["description"], resource.description)
         self.assertIsNotNone(response["id"])
 
     def test_get_resource_by_category(self):
@@ -198,57 +197,58 @@ class TestResources(BaseTest):
         self.assertEqual(0, len(response))
 
     def test_resource_change_log_types(self):
-        u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
-        r = {
-            "id": 258,
-            "title": "A Resource that is Super and Great",
-            "description": "You need this resource in your life.",
-        }
-        rv = self.client.post(
+        u_email = fake.email()
+        u = self.construct_user(email=u_email, role=Role.admin)
+        user_id = u.id
+        headers = self.logged_in_headers(user=u)
+        mock_resource = MockResource()
+        rv_1 = self.client.post(
             "api/resource",
-            data=self.jsonify(r),
+            json=mock_resource.__dict__,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=headers,
         )
-        self.assert_success(rv)
+        self.assert_success(rv_1)
+        r_1 = rv_1.json
+        resource_id = r_1["id"]
 
         logs = self.session.query(ResourceChangeLog).all()
-        self.assertIsNotNone(logs[-1].resource_id)
-        self.assertIsNotNone(logs[-1].user_id)
+        self.assertEqual(logs[-1].resource_id, resource_id)
+        self.assertEqual(logs[-1].user_id, user_id)
         self.assertEqual(logs[-1].type, "create")
 
-        rv = self.client.get("api/resource/%i" % r["id"], content_type="application/json")
+        url = f"api/resource/{resource_id}"
+        rv = self.client.get(url, content_type="application/json")
         self.assert_success(rv)
 
         response = rv.json
-        response["title"] = "Super Great Resource"
+        new_title = fake.catch_phrase()
+        response["title"] = new_title
         rv = self.client.put(
-            "/api/resource/%i" % r["id"],
-            data=self.jsonify(response),
+            url,
+            json=response,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=headers,
         )
         self.assert_success(rv)
-        rv = self.client.get("/api/resource/%i" % r["id"], content_type="application/json")
+        rv = self.client.get(url, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["title"], "Super Great Resource")
+        self.assertEqual(response["title"], new_title)
 
         logs = self.session.query(ResourceChangeLog).all()
-        self.assertIsNotNone(logs[-1].resource_id)
-        self.assertIsNotNone(logs[-1].user_id)
+        self.assertEqual(logs[-1].resource_id, resource_id)
+        self.assertEqual(logs[-1].user_id, user_id)
         self.assertEqual(logs[-1].type, "edit")
 
-        rv = self.client.delete(
-            "api/resource/%i" % r["id"], content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.delete(url, content_type="application/json", headers=headers)
         self.assert_success(rv)
 
         logs = self.session.query(ResourceChangeLog).all()
-        self.assertIsNotNone(logs[-1].resource_id)
-        self.assertIsNotNone(logs[-1].user_id)
+        self.assertEqual(logs[-1].resource_id, resource_id)
+        self.assertEqual(logs[-1].user_id, user_id)
         self.assertEqual(logs[-1].type, "delete")
 
     def test_get_resource_change_log_by_resource(self):
@@ -300,38 +300,38 @@ class TestResources(BaseTest):
         self.assertEqual(response[-1]["resource_id"], r.id)
 
     def test_covid19_resource_lists(self):
-        self.construct_resource(covid19_categories=["COVID-19_for_Autism", "Free_educational_resources"])
-        self.construct_resource(
-            covid19_categories=["COVID-19_for_Autism", "Edu-tainment", "Free_educational_resources"]
-        )
-        self.construct_resource(covid19_categories=["COVID-19_for_Autism", "Edu-tainment", "Supports_with_Living"])
-        self.construct_resource(covid19_categories=["COVID-19_for_Autism", "Edu-tainment", "Visual_Aids"])
-        self.construct_resource(covid19_categories=["COVID-19_for_Autism", "Edu-tainment", "Health_and_Telehealth"])
+        covid_cats = [
+            "covid_19_for_autism",
+            "edu_tainment",
+            "free_educational_resources",
+            "supports_with_living",
+            "visual_aids",
+            "health_and_telehealth",
+        ]
 
-        rv = self.client.get("api/resource/covid19/COVID-19_for_Autism", content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(len(response), 5)
-        rv = self.client.get("api/resource/covid19/Edu-tainment", content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(len(response), 4)
-        rv = self.client.get("api/resource/covid19/Free_educational_resources", content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(len(response), 2)
-        rv = self.client.get("api/resource/covid19/Supports_with_Living", content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(len(response), 1)
-        rv = self.client.get("api/resource/covid19/Visual_Aids", content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(len(response), 1)
-        rv = self.client.get("api/resource/covid19/Health_and_Telehealth", content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertEqual(len(response), 1)
+        resource_cats = [
+            [0, 2],
+            [0, 1, 2],
+            [0, 1, 3],
+            [0, 1, 4],
+            [0, 1, 5],
+        ]
+
+        for cat in resource_cats:
+            resource_covid_cats = [covid_cats[i] for i in cat]
+            new_r = self.construct_resource(covid19_categories=resource_covid_cats, is_draft=False)
+            db_r = self.session.execute(select(Resource).filter(Resource.id == new_r.id)).unique().scalar_one()
+            self.assertEqual(db_r.covid19_categories, resource_covid_cats)
+            self.session.close()
+
+        # Make a dict of the expected counts for each category, based on the resource_cats list
+        expected_counts = dict(sum((Counter(sublist) for sublist in resource_cats), Counter()))
+
+        for i, cat in enumerate(covid_cats):
+            rv = self.client.get(f"api/resource/covid19/{cat}", content_type="application/json")
+            self.assert_success(rv)
+            response = rv.json
+            self.assertEqual(len(response), expected_counts[i])
 
     def test_is_uva_education_content(self):
         self.construct_resource(is_draft=True, title="Autism at UVA", is_uva_education_content=True)

@@ -4,7 +4,8 @@ import flask_restful
 from elasticsearch import NotFoundError
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select, text
+from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
@@ -133,9 +134,18 @@ class Covid19ResourceListEndpoint(flask_restful.Resource):
 
     def get(self, category):
         resources = (
-            session.query(Resource)
-            .filter(Resource.covid19_categories.any(category), Resource.is_draft == False)
-            .order_by(Resource.last_updated.desc())
+            session.execute(
+                select(Resource)
+                .options(
+                    joinedload(Resource.resource_categories),
+                    joinedload(Resource.categories),
+                )
+                .filter(Resource.covid19_categories.any(category))
+                .filter_by(is_draft=False)
+                .order_by(Resource.last_updated.desc())
+            )
+            .unique()
+            .scalars()
             .all()
         )
         return self.resourcesSchema.dump(resources)
