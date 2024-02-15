@@ -21,17 +21,15 @@ class FlowEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, name, participant_id):
+        p_id_int = int(participant_id)
         flow = copy.deepcopy(Flows.get_flow_by_name(name))
-        participant = session.query(Participant).filter_by(id=cast(participant_id, Integer)).first()
+        participant = session.query(Participant).filter_by(id=p_id_int).first()
         if participant is None:
             raise RestException(RestException.NOT_FOUND)
-        if g.user.related_to_participant(participant_id) and not g.user.role == "Admin":
+        if g.user.related_to_participant(p_id_int) and not g.user.role == "Admin":
             raise RestException(RestException.UNRELATED_PARTICIPANT)
         step_logs = (
-            session.execute(select(StepLog).filter_by(participant_id=participant_id, flow=name))
-            .unique()
-            .scalars()
-            .all()
+            session.execute(select(StepLog).filter_by(participant_id=p_id_int, flow=name)).unique().scalars().all()
         )
         session.close()
 

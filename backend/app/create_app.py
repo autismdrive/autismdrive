@@ -1,14 +1,12 @@
 import json
 import logging.config
-import sys
-from inspect import getframeinfo, getargvalues, currentframe, getouterframes
-from urllib.parse import unquote
+from inspect import getargvalues, currentframe, getouterframes
 
 import click
 import flask_restful
 import traceback_with_variables
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import jsonify, url_for, Blueprint
+from flask import jsonify, Blueprint
 from flask_cors import CORS
 from flask_restful.reqparse import RequestParser
 
@@ -78,6 +76,7 @@ def create_app(settings=None):
     # Handle errors consistently
     @_app.errorhandler(RestException)
     def handle_invalid_usage(error):
+        error_dict = {}
 
         try:
             if hasattr(error, "to_dict"):
@@ -114,12 +113,13 @@ def create_app(settings=None):
             del outer_frames
             del frame
 
-        response_dict = error_dict | {
-            "error_location": error_location,
-            "error_context": error_context,
-        }
+        if error_location and error_context:
+            error_dict = error_dict | {
+                "error_location": error_location or None,
+                "error_context": error_context or None,
+            }
 
-        response = jsonify(response_dict)
+        response = jsonify(json.loads(json.dumps(error_dict, ensure_ascii=True, indent=4, sort_keys=True, default=str)))
         response.status_code = error.status_code
         return response
 
@@ -280,8 +280,7 @@ def create_app(settings=None):
                 options[arg] = "<{0}>".format(arg)
 
             methods = ",".join(rule.methods)
-            url = url_for(rule.endpoint, **options)
-            output[rule.endpoint] = unquote(url)
+            output[rule.endpoint] = rule.rule
 
         return jsonify(output)
 

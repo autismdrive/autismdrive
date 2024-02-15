@@ -2,7 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request, g
-from sqlalchemy import func, cast, Integer, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
@@ -19,7 +19,7 @@ class ParticipantEndpoint(flask_restful.Resource):
     schema = ParticipantSchema()
 
     @auth.login_required
-    def get(self, id):
+    def get(self, participant_id: int):
         db_participant = (
             session.execute(
                 select(Participant)
@@ -28,7 +28,7 @@ class ParticipantEndpoint(flask_restful.Resource):
                     joinedload(Participant.identification),
                     joinedload(Participant.contact),
                 )
-                .filter_by(id=cast(id, Integer))
+                .filter_by(id=participant_id)
             )
             .unique()
             .scalar_one_or_none()
@@ -42,14 +42,13 @@ class ParticipantEndpoint(flask_restful.Resource):
 
     @auth.login_required
     @requires_roles(Role.admin)
-    def delete(self, id):
-        session.query(Participant).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, participant_id: int):
+        session.query(Participant).filter_by(id=participant_id).delete()
         return None
 
     @auth.login_required
-    def put(self, id):
+    def put(self, participant_id: int):
         request_data = request.get_json()
-        participant_id = cast(id, Integer)
         db_participant = session.query(Participant).filter_by(id=participant_id).first()
         if db_participant is None:
             raise RestException(RestException.NOT_FOUND)

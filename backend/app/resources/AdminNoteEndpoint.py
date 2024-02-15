@@ -26,24 +26,24 @@ class AdminNoteEndpoint(flask_restful.Resource):
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
-    def get(self, id):
-        model = session.query(AdminNote).filter(AdminNote.id == cast(id, Integer)).first()
+    def get(self, admin_note_id: int):
+        model = session.query(AdminNote).filter(AdminNote.id == admin_note_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
-    def delete(self, id):
-        session.query(AdminNote).filter(AdminNote.id == cast(id, Integer)).delete()
+    def delete(self, admin_note_id: int):
+        session.query(AdminNote).filter(AdminNote.id == admin_note_id).delete()
         session.commit()
         return None
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
-    def put(self, id):
+    def put(self, admin_note_id: int):
         request_data = request.get_json()
-        instance = session.query(AdminNote).filter(AdminNote.id == cast(id, Integer)).first()
+        instance = session.query(AdminNote).filter(AdminNote.id == admin_note_id).first()
         try:
             updated = self.schema.load(data=request_data, instance=instance, session=session)
         except ValidationError as e:

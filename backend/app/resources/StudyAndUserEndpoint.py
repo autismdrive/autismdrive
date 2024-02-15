@@ -92,15 +92,15 @@ class StudyUserEndpoint(flask_restful.Resource):
     schema = StudyUserSchema()
 
     @auth.login_required
-    def get(self, id):
-        model = session.query(StudyUser).filter_by(id=cast(id, Integer)).first()
+    def get(self, study_user_id: int):
+        model = session.query(StudyUser).filter_by(id=study_user_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
-    def delete(self, id):
-        session.query(StudyUser).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, study_user_id: int):
+        session.query(StudyUser).filter_by(id=study_user_id).delete()
         session.commit()
         return None
 

@@ -336,7 +336,7 @@ class ExportInfo:
     size: Optional[int] = 0
     url: Optional[str] = ""
     question_type: Optional[str] = ""
-    export: Optional[bool] = True
+    exportable: Optional[bool] = True
     json_data: dict | list[dict] = field(default_factory=dict)
     sub_tables: Optional[list["ExportInfo"]] = field(default_factory=list)
 

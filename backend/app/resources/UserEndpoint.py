@@ -3,7 +3,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists, desc, cast, Integer, select
+from sqlalchemy import exists, desc, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -24,8 +24,8 @@ class UserEndpoint(flask_restful.Resource):
     schema = UserSchema()
 
     @auth.login_required
-    def get(self, id):
-        if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
+    def get(self, user_id: int):
+        if g.user.id != user_id and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
         model = (
             session.execute(
@@ -41,7 +41,7 @@ class UserEndpoint(flask_restful.Resource):
                     joinedload(User.studies),
                     joinedload(User.user_studies),
                 )
-                .filter_by(id=cast(id, Integer))
+                .filter_by(id=user_id)
             )
             .unique()
             .scalar_one_or_none()
@@ -53,17 +53,17 @@ class UserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     @requires_permission(Permission.delete_user)
-    def delete(self, id):
-        session.query(EventUser).filter_by(user_id=cast(id, Integer)).delete()
-        session.query(StudyUser).filter_by(user_id=cast(id, Integer)).delete()
-        session.query(UserFavorite).filter_by(user_id=cast(id, Integer)).delete()
-        session.query(User).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, user_id: int):
+        session.query(EventUser).filter_by(user_id=user_id).delete()
+        session.query(StudyUser).filter_by(user_id=user_id).delete()
+        session.query(UserFavorite).filter_by(user_id=user_id).delete()
+        session.query(User).filter_by(id=user_id).delete()
         session.commit()
         return None
 
     @auth.login_required
-    def put(self, id):
-        if g.user.id != eval(id) and Permission.user_detail_admin not in g.user.role.permissions():
+    def put(self, user_id: int):
+        if g.user.id != user_id and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
         request_data = request.get_json()
         if "role" in request_data and request_data["role"] == "admin":
@@ -71,7 +71,7 @@ class UserEndpoint(flask_restful.Resource):
                 request_data["role"] = "admin"
             else:
                 request_data["role"] = "user"
-        instance = session.query(User).filter_by(id=cast(id, Integer)).first()
+        instance = session.query(User).filter_by(id=user_id).first()
         try:
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:

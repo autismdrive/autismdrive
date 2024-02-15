@@ -13,11 +13,11 @@ class StudyByCategoryEndpoint(flask_restful.Resource):
 
     schema = CategoryStudiesSchema()
 
-    def get(self, category_id):
+    def get(self, category_id: int):
         study_categories = (
             session.query(StudyCategory)
             .join(StudyCategory.study)
-            .filter(StudyCategory.category_id == cast(category_id, Integer))
+            .filter(StudyCategory.category_id == category_id)
             .order_by(Study.title)
             .all()
         )
@@ -28,24 +28,24 @@ class CategoryByStudyEndpoint(flask_restful.Resource):
 
     schema = StudyCategoriesSchema()
 
-    def get(self, study_id):
+    def get(self, study_id: int):
         study_categories = (
             session.query(StudyCategory)
             .join(StudyCategory.category)
-            .filter(StudyCategory.study_id == cast(study_id, Integer))
+            .filter(StudyCategory.study_id == study_id)
             .order_by(Category.name)
             .all()
         )
         return self.schema.dump(study_categories, many=True)
 
-    def post(self, study_id):
+    def post(self, study_id: int):
         request_data = request.get_json()
 
         for item in request_data:
             item["study_id"] = study_id
 
         study_categories = self.schema.load(request_data, many=True)
-        session.query(StudyCategory).filter_by(study_id=cast(study_id, Integer)).delete()
+        session.query(StudyCategory).filter_by(study_id=study_id).delete()
         for c in study_categories:
             session.add(StudyCategory(study_id=study_id, category_id=c.category_id))
         session.commit()
@@ -55,14 +55,14 @@ class CategoryByStudyEndpoint(flask_restful.Resource):
 class StudyCategoryEndpoint(flask_restful.Resource):
     schema = StudyCategorySchema()
 
-    def get(self, id):
-        model = session.query(StudyCategory).filter_by(id=cast(id, Integer)).first()
+    def get(self, study_category_id: int):
+        model = session.query(StudyCategory).filter_by(id=study_category_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(StudyCategory).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, study_category_id: int):
+        session.query(StudyCategory).filter_by(id=study_category_id).delete()
         session.commit()
         return None
 

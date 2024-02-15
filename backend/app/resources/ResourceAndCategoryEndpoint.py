@@ -4,7 +4,7 @@ from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import Category, Resource, ResourceCategory
+from app.models import Category, Resource
 from app.models import ResourceCategory
 from app.rest_exception import RestException
 from app.schemas import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
@@ -58,14 +58,14 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
 class ResourceCategoryEndpoint(flask_restful.Resource):
     schema = ResourceCategorySchema()
 
-    def get(self, id):
-        model = session.query(ResourceCategory).filter_by(id=cast(id, Integer)).first()
+    def get(self, resource_category_id: int):
+        model = session.query(ResourceCategory).filter_by(id=resource_category_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(ResourceCategory).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, resource_category_id: int):
+        session.query(ResourceCategory).filter_by(id=resource_category_id).delete()
         session.commit()
         return None
 

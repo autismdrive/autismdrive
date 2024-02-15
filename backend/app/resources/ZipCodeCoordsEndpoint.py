@@ -11,8 +11,8 @@ class ZipCodeCoordsEndpoint(flask_restful.Resource):
 
     schema = ZipCodeSchema()
 
-    def get(self, id):
-        z = session.query(ZipCode).filter_by(id=int(id)).first()
+    def get(self, zip_code: int):
+        z = session.query(ZipCode).filter_by(id=zip_code).first()
         if z is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(z)

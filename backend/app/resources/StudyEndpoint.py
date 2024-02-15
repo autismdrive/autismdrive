@@ -7,7 +7,6 @@ from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import StudyUser
 from app.models import Study, StudyInvestigator, StudyCategory, StudyUser
 from app.rest_exception import RestException
 from app.schemas import StudySchema
@@ -17,28 +16,28 @@ class StudyEndpoint(flask_restful.Resource):
 
     schema = StudySchema()
 
-    def get(self, id):
-        model = session.query(Study).filter_by(id=cast(id, Integer)).first()
+    def get(self, study_id: int):
+        model = session.query(Study).filter_by(id=study_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        study = session.query(Study).filter_by(id=cast(id, Integer)).first()
+    def delete(self, study_id: int):
+        study = session.query(Study).filter_by(id=study_id).first()
 
         if study is not None:
             elastic_index.remove_document(study)
 
-        session.query(StudyUser).filter_by(study_id=cast(id, Integer)).delete()
-        session.query(StudyInvestigator).filter_by(study_id=cast(id, Integer)).delete()
-        session.query(StudyCategory).filter_by(study_id=cast(id, Integer)).delete()
-        session.query(Study).filter_by(id=cast(id, Integer)).delete()
+        session.query(StudyUser).filter_by(study_id=study_id).delete()
+        session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
+        session.query(StudyCategory).filter_by(study_id=study_id).delete()
+        session.query(Study).filter_by(id=study_id).delete()
         session.commit()
         return None
 
-    def put(self, id):
+    def put(self, study_id: int):
         request_data = request.get_json()
-        instance = session.query(Study).filter_by(id=cast(id, Integer)).first()
+        instance = session.query(Study).filter_by(id=study_id).first()
         try:
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:

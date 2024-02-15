@@ -1,11 +1,11 @@
 import flask_restful
 from flask import request
-from sqlalchemy import update, select, cast, Integer
+from sqlalchemy import update, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
-from app.database import session, engine
+from app.database import session
 from app.enums import Permission
 from app.models import Category, ResourceCategory, StudyCategory, UserFavorite
 from app.rest_exception import RestException
@@ -16,30 +16,30 @@ from app.wrappers import requires_permission
 class CategoryEndpoint(flask_restful.Resource):
     schema = CategorySchema()
 
-    def get(self, id):
-        category = session.query(Category).filter(Category.id == cast(id, Integer)).first()
+    def get(self, category_id: int):
+        category = session.query(Category).filter(Category.id == category_id).first()
         if category is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(category)
 
     @auth.login_required
     @requires_permission(Permission.taxonomy_admin)
-    def delete(self, id):
+    def delete(self, category_id: int):
         try:
-            session.query(StudyCategory).filter_by(category_id=cast(id, Integer)).delete()
-            session.query(ResourceCategory).filter_by(category_id=cast(id, Integer)).delete()
-            session.query(UserFavorite).filter_by(category_id=cast(id, Integer)).delete()
-            session.query(Category).filter_by(id=cast(id, Integer)).delete()
+            session.query(StudyCategory).filter_by(category_id=category_id).delete()
+            session.query(ResourceCategory).filter_by(category_id=category_id).delete()
+            session.query(UserFavorite).filter_by(category_id=category_id).delete()
+            session.query(Category).filter_by(id=category_id).delete()
             session.commit()
         except IntegrityError as error:
-            raise RestException(RestException.CAN_NOT_DELETE)
+            raise RestException(RestException.CAN_NOT_DELETE, details=error)
         return
 
     @auth.login_required
     @requires_permission(Permission.taxonomy_admin)
-    def put(self, id):
+    def put(self, category_id: int):
         request_data = request.get_json()
-        get_statement = select(Category).where(Category.id == cast(id, Integer))
+        get_statement = select(Category).where(Category.id == category_id)
         old_cat = session.execute(get_statement).unique().scalar_one_or_none()
 
         if old_cat is None:
@@ -52,7 +52,7 @@ class CategoryEndpoint(flask_restful.Resource):
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e)
 
-        update_statement = update(Category).where(Category.id == cast(id, Integer)).values(updated_dict)
+        update_statement = update(Category).where(Category.id == category_id).values(updated_dict)
         session.execute(update_statement)
         session.commit()
         session.close()

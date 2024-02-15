@@ -2,7 +2,7 @@ import datetime
 
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
@@ -27,7 +27,7 @@ from app.wrappers import requires_permission
 
 class QuestionnaireEndpoint(flask_restful.Resource):
     @auth.login_required
-    def get(self, name, id):
+    def get(self, name, questionnaire_id: int):
         """
         Returns a single questionnaire record.
 
@@ -37,20 +37,22 @@ class QuestionnaireEndpoint(flask_restful.Resource):
                 found in app.model.questionnaires.
                 E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
 
-            id (int): ID of the questionnaire record to retrieve
+            questionnaire_id (int): ID of the questionnaire record to retrieve
 
         Returns: A single questionnaire record.
         """
         name = pascal_case_it(name)
         class_ref = get_class(name)
-        instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
+        instance = (
+            session.execute(select(class_ref).filter(class_ref.id == questionnaire_id)).unique().scalar_one_or_none()
+        )
         if instance is None:
             raise RestException(RestException.NOT_FOUND)
         schema = ExportService.get_schema(name)
         return schema.dump(instance)
 
     @auth.login_required
-    def delete(self, name, id):
+    def delete(self, name, questionnaire_id: int):
         """
         Deletes a single questionnaire record.
 
@@ -60,20 +62,25 @@ class QuestionnaireEndpoint(flask_restful.Resource):
                 found in app.model.questionnaires.
                 E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
 
-            id (int): ID of the questionnaire record to delete
+            questionnaire_id (int): ID of the questionnaire record to delete
         """
         try:
             name = pascal_case_it(name)
             class_ref = get_class(name)
-            instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
-            session.delete(instance)
-            session.commit()
+            instance = session.query(class_ref).filter(class_ref.id == questionnaire_id).first()
+
+            if instance is not None:
+                session.delete(instance)
+                session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE, details=error)
-        return
+        finally:
+            session.close()
+
+        return "", 200
 
     @auth.login_required
-    def put(self, name, id):
+    def put(self, name, questionnaire_id: int):
         """
         Modifies an existing questionnaire record.
 
@@ -83,13 +90,13 @@ class QuestionnaireEndpoint(flask_restful.Resource):
                 found in app.model.questionnaires.
                 E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
 
-            id (int): ID of the questionnaire record to retrieve
+            questionnaire_id (int): ID of the questionnaire record to retrieve
 
         Returns: The updated questionnaire record.
         """
         name = pascal_case_it(name)
         class_ref = get_class(name)
-        instance = session.query(class_ref).filter(class_ref.id == cast(id, Integer)).first()
+        instance = session.query(class_ref).filter(class_ref.id == questionnaire_id).first()
         schema = ExportService.get_schema(name)
         request_data = request.get_json()
         if "_links" in request_data:

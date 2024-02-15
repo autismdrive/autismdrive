@@ -3,7 +3,6 @@ from flask import request
 from sqlalchemy import cast, Integer
 
 from app.database import session
-from app.models import EventUser
 from app.models import Event, EventUser, User
 from app.rest_exception import RestException
 from app.schemas import EventUserSchema
@@ -28,11 +27,11 @@ class UserByEventEndpoint(flask_restful.Resource):
 
     schema = EventUserSchema()
 
-    def get(self, event_id):
+    def get(self, event_id: int):
         event_users = (
             session.query(EventUser)
             .join(EventUser.user)
-            .filter(EventUser.event_id == cast(event_id, Integer))
+            .filter(EventUser.event_id == event_id)
             .order_by(User.name)
             .all()
         )
@@ -42,14 +41,14 @@ class UserByEventEndpoint(flask_restful.Resource):
 class EventUserEndpoint(flask_restful.Resource):
     schema = EventUserSchema()
 
-    def get(self, id):
-        model = session.query(EventUser).filter_by(id=cast(id, Integer)).first()
+    def get(self, event_user_id: int):
+        model = session.query(EventUser).filter_by(id=event_user_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(EventUser).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, event_user_id: int):
+        session.query(EventUser).filter_by(id=event_user_id).delete()
         session.commit()
         return None
 

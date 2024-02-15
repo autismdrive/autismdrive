@@ -3,13 +3,12 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer
 
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import Location, Event, Geocode, ResourceChangeLog
 from app.enums import Permission
+from app.models import Location, Event, Geocode, ResourceChangeLog
 from app.rest_exception import RestException
 from app.schemas import LocationSchema
 from app.wrappers import requires_permission
@@ -19,33 +18,34 @@ class LocationEndpoint(flask_restful.Resource):
 
     schema = LocationSchema()
 
-    def get(self, id):
-        model = session.query(Location).filter_by(id=cast(id, Integer)).first()
+    def get(self, location_id: int):
+        model = session.query(Location).filter_by(id=location_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     @requires_permission(Permission.delete_resource)
-    def delete(self, id):
-        location = session.query(Location).filter_by(id=cast(id, Integer)).first()
-        location_id = location.id
+    def delete(self, location_id: int):
+        location = session.query(Location).filter_by(id=location_id).first()
+
+        if location is None:
+            raise RestException(RestException.NOT_FOUND)
+
         location_title = location.title
+        elastic_index.remove_document(location)
 
-        if location is not None:
-            elastic_index.remove_document(location)
-
-        session.query(Event).filter_by(id=cast(id, Integer)).delete()
-        session.query(Location).filter_by(id=cast(id, Integer)).delete()
+        session.query(Event).filter_by(id=location_id).delete()
+        session.query(Location).filter_by(id=location_id).delete()
         session.commit()
         self.log_update(location_id=location_id, location_title=location_title, change_type="delete")
-        return None
+        return "", 200
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
-    def put(self, id):
+    def put(self, location_id: int):
         request_data = request.get_json()
-        instance = session.query(Location).filter_by(id=cast(id, Integer)).first()
+        instance = session.query(Location).filter_by(id=location_id).first()
         if (
             instance.zip != request_data["zip"]
             or instance.street_address1 != request_data["street_address1"]
@@ -121,7 +121,7 @@ class LocationListEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT, details=err)
 
     @staticmethod
-    def log_update(location_id, location_title, change_type):
+    def log_update(location_id: int, location_title: str, change_type: str):
         log = ResourceChangeLog(
             resource_id=location_id,
             resource_title=location_title,

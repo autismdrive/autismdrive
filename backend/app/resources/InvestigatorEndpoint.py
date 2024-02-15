@@ -3,7 +3,6 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.models import Investigator, StudyInvestigator
@@ -15,21 +14,21 @@ class InvestigatorEndpoint(flask_restful.Resource):
 
     schema = InvestigatorSchema()
 
-    def get(self, id):
-        model = session.query(Investigator).filter_by(id=cast(id, Integer)).first()
+    def get(self, investigator_id: int):
+        model = session.query(Investigator).filter_by(id=investigator_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(StudyInvestigator).filter_by(investigator_id=cast(id, Integer)).delete()
-        session.query(Investigator).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, investigator_id: int):
+        session.query(StudyInvestigator).filter_by(investigator_id=investigator_id).delete()
+        session.query(Investigator).filter_by(id=investigator_id).delete()
         session.commit()
         return None
 
-    def put(self, id):
+    def put(self, investigator_id: int):
         request_data = request.get_json()
-        instance = session.query(Investigator).filter_by(id=cast(id, Integer)).first()
+        instance = session.query(Investigator).filter_by(id=investigator_id).first()
 
         try:
             updated = self.schema.load(request_data, instance=instance)

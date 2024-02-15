@@ -38,15 +38,15 @@ class UserFavoriteEndpoint(flask_restful.Resource):
     schema = UserFavoriteSchema()
 
     @auth.login_required
-    def get(self, id):
-        model = session.query(UserFavorite).filter_by(id=cast(id, Integer)).first()
+    def get(self, user_favorite_id: int):
+        model = session.query(UserFavorite).filter_by(id=user_favorite_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
-    def delete(self, id):
-        session.query(UserFavorite).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, user_favorite_id: int):
+        session.query(UserFavorite).filter_by(id=user_favorite_id).delete()
         session.commit()
         return None
 

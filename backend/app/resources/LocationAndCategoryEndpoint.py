@@ -58,14 +58,14 @@ class CategoryByLocationEndpoint(flask_restful.Resource):
 class LocationCategoryEndpoint(flask_restful.Resource):
     schema = LocationCategorySchema()
 
-    def get(self, id):
-        model = session.query(ResourceCategory).filter_by(id=cast(id, Integer)).first()
+    def get(self, location_category_id: int):
+        model = session.query(ResourceCategory).filter_by(id=location_category_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(ResourceCategory).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, location_category_id: int):
+        session.query(ResourceCategory).filter_by(id=location_category_id).delete()
         session.commit()
         return None
 

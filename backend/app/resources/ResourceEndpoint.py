@@ -4,15 +4,15 @@ import flask_restful
 from elasticsearch import NotFoundError
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer, select, text
+from sqlalchemy import cast, Integer, select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import AdminNote, Resource, ResourceCategory, Location, Event, UserFavorite, ResourceChangeLog
-from app.models import ResourceCategory
 from app.enums import Permission
+from app.models import AdminNote, Resource, Location, Event, UserFavorite, ResourceChangeLog
+from app.models import ResourceCategory
 from app.rest_exception import RestException
 from app.schemas import ResourceSchema
 from app.wrappers import requires_permission
@@ -22,39 +22,38 @@ class ResourceEndpoint(flask_restful.Resource):
 
     schema = ResourceSchema()
 
-    def get(self, id):
-        model = session.query(Resource).filter_by(id=cast(id, Integer)).first()
+    def get(self, resource_id: int):
+        model = session.query(Resource).filter_by(id=resource_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
     @requires_permission(Permission.delete_resource)
-    def delete(self, id):
-        resource = session.query(Resource).filter_by(id=cast(id, Integer)).first()
-        resource_id = resource.id
+    def delete(self, resource_id: int):
+        resource = session.query(Resource).filter_by(id=resource_id).first()
+
+        if resource is None:
+            raise RestException(RestException.NOT_FOUND)
+
+        elastic_index.remove_document(resource)
         resource_title = resource.title
 
-        try:
-            elastic_index.remove_document(resource)
-        except NotFoundError:
-            pass
-
-        session.query(AdminNote).filter_by(resource_id=cast(id, Integer)).delete()
-        session.query(Event).filter_by(id=cast(id, Integer)).delete()
-        session.query(Location).filter_by(id=cast(id, Integer)).delete()
-        session.query(ResourceCategory).filter_by(resource_id=cast(id, Integer)).delete()
-        session.query(UserFavorite).filter_by(resource_id=cast(id, Integer)).delete()
-        session.query(Resource).filter_by(id=cast(id, Integer)).delete()
+        session.query(AdminNote).filter_by(resource_id=resource_id).delete()
+        session.query(Event).filter_by(id=resource_id).delete()
+        session.query(Location).filter_by(id=resource_id).delete()
+        session.query(ResourceCategory).filter_by(resource_id=resource_id).delete()
+        session.query(UserFavorite).filter_by(resource_id=resource_id).delete()
+        session.query(Resource).filter_by(id=resource_id).delete()
         session.commit()
         self.log_update(resource_id=resource_id, resource_title=resource_title, change_type="delete")
         return None
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
-    def put(self, id):
+    def put(self, resource_id: int):
         request_data = request.get_json()
-        instance = session.query(Resource).filter_by(id=cast(id, Integer)).first()
+        instance = session.query(Resource).filter_by(id=resource_id).first()
         try:
             updated = self.schema.load(request_data, instance=instance, session=session)
         except Exception as e:

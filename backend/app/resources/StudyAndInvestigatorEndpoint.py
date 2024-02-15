@@ -6,7 +6,7 @@ from app.database import session
 from app.models import Investigator, Study, StudyInvestigator
 from app.models import StudyInvestigator
 from app.rest_exception import RestException
-from app.schemas import StudyInvestigatorSchema, InvestigatorStudiesSchema, StudyInvestigatorsSchema
+from app.schemas import StudyInvestigatorSchema, InvestigatorStudiesSchema
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):
@@ -26,26 +26,26 @@ class StudyByInvestigatorEndpoint(flask_restful.Resource):
 
 class InvestigatorByStudyEndpoint(flask_restful.Resource):
 
-    schema = StudyInvestigatorsSchema()
+    schema = StudyInvestigatorSchema()
 
-    def get(self, study_id):
+    def get(self, study_id: int):
         study_investigators = (
             session.query(StudyInvestigator)
             .join(StudyInvestigator.investigator)
-            .filter(StudyInvestigator.study_id == cast(study_id, Integer))
+            .filter(StudyInvestigator.study_id == study_id)
             .order_by(Investigator.name)
             .all()
         )
         return self.schema.dump(study_investigators, many=True)
 
-    def post(self, study_id):
+    def post(self, study_id: int):
         request_data = request.get_json()
 
         for item in request_data:
             item["study_id"] = study_id
 
         study_investigators = self.schema.load(request_data, many=True)
-        session.query(StudyInvestigator).filter_by(study_id=cast(study_id, Integer)).delete()
+        session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
         for c in study_investigators:
             session.add(StudyInvestigator(study_id=study_id, investigator_id=c.investigator_id))
         session.commit()
@@ -55,14 +55,14 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
 class StudyInvestigatorEndpoint(flask_restful.Resource):
     schema = StudyInvestigatorSchema()
 
-    def get(self, id):
-        model = session.query(StudyInvestigator).filter_by(id=cast(id, Integer)).first()
+    def get(self, study_investigator_id: int):
+        model = session.query(StudyInvestigator).filter_by(id=study_investigator_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(StudyInvestigator).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, study_investigator_id: int):
+        session.query(StudyInvestigator).filter_by(id=study_investigator_id).delete()
         session.commit()
         return None
 

@@ -13,11 +13,11 @@ class EventByCategoryEndpoint(flask_restful.Resource):
 
     schema = CategoryEventsSchema()
 
-    def get(self, category_id):
+    def get(self, category_id: int):
         event_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.resource)
-            .filter(ResourceCategory.category_id == cast(category_id, Integer))
+            .filter(ResourceCategory.category_id == category_id)
             .order_by(Event.title)
             .all()
         )
@@ -28,28 +28,28 @@ class CategoryByEventEndpoint(flask_restful.Resource):
 
     schema = EventCategoriesSchema()
 
-    def get(self, event_id):
+    def get(self, event_id: int):
         event_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.category)
-            .filter(ResourceCategory.resource_id == cast(event_id, Integer))
+            .filter(ResourceCategory.resource_id == event_id)
             .order_by(Category.name)
             .all()
         )
         return self.schema.dump(event_categories, many=True)
 
-    def post(self, event_id):
+    def post(self, event_id: int):
         request_data = request.get_json()
 
         for item in request_data:
             item["resource_id"] = event_id
 
         event_categories = self.schema.load(data=request_data, session=session, many=True)
-        session.query(ResourceCategory).filter_by(resource_id=cast(event_id, Integer)).delete()
+        session.query(ResourceCategory).filter_by(resource_id=event_id).delete()
         for c in event_categories:
             session.add(ResourceCategory(resource_id=event_id, category_id=c.category_id, type="event"))
         session.commit()
-        instance = session.query(Event).filter_by(id=cast(event_id, Integer)).first()
+        instance = session.query(Event).filter_by(id=event_id).first()
         elastic_index.update_document(document=instance, latitude=instance.latitude, longitude=instance.longitude)
         return self.get(event_id)
 
@@ -57,14 +57,14 @@ class CategoryByEventEndpoint(flask_restful.Resource):
 class EventCategoryEndpoint(flask_restful.Resource):
     schema = EventCategorySchema()
 
-    def get(self, id):
-        model = session.query(ResourceCategory).filter_by(id=cast(id, Integer)).first()
+    def get(self, resource_category_id: int):
+        model = session.query(ResourceCategory).filter_by(id=resource_category_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        session.query(ResourceCategory).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, resource_category_id: int):
+        session.query(ResourceCategory).filter_by(id=resource_category_id).delete()
         session.commit()
         return None
 

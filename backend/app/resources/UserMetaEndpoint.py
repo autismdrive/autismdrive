@@ -16,23 +16,23 @@ class UserMetaEndpoint(flask_restful.Resource):
     schema = UserMetaSchema()
 
     @auth.login_required
-    def get(self, id):
-        model = session.query(UserMeta).filter_by(id=cast(id, Integer)).first()
+    def get(self, user_meta_id: int):
+        model = session.query(UserMeta).filter_by(id=user_meta_id).first()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
     @auth.login_required
-    def delete(self, id):
-        session.query(UserMeta).filter_by(id=cast(id, Integer)).delete()
+    def delete(self, user_meta_id: int):
+        session.query(UserMeta).filter_by(id=user_meta_id).delete()
         return None
 
     @auth.login_required
-    def post(self, id):
+    def post(self, user_meta_id: int):
         request_data = request.get_json()
 
         try:
-            existing = session.query(UserMeta).filter(UserMeta.id == cast(id, Integer)).first()
+            existing = session.query(UserMeta).filter(UserMeta.id == user_meta_id).first()
             new_meta = self.schema.load(request_data, instance=existing)
             new_meta.last_updated = datetime.datetime.utcnow()
             session.add(new_meta)

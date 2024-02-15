@@ -1,48 +1,51 @@
 import datetime
 import io
 import json
+import random
 
 import openpyxl
 from dateutil import parser
 
 from app.export_service import ExportService
+from app.views import endpoints
+from fixtures.endpoints_map import endpoints_map
+from fixtures.fixure_utils import fake
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestQuestionnaire(BaseTestQuestionnaire):
     def test_base_endpoint(self):
+        import re
+        from flask import url_for
+
+        param_pattern = re.compile(r"<(int|string|path):([a-z_]+)>")
+
         rv = self.client.get("/", follow_redirects=True, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
 
-        endpoints = [
-            ("api.categorybyresourceendpoint", "/api/resource/<resource_id>/category"),
-            ("api.categorybystudyendpoint", "/api/study/<study_id>/category"),
-            ("api.categoryendpoint", "/api/category/<id>"),
-            ("api.categorylistendpoint", "/api/category"),
-            ("api.questionnaireendpoint", "/api/q/<name>/<id>"),
-            ("api.resourcebycategoryendpoint", "/api/category/<category_id>/resource"),
-            ("api.resourcecategoryendpoint", "/api/resource_category/<id>"),
-            ("api.resourcecategorylistendpoint", "/api/resource_category"),
-            ("api.resourceendpoint", "/api/resource/<id>"),
-            ("api.resourcelistendpoint", "/api/resource"),
-            ("api.rootcategorylistendpoint", "/api/category/root"),
-            ("api.sessionendpoint", "/api/session"),
-            ("api.studybycategoryendpoint", "/api/category/<category_id>/study"),
-            ("api.studycategoryendpoint", "/api/study_category/<id>"),
-            ("api.studycategorylistendpoint", "/api/study_category"),
-            ("api.studyendpoint", "/api/study/<id>"),
-            ("api.studylistendpoint", "/api/study"),
-            ("api.userendpoint", "/api/user/<id>"),
-            ("api.userlistendpoint", "/api/user"),
-            ("api.zipcodecoordsendpoint", "/api/zip_code_coords/<id>"),
-            ("auth.forgot_password", "/api/forgot_password"),
-            ("auth.login_password", "/api/login_password"),
-            ("auth.reset_password", "/api/reset_password"),
-        ]
+        def fake_param(param_type: str) -> str:
+            if param_type == "int":
+                return str(random.randint(1, 999))
+            if param_type == "path":
+                return fake.file_path(depth=random.randint(3, 5))
+            return "-".join(fake.words(3))
 
-        for endpoint in endpoints:
-            self.assertEqual(response[endpoint[0]], endpoint[1])
+        for api_path, url_rule in endpoints_map.items():
+            self.assertEqual(response[api_path], url_rule)
+
+            params = {}
+            param_matches: list[tuple[str, str]] = re.findall(param_pattern, url_rule)
+
+            if param_matches:
+                params = {v: fake_param(k) for k, v in param_matches}
+
+            if "<int:" in url_rule:
+                with self.assertRaises(Exception):
+                    url_for(url_rule, **params)
+
+            some_url = url_for(api_path, **params)
+            self.assertIsNotNone(some_url)
 
     def test_questionnare_post_fails_if_flow_does_not_exist(self):
         evaluation_history_self_questionnaire = {"self_identifies_autistic": True, "years_old_at_first_diagnosis": 5}
@@ -1660,14 +1663,14 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=self.logged_in_headers(),
         )
         self.assert_success(rv)
-        self.construct_medication(name="Iocane Powder", supports_questionnaire=sq)
-        self.construct_therapy(type="socialSkills", supports_questionnaire=sq)
-        self.construct_alternative_augmentative(type="highTechAAC", supports_questionnaire=sq)
+        self.construct_medication(name=fake.enzyme(), supports_questionnaire_id=sq.id)
+        self.construct_therapy(type="socialSkills", supports_questionnaire_id=sq.id)
+        self.construct_alternative_augmentative(type="highTechAAC", supports_questionnaire_id=sq.id)
         self.construct_assistive_device(
             type_group="hearing",
             type="hearingAid",
-            notes="Your ears you keep and I'll tell you why.",
-            supports_questionnaire=sq,
+            notes=fake.paragraph(),
+            supports_questionnaire_id=sq.id,
         )
         rv = self.client.get(
             "/api/q/supports_questionnaire/%i" % sq_id,

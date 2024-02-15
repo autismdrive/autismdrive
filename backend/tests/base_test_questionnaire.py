@@ -2,7 +2,7 @@ import random
 import string
 
 from dateutil import parser
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
 
 from app.models import Participant
 from tests.base_test import BaseTest
@@ -38,13 +38,13 @@ class BaseTestQuestionnaire(BaseTest):
         type="prosthetic",
         timeframe="current",
         notes="I love my new leg!",
-        supports_questionnaire=None,
+        supports_questionnaire_id=None,
     ):
         from app.models import AssistiveDevice
 
         ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
-        if supports_questionnaire is not None:
-            ad.supports_questionnaire_id = supports_questionnaire.id
+        if supports_questionnaire_id is not None:
+            ad.supports_questionnaire_id = supports_questionnaire_id
 
         self.session.add(ad)
         self.session.commit()
@@ -56,14 +56,14 @@ class BaseTestQuestionnaire(BaseTest):
         return db_ad
 
     def construct_alternative_augmentative(
-        self, type="lowTechAAC", timeframe="current", notes="We use pen and paper", supports_questionnaire=None
+        self, type="lowTechAAC", timeframe="current", notes="We use pen and paper", supports_questionnaire_id=None
     ):
 
         from app.models import AlternativeAugmentative
 
         aac = AlternativeAugmentative(type=type, timeframe=timeframe, notes=notes)
-        if supports_questionnaire is not None:
-            aac.supports_questionnaire_id = supports_questionnaire.id
+        if supports_questionnaire_id is not None:
+            aac.supports_questionnaire_id = supports_questionnaire_id
 
         self.session.add(aac)
         self.session.commit()
@@ -787,31 +787,39 @@ class BaseTestQuestionnaire(BaseTest):
         symptom="symptomInsomnia",
         name="Magic Potion",
         notes="I feel better than ever!",
-        supports_questionnaire=None,
+        supports_questionnaire_id=None,
     ):
 
         from app.models import Medication
 
         m = Medication(symptom=symptom, name=name, notes=notes)
-        if supports_questionnaire is not None:
-            m.supports_questionnaire_id = supports_questionnaire.id
+        if supports_questionnaire_id is not None:
+            m.supports_questionnaire_id = supports_questionnaire_id
 
         self.session.add(m)
         self.session.commit()
+        new_med_id = m.id
+        new_med_name = m.name
+        new_med_symptom = m.symptom
+        new_med_notes = m.notes
+        self.session.close()
 
-        db_m = self.session.query(Medication).filter_by(last_updated=m.last_updated).first()
-        self.assertEqual(db_m.notes, m.notes)
+        db_m = self.session.execute(select(Medication).filter_by(id=new_med_id)).unique().scalar_one()
+        self.assertEqual(db_m.name, new_med_name)
+        self.assertEqual(db_m.symptom, new_med_symptom)
+        self.assertEqual(db_m.notes, new_med_notes)
+        self.session.close()
         return db_m
 
     def construct_therapy(
-        self, type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire=None
+        self, type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire_id=None
     ):
 
         from app.models import Therapy
 
         t = Therapy(type=type, timeframe=timeframe, notes=notes)
-        if supports_questionnaire is not None:
-            t.supports_questionnaire_id = supports_questionnaire.id
+        if supports_questionnaire_id is not None:
+            t.supports_questionnaire_id = supports_questionnaire_id
 
         self.session.add(t)
         self.session.commit()
@@ -851,22 +859,22 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.commit()
 
         if assistive_devices is None:
-            self.construct_assistive_device(supports_questionnaire=sq)
+            self.construct_assistive_device(supports_questionnaire_id=sq.id)
         else:
             sq.assistive_devices = assistive_devices
 
         if alternative_augmentative is None:
-            self.construct_alternative_augmentative(supports_questionnaire=sq)
+            self.construct_alternative_augmentative(supports_questionnaire_id=sq.id)
         else:
             sq.alternative_augmentative = alternative_augmentative
 
         if medications is None:
-            self.construct_medication(supports_questionnaire=sq)
+            self.construct_medication(supports_questionnaire_id=sq.id)
         else:
             sq.medications = medications
 
         if therapies is None:
-            self.construct_therapy(supports_questionnaire=sq)
+            self.construct_therapy(supports_questionnaire_id=sq.id)
         else:
             sq.therapies = therapies
 

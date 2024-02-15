@@ -27,7 +27,8 @@ coverage==7.4.0
 elasticsearch-dsl==8.11.0
 elasticsearch==8.11.0
 et-xmlfile==1.1.0
-faker==20.1.0
+faker==23.1.0
+git+https://github.com/ajlouie/faker-biology.git
 flask-marshmallow==0.15.0
 googlemaps==3.0.2
 httpretty==1.1.1

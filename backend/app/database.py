@@ -5,9 +5,9 @@ from random import randint
 
 import click
 from icecream import ic
-from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table
+from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
 from sqlalchemy_utils import database_exists
 
 from config.load import settings
@@ -173,3 +173,36 @@ def get_class(class_name: str):
     for c in Base.registry._class_registry.values():
         if hasattr(c, "__name__") and c.__name__ == class_name:
             return c
+
+
+def _select_by_id(model, object_id: int, joins: list = None):
+    """Selects a record by its id"""
+    statement = _add_joins(select(model), joins)
+    return statement.filter_by(id=object_id)
+
+
+def _add_joins(statement: Select, joins: list = None):
+    """Adds joins to a select statement"""
+    joins = joins or []
+
+    for join in joins:
+        statement = statement.options(joinedload(join))
+
+    return statement
+
+
+def get_db_object_by_id(model, object_id: int, joins: list = None):
+    """Gets a record from the given model by its id, closes the session, and returns the object."""
+    statement = _select_by_id(model, object_id, joins)
+    result = session.execute(statement).unique().scalar_one_or_none()
+    session.close()
+    return result
+
+
+def get_all_db_objects(model, order_by=None, joins: list = None):
+    """Gets all records from the given model, closes the session, and returns the objects."""
+    statement = select(model).order_by(order_by) if order_by else select(model)
+    statement = _add_joins(statement, joins)
+    result = session.execute(statement).unique().scalars().all()
+    session.close()
+    return result
