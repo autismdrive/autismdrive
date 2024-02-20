@@ -2,8 +2,10 @@ import datetime
 
 import flask_restful
 from flask import request, g
-from sqlalchemy import func, select
+from sqlalchemy import func, select, Select
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.interfaces import LoaderOption
+from sqlalchemy.sql.base import ExecutableOption
 
 from app.auth import auth
 from app.database import session
@@ -14,25 +16,36 @@ from app.schemas import ParticipantSchema
 from app.wrappers import requires_roles, requires_permission
 
 
+def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+    return statement.options(
+        joinedload(Participant.user),
+        joinedload(Participant.identification),
+        joinedload(Participant.contact),
+    )
+
+
+def get_participant_by_id(participant_id: int, with_joins=False) -> Participant | None:
+    """
+    Returns a Participant matching the given ID from the database. Optionally include joins to parent and child Categories.
+
+    CAUTION: Make sure to close the session after calling this function!
+    """
+    statement = select(Participant)
+
+    if with_joins:
+        statement = add_joins_to_statement(statement)
+
+    statement = statement.filter_by(id=participant_id)
+    return session.execute(statement).unique().scalar_one_or_none()
+
+
 class ParticipantEndpoint(flask_restful.Resource):
 
     schema = ParticipantSchema()
 
     @auth.login_required
     def get(self, participant_id: int):
-        db_participant = (
-            session.execute(
-                select(Participant)
-                .options(
-                    joinedload(Participant.user),
-                    joinedload(Participant.identification),
-                    joinedload(Participant.contact),
-                )
-                .filter_by(id=participant_id)
-            )
-            .unique()
-            .scalar_one_or_none()
-        )
+        db_participant = get_participant_by_id(participant_id, with_joins=True)
         session.close()
         if db_participant is None:
             raise RestException(RestException.NOT_FOUND)
@@ -49,7 +62,7 @@ class ParticipantEndpoint(flask_restful.Resource):
     @auth.login_required
     def put(self, participant_id: int):
         request_data = request.get_json()
-        db_participant = session.query(Participant).filter_by(id=participant_id).first()
+        db_participant = get_participant_by_id(participant_id, with_joins=False)
         if db_participant is None:
             raise RestException(RestException.NOT_FOUND)
         if not (g.user.related_to_participant(db_participant.id) or g.user.role == Role.admin):
@@ -65,19 +78,8 @@ class ParticipantEndpoint(flask_restful.Resource):
         session.commit()
         session.close()
 
-        updated_db_participant = (
-            session.execute(
-                select(Participant)
-                .options(
-                    joinedload(Participant.user),
-                    joinedload(Participant.identification),
-                    joinedload(Participant.contact),
-                )
-                .filter(Participant.id == participant_id)
-            )
-            .unique()
-            .scalar_one_or_none()
-        )
+        updated_db_participant = get_participant_by_id(participant_id, with_joins=True)
+
         session.close()
         return self.schema.dump(updated_db_participant) if updated_db_participant else None
 
@@ -89,18 +91,8 @@ class ParticipantListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.participant_admin)
     def get(self):
-        participants = (
-            session.execute(
-                select(Participant).options(
-                    joinedload(Participant.user),
-                    joinedload(Participant.contact),
-                    joinedload(Participant.identification),
-                )
-            )
-            .unique()
-            .scalars()
-            .all()
-        )
+        statement = add_joins_to_statement(select(Participant))
+        participants = session.execute(statement).unique().scalars().all()
         session.close()
         return self.schema.dump(participants)
 
@@ -121,20 +113,8 @@ class ParticipantAdminListEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.participant_admin)
     def get(self):
-        all_participants = (
-            session.execute(
-                select(Participant)
-                .options(
-                    joinedload(Participant.contact),
-                    joinedload(Participant.identification),
-                    joinedload(Participant.user),
-                )
-                .order_by(Participant.relationship)
-            )
-            .unique()
-            .scalars()
-            .all()
-        )
+        statement = add_joins_to_statement(select(Participant))
+        all_participants = session.execute(statement.order_by(Participant.relationship)).unique().scalars().all()
         participant_list = {
             "num_self_participants": self.count_participants("self_participant"),
             "num_self_guardians": self.count_participants("self_guardian"),

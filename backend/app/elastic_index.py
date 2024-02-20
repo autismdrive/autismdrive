@@ -268,6 +268,7 @@ class ElasticIndex(object):
     def search(cls, search):
         from flask import g
         from app.models import User
+        from app.resources.CategoryEndpoint import get_category_by_id
 
         sort = None if search.sort is None else search.sort.translate()
 
@@ -355,7 +356,13 @@ class ElasticIndex(object):
             "size": 25,
         }
         if search.category and search.category.id:
-            elastic_search = elastic_search.filter("terms", category=[str(search.category.search_path())])
+            cat_id = int(search.category.id)
+            cat = get_category_by_id(cat_id, with_joins=True)
+            search_path = str(cat.search_path()) if cat else ""
+            session.close()
+
+            if cat:
+                elastic_search = elastic_search.filter("terms", category=[search_path])
 
             # Include all subcategories of the given root-level category.
             if search.category.calculate_level() == 0:

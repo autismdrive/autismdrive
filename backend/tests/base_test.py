@@ -43,6 +43,8 @@ from app.models import User
 from app.models import UserFavorite
 from app.models import UserMeta
 from app.models import ZipCode
+from app.resources.CategoryEndpoint import get_category_by_id
+from app.resources.ResourceEndpoint import get_resource_by_id
 from fixtures.fixure_utils import fake
 from fixtures.location import MockLocationWithLatLong
 from fixtures.resource import MockResource
@@ -160,7 +162,7 @@ class BaseTest(TestCase):
         self.assertIsNotNone(db_user)
         self.session.close()
 
-        password = password or fake.password(length=32)
+        password = fake.password(length=32) if password is None else password
         token = self.login_user(user_id, password)
 
         self.auths[user_id] = dict(Authorization=f"Bearer {token}")
@@ -168,11 +170,9 @@ class BaseTest(TestCase):
         return self.auths[user_id]
 
     def login_user(self, user_id: int, password: str):
-        user = (
-            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
-            .unique()
-            .scalar_one()
-        )
+        from app.resources.UserEndpoint import get_user_by_id
+
+        user = get_user_by_id(user_id, with_joins=True)
         user_email = user.email
         user.email_verified = True
         user.password = password
@@ -296,11 +296,7 @@ class BaseTest(TestCase):
         category_id = category.id
         self.session.close()
 
-        db_category = (
-            self.session.execute(select(Category).options(joinedload(Category.parent)).filter_by(id=category_id))
-            .unique()
-            .scalar_one()
-        )
+        db_category = get_category_by_id(category_id, with_joins=True)
         self.assertIsNotNone(db_category.id)
         self.assertEqual(db_category.name, name)
         self.session.close()
@@ -331,9 +327,9 @@ class BaseTest(TestCase):
         self.session.commit()
         self.session.close()
 
-        db_resource = self.session.execute(select(Resource).filter(Resource.id == resource_id)).unique().scalar_one()
+        db_resource = get_resource_by_id(resource_id, with_joins=True)
+        self.session.close()
         self.assertEqual(db_resource.website, resource.website)
-
         self.elastic_index.add_document(db_resource)
         return db_resource
 

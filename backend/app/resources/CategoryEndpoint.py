@@ -1,8 +1,10 @@
 import flask_restful
 from flask import request
-from sqlalchemy import update, select
+from sqlalchemy import update, select, Select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.interfaces import LoaderOption
+from sqlalchemy.sql.base import ExecutableOption
 
 from app.auth import auth
 from app.database import session
@@ -13,11 +15,33 @@ from app.schemas import CategorySchema, ParentCategorySchema, CategoryUpdateSche
 from app.wrappers import requires_permission
 
 
+def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+    return statement.options(
+        joinedload(Category.parent),
+        joinedload(Category.children),
+    )
+
+
+def get_category_by_id(category_id: int, with_joins=False) -> Category | None:
+    """
+    Returns a Category matching the given ID from the database. Optionally include joins to parent and child Categories.
+
+    CAUTION: Make sure to close the session after calling this function!
+    """
+    statement = select(Category)
+
+    if with_joins:
+        statement = add_joins_to_statement(statement)
+
+    statement = statement.filter_by(id=category_id)
+    return session.execute(statement).unique().scalar_one_or_none()
+
+
 class CategoryEndpoint(flask_restful.Resource):
     schema = CategorySchema()
 
     def get(self, category_id: int):
-        category = session.query(Category).filter(Category.id == category_id).first()
+        category = get_category_by_id(category_id, with_joins=True)
         if category is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(category)
@@ -39,8 +63,7 @@ class CategoryEndpoint(flask_restful.Resource):
     @requires_permission(Permission.taxonomy_admin)
     def put(self, category_id: int):
         request_data = request.get_json()
-        get_statement = select(Category).where(Category.id == category_id)
-        old_cat = session.execute(get_statement).unique().scalar_one_or_none()
+        old_cat = get_category_by_id(category_id, with_joins=False)
 
         if old_cat is None:
             raise RestException(RestException.NOT_FOUND)
@@ -57,7 +80,7 @@ class CategoryEndpoint(flask_restful.Resource):
         session.commit()
         session.close()
 
-        db_updated = session.execute(get_statement).unique().scalar_one()
+        db_updated = get_category_by_id(category_id, with_joins=True)
         return self.schema.dump(db_updated)
 
 
@@ -66,9 +89,8 @@ class CategoryListEndpoint(flask_restful.Resource):
     categories_schema = ParentCategorySchema(many=True)
 
     def get(self):
-        categories = (
-            session.execute(select(Category).order_by(Category.display_order, Category.name)).unique().scalars().all()
-        )
+        statement = add_joins_to_statement(select(Category))
+        categories = session.execute(statement.order_by(Category.display_order, Category.name)).unique().scalars().all()
         return self.categories_schema.dump(categories)
 
     @auth.login_required
@@ -81,18 +103,21 @@ class CategoryListEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT, details=e)
         session.add(new_cat)
         session.commit()
-        return self.category_schema.dump(new_cat)
+        db_cat = get_category_by_id(new_cat.id, with_joins=True)
+        return self.category_schema.dump(db_cat)
 
 
 class RootCategoryListEndpoint(flask_restful.Resource):
     categories_schema = CategorySchema(many=True)
 
     def get(self):
+        statement = add_joins_to_statement(select(Category))
         categories = (
-            session.query(Category)
-            .filter(Category.parent_id == None)
-            .order_by(Category.display_order)
-            .order_by(Category.name)
+            session.execute(
+                statement.filter_by(parent_id=None).order_by(Category.display_order).order_by(Category.name)
+            )
+            .unique()
+            .scalars()
             .all()
         )
         return self.categories_schema.dump(categories)
@@ -100,12 +125,9 @@ class RootCategoryListEndpoint(flask_restful.Resource):
 
 class CategoryNamesListEndpoint(flask_restful.Resource):
     def get(self):
+        statement = add_joins_to_statement(select(Category))
         categories = (
-            session.query(Category)
-            .options(joinedload(Category.children))
-            .order_by(Category.display_order)
-            .order_by(Category.name)
-            .all()
+            session.execute(statement.order_by(Category.display_order).order_by(Category.name)).unique().scalars().all()
         )
         cat_names_list = []
         for cat in categories:

@@ -3,20 +3,49 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import exists, desc, select
+from sqlalchemy import exists, desc, select, Select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm.interfaces import LoaderOption
+from sqlalchemy.sql.base import ExecutableOption
 
 from app.auth import auth
 from app.database import session
 from app.email_service import EmailService, email_service
 from app.enums import Permission, Role
-from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser, Participant
+from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser
+from app.resources.ParticipantEndpoint import add_joins_to_statement as add_participant_joins
 from app.rest_exception import RestException
 from app.schemas import UserSchema, UserSearchSchema, RegistrationQuestionnaireSchema
 from app.wrappers import requires_permission
 from config.load import settings
+
+
+def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+    return statement.options(
+        add_participant_joins(joinedload(User.participants)),
+        joinedload(User.events),
+        joinedload(User.user_events),
+        joinedload(User.admin_notes),
+        joinedload(User.studies),
+        joinedload(User.user_studies),
+    )
+
+
+def get_user_by_id(user_id: int, with_joins=False) -> User | None:
+    """
+    Returns a User matching the given ID from the database. Optionally include joins to parent and child Categories.
+
+    CAUTION: Make sure to close the session after calling this function!
+    """
+    statement = select(User)
+
+    if with_joins:
+        statement = add_joins_to_statement(statement)
+
+    statement = statement.filter_by(id=user_id)
+    return session.execute(statement).unique().scalar_one_or_none()
 
 
 class UserEndpoint(flask_restful.Resource):
@@ -27,25 +56,7 @@ class UserEndpoint(flask_restful.Resource):
     def get(self, user_id: int):
         if g.user.id != user_id and Permission.user_detail_admin not in g.user.role.permissions():
             raise RestException(RestException.PERMISSION_DENIED)
-        model = (
-            session.execute(
-                select(User)
-                .options(
-                    joinedload(User.participants).options(
-                        joinedload(Participant.identification),
-                        joinedload(Participant.contact),
-                    ),
-                    joinedload(User.events),
-                    joinedload(User.user_events),
-                    joinedload(User.admin_notes),
-                    joinedload(User.studies),
-                    joinedload(User.user_studies),
-                )
-                .filter_by(id=user_id)
-            )
-            .unique()
-            .scalar_one_or_none()
-        )
+        model = get_user_by_id(user_id, with_joins=True)
         session.close()
         if model is None:
             raise RestException(RestException.NOT_FOUND)
@@ -71,7 +82,7 @@ class UserEndpoint(flask_restful.Resource):
                 request_data["role"] = "admin"
             else:
                 request_data["role"] = "user"
-        instance = session.query(User).filter_by(id=user_id).first()
+        instance = get_user_by_id(user_id, with_joins=False)
         try:
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:
@@ -79,7 +90,9 @@ class UserEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.utcnow()
         session.add(updated)
         session.commit()
-        return self.schema.dump(updated)
+
+        db_user = get_user_by_id(user_id, with_joins=True)
+        return self.schema.dump(db_user)
 
 
 class UserListEndpoint(flask_restful.Resource):
@@ -133,7 +146,10 @@ class UserListEndpoint(flask_restful.Resource):
             session.add(new_user)
             session.commit()
             self.send_confirm_email(new_user)
-            return self.userSchema.dump(new_user)
+
+            db_user = get_user_by_id(new_user.id, with_joins=True)
+
+            return self.userSchema.dump(db_user)
         except IntegrityError as ie:
             raise RestException(RestException.INVALID_OBJECT, details=ie)
         except ValidationError as err:

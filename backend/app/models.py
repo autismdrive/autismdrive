@@ -105,11 +105,16 @@ class Category(Base):
 
     def calculate_level(self):
         """Provide the depth of the category"""
+        from app.resources.CategoryEndpoint import get_category_by_id
+
+        db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
         level = 0
-        cat = self
+        cat = db_cat
         while cat.parent and isinstance(cat, Category):
             level = level + 1
             cat = cat.parent
+
+        session.close()
         return level
 
     # Returns an array of paths that should be used to search for
@@ -117,19 +122,30 @@ class Category(Base):
     # an array of three paths: ["animal", "animal,cats" and "animal,cats,smelly-cats"
     # but using the id of the category, not the name.
     def all_search_paths(self):
-        cat = self
+        from app.resources.CategoryEndpoint import get_category_by_id
+
+        db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
+        cat = db_cat
+
         paths = [cat.search_path()]
         while cat.parent:
             cat = cat.parent
             paths.append(cat.search_path())
+
+        session.close()
         return paths
 
     def search_path(self) -> str:
-        cat = self
+        from app.resources.CategoryEndpoint import get_category_by_id
+
+        db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
+        cat = db_cat
         path = str(cat.id)
         while cat.parent and cat.parent.id:
             cat = cat.parent
             path = str(cat.id) + "," + path
+
+        session.close()
         return path
 
 
@@ -1053,7 +1069,9 @@ class Participant(Base):
     has_consented: Mapped[Optional[bool]]
 
     def get_name(self):
-        db_self = session.execute(select(Participant).filter(Participant.id == self.id)).unique().scalar_one()
+        from app.resources.ParticipantEndpoint import get_participant_by_id
+
+        db_self = get_participant_by_id(self.id, with_joins=True)
         name = db_self.identification.get_name() if db_self.identification else ""
         session.close()
         return name
@@ -1355,40 +1373,28 @@ class User(Base):
     user_studies: Mapped[list["StudyUser"]] = relationship(back_populates="user")
 
     def related_to_participant(self, participant_id):
-        db_self = (
-            session.execute(select(User).options(joinedload(User.participants)).filter(User.id == self.id))
-            .unique()
-            .scalar_one()
-        )
-        for p in db_self.participants:
+        from app.resources.UserEndpoint import get_user_by_id
+
+        db_self = get_user_by_id(self.id, with_joins=True)
+        participants = db_self.participants
+        session.close()
+
+        for p in participants:
             if participant_id == p.id:
                 return True
 
     def self_participant(self):
-        db_self = (
-            session.execute(select(User).options(joinedload(User.participants)).filter_by(id=self.id))
-            .unique()
-            .scalar_one()
-        )
+        from app.resources.UserEndpoint import get_user_by_id
+        from app.resources.ParticipantEndpoint import get_participant_by_id
+
+        db_self = get_user_by_id(self.id, with_joins=True)
         participants = db_self.participants
         session.close()
 
         if len(participants) > 0:
             for p in participants:
                 p_id = p.id
-                db_p = (
-                    session.execute(
-                        select(Participant)
-                        .options(
-                            joinedload(Participant.identification),
-                            joinedload(Participant.contact),
-                            joinedload(Participant.user),
-                        )
-                        .filter(Participant.id == p_id)
-                    )
-                    .unique()
-                    .scalar()
-                )
+                db_p = get_participant_by_id(p_id, with_joins=True)
                 session.close()
                 if "self" in db_p.relationship.name:
                     return db_p
@@ -1433,12 +1439,9 @@ class User(Base):
     def is_correct_password(cls, user_id: int, plaintext: str) -> bool:
         from app.rest_exception import RestException
         from app.database import session
+        from app.resources.UserEndpoint import get_user_by_id
 
-        db_user = (
-            session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
-            .unique()
-            .scalar_one()
-        )
+        db_user = get_user_by_id(user_id, with_joins=False)
 
         if not db_user._password:
             raise RestException(RestException.LOGIN_FAILURE)
