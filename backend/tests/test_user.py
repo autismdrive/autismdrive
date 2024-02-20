@@ -27,7 +27,7 @@ class TestUser(BaseTest):
         u = self.session.query(User).first()
         self.assertIsNotNone(u)
         u_id = u.id
-        headers = self.logged_in_headers(u)
+        headers = self.logged_in_headers(u.id)
         rv = self.client.get(
             "/api/user/%i" % u_id, follow_redirects=True, content_type="application/json", headers=headers
         )
@@ -39,11 +39,15 @@ class TestUser(BaseTest):
     def test_modify_user_basics(self):
         old_email = fake.email()
         self.construct_user(email=old_email)
-        u = self.session.execute(select(User).filter(User.email == old_email)).unique().scalar_one_or_none()
+        u = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.email == old_email))
+            .unique()
+            .scalar_one_or_none()
+        )
         self.assertIsNotNone(u)
         u_id = u.id
         admin_headers = self.logged_in_headers()
-        user_headers = self.logged_in_headers(u)
+        user_headers = self.logged_in_headers(u.id)
         self.session.close()
 
         # A user should be able to access and modify their user record, with the exception of making themselves Admin
@@ -196,44 +200,46 @@ class TestUser(BaseTest):
         user_id = user_id or random.randint(10000, 99999)
         email = email or fake.email()
         data = {"id": user_id, "email": email}
+        admin_headers = self.logged_in_headers()
 
         rv = self.client.post(
             "/api/user",
             data=self.jsonify(data),
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=admin_headers,
             content_type="application/json",
         )
         self.assert_success(rv)
-        user = self.session.query(User).filter_by(id=cast(user_id, Integer)).first()
 
-        self.assertIsNotNone(user)
-        self.assertIsNotNone(user.token_url)
+        user_to_update = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
+            .unique()
+            .scalar_one()
+        )
 
-        user.role = role
-        user.password = password
+        self.assertIsNotNone(user_to_update)
+        self.assertIsNotNone(user_to_update.token_url)
 
-        self.session.add(user)
+        user_to_update.role = role
+        user_to_update.password = password
+
+        self.session.add(user_to_update)
         self.session.commit()
         self.session.close()
 
-        rv = self.client.get(
-            "/api/user/%i" % user_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get(f"/api/user/{user_id}", content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
         response = rv.json
 
         db_user = (
-            self.session.execute(
-                select(User).options(joinedload(User.participants)).filter(User.id == cast(user_id, Integer))
-            )
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
             .unique()
             .scalar_one()
         )
 
         self.assertEqual(email, response["email"])
         self.assertEqual(role.name, response["role"])
-        self.assertEqual(True, user.is_correct_password(plaintext=password))
+        self.assertTrue(User.is_correct_password(user_id=user_id, plaintext=password))
         self.session.close()
 
         return db_user
@@ -264,7 +270,9 @@ class TestUser(BaseTest):
         user = self.test_login_user()
 
         # Now get the user back.
-        response = self.client.get("/api/session", headers=dict(Authorization=f"Bearer {user.encode_auth_token()}"))
+        response = self.client.get(
+            "/api/session", headers=dict(Authorization=f"Bearer {User.encode_auth_token(user_id=user.id)}")
+        )
         self.assert_success(response)
         return json.loads(response.data.decode())
 
@@ -638,7 +646,7 @@ class TestUser(BaseTest):
             data=self.jsonify(iq),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u),
+            headers=self.logged_in_headers(u.id),
         )
 
         self.assertGreater(u.percent_self_registration_complete(), 0)

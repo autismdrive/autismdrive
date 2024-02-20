@@ -1,9 +1,13 @@
+import copy
+
 import elasticsearch
 import flask_restful
 from elasticsearch_dsl.response import Response as ElasticsearchResponse, AggResponse
 from elasticsearch_dsl.utils import HitMeta
 from flask import request
 from marshmallow import ValidationError
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from app.database import session
 from app.elastic_index import elastic_index
@@ -58,7 +62,13 @@ class SearchEndpoint(flask_restful.Resource):
         search.hits = []
         for hit in results:
             if hit.longitude and hit.latitude:
-                search_hit = MapHit(hit.id, hit.type, hit.latitude, hit.longitude, hit.no_address)
+                search_hit = MapHit(
+                    id=hit.id,
+                    latitude=hit.latitude,
+                    longitude=hit.longitude,
+                    no_address=hit.no_address,
+                    type=hit.type,
+                )
                 search.hits.append(search_hit)
         return SearchSchema().dump(search)
 
@@ -78,17 +88,41 @@ class SearchEndpoint(flask_restful.Resource):
         if not category:
             category = topic_category
             category.children = (
-                session.query(Category)
-                .filter(Category.parent_id == None)
-                .order_by(Category.display_order)
-                .order_by(Category.name.desc())
+                session.execute(
+                    select(Category)
+                    .options(joinedload(Category.parent))
+                    .options(joinedload(Category.children))
+                    .filter_by(parent_id=None)
+                    .order_by(Category.display_order)
+                    .order_by(Category.name.desc())
+                )
+                .unique()
+                .scalars()
                 .all()
             )
+            session.close()
         else:
-            c = category
+            c_id = category.id
+            db_category = (
+                session.execute(
+                    select(Category)
+                    .options(joinedload(Category.parent))
+                    .options(joinedload(Category.children))
+                    .filter_by(id=c_id)
+                )
+                .unique()
+                .scalar_one()
+            )
+            session.close()
+
+            # Add the Topics bucket to the top of the category tree.
+            c = copy.deepcopy(db_category)
+
             while c.parent:
                 c = c.parent
+
             c.parent = topic_category
+            category = copy.deepcopy(c)
 
         for child in category.children:
             for bucket in results.aggregations.category.buckets:

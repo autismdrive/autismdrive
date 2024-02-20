@@ -11,6 +11,7 @@ from fixtures.fixure_utils import fake
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy
 from tests.base_test import BaseTest
+from utils import ordinal
 
 
 def fake_params(kw):
@@ -21,24 +22,33 @@ def fake_params(kw):
 
 
 class TestSearch(BaseTest):
-    def construct_content(self, keyword, add_past_event=False):
-        self.construct_resource(**fake_params(keyword))
-        self.construct_location(**fake_params(keyword))
-        self.construct_event(**fake_params(keyword))
-        self.construct_study(**fake_params(keyword))
-        if add_past_event:
-            self.construct_event(
-                **fake_params(keyword), post_event_description=fake.sentence(), date=fake.past_datetime()
-            )
+    def construct_content(self, keyword, add_past_event=False, only_study=False, is_draft=False):
+        content = {"study": self.construct_study(**fake_params(keyword))}
+
+        if not only_study:
+            content["resource"] = self.construct_resource(**fake_params(keyword), is_draft=is_draft)
+            content["location"] = self.construct_location(**fake_params(keyword), is_draft=is_draft)
+            content["event"] = self.construct_event(**fake_params(keyword), is_draft=is_draft)
+
+            if add_past_event:
+                content["past_event"] = self.construct_event(
+                    **fake_params(keyword),
+                    post_event_description=fake.sentence(),
+                    date=fake.past_datetime(),
+                    is_draft=is_draft,
+                )
+
+        return content
 
     def search(self, query, user=None, path=""):
         """Executes a query as the given user, returning the resulting search results object."""
+        user_id = user.id if user is not None else None
         rv = self.client.post(
             "/api/search" + path,
             data=self.jsonify(query),
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(user),
+            headers=self.logged_in_headers(user_id),
         )
         self.assert_success(rv)
         return rv.json
@@ -61,38 +71,32 @@ class TestSearch(BaseTest):
         self.assertEqual(
             elastic_index.index_name,
             "stardrive_test_resources",
-            msg="Something is wrong with you configuration or import order.  "
+            msg="Something is wrong with your configuration or import order.  "
             + "You are not working with the test index.  Make sure the "
             + "first thing you import in this file is base_test.",
         )
 
     def test_search_has_counts_by_type(self):
-        kw = "unicorn"
+        kw = fake.word()
         basic_query = {"words": kw}
         search_results = self.search(basic_query)
         self.assertEqual(0, len(search_results["hits"]))
 
-        # test that elastic resource is created with post
-        res = self.construct_resource(
-            title=f"{fake.catch_phrase()} {kw} {fake.catch_phrase()}",
-            description=f"{fake.sentence()} {kw} {fake.sentence()}",
-            is_draft=False,
-        )
-        res2 = self.construct_location(
-            title=f"{fake.catch_phrase()} {kw} {fake.catch_phrase()}",
-            description=f"{fake.sentence()} {kw} {fake.sentence()}",
-            is_draft=False,
-        )
-        rv = self.client.get("api/resource/%i" % res.id, content_type="application/json", follow_redirects=True)
-        self.assert_success(rv)
+        content = self.construct_content(kw)
+        expected_num_hits = len(content.keys())
 
         search_results = self.search(basic_query)
-        self.assertEqual(2, len(search_results["hits"]))
+        self.assertEqual(expected_num_hits, len(search_results["hits"]))
 
         locations = next(x for x in search_results["type_counts"] if x["value"] == "location")
         resources = next(x for x in search_results["type_counts"] if x["value"] == "resource")
+        events = next(x for x in search_results["type_counts"] if x["value"] == "event")
+        studies = next(x for x in search_results["type_counts"] if x["value"] == "study")
+
         self.assertEqual(1, locations["count"])
         self.assertEqual(1, resources["count"])
+        self.assertEqual(1, events["count"])
+        self.assertEqual(1, studies["count"])
 
     def test_search_has_counts_by_age_range(self):
 
@@ -101,33 +105,28 @@ class TestSearch(BaseTest):
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
-        res = self.construct_resource(title="Bart", description="free lovin young fella", ages=["young folks"])
-        res2 = self.construct_resource(title="Abe", description="delightful grandpop.", ages=["old folks"])
+        res = self.construct_resource(ages=["pre-k"], is_draft=False)
+        res2 = self.construct_resource(ages=["aging"], is_draft=False)
         rv = self.client.get("api/resource/%i" % res.id, content_type="application/json", follow_redirects=True)
         self.assert_success(rv)
 
         search_results = self.search(basic_query)
         self.assertEqual(2, len(search_results["hits"]))
 
-        young_folks = next(x for x in search_results["age_counts"] if x["value"] == "young folks")
-        old_folks = next(x for x in search_results["age_counts"] if x["value"] == "old folks")
+        pre_k = next(x for x in search_results["age_counts"] if x["value"] == "pre-k")
+        aging = next(x for x in search_results["age_counts"] if x["value"] == "aging")
 
-        self.assertEqual(1, young_folks["count"])
-        self.assertEqual(1, old_folks["count"])
+        self.assertEqual(1, pre_k["count"])
+        self.assertEqual(1, aging["count"])
 
     def test_search_has_counts_by_languages(self):
-
         basic_query = {"words": ""}
         search_results = self.search(basic_query)
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
-        res = self.construct_resource(
-            title="Bart", description="free lovin young fella", languages=["english", "spanish"]
-        )
-        res2 = self.construct_resource(
-            title="Abe", description="delightful grandpop.", languages=["english", "tagalog"]
-        )
+        res = self.construct_resource(languages=["english", "spanish"], is_draft=False)
+        res2 = self.construct_resource(languages=["english", "tagalog"], is_draft=False)
         rv = self.client.get("api/resource/%i" % res.id, content_type="application/json", follow_redirects=True)
         self.assert_success(rv)
         rv = self.client.get("api/resource/%i" % res2.id, content_type="application/json", follow_redirects=True)
@@ -153,16 +152,12 @@ class TestSearch(BaseTest):
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
-        study = {"title": "space platypus", "description": "delivering umbrellas", "organization_name": "Study Org"}
-        rv = self.client.post(
-            "api/study", data=self.jsonify(study), content_type="application/json", follow_redirects=True
-        )
-        self.assert_success(rv)
-        response = rv.json
+        content = self.construct_content("umbrellas", only_study=True)
+        study = content["study"]
 
         search_results = self.search(umbrella_query)
         self.assertEqual(1, len(search_results["hits"]))
-        self.assertEqual(search_results["hits"][0]["id"], response["id"])
+        self.assertEqual(search_results["hits"][0]["id"], study.id)
         search_results = self.search(universe_query)
         self.assertEqual(0, len(search_results["hits"]))
 
@@ -175,26 +170,15 @@ class TestSearch(BaseTest):
         self.assertEqual(0, len(search_results["hits"]))
 
         # test that elastic resource is created with post
-        resource = MockResource(
-            title="space unicorn", description="delivering rainbows", organization_name="Resource Org", is_draft=False
-        )
-        rv = self.client.post(
-            "api/resource",
-            data=self.jsonify(resource),
-            content_type="application/json",
-            follow_redirects=True,
-            headers=self.logged_in_headers(),
-        )
-        self.assert_success(rv)
-        response = rv.json
+        resource = self.construct_resource(title="space unicorn", description="delivering rainbows", is_draft=False)
 
         search_results = self.search(rainbow_query)
         hits = search_results["hits"]
         self.assertEqual(1, len(hits))
 
         hit = hits[0]
-        self.assertEqual(hit["id"], response["id"])
-        self.assertEqual(hit["title"], response["title"])
+        self.assertEqual(hit["id"], resource.id)
+        self.assertEqual(hit["title"], resource.title)
         self.assertEqual(hit["type"], "resource")
         self.assertEqual(hit["highlights"], "space unicorn delivering <em>rainbows</em>")
         self.assertIsNotNone(hit["last_updated"])
@@ -219,6 +203,7 @@ class TestSearch(BaseTest):
             description="delivering rainbows within the orbit of Uranus",
             latitude=38.149595,
             longitude=-79.072557,
+            is_draft=False,
         )
 
         # Add a location beyond the distance filter
@@ -227,6 +212,7 @@ class TestSearch(BaseTest):
             description="delivering rainbows to the greater Trans-Neptunian Region",
             latitude=-38.149595,
             longitude=100.927443,
+            is_draft=False,
         )
 
         # Add a location somewhere in between
@@ -235,6 +221,7 @@ class TestSearch(BaseTest):
             description="delivering rainbows somewhere in between",
             latitude=37.5246403,
             longitude=-77.5633015,
+            is_draft=False,
         )
 
         search_results = self.search(geo_query)
@@ -273,10 +260,11 @@ class TestSearch(BaseTest):
             description="delivering rainbows within the orbit of Uranus",
             latitude=38.149595,
             longitude=-93,
+            is_draft=False,
         )
 
         location_not_near = self.construct_location(
-            title="local", description="delivering rainbows", latitude=28.149595, longitude=-93
+            title="local", description="delivering rainbows", latitude=28.149595, longitude=-93, is_draft=False
         )
         geo_query = {
             "geo_box": {
@@ -398,7 +386,9 @@ class TestSearch(BaseTest):
         for i, name in enumerate(names):
             _top = i <= 1
             parent_index = None if _top else floor((i - 1) / 2)
-            categories.append(self.construct_category(name=name, parent=None if _top else categories[parent_index]))
+            categories.append(
+                self.construct_category(name=name, parent_id=None if _top else categories[parent_index].id)
+            )
 
         for i in range(num_resources):
             r_cat = categories[len(categories) - 1 - i]
@@ -409,8 +399,14 @@ class TestSearch(BaseTest):
                 )
             )
 
-        db_categories = list(self.session.execute(select(Category).order_by(asc(Category.id))).unique().scalars().all())
+        db_categories = list(
+            self.session.execute(select(Category).order_by(asc(Category.id), asc(Category.display_order)))
+            .unique()
+            .scalars()
+            .all()
+        )
         db_resources = list(self.session.execute(select(Resource).order_by(asc(Resource.id))).unique().scalars().all())
+        self.session.close()
 
         return db_categories, db_resources
 
@@ -432,7 +428,9 @@ class TestSearch(BaseTest):
         )
 
         for i, cat in enumerate(search_results["category"]["children"]):
-            self.assertEqual(categories[i].name, cat["name"], f"The first category should be {categories[i].name}")
+            self.assertEqual(
+                categories[i].name, cat["name"], f"The {ordinal(i)} category should be {categories[i].name}"
+            )
             self.assertEqual(2, cat["hit_count"], f"There should be 2 resources in {categories[i].name}")
 
     def test_top_level_category_repost_does_not_create_error(self):
@@ -588,20 +586,21 @@ class TestSearch(BaseTest):
 
     def test_search_filters_out_past_events(self):
         now = datetime.utcnow()
-        self.construct_resource(title="How to style unicorn hair")
-        self.construct_resource(title="Rainbow-emitting capabilities of unicorn horns")
-        self.construct_resource(title="Tips for time travel with a unicorn")
+        self.construct_resource(title="How to style unicorn hair", is_draft=False)
+        self.construct_resource(title="Rainbow-emitting capabilities of unicorn horns", is_draft=False)
+        self.construct_resource(title="Tips for time travel with a unicorn", is_draft=False)
         self.construct_event(
             title="Unicorn council last year",
             date=now + timedelta(days=-365),
             description="Upcoming unicorn council",
             post_event_description="Previously recorded unicorn council",
+            is_draft=False,
         )
-        self.construct_event(title="Unicorn meetup a week ago", date=now + timedelta(days=-7))
-        self.construct_event(title="Unicorn workshop yesterday", date=now + timedelta(days=-1))
-        self.construct_event(title="Unicorn playdate tomorrow", date=now + timedelta(days=1))
-        self.construct_event(title="Unicorn training next week", date=now + timedelta(days=7))
-        self.construct_event(title="Unicorn conference next year", date=now + timedelta(days=365))
+        self.construct_event(title="Unicorn meetup a week ago", date=now + timedelta(days=-7), is_draft=False)
+        self.construct_event(title="Unicorn workshop yesterday", date=now + timedelta(days=-1), is_draft=False)
+        self.construct_event(title="Unicorn playdate tomorrow", date=now + timedelta(days=1), is_draft=False)
+        self.construct_event(title="Unicorn training next week", date=now + timedelta(days=7), is_draft=False)
+        self.construct_event(title="Unicorn conference next year", date=now + timedelta(days=365), is_draft=False)
 
         # Should return future events, plus past events that have a post_event_description
         query = {"words": "unicorn"}
@@ -635,22 +634,27 @@ class TestSearch(BaseTest):
             description="delivering rainbows within the orbit of Uranus",
             latitude=38.149595,
             longitude=-79.072557,
+            is_draft=False,
         )
         location_far = self.construct_location(
             title="distant unicorn",
             description="delivering rainbows to the greater Trans-Neptunian Region",
             latitude=-38.149595,
             longitude=100.927443,
+            is_draft=False,
         )
         location_mid = self.construct_location(
             title="middle unicorn",
             description="delivering rainbows somewhere in between",
             latitude=37.5246403,
             longitude=-77.5633015,
+            is_draft=False,
         )
-        self.construct_resource(title="Rainbow with a bad hair day and no place to be.")
-        self.construct_resource(title="A non-rainbow blue sky that covers nearly all locations.")
-        self.construct_resource(title="A very very tiny rainbow in a sprinkler, that occurs in various places.")
+        self.construct_resource(title="Rainbow with a bad hair day and no place to be.", is_draft=False)
+        self.construct_resource(title="A non-rainbow blue sky that covers nearly all locations.", is_draft=False)
+        self.construct_resource(
+            title="A very very tiny rainbow in a sprinkler, that occurs in various places.", is_draft=False
+        )
 
         query = {"words": "rainbows"}
         search_results = self.search(query)
@@ -713,27 +717,15 @@ class TestSearch(BaseTest):
         researcher = self.construct_user(email="researcher@sartography.com", role=Role.researcher)
         user = self.construct_user(email="user@sartography.com", role=Role.user)
 
-        self.login_user(admin, password)
+        self.login_user(user_id=admin.id, password=password)
         search_results = self.search(resource_query, user=admin)
         self.assertEqual(4, len(search_results["hits"]))
-        self.login_user(editor, password)
+        self.login_user(user_id=editor.id, password=password)
         search_results = self.search(resource_query, user=editor)
         self.assertEqual(4, len(search_results["hits"]))
-        self.login_user(researcher, password)
+        self.login_user(user_id=researcher.id, password=password)
         search_results = self.search(resource_query, user=researcher)
         self.assertEqual(2, len(search_results["hits"]))
-        self.login_user(user, password)
+        self.login_user(user_id=user.id, password=password)
         search_results = self.search(resource_query, user=user)
         self.assertEqual(2, len(search_results["hits"]))
-
-    def login_user(self, user, password):
-        user.email_verified = True
-        user.password = password
-        self.session.add(user)
-        self.session.commit()
-
-        data = {"email": user.email, "password": password}
-        rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
-        self.assert_success(rv)
-        response = rv.json
-        self.assertIsNotNone(response["token"])

@@ -19,3 +19,11 @@ class MockGoogleMapsClient:
             lat, lng = fake.latlng()
 
         return [{"geometry": {"location": {"lat": lat, "lng": lng}}}]
+
+
+def ordinal(n: int):
+    """
+    Convert an integer into its ordinal representation.
+    """
+    suffix = "th" if (11 <= (n % 100) <= 13) else ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]
+    return str(n) + suffix

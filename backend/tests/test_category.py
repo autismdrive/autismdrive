@@ -7,7 +7,7 @@ from tests.base_test import BaseTest
 class TestCategory(BaseTest):
     def test_category_basics(self):
         parent_cat = self.construct_category(name="Mando")
-        child_cat = self.construct_category(parent=parent_cat, name="Grogu")
+        child_cat = self.construct_category(parent_id=parent_cat.id, name="Grogu")
         db_parent = self.session.query(Category).filter_by(id=parent_cat.id).first()
         db_child = self.session.query(Category).filter_by(id=child_cat.id).first()
         self.assertIsNotNone(db_parent)
@@ -26,12 +26,13 @@ class TestCategory(BaseTest):
         parent_name_before = "Rhaegar Targaryen"
         parent_name_after = "Ned Stark"
         parent_cat_1 = self.construct_category(name=parent_name_before)
+        parent_cat_1_id = parent_cat_1.id
         parent_cat_2 = self.construct_category(name=parent_name_after)
         parent_cat_2_id = parent_cat_2.id
 
         child_name_before = "Aegon Targaryen"
         child_name_after = "Jon Snow"
-        child_cat = self.construct_category(name=child_name_before, parent=parent_cat_1)
+        child_cat = self.construct_category(name=child_name_before, parent_id=parent_cat_1_id)
         child_cat_id = child_cat.id
 
         db_child = self.session.query(Category).filter_by(id=cast(child_cat_id, Integer)).first()
@@ -86,10 +87,12 @@ class TestCategory(BaseTest):
 
     def test_delete_category_will_not_delete_descendants(self):
         wool = self.construct_category(name="wool")
-        yarn = self.construct_category(name="yarn", parent=wool)
-        self.construct_category(name="roving", parent=wool)
-        self.construct_category(name="worsted weight", parent=yarn)
-        self.construct_category(name="sport weight", parent=yarn)
+        wool_id = wool.id
+        yarn = self.construct_category(name="yarn", parent_id=wool_id)
+        yarn_id = yarn.id
+        self.construct_category(name="roving", parent_id=wool_id)
+        self.construct_category(name="worsted weight", parent_id=yarn_id)
+        self.construct_category(name="sport weight", parent_id=yarn_id)
 
         rv = self.client.get("api/category/root", content_type="application/json")
         self.assert_success(rv)
@@ -135,17 +138,19 @@ class TestCategory(BaseTest):
 
     def test_category_has_children(self):
         c1 = self.construct_category()
-        c2 = self.construct_category(name="I'm the kid", parent=c1)
-        rv = self.client.get("/api/category/" + str(c1.id), follow_redirects=True, content_type="application/json")
+        c1_id = c1.id
+        c2 = self.construct_category(name="I'm the kid", parent_id=c1_id)
+        c2_id = c2.id
+        rv = self.client.get("/api/category/" + str(c1_id), follow_redirects=True, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["children"][0]["id"], c2.id)
+        self.assertEqual(response["children"][0]["id"], c2_id)
         self.assertEqual(response["children"][0]["name"], "I'm the kid")
 
     def test_category_has_parents_and_that_parent_has_no_children(self):
         c1 = self.construct_category()
-        c2 = self.construct_category(name="I'm the kid", parent=c1)
-        c3 = self.construct_category(name="I'm the grand kid", parent=c2)
+        c2 = self.construct_category(name="I'm the kid", parent_id=c1.id)
+        c3 = self.construct_category(name="I'm the grand kid", parent_id=c2.id)
         rv = self.client.get("/api/category/" + str(c3.id), follow_redirects=True, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
@@ -154,8 +159,8 @@ class TestCategory(BaseTest):
 
     def test_category_can_create_searchable_path(self):
         c1 = self.construct_category()
-        c2 = self.construct_category(name="I'm the kid", parent=c1)
-        c3 = self.construct_category(name="I'm the grand kid", parent=c2)
+        c2 = self.construct_category(name="I'm the kid", parent_id=c1.id)
+        c3 = self.construct_category(name="I'm the grand kid", parent_id=c2.id)
 
         c1_path = str(c1.id)
         c2_path = str(c1.id) + "," + str(c2.id)
@@ -176,24 +181,18 @@ class TestCategory(BaseTest):
         self.assertIn(c1_path, db_c2.all_search_paths())
         self.assertIn(c1_path, db_c1.all_search_paths())
 
-    # def test_category_depth_is_limited(self):
-    #     c1 = self.construct_category()
-    #     c2 = self.construct_category(
-    #         name="I'm the kid", parent=c1)
-    #     c3 = self.construct_category(
-    #         name="I'm the grand kid",
-    #         parent=c2)
-    #     c4 = self.construct_category(
-    #         name="I'm the great grand kid",
-    #         parent=c3)
-    #
-    #     rv = self.app.get(
-    #         '/api/category',
-    #         follow_redirects=True,
-    #         content_type="application/json")
-    #
-    #     self.assert_success(rv)
-    #     response = rv.json
-    #
-    #     self.assertEqual(1, len(response))
-    #     self.assertEqual(1, len(response[0]["children"]))
+    def test_parent_category_depth(self):
+        c1 = self.construct_category()
+        c2 = self.construct_category(name="I'm the kid", parent_id=c1.id)
+        c3 = self.construct_category(name="I'm the grand kid", parent_id=c2.id)
+        c4 = self.construct_category(name="I'm the great grand kid", parent_id=c3.id)
+
+        rv = self.client.get("/api/category", follow_redirects=True, content_type="application/json")
+
+        self.assert_success(rv)
+        response = rv.json
+
+        self.assertEqual(4, len(response))
+
+        for cat in response:
+            self.assertNotIn("children", cat)

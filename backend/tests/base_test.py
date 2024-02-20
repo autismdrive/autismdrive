@@ -143,23 +143,51 @@ class BaseTest(TestCase):
         # Clear out any tables that may have been created
         clear_db()
 
-    def logged_in_headers(self, user=None) -> dict[str, str]:
+    def logged_in_headers(self, user_id: int = None, password: str = None) -> dict[str, str]:
 
         # If no user is provided, generate a dummy Admin user
-        existing_user: User
-        if not user:
-            existing_user = self.construct_user(email="admin@star.org", role=Role.admin)
-        else:
-            existing_user = self.session.query(User).filter_by(id=user.id).first()
+        if user_id is not None and user_id in self.auths:
+            return self.auths[user_id]
 
-        if existing_user.id in self.auths:
-            return self.auths[existing_user.id]
+        if user_id is None:
+            new_user = self.construct_user(email="admin@star.org", role=Role.admin)
+            user_id = new_user.id
 
-        token = existing_user.encode_auth_token()
-        self.assertIsNotNone(token)
-        self.auths[existing_user.id] = dict(Authorization=f"Bearer {token}")
-        self.assertIn(token, self.auths[existing_user.id]["Authorization"])
-        return self.auths[existing_user.id]
+        db_user = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
+            .unique()
+            .scalar_one()
+        )
+        self.assertIsNotNone(db_user)
+        self.session.close()
+
+        password = password or fake.password(length=32)
+        token = self.login_user(user_id, password)
+
+        self.auths[user_id] = dict(Authorization=f"Bearer {token}")
+        self.assertIn(token, self.auths[user_id]["Authorization"])
+        return self.auths[user_id]
+
+    def login_user(self, user_id: int, password: str):
+        user = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
+            .unique()
+            .scalar_one()
+        )
+        user_email = user.email
+        user.email_verified = True
+        user.password = password
+        self.session.add(user)
+        self.session.commit()
+        self.session.close()
+
+        data = {"email": user_email, "password": password}
+        rv = self.client.post("/api/login_password", data=self.jsonify(data), content_type="application/json")
+        self.assert_success(rv)
+        response = rv.json
+        self.assertIsNotNone(response["token"])
+
+        return response["token"]
 
     def decode(self, encoded_words):
         """
@@ -203,14 +231,24 @@ class BaseTest(TestCase):
         email = email or fake.email()
         if isinstance(last_login, str):
             last_login = datetime.datetime.strptime(last_login, "%m/%d/%y %H:%M")
-        db_user = self.session.execute(select(User).filter(User.email == email)).unique().scalar_one_or_none()
+        db_user = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.email == email))
+            .unique()
+            .scalar_one_or_none()
+        )
         if db_user:
             return db_user
         user = User(email=email, role=role, last_login=last_login)
         self.session.add(user)
         self.session.commit()
-        db_user = self.session.execute(select(User).filter(User.email == email)).unique().scalar_one_or_none()
+        db_user = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.email == email))
+            .unique()
+            .scalar_one_or_none()
+        )
         self.assertEqual(db_user.email, user.email)
+
+        self.session.close()
         return db_user
 
     def construct_participant(self, user_id: int, relationship):
@@ -250,10 +288,10 @@ class BaseTest(TestCase):
         self.assertEqual(db_admin_note.note, admin_note.note)
         return db_admin_note
 
-    def construct_category(self, name="Ultimakers", parent=None) -> Category:
+    def construct_category(self, name="Ultimakers", parent_id: int = None) -> Category:
         category = Category(name=name)
-        if parent is not None:
-            category.parent_id = parent.id
+        if parent_id is not None:
+            category.parent_id = parent_id
         self.session.add(category)
         self.session.commit()
         category_id = category.id
@@ -266,6 +304,7 @@ class BaseTest(TestCase):
         )
         self.assertIsNotNone(db_category.id)
         self.assertEqual(db_category.name, name)
+        self.session.close()
         return db_category
 
     def construct_resource(

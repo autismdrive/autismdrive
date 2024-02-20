@@ -67,11 +67,7 @@ class CategoryListEndpoint(flask_restful.Resource):
 
     def get(self):
         categories = (
-            session.query(Category)
-            .options(joinedload(Category.children))
-            .order_by(Category.display_order)
-            .order_by(Category.name)
-            .all()
+            session.execute(select(Category).order_by(Category.display_order, Category.name)).unique().scalars().all()
         )
         return self.categories_schema.dump(categories)
 

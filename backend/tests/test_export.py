@@ -4,6 +4,7 @@ import time
 
 from flask import json
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from app.email_service import EmailService
 from app.enums import Relationship, Role
@@ -127,7 +128,11 @@ class TestExportService(BaseTestQuestionnaire):
         self.session.commit()
         self.session.close()
 
-        db_user = self.session.execute(select(User).filter(User.id == user_id)).unique().scalar_one_or_none()
+        db_user = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.id == user_id))
+            .unique()
+            .scalar_one_or_none()
+        )
         role = db_user.role
         email_verified = db_user.email_verified
         u_registration_date = db_user.registration_date
@@ -182,7 +187,11 @@ class TestExportService(BaseTestQuestionnaire):
         # Load the exported data into the database
         self.load_database(data)
 
-        db_user_before = self.session.execute(select(User).filter(User.id == user_id)).unique().scalar_one_or_none()
+        db_user_before = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.id == user_id))
+            .unique()
+            .scalar_one_or_none()
+        )
         self.assertFalse(db_user_before.email_verified, msg="Email should start off unverified")
 
         # Modify the exported data slightly, and reload
@@ -190,7 +199,11 @@ class TestExportService(BaseTestQuestionnaire):
             user["email_verified"] = True
         self.load_database(data)
 
-        db_user_after = self.session.execute(select(User).filter(User.id == user_id)).unique().scalar_one_or_none()
+        db_user_after = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.id == user_id))
+            .unique()
+            .scalar_one_or_none()
+        )
         self.assertTrue(db_user_after.email_verified, msg="Email should now be verified.")
 
     def test_identifying_questionnaire_does_not_export(self):

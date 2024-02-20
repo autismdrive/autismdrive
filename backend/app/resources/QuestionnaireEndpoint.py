@@ -1,18 +1,22 @@
+import copy
 import datetime
 
 import flask_restful
 from flask import request
-from sqlalchemy import select
+from marshmallow import EXCLUDE
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session, get_class
 from app.enums import Permission
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
+from app.models import ChainSession, ChainQuestionnaire, ChainSessionStep
 from app.rest_exception import RestException
 from app.schemas import ExportInfoSchema
-from app.utils import pascal_case_it
+from app.utils import pascal_case_it, patch_dict
 from app.wrappers import requires_permission
 
 
@@ -67,7 +71,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         try:
             name = pascal_case_it(name)
             class_ref = get_class(name)
-            instance = session.query(class_ref).filter(class_ref.id == questionnaire_id).first()
+            instance = session.scalars(select(class_ref).filter_by(id=questionnaire_id)).first()
 
             if instance is not None:
                 session.delete(instance)
@@ -96,20 +100,40 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         """
         name = pascal_case_it(name)
         class_ref = get_class(name)
-        instance = session.query(class_ref).filter(class_ref.id == questionnaire_id).first()
-        schema = ExportService.get_schema(name)
-        request_data = request.get_json()
-        if "_links" in request_data:
-            request_data.pop("_links")
+        # statement = select(class_ref)
+        #
+        # if name == "ChainQuestionnaire":
+        #     statement = statement.options(
+        #         joinedload(ChainQuestionnaire.sessions).options(
+        #             joinedload(ChainSession.step_attempts).options(joinedload(ChainSessionStep.challenging_behaviors))
+        #         )
+        #     )
 
         try:
-            updated = schema.load(request_data, instance=instance)
-        except Exception as errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
+            instance = (
+                session.query(class_ref)
+                .populate_existing()
+                .with_for_update(nowait=True, of=class_ref)
+                .filter_by(id=questionnaire_id)
+                .first()
+            )
+        except Exception as error:
+            raise RestException(RestException.NOT_FOUND, details=error)
 
-        updated.last_updated = datetime.datetime.utcnow()
-        session.add(updated)
-        session.commit()
+        schema = ExportService.get_schema(name)
+        request_dict: dict = request.get_json()
+
+        try:
+            updated = schema.load(request_dict, instance=instance, unknown=EXCLUDE)
+        except Exception as error:
+            raise RestException(RestException.INVALID_OBJECT, details=error)
+
+        try:
+            session.add(updated)
+            session.commit()
+        except IntegrityError as error:
+            raise RestException(RestException.INVALID_OBJECT, details=error)
+
         return schema.dump(updated)
 
 

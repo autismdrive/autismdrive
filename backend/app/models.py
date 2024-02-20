@@ -19,6 +19,22 @@ from app.utils import pascal_case_it
 from config.load import settings
 
 
+class QuestionnaireMixin(object):
+    """Basically a hack to quickly get all the questionnaires in the system"""
+
+    pass
+
+
+class GeoPointType(TypedDict):
+    lat: float
+    lon: float
+
+
+class GeoBoxType(TypedDict):
+    top_left: GeoPointType
+    bottom_right: GeoPointType
+
+
 class AdminNote(Base):
     __tablename__ = "admin_note"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -265,7 +281,7 @@ class Location(Resource):
     __tablename__ = "location"
     __label__ = "Local Services"
     id: Mapped[int] = mapped_column(ForeignKey("resource.id"), primary_key=True)
-    type: Mapped[str] = mapped_column(default="location")
+    l_type: Mapped[str] = mapped_column("type", default="location")
     primary_contact: Mapped[Optional[str]]
     street_address1: Mapped[str]
     street_address2: Mapped[Optional[str]]
@@ -285,7 +301,7 @@ class Event(Location):
     __tablename__ = "event"
     __label__ = "Events and Training"
     id: Mapped[int] = mapped_column(ForeignKey("location.id"), primary_key=True)
-    type: Mapped[str] = mapped_column(default="event")
+    e_type: Mapped[str] = mapped_column("type", default="event")
     date: Mapped[datetime] = mapped_column(default=func.now())
     time: Mapped[Optional[str]]
     ticket_cost: Mapped[Optional[str]]
@@ -601,7 +617,7 @@ class Investigator(Base):
     investigator_studies: Mapped[list["StudyInvestigator"]] = relationship(back_populates="investigator")
 
 
-class IdentificationQuestionnaire(Base):
+class IdentificationQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "identification_questionnaire"
     __label__ = "Identification"
     __question_type__ = ExportService.TYPE_IDENTIFYING
@@ -831,7 +847,7 @@ class IdentificationQuestionnaire(Base):
         }
 
 
-class ContactQuestionnaire(Base):
+class ContactQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "contact_questionnaire"
     __label__ = "Contact Information"
     __question_type__ = ExportService.TYPE_IDENTIFYING
@@ -1079,59 +1095,39 @@ class AggCount:
         self.is_selected = is_selected
 
 
-class GeoPointType(TypedDict):
-    lat: float
-    lon: float
-
-
-class GeoBoxType(TypedDict):
-    top_left: GeoPointType
-    bottom_right: GeoPointType
-
-
+@dataclass(kw_only=True)
 class Hit:
-    def __init__(
-        self,
-        result_id,
-        content,
-        description,
-        title,
-        doc_type,
-        label,
-        date,
-        last_updated,
-        highlights,
-        latitude,
-        longitude,
-        status,
-        no_address,
-        is_draft,
-        post_event_description,
-    ):
-        self.id = result_id
-        self.content = content
-        self.description = description
-        self.post_event_description = post_event_description
-        self.title = title
-        self.type = doc_type
-        self.label = label
-        self.date = date
-        self.last_updated = last_updated
-        self.highlights = highlights
-        self.latitude = latitude
-        self.longitude = longitude
-        self.status = status
-        self.no_address = no_address
-        self.is_draft = is_draft
+    ages: Optional[list[str]] = field(default_factory=list)
+    category: Optional[list[str]] = field(default_factory=list)
+    content: Optional[str] = ""
+    date: Optional[str | datetime] = None
+    description: Optional[str] = ""
+    geo_point: Optional[GeoPointType] = None
+    highlights: Optional[str] = ""
+    id: Optional[str] = ""
+    is_draft: Optional[bool] = True
+    label: Optional[str] = ""
+    languages: Optional[list[str]] = field(default_factory=list)
+    last_updated: Optional[str | datetime] = None
+    latitude: Optional[float] = None
+    location: Optional[str] = ""
+    longitude: Optional[float] = None
+    no_address: Optional[bool] = True
+    organization_name: Optional[str] = ""
+    post_event_description: Optional[str] = ""
+    status: Optional[str] = ""
+    title: Optional[str] = ""
+    type: Optional[str] = ""
+    website: Optional[str] = ""
 
 
-@dataclass
+@dataclass(kw_only=True)
 class MapHit:
-    id: int
-    latitude: int
-    longitude: int
-    type: str
-    no_address: bool
+    id: Optional[int] = None
+    latitude: Optional[int] = None
+    longitude: Optional[int] = None
+    no_address: Optional[bool] = True
+    type: Optional[str] = ""
 
 
 @dataclass
@@ -1433,31 +1429,43 @@ class User(Base):
         else:
             return False
 
-    def is_correct_password(self, plaintext):
+    @classmethod
+    def is_correct_password(cls, user_id: int, plaintext: str) -> bool:
         from app.rest_exception import RestException
+        from app.database import session
 
-        if not self._password:
+        db_user = (
+            session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
+            .unique()
+            .scalar_one()
+        )
+
+        if not db_user._password:
             raise RestException(RestException.LOGIN_FAILURE)
-        return bcrypt.check_password_hash(self._password, plaintext)
+        is_correct = bcrypt.check_password_hash(db_user._password, plaintext)
 
-    def encode_auth_token(self):
+        session.close()
+        return is_correct
+
+    @classmethod
+    def encode_auth_token(cls, user_id: int):
         try:
             payload = {
                 "exp": datetime.utcnow() + timedelta(hours=2, minutes=0, seconds=0),
                 "iat": datetime.utcnow(),
-                "sub": self.id,
+                "sub": user_id,
             }
             return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
         except Exception as e:
             return e
 
-    @staticmethod
-    def decode_auth_token(auth_token):
+    @classmethod
+    def decode_auth_token(cls, auth_token: str) -> int:
         from app.rest_exception import RestException
 
         try:
             payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms="HS256")
-            return payload["sub"]
+            return int(payload["sub"])
         except jwt.ExpiredSignatureError:
             raise RestException(RestException.TOKEN_EXPIRED)
         except jwt.InvalidTokenError:
@@ -1531,14 +1539,14 @@ class ZipCode(Base):
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
-class AlternativeAugmentative(Base):
+class AlternativeAugmentative(Base, QuestionnaireMixin):
     __tablename__ = "alternative_augmentative"
     __label__ = "Alternative and Augmentative Communication"
     __no_export__ = True  # This will be transferred as a part of a parent class
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.1,
@@ -1619,7 +1627,7 @@ class AlternativeAugmentative(Base):
         }
 
 
-class AssistiveDevice(Base):
+class AssistiveDevice(Base, QuestionnaireMixin):
     __tablename__ = "assistive_device"
     __label__ = "Assistive Device"
     __no_export__ = True  # This will be transferred as a part of a parent class
@@ -1629,7 +1637,7 @@ class AssistiveDevice(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     type_group: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1.1,
@@ -1824,7 +1832,7 @@ class AssistiveDevice(Base):
         }
 
 
-class ChainQuestionnaire(Base):
+class ChainQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "chain_questionnaire"
     __label__ = "SkillSTAR Chain Questionnaire"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
@@ -1835,10 +1843,12 @@ class ChainQuestionnaire(Base):
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
-    sessions: Mapped[list["ChainSession"]] = relationship(back_populates="chain_questionnaire")
+    sessions: Mapped[list["ChainSession"]] = relationship(
+        back_populates="chain_questionnaire", cascade="all, delete-orphan"
+    )
 
 
-class ChainSession(Base):
+class ChainSession(Base, QuestionnaireMixin):
     """
     SkillStar: Chain Session
     """
@@ -1852,8 +1862,15 @@ class ChainSession(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
-    chain_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("chain_questionnaire.id"))
+    chain_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("chain_questionnaire.id", ondelete="CASCADE"))
     chain_questionnaire: Mapped["ChainQuestionnaire"] = relationship(back_populates="sessions")
+    step_attempts: Mapped[list["ChainSessionStep"]] = relationship(
+        "ChainSessionStep",
+        backref=backref("chain_session", lazy="joined"),
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
     date: Mapped[datetime] = mapped_column(
         default=func.now(),
         info={
@@ -1898,14 +1915,14 @@ class ChainSession(Base):
     )
 
 
-class ChallengingBehavior(Base):
+class ChallengingBehavior(Base, QuestionnaireMixin):
     __tablename__ = "challenging_behavior"
     __label__ = "ChallengingBehavior"
     __no_export__ = True  # This will be transferred as a part of a parent class
 
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    chain_session_step_id: Mapped[int] = mapped_column(ForeignKey("chain_session_step.id"))
+    chain_session_step_id: Mapped[int] = mapped_column(ForeignKey("chain_session_step.id", ondelete="CASCADE"))
     time: Mapped[datetime] = mapped_column(
         default=func.now(),
         info={
@@ -1922,7 +1939,7 @@ class ChallengingBehavior(Base):
         return info
 
 
-class ChainSessionStep(Base):
+class ChainSessionStep(Base, QuestionnaireMixin):
     __tablename__ = "chain_session_step"
     __label__ = "ChainSessionStep"
     __no_export__ = True  # This will be transferred as a part of a parent class
@@ -1933,9 +1950,9 @@ class ChainSessionStep(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    chain_session_id: Mapped[Optional[int]] = mapped_column(ForeignKey("chain_session.id"))
+    chain_session_id: Mapped[Optional[int]] = mapped_column(ForeignKey("chain_session.id", ondelete="CASCADE"))
     chain_step_id: Mapped[int] = mapped_column(
-        ForeignKey("chain_step.id"),
+        ForeignKey("chain_step.id", ondelete="CASCADE"),
         info={
             "display_order": 1,
             "type": "select",
@@ -2131,12 +2148,13 @@ class ChainSessionStep(Base):
     num_stars: Mapped[Optional[int]]
 
 
-ChainSession.step_attempts = relationship(
-    "ChainSessionStep",
-    backref=backref("chain_session", lazy="joined"),
-    cascade="all, delete-orphan",
-    passive_deletes=True,
-)
+#
+# ChainSession.step_attempts = relationship(
+#     "ChainSessionStep",
+#     backref=backref("chain_session", lazy="joined"),
+#     cascade="all, delete-orphan",
+#     passive_deletes=True,
+# )
 
 
 def _get_chain_session_field_groups(_self):
@@ -2195,7 +2213,7 @@ def _get_chain_questionnaire_field_groups(_self):
 ChainQuestionnaire.get_field_groups = _get_chain_questionnaire_field_groups
 
 
-class ClinicalDiagnosesQuestionnaire(Base):
+class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "clinical_diagnoses_questionnaire"
     __label__ = "Clinical Diagnosis"
     __question_type__ = ExportService.TYPE_SENSITIVE
@@ -2487,7 +2505,7 @@ class CurrentBehaviorsMixin(object):
         return {}
 
 
-class CurrentBehaviorsDependentQuestionnaire(Base, CurrentBehaviorsMixin):
+class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_dependent_questionnaire"
 
     has_academic_difficulties_desc = (
@@ -2578,7 +2596,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, CurrentBehaviorsMixin):
         return super().get_field_groups()
 
 
-class CurrentBehaviorsSelfQuestionnaire(Base, CurrentBehaviorsMixin):
+class CurrentBehaviorsSelfQuestionnaire(Base, QuestionnaireMixin, CurrentBehaviorsMixin):
     __tablename__ = "current_behaviors_self_questionnaire"
 
     has_academic_difficulties_desc = '"Do you have any difficulties with academics?"'
@@ -2613,7 +2631,7 @@ class CurrentBehaviorsSelfQuestionnaire(Base, CurrentBehaviorsMixin):
         return super().get_field_groups()
 
 
-class DemographicsQuestionnaire(Base):
+class DemographicsQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "demographics_questionnaire"
     __label__ = "Demographics"
     __question_type__ = ExportService.TYPE_SENSITIVE
@@ -2767,7 +2785,7 @@ class DemographicsQuestionnaire(Base):
         }
 
 
-class DevelopmentalQuestionnaire(Base):
+class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "developmental_questionnaire"
     __label__ = "Birth and Developmental History"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
@@ -3049,7 +3067,7 @@ class EducationMixin(object):
         }
 
 
-class EducationDependentQuestionnaire(Base, EducationMixin):
+class EducationDependentQuestionnaire(Base, QuestionnaireMixin, EducationMixin):
     __tablename__ = "education_dependent_questionnaire"
     __label__ = "Education"
 
@@ -3092,7 +3110,7 @@ class EducationDependentQuestionnaire(Base, EducationMixin):
         return field_groups
 
 
-class EducationSelfQuestionnaire(Base, EducationMixin):
+class EducationSelfQuestionnaire(Base, QuestionnaireMixin, EducationMixin):
     __tablename__ = "education_self_questionnaire"
     __label__ = "Education"
 
@@ -3128,7 +3146,7 @@ class EducationSelfQuestionnaire(Base, EducationMixin):
         return field_groups
 
 
-class EmploymentQuestionnaire(Base):
+class EmploymentQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "employment_questionnaire"
     __label__ = "Employment"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
@@ -3474,7 +3492,7 @@ class EvaluationHistoryMixin(object):
         }
 
 
-class EvaluationHistoryDependentQuestionnaire(Base, EvaluationHistoryMixin):
+class EvaluationHistoryDependentQuestionnaire(Base, QuestionnaireMixin, EvaluationHistoryMixin):
     __tablename__ = "evaluation_history_dependent_questionnaire"
     __label__ = "Evaluation History"
 
@@ -3499,7 +3517,7 @@ class EvaluationHistoryDependentQuestionnaire(Base, EvaluationHistoryMixin):
         return field_groups
 
 
-class EvaluationHistorySelfQuestionnaire(Base, EvaluationHistoryMixin):
+class EvaluationHistorySelfQuestionnaire(Base, QuestionnaireMixin, EvaluationHistoryMixin):
     __tablename__ = "evaluation_history_self_questionnaire"
     __label__ = "Evaluation History"
 
@@ -3576,7 +3594,7 @@ class HomeMixin(object):
         return field_groups
 
 
-class HomeDependentQuestionnaire(Base, HomeMixin):
+class HomeDependentQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
     __tablename__ = "home_dependent_questionnaire"
     __label__ = "Home"
     dependent_living_other_hide_expression = (
@@ -3648,7 +3666,7 @@ class HomeDependentQuestionnaire(Base, HomeMixin):
         return field_groups
 
 
-class Housemate(Base):
+class Housemate(Base, QuestionnaireMixin):
     __tablename__ = "housemate"
     __label__ = "Housemate"
     __no_export__ = True  # This will be transferred as a part of a parent class
@@ -3657,9 +3675,11 @@ class Housemate(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     home_dependent_questionnaire_id: Mapped[int] = mapped_column(
-        ForeignKey("home_dependent_questionnaire.id"), nullable=True
+        ForeignKey("home_dependent_questionnaire.id", ondelete="CASCADE"), nullable=True
     )
-    home_self_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("home_self_questionnaire.id"), nullable=True)
+    home_self_questionnaire_id: Mapped[int] = mapped_column(
+        ForeignKey("home_self_questionnaire.id", ondelete="CASCADE"), nullable=True
+    )
     name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.1,
@@ -3753,7 +3773,7 @@ class Housemate(Base):
         return {}
 
 
-class HomeSelfQuestionnaire(Base, HomeMixin):
+class HomeSelfQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
     __tablename__ = "home_self_questionnaire"
     __label__ = "Home"
     self_living_other_hide_expression = (
@@ -3811,7 +3831,7 @@ class HomeSelfQuestionnaire(Base, HomeMixin):
         return field_groups
 
 
-class Medication(Base):
+class Medication(Base, QuestionnaireMixin):
     __tablename__ = "medication"
     __label__ = "Medication"
     __no_export__ = True  # This will be transferred as a part of a parent class
@@ -3819,7 +3839,7 @@ class Medication(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     symptom: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,
@@ -3892,7 +3912,7 @@ class Medication(Base):
         return info
 
 
-class ProfessionalProfileQuestionnaire(Base):
+class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "professional_profile_questionnaire"
     __label__ = "Professional Profile"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
@@ -4097,7 +4117,7 @@ class ProfessionalProfileQuestionnaire(Base):
         }
 
 
-class RegistrationQuestionnaire(Base):
+class RegistrationQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "registration_questionnaire"
     __label__ = "Registration"
     __question_type__ = ExportService.TYPE_IDENTIFYING
@@ -4124,7 +4144,7 @@ class RegistrationQuestionnaire(Base):
         return {}
 
 
-class SupportsQuestionnaire(Base):
+class SupportsQuestionnaire(Base, QuestionnaireMixin):
     __tablename__ = "supports_questionnaire"
     __label__ = "Supports"
     __question_type__ = ExportService.TYPE_UNRESTRICTED
@@ -4290,7 +4310,7 @@ class SupportsQuestionnaire(Base):
         }
 
 
-class Therapy(Base):
+class Therapy(Base, QuestionnaireMixin):
     __tablename__ = "therapy"
     __label__ = "Therapy or Service"
     __no_export__ = True  # This will be transferred as a part of a parent class
@@ -4298,7 +4318,7 @@ class Therapy(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id"))
+    supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     type: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 1,

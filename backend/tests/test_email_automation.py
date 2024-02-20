@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from app.email_prompt_service import EmailPromptService
 from app.email_service import EmailService
@@ -36,7 +37,7 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=self.logged_in_headers(u1.id),
         )
 
         self.client.post(
@@ -44,7 +45,7 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=self.logged_in_headers(u1.id),
         )
 
         self.client.post(
@@ -52,10 +53,14 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=self.logged_in_headers(u1.id),
         )
 
-        db_user = self.session.execute(select(User).filter_by(id=u1.id)).unique().scalar_one()
+        db_user = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=u1.id))
+            .unique()
+            .scalar_one()
+        )
         self.assertTrue(db_user.self_registration_complete())
         self.session.close()
         return db_user
@@ -187,7 +192,11 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             headers=headers_u1,
         )
 
-        db_u1 = self.session.execute(select(User).filter_by(id=u1_id)).unique().scalar_one()
+        db_u1 = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=u1_id))
+            .unique()
+            .scalar_one()
+        )
         self.assertTrue(db_u1.self_registration_complete())
         self.session.close()
 
@@ -214,7 +223,11 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             headers=headers_u2,
         )
 
-        db_u2 = self.session.execute(select(User).filter_by(id=u2_id)).unique().scalar_one()
+        db_u2 = (
+            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=u2_id))
+            .unique()
+            .scalar_one()
+        )
         self.assertFalse(db_u2.self_registration_complete())
         self.session.close()
 
@@ -270,7 +283,7 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1),
+            headers=self.logged_in_headers(u1.id),
         )
         self.assert_success(rv)
 
@@ -290,7 +303,7 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         d1_id = d1.id
         q1 = {"user_id": u1_id, "participant_id": d1_id}
         q1_json = self.jsonify(q1)
-        headers = self.logged_in_headers(u1)
+        headers = self.logged_in_headers(u1.id)
         rv = self.client.post(
             "api/flow/dependent_intake/identification_questionnaire",
             data=q1_json,

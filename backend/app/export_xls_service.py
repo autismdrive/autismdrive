@@ -16,16 +16,14 @@ from app.database import get_class
 class ExportXlsService:
     @staticmethod
     def get_questionnaire_names(app):
-        all_file_names = os.listdir(os.path.dirname(app.instance_path) + "/app/model/questionnaires")
-        non_questionnaires = ["mixin", "__"]
-        questionnaire_file_names = []
-        for index, file_name in enumerate(all_file_names):
-            if any(string in file_name for string in non_questionnaires):
-                pass
-            else:
-                f = file_name.replace(".py", "")
-                questionnaire_file_names.append(pascal_case_it(f))
-        return sorted(questionnaire_file_names)
+        # Get all subclasses of QuestionnaireMixins in app/models.py
+        from app.models import QuestionnaireMixin
+
+        # Make a list of just the class names
+        subclasses = QuestionnaireMixin.__subclasses__()
+        q_names = [c.__name__ for c in subclasses]
+
+        return sorted(q_names)
 
     @staticmethod
     def pretty_title_from_snakecase(title):

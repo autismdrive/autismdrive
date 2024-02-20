@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -26,7 +25,10 @@ from elasticsearch_dsl import (
 )
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
+from app.database import session
 from config.load import settings
 
 if TYPE_CHECKING:
@@ -35,7 +37,6 @@ if TYPE_CHECKING:
     DatabaseObject = Event | Resource | Location | Study
 
 from app.enums import Permission
-
 
 autocomplete = analyzer(
     "autocomplete",
@@ -245,6 +246,7 @@ class ElasticIndex:
 
     def search(self, search):
         from flask import g
+        from app.models import User
 
         sort = None if search.sort is None else search.sort.translate()
 
@@ -311,8 +313,17 @@ class ElasticIndex:
             elastic_search = elastic_search.sort(sort)
 
         if "user" in g and g.user:
-            if Permission.edit_resource not in g.user.role.permissions():
+            user_id = g.user.id
+            db_user = (
+                session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
+                .unique()
+                .scalar_one_or_none()
+            )
+
+            if db_user and Permission.edit_resource not in db_user.role.permissions():
                 elastic_search = elastic_search.filter(Q("bool", must_not=[Q("match", is_draft=True)]))
+
+            session.close()
         else:
             elastic_search = elastic_search.filter(Q("bool", must_not=[Q("match", is_draft=True)]))
 
@@ -357,11 +368,11 @@ class ElasticIndex:
         # 'Status': elasticsearch_dsl.TermsFacet(field='status'),
         # 'Topic': elasticsearch_dsl.TermsFacet(field='topic'),
 
-        from icecream import ic
-
-        ic.configureOutput(includeContext=True, contextAbsPath=True)
-
-        ic(f"{json.dumps(elastic_search.to_dict())}")
+        # from icecream import ic
+        #
+        # ic.configureOutput(includeContext=True, contextAbsPath=True)
+        #
+        # ic(f"{json.dumps(elastic_search.to_dict())}")
 
         return elastic_search.execute()
 

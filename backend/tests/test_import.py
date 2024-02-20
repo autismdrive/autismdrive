@@ -94,16 +94,17 @@ class TestImportCase(BaseTestQuestionnaire):
     def request_user_setup(self):
         info = [ExportInfo("star_user", "User", size=1, url="/api/export/user")]
         info_json = ExportInfoSchema().dump(info, many=True)
+        user_id = random.randint(10000, 99999)
 
         user = User(
-            id=random.randint(10000, 99999),
+            id=user_id,
             last_updated=datetime.datetime.now(),
             email=fake.email(),
             role=Role.user,
             email_verified=True,
         )
         user.password = fake.password(length=25, special_chars=True, upper_case=True)
-        user.token = user.encode_auth_token()
+        user.token = User.encode_auth_token(user_id=user_id)
         user_json = ExportSchemas.UserExportSchema(many=True).dump([user])
         admin_json = ExportSchemas.AdminExportSchema(many=True).dump([user])
 
@@ -274,7 +275,7 @@ class TestImportCase(BaseTestQuestionnaire):
                 last_updated=datetime.datetime.now(),
             )
             admin_user.password = a["password"]
-            admin_user.token = admin_user.encode_auth_token()
+            admin_user.token = User.encode_auth_token(user_id=admin_user.id)
             admin_users.append(admin_user)
 
         exported_admins = ExportSchemas.AdminExportSchema().dump(admin_users, many=True)

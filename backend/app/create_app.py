@@ -139,6 +139,20 @@ def create_app(settings=None):
         data_loader.load_chain_steps()
 
     @_app.cli.command()
+    def upgrade_db():
+        """Run the database migration scripts."""
+        from app.database import upgrade_db as _upgrade_db
+
+        _upgrade_db()
+
+    @_app.cli.command()
+    def migrate_db():
+        """Create a new database migration script, if any changes have been made to the database model."""
+        from app.database import migrate_db as _migrate_db
+
+        _migrate_db()
+
+    @_app.cli.command()
     def initdb():
         """Initialize the database."""
 

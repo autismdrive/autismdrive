@@ -59,7 +59,7 @@ class TestParticipant(BaseTestQuestionnaire):
     def test_modify_participant_you_do_not_own(self):
         u = self.construct_user()
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-        good_headers = self.logged_in_headers(u)
+        good_headers = self.logged_in_headers(u.id)
 
         p = self.session.query(Participant).first()
         odd_user = self.construct_user(email="frankie@badfella.rf")
@@ -76,7 +76,7 @@ class TestParticipant(BaseTestQuestionnaire):
             data=self.jsonify(participant),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(odd_user),
+            headers=self.logged_in_headers(odd_user.id),
         )
         self.assertEqual(400, rv.status_code, "you have to have a relationship with the user to do stuff.")
         response = rv.json
@@ -94,7 +94,7 @@ class TestParticipant(BaseTestQuestionnaire):
         u = self.construct_user()
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         participant_id = p.id
-        headers = self.logged_in_headers(u)
+        headers = self.logged_in_headers(u.id)
         participant = {"id": participant_id}
         rv = self.client.put(
             "/api/participant/%i" % p.id,
@@ -269,7 +269,7 @@ class TestParticipant(BaseTestQuestionnaire):
             data=self.jsonify(iq),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u),
+            headers=self.logged_in_headers(u.id),
         )
 
         rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
@@ -320,7 +320,7 @@ class TestParticipant(BaseTestQuestionnaire):
             "/api/user/%i/usermeta" % u.id,
             data=self.jsonify(um),
             content_type="application/json",
-            headers=self.logged_in_headers(u),
+            headers=self.logged_in_headers(u.id),
         )
         self.assert_success(rv)
         response = rv.json
