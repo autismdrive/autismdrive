@@ -49,9 +49,11 @@ english_stem_filter = analysis.token_filter("my_english_filter", name="minimal_e
 stem_analyzer = analyzer("stem_analyzer", tokenizer=tokenizer("standard"), filter=["lowercase", english_stem_filter])
 
 
-# Star Documents are ElasticSearch documents and can be used to index an Event,
-# Location, Resource, or Study
 class StarDocument(Document):
+    """
+    Star Documents are ElasticSearch documents and can be used to index an Event, Location, Resource, or Study
+    """
+
     type = Keyword()
     label = Keyword()
     id = Integer()
@@ -75,46 +77,49 @@ class StarDocument(Document):
     is_draft = Boolean()
 
 
-def _start_of_day(date=datetime.utcnow().date()) -> str:
-    return datetime(date.year, date.month, date.day, tzinfo=tz.tzutc()).isoformat()
-
-
-def _refresh_and_flush(es_index: Index, flush=True):
-    es_index.refresh()
-
-    if flush:
-        es_index.flush(force=True, wait_if_ongoing=True)
-
-
-class ElasticIndex:
+class ElasticIndex(object):
+    # Initialize the ElasticIndex as a Singleton
+    _instance = None
 
     logger = logging.getLogger("ElasticIndex")
     connection: Elasticsearch
+    index_prefix: str
+    index_name: str
+    index: Index
 
     def __init__(self):
-        self.logger.debug("Initializing Elastic Index")
-        self.establish_connection(settings.ELASTIC_SEARCH)
-        self.index_prefix = settings.ELASTIC_SEARCH["index_prefix"]
+        ElasticIndex.instance()
 
-        self.index_name = "%s_resources" % self.index_prefix
-        self.index = Index(self.index_name)
-        self.index.document(StarDocument)
+    @classmethod
+    def instance(cls) -> ElasticIndex:
+        if cls._instance is None:
+            cls._instance = cls.__new__(cls)
+            cls.logger.debug("Initializing Elastic Index")
+            cls.establish_connection(settings.ELASTIC_SEARCH)
+            cls.index_prefix = settings.ELASTIC_SEARCH["index_prefix"]
 
-        try:
-            self.index.create()
-        except RequestError as requestError:
-            if requestError.error == "resource_already_exists_exception":
-                self.logger.info("The index already exists.")
-            else:
-                self.logger.fatal("Error Creating Index. ")
-                raise requestError
-        except Exception as e:
-            self.logger.info("Failed to create the index(s).  They may already exist." + str(e))
+            cls.index_name = "%s_resources" % cls.index_prefix
+            cls.index = Index(cls.index_name)
+            cls.index.document(StarDocument)
 
-    def establish_connection(self, es_settings):
+            try:
+                cls.index.create()
+            except RequestError as requestError:
+                if requestError.error == "resource_already_exists_exception":
+                    cls.logger.info("The index already exists.")
+                else:
+                    cls.logger.fatal("Error Creating Index. ")
+                    raise requestError
+            except Exception as e:
+                cls.logger.info("Failed to create the index(s).  They may already exist." + str(e))
+
+        return cls._instance
+
+    @classmethod
+    def establish_connection(cls, es_settings):
         """Establish connection to an ElasticSearch host, and initialize the Submission collection"""
         if es_settings["http_auth_user"] != "":
-            self.connection = connections.create_connection(
+            cls.connection = connections.create_connection(
                 hosts=es_settings["hosts"],
                 port=es_settings["port"],
                 request_timeout=es_settings["timeout"],
@@ -123,43 +128,57 @@ class ElasticIndex:
                 http_auth=(es_settings["http_auth_user"], es_settings["http_auth_pass"]),
             )
         else:
-            # Don't set an http_auth at all for connecting to AWS ElasticSearch or you will
+            # Don't set http_auth at all for connecting to AWS ElasticSearch or you will
             # get a cryptic message that is darn near ungoogleable.
-            self.connection = connections.create_connection(
+            cls.connection = connections.create_connection(
                 hosts=es_settings["hosts"],
                 request_timeout=es_settings["timeout"],
                 verify_certs=es_settings["verify_certs"],
                 ssl_show_warn=es_settings["use_ssl"],
             )
 
-    def clear(self):
-        try:
-            self.logger.info("Clearing the index.")
-            self.index.delete(ignore_unavailable=True)
-            self.index.create()
-        except:
-            self.logger.error("Failed to delete the indices. They might not exist.")
+    @classmethod
+    def clear(cls):
+        _instance = cls._instance
 
-    def remove_document(self, document: DatabaseObject, flush: bool = True):
-        obj = self.get_document(document)
+        try:
+            _instance.logger.info("Clearing the index.")
+            _instance.index.delete(ignore_unavailable=True)
+            _instance.index.create()
+        except:
+            _instance.logger.error("Failed to delete the indices. They might not exist.")
+
+    @classmethod
+    def refresh_and_flush(cls, es_index: Index, flush=True):
+        es_index.refresh()
+
+        if flush:
+            es_index.flush(force=True, wait_if_ongoing=True)
+
+    @classmethod
+    def remove_document(cls, document: DatabaseObject, flush: bool = True):
+        obj = cls._instance.get_document(document)
         obj.delete(version=None)
 
-        _refresh_and_flush(self.index, flush)
+        cls.refresh_and_flush(cls._instance.index, flush)
 
-    @staticmethod
-    def _get_id(document: DatabaseObject):
+    @classmethod
+    def get_id(cls, document: DatabaseObject):
         return document.__tablename__.lower() + "_" + str(document.id)
 
-    def get_document(self, document: DatabaseObject):
-        uid = self._get_id(document)
-        return StarDocument.get(id=uid, index=self.index_name)
+    @classmethod
+    def get_document(cls, document: DatabaseObject):
+        uid = cls._instance.get_id(document)
+        return StarDocument.get(id=uid, index=cls._instance.index_name)
 
-    def update_document(self, document: DatabaseObject, flush=True, latitude=None, longitude=None):
+    @classmethod
+    def update_document(cls, document: DatabaseObject, flush=True, latitude=None, longitude=None):
         # update is the same as add, as it will overwrite.  Better to have code in one place.
-        self.add_document(document, flush, latitude, longitude)
+        cls._instance.add_document(document, flush, latitude, longitude)
 
+    @classmethod
     def add_document(
-        self,
+        cls,
         document: DatabaseObject,
         flush: bool = True,
         latitude: float = None,
@@ -200,7 +219,7 @@ class ElasticIndex:
         if hasattr(document, "city") and document.city is not None:
             doc.content = doc.content + " " + document.city
 
-        doc.meta.id = self._get_id(document)
+        doc.meta.id = cls._instance.get_id(document)
 
         for cat in document.categories:
             doc.category.extend(cat.all_search_paths())
@@ -215,22 +234,23 @@ class ElasticIndex:
             doc.geo_point = dict(lat=latitude, lon=longitude)
             doc.no_address = not document.street_address1
 
-        StarDocument.save(doc, index=self.index_name)
+        StarDocument.save(doc, index=cls._instance.index_name)
 
-        _refresh_and_flush(self.index, flush)
+        cls.refresh_and_flush(cls._instance.index, flush)
 
+    @classmethod
     def load_documents(
-        self, resources: list[Resource], events: list[Event], locations: list[Location], studies: list[Study]
+        cls, resources: list[Resource], events: list[Event], locations: list[Location], studies: list[Study]
     ):
         print(
             "Loading search records of events, locations, resources, and studies into Elasticsearch index: %s"
-            % self.index_prefix
+            % cls._instance.index_prefix
         )
         for r in resources:
-            self.add_document(r, flush=False)
+            cls._instance.add_document(r, flush=False)
         for e in events:
             post_event_description = e.post_event_description if hasattr(e, "post_event_description") else None
-            self.add_document(
+            cls._instance.add_document(
                 e,
                 flush=False,
                 latitude=e.latitude,
@@ -238,13 +258,14 @@ class ElasticIndex:
                 post_event_description=post_event_description,
             )
         for loc in locations:
-            self.add_document(loc, flush=False, latitude=loc.latitude, longitude=loc.longitude)
+            cls._instance.add_document(loc, flush=False, latitude=loc.latitude, longitude=loc.longitude)
         for s in studies:
-            self.add_document(s, flush=False)
+            cls._instance.add_document(s, flush=False)
 
-        _refresh_and_flush(self.index)
+        cls.refresh_and_flush(cls._instance.index)
 
-    def search(self, search):
+    @classmethod
+    def search(cls, search):
         from flask import g
         from app.models import User
 
@@ -256,7 +277,7 @@ class ElasticIndex:
             query = MultiMatch(query=search.words, fields=["content"])
 
         elastic_search = (
-            Search(index=self.index_name)
+            Search(index=cls._instance.index_name)
             .doc_type(StarDocument)
             .query(query)
             .highlight("content", type="unified", fragment_size=150)
@@ -282,18 +303,18 @@ class ElasticIndex:
                 "bool",
                 **{
                     "should": [
-                        self._past_events_filter(),  # Past events OR
-                        self._non_events_filter(),  # Date field is empty
+                        cls._past_events_filter(cls._start_of_day()),  # Past events OR
+                        cls._non_events_filter(),  # Date field is empty
                     ]
                 },
             )
         elif search.date:
             # Filter results by date
-            elastic_search = elastic_search.filter("range", **{"date": {"gte": _start_of_day(search.date)}})
+            elastic_search = elastic_search.filter("range", **{"date": {"gte": cls._start_of_day(search.date)}})
         elif set(search.types) == {"event"}:
-            elastic_search = elastic_search.filter("bool", **{"should": self._future_events_filter()})
+            elastic_search = elastic_search.filter("bool", **{"should": cls._future_events_filter(cls._start_of_day())})
         else:
-            elastic_search = elastic_search.filter("bool", **{"should": self._default_filter()})
+            elastic_search = elastic_search.filter("bool", **{"should": cls._default_filter(cls._start_of_day())})
 
         if search.geo_box:
             elastic_search = elastic_search.filter(
@@ -376,12 +397,13 @@ class ElasticIndex:
 
         return elastic_search.execute()
 
-    # Finds all resources related to the given item.
-    def more_like_this(self, item, max_hits=3):
+    @classmethod
+    def more_like_this(cls, item, max_hits=3):
+        """Finds all resources related to the given item."""
 
         query = MoreLikeThis(
             like=[
-                # {'_id': ElasticIndex._get_id(item), '_index': self.index_name},
+                # {'_id': ElasticIndex._get_id(item), '_index': cls._instance.index_name},
                 item.indexable_content(),
                 item.category_names(),
             ],
@@ -391,49 +413,57 @@ class ElasticIndex:
             fields=["title", "content", "description", "location", "category", "organization_name", "website"],
         )
 
-        elastic_search = Search(index=self.index_name).doc_type(StarDocument).query(query)
+        elastic_search = Search(index=cls._instance.index_name).doc_type(StarDocument).query(query)
 
         elastic_search = elastic_search[0:max_hits]
 
         # Filter out past events
-        elastic_search = elastic_search.filter("bool", **{"should": self._default_filter()})
+        elastic_search = elastic_search.filter("bool", **{"should": cls._default_filter(cls._start_of_day())})
 
         return elastic_search.execute()
 
-    # Past events with a non-empty post-event description
-    def _past_events_filter(self):
+    @staticmethod
+    def _start_of_day(date=datetime.utcnow().date()) -> str:
+        return datetime(date.year, date.month, date.day, tzinfo=tz.tzutc()).isoformat()
+
+    @staticmethod
+    def _past_events_filter(d: str):
+        """Past events with a non-empty post-event description"""
         return {
             "bool": {
                 "filter": [
                     {"terms": {"type": ["event"]}},
                     {"exists": {"field": "post_event_description"}},
-                    {"range": {"date": {"lt": _start_of_day()}}},
+                    {"range": {"date": {"lt": d}}},
                 ]
             }
         }
 
-    # Future events
-    def _future_events_filter(self):
+    @staticmethod
+    def _future_events_filter(d: str):
+        """Future events"""
         return {
             "bool": {
                 "filter": [
                     {"terms": {"type": ["event"]}},
-                    {"range": {"date": {"gte": _start_of_day()}}},
+                    {"range": {"date": {"gte": d}}},
                 ]
             }
         }
 
-    # Non-events (i.e., date field is empty)
-    def _non_events_filter(self):
+    @staticmethod
+    def _non_events_filter():
+        """Non-events (i.e., date field is empty)"""
         return {"bool": {"must_not": {"exists": {"field": "date"}}}}
 
-    # Past events, future events, and non-events
-    def _default_filter(self):
+    @staticmethod
+    def _default_filter(d: str):
+        """Past events, future events, and non-events"""
         return [
-            self._past_events_filter(),
-            self._future_events_filter(),
-            self._non_events_filter(),
+            ElasticIndex._past_events_filter(d),
+            ElasticIndex._future_events_filter(d),
+            ElasticIndex._non_events_filter(),
         ]
 
 
-elastic_index = ElasticIndex()
+elastic_index = ElasticIndex.instance()
