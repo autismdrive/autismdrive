@@ -7,12 +7,12 @@ from marshmallow import ValidationError
 from app.database import session
 from app.models import Investigator, StudyInvestigator
 from app.rest_exception import RestException
-from app.schemas import InvestigatorSchema
+from app.schemas import SchemaRegistry
 
 
 class InvestigatorEndpoint(flask_restful.Resource):
 
-    schema = InvestigatorSchema()
+    schema = SchemaRegistry.InvestigatorSchema()
 
     def get(self, investigator_id: int):
         model = session.query(Investigator).filter_by(id=investigator_id).first()
@@ -43,8 +43,8 @@ class InvestigatorEndpoint(flask_restful.Resource):
 
 class InvestigatorListEndpoint(flask_restful.Resource):
 
-    investigatorsSchema = InvestigatorSchema(many=True)
-    investigatorSchema = InvestigatorSchema()
+    investigatorsSchema = SchemaRegistry.InvestigatorSchema(many=True)
+    investigatorSchema = SchemaRegistry.InvestigatorSchema()
 
     def get(self):
         investigators = session.query(Investigator).order_by(Investigator.name).all()

@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime, timedelta
 
 import dateutil.parser
@@ -7,6 +8,8 @@ from sqlalchemy import asc, select
 from app.elastic_index import elastic_index
 from app.enums import Role, Status
 from app.models import Category, Resource
+from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
+from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
 from fixtures.fixure_utils import fake
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy
@@ -399,13 +402,18 @@ class TestSearch(BaseTest):
                 )
             )
 
+        cat_statement = add_cat_joins(select(Category))
         db_categories = list(
-            self.session.execute(select(Category).order_by(asc(Category.id), asc(Category.display_order)))
+            self.session.execute(cat_statement.order_by(asc(Category.id), asc(Category.display_order)))
             .unique()
             .scalars()
             .all()
         )
-        db_resources = list(self.session.execute(select(Resource).order_by(asc(Resource.id))).unique().scalars().all())
+
+        resource_statement = add_resource_joins(select(Resource))
+        db_resources = list(
+            self.session.execute(resource_statement.order_by(asc(Resource.id))).unique().scalars().all()
+        )
         self.session.close()
 
         return db_categories, db_resources
@@ -433,11 +441,20 @@ class TestSearch(BaseTest):
             )
             self.assertEqual(2, cat["hit_count"], f"There should be 2 resources in {categories[i].name}")
 
-    def test_top_level_category_repost_does_not_create_error(self):
+    def test_top_level_category_repost_creates_error(self):
         self.setup_category_aggregations()
         type_query = {"words": ""}
         search_results = self.search(type_query)
-        self.search(search_results)  # This should not create an error.
+
+        results_with_category = copy.deepcopy(search_results)
+
+        # Remove the category field
+        del search_results["category"]
+        results_without_category = copy.deepcopy(search_results)
+        self.search(results_without_category)  # This should not create an error.
+
+        with self.assertRaises(Exception) as e:
+            self.search(results_with_category)
 
     def test_second_level_filtered_category_counts(self):
         categories, resources = self.setup_category_aggregations()
@@ -469,20 +486,22 @@ class TestSearch(BaseTest):
     def test_third_level_filtered_category_counts(self):
         categories, resources = self.setup_category_aggregations()
         cat = categories[0].children[0]
-        type_query = {"words": "", "category": {"id": cat.id}}
+        cat_id = cat.id
+        cat_name = cat.name
+        type_query = {"words": "", "category": {"id": cat_id}}
         search_results = self.search(type_query)
         self.assertEqual(2, len(search_results["hits"]))
         self.assertIsNotNone(search_results["category"], msg="A category should always exist")
         self.assertEqual(
-            cat.name,
+            cat_name,
             search_results["category"]["name"],
             msg="Selected Category Id should be the category returned",
         )
         self.assertEqual(
-            2, len(search_results["category"]["children"]), msg=f"Category {cat.id} should have 2 child categories"
+            2, len(search_results["category"]["children"]), msg=f"Category {cat_id} should have 2 child categories"
         )
         grandchild = search_results["category"]["children"][0]
-        self.assertEqual(1, grandchild["hit_count"], f"Category {cat.id} search results should have one resource")
+        self.assertEqual(1, grandchild["hit_count"], f"Category {cat_id} search results should have one resource")
 
     def test_that_top_level_category_is_always_present(self):
         categories, resources = self.setup_category_aggregations()

@@ -6,12 +6,12 @@ from app.auth import auth
 from app.database import session
 from app.models import UserFavorite
 from app.rest_exception import RestException
-from app.schemas import UserFavoriteSchema
+from app.schemas import SchemaRegistry
 
 
 class FavoritesByUserEndpoint(flask_restful.Resource):
 
-    schema = UserFavoriteSchema()
+    schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
     def get(self, user_id):
@@ -21,7 +21,7 @@ class FavoritesByUserEndpoint(flask_restful.Resource):
 
 class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
 
-    schema = UserFavoriteSchema()
+    schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
     def get(self, user_id, favorite_type):
@@ -35,7 +35,7 @@ class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
 
 
 class UserFavoriteEndpoint(flask_restful.Resource):
-    schema = UserFavoriteSchema()
+    schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
     def get(self, user_favorite_id: int):
@@ -52,7 +52,7 @@ class UserFavoriteEndpoint(flask_restful.Resource):
 
 
 class UserFavoriteListEndpoint(flask_restful.Resource):
-    schema = UserFavoriteSchema(many=True)
+    schema = SchemaRegistry.UserFavoriteSchema(many=True)
 
     @auth.login_required
     def get(self):

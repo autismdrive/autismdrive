@@ -1,18 +1,20 @@
 import elasticsearch
 import flask_restful
 from flask import request, json, jsonify
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, select
 
 from app.database import session
 from app.elastic_index import elastic_index
 from app.models import Resource, Study
+from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
+from app.resources.StudyEndpoint import add_joins_to_statement as add_study_joins
 from app.rest_exception import RestException
-from app.schemas import ResourceSchema, StudySchema
+from app.schemas import SchemaRegistry
 
 
 class RelatedResultsEndpoint(flask_restful.Resource):
-    resourcesSchema = ResourceSchema(many=True)
-    studiesSchema = StudySchema(many=True)
+    resources_schema = SchemaRegistry.ResourceSchema(many=True)
+    studies_schema = SchemaRegistry.StudySchema(many=True)
 
     def post(self):
         request_data = request.get_json()
@@ -38,12 +40,15 @@ class RelatedResultsEndpoint(flask_restful.Resource):
                 if not same_resource and len(resource_ids) < max_length:
                     resource_ids.append(hit.id)
 
-        related_resources = session.query(Resource).filter(Resource.id.in_(resource_ids))
-        related_studies = session.query(Study).filter(Study.id.in_(study_ids))
+        resource_statement = add_resource_joins(select(Resource)).filter(Resource.id.in_(resource_ids))
+        related_resources = session.execute(resource_statement).unique().scalars().all()
+
+        resource_statement = add_study_joins(select(Study)).filter(Study.id.in_(study_ids))
+        related_studies = session.execute(resource_statement).unique().scalars().all()
 
         return jsonify(
             {
-                "resources": self.resourcesSchema.dump(related_resources),
-                "studies": self.studiesSchema.dump(related_studies),
+                "resources": self.resources_schema.dump(related_resources),
+                "studies": self.studies_schema.dump(related_studies),
             }
         )

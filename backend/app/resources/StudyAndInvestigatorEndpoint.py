@@ -6,12 +6,12 @@ from app.database import session
 from app.models import Investigator, Study, StudyInvestigator
 from app.models import StudyInvestigator
 from app.rest_exception import RestException
-from app.schemas import StudyInvestigatorSchema, InvestigatorStudiesSchema
+from app.schemas import SchemaRegistry
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):
 
-    schema = InvestigatorStudiesSchema()
+    schema = SchemaRegistry.InvestigatorStudiesSchema()
 
     def get(self, investigator_id):
         study_investigators = (
@@ -26,7 +26,7 @@ class StudyByInvestigatorEndpoint(flask_restful.Resource):
 
 class InvestigatorByStudyEndpoint(flask_restful.Resource):
 
-    schema = StudyInvestigatorSchema()
+    schema = SchemaRegistry.StudyInvestigatorSchema()
 
     def get(self, study_id: int):
         study_investigators = (
@@ -53,7 +53,7 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
 
 
 class StudyInvestigatorEndpoint(flask_restful.Resource):
-    schema = StudyInvestigatorSchema()
+    schema = SchemaRegistry.StudyInvestigatorSchema()
 
     def get(self, study_investigator_id: int):
         model = session.query(StudyInvestigator).filter_by(id=study_investigator_id).first()
@@ -68,7 +68,7 @@ class StudyInvestigatorEndpoint(flask_restful.Resource):
 
 
 class StudyInvestigatorListEndpoint(flask_restful.Resource):
-    schema = StudyInvestigatorSchema()
+    schema = SchemaRegistry.StudyInvestigatorSchema()
 
     def post(self):
         request_data = request.get_json()

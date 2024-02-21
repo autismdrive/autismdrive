@@ -1,17 +1,16 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
 
 from app.database import session
 from app.elastic_index import elastic_index
 from app.models import Category, ResourceCategory, Event
 from app.rest_exception import RestException
-from app.schemas import EventCategorySchema, CategoryEventsSchema, EventCategoriesSchema
+from app.schemas import SchemaRegistry
 
 
 class EventByCategoryEndpoint(flask_restful.Resource):
 
-    schema = CategoryEventsSchema()
+    schema = SchemaRegistry.CategoryEventsSchema()
 
     def get(self, category_id: int):
         event_categories = (
@@ -26,7 +25,7 @@ class EventByCategoryEndpoint(flask_restful.Resource):
 
 class CategoryByEventEndpoint(flask_restful.Resource):
 
-    schema = EventCategoriesSchema()
+    schema = SchemaRegistry.EventCategoriesSchema()
 
     def get(self, event_id: int):
         event_categories = (
@@ -55,7 +54,7 @@ class CategoryByEventEndpoint(flask_restful.Resource):
 
 
 class EventCategoryEndpoint(flask_restful.Resource):
-    schema = EventCategorySchema()
+    schema = SchemaRegistry.EventCategorySchema()
 
     def get(self, resource_category_id: int):
         model = session.query(ResourceCategory).filter_by(id=resource_category_id).first()
@@ -70,7 +69,7 @@ class EventCategoryEndpoint(flask_restful.Resource):
 
 
 class EventCategoryListEndpoint(flask_restful.Resource):
-    schema = EventCategorySchema()
+    schema = SchemaRegistry.EventCategorySchema()
 
     def post(self):
         request_data = request.get_json()

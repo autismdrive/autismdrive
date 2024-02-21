@@ -13,8 +13,7 @@ from app.database import session, get_class
 from app.export_service import ExportService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo
 from app.rest_exception import RestException
-from app.schemas import ExportInfoSchema
-from app.schemas import ExportSchemas
+from app.schemas import SchemaRegistry
 from config.load import settings
 
 
@@ -110,7 +109,7 @@ class ImportService:
 
         session.close()
         response = requests.get(url, headers=self.get_headers())
-        return ExportInfoSchema().load(response.json(), many=True)
+        return SchemaRegistry.ExportInfoSchema().load(response.json(), many=True)
 
     def request_data(self, export_list, full_backup=False):
         for export in export_list:
@@ -238,7 +237,7 @@ class ImportService:
     def load_admin(self):
         url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
         response = requests.get(url, headers=self.get_headers())
-        schema = ExportSchemas.AdminExportSchema()
+        schema = SchemaRegistry.AdminExportSchema()
         json_response = response.json()
         for json_admin in json_response:
             try:

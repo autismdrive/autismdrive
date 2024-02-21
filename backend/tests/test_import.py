@@ -9,12 +9,7 @@ from app.enums import Role
 from app.export_service import ExportService
 from app.import_service import ImportService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo, User
-from app.schemas import (
-    ExportInfoSchema,
-    ExportSchemas,
-    ClinicalDiagnosesQuestionnaireSchema,
-    EmploymentQuestionnaireSchema,
-)
+from app.schemas import SchemaRegistry
 from config.load import settings
 from fixtures.fixure_utils import fake
 from mocks.mock_response import MockRequestsResponse
@@ -72,7 +67,7 @@ class TestImportCase(BaseTestQuestionnaire):
     @patch("requests.get")
     def test_get_export_list(self, mock_get):
         info = [ExportInfo("my_table", "my_class", size=0, url=f"{self.api_url}/api/export/my_class")]
-        info_json = ExportInfoSchema().dump(info, many=True)
+        info_json = SchemaRegistry.ExportInfoSchema().dump(info, many=True)
         mock_get.return_value = MockRequestsResponse(info_json, 200)
         data_importer = self.get_data_importer_setup_auth()
         exportables = data_importer.get_export_list()
@@ -81,7 +76,7 @@ class TestImportCase(BaseTestQuestionnaire):
     def test_no_subsequent_requests_when_size_is_0(self):
         data_importer = self.get_data_importer_setup_auth()
         info = [ExportInfo("my_table", "my_class", size=0, url=f"{self.api_url}/api/export/my_class")]
-        info_json = ExportInfoSchema().dump(info, many=True)
+        info_json = SchemaRegistry.ExportInfoSchema().dump(info, many=True)
 
         with patch("requests.get") as mock_get:
             mock_get.return_value = MockRequestsResponse(info_json, 200)
@@ -93,7 +88,7 @@ class TestImportCase(BaseTestQuestionnaire):
 
     def request_user_setup(self):
         info = [ExportInfo("star_user", "User", size=1, url="/api/export/user")]
-        info_json = ExportInfoSchema().dump(info, many=True)
+        info_json = SchemaRegistry.ExportInfoSchema().dump(info, many=True)
         user_id = random.randint(10000, 99999)
 
         user = User(
@@ -105,8 +100,8 @@ class TestImportCase(BaseTestQuestionnaire):
         )
         user.password = fake.password(length=25, special_chars=True, upper_case=True)
         user.token = User.encode_auth_token(user_id=user_id)
-        user_json = ExportSchemas.UserExportSchema(many=True).dump([user])
-        admin_json = ExportSchemas.AdminExportSchema(many=True).dump([user])
+        user_json = SchemaRegistry.UserExportSchema(many=True).dump([user])
+        admin_json = SchemaRegistry.AdminExportSchema(many=True).dump([user])
 
         return info_json, user_json, admin_json
 
@@ -278,7 +273,7 @@ class TestImportCase(BaseTestQuestionnaire):
             admin_user.token = User.encode_auth_token(user_id=admin_user.id)
             admin_users.append(admin_user)
 
-        exported_admins = ExportSchemas.AdminExportSchema().dump(admin_users, many=True)
+        exported_admins = SchemaRegistry.AdminExportSchema().dump(admin_users, many=True)
         mock_get.return_value = MockRequestsResponse(exported_admins, 200)
         data_importer = self.get_data_importer_setup_auth()
         data_importer.load_admin()
@@ -302,7 +297,7 @@ class TestImportCase(BaseTestQuestionnaire):
 
         q = self.construct_clinical_diagnoses_questionnaire()
         id = q.id
-        json_q = ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q])
+        json_q = SchemaRegistry.ClinicalDiagnosesQuestionnaireSchema(many=True).dump([q])
         self.session.delete(q)
 
         settings.DELETE_RECORDS = True
@@ -346,7 +341,7 @@ class TestImportCase(BaseTestQuestionnaire):
 
         q = self.construct_employment_questionnaire()
         id = q.id
-        json_q = EmploymentQuestionnaireSchema(many=True).dump([q])
+        json_q = SchemaRegistry.EmploymentQuestionnaireSchema(many=True).dump([q])
         self.session.delete(q)
 
         mock_get.return_value = MockRequestsResponse(json_q, 200)

@@ -6,12 +6,12 @@ from app.database import session
 from app.elastic_index import elastic_index
 from app.models import Category, ResourceCategory, Location
 from app.rest_exception import RestException
-from app.schemas import LocationCategorySchema, CategoryLocationsSchema, LocationCategoriesSchema
+from app.schemas import SchemaRegistry
 
 
 class LocationByCategoryEndpoint(flask_restful.Resource):
 
-    schema = CategoryLocationsSchema()
+    schema = SchemaRegistry.CategoryLocationsSchema()
 
     def get(self, category_id):
         c_id = cast(category_id, Integer)
@@ -27,7 +27,7 @@ class LocationByCategoryEndpoint(flask_restful.Resource):
 
 class CategoryByLocationEndpoint(flask_restful.Resource):
 
-    schema = LocationCategoriesSchema()
+    schema = SchemaRegistry.LocationCategoriesSchema()
 
     def get(self, location_id):
         location_categories = (
@@ -56,7 +56,7 @@ class CategoryByLocationEndpoint(flask_restful.Resource):
 
 
 class LocationCategoryEndpoint(flask_restful.Resource):
-    schema = LocationCategorySchema()
+    schema = SchemaRegistry.LocationCategorySchema()
 
     def get(self, location_category_id: int):
         model = session.query(ResourceCategory).filter_by(id=location_category_id).first()
@@ -71,7 +71,7 @@ class LocationCategoryEndpoint(flask_restful.Resource):
 
 
 class LocationCategoryListEndpoint(flask_restful.Resource):
-    schema = LocationCategorySchema()
+    schema = SchemaRegistry.LocationCategorySchema()
 
     def post(self):
         request_data = request.get_json()

@@ -8,13 +8,13 @@ from app.database import session
 from app.enums import Role, StudyUserStatus
 from app.models import Study, StudyUser, User
 from app.rest_exception import RestException
-from app.schemas import StudyUserSchema, UserStudiesSchema, StudyUsersSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_roles
 
 
 class StudyInquiryByUserEndpoint(flask_restful.Resource):
 
-    schema = UserStudiesSchema()
+    schema = SchemaRegistry.UserStudiesSchema()
 
     @auth.login_required
     def get(self, user_id):
@@ -31,7 +31,7 @@ class StudyInquiryByUserEndpoint(flask_restful.Resource):
 
 class StudyEnrolledByUserEndpoint(flask_restful.Resource):
 
-    schema = UserStudiesSchema()
+    schema = SchemaRegistry.UserStudiesSchema()
 
     @auth.login_required
     def get(self, user_id):
@@ -48,7 +48,7 @@ class StudyEnrolledByUserEndpoint(flask_restful.Resource):
 
 class UserByStudyEndpoint(flask_restful.Resource):
 
-    schema = StudyUsersSchema()
+    schema = SchemaRegistry.StudyUsersSchema()
 
     @auth.login_required
     @requires_roles(Role.admin)
@@ -89,7 +89,7 @@ class UserByStudyEndpoint(flask_restful.Resource):
 
 
 class StudyUserEndpoint(flask_restful.Resource):
-    schema = StudyUserSchema()
+    schema = SchemaRegistry.StudyUserSchema()
 
     @auth.login_required
     def get(self, study_user_id: int):
@@ -106,7 +106,7 @@ class StudyUserEndpoint(flask_restful.Resource):
 
 
 class StudyUserListEndpoint(flask_restful.Resource):
-    schema = StudyUserSchema()
+    schema = SchemaRegistry.StudyUserSchema()
 
     @auth.login_required
     def post(self):

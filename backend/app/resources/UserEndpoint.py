@@ -17,7 +17,7 @@ from app.enums import Permission, Role
 from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser
 from app.resources.ParticipantEndpoint import add_joins_to_statement as add_participant_joins
 from app.rest_exception import RestException
-from app.schemas import UserSchema, UserSearchSchema, RegistrationQuestionnaireSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 from config.load import settings
 
@@ -50,7 +50,7 @@ def get_user_by_id(user_id: int, with_joins=False) -> User | None:
 
 class UserEndpoint(flask_restful.Resource):
 
-    schema = UserSchema()
+    schema = SchemaRegistry.UserSchema()
 
     @auth.login_required
     def get(self, user_id: int):
@@ -97,9 +97,9 @@ class UserEndpoint(flask_restful.Resource):
 
 class UserListEndpoint(flask_restful.Resource):
 
-    usersSchema = UserSchema(many=True)
-    userSchema = UserSchema()
-    searchSchema = UserSearchSchema()
+    users_schema = SchemaRegistry.UserSchema(many=True)
+    user_schema = SchemaRegistry.UserSchema()
+    search_schema = SchemaRegistry.UserSearchSchema()
 
     @auth.login_required
     @requires_permission(Permission.user_admin)
@@ -126,7 +126,7 @@ class UserListEndpoint(flask_restful.Resource):
                 query = query.order_by(col)
 
         page = query.paginate(page=pageNumber + 1, per_page=per_page, error_out=False)
-        return self.searchSchema.dump(page)
+        return self.search_schema.dump(page)
 
     def post(self):
         """
@@ -137,7 +137,7 @@ class UserListEndpoint(flask_restful.Resource):
         try:
             request_data["role"] = "user"
             try:
-                new_user = self.userSchema.load(request_data)
+                new_user = self.user_schema.load(request_data)
             except Exception as errors:
                 raise RestException(RestException.INVALID_OBJECT, details=errors)
             email_exists = session.query(exists().where(User.email == new_user.email)).scalar()
@@ -149,7 +149,7 @@ class UserListEndpoint(flask_restful.Resource):
 
             db_user = get_user_by_id(new_user.id, with_joins=True)
 
-            return self.userSchema.dump(db_user)
+            return self.user_schema.dump(db_user)
         except IntegrityError as ie:
             raise RestException(RestException.INVALID_OBJECT, details=ie)
         except ValidationError as err:
@@ -176,7 +176,7 @@ class UserRegistrationEndpoint(flask_restful.Resource):
         request_data = request.get_json()
         if "_links" in request_data:
             request_data.pop("_links")
-        schema = RegistrationQuestionnaireSchema()
+        schema = SchemaRegistry.RegistrationQuestionnaireSchema()
         registration_quest, errors = schema.load(request_data, session=session)
 
         if errors:

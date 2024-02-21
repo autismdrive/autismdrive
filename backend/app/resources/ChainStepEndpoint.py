@@ -10,14 +10,14 @@ from app.database import session
 from app.enums import Permission
 from app.models import ChainStep, ChainSessionStep
 from app.rest_exception import RestException
-from app.schemas import ChainStepSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 
 class ChainStepEndpoint(flask_restful.Resource):
     """SkillSTAR Chain Step"""
 
-    schema = ChainStepSchema()
+    schema = SchemaRegistry.ChainStepSchema()
 
     def get(self, chain_step_id):
         chain_step = session.query(ChainStep).filter_by(id=int(chain_step_id)).first()
@@ -72,7 +72,7 @@ class ChainStepEndpoint(flask_restful.Resource):
 class ChainStepListEndpoint(flask_restful.Resource):
     """SkillSTAR Chain Steps"""
 
-    schema = ChainStepSchema(many=True)
+    schema = SchemaRegistry.ChainStepSchema(many=True)
 
     def get(self):
         chain_steps = session.query(ChainStep).all()

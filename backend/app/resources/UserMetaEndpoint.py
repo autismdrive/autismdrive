@@ -3,17 +3,17 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
-from sqlalchemy import exc, cast, Integer
+from sqlalchemy import exc
 
 from app.auth import auth
 from app.database import session
 from app.models import UserMeta
 from app.rest_exception import RestException
-from app.schemas import UserMetaSchema
+from app.schemas import SchemaRegistry
 
 
 class UserMetaEndpoint(flask_restful.Resource):
-    schema = UserMetaSchema()
+    schema = SchemaRegistry.UserMetaSchema()
 
     @auth.login_required
     def get(self, user_meta_id: int):

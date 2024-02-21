@@ -11,7 +11,7 @@ from app.database import session
 from app.models import AdminNote, Resource, User
 from app.enums import Permission
 from app.rest_exception import RestException
-from app.schemas import AdminNoteSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 select_admin_notes_with_joins = select(AdminNote).options(
@@ -22,7 +22,7 @@ select_admin_notes_with_joins = select(AdminNote).options(
 
 class AdminNoteEndpoint(flask_restful.Resource):
 
-    schema = AdminNoteSchema()
+    schema = SchemaRegistry.AdminNoteSchema()
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
@@ -56,8 +56,8 @@ class AdminNoteEndpoint(flask_restful.Resource):
 
 class AdminNoteListEndpoint(flask_restful.Resource):
 
-    adminNotesSchema = AdminNoteSchema(many=True)
-    adminNoteSchema = AdminNoteSchema()
+    adminNotesSchema = SchemaRegistry.AdminNoteSchema(many=True)
+    adminNoteSchema = SchemaRegistry.AdminNoteSchema()
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
@@ -87,7 +87,7 @@ class AdminNoteListByUserEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
-        schema = AdminNoteSchema(many=True)
+        schema = SchemaRegistry.AdminNoteSchema(many=True)
         logs = (
             session.execute(select_admin_notes_with_joins.filter(AdminNote.user_id == cast(user_id, Integer)))
             .unique()
@@ -101,7 +101,7 @@ class AdminNoteListByResourceEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def get(self, resource_id):
-        schema = AdminNoteSchema(many=True)
+        schema = SchemaRegistry.AdminNoteSchema(many=True)
         logs = (
             session.execute(select_admin_notes_with_joins.filter(AdminNote.resource_id == cast(resource_id, Integer)))
             .unique()

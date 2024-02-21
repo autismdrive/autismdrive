@@ -1,17 +1,16 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
 
 from app.database import session
-from app.models import Category, Study, StudyCategory
+from app.models import Category, Study
 from app.models import StudyCategory
 from app.rest_exception import RestException
-from app.schemas import StudyCategorySchema, CategoryStudiesSchema, StudyCategoriesSchema
+from app.schemas import SchemaRegistry
 
 
 class StudyByCategoryEndpoint(flask_restful.Resource):
 
-    schema = CategoryStudiesSchema()
+    schema = SchemaRegistry.CategoryStudiesSchema()
 
     def get(self, category_id: int):
         study_categories = (
@@ -26,7 +25,7 @@ class StudyByCategoryEndpoint(flask_restful.Resource):
 
 class CategoryByStudyEndpoint(flask_restful.Resource):
 
-    schema = StudyCategoriesSchema()
+    schema = SchemaRegistry.StudyCategoriesSchema()
 
     def get(self, study_id: int):
         study_categories = (
@@ -53,7 +52,7 @@ class CategoryByStudyEndpoint(flask_restful.Resource):
 
 
 class StudyCategoryEndpoint(flask_restful.Resource):
-    schema = StudyCategorySchema()
+    schema = SchemaRegistry.StudyCategorySchema()
 
     def get(self, study_category_id: int):
         model = session.query(StudyCategory).filter_by(id=study_category_id).first()
@@ -68,7 +67,7 @@ class StudyCategoryEndpoint(flask_restful.Resource):
 
 
 class StudyCategoryListEndpoint(flask_restful.Resource):
-    schema = StudyCategorySchema()
+    schema = SchemaRegistry.StudyCategorySchema()
 
     def post(self):
         request_data = request.get_json()

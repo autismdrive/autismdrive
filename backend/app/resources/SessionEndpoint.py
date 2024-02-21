@@ -2,13 +2,13 @@ import flask_restful
 from flask import g, jsonify
 
 from app.auth import auth
-from app.schemas import UserSchema
+from app.schemas import SchemaRegistry
 
 
 class SessionEndpoint(flask_restful.Resource):
     """Provides a way to get the current user, and to delete the user."""
 
-    schema = UserSchema()
+    schema = SchemaRegistry.UserSchema()
 
     @auth.login_required
     def get(self):

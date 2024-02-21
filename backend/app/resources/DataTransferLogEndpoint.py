@@ -7,7 +7,7 @@ from app.auth import auth
 from app.database import session
 from app.enums import Role
 from app.models import DataTransferLog
-from app.schemas import DataTransferLogPageSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_roles
 
 
@@ -16,7 +16,7 @@ class DataTransferLogEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def get(self):
 
-        logs_schema = DataTransferLogPageSchema()
+        logs_schema = SchemaRegistry.DataTransferLogPageSchema()
 
         args = request.args
         page_number = int(args["pageNumber"]) if ("pageNumber" in args) else 0

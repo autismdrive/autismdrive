@@ -12,7 +12,7 @@ from app.auth import auth
 from app.database import session
 from app.email_service import email_service
 from app.rest_exception import RestException
-from app.schemas import UserSchema
+from app.schemas import SchemaRegistry
 from config.load import settings
 
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
@@ -80,7 +80,7 @@ def login_password():
         .unique()
         .scalar_one_or_none()
     )
-    schema = UserSchema(many=False)
+    schema = SchemaRegistry.UserSchema(many=False)
 
     if db_user is None:
         raise RestException(RestException.LOGIN_FAILURE)
@@ -180,7 +180,7 @@ def reset_password():
     db_user = (
         session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id)).unique().scalar_one()
     )
-    return jsonify(UserSchema().dump(user))
+    return jsonify(SchemaRegistry.UserSchema().dump(user))
 
 
 @auth.verify_token

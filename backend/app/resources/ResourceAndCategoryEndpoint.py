@@ -7,12 +7,12 @@ from app.elastic_index import elastic_index
 from app.models import Category, Resource
 from app.models import ResourceCategory
 from app.rest_exception import RestException
-from app.schemas import ResourceCategorySchema, CategoryResourcesSchema, ResourceCategoriesSchema
+from app.schemas import SchemaRegistry
 
 
 class ResourceByCategoryEndpoint(flask_restful.Resource):
 
-    schema = CategoryResourcesSchema()
+    schema = SchemaRegistry.CategoryResourcesSchema()
 
     def get(self, category_id):
         resource_categories = (
@@ -27,7 +27,7 @@ class ResourceByCategoryEndpoint(flask_restful.Resource):
 
 class CategoryByResourceEndpoint(flask_restful.Resource):
 
-    schema = ResourceCategoriesSchema()
+    schema = SchemaRegistry.ResourceCategoriesSchema()
 
     def get(self, resource_id):
         resource_categories = (
@@ -56,7 +56,7 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
 
 
 class ResourceCategoryEndpoint(flask_restful.Resource):
-    schema = ResourceCategorySchema()
+    schema = SchemaRegistry.ResourceCategorySchema()
 
     def get(self, resource_category_id: int):
         model = session.query(ResourceCategory).filter_by(id=resource_category_id).first()
@@ -71,7 +71,7 @@ class ResourceCategoryEndpoint(flask_restful.Resource):
 
 
 class ResourceCategoryListEndpoint(flask_restful.Resource):
-    schema = ResourceCategorySchema()
+    schema = SchemaRegistry.ResourceCategorySchema()
 
     def post(self):
         request_data = request.get_json()

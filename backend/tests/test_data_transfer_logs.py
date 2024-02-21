@@ -1,5 +1,5 @@
 from app.models import DataTransferLog, DataTransferLogDetail
-from app.schemas import DataTransferLogSchema, DataTransferLogDetailSchema
+from app.schemas import SchemaRegistry
 from tests.base_test import BaseTest
 
 
@@ -28,7 +28,7 @@ class TestDataTransferLogs(BaseTest):
         self.assertEqual(20, response["total"])
         self.assertEqual(2, response["pages"])
         self.assertEqual(10, len(response["items"]))
-        results = DataTransferLogSchema(many=True, session=self.session).load(response["items"])
+        results = SchemaRegistry.DataTransferLogSchema(many=True, session=self.session).load(response["items"])
         self.assertEqual(10, len(results))
 
         # Each log should have 2 details

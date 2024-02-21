@@ -1,5 +1,3 @@
-import copy
-
 import elasticsearch
 import flask_restful
 from elasticsearch_dsl.response import Response as ElasticsearchResponse, AggResponse
@@ -7,13 +5,11 @@ from elasticsearch_dsl.utils import HitMeta
 from flask import request
 from marshmallow import ValidationError
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
-from app.database import session
 from app.elastic_index import elastic_index
 from app.models import Category, Hit, MapHit, Search
 from app.rest_exception import RestException
-from app.schemas import SearchSchema
+from app.schemas import SchemaRegistry
 
 
 class SearchEndpoint(flask_restful.Resource):
@@ -25,7 +21,7 @@ class SearchEndpoint(flask_restful.Resource):
             del request_data["category"]
 
         try:
-            search: Search = SearchSchema().load(request_data)
+            search: Search = SchemaRegistry.SearchSchema().load(request_data)
         except ValidationError as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.messages)
 
@@ -56,7 +52,7 @@ class SearchEndpoint(flask_restful.Resource):
         search.category = self.update_category_counts(search.category, results)
         self.update_aggregations(search, results.aggregations)
         search.hits = [Hit(highlights=self.highlights_str(h.meta), **h.to_dict()) for h in results.hits]
-        return SearchSchema().dump(search)
+        return SchemaRegistry.SearchSchema().dump(search)
 
     def map_data_only_search_results(self, search: Search, results: list[Hit]) -> Search:
         search.hits = []
@@ -70,10 +66,10 @@ class SearchEndpoint(flask_restful.Resource):
                     type=hit.type,
                 )
                 search.hits.append(search_hit)
-        return SearchSchema().dump(search)
+        return SchemaRegistry.SearchSchema().dump(search)
 
     def update_aggregations(self, search: Search, aggregations: AggResponse):
-        """Mutates given SearchSchema object with counts for the given aggregations."""
+        """Mutates given SchemaRegistry.SearchSchema object with counts for the given aggregations."""
         for bucket in aggregations.ages.buckets:
             search.add_aggregation("ages", bucket.key, bucket.doc_count, bucket.key in search.ages)
         for bucket in aggregations.languages.buckets:
@@ -84,14 +80,16 @@ class SearchEndpoint(flask_restful.Resource):
     # given a results of a search, creates the appropriate category.
     # Also assures that there is a category at the top called "TOP".
     def update_category_counts(self, category: Category, results: ElasticsearchResponse):
-        topic_category = Category(name="Topics")
+        from app.resources.CategoryEndpoint import add_joins_to_statement, get_category_by_id
+        from app.database import session
+
+        "Make a fake category to hold all the other categories."
+        topic_category = Category(id=99999, name="Topics", children=[], parent=None)
         if not category:
             category = topic_category
             category.children = (
                 session.execute(
-                    select(Category)
-                    .options(joinedload(Category.parent))
-                    .options(joinedload(Category.children))
+                    add_joins_to_statement(select(Category))
                     .filter_by(parent_id=None)
                     .order_by(Category.display_order)
                     .order_by(Category.name.desc())
@@ -100,29 +98,17 @@ class SearchEndpoint(flask_restful.Resource):
                 .scalars()
                 .all()
             )
-            session.close()
         else:
             c_id = category.id
-            db_category = (
-                session.execute(
-                    select(Category)
-                    .options(joinedload(Category.parent))
-                    .options(joinedload(Category.children))
-                    .filter_by(id=c_id)
-                )
-                .unique()
-                .scalar_one()
-            )
-            session.close()
+            category = topic_category if c_id == topic_category.id else get_category_by_id(c_id, with_joins=True)
 
             # Add the Topics bucket to the top of the category tree.
-            c = copy.deepcopy(db_category)
+            c = category
 
-            while c.parent:
+            while c and c.parent:
                 c = c.parent
 
             c.parent = topic_category
-            category = copy.deepcopy(c)
 
         for child in category.children:
             for bucket in results.aggregations.category.buckets:
@@ -131,6 +117,7 @@ class SearchEndpoint(flask_restful.Resource):
 
                 if bucket.key == child_key:
                     child.hit_count = bucket.doc_count
+
         return category
 
     def post(self):

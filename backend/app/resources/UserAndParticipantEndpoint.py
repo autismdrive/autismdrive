@@ -9,12 +9,12 @@ from app.database import session
 from app.models import Participant, User
 from app.enums import Relationship
 from app.rest_exception import RestException
-from app.schemas import ParticipantSchema
+from app.schemas import SchemaRegistry
 
 
 class ParticipantBySessionEndpoint(flask_restful.Resource):
 
-    schema = ParticipantSchema()
+    schema = SchemaRegistry.ParticipantSchema()
 
     @auth.login_required
     def get(self):

@@ -10,13 +10,13 @@ from app.elastic_index import elastic_index
 from app.enums import Permission
 from app.models import Location, Event, Geocode, ResourceChangeLog
 from app.rest_exception import RestException
-from app.schemas import LocationSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 
 class LocationEndpoint(flask_restful.Resource):
 
-    schema = LocationSchema()
+    schema = SchemaRegistry.LocationSchema()
 
     def get(self, location_id: int):
         model = session.query(Location).filter_by(id=location_id).first()
@@ -88,8 +88,8 @@ class LocationEndpoint(flask_restful.Resource):
 
 class LocationListEndpoint(flask_restful.Resource):
 
-    locationsSchema = LocationSchema(many=True)
-    locationSchema = LocationSchema()
+    locationsSchema = SchemaRegistry.LocationSchema(many=True)
+    locationSchema = SchemaRegistry.LocationSchema()
 
     def get(self):
         locations = session.query(Location).all()

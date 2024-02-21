@@ -9,7 +9,7 @@ from app.database import session
 from app.enums import Role
 from app.export_service import ExportService
 from app.models import DataTransferLog, DataTransferLogDetail, User
-from app.schemas import ExportSchemas, ExportInfoSchema
+from app.schemas import SchemaRegistry
 from app.utils import pascal_case_it
 from app.wrappers import requires_roles
 
@@ -40,13 +40,13 @@ class ExportEndpoint(flask_restful.Resource):
 
     def get_admin(self):
         query = session.query(User).filter(User.role == Role.admin)
-        schema = ExportSchemas.AdminExportSchema(many=True)
+        schema = SchemaRegistry.AdminExportSchema(many=True)
         return schema.dump(query.all())
 
 
 class ExportListEndpoint(flask_restful.Resource):
 
-    schema = ExportInfoSchema(many=True)
+    schema = SchemaRegistry.ExportInfoSchema(many=True)
 
     @auth.login_required
     @requires_roles(Role.admin)

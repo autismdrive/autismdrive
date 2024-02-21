@@ -15,12 +15,15 @@ from app.enums import Permission
 from app.models import AdminNote, Resource, Location, Event, UserFavorite, ResourceChangeLog, ResourceCategory
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
-from app.schemas import ResourceSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 
 def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
-    return statement.options(joinedload(Resource.resource_categories), add_cat_joins(joinedload(Resource.categories)))
+    return statement.options(
+        add_cat_joins(joinedload(Resource.resource_categories).joinedload(ResourceCategory.category)),
+        add_cat_joins(joinedload(Resource.categories)),
+    )
 
 
 def get_resource_by_id(resource_id: int, with_joins=False) -> Resource:
@@ -40,7 +43,7 @@ def get_resource_by_id(resource_id: int, with_joins=False) -> Resource:
 
 class ResourceEndpoint(flask_restful.Resource):
 
-    schema = ResourceSchema()
+    schema = SchemaRegistry.ResourceSchema()
 
     def get(self, resource_id: int):
         model = get_resource_by_id(resource_id, with_joins=True)
@@ -99,8 +102,8 @@ class ResourceEndpoint(flask_restful.Resource):
 
 class ResourceListEndpoint(flask_restful.Resource):
 
-    resourcesSchema = ResourceSchema(many=True)
-    resourceSchema = ResourceSchema()
+    resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
+    resourceSchema = SchemaRegistry.ResourceSchema()
 
     def get(self):
         statement = add_joins_to_statement(select(Resource))
@@ -137,7 +140,7 @@ class ResourceListEndpoint(flask_restful.Resource):
 
 class EducationResourceListEndpoint(flask_restful.Resource):
 
-    resourcesSchema = ResourceSchema(many=True)
+    resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
 
     def get(self):
         statement = add_joins_to_statement(select(Resource))
@@ -157,7 +160,7 @@ class EducationResourceListEndpoint(flask_restful.Resource):
 
 class Covid19ResourceListEndpoint(flask_restful.Resource):
 
-    resourcesSchema = ResourceSchema(many=True)
+    resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
 
     def get(self, category):
         statement = add_joins_to_statement(select(Resource))

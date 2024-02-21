@@ -4,7 +4,7 @@ import datetime
 import flask_restful
 from flask import request, g
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer, select
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
@@ -12,12 +12,12 @@ from app.database import session, get_class
 from app.export_service import ExportService
 from app.models import Flows, Participant, StepLog
 from app.rest_exception import RestException
-from app.schemas import FlowSchema
+from app.schemas import SchemaRegistry
 from app.utils import pascal_case_it
 
 
 class FlowEndpoint(flask_restful.Resource):
-    schema = FlowSchema()
+    schema = SchemaRegistry.FlowSchema()
 
     @auth.login_required
     def get(self, name, participant_id: int):
@@ -39,7 +39,7 @@ class FlowEndpoint(flask_restful.Resource):
 
 
 class FlowListEndpoint(flask_restful.Resource):
-    flows_schema = FlowSchema(many=True)
+    flows_schema = SchemaRegistry.FlowSchema(many=True)
 
     def get(self):
         return self.flows_schema.dump(Flows.get_all_flows())

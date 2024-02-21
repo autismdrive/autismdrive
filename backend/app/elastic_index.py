@@ -267,7 +267,7 @@ class ElasticIndex(object):
     @classmethod
     def search(cls, search):
         from flask import g
-        from app.models import User
+        from app.resources.UserEndpoint import get_user_by_id
         from app.resources.CategoryEndpoint import get_category_by_id
 
         sort = None if search.sort is None else search.sort.translate()
@@ -336,11 +336,7 @@ class ElasticIndex(object):
 
         if "user" in g and g.user:
             user_id = g.user.id
-            db_user = (
-                session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
-                .unique()
-                .scalar_one_or_none()
-            )
+            db_user = get_user_by_id(user_id, with_joins=True)
 
             if db_user and Permission.edit_resource not in db_user.role.permissions():
                 elastic_search = elastic_search.filter(Q("bool", must_not=[Q("match", is_draft=True)]))
@@ -359,7 +355,6 @@ class ElasticIndex(object):
             cat_id = int(search.category.id)
             cat = get_category_by_id(cat_id, with_joins=True)
             search_path = str(cat.search_path()) if cat else ""
-            session.close()
 
             if cat:
                 elastic_search = elastic_search.filter("terms", category=[search_path])
@@ -380,6 +375,8 @@ class ElasticIndex(object):
                 # Include only children of the given 2nd-level category.
                 if search.category.calculate_level() == 1:
                     category_agg_args.update({"include": ".*\\,.*\\,.*"})
+
+            session.close()
 
         elastic_search.aggs.bucket("category", A(**category_agg_args))
         elastic_search.aggs.bucket("type", A("terms", field="type"))

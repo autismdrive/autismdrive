@@ -11,7 +11,7 @@ from app.enums import Relationship, Role
 from app.export_service import ExportService
 from app.import_service import ImportService
 from app.models import DataTransferLog, Participant, User, IdentificationQuestionnaire
-from app.schemas import ExportInfoSchema, UserSchema, ParticipantSchema
+from app.schemas import SchemaRegistry
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 os.environ["ENV_NAME"] = "testing"
@@ -97,7 +97,7 @@ class TestExportService(BaseTestQuestionnaire):
 
         rv = self.client.get("/api/export", headers=self.logged_in_headers())
         response = rv.json
-        exports = ExportInfoSchema(many=True).load(response)
+        exports = SchemaRegistry.ExportInfoSchema(many=True).load(response)
         for export in exports:
             rv = self.client.get(
                 export.url, follow_redirects=True, content_type="application/json", headers=self.logged_in_headers()
@@ -108,7 +108,7 @@ class TestExportService(BaseTestQuestionnaire):
     def load_database(self, all_data):
         rv = self.client.get("/api/export", headers=self.logged_in_headers())
         response = rv.json
-        exports = ExportInfoSchema(many=True).load(response)
+        exports = SchemaRegistry.ExportInfoSchema(many=True).load(response)
         importer = ImportService()
         log = importer.log_for_export(exports, datetime.datetime.utcnow())
         results = {}
@@ -137,7 +137,7 @@ class TestExportService(BaseTestQuestionnaire):
         email_verified = db_user.email_verified
         u_registration_date = db_user.registration_date
         u_last_updated = db_user.last_updated
-        orig_user_dict = UserSchema().dump(db_user)  # Use standard schema
+        orig_user_dict = SchemaRegistry.UserSchema().dump(db_user)  # Use standard schema
 
         p = self.construct_participant(user_id=user_id, relationship=Relationship.self_participant)
         p_last_updated = p.last_updated

@@ -12,7 +12,7 @@ from app.database import session
 from app.enums import Permission, Role
 from app.models import Participant, User
 from app.rest_exception import RestException
-from app.schemas import ParticipantSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_roles, requires_permission
 
 
@@ -41,7 +41,7 @@ def get_participant_by_id(participant_id: int, with_joins=False) -> Participant 
 
 class ParticipantEndpoint(flask_restful.Resource):
 
-    schema = ParticipantSchema()
+    schema = SchemaRegistry.ParticipantSchema()
 
     @auth.login_required
     def get(self, participant_id: int):
@@ -86,7 +86,7 @@ class ParticipantEndpoint(flask_restful.Resource):
 
 class ParticipantListEndpoint(flask_restful.Resource):
 
-    schema = ParticipantSchema(many=True)
+    schema = SchemaRegistry.ParticipantSchema(many=True)
 
     @auth.login_required
     @requires_permission(Permission.participant_admin)
@@ -126,6 +126,6 @@ class ParticipantAdminListEndpoint(flask_restful.Resource):
             "filtered_dependents": self.count_participants("dependent", filter_out_test=True),
             "filtered_self_professionals": self.count_participants("self_professional", filter_out_test=True),
             "filtered_self_interested": self.count_participants("self_interested", filter_out_test=True),
-            "all_participants": ParticipantSchema(many=True).dump(all_participants, many=True),
+            "all_participants": SchemaRegistry.ParticipantSchema(many=True).dump(all_participants, many=True),
         }
         return participant_list

@@ -10,7 +10,6 @@ from marshmallow.fields import (
     List,
     Method,
     Nested,
-    Number,
     Str,
     String,
 )
@@ -112,7 +111,7 @@ class ParentCategorySchema(ModelSchema):
         model = Category
         fields = ("id", "name", "parent", "level", "_links", "display_order")
 
-    parent = Nested(lambda: ParentCategorySchema(), dump_only=True)
+    parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
     level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
     _links = Hyperlinks(
         {
@@ -144,11 +143,11 @@ class CategoryInSearchSchema(ModelSchema):
         model = Category
         fields = ("id", "name", "children", "parent_id", "parent", "level", "display_order")
 
-    parent_id = Number(required=False, allow_none=True)
-    parent = Nested(ParentCategorySchema(), dump_only=True, required=False, allow_none=True)
-    children = List(Nested(ChildCategoryInSearchSchema(), dump_only=True))
+    parent_id = Integer(required=False, allow_none=True)
     level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
     name = String(required=False, dump_only=True)
+    children = List(Nested("ChildCategoryInSearchSchema", dump_only=True))
+    parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
 
 
 class CategorySchema(ModelSchema):
@@ -176,14 +175,15 @@ class CategorySchema(ModelSchema):
 
     id = Integer(required=False, allow_none=True)
     parent_id = Integer(required=False, allow_none=True)
-    children = List(Nested(lambda: CategorySchema(), dump_only=True, exclude=("parent", "color")))
-    parent = Nested(ParentCategorySchema(), dump_only=True)
     level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
     event_count = Method("get_event_count", dump_only=True)
     location_count = Method("get_location_count", dump_only=True)
     resource_count = Method("get_resource_count", dump_only=True)
     all_resource_count = Method("get_all_resource_count", dump_only=True)
     study_count = Method("get_study_count", dump_only=True)
+    children = List(Nested("CategorySchema", dump_only=True, exclude=("parent", "color")))
+    parent = Nested("ParentCategorySchema", dump_only=True)
+
     _links = Hyperlinks(
         {
             "self": url_for.Category("id"),
@@ -260,7 +260,7 @@ class CategoriesOnEventSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category", "type")
 
-    category = Nested(ParentCategorySchema(), dump_only=True)
+    category = Nested("ParentCategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.EventCategory("id"),
@@ -275,7 +275,8 @@ class CategoriesOnLocationSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category", "type")
 
-    category = Nested(ParentCategorySchema(), dump_only=True)
+    category = Nested("ParentCategorySchema", dump_only=True)
+    resource_categories = List(Nested("CategoriesOnLocationSchema", dump_only=True))
     _links = Hyperlinks(
         {
             "self": url_for.ResourceCategory("id"),
@@ -290,7 +291,7 @@ class CategoriesOnResourceSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category", "type")
 
-    category = Nested(ParentCategorySchema(), dump_only=True)
+    category = Nested("ParentCategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.ResourceCategory("id"),
@@ -305,7 +306,7 @@ class CategoriesOnStudySchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id", "category")
 
-    category = Nested(ParentCategorySchema(), dump_only=True)
+    category = Nested("ParentCategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.StudyCategory("id"),
@@ -320,7 +321,7 @@ class StudyInvestigatorSchema(ModelSchema):
         model = StudyInvestigator
         fields = ("id", "_links", "study_id", "investigator_id", "investigator")
 
-    investigator = Nested(InvestigatorSchema(), dump_only=True)
+    investigator = Nested("InvestigatorSchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.StudyInvestigator("id"),
@@ -356,7 +357,8 @@ class ResourceSchema(ModelSchema):
             "_links",
         )
 
-    resource_categories = List(Nested(CategoriesOnResourceSchema(), dump_only=True))
+    resource_categories = List(Nested("CategoriesOnResourceSchema", dump_only=True))
+
     _links = Hyperlinks(
         {
             "self": url_for.Resource("id"),
@@ -371,7 +373,7 @@ class ResourceCategoriesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category", "type")
 
-    category = Nested(CategorySchema(), dump_only=True)
+    category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.ResourceCategory("id"),
@@ -386,7 +388,7 @@ class CategoryResourcesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "resource", "type")
 
-    resource = Nested(ResourceSchema(), dump_only=True)
+    resource = Nested("ResourceSchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.ResourceCategory("id"),
@@ -417,8 +419,8 @@ class EventUserSchema(ModelSchema):
 
     event_id = Integer(required=False, allow_none=True)
     user_id = Integer(required=False, allow_none=True)
-    event = Nested(ResourceSchema(), dump_only=True)
-    user = Nested(CategorySchema(), dump_only=True)
+    event = Nested("ResourceSchema", dump_only=True)
+    user = Nested("CategorySchema", dump_only=True)
 
 
 class EventSchema(ModelSchema):
@@ -468,8 +470,8 @@ class EventSchema(ModelSchema):
         )
 
     id = Integer(required=False, allow_none=True)
-    resource_categories = List(Nested(CategoriesOnEventSchema(), dump_only=True))
-    registered_users = List(Nested(EventUserSchema(), dump_only=True))
+    registered_users = List(Nested("EventUserSchema", dump_only=True))
+    resource_categories = List(Nested("CategoriesOnEventSchema", dump_only=True))
     _links = Hyperlinks(
         {
             "self": url_for.Event("id"),
@@ -484,7 +486,7 @@ class EventCategoriesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category", "type")
 
-    category = Nested(CategorySchema(), dump_only=True)
+    category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.EventCategory("id"),
@@ -499,7 +501,7 @@ class CategoryEventsSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "resource", "type")
 
-    resource = Nested(EventSchema(), dump_only=True)
+    resource = Nested("EventSchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.EventCategory("id"),
@@ -559,7 +561,6 @@ class LocationSchema(ModelSchema):
         )
 
     id = Integer(required=False, allow_none=True)
-    resource_categories = List(Nested(CategoriesOnLocationSchema(), dump_only=True))
     _links = Hyperlinks(
         {
             "self": url_for.Location("id"),
@@ -573,7 +574,7 @@ class LocationCategoriesSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "category", "type")
 
-    category = Nested(CategorySchema(), dump_only=True)
+    category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.LocationCategory("id"),
@@ -588,7 +589,7 @@ class CategoryLocationsSchema(ModelSchema):
         model = ResourceCategory
         fields = ("id", "_links", "resource_id", "category_id", "resource", "type")
 
-    resource = Nested(LocationSchema(), dump_only=True)
+    resource = Nested("LocationSchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.LocationCategory("id"),
@@ -635,8 +636,8 @@ class ParticipantSchema(ModelSchema):
     relationship = Enum(Relationship)
     user_id = Integer(required=False, allow_none=True)
     percent_complete = Function(lambda obj: missing if obj is None else obj.get_percent_complete())
-    contact = Nested(lambda: ContactQuestionnaireSchema(), dump_only=True)
-    identification = Nested(lambda: IdentificationQuestionnaireSchema(), dump_only=True)
+    contact = Nested("ContactQuestionnaireSchema", dump_only=True)
+    identification = Nested("IdentificationQuestionnaireSchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.Participant("id"),
@@ -664,8 +665,8 @@ class UserFavoriteSchema(ModelSchema):
 
     resource_id = Integer(required=False, allow_none=True)
     category_id = Integer(required=False, allow_none=True)
-    resource = Nested(ResourceSchema(), dump_only=True)
-    category = Nested(CategorySchema(), dump_only=True)
+    category = Nested("CategorySchema", dump_only=True)
+    resource = Nested("ResourceSchema", dump_only=True)
 
 
 class UserMetaSchema(ModelSchema):
@@ -720,10 +721,7 @@ class UserSchema(ModelSchema):
         )
 
     password = String(load_only=True)
-    participants = List(Nested(ParticipantSchema(), dump_only=True))
     participant_count = Integer(required=False, allow_none=True)
-    user_favorites = List(Nested(UserFavoriteSchema(), dump_only=True))
-    user_meta = Nested(UserMetaSchema(), dump_only=True)
     id = Integer(required=False, allow_none=True)
     role = Enum(Role)
     permissions = Method("get_permissions", dump_only=True)
@@ -732,6 +730,9 @@ class UserSchema(ModelSchema):
     )
     created_password = Function(lambda obj: missing if obj is None else obj.created_password(), dump_only=True)
     identity = Function(lambda obj: missing if obj is None else obj.identity(), dump_only=True)
+    participants = List(Nested("ParticipantSchema", dump_only=True))
+    user_favorites = List(Nested("UserFavoriteSchema", dump_only=True))
+    user_meta = Nested("UserMetaSchema", dump_only=True)
 
     def get_permissions(self, obj):
         if obj is None:
@@ -747,7 +748,7 @@ class StudyUsersSchema(ModelSchema):
         model = StudyUser
         fields = ("id", "_links", "status", "study_id", "user_id", "user")
 
-    user = Nested(UserSchema(), dump_only=True)
+    user = Nested("UserSchema", dump_only=True)
     status = Enum(StudyUserStatus, allow_none=True)
     _links = Hyperlinks(
         {
@@ -801,9 +802,9 @@ class StudySchema(ModelSchema):
             "_links",
         )
 
+    study_categories = List(Nested("CategoriesOnStudySchema", dump_only=True))
+    study_investigators = List(Nested("StudyInvestigatorSchema", dump_only=True))
     status = Enum(Status)
-    study_categories = List(Nested(CategoriesOnStudySchema(), dump_only=True))
-    study_investigators = List(Nested(StudyInvestigatorSchema(), dump_only=True))
     _links = Hyperlinks(
         {
             "self": url_for.Study("id"),
@@ -818,8 +819,8 @@ class UserStudiesSchema(ModelSchema):
         model = StudyUser
         fields = ("id", "_links", "status", "study_id", "user_id", "study")
 
-    study = Nested(StudySchema(), dump_only=True)
     status = Enum(StudyUserStatus, allow_none=True)
+    study = Nested("StudySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.StudyUser("id"),
@@ -834,7 +835,7 @@ class StudyCategoriesSchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id", "category")
 
-    category = Nested(CategorySchema(), dump_only=True)
+    category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.StudyCategory("id"),
@@ -849,7 +850,7 @@ class CategoryStudiesSchema(ModelSchema):
         model = StudyCategory
         fields = ("id", "_links", "study_id", "category_id", "study")
 
-    study = Nested(StudySchema(), dump_only=True)
+    study = Nested("StudySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.StudyCategory("id"),
@@ -878,7 +879,7 @@ class InvestigatorStudiesSchema(ModelSchema):
         model = StudyInvestigator
         fields = ("id", "_links", "study_id", "investigator_id", "study")
 
-    study = Nested(StudySchema(), dump_only=True)
+    study = Nested("StudySchema", dump_only=True)
     _links = Hyperlinks(
         {
             "self": url_for.StudyInvestigator("id"),
@@ -898,8 +899,8 @@ class HitSchema(Schema):
     label = Str(missing=None)
     last_updated = DateTime(missing=None)
     highlights = Str(missing=None)
-    latitude = Float()
-    longitude = Float()
+    latitude = Float(missing=None)
+    longitude = Float(missing=None)
     date = DateTime(missing=None)
     status = Str(missing=None)
     no_address = Boolean(missing=None)
@@ -939,8 +940,8 @@ class GeopointSchema(Schema):
 
 
 class GeoboxSchema(Schema):
-    top_left = Nested(GeopointSchema())
-    bottom_right = Nested(GeopointSchema())
+    bottom_right = Nested("GeopointSchema")
+    top_left = Nested("GeopointSchema")
 
     @post_load
     def make_geo_box(self, data, **kwargs):
@@ -954,20 +955,20 @@ class SearchSchema(Schema):
     words = Str()
     start = Integer()
     size = Integer()
-    sort = Nested(SortSchema(), allow_none=True, default=None)
     types = List(Str())
     ages = List(Str())
     languages = List(Str())
-    age_counts = List(Nested(AggCountSchema()), dump_only=True)
-    language_counts = List(Nested(AggCountSchema()), dump_only=True)
-    type_counts = List(Nested(AggCountSchema()), dump_only=True)
-    total = Nested(TotalSchema(), allow_none=True, default=None)
-    hits = List(Nested(HitSchema(), dump_only=True))
-    category = Nested(CategoryInSearchSchema())
     ordered = True
     date = DateTime(allow_none=True)
     map_data_only = Boolean()
-    geo_box = Nested(GeoboxSchema(), allow_none=True, default=None)
+    age_counts = List(Nested("AggCountSchema"), dump_only=True)
+    category = Nested("CategoryInSearchSchema")
+    geo_box = Nested("GeoboxSchema", allow_none=True, default=None)
+    hits = List(Nested("HitSchema", dump_only=True))
+    language_counts = List(Nested("AggCountSchema"), dump_only=True)
+    sort = Nested("SortSchema", allow_none=True, default=None)
+    total = Nested("TotalSchema", allow_none=True, default=None)
+    type_counts = List(Nested("AggCountSchema"), dump_only=True)
 
     @post_load
     def make_search(self, data, **kwargs):
@@ -977,7 +978,7 @@ class SearchSchema(Schema):
 class UserSearchSchema(Schema):
     pages = Integer()
     total = Integer()
-    items = List(Nested(UserSchema()))
+    items = List(Nested("UserSchema"))
 
 
 class StepSchema(Schema):
@@ -991,12 +992,7 @@ class StepSchema(Schema):
 
 class FlowSchema(Schema):
     name = Str()
-    steps = List(Nested(StepSchema()))
-
-
-# class EmailLogSchema(ModelSchema):
-#     class Meta(ModelSchema.Meta):
-#         model = EmailLog
+    steps = List(Nested("StepSchema"))
 
 
 class ResourceChangeLogSchema(ModelSchema):
@@ -1009,8 +1005,8 @@ class AdminNoteSchema(ModelSchema):
         model = AdminNote
         fields = ("id", "resource_id", "user_id", "resource", "user", "last_updated", "note")
 
-    user = Nested(UserSchema(), dump_only=True)
-    resource = Nested(ResourceSchema(), dump_only=True)
+    resource = Nested("ResourceSchema", dump_only=True)
+    user = Nested("UserSchema", dump_only=True)
 
 
 class StepLogSchema(ModelSchema):
@@ -1094,8 +1090,8 @@ class ExportInfoSchema(Schema):
         ordered = True
         fields = ["table_name", "class_name", "display_name", "size", "url", "question_type", "sub_tables"]
 
-    sub_tables = List(Nested(lambda: ExportInfoSchema(), default=None, dump_only=True))
     display_name = String(dump_only=True)
+    sub_tables = List(Nested("ExportInfoSchema", default=None, dump_only=True))
 
     @post_load
     def make_info(self, data, **kwargs):
@@ -1178,10 +1174,10 @@ class ChainSessionSchema(ModelSchema):
             "step_attempts",
         )
 
-    step_attempts = List(Nested(lambda: ChainSessionStepSchema()))
     participant_id = Method("get_participant_id", dump_only=True)
     user_id = Method("get_user_id", dump_only=True)
     session_number = Method("get_session_number", dump_only=True)
+    step_attempts = List(Nested("ChainSessionStepSchema"))
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1245,10 +1241,10 @@ class ChainSessionStepSchema(ModelSchema):
 
     participant_id = Method("get_participant_id", dump_only=True)
     user_id = Method("get_user_id", dump_only=True)
-    challenging_behaviors = List(Nested(ChallengingBehaviorSchema()))
     chain_step = Method("get_chain_step", dump_only=True)
     session_type = Method("get_session_type", dump_only=True)
     session_number = Method("get_session_number", dump_only=True)
+    challenging_behaviors = List(Nested("ChallengingBehaviorSchema"))
 
     def get_chain_step(self, obj):
         if obj is None:
@@ -1308,7 +1304,7 @@ class ChainQuestionnaireSchema(ModelSchema):
             "sessions",
         )
 
-    sessions = List(Nested(ChainSessionSchema()))
+    sessions = List(Nested("ChainSessionSchema"))
 
 
 class ClinicalDiagnosesQuestionnaireSchema(ModelSchema):
@@ -1524,7 +1520,7 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "struggle_to_afford",
         )
 
-    housemates = List(Nested(lambda: HousemateSchema()))
+    housemates = List(Nested("HousemateSchema"))
 
 
 class HomeDependentQuestionnaireSchema(ModelSchema):
@@ -1547,7 +1543,7 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "struggle_to_afford",
         )
 
-    housemates = List(Nested(lambda: HousemateSchema()))
+    housemates = List(Nested("HousemateSchema"))
 
 
 class IdentificationQuestionnaireSchema(ModelSchema):
@@ -1605,10 +1601,10 @@ class SupportsQuestionnaireSchema(ModelSchema):
             "_links",
         )
 
-    medications = List(Nested(lambda: MedicationSchema()))
-    therapies = List(Nested(lambda: TherapySchema()))
-    assistive_devices = List(Nested(AssistiveDeviceSchema()))
-    alternative_augmentative = List(Nested(AlternativeAugmentativeSchema()))
+    alternative_augmentative = List(Nested("AlternativeAugmentativeSchema"))
+    assistive_devices = List(Nested("AssistiveDeviceSchema"))
+    medications = List(Nested("MedicationSchema"))
+    therapies = List(Nested("TherapySchema"))
     _links = Hyperlinks(
         {
             "self": url_for.Questionnaire("supports_questionnaire", "id"),
@@ -1642,8 +1638,8 @@ class HousemateSchema(ModelSchema):
     user_id = Method("get_user_id")
     home_dependent_questionnaire_id = Integer(required=False, allow_none=True)
     home_self_questionnaire_id = Integer(required=False, allow_none=True)
-    home_dependent_questionnaire = Nested(HomeDependentQuestionnaireSchema(), required=False, allow_none=True)
-    home_self_questionnaire = Nested(HomeSelfQuestionnaireSchema(), required=False, allow_none=True)
+    home_dependent_questionnaire = Nested("HomeDependentQuestionnaireSchema", required=False, allow_none=True)
+    home_self_questionnaire = Nested("HomeSelfQuestionnaireSchema", required=False, allow_none=True)
 
     def get_participant_id(self, obj):
         if obj is None:
@@ -1688,11 +1684,103 @@ class DataTransferLogSchema(ModelSchema):
         model = DataTransferLog
         fields = ("id", "type", "date_started", "last_updated", "total_records", "alerts_sent", "details", "_links")
 
-    details = List(Nested(DataTransferLogDetailSchema(), dump_only=True))
+    details = List(Nested("DataTransferLogDetailSchema", dump_only=True))
     _links = Hyperlinks({"self": url_for.DataTransferLog("id")})
 
 
 class DataTransferLogPageSchema(Schema):
     pages = Integer()
     total = Integer()
-    items = List(Nested(DataTransferLogSchema()))
+    items = List(Nested("DataTransferLogSchema"))
+
+
+class SchemaRegistry(object):
+    AdminExportSchema = ExportSchemas.AdminExportSchema
+    AdminNoteSchema = AdminNoteSchema
+    AggCountSchema = AggCountSchema
+    AlternativeAugmentativeSchema = AlternativeAugmentativeSchema
+    AssistiveDeviceSchema = AssistiveDeviceSchema
+    CategoriesOnEventSchema = CategoriesOnEventSchema
+    CategoriesOnLocationSchema = CategoriesOnLocationSchema
+    CategoriesOnResourceSchema = CategoriesOnResourceSchema
+    CategoriesOnStudySchema = CategoriesOnStudySchema
+    CategoryEventsSchema = CategoryEventsSchema
+    CategoryInSearchSchema = CategoryInSearchSchema
+    CategoryLocationsSchema = CategoryLocationsSchema
+    CategoryResourcesSchema = CategoryResourcesSchema
+    CategorySchema = CategorySchema
+    CategoryStudiesSchema = CategoryStudiesSchema
+    CategoryUpdateSchema = CategoryUpdateSchema
+    ChainQuestionnaireSchema = ChainQuestionnaireSchema
+    ChainSessionSchema = ChainSessionSchema
+    ChainSessionStepSchema = ChainSessionStepSchema
+    ChainStepSchema = ChainStepSchema
+    ChallengingBehaviorSchema = ChallengingBehaviorSchema
+    ChildCategoryInSearchSchema = ChildCategoryInSearchSchema
+    ClinicalDiagnosesQuestionnaireSchema = ClinicalDiagnosesQuestionnaireSchema
+    ContactQuestionnaireSchema = ContactQuestionnaireSchema
+    CurrentBehaviorsDependentQuestionnaireSchema = CurrentBehaviorsDependentQuestionnaireSchema
+    CurrentBehaviorsSelfQuestionnaireSchema = CurrentBehaviorsSelfQuestionnaireSchema
+    DataTransferLogDetailSchema = DataTransferLogDetailSchema
+    DataTransferLogPageSchema = DataTransferLogPageSchema
+    DataTransferLogSchema = DataTransferLogSchema
+    DemographicsQuestionnaireSchema = DemographicsQuestionnaireSchema
+    DevelopmentalQuestionnaireSchema = DevelopmentalQuestionnaireSchema
+    EducationDependentQuestionnaireSchema = EducationDependentQuestionnaireSchema
+    EducationSelfQuestionnaireSchema = EducationSelfQuestionnaireSchema
+    EmailLogSchema = EmailLogSchema
+    EmploymentQuestionnaireSchema = EmploymentQuestionnaireSchema
+    EvaluationHistoryDependentQuestionnaireSchema = EvaluationHistoryDependentQuestionnaireSchema
+    EvaluationHistorySelfQuestionnaireSchema = EvaluationHistorySelfQuestionnaireSchema
+    EventCategoriesSchema = EventCategoriesSchema
+    EventCategorySchema = EventCategorySchema
+    EventSchema = EventSchema
+    EventUserSchema = EventUserSchema
+    ExportInfoSchema = ExportInfoSchema
+    ExportSchemas = ExportSchemas()
+    FlowSchema = FlowSchema
+    FrontendConfigSchema = FrontendConfigSchema
+    GeoboxSchema = GeoboxSchema
+    GeopointSchema = GeopointSchema
+    HitSchema = HitSchema
+    HomeDependentQuestionnaireSchema = HomeDependentQuestionnaireSchema
+    HomeSelfQuestionnaireSchema = HomeSelfQuestionnaireSchema
+    HousemateSchema = HousemateSchema
+    IdentificationQuestionnaireSchema = IdentificationQuestionnaireSchema
+    InvestigatorSchema = InvestigatorSchema
+    InvestigatorStudiesSchema = InvestigatorStudiesSchema
+    LocationCategoriesSchema = LocationCategoriesSchema
+    LocationCategorySchema = LocationCategorySchema
+    LocationSchema = LocationSchema
+    MedicationSchema = MedicationSchema
+    ModelSchema = ModelSchema
+    ParentCategorySchema = ParentCategorySchema
+    ParticipantExportSchema = ExportSchemas.ParticipantExportSchema
+    ParticipantSchema = ParticipantSchema
+    ProfessionalProfileQuestionnaireSchema = ProfessionalProfileQuestionnaireSchema
+    RegistrationQuestionnaireSchema = RegistrationQuestionnaireSchema
+    ResourceCategoriesSchema = ResourceCategoriesSchema
+    ResourceCategorySchema = ResourceCategorySchema
+    ResourceChangeLogSchema = ResourceChangeLogSchema
+    ResourceSchema = ResourceSchema
+    SearchSchema = SearchSchema
+    SortSchema = SortSchema
+    StepLogSchema = StepLogSchema
+    StepSchema = StepSchema
+    StudyCategoriesSchema = StudyCategoriesSchema
+    StudyCategorySchema = StudyCategorySchema
+    StudyInvestigatorSchema = StudyInvestigatorSchema
+    StudySchema = StudySchema
+    StudyUserSchema = StudyUserSchema
+    StudyUsersSchema = StudyUsersSchema
+    SupportsBaseSchema = SupportsBaseSchema
+    SupportsQuestionnaireSchema = SupportsQuestionnaireSchema
+    TherapySchema = TherapySchema
+    TotalSchema = TotalSchema
+    UserExportSchema = ExportSchemas.UserExportSchema
+    UserFavoriteSchema = UserFavoriteSchema
+    UserMetaSchema = UserMetaSchema
+    UserSchema = UserSchema
+    UserSearchSchema = UserSearchSchema
+    UserStudiesSchema = UserStudiesSchema
+    ZipCodeSchema = ZipCodeSchema

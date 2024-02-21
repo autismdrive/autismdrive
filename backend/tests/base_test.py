@@ -131,6 +131,7 @@ class BaseTest(TestCase):
     def tearDown(self):
         self.session.rollback()
         close_all_sessions()
+        self.elastic_index.refresh_and_flush(self.elastic_index.index)
 
     @classmethod
     def reset_indices(cls):

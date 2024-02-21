@@ -10,13 +10,13 @@ from app.elastic_index import elastic_index
 from app.enums import Permission
 from app.models import Event, EventUser, Geocode, ResourceChangeLog
 from app.rest_exception import RestException
-from app.schemas import EventSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 
 class EventEndpoint(flask_restful.Resource):
 
-    schema = EventSchema()
+    schema = SchemaRegistry.EventSchema()
 
     def get(self, event_id: int):
         model = session.query(Event).filter_by(id=event_id).first()
@@ -85,8 +85,8 @@ class EventEndpoint(flask_restful.Resource):
 
 class EventListEndpoint(flask_restful.Resource):
 
-    eventsSchema = EventSchema(many=True)
-    eventSchema = EventSchema()
+    eventsSchema = SchemaRegistry.EventSchema(many=True)
+    eventSchema = SchemaRegistry.EventSchema()
 
     def get(self):
         events = session.query(Event).all()

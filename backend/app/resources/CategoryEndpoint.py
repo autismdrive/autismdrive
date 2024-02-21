@@ -11,7 +11,7 @@ from app.database import session
 from app.enums import Permission
 from app.models import Category, ResourceCategory, StudyCategory, UserFavorite
 from app.rest_exception import RestException
-from app.schemas import CategorySchema, ParentCategorySchema, CategoryUpdateSchema
+from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 
@@ -19,6 +19,8 @@ def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | Loa
     return statement.options(
         joinedload(Category.parent),
         joinedload(Category.children),
+        joinedload(Category.resources),
+        joinedload(Category.studies),
     )
 
 
@@ -38,7 +40,7 @@ def get_category_by_id(category_id: int, with_joins=False) -> Category | None:
 
 
 class CategoryEndpoint(flask_restful.Resource):
-    schema = CategorySchema()
+    schema = SchemaRegistry.CategorySchema()
 
     def get(self, category_id: int):
         category = get_category_by_id(category_id, with_joins=True)
@@ -69,7 +71,7 @@ class CategoryEndpoint(flask_restful.Resource):
             raise RestException(RestException.NOT_FOUND)
 
         try:
-            schema = CategoryUpdateSchema()
+            schema = SchemaRegistry.CategoryUpdateSchema()
             updated_cat = schema.load(data=request_data, session=session, instance=old_cat)
             updated_dict = schema.dump(updated_cat)
         except Exception as e:
@@ -85,8 +87,8 @@ class CategoryEndpoint(flask_restful.Resource):
 
 
 class CategoryListEndpoint(flask_restful.Resource):
-    category_schema = CategorySchema()
-    categories_schema = ParentCategorySchema(many=True)
+    category_schema = SchemaRegistry.CategorySchema()
+    categories_schema = SchemaRegistry.CategorySchema(many=True)
 
     def get(self):
         statement = add_joins_to_statement(select(Category))
@@ -108,7 +110,7 @@ class CategoryListEndpoint(flask_restful.Resource):
 
 
 class RootCategoryListEndpoint(flask_restful.Resource):
-    categories_schema = CategorySchema(many=True)
+    categories_schema = SchemaRegistry.CategorySchema(many=True)
 
     def get(self):
         statement = add_joins_to_statement(select(Category))

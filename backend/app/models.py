@@ -110,7 +110,11 @@ class Category(Base):
         db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
         level = 0
         cat = db_cat
-        while cat.parent and isinstance(cat, Category):
+
+        if cat is None:
+            return 0
+
+        while cat and isinstance(cat, Category) and cat.parent:
             level = level + 1
             cat = cat.parent
 
@@ -140,6 +144,10 @@ class Category(Base):
 
         db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
         cat = db_cat
+
+        if cat is None:
+            return ""
+
         path = str(cat.id)
         while cat.parent and cat.parent.id:
             cat = cat.parent

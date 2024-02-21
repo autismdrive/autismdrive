@@ -5,12 +5,12 @@ from sqlalchemy import cast, Integer
 from app.database import session
 from app.models import Event, EventUser, User
 from app.rest_exception import RestException
-from app.schemas import EventUserSchema
+from app.schemas import SchemaRegistry
 
 
 class EventByUserEndpoint(flask_restful.Resource):
 
-    schema = EventUserSchema()
+    schema = SchemaRegistry.EventUserSchema()
 
     def get(self, user_id):
         event_users = (
@@ -25,7 +25,7 @@ class EventByUserEndpoint(flask_restful.Resource):
 
 class UserByEventEndpoint(flask_restful.Resource):
 
-    schema = EventUserSchema()
+    schema = SchemaRegistry.EventUserSchema()
 
     def get(self, event_id: int):
         event_users = (
@@ -39,7 +39,7 @@ class UserByEventEndpoint(flask_restful.Resource):
 
 
 class EventUserEndpoint(flask_restful.Resource):
-    schema = EventUserSchema()
+    schema = SchemaRegistry.EventUserSchema()
 
     def get(self, event_user_id: int):
         model = session.query(EventUser).filter_by(id=event_user_id).first()
@@ -54,7 +54,7 @@ class EventUserEndpoint(flask_restful.Resource):
 
 
 class EventUserListEndpoint(flask_restful.Resource):
-    schema = EventUserSchema()
+    schema = SchemaRegistry.EventUserSchema()
 
     def post(self):
         request_data = request.get_json()

@@ -1,22 +1,19 @@
-import copy
 import datetime
 
 import flask_restful
 from flask import request
 from marshmallow import EXCLUDE
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session, get_class
 from app.enums import Permission
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
-from app.models import ChainSession, ChainQuestionnaire, ChainSessionStep
 from app.rest_exception import RestException
-from app.schemas import ExportInfoSchema
-from app.utils import pascal_case_it, patch_dict
+from app.schemas import SchemaRegistry
+from app.utils import pascal_case_it
 from app.wrappers import requires_permission
 
 
@@ -206,19 +203,19 @@ class QuestionnaireInfoEndpoint(flask_restful.Resource):
         Lists available questionnaires. Used for data export to get meta without specifying flow and relationship.
 
         Returns:
-            list[ExportInfoSchema] - A list of dict objects, including the following info for each questionnaire:
+            list[SchemaRegistry.ExportInfoSchema] - A list of dict objects, including the following info for each questionnaire:
                 table_name (str): Snake-case database table name. E.g., "chain_session_questionnaire",
                 class_name (str): Pascal-case class name for Model class. E.g., "ChainSession",
                 display_name (str): Questionnaire title. E.g., "Chain Session Assessment",
                 size (int): Number of questionnaire records in the database,
                 url (str): Export endpoint. E.g., "/api/export/chain_session_questionnaire",
                 question_type (str): 'sensitive' | 'identifying' | 'unrestricted' | 'sub-table'
-                sub_tables (list[ExportInfoSchema]): A list of sub-tables within this table, if applicable.
+                sub_tables (list[SchemaRegistry.ExportInfoSchema]): A list of sub-tables within this table, if applicable.
         """
         info_list = ExportService.get_table_info()
         info_list = [item for item in info_list if item.question_type]
         info_list = sorted(info_list, key=lambda item: item.table_name)
-        return ExportInfoSchema(many=True).dump(info_list)
+        return SchemaRegistry.ExportInfoSchema(many=True).dump(info_list)
 
 
 class QuestionnaireDataExportEndpoint(flask_restful.Resource):
