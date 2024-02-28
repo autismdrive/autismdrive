@@ -25,26 +25,26 @@ from app.models import (
     Category,
     ChainStep,
     EmailLog,
-    Resource,
-    Location,
     Event,
+    EventUser,
+    Investigator,
+    Location,
+    Participant,
+    Resource,
+    ResourceCategory,
+    ResourceChangeLog,
+    StepLog,
     Study,
-    StudyInvestigator,
     StudyCategory,
+    StudyInvestigator,
+    StudyUser,
+    User,
+    UserFavorite,
+    UserMeta,
+    ZipCode,
 )
-from app.models import EventUser
-from app.models import Investigator
-from app.models import Participant
-from app.models import ResourceCategory
-from app.models import ResourceChangeLog
-from app.models import StepLog
-from app.models import StudyUser
-from app.models import User
-from app.models import UserFavorite
-from app.models import UserMeta
-from app.models import ZipCode
-from app.resources.CategoryEndpoint import get_category_by_id
-from app.resources.ResourceEndpoint import get_resource_by_id
+from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 from fixtures.fixure_utils import fake
 from fixtures.location import MockLocationWithLatLong
 from fixtures.resource import MockResource
@@ -329,10 +329,11 @@ class BaseTest(TestCase):
         self.session.close()
 
         db_resource = get_resource_by_id(resource_id, with_joins=True)
-        self.session.close()
         self.assertEqual(db_resource.website, resource.website)
-        self.elastic_index.add_document(db_resource)
-        return db_resource
+        self.elastic_index.add_document(to_database_object_dict(SchemaRegistry.ResourceSchema(), db_resource))
+        self.session.close()
+
+        return get_resource_by_id(resource_id, with_joins=True)
 
     def construct_location(
         self,
@@ -370,9 +371,7 @@ class BaseTest(TestCase):
         )
         self.assertEqual(db_location.website, location.website)
 
-        self.elastic_index.add_document(
-            document=db_location, latitude=db_location.latitude, longitude=db_location.longitude
-        )
+        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.LocationSchema(), db_location))
         return db_location
 
     def construct_location_category(self, location_id, category_name):
@@ -431,7 +430,7 @@ class BaseTest(TestCase):
         db_study: Study = self.session.execute(select(Study).filter(Study.id == study_id)).unique().scalars().first()
         self.assertEqual(db_study.eligibility_url, study.eligibility_url)
 
-        self.elastic_index.add_document(db_study)
+        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.LocationSchema(), db_study))
         self.assertEqual(len(db_study.categories), len(category_ids))
 
         return db_study
@@ -510,7 +509,7 @@ class BaseTest(TestCase):
         self.session.close()
 
         db_event = self.session.query(Event).filter(Event.id == event.id).first()
-        self.elastic_index.add_document(db_event)
+        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.EventSchema(), db_event))
         return db_event
 
     def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):

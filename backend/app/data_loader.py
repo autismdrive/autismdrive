@@ -2,12 +2,12 @@ import csv
 import os
 
 import googlemaps
-from sqlalchemy import Sequence, select, func
+from sqlalchemy import select, func
 
 from app.elastic_index import elastic_index
 from app.enums import Status
 from config.load import settings
-from .database import session, engine
+from .database import session, engine, get_all_db_objects
 
 
 class DataLoader:
@@ -395,8 +395,15 @@ class DataLoader:
 
     def get_category_by_name(self, category_name, parent=None, create_missing=False):
         from .models import Category
+        from sqlalchemy.orm import joinedload
 
-        category = session.query(Category).filter(Category.name == category_name).first()
+        category = (
+            session.execute(
+                select(Category).options(joinedload(Category.parent)).filter(Category.name == category_name)
+            )
+            .unique()
+            .scalar_one_or_none()
+        )
         if category is None:
             if create_missing:
                 category = Category(name=category_name, parent=parent)
@@ -404,6 +411,8 @@ class DataLoader:
                 session.commit()
             else:
                 raise (Exception("This category is not defined: " + category_name))
+
+        session.close()
         return category
 
     def get_geocode(self, address_dict, lat_long_dict):
@@ -435,14 +444,37 @@ class DataLoader:
         return {"lat": lat, "lng": lng}
 
     def build_index(self):
-        from .models import Resource
-        from .models import Study
+        from .models import Resource, Location, Event, Study, ResourceCategory, StudyCategory, Category
+        from app.utils.resource_utils import to_database_object_dict
+        from app.schemas import SchemaRegistry
+
+        # from app.resources.ResourceEndpoint import get_all_resources
+        # from app.resources.StudyEndpoint import get_all_studies
+
+        resource_joins = [Resource.resource_categories, Resource.categories]
+        study_joins = [Study.study_categories, Study.categories, Study.investigators]
+
+        # all_resources = get_all_resources(filter_statement=(Resource.type == "resource"), with_joins=True)
+        all_resources = get_all_db_objects(Resource, joins=resource_joins)
+        resource_dicts = [to_database_object_dict(SchemaRegistry.ResourceSchema(), r) for r in all_resources]
+
+        # all_events = get_all_resources(filter_statement=(Resource.type == "event"), with_joins=True)
+        all_events = get_all_db_objects(Event, joins=resource_joins)
+        events_dicts = [to_database_object_dict(SchemaRegistry.EventSchema(), r) for r in all_events]
+
+        # all_locations = get_all_resources(filter_statement=(Resource.type == "location"), with_joins=True)
+        all_locations = get_all_db_objects(Location, joins=resource_joins)
+        location_dicts = [to_database_object_dict(SchemaRegistry.LocationSchema(), r) for r in all_locations]
+
+        # all_studies = get_all_studies(filter_statement=None, with_joins=True)
+        all_studies = get_all_db_objects(Study, joins=study_joins)
+        study_dicts = [to_database_object_dict(SchemaRegistry.StudySchema(), s) for s in all_studies]
 
         elastic_index.load_documents(
-            resources=session.query(Resource).filter(Resource.type == "resource").all(),
-            events=session.query(Resource).filter(Resource.type == "event").all(),
-            locations=session.query(Resource).filter(Resource.type == "location").all(),
-            studies=session.query(Study).all(),
+            resources=resource_dicts,
+            events=events_dicts,
+            locations=location_dicts,
+            studies=study_dicts,
         )
 
     def clear_index(self):

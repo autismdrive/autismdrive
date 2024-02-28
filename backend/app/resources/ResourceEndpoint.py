@@ -16,14 +16,27 @@ from app.models import AdminNote, Resource, Location, Event, UserFavorite, Resou
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission
 
 
 def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
     return statement.options(
-        add_cat_joins(joinedload(Resource.resource_categories).joinedload(ResourceCategory.category)),
+        joinedload(Resource.resource_categories).joinedload(ResourceCategory.category),
         add_cat_joins(joinedload(Resource.categories)),
     )
+
+
+def get_all_resources(filter_statement=None, with_joins=False) -> list[Resource]:
+    statement = select(Resource)
+
+    if with_joins:
+        statement = add_joins_to_statement(statement)
+
+    if filter_statement:
+        statement = statement.filter(filter_statement)
+
+    return session.execute(statement).unique().scalars().all()
 
 
 def get_resource_by_id(resource_id: int, with_joins=False) -> Resource:
@@ -59,9 +72,9 @@ class ResourceEndpoint(flask_restful.Resource):
         if resource is None:
             raise RestException(RestException.NOT_FOUND)
 
-        elastic_index.remove_document(resource)
         resource_title = resource.title
-
+        resource_dict = to_database_object_dict(self.schema, resource)
+        elastic_index.remove_document(resource_dict)
         session.query(AdminNote).filter_by(resource_id=resource_id).delete()
         session.query(Event).filter_by(id=resource_id).delete()
         session.query(Location).filter_by(id=resource_id).delete()
@@ -84,7 +97,7 @@ class ResourceEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.utcnow()
         session.add(updated)
         session.commit()
-        elastic_index.update_document(document=updated)
+        elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
         self.log_update(resource_id=updated.id, resource_title=updated.title, change_type="edit")
         return self.schema.dump(updated)
 
@@ -102,27 +115,28 @@ class ResourceEndpoint(flask_restful.Resource):
 
 class ResourceListEndpoint(flask_restful.Resource):
 
-    resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
-    resourceSchema = SchemaRegistry.ResourceSchema()
+    resources_schema = SchemaRegistry.ResourceSchema(many=True)
+    resource_schema = SchemaRegistry.ResourceSchema()
 
     def get(self):
         statement = add_joins_to_statement(select(Resource))
         resources = session.execute(statement).unique().scalars().all()
-        return self.resourcesSchema.dump(resources)
+        return self.resources_schema.dump(resources)
 
     @auth.login_required
     @requires_permission(Permission.create_resource)
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.resourceSchema.load(request_data)
+            load_result = self.resource_schema.load(request_data)
             session.add(load_result)
             session.commit()
 
             db_resource = get_resource_by_id(load_result.id, with_joins=True)
-            elastic_index.add_document(document=db_resource)
+
+            elastic_index.add_document(document=to_database_object_dict(self.resource_schema, db_resource))
             self.log_update(resource_id=db_resource.id, resource_title=db_resource.title, change_type="create")
-            return self.resourceSchema.dump(db_resource)
+            return self.resource_schema.dump(db_resource)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 

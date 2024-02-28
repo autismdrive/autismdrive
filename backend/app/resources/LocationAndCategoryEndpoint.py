@@ -7,6 +7,7 @@ from app.elastic_index import elastic_index
 from app.models import Category, ResourceCategory, Location
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 
 
 class LocationByCategoryEndpoint(flask_restful.Resource):
@@ -51,7 +52,7 @@ class CategoryByLocationEndpoint(flask_restful.Resource):
             session.add(ResourceCategory(resource_id=location_id, category_id=c.category_id, type="location"))
         session.commit()
         instance = session.query(Location).filter_by(id=cast(location_id, Integer)).first()
-        elastic_index.update_document(document=instance, latitude=instance.latitude, longitude=instance.longitude)
+        elastic_index.update_document(document=to_database_object_dict(self.schema, instance))
         return self.get(location_id)
 
 

@@ -11,6 +11,7 @@ from app.enums import Permission
 from app.models import Event, EventUser, Geocode, ResourceChangeLog
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission
 
 
@@ -28,11 +29,13 @@ class EventEndpoint(flask_restful.Resource):
     @requires_permission(Permission.delete_resource)
     def delete(self, event_id: int):
         event = session.query(Event).filter_by(id=event_id).first()
-        event_id = event.id
-        event_title = event.title
 
-        if event is not None:
-            elastic_index.remove_document(event)
+        if event is None:
+            raise RestException(RestException.NOT_FOUND)
+
+        event_title = event.title
+        event_dict = to_database_object_dict(self.schema, event)
+        elastic_index.remove_document(event_dict)
 
         session.query(EventUser).filter_by(event_id=event_id).delete()
         session.query(Event).filter_by(id=event_id).delete()
@@ -66,7 +69,7 @@ class EventEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.utcnow()
         session.add(updated)
         session.commit()
-        elastic_index.update_document(document=updated, latitude=updated.latitude, longitude=updated.longitude)
+        elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
         self.log_update(event_id=updated.id, event_title=updated.title, change_type="edit")
         return self.schema.dump(updated)
 
@@ -85,19 +88,19 @@ class EventEndpoint(flask_restful.Resource):
 
 class EventListEndpoint(flask_restful.Resource):
 
-    eventsSchema = SchemaRegistry.EventSchema(many=True)
-    eventSchema = SchemaRegistry.EventSchema()
+    events_schema = SchemaRegistry.EventSchema(many=True)
+    event_schema = SchemaRegistry.EventSchema()
 
     def get(self):
         events = session.query(Event).all()
-        return self.eventsSchema.dump(events)
+        return self.events_schema.dump(events)
 
     @auth.login_required
     @requires_permission(Permission.create_resource)
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.eventSchema.load(data=request_data, session=session)
+            load_result = self.event_schema.load(data=request_data, session=session)
             address_dict = {
                 "street": load_result.street_address1,
                 "city": load_result.city,
@@ -109,11 +112,11 @@ class EventListEndpoint(flask_restful.Resource):
             load_result.longitude = geocode["lng"]
             session.add(load_result)
             session.commit()
-            elastic_index.add_document(
-                document=load_result, latitude=load_result.latitude, longitude=load_result.longitude
-            )
-            self.log_update(event_id=load_result.id, event_title=load_result.title, change_type="create")
-            return self.eventSchema.dump(load_result)
+
+            obj_dict = to_database_object_dict(self.event_schema, load_result)
+            elastic_index.add_document(document=obj_dict)
+            self.log_update(event_id=obj_dict.id, event_title=obj_dict.title, change_type="create")
+            return self.event_schema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 

@@ -2,14 +2,14 @@ import copy
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Optional, Literal, Union, TypedDict
+from typing import Optional, Literal, TypedDict
 
 import googlemaps
 import jwt
 from sqlalchemy import ForeignKey, TEXT, func, ARRAY, select, Integer, Boolean, String, cast
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr, joinedload
+from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr
 
 from app.auth import bcrypt, password_requirements
 from app.database import Base, session, random_integer, get_class
@@ -103,59 +103,6 @@ class Category(Base):
     )
     category_studies: Mapped[list["StudyCategory"]] = relationship(back_populates="category")
 
-    def calculate_level(self):
-        """Provide the depth of the category"""
-        from app.resources.CategoryEndpoint import get_category_by_id
-
-        db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
-        level = 0
-        cat = db_cat
-
-        if cat is None:
-            return 0
-
-        while cat and isinstance(cat, Category) and cat.parent:
-            level = level + 1
-            cat = cat.parent
-
-        session.close()
-        return level
-
-    # Returns an array of paths that should be used to search for
-    # this category. , for instance "animals,cats,smelly-cats" would return
-    # an array of three paths: ["animal", "animal,cats" and "animal,cats,smelly-cats"
-    # but using the id of the category, not the name.
-    def all_search_paths(self):
-        from app.resources.CategoryEndpoint import get_category_by_id
-
-        db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
-        cat = db_cat
-
-        paths = [cat.search_path()]
-        while cat.parent:
-            cat = cat.parent
-            paths.append(cat.search_path())
-
-        session.close()
-        return paths
-
-    def search_path(self) -> str:
-        from app.resources.CategoryEndpoint import get_category_by_id
-
-        db_cat = self if self.id is None else get_category_by_id(self.id, with_joins=True)
-        cat = db_cat
-
-        if cat is None:
-            return ""
-
-        path = str(cat.id)
-        while cat.parent and cat.parent.id:
-            cat = cat.parent
-            path = str(cat.id) + "," + path
-
-        session.close()
-        return path
-
 
 class ChainStep(Base):
     __tablename__ = "chain_step"
@@ -227,22 +174,6 @@ class EmailLog(Base):
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
 
-def _category_names(obj: Union["Resource", "Study"]):
-    cat_text = ""
-    for cat in obj.categories:
-        cat_text = cat_text + " " + cat.name
-
-    fields = ["ages", "languages", "covid19_categories"]
-
-    for field in fields:
-        if hasattr(obj, field):
-            value = getattr(obj, field)
-            if value is not None and len(value) > 0:
-                cat_text += " " + " ".join(value)
-
-    return cat_text
-
-
 class Resource(Base):
     __tablename__ = "resource"
     __label__ = "Online Information"
@@ -272,22 +203,6 @@ class Resource(Base):
     )
     resource_categories: Mapped[list["ResourceCategory"]] = relationship(back_populates="resource")
     admin_notes: Mapped[list["AdminNote"]] = relationship(back_populates="resource")
-
-    def indexable_content(self):
-        return " ".join(
-            filter(
-                None,
-                (
-                    self.title,
-                    self.description,
-                    self.insurance,
-                    self.category_names(),
-                ),
-            )
-        )
-
-    def category_names(self):
-        return _category_names(self)
 
 
 class ResourceCategory(Base):
@@ -343,20 +258,6 @@ class Event(Location):
     __mapper_args__ = {
         "polymorphic_identity": "event",
     }
-
-    def indexable_content(self):
-        return " ".join(
-            filter(
-                None,
-                (
-                    self.title,
-                    self.description,
-                    self.post_event_description,
-                    self.insurance,
-                    self.category_names(),
-                ),
-            )
-        )
 
 
 class EventUser(Base):
@@ -1293,26 +1194,6 @@ class Study(Base):
     study_investigators: Mapped[list["StudyInvestigator"]] = relationship(back_populates="study")
     study_users: Mapped[list["StudyUser"]] = relationship(back_populates="study")
     users: Mapped[list["User"]] = relationship(secondary="study_user", back_populates="studies", viewonly=True)
-
-    def indexable_content(self):
-        return " ".join(
-            filter(
-                None,
-                (
-                    self.category_names(),
-                    self.title,
-                    self.short_title,
-                    self.short_description,
-                    self.description,
-                    self.participant_description,
-                    self.benefit_description,
-                    self.location,
-                ),
-            )
-        )
-
-    def category_names(self):
-        return _category_names(self)
 
 
 class StudyInvestigator(Base):

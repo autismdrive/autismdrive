@@ -5,7 +5,8 @@ from app.database import session
 from app.elastic_index import elastic_index
 from app.models import Category, ResourceCategory, Event
 from app.rest_exception import RestException
-from app.schemas import SchemaRegistry
+from app.schemas import SchemaRegistry, EventSchema
+from app.utils.resource_utils import to_database_object_dict
 
 
 class EventByCategoryEndpoint(flask_restful.Resource):
@@ -49,7 +50,7 @@ class CategoryByEventEndpoint(flask_restful.Resource):
             session.add(ResourceCategory(resource_id=event_id, category_id=c.category_id, type="event"))
         session.commit()
         instance = session.query(Event).filter_by(id=event_id).first()
-        elastic_index.update_document(document=instance, latitude=instance.latitude, longitude=instance.longitude)
+        elastic_index.update_document(document=to_database_object_dict(EventSchema(), instance))
         return self.get(event_id)
 
 

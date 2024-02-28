@@ -77,6 +77,7 @@ from app.models import (
     DataTransferLogDetail,
 )
 from app.url_for_endpoint_map import URLForEndpointMap
+from app.utils.category_utils import calculate_level
 
 url_for = URLForEndpointMap()
 
@@ -112,7 +113,7 @@ class ParentCategorySchema(ModelSchema):
         fields = ("id", "name", "parent", "level", "_links", "display_order")
 
     parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
-    level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0)
+    level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0)
     _links = Hyperlinks(
         {
             "self": url_for.Category("id"),
@@ -144,7 +145,7 @@ class CategoryInSearchSchema(ModelSchema):
         fields = ("id", "name", "children", "parent_id", "parent", "level", "display_order")
 
     parent_id = Integer(required=False, allow_none=True)
-    level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
+    level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0, dump_only=True)
     name = String(required=False, dump_only=True)
     children = List(Nested("ChildCategoryInSearchSchema", dump_only=True))
     parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
@@ -175,7 +176,7 @@ class CategorySchema(ModelSchema):
 
     id = Integer(required=False, allow_none=True)
     parent_id = Integer(required=False, allow_none=True)
-    level = Function(lambda obj: obj.calculate_level() if isinstance(obj, Category) else 0, dump_only=True)
+    level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0, dump_only=True)
     event_count = Method("get_event_count", dump_only=True)
     location_count = Method("get_location_count", dump_only=True)
     resource_count = Method("get_resource_count", dump_only=True)

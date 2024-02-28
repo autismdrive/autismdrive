@@ -1,8 +1,5 @@
 import re
 
-from sqlalchemy.orm import InstrumentedAttribute
-from sqlalchemy.orm.collections import InstrumentedList
-
 
 def pascal_case_it(name: str) -> str:
     """Returns the given string as PascalCase string"""
@@ -35,17 +32,3 @@ def patch_dict(a: dict, b: dict, path: list = None):
             a[key] = b[key]
 
     return a
-
-
-class Singleton(object):
-    _instance = None
-
-    def __init__(self):
-        raise Exception("call instance()")
-
-    @classmethod
-    def instance(cls):
-        if cls._instance is None:
-            cls._instance = cls.__new__(cls)
-            # more init operation here
-        return cls._instance

@@ -63,13 +63,17 @@ class TestResources(BaseTest):
         self.assertEqual(404, rv.status_code)
 
     def test_delete_resource_with_admin_note_and_no_elastic_record(self):
+        from app.schemas import SchemaRegistry
+        from app.utils.resource_utils import to_database_object_dict
+
         r = self.construct_resource()
         r_id = r.id
         rv = self.client.get("api/resource/%i" % r_id, content_type="application/json")
         self.assert_success(rv)
 
         self.construct_admin_note(user=self.construct_user(), resource=r)
-        elastic_index.remove_document(r)
+        resource_dict = to_database_object_dict(SchemaRegistry.ResourceSchema(), r)
+        elastic_index.remove_document(resource_dict)
         rv = self.client.delete(
             "api/resource/%i" % r_id, content_type="application/json", headers=self.logged_in_headers()
         )

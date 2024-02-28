@@ -14,15 +14,28 @@ from app.models import Study, StudyInvestigator, StudyCategory, StudyUser
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 
 
 def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
     return statement.options(
-        add_cat_joins(joinedload(Study.study_categories).joinedload(StudyCategory.category)),
+        joinedload(Study.study_categories).joinedload(StudyCategory.category),
         add_cat_joins(joinedload(Study.categories)),
         joinedload(Study.study_investigators).joinedload(StudyInvestigator.investigator),
         joinedload(Study.investigators),
     )
+
+
+def get_all_studies(filter_statement=None, with_joins=False) -> list[Study]:
+    statement = select(Study)
+
+    if with_joins:
+        statement = add_joins_to_statement(statement)
+
+    if filter_statement:
+        statement = statement.filter(filter_statement)
+
+    return session.execute(statement).unique().scalars().all()
 
 
 def get_study_by_id(study_id: int, with_joins=False) -> Study:
@@ -54,16 +67,20 @@ class StudyEndpoint(flask_restful.Resource):
 
     def delete(self, study_id: int):
         study = get_study_by_id(study_id, with_joins=False)
-        session.close()
 
-        if study is not None:
-            elastic_index.remove_document(study)
+        if study is None:
+            raise RestException(RestException.NOT_FOUND)
 
+        study_title = study.title
+        study_dict = to_database_object_dict(self.schema, study)
+        elastic_index.remove_document(study_dict)
         session.query(StudyUser).filter_by(study_id=study_id).delete()
         session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
         session.query(StudyCategory).filter_by(study_id=study_id).delete()
         session.query(Study).filter_by(id=study_id).delete()
         session.commit()
+
+        self.log_update(study_id=study_id, study_title=study_title, change_type="delete")
         return None
 
     def put(self, study_id: int):
@@ -76,33 +93,32 @@ class StudyEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.utcnow()
         session.add(updated)
         session.commit()
-        elastic_index.update_document(document=updated)
-
+        elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
         db_study = get_study_by_id(study_id, with_joins=True)
         return self.schema.dump(db_study)
 
 
 class StudyListEndpoint(flask_restful.Resource):
 
-    studiesSchema = SchemaRegistry.StudySchema(many=True)
-    studySchema = SchemaRegistry.StudySchema()
+    studies_schema = SchemaRegistry.StudySchema(many=True)
+    study_schema = SchemaRegistry.StudySchema()
 
     def get(self):
         studies = session.execute(add_joins_to_statement(select(Study))).unique().scalars().all()
-        return self.studiesSchema.dump(studies)
+        return self.studies_schema.dump(studies)
 
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.studySchema.load(request_data)
+            load_result = self.study_schema.load(request_data)
             session.add(load_result)
             session.commit()
             study_id = load_result.id
             session.close()
 
             db_study = get_study_by_id(study_id, with_joins=True)
-            elastic_index.add_document(document=db_study)
-            return self.studySchema.dump(db_study)
+            elastic_index.add_document(document=to_database_object_dict(self.study_schema, db_study))
+            return self.study_schema.dump(db_study)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 

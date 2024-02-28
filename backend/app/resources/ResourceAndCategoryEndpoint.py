@@ -7,7 +7,8 @@ from app.elastic_index import elastic_index
 from app.models import Category, Resource
 from app.models import ResourceCategory
 from app.rest_exception import RestException
-from app.schemas import SchemaRegistry
+from app.schemas import SchemaRegistry, ResourceSchema
+from app.utils.resource_utils import to_database_object_dict
 
 
 class ResourceByCategoryEndpoint(flask_restful.Resource):
@@ -51,7 +52,7 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
             session.add(ResourceCategory(resource_id=resource_id, category_id=c.category_id, type="resource"))
         session.commit()
         instance = session.query(Resource).filter_by(id=cast(resource_id, Integer)).first()
-        elastic_index.update_document(document=instance)
+        elastic_index.update_document(document=to_database_object_dict(ResourceSchema(), instance))
         return self.get(resource_id)
 
 

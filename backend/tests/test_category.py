@@ -1,6 +1,7 @@
 from sqlalchemy import cast, Integer, select
 
 from app.models import Category
+from app.utils.category_utils import all_search_paths
 from tests.base_test import BaseTest
 
 
@@ -170,16 +171,16 @@ class TestCategory(BaseTest):
         db_c2 = self.session.execute(select(Category).where(Category.id == c2.id)).unique().scalar_one()
         db_c3 = self.session.execute(select(Category).where(Category.id == c3.id)).unique().scalar_one()
 
-        self.assertEqual(1, len(db_c1.all_search_paths()))
-        self.assertEqual(2, len(db_c2.all_search_paths()))
-        self.assertEqual(3, len(db_c3.all_search_paths()))
+        self.assertEqual(1, len(all_search_paths(db_c1.id)))
+        self.assertEqual(2, len(all_search_paths(db_c2.id)))
+        self.assertEqual(3, len(all_search_paths(db_c3.id)))
 
-        self.assertIn(c3_path, db_c3.all_search_paths())
-        self.assertIn(c2_path, db_c3.all_search_paths())
-        self.assertIn(c1_path, db_c3.all_search_paths())
-        self.assertIn(c2_path, db_c2.all_search_paths())
-        self.assertIn(c1_path, db_c2.all_search_paths())
-        self.assertIn(c1_path, db_c1.all_search_paths())
+        self.assertIn(c3_path, all_search_paths(db_c3.id))
+        self.assertIn(c2_path, all_search_paths(db_c3.id))
+        self.assertIn(c1_path, all_search_paths(db_c3.id))
+        self.assertIn(c2_path, all_search_paths(db_c2.id))
+        self.assertIn(c1_path, all_search_paths(db_c2.id))
+        self.assertIn(c1_path, all_search_paths(db_c1.id))
 
     def test_parent_category_depth(self):
         c1 = self.construct_category()

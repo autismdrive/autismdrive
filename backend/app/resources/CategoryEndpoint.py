@@ -9,7 +9,7 @@ from sqlalchemy.sql.base import ExecutableOption
 from app.auth import auth
 from app.database import session
 from app.enums import Permission
-from app.models import Category, ResourceCategory, StudyCategory, UserFavorite
+from app.models import Category, ResourceCategory, StudyCategory, UserFavorite, Resource, Study
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
@@ -88,7 +88,7 @@ class CategoryEndpoint(flask_restful.Resource):
 
 class CategoryListEndpoint(flask_restful.Resource):
     category_schema = SchemaRegistry.CategorySchema()
-    categories_schema = SchemaRegistry.CategorySchema(many=True)
+    categories_schema = SchemaRegistry.ParentCategorySchema(many=True)
 
     def get(self):
         statement = add_joins_to_statement(select(Category))
@@ -116,7 +116,7 @@ class RootCategoryListEndpoint(flask_restful.Resource):
         statement = add_joins_to_statement(select(Category))
         categories = (
             session.execute(
-                statement.filter_by(parent_id=None).order_by(Category.display_order).order_by(Category.name)
+                statement.filter(Category.parent_id.is_(None)).order_by(Category.display_order).order_by(Category.name)
             )
             .unique()
             .scalars()

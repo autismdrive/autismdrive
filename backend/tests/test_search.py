@@ -310,6 +310,9 @@ class TestSearch(BaseTest):
         self.assertEqual(resource_id, search_results["hits"][0]["id"])
 
     def test_delete_search_item(self):
+        from app.schemas import SchemaRegistry
+        from app.utils.resource_utils import to_database_object_dict
+
         kw = "rainbows"
         kw_query = {"words": kw}
         resource = self.construct_resource(
@@ -323,7 +326,8 @@ class TestSearch(BaseTest):
         self.assertEqual(1, len(search_results["hits"]))
 
         db_resource = self.session.query(Resource).filter_by(id=resource_id).first()
-        elastic_index.remove_document(db_resource)
+        resource_dict = to_database_object_dict(SchemaRegistry.ResourceSchema(), db_resource)
+        elastic_index.remove_document(resource_dict)
 
         search_results = self.search(kw_query)
         self.assertEqual(0, len(search_results["hits"]))

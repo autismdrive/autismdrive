@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from dateutil import tz
 from elasticsearch import RequestError, Elasticsearch
@@ -25,18 +24,13 @@ from elasticsearch_dsl import (
 )
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
-from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
 from app.database import session
-from config.load import settings
-
-if TYPE_CHECKING:
-    from app.models import Resource, Location, Event, Study
-
-    DatabaseObject = Event | Resource | Location | Study
-
 from app.enums import Permission
+from app.utils.category_utils import all_search_paths, search_path, calculate_level
+from app.utils.resource_utils import DatabaseObject, DatabaseObjectDict
+from app.utils.resource_utils import indexable_content, category_names
+from config.load import settings
 
 autocomplete = analyzer(
     "autocomplete",
@@ -79,7 +73,7 @@ class StarDocument(Document):
 
 class ElasticIndex(object):
     # Initialize the ElasticIndex as a Singleton
-    _instance = None
+    _instance: ElasticIndex = None
 
     logger = logging.getLogger("ElasticIndex")
     connection: Elasticsearch
@@ -156,111 +150,68 @@ class ElasticIndex(object):
             es_index.flush(force=True, wait_if_ongoing=True)
 
     @classmethod
-    def remove_document(cls, document: DatabaseObject, flush: bool = True):
+    def remove_document(cls, document: DatabaseObjectDict, flush: bool = True):
         obj = cls._instance.get_document(document)
         obj.delete(version=None)
 
         cls.refresh_and_flush(cls._instance.index, flush)
 
     @classmethod
-    def get_id(cls, document: DatabaseObject):
-        return document.__tablename__.lower() + "_" + str(document.id)
+    def get_id(cls, document: DatabaseObjectDict):
+        return document.type.lower() + "_" + str(document.id)
 
     @classmethod
-    def get_document(cls, document: DatabaseObject):
+    def get_document(cls, document: DatabaseObjectDict):
         uid = cls._instance.get_id(document)
         return StarDocument.get(id=uid, index=cls._instance.index_name)
 
     @classmethod
-    def update_document(cls, document: DatabaseObject, flush=True, latitude=None, longitude=None):
+    def update_document(cls, document: DatabaseObjectDict, flush=True):
         # update is the same as add, as it will overwrite.  Better to have code in one place.
-        cls._instance.add_document(document, flush, latitude, longitude)
+        cls._instance.add_document(document=document, flush=flush)
 
     @classmethod
     def add_document(
         cls,
-        document: DatabaseObject,
+        document: DatabaseObjectDict,
         flush: bool = True,
-        latitude: float = None,
-        longitude: float = None,
-        post_event_description: str = None,
     ):
-        doc = StarDocument(
-            id=document.id,
-            type=document.__tablename__,
-            label=document.__label__,
-            title=document.title,
-            last_updated=document.last_updated,
-            content=document.indexable_content(),
-            description=document.description,
-            post_event_description=post_event_description,
-            organization_name=document.organization_name,
-            location=None,
-            ages=document.ages,
-            status=None,
-            category=[],
-            latitude=None,
-            longitude=None,
-            geo_point=None,
-        )
+        def _get(field: str, default=None):
+            if hasattr(document, field):
+                return document.__getattribute__(field)
+            return default
 
-        if hasattr(document, "date"):
-            doc.date = document.date
-        if hasattr(document, "post_event_description"):
-            doc.post_event_description = document.post_event_description
-        if hasattr(document, "languages"):
-            doc.languages = document.languages
-        if hasattr(document, "website"):
-            doc.website = document.website
-        if hasattr(document, "is_draft"):
-            doc.is_draft = document.is_draft
-        if hasattr(document, "status") and document.status is not None:
-            doc.status = document.status.value
-        if hasattr(document, "city") and document.city is not None:
-            doc.content = doc.content + " " + document.city
+        fields = DatabaseObjectDict.field_names()
 
+        doc_fields = {field: _get(field) for field in fields}
+        # Remove all the None values
+        doc_fields_dict = {k: v for k, v in doc_fields.items() if v is not None}
+
+        if "geo_point" in doc_fields_dict or "latitude" in doc_fields_dict or "longitude" in doc_fields_dict:
+            print(doc_fields_dict["latitude"], doc_fields_dict["longitude"])
+            print(doc_fields_dict["geo_point"])
+
+        doc = StarDocument(**doc_fields_dict)
         doc.meta.id = cls._instance.get_id(document)
 
-        for cat in document.categories:
-            doc.category.extend(cat.all_search_paths())
-
-        if document.__tablename__ == "study":
-            doc.title = document.short_title
-            doc.description = document.short_description
-
-        if (doc.type in ["location", "event"]) and None not in (latitude, longitude):
-            doc.latitude = latitude
-            doc.longitude = longitude
-            doc.geo_point = dict(lat=latitude, lon=longitude)
-            doc.no_address = not document.street_address1
-
         StarDocument.save(doc, index=cls._instance.index_name)
-
         cls.refresh_and_flush(cls._instance.index, flush)
 
     @classmethod
     def load_documents(
-        cls, resources: list[Resource], events: list[Event], locations: list[Location], studies: list[Study]
+        cls,
+        resources: list[DatabaseObjectDict],
+        events: list[DatabaseObjectDict],
+        locations: list[DatabaseObjectDict],
+        studies: list[DatabaseObjectDict],
     ):
         print(
             "Loading search records of events, locations, resources, and studies into Elasticsearch index: %s"
             % cls._instance.index_prefix
         )
-        for r in resources:
-            cls._instance.add_document(r, flush=False)
-        for e in events:
-            post_event_description = e.post_event_description if hasattr(e, "post_event_description") else None
-            cls._instance.add_document(
-                e,
-                flush=False,
-                latitude=e.latitude,
-                longitude=e.longitude,
-                post_event_description=post_event_description,
-            )
-        for loc in locations:
-            cls._instance.add_document(loc, flush=False, latitude=loc.latitude, longitude=loc.longitude)
-        for s in studies:
-            cls._instance.add_document(s, flush=False)
+        for document_list in [resources, events, locations, studies]:
+            for document in document_list:
+                cls._instance.add_document(document=document, flush=False)
 
         cls.refresh_and_flush(cls._instance.index)
 
@@ -354,13 +305,14 @@ class ElasticIndex(object):
         if search.category and search.category.id:
             cat_id = int(search.category.id)
             cat = get_category_by_id(cat_id, with_joins=True)
-            search_path = str(cat.search_path()) if cat else ""
+            cat_search_path = str(search_path(cat.id)) if cat else ""
 
             if cat:
-                elastic_search = elastic_search.filter("terms", category=[search_path])
+                elastic_search = elastic_search.filter("terms", category=[cat_search_path])
 
             # Include all subcategories of the given root-level category.
-            if search.category.calculate_level() == 0:
+            cat_level = calculate_level(search.category.id)
+            if cat_level == 0:
                 category_agg_args.update(
                     {
                         "exclude": ".*\\,.*\\,.*",  # Exclude other root-level categories.
@@ -373,7 +325,8 @@ class ElasticIndex(object):
                 category_agg_args.pop("exclude")
 
                 # Include only children of the given 2nd-level category.
-                if search.category.calculate_level() == 1:
+                cat_level = calculate_level(search.category.id)
+                if cat_level == 1:
                     category_agg_args.update({"include": ".*\\,.*\\,.*"})
 
             session.close()
@@ -408,8 +361,8 @@ class ElasticIndex(object):
         query = MoreLikeThis(
             like=[
                 # {'_id': ElasticIndex._get_id(item), '_index': cls._instance.index_name},
-                item.indexable_content(),
-                item.category_names(),
+                indexable_content(item),
+                category_names(item),
             ],
             # min_term_freq=1,
             # min_doc_freq=2,

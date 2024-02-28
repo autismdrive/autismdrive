@@ -11,6 +11,7 @@ from app.enums import Permission
 from app.models import Location, Event, Geocode, ResourceChangeLog
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission
 
 
@@ -33,7 +34,8 @@ class LocationEndpoint(flask_restful.Resource):
             raise RestException(RestException.NOT_FOUND)
 
         location_title = location.title
-        elastic_index.remove_document(location)
+        location_dict = to_database_object_dict(self.schema, location)
+        elastic_index.remove_document(location_dict)
 
         session.query(Event).filter_by(id=location_id).delete()
         session.query(Location).filter_by(id=location_id).delete()
@@ -69,7 +71,7 @@ class LocationEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.utcnow()
         session.add(updated)
         session.commit()
-        elastic_index.update_document(document=updated, latitude=updated.latitude, longitude=updated.longitude)
+        elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
         self.log_update(location_id=updated.id, location_title=updated.title, change_type="edit")
         return self.schema.dump(updated)
 
@@ -88,19 +90,19 @@ class LocationEndpoint(flask_restful.Resource):
 
 class LocationListEndpoint(flask_restful.Resource):
 
-    locationsSchema = SchemaRegistry.LocationSchema(many=True)
-    locationSchema = SchemaRegistry.LocationSchema()
+    locations_schema = SchemaRegistry.LocationSchema(many=True)
+    location_schema = SchemaRegistry.LocationSchema()
 
     def get(self):
         locations = session.query(Location).all()
-        return self.locationsSchema.dump(locations)
+        return self.locations_schema.dump(locations)
 
     @auth.login_required
     @requires_permission(Permission.create_resource)
     def post(self):
         request_data = request.get_json()
         try:
-            load_result = self.locationSchema.load(request_data)
+            load_result = self.location_schema.load(request_data)
             address_dict = {
                 "street": load_result.street_address1,
                 "city": load_result.city,
@@ -112,11 +114,11 @@ class LocationListEndpoint(flask_restful.Resource):
             load_result.longitude = geocode["lng"]
             session.add(load_result)
             session.commit()
-            elastic_index.add_document(
-                document=load_result, latitude=load_result.latitude, longitude=load_result.longitude
-            )
+
+            obj_dict = to_database_object_dict(self.location_schema, load_result)
+            elastic_index.add_document(document=obj_dict)
             self.log_update(location_id=load_result.id, location_title=load_result.title, change_type="create")
-            return self.locationSchema.dump(load_result)
+            return self.location_schema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 

@@ -195,7 +195,7 @@ def get_db_object_by_id(model, object_id: int, joins: list = None):
     """Gets a record from the given model by its id, closes the session, and returns the object."""
     statement = _select_by_id(model, object_id, joins)
     result = session.execute(statement).unique().scalar_one_or_none()
-    session.close()
+    # session.close()
     return result
 
 
@@ -204,5 +204,5 @@ def get_all_db_objects(model, order_by=None, joins: list = None):
     statement = select(model).order_by(order_by) if order_by else select(model)
     statement = _add_joins(statement, joins)
     result = session.execute(statement).unique().scalars().all()
-    session.close()
+    # session.close()
     return result

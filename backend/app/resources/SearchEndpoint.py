@@ -10,6 +10,7 @@ from app.elastic_index import elastic_index
 from app.models import Category, Hit, MapHit, Search
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils.category_utils import search_path
 
 
 class SearchEndpoint(flask_restful.Resource):
@@ -113,7 +114,8 @@ class SearchEndpoint(flask_restful.Resource):
         for child in category.children:
             for bucket in results.aggregations.category.buckets:
                 # Remove topic category id from child search path
-                child_key: str = child.search_path().replace(f"{topic_category.id},", "")
+                child_search_path = search_path(child.id)
+                child_key: str = child_search_path.replace(f"{topic_category.id},", "")
 
                 if bucket.key == child_key:
                     child.hit_count = bucket.doc_count
