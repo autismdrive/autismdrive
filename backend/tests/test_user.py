@@ -136,6 +136,10 @@ class TestUser(BaseTest):
 
     def test_non_admin_cannot_create_admin_user(self):
         u = self.construct_user()
+        u_id = u.id
+        u_email = u.email
+        non_admin_headers = self.logged_in_headers(user_id=u.id)
+        admin_headers = self.logged_in_headers()
 
         # post should make role 'user'
         new_admin_user = {"email": "tara@spiders.org", "role": "admin"}
@@ -144,32 +148,32 @@ class TestUser(BaseTest):
             data=self.jsonify(new_admin_user),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=non_admin_headers,
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["role"], "user")
         new_id = response["id"]
 
-        # put as non-admin user should keep role as 'user'
+        # If non-admin user tries to change their own role, the system should keep role as 'user'
         rv = self.client.put(
-            "/api/user/%i" % u.id,
-            data=self.jsonify({"email": u.email, "role": "admin"}),
+            "/api/user/%i" % u_id,
+            data=self.jsonify({"email": u_email, "role": "admin"}),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=non_admin_headers,
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["role"], "user")
 
-        # put as admin user should allow to make role 'admin'
+        # If admin user changes the role, the system should allow them to make role 'admin'
         rv = self.client.put(
             "/api/user/%i" % new_id,
             data=self.jsonify(new_admin_user),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=admin_headers,
         )
         self.assert_success(rv)
         response = rv.json

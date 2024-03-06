@@ -1,10 +1,15 @@
 from datetime import datetime
+from typing import Callable
 
 from sqlalchemy import cast, Integer, select
+from sqlalchemy.orm import joinedload
 
 from app.database import session
 from app.email_service import EmailService
+from app.models import User
 from config.load import settings
+
+ONE_DAY = 86400
 
 
 class EmailPromptService:
@@ -33,7 +38,12 @@ class EmailPromptService:
         )
 
     def send_dependent_profile_prompting_emails(self):
-        confirmed_users = session.query(self.user_model).filter(self.user_model.password is not None).all()
+        confirmed_users = (
+            session.execute(select(User).options(joinedload(User.participants)).where(User._password.is_not(None)))
+            .unique()
+            .scalars()
+            .all()
+        )
         recipients = []
         for u in confirmed_users:
             if (
@@ -49,44 +59,59 @@ class EmailPromptService:
             recipients, self.email_service.complete_dependent_profile_prompt_email, "dependent_profile_prompt"
         )
 
-    def __send_prompts(self, recipients, send_method, log_type):
+    def __send_prompts(self, recipients: list[User], send_method: Callable, log_type: str):
+        """Send prompting emails to recipients who have not completed the specified action."""
+
         for rec in recipients:
             email_logs = (
                 session.query(self.email_log_model)
-                .filter_by(user_id=cast(rec.id, Integer))
+                .filter_by(user_id=rec.id)
                 .filter_by(type=log_type)
                 .order_by(self.email_log_model.last_updated)
                 .all()
             )
             days_since_most_recent = -1
+
+            # Determine when we last sent them an email.
             if len(email_logs) > 0:
                 most_recent = email_logs[-1]
-                days_since_most_recent = (datetime.utcnow() - most_recent.last_updated).total_seconds() / 86400
+                days_since_most_recent = (datetime.utcnow() - most_recent.last_updated).total_seconds() / ONE_DAY
+
+            # Prompt user to complete registration/profile 2 days after last login
             if (len(email_logs) == 0) and (log_type != "confirm_email"):
                 if (rec.last_login is not None) and (
-                    (datetime.utcnow() - rec.last_login).total_seconds() > (2 * 86400)
+                    (datetime.utcnow() - rec.last_login).total_seconds() > (2 * ONE_DAY)
                 ):
                     self.__send_prompting_email(rec, send_method, log_type, "0days")
+
+            # Prompt user 1 week and 2 weeks after last prompting email (if we haven't already sent them 2 emails)
             elif 0 < len(email_logs) <= 2:
                 days = "7days" if len(email_logs) == 1 else "14days"
                 if days_since_most_recent > 7:
                     self.__send_prompting_email(rec, send_method, log_type, days)
+
+            # Prompt user 1 month after last prompting email if we've already sent them 3 emails
             elif len(email_logs) == 3:
                 if days_since_most_recent > 16:
                     self.__send_prompting_email(rec, send_method, log_type, "30days")
+
+            # Prompt user once a month if we've already sent them 4-5 emails
             elif 3 < len(email_logs) < 6:
                 if days_since_most_recent > 30:
                     days = str((len(email_logs) - 2) * 30) + "days"
                     self.__send_prompting_email(rec, send_method, log_type, days)
 
     def __send_prompting_email(self, user, send_method, log_type, days):
-        campaign = "prompting"
-        if log_type == "confirm_email":
-            campaign = "reset_password"
-        elif log_type == "complete_registration_prompt":
-            campaign = "create_yourprofile"
-        elif log_type == "dependent_profile_prompt":
-            campaign = "create_dependentprofile"
+        match log_type:
+            case "confirm_email":
+                campaign = "reset_password"
+            case "complete_registration_prompt":
+                campaign = "create_yourprofile"
+            case "dependent_profile_prompt":
+                campaign = "create_dependentprofile"
+            case _:
+                campaign = "prompting"
+
         current_studies = session.query(self.study_model).filter_by(status="currently_enrolling").all()
         for study in current_studies:
             study.link = (

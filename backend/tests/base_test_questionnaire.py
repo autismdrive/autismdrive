@@ -4,7 +4,38 @@ import string
 from dateutil import parser
 from sqlalchemy import cast, Integer, select
 
-from app.models import Participant
+from app.enums import Relationship
+from app.models import (
+    Participant,
+    User,
+    CurrentBehaviorsDependentQuestionnaire,
+    ContactQuestionnaire,
+    AssistiveDevice,
+    AlternativeAugmentative,
+    ChainQuestionnaire,
+    ChainSession,
+    ChainSessionStep,
+    ClinicalDiagnosesQuestionnaire,
+    CurrentBehaviorsSelfQuestionnaire,
+    DemographicsQuestionnaire,
+    DevelopmentalQuestionnaire,
+    EducationDependentQuestionnaire,
+    EducationSelfQuestionnaire,
+    EmploymentQuestionnaire,
+    EvaluationHistorySelfQuestionnaire,
+    EvaluationHistoryDependentQuestionnaire,
+    HomeDependentQuestionnaire,
+    HomeSelfQuestionnaire,
+    Housemate,
+    IdentificationQuestionnaire,
+    Medication,
+    ProfessionalProfileQuestionnaire,
+    RegistrationQuestionnaire,
+    SupportsQuestionnaire,
+    Therapy,
+)
+from app.resources.UserEndpoint import get_user_by_id
+from fixtures.fixure_utils import fake
 from tests.base_test import BaseTest
 
 
@@ -21,15 +52,17 @@ class BaseTestQuestionnaire(BaseTest):
                 return field
 
     def construct_admin_user(self, email="rmond@virginia.gov"):
-        from app.models import User
         from app.enums import Role
 
-        user = User(email=email, role=Role.admin)
+        u_role = Role.admin
+
+        user = User(email=email, role=u_role)
         self.session.add(user)
         self.session.commit()
 
-        db_user = self.session.query(User).filter_by(email=user.email).first()
-        self.assertEqual(db_user.role, user.role)
+        u_id = user.id
+        db_user = get_user_by_id(u_id, with_joins=True)
+        self.assertEqual(db_user.role, u_role)
         return db_user
 
     def construct_assistive_device(
@@ -40,8 +73,6 @@ class BaseTestQuestionnaire(BaseTest):
         notes="I love my new leg!",
         supports_questionnaire_id=None,
     ):
-        from app.models import AssistiveDevice
-
         ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
             ad.supports_questionnaire_id = supports_questionnaire_id
@@ -58,8 +89,6 @@ class BaseTestQuestionnaire(BaseTest):
     def construct_alternative_augmentative(
         self, type="lowTechAAC", timeframe="current", notes="We use pen and paper", supports_questionnaire_id=None
     ):
-
-        from app.models import AlternativeAugmentative
 
         aac = AlternativeAugmentative(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
@@ -85,8 +114,6 @@ class BaseTestQuestionnaire(BaseTest):
         mental_health = ["ocd"] if mental_health is None else mental_health
         medical = ["insomnia"] if medical is None else medical
         genetic = ["corneliaDeLange"] if genetic is None else genetic
-
-        from app.models import ClinicalDiagnosesQuestionnaire
 
         cdq = ClinicalDiagnosesQuestionnaire(
             developmental=developmental, mental_health=mental_health, medical=medical, genetic=genetic
@@ -118,8 +145,6 @@ class BaseTestQuestionnaire(BaseTest):
         self, phone="123-456-7890", zip=55678, marketing_channel="Zine Ad", participant=None, user=None
     ):
 
-        from app.models import ContactQuestionnaire
-
         cq = ContactQuestionnaire(phone=phone, zip=zip, marketing_channel=marketing_channel)
         if user is None:
             u = self.construct_user(email="contact@questionnaire.com")
@@ -148,47 +173,45 @@ class BaseTestQuestionnaire(BaseTest):
         concerning_behaviors=None,
         has_academic_difficulties=True,
         academic_difficulty_areas=None,
-        participant=None,
-        user=None,
-    ):
+        participant: Participant = None,
+        user: User = None,
+    ) -> CurrentBehaviorsDependentQuestionnaire:
         concerning_behaviors = ["hoarding"] if concerning_behaviors is None else concerning_behaviors
         academic_difficulty_areas = (
             ["math", "writing"] if academic_difficulty_areas is None else academic_difficulty_areas
         )
 
-        from app.models import CurrentBehaviorsDependentQuestionnaire
-
-        cb = CurrentBehaviorsDependentQuestionnaire(
+        cbd = CurrentBehaviorsDependentQuestionnaire(
             dependent_verbal_ability=dependent_verbal_ability,
             concerning_behaviors=concerning_behaviors,
             has_academic_difficulties=has_academic_difficulties,
             academic_difficulty_areas=academic_difficulty_areas,
         )
-        if user is None:
-            u = self.construct_user(email="cbd@questionnaire.com")
-            cb.user_id = u.id
-        else:
-            u = user
-            cb.user_id = u.id
+        user = self.construct_user(email=fake.email()) if user is None else user
+        u_id = user.id
 
-        if participant is None:
-            from app.enums import Relationship
+        p = (
+            self.construct_participant(user_id=u_id, relationship=Relationship.dependent)
+            if participant is None
+            else participant
+        )
+        p_id = p.id
+        cbd.participant_id = p_id
 
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-            cb.participant_id = p.id
-        else:
-            p = participant
-            cb.participant_id = p.id
-
-        self.session.add(cb)
+        self.session.add(cbd)
         self.session.commit()
 
         db_cbd = (
-            self.session.query(CurrentBehaviorsDependentQuestionnaire)
-            .filter_by(participant_id=cast(cb.participant_id, Integer))
-            .first()
+            self.session.execute(select(CurrentBehaviorsDependentQuestionnaire).filter_by(participant_id=p_id))
+            .unique()
+            .scalar_one_or_none()
         )
-        self.assertEqual(db_cbd.concerning_behaviors, cb.concerning_behaviors)
+        assert db_cbd is not None
+        self.assertEqual(db_cbd.dependent_verbal_ability, dependent_verbal_ability)
+        self.assertEqual(db_cbd.concerning_behaviors, concerning_behaviors)
+        self.assertEqual(db_cbd.has_academic_difficulties, has_academic_difficulties)
+        self.assertEqual(db_cbd.academic_difficulty_areas, academic_difficulty_areas)
+
         return db_cbd
 
     def construct_current_behaviors_self_questionnaire(
@@ -198,9 +221,7 @@ class BaseTestQuestionnaire(BaseTest):
         academic_difficulty_areas="math",
         participant=None,
         user=None,
-    ):
-
-        from app.models import CurrentBehaviorsSelfQuestionnaire
+    ) -> CurrentBehaviorsSelfQuestionnaire:
 
         cb = CurrentBehaviorsSelfQuestionnaire(
             self_verbal_ability=self_verbal_ability,
@@ -238,8 +259,6 @@ class BaseTestQuestionnaire(BaseTest):
         self, birth_sex="intersex", gender_identity="intersex", race_ethnicity="raceBlack", participant=None, user=None
     ):
 
-        from app.models import DemographicsQuestionnaire
-
         dq = DemographicsQuestionnaire(
             birth_sex=birth_sex, gender_identity=gender_identity, race_ethnicity=race_ethnicity
         )
@@ -273,8 +292,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant=None,
         user=None,
     ):
-
-        from app.models import DevelopmentalQuestionnaire
 
         dq = DevelopmentalQuestionnaire(
             had_birth_complications=had_birth_complications,
@@ -316,8 +333,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant=None,
         user=None,
     ):
-
-        from app.models import EducationDependentQuestionnaire
 
         eq = EducationDependentQuestionnaire(
             attends_school=attends_school,
@@ -362,8 +377,6 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.models import EducationSelfQuestionnaire
-
         eq = EducationSelfQuestionnaire(
             attends_school=attends_school,
             school_name=school_name,
@@ -407,8 +420,6 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.models import EmploymentQuestionnaire
-
         eq = EmploymentQuestionnaire(
             is_currently_employed=is_currently_employed,
             employment_capacity=employment_capacity,
@@ -448,11 +459,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant=None,
         user=None,
     ):
-
-        from app.models import (
-            EvaluationHistoryDependentQuestionnaire,
-        )
-
         ehq = EvaluationHistoryDependentQuestionnaire(
             self_identifies_autistic=self_identifies_autistic,
             has_autism_diagnosis=has_autism_diagnosis,
@@ -496,8 +502,6 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.models import EvaluationHistorySelfQuestionnaire
-
         ehq = EvaluationHistorySelfQuestionnaire(
             self_identifies_autistic=self_identifies_autistic,
             has_autism_diagnosis=has_autism_diagnosis,
@@ -540,8 +544,6 @@ class BaseTestQuestionnaire(BaseTest):
         user=None,
     ):
 
-        from app.models import HomeDependentQuestionnaire
-
         hq = HomeDependentQuestionnaire(
             dependent_living_situation=[dependent_living_situation], struggle_to_afford=struggle_to_afford
         )
@@ -581,8 +583,6 @@ class BaseTestQuestionnaire(BaseTest):
     def construct_home_self_questionnaire(
         self, self_living_situation="alone", housemates=None, struggle_to_afford=False, participant=None, user=None
     ):
-
-        from app.models import HomeSelfQuestionnaire
 
         hq = HomeSelfQuestionnaire(self_living_situation=[self_living_situation], struggle_to_afford=struggle_to_afford)
 
@@ -626,8 +626,6 @@ class BaseTestQuestionnaire(BaseTest):
         home_self_questionnaire=None,
     ):
 
-        from app.models import Housemate
-
         h_dict = {"name": name, "relationship": relationship, "age": age, "has_autism": has_autism}
         if home_dependent_questionnaire is not None:
             h_dict["home_dependent_questionnaire_id"] = home_dependent_questionnaire.id
@@ -656,8 +654,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant=None,
         user=None,
     ):
-
-        from app.models import IdentificationQuestionnaire
 
         iq = IdentificationQuestionnaire(
             relationship_to_participant=relationship_to_participant,
@@ -707,7 +703,6 @@ class BaseTestQuestionnaire(BaseTest):
     ):
         professional_identity = ["artTher", "profOther"] if professional_identity is None else professional_identity
         learning_interests = ["insuranceCov", "learnOther"] if learning_interests is None else learning_interests
-        from app.models import ProfessionalProfileQuestionnaire
 
         pq = ProfessionalProfileQuestionnaire(
             purpose=purpose,
@@ -756,8 +751,6 @@ class BaseTestQuestionnaire(BaseTest):
         event=None,
     ):
 
-        from app.models import RegistrationQuestionnaire
-
         u = user if user else self.construct_user(email="nora@bora.com")
         e = event if event else self.construct_event(title="Webinar: You have to be here (virtually)")
 
@@ -790,8 +783,6 @@ class BaseTestQuestionnaire(BaseTest):
         supports_questionnaire_id=None,
     ):
 
-        from app.models import Medication
-
         m = Medication(symptom=symptom, name=name, notes=notes)
         if supports_questionnaire_id is not None:
             m.supports_questionnaire_id = supports_questionnaire_id
@@ -815,8 +806,6 @@ class BaseTestQuestionnaire(BaseTest):
         self, type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire_id=None
     ):
 
-        from app.models import Therapy
-
         t = Therapy(type=type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
             t.supports_questionnaire_id = supports_questionnaire_id
@@ -837,8 +826,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant=None,
         user=None,
     ):
-
-        from app.models import SupportsQuestionnaire
 
         sq = SupportsQuestionnaire()
         if user is None:
@@ -887,8 +874,6 @@ class BaseTestQuestionnaire(BaseTest):
     def construct_chain_session_questionnaire(self, participant=None, user=None):
         self.construct_chain_steps()
 
-        from app.models import ChainQuestionnaire
-
         bq = ChainQuestionnaire()
         if user is None:
             from app.enums import Role
@@ -909,7 +894,6 @@ class BaseTestQuestionnaire(BaseTest):
             bq.participant_id = p.id
 
         session_date = parser.parse("2020-12-14T17:46:14.030Z")
-        from app.models import ChainSessionStep
 
         session_1_step_1 = ChainSessionStep(
             date=session_date,
@@ -922,7 +906,6 @@ class BaseTestQuestionnaire(BaseTest):
             reason_step_incomplete="challenging_behavior",
             num_stars=0,
         )
-        from app.models import ChainSession
 
         session_1 = ChainSession(date=session_date)
         session_1.step_attempts = [session_1_step_1]

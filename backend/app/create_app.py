@@ -241,9 +241,7 @@ def create_app(settings=None):
 
     @_app.cli.command()
     def schedule_tasks():
-        from app.models import User
-        from app.models import Study
-        from app.models import EmailLog
+        from app.models import User, Study, EmailLog
         from app.export_service import ExportService
         from app.import_service import ImportService
 

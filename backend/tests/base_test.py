@@ -43,6 +43,8 @@ from app.models import (
     UserMeta,
     ZipCode,
 )
+from app.resources.CategoryEndpoint import get_category_by_id
+from app.resources.ResourceEndpoint import get_resource_by_id
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 from fixtures.fixure_utils import fake
@@ -382,25 +384,22 @@ class BaseTest(TestCase):
         self.session.commit()
         self.session.close()
 
-        db_c = (
-            self.session.execute(
-                select(Category)
-                .options(joinedload(Category.parent), joinedload(Category.children))
-                .filter(Category.id == c_id)
-            )
-            .unique()
-            .scalar_one()
-        )
+        db_c = get_category_by_id(c_id, with_joins=True)
         self.assertEqual(db_c.name, category_name)
         self.session.close()
         return db_c
 
     def construct_study_category(self, study_id, category_name):
         c = self.construct_category(name=category_name)
-        sc = StudyCategory(study_id=study_id, category=c)
+        c_id = c.id
+        sc = StudyCategory(study_id=study_id, category_id=c_id)
         self.session.add(sc)
         self.session.commit()
-        return c
+
+        db_c = get_category_by_id(c_id, with_joins=True)
+        self.assertEqual(db_c.name, category_name)
+        self.session.close()
+        return db_c
 
     def construct_study(
         self,

@@ -562,6 +562,7 @@ class LocationSchema(ModelSchema):
         )
 
     id = Integer(required=False, allow_none=True)
+    resource_categories = List(Nested("CategoriesOnLocationSchema", dump_only=True))
     _links = Hyperlinks(
         {
             "self": url_for.Location("id"),

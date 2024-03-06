@@ -204,7 +204,7 @@ class TestResources(BaseTest):
         u_email = fake.email()
         u = self.construct_user(email=u_email, role=Role.admin)
         user_id = u.id
-        headers = self.logged_in_headers(user=u)
+        headers = self.logged_in_headers(user_id=user_id)
         mock_resource = MockResource()
         rv_1 = self.client.post(
             "api/resource",
@@ -257,51 +257,55 @@ class TestResources(BaseTest):
 
     def test_get_resource_change_log_by_resource(self):
         r = self.construct_resource()
+        r_id = r.id
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
-        rv = self.client.get("api/resource/%i" % r.id, content_type="application/json")
+        u_id = u.id
+        headers = self.logged_in_headers(user_id=u_id)
+        rv = self.client.get("api/resource/%i" % r_id, content_type="application/json")
         self.assert_success(rv)
 
         response = rv.json
         response["title"] = "Super Great Resource"
         rv = self.client.put(
-            "/api/resource/%i" % r.id,
+            "/api/resource/%i" % r_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=headers,
         )
         self.assert_success(rv)
 
-        rv = self.client.get(
-            "/api/resource/%i/change_log" % r.id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get("/api/resource/%i/change_log" % r_id, content_type="application/json", headers=headers)
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["user_id"], u.id)
+        self.assertEqual(response[-1]["user_id"], u_id)
 
     def test_get_resource_change_log_by_user(self):
         r = self.construct_resource()
+        r_id = r.id
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
-        rv = self.client.get("api/resource/%i" % r.id, content_type="application/json")
+        u_id = u.id
+        headers = self.logged_in_headers(user_id=u_id)
+        rv = self.client.get("api/resource/%i" % r_id, content_type="application/json")
         self.assert_success(rv)
 
         response = rv.json
         response["title"] = "Super Great Resource"
         rv = self.client.put(
-            "/api/resource/%i" % r.id,
+            "/api/resource/%i" % r_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
-            "/api/user/%i/resource_change_log" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/resource_change_log" % u.id, content_type="application/json", headers=headers
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["resource_id"], r.id)
+        self.assertEqual(response[-1]["resource_id"], r_id)
 
     def test_covid19_resource_lists(self):
         covid_cats = [

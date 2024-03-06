@@ -194,22 +194,25 @@ class TestLocations(BaseTest):
 
     def test_resource_change_log(self):
         l = self.construct_location(title="A Location that is Super and Great")
+        l_id = l.id
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+        u_id = u.id
+        admin_headers = self.logged_in_headers(user_id=u_id)
 
-        rv = self.client.get("api/location/%i" % l.id, content_type="application/json")
+        rv = self.client.get("api/location/%i" % l_id, content_type="application/json")
         self.assert_success(rv)
 
         response = rv.json
         response["title"] = "Super Great Location"
         rv = self.client.put(
-            "/api/location/%i" % l.id,
+            "/api/location/%i" % l_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=admin_headers,
         )
         self.assert_success(rv)
-        rv = self.client.get("/api/location/%i" % l.id, content_type="application/json")
+        rv = self.client.get("/api/location/%i" % l_id, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["title"], "Super Great Location")
@@ -219,18 +222,18 @@ class TestLocations(BaseTest):
         self.assertIsNotNone(logs[-1].user_id)
 
         rv = self.client.get(
-            "/api/resource/%i/change_log" % l.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/resource/%i/change_log" % l_id, content_type="application/json", headers=admin_headers
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["user_id"], u.id)
+        self.assertEqual(response[-1]["user_id"], u_id)
 
         rv = self.client.get(
-            "/api/user/%i/resource_change_log" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/resource_change_log" % u_id, content_type="application/json", headers=admin_headers
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["resource_id"], l.id)
+        self.assertEqual(response[-1]["resource_id"], l_id)
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_geocode_setting(self, mock_gmaps_client):

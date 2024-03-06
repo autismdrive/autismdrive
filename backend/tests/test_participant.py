@@ -137,26 +137,21 @@ class TestParticipant(BaseTestQuestionnaire):
     def test_delete_participant(self):
         u = self.construct_user()
         p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
+        admin_headers = self.logged_in_headers()
         p_id = p.id
         rv = self.client.get("api/participant/%i" % p_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
-        rv = self.client.get(
-            "api/participant/%i" % p_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get("api/participant/%i" % p_id, content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
 
         rv = self.client.delete("api/participant/%i" % p_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
-        rv = self.client.delete(
-            "api/participant/%i" % p_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.delete("api/participant/%i" % p_id, content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
 
         rv = self.client.get("api/participant/%i" % p_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
-        rv = self.client.get(
-            "api/participant/%i" % p_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get("api/participant/%i" % p_id, content_type="application/json", headers=admin_headers)
         self.assertEqual(404, rv.status_code)
 
     def test_create_participant(self):
@@ -362,31 +357,31 @@ class TestParticipant(BaseTestQuestionnaire):
 
     def test_delete_user_meta(self):
         u = self.construct_user()
-        usermeta = UserMeta(id=u.id, interested=True)
+        u_id = u.id
+        admin_headers = self.logged_in_headers()
+        usermeta = UserMeta(id=u_id, interested=True)
         self.session.add(usermeta)
         self.session.commit()
-        rv = self.client.get("/api/user/%i/usermeta" % u.id, follow_redirects=True, content_type="application/json")
+        rv = self.client.get("/api/user/%i/usermeta" % u_id, follow_redirects=True, content_type="application/json")
         self.assertEqual(401, rv.status_code)
         rv = self.client.get(
-            "/api/user/%i/usermeta" % u.id,
+            "/api/user/%i/usermeta" % u_id,
             follow_redirects=True,
             content_type="application/json",
             headers=self.logged_in_headers(),
         )
         self.assert_success(rv)
-        rv = self.client.delete("/api/user/%i/usermeta" % u.id, content_type="application/json")
-        self.assertEqual(401, rv.status_code)
-        rv = self.client.delete(
-            "/api/user/%i/usermeta" % u.id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.delete("/api/user/%i/usermeta" % u_id, content_type="application/json")
+        self.assertEqual(401, rv.status_code, "Anonymous user can't delete user meta.")
+        rv = self.client.delete("/api/user/%i/usermeta" % u_id, content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
-        rv = self.client.get("/api/user/%i/usermeta" % u.id, follow_redirects=True, content_type="application/json")
+        rv = self.client.get("/api/user/%i/usermeta" % u_id, follow_redirects=True, content_type="application/json")
         self.assertEqual(401, rv.status_code)
         rv = self.client.get(
-            "/api/user/%i/usermeta" % u.id,
+            "/api/user/%i/usermeta" % u_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=admin_headers,
         )
         self.assertEqual(404, rv.status_code)
 

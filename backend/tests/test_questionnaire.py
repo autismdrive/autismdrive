@@ -5,6 +5,7 @@ import random
 
 import openpyxl
 from dateutil import parser
+from sqlalchemy import select
 
 from app.export_service import ExportService
 from fixtures.endpoints_map import endpoints_map
@@ -1282,10 +1283,14 @@ class TestQuestionnaire(BaseTestQuestionnaire):
     def test_home_dependent_questionnaire_basics(self):
         self.construct_home_dependent_questionnaire()
         from app.models import HomeDependentQuestionnaire
+        from app.schemas import HomeDependentQuestionnaireSchema
 
         hq = self.session.query(HomeDependentQuestionnaire).first()
         self.assertIsNotNone(hq)
+
         hq_id = hq.id
+        hq_dict = HomeDependentQuestionnaireSchema().dump(hq)
+
         rv = self.client.get(
             "/api/q/home_dependent_questionnaire/%i" % hq_id,
             follow_redirects=True,
@@ -1295,11 +1300,11 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], hq_id)
-        self.assertEqual(response["participant_id"], hq.participant_id)
-        self.assertEqual(response["user_id"], hq.user_id)
-        self.assertEqual(response["dependent_living_situation"], hq.dependent_living_situation)
-        self.assertEqual(response["struggle_to_afford"], hq.struggle_to_afford)
-        self.assertEqual(len(response["housemates"]), len(hq.housemates))
+        self.assertEqual(response["participant_id"], hq_dict["participant_id"])
+        self.assertEqual(response["user_id"], hq_dict["user_id"])
+        self.assertEqual(response["dependent_living_situation"], hq_dict["dependent_living_situation"])
+        self.assertEqual(response["struggle_to_afford"], hq_dict["struggle_to_afford"])
+        self.assertEqual(len(response["housemates"]), len(hq_dict["housemates"]))
 
     def test_modify_home_dependent_questionnaire_basics(self):
         self.construct_home_dependent_questionnaire()
@@ -1395,10 +1400,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
     def test_home_self_questionnaire_basics(self):
         self.construct_home_self_questionnaire()
         from app.models import HomeSelfQuestionnaire
+        from app.schemas import HomeSelfQuestionnaireSchema
 
         hq = self.session.query(HomeSelfQuestionnaire).first()
         self.assertIsNotNone(hq)
         hq_id = hq.id
+        hq_dict = HomeSelfQuestionnaireSchema().dump(hq)
+
         rv = self.client.get(
             "/api/q/home_self_questionnaire/%i" % hq_id,
             follow_redirects=True,
@@ -1408,11 +1416,11 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], hq_id)
-        self.assertEqual(response["participant_id"], hq.participant_id)
-        self.assertEqual(response["user_id"], hq.user_id)
-        self.assertEqual(response["self_living_situation"], hq.self_living_situation)
-        self.assertEqual(response["struggle_to_afford"], hq.struggle_to_afford)
-        self.assertEqual(len(response["housemates"]), len(hq.housemates))
+        self.assertEqual(response["participant_id"], hq_dict["participant_id"])
+        self.assertEqual(response["user_id"], hq_dict["user_id"])
+        self.assertEqual(response["self_living_situation"], hq_dict["self_living_situation"])
+        self.assertEqual(response["struggle_to_afford"], hq_dict["struggle_to_afford"])
+        self.assertEqual(len(response["housemates"]), len(hq_dict["housemates"]))
 
     def test_modify_home_self_questionnaire_basics(self):
         self.construct_home_self_questionnaire()
@@ -1613,12 +1621,18 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertIsNotNone(response["id"])
 
     def test_supports_questionnaire_basics(self):
-        self.construct_supports_questionnaire()
         from app.models import SupportsQuestionnaire
+        from app.schemas import SupportsQuestionnaireSchema
 
-        sq = self.session.query(SupportsQuestionnaire).first()
+        sq = self.construct_supports_questionnaire()
         self.assertIsNotNone(sq)
         sq_id = sq.id
+
+        db_sq = self.session.execute(select(SupportsQuestionnaire).filter_by(id=sq_id)).unique().scalars().one_or_none()
+        self.assertIsNotNone(db_sq)
+        sq_dict = SupportsQuestionnaireSchema().dump(db_sq)
+        sq_id = sq.id
+
         rv = self.client.get(
             "/api/q/supports_questionnaire/%i" % sq_id,
             follow_redirects=True,
@@ -1628,11 +1642,11 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["id"], sq_id)
-        self.assertEqual(response["participant_id"], sq.participant_id)
-        self.assertEqual(response["user_id"], sq.user_id)
-        self.assertEqual(len(response["assistive_devices"]), len(sq.assistive_devices))
-        self.assertEqual(len(response["medications"]), len(sq.medications))
-        self.assertEqual(len(response["therapies"]), len(sq.therapies))
+        self.assertEqual(response["participant_id"], sq_dict["participant_id"])
+        self.assertEqual(response["user_id"], sq_dict["user_id"])
+        self.assertEqual(len(response["assistive_devices"]), len(sq_dict["assistive_devices"]))
+        self.assertEqual(len(response["medications"]), len(sq_dict["medications"]))
+        self.assertEqual(len(response["therapies"]), len(sq_dict["therapies"]))
 
     def test_modify_supports_questionnaire_basics(self):
         self.construct_supports_questionnaire()
@@ -1976,7 +1990,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
     def test_self_intake_flow_with_user(self):
         u = self.construct_user()
         u_id = u.id
-        headers = self.logged_in_headers(user=u)
+        headers = self.logged_in_headers(user_id=u_id)
 
         from app.enums import Relationship
 
@@ -2206,18 +2220,16 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertEqual(q.id, response[0]["id"])
 
     def test_non_admin_cannot_view_questionnaire_list(self):
-        user = self.construct_user(email="regularUser@user.com")
-        admin = self.construct_admin_user(email="adminUser@user.com")
-        self.construct_contact_questionnaire()
+        user = self.construct_user(email=fake.email())
+        user_headers = self.logged_in_headers(user_id=user.id)
+        admin = self.construct_admin_user(email=fake.email())
+        admin_headers = self.logged_in_headers(user_id=admin.id)
+        self.construct_contact_questionnaire(user=user)
         rv = self.client.get("/api/q/contact_questionnaire", content_type="application/json")
         self.assertEqual(401, rv.status_code)
-        rv = self.client.get(
-            "/api/q/contact_questionnaire", content_type="application/json", headers=self.logged_in_headers(user=user)
-        )
+        rv = self.client.get("/api/q/contact_questionnaire", content_type="application/json", headers=user_headers)
         self.assertEqual(403, rv.status_code)
-        rv = self.client.get(
-            "/api/q/contact_questionnaire", content_type="application/json", headers=self.logged_in_headers(user=admin)
-        )
+        rv = self.client.get("/api/q/contact_questionnaire", content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
 
     def test_export_single_questionnaire(self):

@@ -17,6 +17,8 @@ from config.load import settings
 
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
 
+ONE_DAY = 86400
+
 
 def confirm_email(email_token):
     """When users create a new account with an email and a password, this
@@ -25,7 +27,7 @@ def confirm_email(email_token):
 
     try:
         ts = URLSafeTimedSerializer(settings.SECRET_KEY)
-        email = ts.loads(email_token, salt="email-confirm-key", max_age=86400)
+        email = ts.loads(email_token, salt="email-confirm-key", max_age=ONE_DAY)
     except:
         raise RestException(RestException.EMAIL_TOKEN_INVALID)
 
@@ -105,7 +107,6 @@ def login_password():
                 .unique()
                 .scalar_one_or_none()
             )
-            session.close()
 
             g.user = updated_user
             return jsonify(schema.dump(updated_user))
@@ -153,7 +154,7 @@ def reset_password():
     email_token = request_data["email_token"]
     try:
         ts = URLSafeTimedSerializer(settings.SECRET_KEY)
-        email = ts.loads(email_token, salt="email-reset-key", max_age=86400).lower()  # 24 hours
+        email = ts.loads(email_token, salt="email-reset-key", max_age=ONE_DAY).lower()  # 24 hours
     except SignatureExpired:
         raise RestException(RestException.TOKEN_EXPIRED)
     except BadSignature:

@@ -12,8 +12,11 @@ class SessionEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self):
-        if "user" in g:
-            return jsonify(self.schema.dump(g.user))
+        if "user" in g and g.user.id is not None:
+            from app.resources.UserEndpoint import get_user_by_id
+
+            db_user = get_user_by_id(g.user.id)
+            return jsonify(self.schema.dump(db_user))
         else:
             return None
 

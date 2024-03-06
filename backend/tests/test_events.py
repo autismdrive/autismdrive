@@ -193,22 +193,26 @@ class TestEvents(BaseTest):
     def test_resource_change_log(self, mock_gmaps_client):
         self.loader.load_partial_zip_codes()
         event = self.construct_event(title="A Event that is Super and Great")
+        event_id = event.id
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
+        u_id = u.id
+        headers = self.logged_in_headers(user_id=u_id)
+        admin_headers = self.logged_in_headers()
 
-        rv = self.client.get("api/event/%i" % event.id, content_type="application/json")
+        rv = self.client.get("api/event/%i" % event_id, content_type="application/json")
         self.assert_success(rv)
 
         response = rv.json
         response["title"] = "Super Great Event"
         rv = self.client.put(
-            "/api/event/%i" % event.id,
+            "/api/event/%i" % event_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(user=u),
+            headers=headers,
         )
         self.assert_success(rv)
-        rv = self.client.get("/api/event/%i" % event.id, content_type="application/json")
+        rv = self.client.get("/api/event/%i" % event_id, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["title"], "Super Great Event")
@@ -218,15 +222,15 @@ class TestEvents(BaseTest):
         self.assertIsNotNone(logs[-1].user_id)
 
         rv = self.client.get(
-            "/api/resource/%i/change_log" % event.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/resource/%i/change_log" % event_id, content_type="application/json", headers=admin_headers
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["user_id"], u.id)
+        self.assertEqual(response[-1]["user_id"], u_id)
 
         rv = self.client.get(
-            "/api/user/%i/resource_change_log" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/resource_change_log" % u_id, content_type="application/json", headers=admin_headers
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["resource_id"], event.id)
+        self.assertEqual(response[-1]["resource_id"], event_id)

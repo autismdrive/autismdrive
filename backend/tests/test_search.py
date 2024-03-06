@@ -10,6 +10,7 @@ from app.enums import Role, Status
 from app.models import Category, Resource
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
+from app.resources.StudyEndpoint import get_study_by_id
 from fixtures.fixure_utils import fake
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy
@@ -418,7 +419,6 @@ class TestSearch(BaseTest):
         db_resources = list(
             self.session.execute(resource_statement.order_by(asc(Resource.id))).unique().scalars().all()
         )
-        self.session.close()
 
         return db_categories, db_resources
 
@@ -650,8 +650,7 @@ class TestSearch(BaseTest):
             self.assertGreaterEqual(hit_date, now)
 
     def test_search_for_map_points_only(self):
-
-        # Add some locations with coordinates, and some with out.
+        # Add some locations with coordinates, and some without.
         location_near = self.construct_location(
             title="local unicorn",
             description="delivering rainbows within the orbit of Uranus",
@@ -708,11 +707,13 @@ class TestSearch(BaseTest):
         self.assert_success(rv)
         response = rv.json
         s_id = response["id"]
+        db_study = get_study_by_id(s_id, with_joins=True)
+        self.assertEqual(db_study.status, Status.currently_enrolling)
 
         search_results = self.search(kw_query)
         self.assertEqual(1, len(search_results["hits"]))
-        self.assertEqual(search_results["hits"][0]["id"], s_id)
-        self.assertEqual(search_results["hits"][0]["status"], Status.currently_enrolling.value)
+        self.assertEqual(s_id, search_results["hits"][0]["id"])
+        self.assertEqual(Status.currently_enrolling.value, search_results["hits"][0]["status"])
 
         response["status"] = Status.study_in_progress.name
         rv = self.client.put(

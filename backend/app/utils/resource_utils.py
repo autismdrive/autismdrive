@@ -1,10 +1,12 @@
 import json
 from dataclasses import dataclass, KW_ONLY
 from datetime import datetime, date
+from enum import Enum
 from typing import cast, TypedDict
 
 from marshmallow import Schema
 
+from app.enums import Status
 from app.models import Resource, Event, Location, Study
 
 DatabaseObject = Event | Resource | Location | Study
@@ -57,7 +59,7 @@ class DatabaseObjectDict:
     short_title: str = None
     should_hide_related_resources: str = None
     state: str = None
-    status: str = None
+    status: Status = None
     street_address1: str = None
     street_address2: str = None
     study_categories: list[dict] = None
@@ -83,7 +85,9 @@ class DatabaseObjectDict:
     def from_dict(cls, d: dict) -> "DatabaseObjectDict":
         import inspect
 
-        kw_dict = {k: v for k, v in d.items() if k in inspect.signature(cls).parameters}
+        field_names = cls.field_names()
+
+        kw_dict = {k: v for k, v in d.items() if k in field_names}
         return cls(**kw_dict)
 
     @classmethod
@@ -196,6 +200,9 @@ def to_database_object_dict(schema: Schema = None, db_object: DatabaseObject = N
 
         if isinstance(value, (str, int, float, bool, type(None))):
             return value
+
+        if isinstance(value, Enum):
+            return value.value
 
         if isinstance(value, (date, datetime)):
             return value.isoformat()

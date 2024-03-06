@@ -1024,28 +1024,70 @@ class AggCount:
 
 @dataclass(kw_only=True)
 class Hit:
+    admin_notes: Optional[str] = None
     ages: Optional[list[str]] = field(default_factory=list)
+    benefit_description: Optional[str] = None
+    categories: Optional[str] = None
     category: Optional[list[str]] = field(default_factory=list)
+    city: Optional[str] = None
+    contact_email: Optional[str] = None
     content: Optional[str] = ""
+    coordinator_email: Optional[str] = None
+    covid19_categories: Optional[str] = None
     date: Optional[str | datetime] = None
     description: Optional[str] = ""
+    eligibility_url: Optional[str] = None
+    email: Optional[str] = None
     geo_point: Optional[GeoPointType] = None
     highlights: Optional[str] = ""
     id: Optional[str] = ""
+    image_url: Optional[str] = None
+    includes_registration: Optional[bool] = None
+    insurance: Optional[str] = None
+    investigators: Optional[str] = None
     is_draft: Optional[bool] = True
+    is_uva_education_content: Optional[bool] = None
     label: Optional[str] = ""
     languages: Optional[list[str]] = field(default_factory=list)
     last_updated: Optional[str | datetime] = None
     latitude: Optional[float] = None
     location: Optional[str] = ""
+    location_name: Optional[str] = None
     longitude: Optional[float] = None
+    max_users: Optional[int] = None
     no_address: Optional[bool] = True
+    num_visits: Optional[str] = None
     organization_name: Optional[str] = ""
+    participant_description: Optional[str] = None
+    phone: Optional[str] = ""
+    phone_extension: Optional[str] = None
     post_event_description: Optional[str] = ""
-    status: Optional[str] = ""
+    post_survey_link: Optional[str] = None
+    primary_contact: Optional[str] = None
+    registered_users: Optional[list[any]] = None
+    registration_url: Optional[str] = None
+    resource_categories: Optional[str] = None
+    results_url: Optional[str] = None
+    short_description: Optional[str] = None
+    short_title: Optional[str] = None
+    should_hide_related_resources: Optional[bool] = None
+    state: Optional[str] = None
+    status: Optional[str] = None
+    street_address1: Optional[str] = None
+    street_address2: Optional[str] = None
+    study_categories: Optional[str] = None
+    study_investigators: Optional[str] = None
+    study_users: Optional[str] = None
+    survey_url: Optional[str] = None
+    ticket_cost: Optional[str] = None
+    time: Optional[str] = None
     title: Optional[str] = ""
     type: Optional[str] = ""
+    users: Optional[list[any]] = None
+    video_code: Optional[str] = None
+    webinar_link: Optional[str] = None
     website: Optional[str] = ""
+    zip: Optional[str] = ""
 
 
 @dataclass(kw_only=True)

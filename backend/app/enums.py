@@ -48,7 +48,7 @@ class Relationship(enum.Enum):
         return [item.name for item in cls]
 
 
-class Status(enum.Enum):
+class Status(enum.StrEnum):
     currently_enrolling = "Currently enrolling"
     study_in_progress = "Study in progress"
     results_being_analyzed = "Results being analyzed"
@@ -63,7 +63,7 @@ class Status(enum.Enum):
         return [item.name for item in cls]
 
 
-class Permission(enum.Enum):
+class Permission(enum.StrEnum):
     create_resource = "Create Resources"
     edit_resource = "Edit Resources"
     delete_resource = "Delete Resources"

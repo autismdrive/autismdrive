@@ -8,6 +8,8 @@ from app.email_prompt_service import EmailPromptService
 from app.email_service import EmailService
 from app.models import EmailLog, Study, User
 from app.enums import Relationship
+from app.resources.UserEndpoint import get_user_by_id
+from fixtures.fixure_utils import fake
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
@@ -162,9 +164,9 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
 
     def test_self_registration_prompting_email(self):
-        u1 = self.construct_user(email="test1@sartography.com")
-        headers_u1 = self.logged_in_headers(user=u1)
+        u1 = self.construct_user(email=fake.email())
         u1_id = u1.id
+        headers_u1 = self.logged_in_headers(user_id=u1_id)
         p1 = self.construct_participant(user_id=u1_id, relationship=Relationship.self_guardian)
         p1_id = p1.id
         q1 = {"user_id": u1_id, "participant_id": p1_id}
@@ -192,17 +194,13 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             headers=headers_u1,
         )
 
-        db_u1 = (
-            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=u1_id))
-            .unique()
-            .scalar_one()
-        )
+        db_u1 = get_user_by_id(u1_id)
         self.assertTrue(db_u1.self_registration_complete())
         self.session.close()
 
         u2 = self.construct_user(email="test2@sartography.com", last_login="12/4/19 10:00")
-        headers_u2 = self.logged_in_headers(user=u2)
         u2_id = u2.id
+        headers_u2 = self.logged_in_headers(user_id=u2_id)
         p2 = self.construct_participant(user_id=u2.id, relationship=Relationship.self_guardian)
         p2_id = p2.id
         q2 = {"user_id": u2_id, "participant_id": p2_id}
@@ -223,15 +221,15 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             headers=headers_u2,
         )
 
-        db_u2 = (
-            self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=u2_id))
-            .unique()
-            .scalar_one()
-        )
+        db_u2 = get_user_by_id(u2_id)
         self.assertFalse(db_u2.self_registration_complete())
         self.session.close()
 
         message_count = len(EmailService.TEST_MESSAGES)
+
+        # Set the users' last login dates to 2 days ago.
+        self._back_date_last_login(u1_id, 2)
+        self._back_date_last_login(u2_id, 2)
 
         self.email_prompt_service.send_complete_registration_prompting_emails()
         self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
@@ -244,6 +242,9 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         u1 = self.create_complete_guardian()
 
         message_count = len(EmailService.TEST_MESSAGES)
+
+        # Set the user's last login date to 2 days ago.
+        self._back_date_last_login(u1.id, 2)
 
         self.email_prompt_service.send_dependent_profile_prompting_emails()
         self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
@@ -276,18 +277,23 @@ class TestEmailPromptService(BaseTestQuestionnaire):
 
     def test_dependent_profile_sends_prompt_with_incomplete_dependent(self):
         u1 = self.create_complete_guardian()
-        d1 = self.construct_participant(user_id=u1.id, relationship=Relationship.dependent)
-        q1 = {"user_id": u1.id, "participant_id": d1.id}
+        u1_id = u1.id
+        d1 = self.construct_participant(user_id=u1_id, relationship=Relationship.dependent)
+        d1_id = d1.id
+        q1 = {"user_id": u1_id, "participant_id": d1_id}
         rv = self.client.post(
             "api/flow/dependent_intake/developmental_questionnaire",
             data=self.jsonify(q1),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1.id),
+            headers=self.logged_in_headers(u1_id),
         )
         self.assert_success(rv)
 
         message_count = len(EmailService.TEST_MESSAGES)
+
+        # Set the user's last login date to 2 days ago.
+        self._back_date_last_login(u1_id, 2)
 
         self.email_prompt_service.send_dependent_profile_prompting_emails()
         self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
@@ -377,10 +383,10 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
 
-        message_count = len(EmailService.TEST_MESSAGES)
+        message_count_before = len(EmailService.TEST_MESSAGES)
 
         self.email_prompt_service.send_dependent_profile_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count_before)
 
     def test_self_participants_that_are_not_their_own_legal_guardians_do_not_get_reminders(self):
         u2 = self.construct_user(email="test2@sartography.com", last_login="12/4/19 10:00")
@@ -397,3 +403,9 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         message_count = len(EmailService.TEST_MESSAGES)
         self.email_prompt_service.send_complete_registration_prompting_emails()
         self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+
+    def _back_date_last_login(self, user_id, days):
+        db_user = get_user_by_id(user_id)
+        db_user.last_login = datetime.datetime.now() - datetime.timedelta(days=days)
+        self.session.commit()
+        self.session.close()

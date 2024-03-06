@@ -11,7 +11,9 @@ from app.enums import Relationship, Role
 from app.export_service import ExportService
 from app.import_service import ImportService
 from app.models import DataTransferLog, Participant, User, IdentificationQuestionnaire
-from app.schemas import SchemaRegistry
+from app.resources.UserEndpoint import get_user_by_id
+from app.schemas import SchemaRegistry, ParticipantSchema
+from fixtures.fixure_utils import fake
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 os.environ["ENV_NAME"] = "testing"
@@ -23,7 +25,9 @@ class TestExportService(BaseTestQuestionnaire):
         rv = self.client.get("/api/export")
         self.assertEqual(401, rv.status_code)
 
-        headers = self.logged_in_headers(self.construct_user(email="joe@smoe.com", role=Role.user))
+        u = self.construct_user(email="joe@smoe.com", role=Role.user)
+        u_id = u.id
+        headers = self.logged_in_headers(user_id=u_id)
         rv = self.client.get("/api/export", headers=headers)
         self.assertEqual(403, rv.status_code)
 
@@ -93,16 +97,17 @@ class TestExportService(BaseTestQuestionnaire):
 
     def get_export(self):
         """Grabs everything exportable via the API, and returns it fully serialized ss json"""
+        headers = self.logged_in_headers()
         all_data = {}
 
-        rv = self.client.get("/api/export", headers=self.logged_in_headers())
+        rv = self.client.get("/api/export", headers=headers)
         response = rv.json
         exports = SchemaRegistry.ExportInfoSchema(many=True).load(response)
         for export in exports:
-            rv = self.client.get(
-                export.url, follow_redirects=True, content_type="application/json", headers=self.logged_in_headers()
-            )
+            rv = self.client.get(export.url, follow_redirects=True, content_type="application/json", headers=headers)
             all_data[export.class_name] = rv.json
+            if export.class_name == "ResourceCategory":
+                print(all_data[export.class_name])
         return all_data
 
     def load_database(self, all_data):
@@ -123,25 +128,23 @@ class TestExportService(BaseTestQuestionnaire):
     def test_insert_user_with_participant(self):
         u = self.construct_user()
         user_id = u.id
+        user_email = u.email
         u._password = b"xxxxx"
         u.email_verified = True
         self.session.commit()
         self.session.close()
 
-        db_user = (
-            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.id == user_id))
-            .unique()
-            .scalar_one_or_none()
-        )
+        db_user = get_user_by_id(user_id)
         role = db_user.role
         email_verified = db_user.email_verified
         u_registration_date = db_user.registration_date
         u_last_updated = db_user.last_updated
-        orig_user_dict = SchemaRegistry.UserSchema().dump(db_user)  # Use standard schema
+        self.session.commit()
+        self.session.close()
 
         p = self.construct_participant(user_id=user_id, relationship=Relationship.self_participant)
         p_last_updated = p.last_updated
-        orig_p_dict = ParticipantSchema().dump(p)  # Use standard schema
+        p_id = p.id
         self.session.commit()
         self.session.close()
 
@@ -158,15 +161,15 @@ class TestExportService(BaseTestQuestionnaire):
 
         self.load_database(data)
 
-        db_user = self.session.query(User).filter_by(id=orig_user_dict["id"]).first()
+        db_user = self.session.query(User).filter_by(id=user_id).first()
         self.assertIsNotNone(db_user, msg="User is recreated.")
-        self.assertNotEqual(orig_user_dict["email"], db_user.email, msg="Email should be obfuscated")
+        self.assertNotEqual(user_email, db_user.email, msg="Email should be obfuscated")
         self.assertEqual(u_registration_date, db_user.registration_date, msg="Dates are kept intact")
         self.assertEqual(u_last_updated, db_user.last_updated, msg="Dates are kept intact")
         self.assertEqual(role, db_user.role)
         self.assertEqual(email_verified, db_user.email_verified)
 
-        db_par = self.session.query(Participant).filter_by(id=orig_p_dict["id"]).first()
+        db_par = self.session.query(Participant).filter_by(id=p_id).first()
         self.assertIsNotNone(db_par, msg="Participant is recreated.")
         self.assertEqual(db_user, db_par.user, msg="Relationship intact")
         self.assertEqual(p_last_updated, db_par.last_updated, msg="Dates are kept intact")
@@ -308,22 +311,37 @@ class TestExportService(BaseTestQuestionnaire):
         self.load_database(data)
 
     def test_export_admin_details(self):
-        user = self.construct_user(email="testadmin@test.com", role=Role.admin)
-        user.password = "This_is_my_password!12345"
-        self.session.add(user)
+        u1_email = fake.email()
+        u1 = self.construct_user(email=u1_email, role=Role.admin)
+        u1_id = u1.id
+
+        # Create another admin user
+        u2_email = fake.email()
+        u2 = self.construct_user(email=u2_email, role=Role.admin)
+        u2_id = u2.id
+        u2_headers = self.logged_in_headers(user_id=u2_id)
+
+        db_u1 = get_user_by_id(u1_id)
+        db_u1.password = fake.password(length=25, special_chars=True, upper_case=True)
+        self.session.add(db_u1)
         self.session.commit()
+        self.session.close()
 
         rv = self.client.get(
             "/api/export/admin",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=u2_headers,
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertTrue(len(response) > 1)
-        self.assertEqual(1, len(list(filter(lambda field: field["email"] == "testadmin@test.com", response))))
-        self.assertEqual(1, len(list(filter(lambda field: field["_password"] is not None, response))))
+        self.assertEqual(2, len(response))
+
+        for u_dict in response:
+            self.assertIn("email", u_dict)
+            self.assertIn(u_dict["email"], [u1_email, u2_email])
+            self.assertIn("_password", u_dict)
+            self.assertIsNotNone(u_dict["_password"])
 
     def test_exporter_logs_export_calls(self):
         rv = self.client.get(
