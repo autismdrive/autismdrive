@@ -4,39 +4,40 @@ import string
 from dateutil import parser
 from sqlalchemy import cast, Integer, select
 
-from app.enums import Relationship
+from tests.base_test import BaseTest
+from app.enums import Relationship, Role
 from app.models import (
-    Participant,
-    User,
-    CurrentBehaviorsDependentQuestionnaire,
-    ContactQuestionnaire,
-    AssistiveDevice,
     AlternativeAugmentative,
+    AssistiveDevice,
     ChainQuestionnaire,
     ChainSession,
     ChainSessionStep,
     ClinicalDiagnosesQuestionnaire,
+    ContactQuestionnaire,
+    CurrentBehaviorsDependentQuestionnaire,
     CurrentBehaviorsSelfQuestionnaire,
     DemographicsQuestionnaire,
     DevelopmentalQuestionnaire,
     EducationDependentQuestionnaire,
     EducationSelfQuestionnaire,
     EmploymentQuestionnaire,
-    EvaluationHistorySelfQuestionnaire,
     EvaluationHistoryDependentQuestionnaire,
+    EvaluationHistorySelfQuestionnaire,
     HomeDependentQuestionnaire,
     HomeSelfQuestionnaire,
     Housemate,
     IdentificationQuestionnaire,
     Medication,
+    Participant,
     ProfessionalProfileQuestionnaire,
     RegistrationQuestionnaire,
     SupportsQuestionnaire,
     Therapy,
+    User,
 )
+from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.UserEndpoint import get_user_by_id
 from fixtures.fixure_utils import fake
-from tests.base_test import BaseTest
 
 
 class BaseTestQuestionnaire(BaseTest):
@@ -46,51 +47,60 @@ class BaseTestQuestionnaire(BaseTest):
         char_set = string.ascii_uppercase + string.digits
         return "".join(random.sample(char_set * 6, 6))
 
-    def get_field_from_response(self, response, name):
-        for field in response["fields"]:
-            if field["name"] == name:
-                return field
+    def construct_user_and_participant(
+        self,
+        user_id: int = None,
+        participant_id: int = None,
+        relationship: Relationship = Relationship.dependent,
+        user_role: Role = Role.user,
+    ) -> tuple[User, Participant]:
+        """
+        Constructs a user and a participant or retrieves an existing user and participant for the given ID(s).
+        Returns a tuple of the User and Participant
+        """
 
-    def construct_admin_user(self, email="rmond@virginia.gov"):
-        from app.enums import Role
+        if user_id is None:
+            u = self.construct_user(email=fake.email(), role=user_role)
+        else:
+            u = get_user_by_id(user_id, with_joins=True)
+        assert u is not None
+        u_id = u.id
 
-        u_role = Role.admin
+        if participant_id is None:
+            p = self.construct_participant(user_id=u_id, relationship=relationship)
+        else:
+            p = get_participant_by_id(participant_id, with_joins=True)
+        assert p is not None
 
-        user = User(email=email, role=u_role)
-        self.session.add(user)
-        self.session.commit()
-
-        u_id = user.id
-        db_user = get_user_by_id(u_id, with_joins=True)
-        self.assertEqual(db_user.role, u_role)
-        return db_user
+        return u, p
 
     def construct_assistive_device(
         self,
         type_group="mobility",
-        type="prosthetic",
+        device_type="prosthetic",
         timeframe="current",
         notes="I love my new leg!",
-        supports_questionnaire_id=None,
+        supports_questionnaire_id: int = None,
     ):
-        ad = AssistiveDevice(type=type, timeframe=timeframe, notes=notes)
+        ad = AssistiveDevice(type_group=type_group, type=device_type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
             ad.supports_questionnaire_id = supports_questionnaire_id
 
         self.session.add(ad)
         self.session.commit()
+        ad_id = ad.id
+        assert ad_id is not None
 
-        db_ad = self.session.query(AssistiveDevice).filter_by(id=ad.id).first()
-        self.assertEqual(db_ad.notes, ad.notes)
-        self.assertEqual(db_ad.type_group, ad.type_group)
-        self.assertEqual(db_ad.type, ad.type)
+        db_ad = self.session.query(AssistiveDevice).filter_by(id=ad_id).first()
+        self.assertEqual(db_ad.notes, notes)
+        self.assertEqual(db_ad.type_group, type_group)
+        self.assertEqual(db_ad.type, device_type)
         return db_ad
 
     def construct_alternative_augmentative(
-        self, type="lowTechAAC", timeframe="current", notes="We use pen and paper", supports_questionnaire_id=None
+        self, aac_type="lowTechAAC", timeframe="current", notes="We use pen and paper", supports_questionnaire_id=None
     ):
-
-        aac = AlternativeAugmentative(type=type, timeframe=timeframe, notes=notes)
+        aac = AlternativeAugmentative(type=aac_type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
             aac.supports_questionnaire_id = supports_questionnaire_id
 
@@ -98,7 +108,8 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.commit()
 
         db_aac = self.session.query(AlternativeAugmentative).filter_by(last_updated=aac.last_updated).first()
-        self.assertEqual(db_aac.notes, aac.notes)
+        self.assertEqual(db_aac.notes, notes)
+        self.assertEqual(db_aac.type, aac_type)
         return db_aac
 
     def construct_clinical_diagnoses_questionnaire(
@@ -107,58 +118,61 @@ class BaseTestQuestionnaire(BaseTest):
         mental_health=None,
         medical=None,
         genetic=None,
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
         developmental = ["speechLanguage"] if developmental is None else developmental
         mental_health = ["ocd"] if mental_health is None else mental_health
         medical = ["insomnia"] if medical is None else medical
         genetic = ["corneliaDeLange"] if genetic is None else genetic
 
+        u, p = self.construct_user_and_participant(user_id, participant_id)
+        u_id = u.id
+        p_id = p.id
+
         cdq = ClinicalDiagnosesQuestionnaire(
-            developmental=developmental, mental_health=mental_health, medical=medical, genetic=genetic
+            developmental=developmental,
+            mental_health=mental_health,
+            medical=medical,
+            genetic=genetic,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="clinic@questionnaire.com")
-            cdq.user_id = u.id
-        else:
-            u = user
-            cdq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            cdq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            cdq.participant_id = participant.id
-
         self.session.add(cdq)
         self.session.commit()
 
         db_cdq = (
-            self.session.query(ClinicalDiagnosesQuestionnaire).filter_by(user_id=cast(cdq.user_id, Integer)).first()
+            self.session.execute(
+                select(ClinicalDiagnosesQuestionnaire).filter_by(user_id=u_id).filter_by(participant_id=p_id)
+            )
+            .unique()
+            .scalar_one_or_none()
         )
-        self.assertEqual(db_cdq.participant_id, cdq.participant_id)
+
+        self.assertEqual(db_cdq.user_id, u_id)
+        self.assertEqual(db_cdq.participant_id, p_id)
+        self.assertEqual(db_cdq.developmental, developmental)
+        self.assertEqual(db_cdq.mental_health, mental_health)
+        self.assertEqual(db_cdq.medical, medical)
+        self.assertEqual(db_cdq.genetic, genetic)
         return db_cdq
 
     def construct_contact_questionnaire(
-        self, phone="123-456-7890", zip=55678, marketing_channel="Zine Ad", participant=None, user=None
+        self,
+        phone="123-456-7890",
+        zip_code=55678,
+        marketing_channel="Zine Ad",
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
-        cq = ContactQuestionnaire(phone=phone, zip=zip, marketing_channel=marketing_channel)
-        if user is None:
-            u = self.construct_user(email="contact@questionnaire.com")
-            cq.user_id = u.id
-        else:
-            u = user
-            cq.user_id = u.id
+        u, p = self.construct_user_and_participant(user_id, participant_id)
+        u_id = u.id
+        p_id = p.id
 
-        if participant is None:
-            from app.enums import Relationship
-
-            cq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            cq.participant_id = participant.id
+        cq = ContactQuestionnaire(
+            phone=phone, zip=zip_code, marketing_channel=marketing_channel, user_id=u_id, participant_id=p_id
+        )
 
         self.session.add(cq)
         self.session.commit()
@@ -173,30 +187,26 @@ class BaseTestQuestionnaire(BaseTest):
         concerning_behaviors=None,
         has_academic_difficulties=True,
         academic_difficulty_areas=None,
-        participant: Participant = None,
-        user: User = None,
+        participant_id: int = None,
+        user_id: int = None,
     ) -> CurrentBehaviorsDependentQuestionnaire:
         concerning_behaviors = ["hoarding"] if concerning_behaviors is None else concerning_behaviors
         academic_difficulty_areas = (
             ["math", "writing"] if academic_difficulty_areas is None else academic_difficulty_areas
         )
 
+        u, p = self.construct_user_and_participant(user_id, participant_id)
+        u_id = u.id
+        p_id = p.id
+
         cbd = CurrentBehaviorsDependentQuestionnaire(
             dependent_verbal_ability=dependent_verbal_ability,
             concerning_behaviors=concerning_behaviors,
             has_academic_difficulties=has_academic_difficulties,
             academic_difficulty_areas=academic_difficulty_areas,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        user = self.construct_user(email=fake.email()) if user is None else user
-        u_id = user.id
-
-        p = (
-            self.construct_participant(user_id=u_id, relationship=Relationship.dependent)
-            if participant is None
-            else participant
-        )
-        p_id = p.id
-        cbd.participant_id = p_id
 
         self.session.add(cbd)
         self.session.commit()
@@ -219,30 +229,20 @@ class BaseTestQuestionnaire(BaseTest):
         self_verbal_ability="verbal",
         has_academic_difficulties=True,
         academic_difficulty_areas="math",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ) -> CurrentBehaviorsSelfQuestionnaire:
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
         cb = CurrentBehaviorsSelfQuestionnaire(
             self_verbal_ability=self_verbal_ability,
             has_academic_difficulties=has_academic_difficulties,
             academic_difficulty_areas=academic_difficulty_areas,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="cbs@questionnaire.com")
-            cb.user_id = u.id
-        else:
-            u = user
-            cb.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-            cb.participant_id = p.id
-        else:
-            p = participant
-            cb.participant_id = p.id
 
         self.session.add(cb)
         self.session.commit()
@@ -256,25 +256,24 @@ class BaseTestQuestionnaire(BaseTest):
         return db_cb
 
     def construct_demographics_questionnaire(
-        self, birth_sex="intersex", gender_identity="intersex", race_ethnicity="raceBlack", participant=None, user=None
+        self,
+        birth_sex="intersex",
+        gender_identity="intersex",
+        race_ethnicity="raceBlack",
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
         dq = DemographicsQuestionnaire(
-            birth_sex=birth_sex, gender_identity=gender_identity, race_ethnicity=race_ethnicity
+            birth_sex=birth_sex,
+            gender_identity=gender_identity,
+            race_ethnicity=race_ethnicity,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="demograph@questionnaire.com")
-            dq.user_id = u.id
-        else:
-            u = user
-            dq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            dq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant).id
-        else:
-            dq.participant_id = participant.id
 
         self.session.add(dq)
         self.session.commit()
@@ -289,29 +288,21 @@ class BaseTestQuestionnaire(BaseTest):
         when_motor_milestones="delayed",
         when_language_milestones="early",
         when_toileting_milestones="notYet",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
         dq = DevelopmentalQuestionnaire(
             had_birth_complications=had_birth_complications,
             when_motor_milestones=when_motor_milestones,
             when_language_milestones=when_language_milestones,
             when_toileting_milestones=when_toileting_milestones,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="develop@questionnaire.com")
-            dq.user_id = u.id
-        else:
-            u = user
-            dq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            dq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            dq.participant_id = participant.id
 
         self.session.add(dq)
         self.session.commit()
@@ -330,31 +321,21 @@ class BaseTestQuestionnaire(BaseTest):
         school_name="Harvard",
         school_type="privateSchool",
         dependent_placement="graduate",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
         eq = EducationDependentQuestionnaire(
             attends_school=attends_school,
             school_name=school_name,
             school_type=school_type,
             dependent_placement=dependent_placement,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="edudep@questionnaire.com")
-            eq.user_id = u.id
-        else:
-            u = user
-            eq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-            eq.participant_id = p.id
-        else:
-            p = participant
-            eq.participant_id = p.id
 
         self.session.add(eq)
         self.session.commit()
@@ -373,32 +354,21 @@ class BaseTestQuestionnaire(BaseTest):
         school_name="Harvard",
         school_type="privateSchool",
         self_placement="graduate",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
         eq = EducationSelfQuestionnaire(
             attends_school=attends_school,
             school_name=school_name,
             school_type=school_type,
             self_placement=self_placement,
+            user_id=u_id,
+            participant_id=p_id,
         )
-
-        if user is None:
-            u = self.construct_user(email="eduself@questionnaire.com")
-            eq.user_id = u.id
-        else:
-            u = user
-            eq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-            eq.participant_id = p.id
-        else:
-            p = participant
-            eq.participant_id = p.id
 
         self.session.add(eq)
         self.session.commit()
@@ -408,7 +378,10 @@ class BaseTestQuestionnaire(BaseTest):
             .filter_by(participant_id=cast(eq.participant_id, Integer))
             .first()
         )
-        self.assertEqual(db_eq.school_name, eq.school_name)
+        self.assertEqual(db_eq.attends_school, attends_school)
+        self.assertEqual(db_eq.school_name, school_name)
+        self.assertEqual(db_eq.school_type, school_type)
+        self.assertEqual(db_eq.self_placement, self_placement)
         return db_eq
 
     def construct_employment_questionnaire(
@@ -416,28 +389,20 @@ class BaseTestQuestionnaire(BaseTest):
         is_currently_employed=True,
         employment_capacity="fullTime",
         has_employment_support=False,
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
         eq = EmploymentQuestionnaire(
             is_currently_employed=is_currently_employed,
             employment_capacity=employment_capacity,
             has_employment_support=has_employment_support,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="employ@questionnaire.com")
-            eq.user_id = u.id
-        else:
-            u = user
-            eq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            eq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant).id
-        else:
-            eq.participant_id = participant.id
 
         self.session.add(eq)
         self.session.commit()
@@ -447,7 +412,7 @@ class BaseTestQuestionnaire(BaseTest):
             .filter_by(participant_id=cast(eq.participant_id, Integer))
             .first()
         )
-        self.assertEqual(db_eq.employment_capacity, eq.employment_capacity)
+        self.assertEqual(db_eq.employment_capacity, employment_capacity)
         return db_eq
 
     def construct_evaluation_history_dependent_questionnaire(
@@ -456,30 +421,20 @@ class BaseTestQuestionnaire(BaseTest):
         has_autism_diagnosis=True,
         years_old_at_first_diagnosis=7,
         who_diagnosed="pediatrician",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
         ehq = EvaluationHistoryDependentQuestionnaire(
             self_identifies_autistic=self_identifies_autistic,
             has_autism_diagnosis=has_autism_diagnosis,
             years_old_at_first_diagnosis=years_old_at_first_diagnosis,
             who_diagnosed=who_diagnosed,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="evaldep@questionnaire.com")
-            ehq.user_id = u.id
-        else:
-            u = user
-            ehq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-            ehq.participant_id = p.id
-        else:
-            p = participant
-            ehq.participant_id = p.id
 
         self.session.add(ehq)
         self.session.commit()
@@ -489,7 +444,7 @@ class BaseTestQuestionnaire(BaseTest):
             .filter_by(participant_id=cast(ehq.participant_id, Integer))
             .first()
         )
-        self.assertEqual(db_ehq.who_diagnosed, ehq.who_diagnosed)
+        self.assertEqual(db_ehq.who_diagnosed, who_diagnosed)
         return db_ehq
 
     def construct_evaluation_history_self_questionnaire(
@@ -498,31 +453,20 @@ class BaseTestQuestionnaire(BaseTest):
         has_autism_diagnosis=True,
         years_old_at_first_diagnosis=7,
         who_diagnosed="pediatrician",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
-
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
         ehq = EvaluationHistorySelfQuestionnaire(
             self_identifies_autistic=self_identifies_autistic,
             has_autism_diagnosis=has_autism_diagnosis,
             years_old_at_first_diagnosis=years_old_at_first_diagnosis,
             who_diagnosed=who_diagnosed,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="evalself@questionnaire.com")
-            ehq.user_id = u.id
-        else:
-            u = user
-            ehq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-            ehq.participant_id = p.id
-        else:
-            p = participant
-            ehq.participant_id = p.id
 
         self.session.add(ehq)
         self.session.commit()
@@ -540,29 +484,19 @@ class BaseTestQuestionnaire(BaseTest):
         dependent_living_situation="fullTimeGuardian",
         housemates=None,
         struggle_to_afford=False,
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
         hq = HomeDependentQuestionnaire(
-            dependent_living_situation=[dependent_living_situation], struggle_to_afford=struggle_to_afford
+            dependent_living_situation=[dependent_living_situation],
+            struggle_to_afford=struggle_to_afford,
+            user_id=u_id,
+            participant_id=p_id,
         )
-
-        if user is None:
-            u = self.construct_user(email="homedep@questionnaire.com")
-            hq.user_id = u.id
-        else:
-            u = user
-            hq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-            hq.participant_id = p.id
-        else:
-            p = participant
-            hq.participant_id = p.id
 
         self.session.add(hq)
         self.session.commit()
@@ -581,26 +515,22 @@ class BaseTestQuestionnaire(BaseTest):
         return db_hq
 
     def construct_home_self_questionnaire(
-        self, self_living_situation="alone", housemates=None, struggle_to_afford=False, participant=None, user=None
+        self,
+        self_living_situation="alone",
+        housemates=None,
+        struggle_to_afford=False,
+        participant_id: int = None,
+        user_id: int = None,
     ):
-
-        hq = HomeSelfQuestionnaire(self_living_situation=[self_living_situation], struggle_to_afford=struggle_to_afford)
-
-        if user is None:
-            u = self.construct_user(email="homeself@questionnaire.com")
-            hq.user_id = u.id
-        else:
-            u = user
-            hq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-            hq.participant_id = p.id
-        else:
-            p = participant
-            hq.participant_id = p.id
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
+        hq = HomeSelfQuestionnaire(
+            self_living_situation=[self_living_situation],
+            struggle_to_afford=struggle_to_afford,
+            user_id=u_id,
+            participant_id=p_id,
+        )
 
         self.session.add(hq)
         self.session.commit()
@@ -651,9 +581,12 @@ class BaseTestQuestionnaire(BaseTest):
         nickname="Big K",
         birth_state="VA",
         is_english_primary=False,
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
 
         iq = IdentificationQuestionnaire(
             relationship_to_participant=relationship_to_participant,
@@ -662,20 +595,9 @@ class BaseTestQuestionnaire(BaseTest):
             nickname=nickname,
             birth_state=birth_state,
             is_english_primary=is_english_primary,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="ident@questionnaire.com")
-            iq.user_id = u.id
-        else:
-            u = user
-            iq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            iq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            iq.participant_id = participant.id
 
         self.session.add(iq)
         self.session.commit()
@@ -698,12 +620,15 @@ class BaseTestQuestionnaire(BaseTest):
         currently_work_with_autistic=True,
         previous_work_with_autistic=False,
         length_work_with_autistic="3 minutes",
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
         professional_identity = ["artTher", "profOther"] if professional_identity is None else professional_identity
         learning_interests = ["insuranceCov", "learnOther"] if learning_interests is None else learning_interests
 
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
         pq = ProfessionalProfileQuestionnaire(
             purpose=purpose,
             professional_identity=professional_identity,
@@ -713,20 +638,9 @@ class BaseTestQuestionnaire(BaseTest):
             currently_work_with_autistic=currently_work_with_autistic,
             previous_work_with_autistic=previous_work_with_autistic,
             length_work_with_autistic=length_work_with_autistic,
+            user_id=u_id,
+            participant_id=p_id,
         )
-        if user is None:
-            u = self.construct_user(email="prof@questionnaire.com")
-            pq.user_id = u.id
-        else:
-            u = user
-            pq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            pq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            pq.participant_id = participant.id
 
         self.session.add(pq)
         self.session.commit()
@@ -747,14 +661,16 @@ class BaseTestQuestionnaire(BaseTest):
         zip_code=24401,
         relationship_to_autism=None,
         marketing_channel=None,
-        user=None,
+        user_id: int = None,
+        participant_id: int = None,
         event=None,
     ):
 
-        u = user if user else self.construct_user(email="nora@bora.com")
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
         e = event if event else self.construct_event(title="Webinar: You have to be here (virtually)")
-
-        p = self.session.query(Participant).filter_by(user_id=cast(u.id, Integer)).first()
+        e_id = e.id
 
         rq = RegistrationQuestionnaire(
             first_name=first_name,
@@ -763,15 +679,15 @@ class BaseTestQuestionnaire(BaseTest):
             zip_code=zip_code,
             relationship_to_autism=relationship_to_autism if relationship_to_autism else ["self", "professional"],
             marketing_channel=marketing_channel if marketing_channel else ["drive", "facebook"],
-            user_id=u.id,
-            event_id=e.id,
-            participant_id=p.id,
+            user_id=u_id,
+            event_id=e_id,
+            participant_id=p_id,
         )
 
         self.session.add(rq)
         self.session.commit()
 
-        db_rq = self.session.query(RegistrationQuestionnaire).filter_by(user_id=cast(rq.user_id, Integer)).first()
+        db_rq = self.session.query(RegistrationQuestionnaire).filter_by(user_id=u_id).first()
         self.assertEqual(db_rq.email, rq.email)
         return db_rq
 
@@ -803,10 +719,10 @@ class BaseTestQuestionnaire(BaseTest):
         return db_m
 
     def construct_therapy(
-        self, type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire_id=None
+        self, therapy_type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire_id=None
     ):
 
-        t = Therapy(type=type, timeframe=timeframe, notes=notes)
+        t = Therapy(type=therapy_type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
             t.supports_questionnaire_id = supports_questionnaire_id
 
@@ -814,7 +730,8 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.commit()
 
         db_t = self.session.query(Therapy).filter_by(last_updated=t.last_updated).first()
-        self.assertEqual(db_t.notes, t.notes)
+        self.assertEqual(db_t.notes, notes)
+        self.assertEqual(db_t.type, therapy_type)
         return db_t
 
     def construct_supports_questionnaire(
@@ -823,75 +740,57 @@ class BaseTestQuestionnaire(BaseTest):
         therapies=None,
         assistive_devices=None,
         alternative_augmentative=None,
-        participant=None,
-        user=None,
+        participant_id: int = None,
+        user_id: int = None,
     ):
-
-        sq = SupportsQuestionnaire()
-        if user is None:
-            u = self.construct_user(email="support@questionnaire.com")
-            sq.user_id = u.id
-        else:
-            u = user
-            sq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            sq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            sq.participant_id = participant.id
-
+        u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
+        u_id = u.id
+        p_id = p.id
+        sq = SupportsQuestionnaire(
+            user_id=u_id,
+            participant_id=p_id,
+        )
         self.session.add(sq)
         self.session.commit()
 
+        sq_id = sq.id
+
         if assistive_devices is None:
-            self.construct_assistive_device(supports_questionnaire_id=sq.id)
+            self.construct_assistive_device(supports_questionnaire_id=sq_id)
         else:
             sq.assistive_devices = assistive_devices
 
         if alternative_augmentative is None:
-            self.construct_alternative_augmentative(supports_questionnaire_id=sq.id)
+            self.construct_alternative_augmentative(supports_questionnaire_id=sq_id)
         else:
             sq.alternative_augmentative = alternative_augmentative
 
         if medications is None:
-            self.construct_medication(supports_questionnaire_id=sq.id)
+            self.construct_medication(supports_questionnaire_id=sq_id)
         else:
             sq.medications = medications
 
         if therapies is None:
-            self.construct_therapy(supports_questionnaire_id=sq.id)
+            self.construct_therapy(supports_questionnaire_id=sq_id)
         else:
             sq.therapies = therapies
 
-        db_sq = (
-            self.session.query(SupportsQuestionnaire).filter_by(participant_id=cast(sq.participant_id, Integer)).first()
-        )
+        self.session.add(sq)
+        self.session.commit()
+
+        db_sq = self.session.query(SupportsQuestionnaire).filter_by(participant_id=p_id).first()
         self.assertEqual(db_sq.last_updated, sq.last_updated)
         return db_sq
 
-    def construct_chain_session_questionnaire(self, participant=None, user=None):
+    def construct_chain_session_questionnaire(self, participant_id: int = None, user_id: int = None):
         self.construct_chain_steps()
 
-        bq = ChainQuestionnaire()
-        if user is None:
-            from app.enums import Role
-
-            u = self.construct_user(email="edudep@questionnaire.com", role=Role.researcher)
-            bq.user_id = u.id
-        else:
-            u = user
-            bq.user_id = u.id
-
-        if participant is None:
-            from app.enums import Relationship
-
-            p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-            bq.participant_id = p.id
-        else:
-            p = participant
-            bq.participant_id = p.id
+        u, p = self.construct_user_and_participant(
+            user_id, participant_id, relationship=Relationship.dependent, user_role=Role.researcher
+        )
+        u_id = u.id
+        p_id = p.id
+        bq = ChainQuestionnaire(user_id=u_id, participant_id=p_id)
 
         session_date = parser.parse("2020-12-14T17:46:14.030Z")
 
@@ -914,9 +813,7 @@ class BaseTestQuestionnaire(BaseTest):
         self.session.add(bq)
         self.session.commit()
 
-        db_bq = (
-            self.session.query(ChainQuestionnaire).filter_by(participant_id=cast(bq.participant_id, Integer)).first()
-        )
+        db_bq = self.session.query(ChainQuestionnaire).filter_by(participant_id=p_id).first()
         self.assertEqual(db_bq.participant_id, bq.participant_id)
         self.assertEqual(db_bq.user_id, bq.user_id)
         self.assertEqual(db_bq.sessions, bq.sessions)
@@ -925,38 +822,40 @@ class BaseTestQuestionnaire(BaseTest):
         self.assertEqual(db_bq.sessions[0].step_attempts[0].num_stars, 0)
         return db_bq
 
-    def construct_all_questionnaires(self, user=None) -> dict[str, object]:
-        if user is None:
-            user = self.construct_user()
-        from app.enums import Relationship
+    def construct_all_questionnaires(self, user_id: int = None) -> dict[str, object]:
+        u, p = self.construct_user_and_participant(
+            user_id=user_id, participant_id=None, relationship=Relationship.dependent
+        )
+        u_id = u.id
+        p_id = p.id
 
-        participant = self.construct_participant(user_id=user.id, relationship=Relationship.dependent)
-        self.construct_usermeta(user=user)
+        self.construct_user_meta(user_id=u_id)
+
         return {
-            "clinical_diagnoses": self.construct_clinical_diagnoses_questionnaire(user=user, participant=participant),
-            "contact": self.construct_contact_questionnaire(user=user, participant=participant),
+            "clinical_diagnoses": self.construct_clinical_diagnoses_questionnaire(user_id=u_id, participant_id=p_id),
+            "contact": self.construct_contact_questionnaire(user_id=u_id, participant_id=p_id),
             "current_behaviors_dependent": self.construct_current_behaviors_dependent_questionnaire(
-                user=user, participant=participant
+                user_id=u_id, participant_id=p_id
             ),
             "current_behaviors_self": self.construct_current_behaviors_self_questionnaire(
-                user=user, participant=participant
+                user_id=u_id, participant_id=p_id
             ),
-            "demographics": self.construct_demographics_questionnaire(user=user, participant=participant),
-            "developmental": self.construct_developmental_questionnaire(user=user, participant=participant),
-            "education_dependent": self.construct_education_dependent_questionnaire(user=user, participant=participant),
-            "education_self": self.construct_education_self_questionnaire(user=user, participant=participant),
-            "employment": self.construct_employment_questionnaire(user=user, participant=participant),
+            "demographics": self.construct_demographics_questionnaire(user_id=u_id, participant_id=p_id),
+            "developmental": self.construct_developmental_questionnaire(user_id=u_id, participant_id=p_id),
+            "education_dependent": self.construct_education_dependent_questionnaire(user_id=u_id, participant_id=p_id),
+            "education_self": self.construct_education_self_questionnaire(user_id=u_id, participant_id=p_id),
+            "employment": self.construct_employment_questionnaire(user_id=u_id, participant_id=p_id),
             "evaluation_history_dependent": self.construct_evaluation_history_dependent_questionnaire(
-                user=user, participant=participant
+                user_id=u_id, participant_id=p_id
             ),
             "evaluation_history_self": self.construct_evaluation_history_self_questionnaire(
-                user=user, participant=participant
+                user_id=u_id, participant_id=p_id
             ),
-            "home_dependent": self.construct_home_dependent_questionnaire(user=user, participant=participant),
-            "home_self": self.construct_home_self_questionnaire(user=user, participant=participant),
-            "identification": self.construct_identification_questionnaire(user=user, participant=participant),
-            "professional": self.construct_professional_questionnaire(user=user, participant=participant),
-            "supports": self.construct_supports_questionnaire(user=user, participant=participant),
-            "registration": self.construct_registration_questionnaire(user=user),
-            "chain_session": self.construct_chain_session_questionnaire(user=user, participant=participant),
+            "home_dependent": self.construct_home_dependent_questionnaire(user_id=u_id, participant_id=p_id),
+            "home_self": self.construct_home_self_questionnaire(user_id=u_id, participant_id=p_id),
+            "identification": self.construct_identification_questionnaire(user_id=u_id, participant_id=p_id),
+            "professional": self.construct_professional_questionnaire(user_id=u_id, participant_id=p_id),
+            "supports": self.construct_supports_questionnaire(user_id=u_id, participant_id=p_id),
+            "registration": self.construct_registration_questionnaire(user_id=u_id),
+            "chain_session": self.construct_chain_session_questionnaire(user_id=u_id, participant_id=p_id),
         }

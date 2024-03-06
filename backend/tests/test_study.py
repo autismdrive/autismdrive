@@ -1,8 +1,8 @@
 from sqlalchemy import cast, Integer
 
 from app.email_service import EmailService
-from app.models import EmailLog, Study, StudyInvestigator, StudyCategory, ContactQuestionnaire, StudyUser
 from app.enums import Relationship
+from app.models import EmailLog, Study, StudyInvestigator, ContactQuestionnaire
 from app.models import IdentificationQuestionnaire
 from app.models import StudyCategory
 from fixtures.study import MockStudy, MockStudyWithMoreFields

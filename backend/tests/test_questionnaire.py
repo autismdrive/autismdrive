@@ -7,10 +7,33 @@ import openpyxl
 from dateutil import parser
 from sqlalchemy import select
 
+from app.enums import Role
+from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app.export_service import ExportService
+from app.models import (
+    ChainQuestionnaire,
+    ChainStep,
+    ChallengingBehavior,
+    ClinicalDiagnosesQuestionnaire,
+    ContactQuestionnaire,
+    CurrentBehaviorsDependentQuestionnaire,
+    CurrentBehaviorsSelfQuestionnaire,
+    DemographicsQuestionnaire,
+    DevelopmentalQuestionnaire,
+    EducationDependentQuestionnaire,
+    EducationSelfQuestionnaire,
+    EmploymentQuestionnaire,
+    EvaluationHistoryDependentQuestionnaire,
+    EvaluationHistorySelfQuestionnaire,
+    HomeDependentQuestionnaire,
+    HomeSelfQuestionnaire,
+    IdentificationQuestionnaire,
+    Step,
+    StepLog,
+    SupportsQuestionnaire,
+)
 from fixtures.endpoints_map import endpoints_map
 from fixtures.fixure_utils import fake
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestQuestionnaire(BaseTestQuestionnaire):
@@ -123,7 +146,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=headers,
         )
         self.assert_success(rv)
-        from app.models import StepLog
 
         log = self.session.query(StepLog).all()
         self.assertIsNotNone(log)
@@ -131,7 +153,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
-        from app.models import ClinicalDiagnosesQuestionnaire
 
         cq = self.session.query(ClinicalDiagnosesQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -150,7 +171,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_clinical_diagnoses_questionnaire_basics(self):
         self.construct_clinical_diagnoses_questionnaire()
-        from app.models import ClinicalDiagnosesQuestionnaire
 
         cq = self.session.query(ClinicalDiagnosesQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -233,7 +253,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
-        from app.models import ContactQuestionnaire
 
         cq = self.session.query(ContactQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -252,7 +271,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_contact_questionnaire_basics(self):
         self.construct_contact_questionnaire()
-        from app.models import ContactQuestionnaire
 
         cq = self.session.query(ContactQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -324,7 +342,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_current_behaviors_dependent_questionnaire_basics(self):
         self.construct_current_behaviors_dependent_questionnaire()
-        from app.models import CurrentBehaviorsDependentQuestionnaire
 
         cbdq = self.session.query(CurrentBehaviorsDependentQuestionnaire).first()
         self.assertIsNotNone(cbdq)
@@ -343,7 +360,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_current_behaviors_dependent_questionnaire_basics(self):
         self.construct_current_behaviors_dependent_questionnaire()
-        from app.models import CurrentBehaviorsDependentQuestionnaire
 
         cbdq = self.session.query(CurrentBehaviorsDependentQuestionnaire).first()
         self.assertIsNotNone(cbdq)
@@ -429,7 +445,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_current_behaviors_self_questionnaire_basics(self):
         self.construct_current_behaviors_self_questionnaire()
-        from app.models import CurrentBehaviorsSelfQuestionnaire
 
         cbsq = self.session.query(CurrentBehaviorsSelfQuestionnaire).first()
         self.assertIsNotNone(cbsq)
@@ -447,7 +462,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_current_behaviors_self_questionnaire_basics(self):
         self.construct_current_behaviors_self_questionnaire()
-        from app.models import CurrentBehaviorsSelfQuestionnaire
 
         cbsq = self.session.query(CurrentBehaviorsSelfQuestionnaire).first()
         self.assertIsNotNone(cbsq)
@@ -533,7 +547,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_demographics_questionnaire_basics(self):
         self.construct_demographics_questionnaire()
-        from app.models import DemographicsQuestionnaire
 
         dq = self.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -552,7 +565,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_demographics_questionnaire_basics(self):
         self.construct_demographics_questionnaire()
-        from app.models import DemographicsQuestionnaire
 
         dq = self.session.query(DemographicsQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -635,7 +647,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_developmental_questionnaire_basics(self):
         self.construct_developmental_questionnaire()
-        from app.models import DevelopmentalQuestionnaire
 
         dq = self.session.query(DevelopmentalQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -654,7 +665,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_developmental_questionnaire_basics(self):
         self.construct_developmental_questionnaire()
-        from app.models import DevelopmentalQuestionnaire
 
         dq = self.session.query(DevelopmentalQuestionnaire).first()
         self.assertIsNotNone(dq)
@@ -743,7 +753,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_education_dependent_questionnaire_basics(self):
         self.construct_education_dependent_questionnaire()
-        from app.models import EducationDependentQuestionnaire
 
         eq = self.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -762,7 +771,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_education_dependent_questionnaire_basics(self):
         self.construct_education_dependent_questionnaire()
-        from app.models import EducationDependentQuestionnaire
 
         eq = self.session.query(EducationDependentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -851,7 +859,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_education_self_questionnaire_basics(self):
         self.construct_education_self_questionnaire()
-        from app.models import EducationSelfQuestionnaire
 
         eq = self.session.query(EducationSelfQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -870,7 +877,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_education_self_questionnaire_basics(self):
         self.construct_education_self_questionnaire()
-        from app.models import EducationSelfQuestionnaire
 
         eq = self.session.query(EducationSelfQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -959,7 +965,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_employment_questionnaire_basics(self):
         self.construct_employment_questionnaire()
-        from app.models import EmploymentQuestionnaire
 
         eq = self.session.query(EmploymentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -979,7 +984,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_employment_questionnaire_basics(self):
         self.construct_employment_questionnaire()
-        from app.models import EmploymentQuestionnaire
 
         eq = self.session.query(EmploymentQuestionnaire).first()
         self.assertIsNotNone(eq)
@@ -1068,9 +1072,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_evaluation_history_dependent_questionnaire_basics(self):
         self.construct_evaluation_history_dependent_questionnaire()
-        from app.models import (
-            EvaluationHistoryDependentQuestionnaire,
-        )
 
         ehq = self.session.query(EvaluationHistoryDependentQuestionnaire).first()
         self.assertIsNotNone(ehq)
@@ -1089,9 +1090,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_evaluation_history_dependent_questionnaire_basics(self):
         self.construct_evaluation_history_dependent_questionnaire()
-        from app.models import (
-            EvaluationHistoryDependentQuestionnaire,
-        )
 
         ehq = self.session.query(EvaluationHistoryDependentQuestionnaire).first()
         self.assertIsNotNone(ehq)
@@ -1177,7 +1175,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_evaluation_history_self_questionnaire_basics(self):
         self.construct_evaluation_history_self_questionnaire()
-        from app.models import EvaluationHistorySelfQuestionnaire
 
         ehq = self.session.query(EvaluationHistorySelfQuestionnaire).first()
         self.assertIsNotNone(ehq)
@@ -1196,7 +1193,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_evaluation_history_self_questionnaire_basics(self):
         self.construct_evaluation_history_self_questionnaire()
-        from app.models import EvaluationHistorySelfQuestionnaire
 
         ehq = self.session.query(EvaluationHistorySelfQuestionnaire).first()
         self.assertIsNotNone(ehq)
@@ -1282,7 +1278,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_home_dependent_questionnaire_basics(self):
         self.construct_home_dependent_questionnaire()
-        from app.models import HomeDependentQuestionnaire
         from app.schemas import HomeDependentQuestionnaireSchema
 
         hq = self.session.query(HomeDependentQuestionnaire).first()
@@ -1308,7 +1303,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_home_dependent_questionnaire_basics(self):
         self.construct_home_dependent_questionnaire()
-        from app.models import HomeDependentQuestionnaire
 
         hq = self.session.query(HomeDependentQuestionnaire).first()
         self.assertIsNotNone(hq)
@@ -1399,7 +1393,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_home_self_questionnaire_basics(self):
         self.construct_home_self_questionnaire()
-        from app.models import HomeSelfQuestionnaire
         from app.schemas import HomeSelfQuestionnaireSchema
 
         hq = self.session.query(HomeSelfQuestionnaire).first()
@@ -1424,7 +1417,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_home_self_questionnaire_basics(self):
         self.construct_home_self_questionnaire()
-        from app.models import HomeSelfQuestionnaire
 
         hq = self.session.query(HomeSelfQuestionnaire).first()
         self.assertIsNotNone(hq)
@@ -1517,7 +1509,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_identification_questionnaire_basics(self):
         self.construct_identification_questionnaire()
-        from app.models import IdentificationQuestionnaire
 
         iq = self.session.query(IdentificationQuestionnaire).first()
         self.assertIsNotNone(iq)
@@ -1537,7 +1528,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_identification_questionnaire_basics(self):
         self.construct_identification_questionnaire()
-        from app.models import IdentificationQuestionnaire
 
         iq = self.session.query(IdentificationQuestionnaire).first()
         self.assertIsNotNone(iq)
@@ -1621,7 +1611,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertIsNotNone(response["id"])
 
     def test_supports_questionnaire_basics(self):
-        from app.models import SupportsQuestionnaire
         from app.schemas import SupportsQuestionnaireSchema
 
         sq = self.construct_supports_questionnaire()
@@ -1650,7 +1639,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_modify_supports_questionnaire_basics(self):
         self.construct_supports_questionnaire()
-        from app.models import SupportsQuestionnaire
 
         sq = self.session.query(SupportsQuestionnaire).first()
         self.assertIsNotNone(sq)
@@ -1677,11 +1665,11 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         self.construct_medication(name=fake.enzyme(), supports_questionnaire_id=sq.id)
-        self.construct_therapy(type="socialSkills", supports_questionnaire_id=sq.id)
-        self.construct_alternative_augmentative(type="highTechAAC", supports_questionnaire_id=sq.id)
+        self.construct_therapy(therapy_type="socialSkills", supports_questionnaire_id=sq.id)
+        self.construct_alternative_augmentative(aac_type="highTechAAC", supports_questionnaire_id=sq.id)
         self.construct_assistive_device(
             type_group="hearing",
-            type="hearingAid",
+            device_type="hearingAid",
             notes=fake.paragraph(),
             supports_questionnaire_id=sq.id,
         )
@@ -1738,7 +1726,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_get_chain_steps(self):
         self.construct_chain_steps()
-        from app.models import ChainStep
 
         chain_step = self.session.query(ChainStep).first()
         self.assertIsNotNone(chain_step)
@@ -1759,7 +1746,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_chain_session_questionnaire_basics(self):
         self.construct_chain_session_questionnaire()
-        from app.models import ChainQuestionnaire
 
         cq = self.session.query(ChainQuestionnaire).first()
         self.assertIsNotNone(cq)
@@ -1869,7 +1855,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertTrue("target_prompt_level" in step_attempt_after)
 
         self.assertEqual(step_attempt_before["prompt_level"], step_attempt_after["prompt_level"])
-        from app.models import ChallengingBehavior
 
         all_cbs = self.session.query(ChallengingBehavior).all()
         self.assertEqual(len(all_cbs), 3)
@@ -2006,7 +1991,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertTrue(len(response["steps"]) > 0)
         self.assertEqual("identification_questionnaire", response["steps"][0]["name"])
         self.assertEqual(ExportService.TYPE_IDENTIFYING, response["steps"][0]["type"])
-        from app.models import Step
 
         self.assertEqual(Step.STATUS_INCOMPLETE, response["steps"][0]["status"])
 
@@ -2034,14 +2018,14 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        intro = self.get_field_from_response(response, "intro")
+        intro = self._get_field("intro", response)
         self.assertIsNotNone(intro["template_options"]["description"])
         self.assertEqual(
             intro["template_options"]["description"],
             "Please answer the following questions about yourself (* indicates required response):",
         )
 
-        birth_city = self.get_field_from_response(response, "birth_city")
+        birth_city = self._get_field("birth_city", response)
         self.assertIsNotNone(birth_city)
         self.assertIsNotNone(birth_city["template_options"])
         self.assertIsNotNone(birth_city["template_options"]["label"])
@@ -2055,7 +2039,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        birth_city = self.get_field_from_response(response, "birth_city")
+        birth_city = self._get_field("birth_city", response)
         self.assertIsNotNone(birth_city["template_options"]["label"])
         self.assertEqual(birth_city["template_options"]["label"], "Your child's city/municipality of birth")
 
@@ -2068,7 +2052,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        relationship = self.get_field_from_response(response, "relationship")
+        relationship = self._get_field("relationship", response)
         self.assertIsNotNone(relationship)
 
         # Convert Participant to a dependant
@@ -2080,7 +2064,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        relationship = self.get_field_from_response(response, "relationship")
+        relationship = self._get_field("relationship", response)
         self.assertIsNone(relationship)
 
     def test_meta_contains_table_details(self):
@@ -2104,7 +2088,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        self_living = self.get_field_from_response(response, "self_living")
+        self_living = self._get_field("self_living", response)
         self.assertEqual("self_living_situation", self_living["fieldGroup"][0]["name"])
 
     def test_support_meta_contain_their_fields(self):
@@ -2116,7 +2100,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        assistive_devices = self.get_field_from_response(response, "assistive_devices")
+        assistive_devices = self._get_field("assistive_devices", response)
         self.assertIsNotNone(assistive_devices["fieldArray"]["fieldGroup"][0])
         self.assertEqual("type", assistive_devices["fieldArray"]["fieldGroup"][0]["name"])
 
@@ -2173,12 +2157,18 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(1, response["fields"][0]["display_order"])
-        self.assertEqual(2, response["fields"][1]["display_order"])
-        self.assertEqual(3, response["fields"][2]["display_order"])
 
-        self.assertEqual(6.1, response["fields"][4]["fieldGroup"][0]["display_order"])
-        self.assertEqual(6.2, response["fields"][4]["fieldGroup"][1]["display_order"])
+        for i in range(len(response["fields"]) - 1):
+            this_field = response["fields"][i]
+            next_field = response["fields"][i + 1]
+
+            self.assertLess(this_field["display_order"], next_field["display_order"])
+
+            if "fieldGroup" in this_field:
+                for j in range(len(this_field["fieldGroup"]) - 1):
+                    this_group_field = this_field["fieldGroup"][j]
+                    next_group_field = this_field["fieldGroup"][j + 1]
+                    self.assertLess(this_group_field["display_order"], next_group_field["display_order"])
 
     def test_questionnaire_info_list_basics(self):
         rv = self.client.get("/api/q", follow_redirects=True, content_type="application/json")
@@ -2221,10 +2211,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_non_admin_cannot_view_questionnaire_list(self):
         user = self.construct_user(email=fake.email())
-        user_headers = self.logged_in_headers(user_id=user.id)
-        admin = self.construct_admin_user(email=fake.email())
-        admin_headers = self.logged_in_headers(user_id=admin.id)
-        self.construct_contact_questionnaire(user=user)
+        u_id = user.id
+        user_headers = self.logged_in_headers(user_id=u_id)
+        admin = self.construct_user(email=fake.email(), role=Role.admin)
+        admin_id = admin.id
+        admin_headers = self.logged_in_headers(user_id=admin_id)
+
+        self.construct_contact_questionnaire(user_id=u_id)
         rv = self.client.get("/api/q/contact_questionnaire", content_type="application/json")
         self.assertEqual(401, rv.status_code)
         rv = self.client.get("/api/q/contact_questionnaire", content_type="application/json", headers=user_headers)
@@ -2317,8 +2310,8 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         u2_email = fake.email()
         u2 = self.construct_user(email=u2_email)
         u2_id = u2.id
-        self.construct_all_questionnaires(u1)
-        self.construct_all_questionnaires(u2)
+        self.construct_all_questionnaires(user_id=u1_id)
+        self.construct_all_questionnaires(user_id=u2_id)
         rv = self.client.get(
             "/api/q/all/export/user/%i" % u1_id,
             follow_redirects=True,
@@ -2373,3 +2366,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def _parse_date(self, date_str):
         return parser.parse(date_str).replace(tzinfo=None)
+
+    def _get_field(self, field_name, response):
+        return next(filter(lambda field: field["name"] == field_name, response["fields"]), None)

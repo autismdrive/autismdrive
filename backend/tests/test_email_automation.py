@@ -391,7 +391,7 @@ class TestEmailPromptService(BaseTestQuestionnaire):
     def test_self_participants_that_are_not_their_own_legal_guardians_do_not_get_reminders(self):
         u2 = self.construct_user(email="test2@sartography.com", last_login="12/4/19 10:00")
         u2._password = b"123412"
-        user_meta = self.construct_usermeta(user=u2)
+        user_meta = self.construct_user_meta(user_id=u2.id)
 
         user_meta.self_participant = True
         user_meta.self_has_guardian = True

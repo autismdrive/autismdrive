@@ -274,11 +274,17 @@ class BaseTest(TestCase):
 
         return db_participant
 
-    def construct_usermeta(self, user):
-        usermeta = UserMeta(id=user.id)
-        self.session.add(usermeta)
+    def construct_user_meta(self, user_id):
+        user_meta = UserMeta(id=user_id)
+        self.session.add(user_meta)
         self.session.commit()
-        return usermeta
+        user_meta_id = user_meta.id
+        assert user_meta_id is not None
+        self.assertEqual(user_meta_id, user_id)
+
+        db_user_meta = self.session.query(UserMeta).filter_by(id=user_id).first()
+        self.assertEqual(db_user_meta.id, user_id)
+        return db_user_meta
 
     def construct_admin_note(
         self, user, resource, note="I think all sorts of things about this resource and I'm telling you now."
