@@ -1,14 +1,15 @@
 import datetime
 
 import flask_restful
-from flask import request, g
+from flask import request
 from marshmallow import ValidationError
 
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission
-from app.models import Event, EventUser, Geocode, ResourceChangeLog
+from app.log_service import LogService
+from app.models import Event, EventUser, Geocode
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
@@ -40,7 +41,8 @@ class EventEndpoint(flask_restful.Resource):
         session.query(EventUser).filter_by(event_id=event_id).delete()
         session.query(Event).filter_by(id=event_id).delete()
         session.commit()
-        self.log_update(event_id=event_id, event_title=event_title, change_type="delete")
+
+        LogService.log_resource_change(resource_id=event_id, resource_title=event_title, change_type="delete")
         return None
 
     @auth.login_required
@@ -70,20 +72,8 @@ class EventEndpoint(flask_restful.Resource):
         session.add(updated)
         session.commit()
         elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
-        self.log_update(event_id=updated.id, event_title=updated.title, change_type="edit")
+        LogService.log_resource_change(resource_id=updated.id, resource_title=updated.title, change_type="edit")
         return self.schema.dump(updated)
-
-    @staticmethod
-    def log_update(event_id, event_title, change_type):
-        log = ResourceChangeLog(
-            resource_id=event_id,
-            resource_title=event_title,
-            user_id=g.user.id,
-            user_email=g.user.email,
-            type=change_type,
-        )
-        session.add(log)
-        session.commit()
 
 
 class EventListEndpoint(flask_restful.Resource):
@@ -115,19 +105,7 @@ class EventListEndpoint(flask_restful.Resource):
 
             obj_dict = to_database_object_dict(self.event_schema, load_result)
             elastic_index.add_document(document=obj_dict)
-            self.log_update(event_id=obj_dict.id, event_title=obj_dict.title, change_type="create")
+            LogService.log_resource_change(resource_id=obj_dict.id, resource_title=obj_dict.title, change_type="create")
             return self.event_schema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
-
-    @staticmethod
-    def log_update(event_id, event_title, change_type):
-        log = ResourceChangeLog(
-            resource_id=event_id,
-            resource_title=event_title,
-            user_id=g.user.id,
-            user_email=g.user.email,
-            type=change_type,
-        )
-        session.add(log)
-        session.commit()

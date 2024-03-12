@@ -27,8 +27,8 @@ from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
 
 from app.database import session
 from app.enums import Permission
-from app.utils.category_utils import all_search_paths, search_path, calculate_level
-from app.utils.resource_utils import DatabaseObject, DatabaseObjectDict
+from app.utils.category_utils import search_path, calculate_level
+from app.utils.resource_utils import DatabaseObjectDict
 from app.utils.resource_utils import indexable_content, category_names
 from config.load import settings
 
@@ -151,6 +151,12 @@ class ElasticIndex(object):
 
     @classmethod
     def remove_document(cls, document: DatabaseObjectDict, flush: bool = True):
+        doc_id = cls._instance.get_id(document)
+        exists = cls._instance.connection.exists(id=doc_id, index=cls._instance.index_name)
+
+        if not exists:
+            return
+
         obj = cls._instance.get_document(document)
         obj.delete(version=None)
 

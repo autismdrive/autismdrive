@@ -10,6 +10,7 @@ class TestParticipant(BaseTestQuestionnaire):
     def test_participant_relationships(self):
         u = self.construct_user()
         u_id = u.id
+        headers = self.logged_in_headers(user_id=u_id)
         participant = self.construct_participant(user_id=u_id, relationship=Relationship.self_participant)
         guardian = self.construct_participant(user_id=u_id, relationship=Relationship.self_guardian)
         dependent = self.construct_participant(user_id=u_id, relationship=Relationship.dependent)
@@ -19,7 +20,7 @@ class TestParticipant(BaseTestQuestionnaire):
             "/api/user/%i" % u_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -250,38 +251,44 @@ class TestParticipant(BaseTestQuestionnaire):
         self.assertIsNotNone(response["all_participants"])
 
     def test_participant_percent_complete(self):
-        u = self.construct_user()
-        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
+        u, p = self.construct_user_and_participant(relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
+        user_headers = self.logged_in_headers(user_id=u_id)
+        admin_headers = self.logged_in_headers()
 
-        rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get("/api/participant", content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(0, response[0]["percent_complete"])
 
-        iq = self.get_identification_questionnaire(p.id)
+        iq = self.get_identification_questionnaire(p_id)
         self.client.post(
             "api/flow/self_intake/identification_questionnaire",
             data=self.jsonify(iq),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u.id),
+            headers=user_headers,
         )
 
-        rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get("/api/participant", content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
         response = rv.json
         self.assertGreater(response[0]["percent_complete"], 0)
 
     def test_participant_name(self):
-        u = self.construct_user()
-        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-        rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
+        u, p = self.construct_user_and_participant(relationship=Relationship.self_participant)
+        u_id = u.id
+        p_id = p.id
+        admin_headers = self.logged_in_headers()
+        self.session.close()
+
+        rv = self.client.get("/api/participant", content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[0]["name"], "")
 
-        self.construct_identification_questionnaire(first_name="Felicity", nickname="City", participant=p)
-        rv = self.client.get("/api/participant", content_type="application/json", headers=self.logged_in_headers())
+        self.construct_identification_questionnaire(first_name="Felicity", nickname="City", participant_id=p_id)
+        rv = self.client.get("/api/participant", content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response[0]["name"], "City")

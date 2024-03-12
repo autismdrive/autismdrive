@@ -11,7 +11,7 @@ from app.import_service import ImportService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo, User
 from app.schemas import SchemaRegistry
 from config.load import settings
-from fixtures.fixure_utils import fake
+from fixtures.fixure_utils import fake, fake_password, fake_user_id
 from mocks.mock_response import MockRequestsResponse
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
@@ -89,7 +89,7 @@ class TestImportCase(BaseTestQuestionnaire):
     def request_user_setup(self):
         info = [ExportInfo("star_user", "User", size=1, url="/api/export/user")]
         info_json = SchemaRegistry.ExportInfoSchema().dump(info, many=True)
-        user_id = random.randint(10000, 99999)
+        user_id = fake_user_id()
 
         user = User(
             id=user_id,
@@ -98,7 +98,7 @@ class TestImportCase(BaseTestQuestionnaire):
             role=Role.user,
             email_verified=True,
         )
-        user.password = fake.password(length=25, special_chars=True, upper_case=True)
+        user.password = fake_password()
         user.token = User.encode_auth_token(user_id=user_id)
         user_json = SchemaRegistry.UserExportSchema(many=True).dump([user])
         admin_json = SchemaRegistry.AdminExportSchema(many=True).dump([user])
@@ -255,9 +255,9 @@ class TestImportCase(BaseTestQuestionnaire):
         for i in range(num_admins):
             admin_accounts.append(
                 {
-                    "id": random.randint(10000, 99999),
+                    "id": fake_user_id(),
                     "email": fake.email(),
-                    "password": fake.password(length=25, special_chars=True, upper_case=True),
+                    "password": fake_password(),
                 }
             )
 

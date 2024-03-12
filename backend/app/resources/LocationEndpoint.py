@@ -1,14 +1,15 @@
 import datetime
 
 import flask_restful
-from flask import request, g
+from flask import request
 from marshmallow import ValidationError
 
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission
-from app.models import Location, Event, Geocode, ResourceChangeLog
+from app.log_service import LogService
+from app.models import Location, Event, Geocode
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
@@ -40,7 +41,7 @@ class LocationEndpoint(flask_restful.Resource):
         session.query(Event).filter_by(id=location_id).delete()
         session.query(Location).filter_by(id=location_id).delete()
         session.commit()
-        self.log_update(location_id=location_id, location_title=location_title, change_type="delete")
+        LogService.log_resource_change(resource_id=location_id, resource_title=location_title, change_type="delete")
         return "", 200
 
     @auth.login_required
@@ -72,20 +73,8 @@ class LocationEndpoint(flask_restful.Resource):
         session.add(updated)
         session.commit()
         elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
-        self.log_update(location_id=updated.id, location_title=updated.title, change_type="edit")
+        LogService.log_resource_change(resource_id=updated.id, resource_title=updated.title, change_type="edit")
         return self.schema.dump(updated)
-
-    @staticmethod
-    def log_update(location_id, location_title, change_type):
-        log = ResourceChangeLog(
-            resource_id=location_id,
-            resource_title=location_title,
-            user_id=g.user.id,
-            user_email=g.user.email,
-            type=change_type,
-        )
-        session.add(log)
-        session.commit()
 
 
 class LocationListEndpoint(flask_restful.Resource):
@@ -117,19 +106,10 @@ class LocationListEndpoint(flask_restful.Resource):
 
             obj_dict = to_database_object_dict(self.location_schema, load_result)
             elastic_index.add_document(document=obj_dict)
-            self.log_update(location_id=load_result.id, location_title=load_result.title, change_type="create")
+
+            LogService.log_resource_change(
+                resource_id=load_result.id, resource_title=load_result.title, change_type="create"
+            )
             return self.location_schema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
-
-    @staticmethod
-    def log_update(location_id: int, location_title: str, change_type: str):
-        log = ResourceChangeLog(
-            resource_id=location_id,
-            resource_title=location_title,
-            user_id=g.user.id,
-            user_email=g.user.email,
-            type=change_type,
-        )
-        session.add(log)
-        session.commit()

@@ -1,9 +1,23 @@
 from unittest import TestCase
 
-from app.utils import snake_case_it, pascal_case_it
+from math import floor
+
+from app.utils import snake_case_it, pascal_case_it, get_random_integer
 
 
 class TestUtils(TestCase):
+    def test_should_generate_unique_random_integers(self):
+        num_ints = 1000000  # 1 million
+        ints = [get_random_integer() for _ in range(num_ints)]
+        for i in ints:
+            self.assertIsNotNone(i)
+            self.assertIsInstance(i, int)
+            self.assertGreaterEqual(i, 100)
+            self.assertLessEqual(i, 2147483647)
+
+        # There should be no duplicates
+        self.assertEqual(num_ints, len(set(ints)))
+
     def test_should_convert_string_to_pascal_case(self):
         test_cases = [
             ("", ""),

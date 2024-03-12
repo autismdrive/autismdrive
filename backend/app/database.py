@@ -1,15 +1,18 @@
 import datetime
 import enum
+import sys
 import typing
 from random import randint
 
 import click
+import sqlalchemy
 from icecream import ic
 from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
 from sqlalchemy_utils import database_exists
 
+from app.utils import get_random_integer
 from config.load import settings
 
 engine: Engine = create_engine(
@@ -141,23 +144,23 @@ def upgrade_db():
     upgrade(config=alembic_cfg, revision="head")
 
 
-def random_integer(context):
+def random_integer(context) -> int:
     """
+    Returns a random integer id that is not already in the database.
+
     Generates a random integer for use as ids for users, participants and the like
     where we want to avoid incremental ids that might be easy to guess.
+
     The context here is passed in by SQLAlchemy and allows us to check details of
     the query to make sure the id doesn't exist, though this is highly unlikely.
     """
-    min_ = 100
-    max_ = 1000000000
-    rand = randint(min_, max_)
 
-    # possibility of same random number is very low.
-    # but if you want to make sure, here you can check id exists in database.
-    while session.query(context.current_column.table).filter(id == rand).limit(1).first() is not None:
-        rand = randint(min_, max_)
+    id_ = get_random_integer()
 
-    return rand
+    while get_db_object_by_id(context.current_column.table, id_) is not None:
+        id_ = get_random_integer()
+
+    return id_
 
 
 def get_class_for_table(table: Table):

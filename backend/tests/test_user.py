@@ -10,7 +10,7 @@ from app.enums import Relationship, Permission, Role, StudyUserStatus
 from app.models import EmailLog, User, UserFavorite
 from app.models import StudyUser
 from app.rest_exception import RestException
-from fixtures.fixure_utils import fake
+from fixtures.fixure_utils import fake, fake_password, fake_user_id
 from tests.base_test import BaseTest
 
 
@@ -179,8 +179,11 @@ class TestUser(BaseTest):
         response = rv.json
         self.assertEqual(response["role"], "admin")
 
-    def test_create_user_with_bad_password(self, id=8, email="tyrion@got.com", role=Role.user):
-        data = {"id": id, "email": email}
+    def test_create_user_with_bad_password(self):
+        user_id = fake_user_id()
+        email = fake.email()
+        role = Role.user
+        data = {"id": user_id, "email": email}
         rv = self.client.post(
             "/api/user",
             data=self.jsonify(data),
@@ -189,19 +192,19 @@ class TestUser(BaseTest):
             content_type="application/json",
         )
         self.assert_success(rv)
-        user = self.session.query(User).filter_by(id=cast(id, Integer)).first()
+        user = self.session.query(User).filter_by(id=user_id).first()
         user.role = role
 
         with self.assertRaises(RestException):
             # Should raise exception
-            user.password = "badpass"
+            user.password = fake_password(secure=False)
 
     def test_create_user_with_password(
         self, user_id: int = None, email: str = None, role: Role = None, password: str = None
     ) -> User:
         role = role or Role.user
-        password = password or fake.password(length=32)
-        user_id = user_id or random.randint(10000, 99999)
+        password = password or fake_password()
+        user_id = user_id or fake_user_id()
         email = email or fake.email()
         data = {"id": user_id, "email": email}
         admin_headers = self.logged_in_headers()
@@ -250,8 +253,8 @@ class TestUser(BaseTest):
 
     def test_login_user(self):
         user_email = fake.email()
-        user_password = fake.password(length=32)
-        user_id = random.randint(10000, 99999)
+        user_password = fake_password()
+        user_id = fake_user_id()
         user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
         data = {"email": user_email, "password": user_password}
 
@@ -443,8 +446,8 @@ class TestUser(BaseTest):
 
     def test_login_tracks_login_date(self):
         user_email = fake.email()
-        user_password = fake.password(length=32)
-        user_id = random.randint(10000, 99999)
+        user_password = fake_password()
+        user_id = fake_user_id()
         time_before_create = datetime.datetime.utcnow()
         user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
         last_login = user.last_login

@@ -72,6 +72,7 @@ from app.models import (
     Therapy,
     Housemate,
     ResourceChangeLog,
+    StudyChangeLog,
     Medication,
     DataTransferLog,
     DataTransferLogDetail,
@@ -1002,6 +1003,11 @@ class ResourceChangeLogSchema(ModelSchema):
         model = ResourceChangeLog
 
 
+class StudyChangeLogSchema(ModelSchema):
+    class Meta(ModelSchema.Meta):
+        model = StudyChangeLog
+
+
 class AdminNoteSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = AdminNote
@@ -1771,6 +1777,7 @@ class SchemaRegistry(object):
     StepSchema = StepSchema
     StudyCategoriesSchema = StudyCategoriesSchema
     StudyCategorySchema = StudyCategorySchema
+    StudyChangeLogSchema = StudyChangeLogSchema
     StudyInvestigatorSchema = StudyInvestigatorSchema
     StudySchema = StudySchema
     StudyUserSchema = StudyUserSchema

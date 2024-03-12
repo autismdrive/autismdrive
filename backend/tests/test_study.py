@@ -41,6 +41,7 @@ class TestStudy(BaseTest):
             data=self.jsonify(modified_study),
             content_type="application/json",
             follow_redirects=True,
+            headers=self.logged_in_headers(),
         )
         self.assert_success(rv)
         rv = self.client.get("/api/study/%i" % s_id, content_type="application/json")
@@ -58,10 +59,11 @@ class TestStudy(BaseTest):
     def test_delete_study(self):
         s = self.construct_study()
         s_id = s.id
+        admin_headers = self.logged_in_headers()
         rv = self.client.get("api/study/%i" % s_id, content_type="application/json")
         self.assert_success(rv)
 
-        rv = self.client.delete("api/study/%i" % s_id, content_type="application/json")
+        rv = self.client.delete("api/study/%i" % s_id, content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
 
         rv = self.client.get("api/study/%i" % s_id, content_type="application/json")
@@ -70,7 +72,11 @@ class TestStudy(BaseTest):
     def test_create_study(self):
         study = MockStudy()
         rv = self.client.post(
-            "api/study", data=self.jsonify(study), content_type="application/json", follow_redirects=True
+            "api/study",
+            data=self.jsonify(study),
+            content_type="application/json",
+            follow_redirects=True,
+            headers=self.logged_in_headers(),
         )
         self.assert_success(rv)
         response = rv.json
@@ -187,13 +193,19 @@ class TestStudy(BaseTest):
 
         si_data = {"study_id": s.id, "investigator_id": i.id}
 
-        rv = self.client.post("/api/study_investigator", data=self.jsonify(si_data), content_type="application/json")
+        rv = self.client.post(
+            "/api/study_investigator",
+            data=self.jsonify(si_data),
+            content_type="application/json",
+            headers=self.logged_in_headers(),
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(i.id, response["investigator_id"])
         self.assertEqual(s.id, response["study_id"])
 
     def test_set_all_investigators_on_study(self):
+        headers = self.logged_in_headers()
         i1 = self.construct_investigator(name="person1")
         i2 = self.construct_investigator(name="person2")
         i3 = self.construct_investigator(name="person3")
@@ -205,7 +217,10 @@ class TestStudy(BaseTest):
             {"investigator_id": i3.id},
         ]
         rv = self.client.post(
-            "/api/study/%i/investigator" % s.id, data=self.jsonify(si_data), content_type="application/json"
+            "/api/study/%i/investigator" % s.id,
+            data=self.jsonify(si_data),
+            content_type="application/json",
+            headers=headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -213,7 +228,10 @@ class TestStudy(BaseTest):
 
         si_data = [{"investigator_id": i1.id}]
         rv = self.client.post(
-            "/api/study/%i/investigator" % s.id, data=self.jsonify(si_data), content_type="application/json"
+            "/api/study/%i/investigator" % s.id,
+            data=self.jsonify(si_data),
+            content_type="application/json",
+            headers=headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -221,7 +239,7 @@ class TestStudy(BaseTest):
 
     def test_remove_investigator_from_study(self):
         self.test_add_investigator_to_study()
-        rv = self.client.delete("/api/study_investigator/%i" % 1)
+        rv = self.client.delete("/api/study_investigator/%i" % 1, headers=self.logged_in_headers())
         self.assert_success(rv)
         rv = self.client.get("/api/study/%i/investigator" % 1, content_type="application/json")
         self.assert_success(rv)
@@ -384,23 +402,22 @@ class TestStudy(BaseTest):
 
     def test_delete_study_deletes_relationship(self):
         i = self.construct_investigator()
+        i_id = i.id
         s = self.construct_study()
-        si = StudyInvestigator(investigator_id=i.id, study_id=s.id)
+        s_id = s.id
+        si = StudyInvestigator(investigator_id=i_id, study_id=s_id)
         self.session.add(si)
         self.session.commit()
         si_id = si.id
 
-        rv = self.client.get(
-            "api/study_investigator/%i" % si_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get(f"/api/study_investigator/{si_id}", content_type="application/json")
+        self.assert_success(rv)
+        r_dict = rv.json
+        self.assertEqual(r_dict["investigator_id"], i_id)
+        self.assertEqual(r_dict["study_id"], s_id)
+
+        rv = self.client.delete(f"/api/study/{s_id}", content_type="application/json", headers=self.logged_in_headers())
         self.assert_success(rv)
 
-        rv = self.client.delete(
-            "api/study/%i" % s.id, content_type="application/json", headers=self.logged_in_headers()
-        )
-        self.assert_success(rv)
-
-        rv = self.client.get(
-            "api/study_investigator/%i" % si_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get(f"/api/study_investigator/{si_id}", content_type="application/json")
         self.assertEqual(404, rv.status_code)

@@ -42,12 +42,14 @@ from app.models import (
     UserFavorite,
     UserMeta,
     ZipCode,
+    StudyChangeLog,
 )
 from app.resources.CategoryEndpoint import get_category_by_id
+from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.ResourceEndpoint import get_resource_by_id
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
-from fixtures.fixure_utils import fake
+from fixtures.fixure_utils import fake, fake_password
 from fixtures.location import MockLocationWithLatLong
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy
@@ -165,7 +167,7 @@ class BaseTest(TestCase):
         self.assertIsNotNone(db_user)
         self.session.close()
 
-        password = fake.password(length=32) if password is None else password
+        password = fake_password() if password is None else password
         token = self.login_user(user_id, password)
 
         self.auths[user_id] = dict(Authorization=f"Bearer {token}")
@@ -259,16 +261,7 @@ class BaseTest(TestCase):
         self.session.commit()
 
         participant_id = participant.id
-        db_participant = (
-            self.session.execute(
-                select(Participant)
-                .options(joinedload(Participant.identification), joinedload(Participant.contact))
-                .filter_by(id=participant_id)
-                .filter_by(user_id=user_id)
-            )
-            .unique()
-            .scalar_one()
-        )
+        db_participant = get_participant_by_id(participant_id, with_joins=True)
         self.assertEqual(db_participant.relationship, participant.relationship)
         self.session.close()
 
@@ -440,15 +433,20 @@ class BaseTest(TestCase):
 
         return db_study
 
-    def construct_investigator(self, name="Judith Wonder", title="Ph.D., Assistant Professor of Mereology"):
-
+    def construct_investigator(self, name: str = None, title="Ph.D., Assistant Professor of Mereology"):
+        name = name or fake.name()
+        title = title or fake.title()
         investigator = Investigator(name=name, title=title)
         investigator.organization_name = "Investigator Org"
         self.session.add(investigator)
         self.session.commit()
+        i_id = investigator.id
+        self.session.close()
+        assert i_id is not None
 
-        db_inv = self.session.query(Investigator).filter_by(name=investigator.name).first()
-        self.assertEqual(db_inv.title, investigator.title)
+        db_inv = self.session.query(Investigator).filter_by(id=i_id).first()
+        self.assertEqual(db_inv.name, name)
+        self.assertEqual(db_inv.title, title)
         return db_inv
 
     def construct_event(
@@ -575,6 +573,15 @@ class BaseTest(TestCase):
                 user_email=user.email,
                 resource_id=resource.id,
                 resource_title=resource.title,
+            )
+        )
+        self.session.add(
+            StudyChangeLog(
+                type="edit",
+                user_id=user.id,
+                user_email=user.email,
+                study_id=study.id,
+                study_title=study.title,
             )
         )
         if questionnaires and "identification" in questionnaires:

@@ -33,7 +33,7 @@ from app.models import (
     SupportsQuestionnaire,
 )
 from fixtures.endpoints_map import endpoints_map
-from fixtures.fixure_utils import fake
+from fixtures.fixure_utils import fake, fake_user_id
 
 
 class TestQuestionnaire(BaseTestQuestionnaire):
@@ -49,7 +49,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
         def fake_param(param_type: str) -> str:
             if param_type == "int":
-                return str(random.randint(1, 999))
+                return str(fake_user_id())
             if param_type == "path":
                 return fake.file_path(depth=random.randint(3, 5))
             return "-".join(fake.words(3))

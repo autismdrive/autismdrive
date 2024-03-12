@@ -5,6 +5,7 @@ from sqlalchemy import select
 from app.elastic_index import elastic_index
 from app.enums import Role
 from app.models import Resource, ResourceCategory, ResourceChangeLog
+from app.resources.ResourceEndpoint import get_resource_by_id
 from fixtures.fixure_utils import fake
 from fixtures.resource import MockResource
 from tests.base_test import BaseTest
@@ -66,17 +67,22 @@ class TestResources(BaseTest):
         from app.schemas import SchemaRegistry
         from app.utils.resource_utils import to_database_object_dict
 
+        admin_headers = self.logged_in_headers()
+
         r = self.construct_resource()
         r_id = r.id
         rv = self.client.get("api/resource/%i" % r_id, content_type="application/json")
         self.assert_success(rv)
 
         self.construct_admin_note(user=self.construct_user(), resource=r)
-        resource_dict = to_database_object_dict(SchemaRegistry.ResourceSchema(), r)
+        db_r = get_resource_by_id(r_id, with_joins=True)
+        resource_dict = to_database_object_dict(SchemaRegistry.ResourceSchema(), db_r)
+
+        # Delete the resource from Elasticsearch before deleting the resource from the database
         elastic_index.remove_document(resource_dict)
-        rv = self.client.delete(
-            "api/resource/%i" % r_id, content_type="application/json", headers=self.logged_in_headers()
-        )
+
+        # Deleting the resource from the database should not raise an error
+        rv = self.client.delete("api/resource/%i" % r_id, content_type="application/json", headers=admin_headers)
         self.assert_success(rv)
 
         rv = self.client.get("api/resource/%i" % r_id, content_type="application/json")

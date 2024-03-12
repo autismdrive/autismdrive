@@ -68,13 +68,18 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = "admin@tester.com"
     PRINCIPAL_INVESTIGATOR_EMAIL: str = "pi@tester.com"  # Receives some high level alerts per agreement with InfoSec.
 
-    ADMIN_PASSWORD_REGEX: str = r"((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{25})"
+    _d = r"(?=.*\d)"  # At least one digit.
+    _u = r"(?=.*[A-Z])"  # At least one uppercase letter.
+    _l = r"(?=.*[a-z])"  # At least one lowercase letter.
+    _p = r"(?=.*[^a-zA-Z\d])"  # Punctuation. i.e., any character that isn't a letter or a number.
+
+    ADMIN_PASSWORD_REGEX: str = f"({_d}{_l}{_u}{_p}.{{25}})"  # At least 25 characters long.
     ADMIN_PASSWORD_INSTRUCTIONS: str = (
         "Your password must be at least 25 characters long and contain at least one of each of "
         "the following: uppercase letters, lowercase letters, numbers, and punctuation "
         "characters. Don't use a password that you have used for any other purpose."
     )
-    USER_PASSWORD_REGEX: str = r"((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8})"
+    USER_PASSWORD_REGEX: str = f"({_d}{_l}{_u}{_p}.{{8}})"  # At least 8 characters long.
     USER_PASSWORD_INSTRUCTIONS: str = (
         "Your password must be at least 8 characters long, but we recommend 20 characters. It "
         "should include at least one of each of the following: uppercase letters, "

@@ -45,13 +45,22 @@ class ParticipantEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, participant_id: int):
+        from app.resources.UserEndpoint import get_user_by_id
+
+        u_id = g.user.id
         db_participant = get_participant_by_id(participant_id, with_joins=True)
-        session.close()
+        db_user = get_user_by_id(u_id, with_joins=True)
+
         if db_participant is None:
             raise RestException(RestException.NOT_FOUND)
-        if not (db_participant and (g.user.related_to_participant(db_participant.id) or g.user.role == Role.admin)):
-            raise RestException(RestException.UNRELATED_PARTICIPANT)
-        return self.schema.dump(db_participant)
+
+        is_related = db_user.related_to_participant(participant_id)
+        is_admin = db_user.role == Role.admin
+
+        if is_related or is_admin:
+            return self.schema.dump(db_participant)
+
+        raise RestException(RestException.UNRELATED_PARTICIPANT)
 
     @auth.login_required
     @requires_roles(Role.admin)

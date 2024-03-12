@@ -13,7 +13,7 @@ from app.import_service import ImportService
 from app.models import DataTransferLog, Participant, User, IdentificationQuestionnaire
 from app.resources.UserEndpoint import get_user_by_id
 from app.schemas import SchemaRegistry, ParticipantSchema
-from fixtures.fixure_utils import fake
+from fixtures.fixure_utils import fake, fake_password
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 os.environ["ENV_NAME"] = "testing"
@@ -213,9 +213,10 @@ class TestExportService(BaseTestQuestionnaire):
 
         # Construct the base user.
         u = self.construct_user()
-        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
-        iq = self.construct_identification_questionnaire(user=u, participant=p)
-        id = u.id
+        u_id = u.id
+        p = self.construct_participant(user_id=u_id, relationship=Relationship.self_participant)
+        p_id = p.id
+        iq = self.construct_identification_questionnaire(user_id=u_id, participant_id=p_id)
         self.session.commit()
         data = self.get_export()
 
@@ -322,7 +323,7 @@ class TestExportService(BaseTestQuestionnaire):
         u2_headers = self.logged_in_headers(user_id=u2_id)
 
         db_u1 = get_user_by_id(u1_id)
-        db_u1.password = fake.password(length=25, special_chars=True, upper_case=True)
+        db_u1.password = fake_password()
         self.session.add(db_u1)
         self.session.commit()
         self.session.close()

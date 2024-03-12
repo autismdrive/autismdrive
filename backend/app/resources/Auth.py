@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
+from app.resources.UserEndpoint import get_user_by_id
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from config.load import settings
@@ -195,16 +196,14 @@ def verify_token(token):
         g.user = None
 
     if user_id is not None:
-        db_user = (
-            session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
-            .unique()
-            .scalar_one()
-        )
+        db_user = get_user_by_id(user_id, with_joins=True)
         db_user.token_url = ""
         session.add(db_user)
         session.commit()
         session.close()
-        g.user = db_user
+
+        updated_user = get_user_by_id(user_id, with_joins=True)
+        g.user = updated_user
 
     return "user" in g and g.user
 

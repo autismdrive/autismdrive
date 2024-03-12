@@ -1,7 +1,7 @@
 import datetime
 
 import flask_restful
-from flask import request, g
+from flask import request
 from marshmallow import ValidationError
 from sqlalchemy import select, Select
 from sqlalchemy.orm import joinedload
@@ -12,7 +12,8 @@ from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission
-from app.models import AdminNote, Resource, Location, Event, UserFavorite, ResourceChangeLog, ResourceCategory
+from app.log_service import LogService
+from app.models import AdminNote, Resource, Location, Event, UserFavorite, ResourceCategory
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
@@ -74,6 +75,7 @@ class ResourceEndpoint(flask_restful.Resource):
 
         resource_title = resource.title
         resource_dict = to_database_object_dict(self.schema, resource)
+
         elastic_index.remove_document(resource_dict)
         session.query(AdminNote).filter_by(resource_id=resource_id).delete()
         session.query(Event).filter_by(id=resource_id).delete()
@@ -82,7 +84,7 @@ class ResourceEndpoint(flask_restful.Resource):
         session.query(UserFavorite).filter_by(resource_id=resource_id).delete()
         session.query(Resource).filter_by(id=resource_id).delete()
         session.commit()
-        self.log_update(resource_id=resource_id, resource_title=resource_title, change_type="delete")
+        LogService.log_resource_change(resource_id=resource_id, resource_title=resource_title, change_type="delete")
         return None
 
     @auth.login_required
@@ -98,19 +100,8 @@ class ResourceEndpoint(flask_restful.Resource):
         session.add(updated)
         session.commit()
         elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
-        self.log_update(resource_id=updated.id, resource_title=updated.title, change_type="edit")
+        LogService.log_resource_change(resource_id=updated.id, resource_title=updated.title, change_type="edit")
         return self.schema.dump(updated)
-
-    def log_update(self, resource_id, resource_title, change_type):
-        log = ResourceChangeLog(
-            resource_id=resource_id,
-            resource_title=resource_title,
-            user_id=g.user.id,
-            user_email=g.user.email,
-            type=change_type,
-        )
-        session.add(log)
-        session.commit()
 
 
 class ResourceListEndpoint(flask_restful.Resource):
@@ -135,21 +126,12 @@ class ResourceListEndpoint(flask_restful.Resource):
             db_resource = get_resource_by_id(load_result.id, with_joins=True)
 
             elastic_index.add_document(document=to_database_object_dict(self.resource_schema, db_resource))
-            self.log_update(resource_id=db_resource.id, resource_title=db_resource.title, change_type="create")
+            LogService.log_resource_change(
+                resource_id=db_resource.id, resource_title=db_resource.title, change_type="create"
+            )
             return self.resource_schema.dump(db_resource)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
-
-    def log_update(self, resource_id, resource_title, change_type):
-        log = ResourceChangeLog(
-            resource_id=resource_id,
-            resource_title=resource_title,
-            user_id=g.user.id,
-            user_email=g.user.email,
-            type=change_type,
-        )
-        session.add(log)
-        session.commit()
 
 
 class EducationResourceListEndpoint(flask_restful.Resource):

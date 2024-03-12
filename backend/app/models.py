@@ -1308,11 +1308,9 @@ class User(Base):
 
         db_self = get_user_by_id(self.id, with_joins=True)
         participants = db_self.participants
-        session.close()
+        p_ids = [p.id for p in participants]
 
-        for p in participants:
-            if participant_id == p.id:
-                return True
+        return participant_id in p_ids
 
     def self_participant(self):
         from app.resources.UserEndpoint import get_user_by_id
@@ -1320,13 +1318,11 @@ class User(Base):
 
         db_self = get_user_by_id(self.id, with_joins=True)
         participants = db_self.participants
-        session.close()
+        p_ids = [p.id for p in participants]
 
-        if len(participants) > 0:
-            for p in participants:
-                p_id = p.id
+        if len(p_ids) > 0:
+            for p_id in p_ids:
                 db_p = get_participant_by_id(p_id, with_joins=True)
-                session.close()
                 if "self" in db_p.relationship.name:
                     return db_p
 
@@ -4372,4 +4368,15 @@ class ResourceChangeLog(Base):
     user_email: Mapped[str]
     resource_id: Mapped[int]
     resource_title: Mapped[str]
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+
+class StudyChangeLog(Base):
+    __tablename__ = "study_change_log"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[str]
+    user_id: Mapped[int]
+    user_email: Mapped[str]
+    study_id: Mapped[int]
+    study_title: Mapped[str]
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())

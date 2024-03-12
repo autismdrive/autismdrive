@@ -696,13 +696,18 @@ class TestSearch(BaseTest):
 
         keyword = fake.word()
         kw_query = {"words": keyword}
+        headers = self.logged_in_headers()
 
         # test that elastic resource is created with post
         study = MockStudy(
             description=f"{fake.sentence()} {keyword} {fake.sentence()}", status=Status.currently_enrolling.name
         )
         rv = self.client.post(
-            "api/study", data=self.jsonify(study), content_type="application/json", follow_redirects=True
+            "api/study",
+            data=self.jsonify(study),
+            content_type="application/json",
+            follow_redirects=True,
+            headers=headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -717,7 +722,11 @@ class TestSearch(BaseTest):
 
         response["status"] = Status.study_in_progress.name
         rv = self.client.put(
-            "/api/study/%i" % s_id, data=self.jsonify(response), content_type="application/json", follow_redirects=True
+            "/api/study/%i" % s_id,
+            data=self.jsonify(response),
+            content_type="application/json",
+            follow_redirects=True,
+            headers=headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/study/%i" % s_id, content_type="application/json")

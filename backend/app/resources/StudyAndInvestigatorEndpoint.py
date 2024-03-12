@@ -2,11 +2,14 @@ import flask_restful
 from flask import request
 from sqlalchemy import cast, Integer
 
+from app.auth import auth
 from app.database import session
+from app.enums import Role, Permission
 from app.models import Investigator, Study, StudyInvestigator
 from app.models import StudyInvestigator
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.wrappers import requires_roles, requires_permission
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):
@@ -38,6 +41,8 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
         )
         return self.schema.dump(study_investigators, many=True)
 
+    @auth.login_required
+    @requires_permission(Permission.edit_study)
     def post(self, study_id: int):
         request_data = request.get_json()
 
@@ -61,6 +66,8 @@ class StudyInvestigatorEndpoint(flask_restful.Resource):
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
+    @auth.login_required
+    @requires_permission(Permission.edit_study)
     def delete(self, study_investigator_id: int):
         session.query(StudyInvestigator).filter_by(id=study_investigator_id).delete()
         session.commit()
@@ -70,6 +77,8 @@ class StudyInvestigatorEndpoint(flask_restful.Resource):
 class StudyInvestigatorListEndpoint(flask_restful.Resource):
     schema = SchemaRegistry.StudyInvestigatorSchema()
 
+    @auth.login_required
+    @requires_permission(Permission.edit_study)
     def post(self):
         request_data = request.get_json()
         load_result = self.schema.load(request_data)

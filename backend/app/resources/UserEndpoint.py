@@ -15,7 +15,6 @@ from app.database import session
 from app.email_service import EmailService, email_service
 from app.enums import Permission, Role
 from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser
-from app.resources.ParticipantEndpoint import add_joins_to_statement as add_participant_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
@@ -23,6 +22,8 @@ from config.load import settings
 
 
 def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+    from app.resources.ParticipantEndpoint import add_joins_to_statement as add_participant_joins
+
     return statement.options(
         add_participant_joins(joinedload(User.participants)),
         joinedload(User.events),
@@ -54,10 +55,14 @@ class UserEndpoint(flask_restful.Resource):
 
     @auth.login_required
     def get(self, user_id: int):
-        if g.user.id != user_id and Permission.user_detail_admin not in g.user.role.permissions():
+        db_user = get_user_by_id(g.user.id, with_joins=True)
+        permissions = db_user.role.permissions()
+        is_admin = Permission.user_detail_admin in permissions
+
+        if not (db_user.id == user_id or is_admin):
             raise RestException(RestException.PERMISSION_DENIED)
         model = get_user_by_id(user_id, with_joins=True)
-        session.close()
+
         if model is None:
             raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)

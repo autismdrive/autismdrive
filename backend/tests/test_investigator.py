@@ -2,7 +2,7 @@ from app.models import Investigator, StudyInvestigator
 from tests.base_test import BaseTest
 
 
-class TestStudy(BaseTest):
+class TestInvestigator(BaseTest):
     def test_investigator_basics(self):
         self.construct_investigator()
         i = self.session.query(Investigator).first()
