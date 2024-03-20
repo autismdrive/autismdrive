@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import '../../material';
 
 a {
@@ -7,7 +8,7 @@ a {
   align-items: center;
 
   [class*="details-link-text"] {
-    @include mat-typography-level-to-styles($custom-typography, title);
+    @include mat.typography-level($custom-typography, title);
     font-style: italic;
     color: $brand-primary;
   }

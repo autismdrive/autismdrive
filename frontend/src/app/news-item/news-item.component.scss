@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import '../../material';
 
 .news-item {
@@ -46,7 +47,7 @@
     }
 
     .item-title {
-      @include mat-typography-level-to-styles($custom-typography, headline);
+      @include mat.typography-level($custom-typography, headline);
       font-style: italic;
       color: $brand-primary;
       cursor: pointer;

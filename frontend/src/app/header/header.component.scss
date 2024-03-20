@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import '../../material';
 
 #header-bg {
@@ -27,7 +28,7 @@
     color: $brand-primary;
 
     .uva-logo a {
-      @include mat-typography-level-to-styles($custom-typography, button);
+      @include mat.typography-level($custom-typography, button);
       color: $brand-primary;
       text-transform: uppercase;
     }

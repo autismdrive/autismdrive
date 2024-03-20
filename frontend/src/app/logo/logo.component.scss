@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import '../../material';
 
 #logo {
@@ -12,7 +13,7 @@
 
   &.dark-lg, &.light-lg {
     a {
-      @include mat-typography-level-to-styles($custom-typography, display-3);
+      @include mat.typography-level($custom-typography, display-3);
       font-family: "franklin-gothic-urw", serif;
       text-transform: uppercase;
       margin-top: 4rem;
@@ -39,7 +40,7 @@
 
   &.dark, &.light {
     a {
-      @include mat-typography-level-to-styles($custom-typography, display-1);
+      @include mat.typography-level($custom-typography, display-1);
       font-family: "franklin-gothic-urw", serif;
       text-transform: uppercase;
       font-weight: lighter;
