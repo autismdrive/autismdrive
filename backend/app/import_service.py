@@ -11,15 +11,11 @@ from sqlalchemy.orm import joinedload
 
 from app.database import session, get_class
 from app.export_service import ExportService
+from app.log_service import LogService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from config.load import settings
-
-
-from icecream import ic
-
-ic.configureOutput(includeContext=True, contextAbsPath=True)
 
 
 class ImportService:
@@ -246,5 +242,5 @@ class ImportService:
                 admin._password = password
                 session.add(admin)
             except (ValidationError, RestException) as e:
-                ic(f"Failed to import admin user: {json_admin['id']}", e)
+                LogService.print(f"Failed to import admin user: {json_admin['id']}", e)
         session.commit()

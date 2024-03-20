@@ -352,12 +352,6 @@ class ElasticIndex(object):
         # 'Status': elasticsearch_dsl.TermsFacet(field='status'),
         # 'Topic': elasticsearch_dsl.TermsFacet(field='topic'),
 
-        # from icecream import ic
-        #
-        # ic.configureOutput(includeContext=True, contextAbsPath=True)
-        #
-        # ic(f"{json.dumps(elastic_search.to_dict())}")
-
         return elastic_search.execute()
 
     @classmethod

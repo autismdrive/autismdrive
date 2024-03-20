@@ -6,7 +6,6 @@ from random import randint
 
 import click
 import sqlalchemy
-from icecream import ic
 from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
@@ -91,8 +90,6 @@ if not database_exists(engine.url):
     _create_db(engine)
     _create_tables(Base.metadata, engine)
 
-ic.configureOutput(includeContext=True, contextAbsPath=True)
-ic(settings.SQLALCHEMY_DATABASE_URI)
 
 session = scoped_session(
     sessionmaker(
