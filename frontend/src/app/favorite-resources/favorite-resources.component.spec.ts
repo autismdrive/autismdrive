@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FavoriteResourcesComponent } from './favorite-resources.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {FavoriteResourcesComponent} from './favorite-resources.component';
 
 describe('FavoriteResourcesComponent', () => {
   let component: FavoriteResourcesComponent;
@@ -8,9 +7,8 @@ describe('FavoriteResourcesComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FavoriteResourcesComponent ]
-    })
-    .compileComponents();
+      declarations: [FavoriteResourcesComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

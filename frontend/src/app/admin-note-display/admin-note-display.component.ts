@@ -1,27 +1,22 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
+import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
 import {AdminNote} from '../_models/admin_note';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
 
 @Component({
   selector: 'app-admin-note-display',
   templateUrl: './admin-note-display.component.html',
-  styleUrls: ['./admin-note-display.component.scss']
+  styleUrls: ['./admin-note-display.component.scss'],
 })
 export class AdminNoteDisplayComponent implements OnInit {
   @Input() currentUser: User;
   @Input() currentResource: Resource;
   notes: AdminNote[];
 
-  constructor(
-    private api: ApiService,
-    public dialog: MatDialog
-  ) {
-
-  }
+  constructor(private api: ApiService, public dialog: MatDialog) {}
 
   ngOnInit() {
     this.getNotes();
@@ -38,11 +33,11 @@ export class AdminNoteDisplayComponent implements OnInit {
       width: `${window.innerWidth}px`,
       data: {
         adminNote: adminNote || {
-          'user_id': this.currentUser.id,
-          'resource_id': this.currentResource.id,
-          'note': ''
-        }
-      }
+          user_id: this.currentUser.id,
+          resource_id: this.currentResource.id,
+          note: '',
+        },
+      },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -52,13 +47,15 @@ export class AdminNoteDisplayComponent implements OnInit {
           this.getNotes();
         });
       } else if (result && !adminNote) {
-        this.api.addAdminNote({
-          'user_id': this.currentUser.id,
-          'resource_id': this.currentResource.id,
-          'note': result
-        }).subscribe(x => {
-          this.getNotes();
-        });
+        this.api
+          .addAdminNote({
+            user_id: this.currentUser.id,
+            resource_id: this.currentResource.id,
+            note: result,
+          })
+          .subscribe(x => {
+            this.getNotes();
+          });
       }
     });
   }

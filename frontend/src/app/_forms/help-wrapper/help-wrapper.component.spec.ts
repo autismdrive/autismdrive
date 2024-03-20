@@ -1,5 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HelpWrapperComponent } from './help-wrapper.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HelpWrapperComponent} from './help-wrapper.component';
 
 describe('HelpWrapperComponent', () => {
   let component: HelpWrapperComponent;
@@ -7,9 +7,8 @@ describe('HelpWrapperComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HelpWrapperComponent ]
-    })
-    .compileComponents();
+      declarations: [HelpWrapperComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

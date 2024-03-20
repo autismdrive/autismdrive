@@ -24,4 +24,3 @@ export interface DataTransferPageResults {
   total: number;
   items: DataTransferLog[];
 }
-

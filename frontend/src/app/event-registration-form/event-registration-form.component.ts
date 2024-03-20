@@ -1,19 +1,19 @@
-import {ChangeDetectorRef, Component, Inject, Input, OnInit} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {User} from '../_models/user';
+import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {ApiService} from '../_services/api/api.service';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {EventRegistrationComponent} from '../event-registration/event-registration.component';
+import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-event-registration-form',
   templateUrl: './event-registration-form.component.html',
-  styleUrls: ['./event-registration-form.component.scss']
+  styleUrls: ['./event-registration-form.component.scss'],
 })
 export class EventRegistrationFormComponent implements OnInit {
   private _stateSubject: BehaviorSubject<string>;
@@ -51,7 +51,7 @@ export class EventRegistrationFormComponent implements OnInit {
       },
       validators: {
         validation: ['email'],
-      }
+      },
     },
     {
       key: 'emailConfirm',
@@ -64,7 +64,7 @@ export class EventRegistrationFormComponent implements OnInit {
       },
       validators: {
         validation: ['emailConfirm'],
-      }
+      },
     },
     {
       key: 'zip_code',
@@ -86,11 +86,11 @@ export class EventRegistrationFormComponent implements OnInit {
         description: '(select all that apply)',
         type: 'array',
         options: [
-          {'value': 'friend_colleague', 'label': 'Friend/Colleague'},
-          {'value': 'family_member', 'label': 'Parent/Family Member'},
-          {'value': 'self_advocate', 'label': 'Individual With Autism'},
-          {'value': 'professional', 'label': 'Professional'},
-          {'value': 'other', 'label': 'Other'},
+          {value: 'friend_colleague', label: 'Friend/Colleague'},
+          {value: 'family_member', label: 'Parent/Family Member'},
+          {value: 'self_advocate', label: 'Individual With Autism'},
+          {value: 'professional', label: 'Professional'},
+          {value: 'other', label: 'Other'},
         ],
         required: true,
       },
@@ -111,12 +111,12 @@ export class EventRegistrationFormComponent implements OnInit {
         description: '(select all that apply)',
         type: 'array',
         options: [
-          {'value': 'star_newsletter', 'label': 'STAR e-newsletter'},
-          {'value': 'facebook', 'label': 'Facebook'},
-          {'value': 'drive', 'label': 'Autism DRIVE'},
-          {'value': 'family_member', 'label': 'Parent/Family Member'},
-          {'value': 'friend_colleague', 'label': 'Friend/Colleague'},
-          {'value': 'other', 'label': 'Other'},
+          {value: 'star_newsletter', label: 'STAR e-newsletter'},
+          {value: 'facebook', label: 'Facebook'},
+          {value: 'drive', label: 'Autism DRIVE'},
+          {value: 'family_member', label: 'Parent/Family Member'},
+          {value: 'friend_colleague', label: 'Friend/Colleague'},
+          {value: 'other', label: 'Other'},
         ],
         required: true,
       },
@@ -135,7 +135,8 @@ export class EventRegistrationFormComponent implements OnInit {
       defaultValue: true,
       templateOptions: {
         label: 'Please sign me up for the STAR E-newsletter',
-        description: 'Send me notifications of workshops, information, events, and research opportunities offered ' +
+        description:
+          'Send me notifications of workshops, information, events, and research opportunities offered ' +
           'by the UVA Supporting Transformative Autism Research Initiative and partnering organizations.',
       },
     },
@@ -148,11 +149,12 @@ export class EventRegistrationFormComponent implements OnInit {
     private googleAnalytics: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     public dialogRef: MatDialogRef<EventRegistrationComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      registered: boolean,
-      title: string,
-      event_id: number
-    }
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      registered: boolean;
+      title: string;
+      event_id: number;
+    },
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
@@ -167,14 +169,13 @@ export class EventRegistrationFormComponent implements OnInit {
         this.user = new User({
           id: null,
           email: this.model['email'],
-          role: 'User'
+          role: 'User',
         });
       }
     });
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   submit() {
     localStorage.removeItem('token_url');
@@ -185,25 +186,28 @@ export class EventRegistrationFormComponent implements OnInit {
         this.registerState = this._stateSubject.asObservable();
         this.errorMessage = '';
         this.user['email'] = this.model.email;
-        this.api.addUser(this.user).subscribe(u => {
-          this.user = u;
-          this.model['user_id'] = this.user.id;
-          this.api.submitRegistration(this.model).subscribe();
-          if (u.hasOwnProperty('token_url')) {
-            localStorage.setItem('token_url', u.token_url);
-          }
-          this.googleAnalytics.accountEvent('register');
-          this._stateSubject.next('wait_for_email');
-          this.registerState = this._stateSubject.asObservable();
-          this.changeDetectorRef.detectChanges();
-          this.data.registered = true;
-          this.dialogRef.close();
-        }, error1 => {
-          this._stateSubject.next('form');
-          this.registerState = this._stateSubject.asObservable();
-          this.errorMessage = error1;
-          this.changeDetectorRef.detectChanges();
-        });
+        this.api.addUser(this.user).subscribe(
+          u => {
+            this.user = u;
+            this.model['user_id'] = this.user.id;
+            this.api.submitRegistration(this.model).subscribe();
+            if (u.hasOwnProperty('token_url')) {
+              localStorage.setItem('token_url', u.token_url);
+            }
+            this.googleAnalytics.accountEvent('register');
+            this._stateSubject.next('wait_for_email');
+            this.registerState = this._stateSubject.asObservable();
+            this.changeDetectorRef.detectChanges();
+            this.data.registered = true;
+            this.dialogRef.close();
+          },
+          error1 => {
+            this._stateSubject.next('form');
+            this.registerState = this._stateSubject.asObservable();
+            this.errorMessage = error1;
+            this.changeDetectorRef.detectChanges();
+          },
+        );
         this.dialogRef.close();
       } else {
         this.model['participant_id'] = this.user.getSelf().id;
@@ -219,5 +223,4 @@ export class EventRegistrationFormComponent implements OnInit {
   public get registerStateValue(): string {
     return this._stateSubject.value;
   }
-
 }

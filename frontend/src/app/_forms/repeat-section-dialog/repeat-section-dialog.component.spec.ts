@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RepeatSectionDialogComponent } from './repeat-section-dialog.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {RepeatSectionDialogComponent} from './repeat-section-dialog.component';
 
 describe('RepeatSectionDialogComponent', () => {
   let component: RepeatSectionDialogComponent;
@@ -8,9 +7,8 @@ describe('RepeatSectionDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RepeatSectionDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [RepeatSectionDialogComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

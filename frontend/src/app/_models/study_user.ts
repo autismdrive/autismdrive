@@ -1,5 +1,5 @@
-import { User } from './user';
-import { Study } from './study';
+import {Study} from './study';
+import {User} from './user';
 
 export interface StudyUser {
   id: number;

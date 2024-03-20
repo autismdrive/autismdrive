@@ -33,7 +33,7 @@ export const clone = function (value: any): any {
   }
 
   value = Object.assign({}, value);
-  Object.keys(value).forEach(k => value[k] = clone(value[k]));
+  Object.keys(value).forEach(k => (value[k] = clone(value[k])));
 
   return value;
 };

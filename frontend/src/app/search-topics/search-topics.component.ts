@@ -1,20 +1,11 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges
-} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 import {CategoriesById, Category} from '../_models/category';
 import {CategoriesService} from '../_services/categories/categories.service';
 
 @Component({
   selector: 'app-search-topics',
   templateUrl: './search-topics.component.html',
-  styleUrls: ['./search-topics.component.scss']
+  styleUrls: ['./search-topics.component.scss'],
 })
 export class SearchTopicsComponent {
   @Input() category: Category;
@@ -22,10 +13,7 @@ export class SearchTopicsComponent {
   categoriesById: CategoriesById = {};
   loading = true;
 
-  constructor(
-    private categoriesService: CategoriesService,
-    private changeDetectorRef: ChangeDetectorRef,
-  ) {
+  constructor(private categoriesService: CategoriesService, private changeDetectorRef: ChangeDetectorRef) {
     if (this.categoriesService.categoriesById) {
       this.categoriesById = this.categoriesService.categoriesById;
       this.loading = false;
@@ -56,7 +44,7 @@ export class SearchTopicsComponent {
   }
 
   hasChildren(cat: Category) {
-    const category = (cat.id === null) ? cat : this.categoriesById[cat.id];
+    const category = cat.id === null ? cat : this.categoriesById[cat.id];
     return category && category.children && category.children.length > 0;
   }
 
@@ -67,5 +55,4 @@ export class SearchTopicsComponent {
       return [];
     }
   }
-
 }

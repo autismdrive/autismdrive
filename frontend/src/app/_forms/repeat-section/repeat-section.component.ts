@@ -1,18 +1,15 @@
 import {Component} from '@angular/core';
-import {FormArray} from '@angular/forms';
-import {FieldArrayType, FormlyFieldConfig} from '@ngx-formly/core';
 import {MatDialog} from '@angular/material/dialog';
+import {FieldArrayType, FormlyFieldConfig} from '@ngx-formly/core';
 import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-section-dialog.component';
 
 @Component({
   selector: 'app-repeat-section',
   templateUrl: './repeat-section.component.html',
-  styleUrls: ['./repeat-section.component.scss']
+  styleUrls: ['./repeat-section.component.scss'],
 })
 export class RepeatSectionComponent extends FieldArrayType {
-  constructor(
-    public dialog: MatDialog
-  ) {
+  constructor(public dialog: MatDialog) {
     super();
   }
 
@@ -27,7 +24,7 @@ export class RepeatSectionComponent extends FieldArrayType {
         title: isEdit ? title.replace(/^Add an|^Add a|^Add/, 'Edit') : title,
         fields: [this.field.fieldArray],
         model: isEdit ? this.field.fieldGroup[i].model : {},
-      }
+      },
     });
 
     dialogRef.afterClosed().subscribe(data => {

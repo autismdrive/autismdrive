@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FilterChipsComponent } from './filter-chips.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {FilterChipsComponent} from './filter-chips.component';
 
 describe('CategoryChipsComponent', () => {
   let component: FilterChipsComponent;
@@ -8,9 +7,8 @@ describe('CategoryChipsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FilterChipsComponent ]
-    })
-    .compileComponents();
+      declarations: [FilterChipsComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

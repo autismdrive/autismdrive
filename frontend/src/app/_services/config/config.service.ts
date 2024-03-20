@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
 import {LazyMapsAPILoaderConfigLiteral} from '@agm/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConfigService implements LazyMapsAPILoaderConfigLiteral {
   public apiUrl: string;

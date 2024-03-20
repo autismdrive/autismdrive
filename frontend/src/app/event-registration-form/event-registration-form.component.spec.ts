@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { EventRegistrationFormComponent } from './event-registration-form.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {EventRegistrationFormComponent} from './event-registration-form.component';
 
 describe('EventRegistrationFormComponent', () => {
   let component: EventRegistrationFormComponent;
@@ -8,9 +7,8 @@ describe('EventRegistrationFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventRegistrationFormComponent ]
-    })
-    .compileComponents();
+      declarations: [EventRegistrationFormComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

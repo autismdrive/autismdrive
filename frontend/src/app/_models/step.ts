@@ -1,4 +1,3 @@
-
 export interface Step {
   name: string;
   type: string;
@@ -13,4 +12,3 @@ export class StepStatus {
   public static readonly COMPLETE = 'COMPLETE';
   public static readonly INCOMPLETE = 'INCOMPLETE';
 }
-

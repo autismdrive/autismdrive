@@ -1,8 +1,7 @@
-import { AppPage } from '../app-page.po';
+import {AppPage} from '../app-page.po';
 
 export class LoginUseCases {
-  constructor(private page: AppPage) {
-  }
+  constructor(private page: AppPage) {}
 
   displayLoginForm() {
     this.page.waitForClickable('#login-button');

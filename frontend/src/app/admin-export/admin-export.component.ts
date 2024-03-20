@@ -5,22 +5,22 @@ import {
   OnInit,
   ViewChild,
   ViewChildren,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {Router} from '@angular/router';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
+import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 import {DataTransferDataSource} from '../_models/data_transfer_data_source';
 import {DataTransferLog} from '../_models/data_transfer_log';
 import {ApiService} from '../_services/api/api.service';
 import {ConfigService} from '../_services/config/config.service';
-import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({
   selector: 'app-admin-export',
   templateUrl: './admin-export.component.html',
-  styleUrls: ['./admin-export.component.scss']
+  styleUrls: ['./admin-export.component.scss'],
 })
 export class AdminExportComponent implements OnInit {
   dataTransferDataSource: DataTransferDataSource;
@@ -38,17 +38,16 @@ export class AdminExportComponent implements OnInit {
     private api: ApiService,
     private configService: ConfigService,
     private router: Router,
-    private resolver: ComponentFactoryResolver
-  ) {
-  }
+    private resolver: ComponentFactoryResolver,
+  ) {}
 
   ngOnInit(): void {
     this.mirroring = this.configService.mirroring;
     this.loadData();
     this.loadLatestLog();
-    merge(this.paginator.page).pipe(
-      tap(() => this.loadData())
-    ).subscribe();
+    merge(this.paginator.page)
+      .pipe(tap(() => this.loadData()))
+      .subscribe();
   }
 
   loadData() {

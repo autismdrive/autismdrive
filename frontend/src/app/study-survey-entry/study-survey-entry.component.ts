@@ -1,17 +1,17 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {Study} from '../_models/study';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {MatDialog} from '@angular/material/dialog';
+import {Router} from '@angular/router';
 import {RegisterDialogComponent} from '../register-dialog/register-dialog.component';
+import {Study} from '../_models/study';
 import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-study-survey-entry',
   templateUrl: './study-survey-entry.component.html',
-  styleUrls: ['./study-survey-entry.component.scss']
+  styleUrls: ['./study-survey-entry.component.scss'],
 })
 export class StudySurveyEntryComponent implements OnInit {
   @Input() study: Study;
@@ -23,17 +23,17 @@ export class StudySurveyEntryComponent implements OnInit {
     private router: Router,
     private googleAnalytics: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
   }
 
   ngOnInit() {
-     if (this.currentUser) {
-       this.api.getUser(this.currentUser.id).subscribe(u => {
-         this.currentUser = new User(u);
-       });
-     }
+    if (this.currentUser) {
+      this.api.getUser(this.currentUser.id).subscribe(u => {
+        this.currentUser = new User(u);
+      });
+    }
   }
 
   goLogin() {
@@ -57,8 +57,8 @@ export class StudySurveyEntryComponent implements OnInit {
     const dialogRef = this.dialog.open(RegisterDialogComponent, {
       width: `${window.innerWidth}px`,
       data: {
-        'displaySurvey': false
-      }
+        displaySurvey: false,
+      },
     });
 
     dialogRef.afterClosed().subscribe(result => {

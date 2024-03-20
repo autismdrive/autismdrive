@@ -1,6 +1,6 @@
-import { ResourceCategory } from './resource_category';
-import { GeoLocation } from './geolocation';
-import { Category } from './category';
+import {Category} from './category';
+import {GeoLocation} from './geolocation';
+import {ResourceCategory} from './resource_category';
 
 export class Resource extends GeoLocation {
   id?: number;

@@ -7,7 +7,7 @@ import {ApiService} from '../_services/api/api.service';
 @Component({
   selector: 'app-questionnaire-data-view',
   templateUrl: './questionnaire-data-view.component.html',
-  styleUrls: ['./questionnaire-data-view.component.scss']
+  styleUrls: ['./questionnaire-data-view.component.scss'],
 })
 export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   questionnaire_info: TableInfo[];
@@ -17,11 +17,7 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   sidebarOpen = true;
   private _mobileQueryListener: () => void;
 
-  constructor(
-    private api: ApiService,
-    changeDetectorRef: ChangeDetectorRef,
-    media: MediaMatcher
-  ) {
+  constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
@@ -38,11 +34,9 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.api.getQuestionnaireInfoList().subscribe(
-      info => {
-        this.questionnaire_info = info;
-      }
-    );
+    this.api.getQuestionnaireInfoList().subscribe(info => {
+      this.questionnaire_info = info;
+    });
   }
 
   ngOnDestroy(): void {
@@ -64,7 +58,9 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
     this.api.exportQuestionnaire('all').subscribe(response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
-      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
 
       const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;

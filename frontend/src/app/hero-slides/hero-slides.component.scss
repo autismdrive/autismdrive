@@ -7,16 +7,24 @@ $dot_size: 8px;
   height: 60vh;
 
   // Small devices (landscape phones, 576px and up)
-  @media (min-width: 576px) { height: 60vh; }
+  @media (min-width: 576px) {
+    height: 60vh;
+  }
 
   // Medium devices (tablets, 768px and up)
-  @media (min-width: 768px) { height: 60vh; }
+  @media (min-width: 768px) {
+    height: 60vh;
+  }
 
   // Large devices (desktops, 992px and up)
-  @media (min-width: 992px) { height: 60vh; }
+  @media (min-width: 992px) {
+    height: 60vh;
+  }
 
   // Extra large devices (large desktops, 1200px and up)
-  @media (min-width: 1200px) { height: 60vh; }
+  @media (min-width: 1200px) {
+    height: 60vh;
+  }
 
   .dots {
     list-style: none;
@@ -40,11 +48,14 @@ $dot_size: 8px;
       margin-right: 10px;
       cursor: pointer;
 
-      &.active, &.inactive:hover {
+      &.active,
+      &.inactive:hover {
         background-color: $brand-primary;
         opacity: 1;
       }
-      &.inactive { opacity: 0.5; }
+      &.inactive {
+        opacity: 0.5;
+      }
     }
   }
 }
@@ -58,7 +69,16 @@ $dot_size: 8px;
   transition: opacity 1s ease-in-out;
   cursor: pointer;
 
-  &.active { opacity: 1; z-index: 1; }
-  &.prev { opacity: 0; z-index: 0; }
-  &.next { opacity: 0; z-index: 0; }
+  &.active {
+    opacity: 1;
+    z-index: 1;
+  }
+  &.prev {
+    opacity: 0;
+    z-index: 0;
+  }
+  &.next {
+    opacity: 0;
+    z-index: 0;
+  }
 }

@@ -1,35 +1,19 @@
-<div
-  *ngIf="user"
-  class="user-admin-details"
-  fxLayout="column"
->
+<div *ngIf="user" class="user-admin-details" fxLayout="column">
   <h1>User:</h1>
-  <div
-    fxFlex="20%"
-    fxLayoutGap="2em"
-  >
-    <button
-      mat-flat-button
-      (click)="exportUserData()"
-      color="accent"
-    >
-      Export User Data
-    </button>
+  <div fxFlex="20%" fxLayoutGap="2em">
+    <button mat-flat-button (click)="exportUserData()" color="accent">Export User Data</button>
   </div>
-  <div
-    fxLayout="row"
-  >
+  <div fxLayout="row">
     <div>
-      <p><b>User ID: {{user.id}}</b></p>
-      <p>User Email: {{user.email}}</p>
-      <p>User Role: {{user.role}}</p>
-      <p>Last Updated: {{user.last_updated | date:'short'}}</p>
-      <p>Account Creation Date: {{user.registration_date | date:'short'}}</p>
-      <p>Last Login: {{user.last_login | date:'short'}}</p>
-      <div
-        *ngIf="currentUser && currentUser.permissions.includes('user_roles')"
-        fxLayout="column"
-      >
+      <p>
+        <b>User ID: {{ user.id }}</b>
+      </p>
+      <p>User Email: {{ user.email }}</p>
+      <p>User Role: {{ user.role }}</p>
+      <p>Last Updated: {{ user.last_updated | date: 'short' }}</p>
+      <p>Account Creation Date: {{ user.registration_date | date: 'short' }}</p>
+      <p>Last Login: {{ user.last_login | date: 'short' }}</p>
+      <div *ngIf="currentUser && currentUser.permissions.includes('user_roles')" fxLayout="column">
         <mat-form-field>
           <mat-label>Select an option</mat-label>
           <mat-select [(value)]="roleSelected">
@@ -40,65 +24,49 @@
             <mat-option value="user">User</mat-option>
           </mat-select>
         </mat-form-field>
-        <button
-          mat-flat-button
-          (click)="saveSelection()"
-          color="accent"
-        >
-          Save Selection
-        </button>
+        <button mat-flat-button (click)="saveSelection()" color="accent">Save Selection</button>
       </div>
     </div>
-    <div
-      class="email-log"
-      *ngIf="user.email_log && user.email_log.length > 0"
-    >
+    <div class="email-log" *ngIf="user.email_log && user.email_log.length > 0">
       <h5>User Email Log:</h5>
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
-      </ng-container>
+        <ng-container matColumnDef="user_id">
+          <th mat-header-cell *matHeaderCellDef>User ID</th>
+          <td mat-cell *matCellDef="let element">{{ element.user_id }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="user_id">
-        <th mat-header-cell *matHeaderCellDef> User ID </th>
-        <td mat-cell *matCellDef="let element"> {{element.user_id}} </td>
-      </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let element">{{ element.type }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef> Type </th>
-        <td mat-cell *matCellDef="let element"> {{element.type}} </td>
-      </ng-container>
+        <ng-container matColumnDef="tracking_code">
+          <th mat-header-cell *matHeaderCellDef>Tracking Code</th>
+          <td mat-cell *matCellDef="let element">{{ element.tracking_code }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="tracking_code">
-        <th mat-header-cell *matHeaderCellDef> Tracking Code </th>
-        <td mat-cell *matCellDef="let element"> {{element.tracking_code}} </td>
-      </ng-container>
+        <ng-container matColumnDef="viewed">
+          <th mat-header-cell *matHeaderCellDef>Viewed</th>
+          <td mat-cell *matCellDef="let element">{{ element.viewed }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="viewed">
-        <th mat-header-cell *matHeaderCellDef> Viewed </th>
-        <td mat-cell *matCellDef="let element"> {{element.viewed}} </td>
-      </ng-container>
+        <ng-container matColumnDef="date_viewed">
+          <th mat-header-cell *matHeaderCellDef>Date Viewed</th>
+          <td mat-cell *matCellDef="let element">{{ element.date_viewed | date: 'short' }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="date_viewed">
-        <th mat-header-cell *matHeaderCellDef> Date Viewed </th>
-        <td mat-cell *matCellDef="let element"> {{element.date_viewed | date:'short'}} </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
     </div>
   </div>
   <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>
-  <div
-    id="participants"
-   *ngFor="let p of user.participants"
-    id="participant-detail"
-    fxFlex="40%"
-    fxLayoutGap="2em"
-  >
+  <div id="participants" *ngFor="let p of user.participants" id="participant-detail" fxFlex="40%" fxLayoutGap="2em">
     <mat-card>
       <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>
@@ -108,25 +76,23 @@
     <div *ngFor="let l of resourceChangeLog">
       <p mat-line>
         <a [href]="'/#/resource/' + l.resource_id">
-          <b>Resource #{{l.resource_id}} - {{l.resource_title}}</b>
+          <b>Resource #{{ l.resource_id }} - {{ l.resource_title }}</b>
         </a>
-        - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
+        - Edit Type: {{ l.type | uppercase }} - Update Date: {{ l.last_updated | date: 'long' }}
       </p>
     </div>
   </mat-card>
   <mat-card *ngIf="adminNotes && adminNotes.length > 0">
     <mat-card-title>Admin Notes</mat-card-title>
     <mat-card-content>
-      <div
-        *ngFor="let adminNote of adminNotes; let i = index;"
-      >
+      <div *ngFor="let adminNote of adminNotes; let i = index">
         <p mat-line>
           <a [href]="'/#/resource/' + adminNote.resource_id">
-            <b>Resource #{{adminNote.resource_id}} - {{adminNote.resource.title}}</b>
+            <b>Resource #{{ adminNote.resource_id }} - {{ adminNote.resource.title }}</b>
           </a>
-          <i> - note last updated: {{adminNote.last_updated | date:'short'}}</i>
+          <i> - note last updated: {{ adminNote.last_updated | date: 'short' }}</i>
         </p>
-        <p mat-line>{{adminNote.note}}</p>
+        <p mat-line>{{ adminNote.note }}</p>
       </div>
     </mat-card-content>
   </mat-card>

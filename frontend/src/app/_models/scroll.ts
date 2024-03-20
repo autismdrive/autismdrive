@@ -1,20 +1,20 @@
 export enum ViewportWidth {
   Small = 'sm',
   Medium = 'md',
-  Large = 'lg'
+  Large = 'lg',
 }
 
 export enum MenuState {
   Visible = 'visible',
-  Hidden = 'hidden'
+  Hidden = 'hidden',
 }
 
 export enum HeaderState {
   Expanded = 'expanded',
-  Collapsed = 'collapsed'
+  Collapsed = 'collapsed',
 }
 
 export enum Direction {
   Up = 'Up',
-  Down = 'Down'
+  Down = 'Down',
 }

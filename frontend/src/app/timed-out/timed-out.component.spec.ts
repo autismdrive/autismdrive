@@ -1,5 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TimedoutComponent } from './timed-out.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TimedoutComponent} from './timed-out.component';
 
 describe('TimedoutComponent', () => {
   let component: TimedoutComponent;
@@ -7,9 +7,8 @@ describe('TimedoutComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TimedoutComponent ]
-    })
-    .compileComponents();
+      declarations: [TimedoutComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

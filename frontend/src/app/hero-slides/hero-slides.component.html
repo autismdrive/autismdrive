@@ -1,21 +1,21 @@
 <div class="hero-slides">
   <div
     *ngFor="let slide of slides; let i = index"
-    class="hero-slide gradient-overlay container {{slide.imgClass}} {{activeClass(i)}}"
+    class="hero-slide gradient-overlay container {{ slide.imgClass }} {{ activeClass(i) }}"
     [ngStyle]="{'background-image': 'url(' + slide.img + ')'}"
     [matTooltip]="slide.description"
-    [routerLink]="[ slide.url ]"
+    [routerLink]="[slide.url]"
   >
     <div class="row">
       <div class="border-box">
-        <h1>{{slide.title}}</h1>
+        <h1>{{ slide.title }}</h1>
       </div>
     </div>
   </div>
   <ul class="dots">
     <li
       *ngFor="let slide of slides; let i = index"
-      class="dot {{i === activeIndex ? 'active' : 'inactive'}}"
+      class="dot {{ i === activeIndex ? 'active' : 'inactive' }}"
       (click)="setActiveSlide(i)"
     >
       &nbsp;

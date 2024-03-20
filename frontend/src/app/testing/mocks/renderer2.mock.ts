@@ -1,8 +1,7 @@
-import { Renderer2 } from '@angular/core';
-import { SpyObject, SDSpy } from './helper.mock';
+import {Renderer2} from '@angular/core';
+import {SDSpy, SpyObject} from './helper.mock';
 
 export class MockRenderer2 extends SpyObject {
-
   addClassSpy: SDSpy;
   appendChildSpy: SDSpy;
   createCommentSpy: SDSpy;
@@ -59,6 +58,6 @@ export class MockRenderer2 extends SpyObject {
   }
 
   spyAndReturnFake(methodName: string, fakeResponse: any) {
-    this.spy(methodName).andReturn({ subscribe: callback => callback(fakeResponse) });
+    this.spy(methodName).andReturn({subscribe: callback => callback(fakeResponse)});
   }
 }

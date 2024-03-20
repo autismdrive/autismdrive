@@ -1,89 +1,91 @@
-<div class="meta_info" *ngIf="meta"
-     fxLayout="row" fxLayout.sm="row" fxLayout.xs="column" fxLayoutGap="10px"
-     fxLayoutAlign="center center" fxFlexOffset="5">
-
-
+<div
+  class="meta_info"
+  *ngIf="meta"
+  fxLayout="row"
+  fxLayout.sm="row"
+  fxLayout.xs="column"
+  fxLayoutGap="10px"
+  fxLayoutAlign="center center"
+  fxFlexOffset="5"
+>
   <div id="null_relationship" *ngIf="meta.self_relationship === null">
     <h1>Profile complete!</h1>
-    <p>
-      Your account set up is complete! You may now sign up for webinars and search for resources.
-    </p>
+    <p>Your account set up is complete! You may now sign up for webinars and search for resources.</p>
     <p *ngIf="meta.self_participant && meta.self_has_guardian">
       If you would like to join the research registry, please work with your legal guardian to create a profile for
       yourself. Your profile information will be used to match you with new study opportunities.
     </p>
-
   </div>
   <div id="self_participant" *ngIf="meta.self_relationship === relationships.SELF_PARTICIPANT">
     <h1>Join the Registry!</h1>
-    <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
-      registry.</p>
+    <p>
+      Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
+      registry.
+    </p>
 
-    <p>Joining the research registry allows you to get connected with new study opportunities! The joining process
-      involves creating a profile about yourself. Your information will be used to match you with study
-      opportunities.</p>
+    <p>
+      Joining the research registry allows you to get connected with new study opportunities! The joining process
+      involves creating a profile about yourself. Your information will be used to match you with study opportunities.
+    </p>
   </div>
 
   <div id="self_guardian" *ngIf="meta.self_relationship === relationships.SELF_GUARDIAN">
     <h1>Join the Registry as a Parent/Guardian!</h1>
-    <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
-      registry.</p>
+    <p>
+      Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
+      registry.
+    </p>
 
-    <p>Joining the research registry allows you and your child to get connected with new study opportunities! The
-      joining process involves creating profiles for yourself and your child. Your profile information will be used to
-      match you or your child with relevant study opportunities.
+    <p>
+      Joining the research registry allows you and your child to get connected with new study opportunities! The joining
+      process involves creating profiles for yourself and your child. Your profile information will be used to match you
+      or your child with relevant study opportunities.
     </p>
   </div>
 
   <div id="self_profressional" *ngIf="meta.self_relationship === relationships.SELF_PROFESSIONAL">
     <h1>Join the Registry as a Professional!</h1>
-    <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
-      registry.</p>
+    <p>
+      Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
+      registry.
+    </p>
 
-    <p>Joining the research registry allows you to get connected with exciting study opportunities! The joining process
+    <p>
+      Joining the research registry allows you to get connected with exciting study opportunities! The joining process
       involves creating a profile about yourself. Your information will be used to match you with study opportunities.
     </p>
   </div>
 
   <div *ngIf="meta.self_relationship === relationships.SELF_INTERESTED">
     <h1>Join the Registry!</h1>
-    <p>Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
-      registry.</p>
+    <p>
+      Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
+      registry.
+    </p>
 
-    <p>Joining the research registry allows you to get connected with exciting study opportunities! The joining process
+    <p>
+      Joining the research registry allows you to get connected with exciting study opportunities! The joining process
       involves creating a profile about yourself. Your information will be used to match you with study opportunities.
     </p>
 
     <p *ngIf="meta.guardian && !meta.guardian_has_dependent">
-    If you think your child would be interested in joining, please share information about Autism DRIVE with them so they can sign up directly.
+      If you think your child would be interested in joining, please share information about Autism DRIVE with them so
+      they can sign up directly.
     </p>
-
   </div>
 
-  <div fxLayout="column" fxLayout.gt-sm="column" fxLayoutGap="10px"
-       fxLayoutAlign="center center" fxFlexOffset="15">
-    <button *ngIf="meta.self_relationship"
-            mat-flat-button
-            id="join"
-            type="button"
-            color="accent"
-            (click)="goFlow($event)">
+  <div fxLayout="column" fxLayout.gt-sm="column" fxLayoutGap="10px" fxLayoutAlign="center center" fxFlexOffset="15">
+    <button
+      *ngIf="meta.self_relationship"
+      mat-flat-button
+      id="join"
+      type="button"
+      color="accent"
+      (click)="goFlow($event)"
+    >
       Join the Registry
     </button>
-    <button
-      mat-flat-button
-      type="button"
-      color="primary"
-      routerLink="/uva-education">
-      Watch Webinars
-    </button>
-    <button
-      mat-flat-button
-      type="button"
-      color="primary"
-      routerLink="/search">
-      Search Resources
-    </button>
+    <button mat-flat-button type="button" color="primary" routerLink="/uva-education">Watch Webinars</button>
+    <button mat-flat-button type="button" color="primary" routerLink="/search">Search Resources</button>
   </div>
 </div>
-

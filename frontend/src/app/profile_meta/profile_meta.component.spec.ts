@@ -1,6 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ProfileMetaComponent } from './profile_meta.component';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ProfileMetaComponent} from './profile_meta.component';
 
 describe('MetaComponent', () => {
   let component: ProfileMetaComponent;
@@ -8,9 +7,8 @@ describe('MetaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProfileMetaComponent ]
-    })
-    .compileComponents();
+      declarations: [ProfileMetaComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

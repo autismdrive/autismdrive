@@ -1,9 +1,8 @@
-  import { AppPage } from '../app-page.po';
 import {by, ElementFinder} from 'protractor';
+import {AppPage} from '../app-page.po';
 
 export class EnrollUseCases {
-  constructor(private page: AppPage) {
-  }
+  constructor(private page: AppPage) {}
 
   async displayMenuLinks() {
     const numStepsStr: string = await this.page.getElement('#num_total_steps').getText();
@@ -17,7 +16,9 @@ export class EnrollUseCases {
     const numSteps = parseInt(numStepsStr, 10);
     const numCompletedStepsStr: string = await this.page.getElement('#num_completed_steps').getText();
     const numCompletedSteps = parseInt(numCompletedStepsStr, 10);
-    const incompleteLinks = await this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.hidden');
+    const incompleteLinks = await this.page.getElements(
+      'app-questionnaire-steps-list .step-link .done mat-icon.hidden',
+    );
     const completeLinks = await this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.visible');
     expect(completeLinks.length).toEqual(numCompletedSteps);
     const totalNumLinks = incompleteLinks.length + completeLinks.length;
@@ -31,7 +32,12 @@ export class EnrollUseCases {
       this.page.waitForVisible('form');
       this.page.waitForVisible('form h1');
       // this.page.waitForAnimations();
-      expect(this.page.getElement('form h1').getText().then(s => s.toLowerCase())).toEqual(link_span.getText().then(s => s.toLowerCase()));
+      expect(
+        this.page
+          .getElement('form h1')
+          .getText()
+          .then(s => s.toLowerCase()),
+      ).toEqual(link_span.getText().then(s => s.toLowerCase()));
       expect(this.page.getElements('form mat-form-field').count()).toBeGreaterThan(0);
     });
   }
@@ -76,12 +82,22 @@ export class EnrollUseCases {
     expect(this.page.getElements('[id*="_input_"]').count()).toBeGreaterThanOrEqual(1);
   }
 
-  async fillOutRequiredFields(reqSelector: string, btnSelector: string, invalidSelector: string, highlightSelector: string) {
+  async fillOutRequiredFields(
+    reqSelector: string,
+    btnSelector: string,
+    invalidSelector: string,
+    highlightSelector: string,
+  ) {
     await this._fillOutRequiredFieldsRecursive(reqSelector, btnSelector, invalidSelector, highlightSelector);
     return expect(this.page.getElements(btnSelector).count()).toEqual(0);
   }
 
-  async _fillOutRequiredFieldsRecursive(reqSelector: string, btnSelector: string, invalidSelector: string, highlightSelector: string) {
+  async _fillOutRequiredFieldsRecursive(
+    reqSelector: string,
+    btnSelector: string,
+    invalidSelector: string,
+    highlightSelector: string,
+  ) {
     await this.page.clickElement(highlightSelector);
     await this.page.waitFor(300);
     const numInvalidBefore = await this.page.getElements(invalidSelector).count();
@@ -114,7 +130,7 @@ export class EnrollUseCases {
       '.mat-form-field-required-marker',
       '#save-next-button.disabled',
       '.ng-invalid',
-      '#highlight-required-fields'
+      '#highlight-required-fields',
     );
     await this.fillOutRepeatSections();
     await this.page.waitFor(1000);
@@ -146,7 +162,7 @@ export class EnrollUseCases {
           `${dialogSelector} .mat-form-field-required-marker`,
           `${saveBtnSelector}.disabled`,
           `${dialogSelector} .ng-invalid`,
-          '#highlight-required-fields-in-dialog'
+          '#highlight-required-fields-in-dialog',
         );
         await this.page.waitFor(100).then(async () => {
           await this.page.waitForNotVisible(`${saveBtnSelector}.disabled`);

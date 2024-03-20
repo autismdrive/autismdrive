@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RepeatSectionComponent } from './repeat-section.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {RepeatSectionComponent} from './repeat-section.component';
 
 describe('RepeatSectionComponent', () => {
   let component: RepeatSectionComponent;
@@ -8,9 +7,8 @@ describe('RepeatSectionComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RepeatSectionComponent ]
-    })
-    .compileComponents();
+      declarations: [RepeatSectionComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

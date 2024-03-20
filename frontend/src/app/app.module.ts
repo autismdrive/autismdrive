@@ -2,7 +2,7 @@ import {AgmCoreModule, LAZY_MAPS_API_CONFIG} from '@agm/core';
 import {AgmJsMarkerClustererModule} from '@agm/js-marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule, DatePipe} from '@angular/common';
-import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClient, HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {APP_INITIALIZER, Injectable, NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -17,7 +17,7 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule} from '@angular/material/form-field';
+import {MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
@@ -51,38 +51,6 @@ import {NgProgressModule} from 'ngx-progressbar';
 import {Observable, ObservableInput, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {environment} from '../environments/environment';
-import {AutocompleteSectionComponent} from './_forms/autocomplete-section/autocomplete-section.component';
-import {CardWrapperComponent} from './_forms/card-wrapper/card-wrapper.component';
-import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
-import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component';
-import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
-import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
-import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
-import {ResizeTextareaComponent} from './_forms/resize-textarea/resize-textarea.component';
-import {
-  EmailMatchValidator,
-  EmailMatchValidatorMessage,
-  EmailValidator,
-  EmailValidatorMessage,
-  MaxValidationMessage,
-  MinValidationMessage,
-  MulticheckboxValidator,
-  MulticheckboxValidatorMessage,
-  PhoneValidator,
-  PhoneValidatorMessage,
-  ShowError,
-  UrlValidator,
-  UrlValidatorMessage
-} from './_forms/validators/formly.validator';
-import {ErrorInterceptor} from './_routing/error-interceptor';
-import {JwtInterceptor} from './_routing/jwt-interceptor';
-import {RoutingModule} from './_routing/routing.module';
-import {ApiService} from './_services/api/api.service';
-import {CategoriesService} from './_services/categories/categories.service';
-import {ConfigService} from './_services/config/config.service';
-import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
-import {IntervalService} from './_services/interval/interval.service';
-import {SearchService} from './_services/search/search.service';
 import {AboutComponent} from './about/about.component';
 import {AccordionComponent} from './accordion/accordion.component';
 import {AddButtonComponent} from './add-button/add-button.component';
@@ -129,6 +97,7 @@ import {ParticipantDetailComponent} from './participant-detail/participant-detai
 import {ParticipantProfileComponent} from './participant-profile/participant-profile.component';
 import {PasswordResetComponent} from './password-reset/password-reset.component';
 import {ProfileComponent} from './profile/profile.component';
+import {ProfileMetaComponent} from './profile_meta/profile_meta.component';
 import {QuestionnaireDataTableComponent} from './questionnaire-data-table/questionnaire-data-table.component';
 import {QuestionnaireDataViewComponent} from './questionnaire-data-view/questionnaire-data-view.component';
 import {QuestionnaireStepComponent} from './questionnaire-step/questionnaire-step.component';
@@ -145,6 +114,7 @@ import {SearchResultComponent} from './search-result/search-result.component';
 import {SearchSortComponent} from './search-sort/search-sort.component';
 import {SearchTopicsComponent} from './search-topics/search-topics.component';
 import {SearchComponent} from './search/search.component';
+import {SkillstarAdminComponent} from './skillstar-admin/skillstar-admin.component';
 import {StudiesComponent} from './studies/studies.component';
 import {StudyDetailComponent} from './study-detail/study-detail.component';
 import {StudyFormComponent} from './study-form/study-form.component';
@@ -158,33 +128,64 @@ import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
-import { SkillstarAdminComponent } from './skillstar-admin/skillstar-admin.component';
-import { GroupValidationWrapperComponent } from './_forms/group-validation-wrapper/group-validation-wrapper.component';
-import {ProfileMetaComponent} from './profile_meta/profile_meta.component';
-
+import {AutocompleteSectionComponent} from './_forms/autocomplete-section/autocomplete-section.component';
+import {CardWrapperComponent} from './_forms/card-wrapper/card-wrapper.component';
+import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
+import {GroupValidationWrapperComponent} from './_forms/group-validation-wrapper/group-validation-wrapper.component';
+import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component';
+import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
+import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
+import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
+import {ResizeTextareaComponent} from './_forms/resize-textarea/resize-textarea.component';
+import {
+  EmailMatchValidator,
+  EmailMatchValidatorMessage,
+  EmailValidator,
+  EmailValidatorMessage,
+  MaxValidationMessage,
+  MinValidationMessage,
+  MulticheckboxValidator,
+  MulticheckboxValidatorMessage,
+  PhoneValidator,
+  PhoneValidatorMessage,
+  ShowError,
+  UrlValidator,
+  UrlValidatorMessage,
+} from './_forms/validators/formly.validator';
+import {ErrorInterceptor} from './_routing/error-interceptor';
+import {JwtInterceptor} from './_routing/jwt-interceptor';
+import {RoutingModule} from './_routing/routing.module';
+import {ApiService} from './_services/api/api.service';
+import {CategoriesService} from './_services/categories/categories.service';
+import {ConfigService} from './_services/config/config.service';
+import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
+import {IntervalService} from './_services/interval/interval.service';
+import {SearchService} from './_services/search/search.service';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists.  Otherwise assume we are connecting to port
 // 5000 on the local server.
-export function load(http: HttpClient, config: ConfigService): (() => Promise<boolean>) {
+export function load(http: HttpClient, config: ConfigService): () => Promise<boolean> {
   return (): Promise<boolean> => {
     return new Promise<boolean>((resolve: (a: boolean) => void): void => {
       let url = './api/config';
       if ('override_config_url' in environment) {
         url = environment['override_config_url'];
       }
-      http.get(url)
+      http
+        .get(url)
         .pipe(
-          map((fromServer) => {
+          map(fromServer => {
             config.fromProperties(fromServer);
             resolve(true);
           }),
-          catchError((x: { status: number }, caught: Observable<void>): ObservableInput<{}> => {
+          catchError((x: {status: number}, caught: Observable<void>): ObservableInput<{}> => {
             console.log('Failed to load configuration, unable to find ./api/config');
             resolve(false);
             return of({});
-          })
-        ).subscribe();
+          }),
+        )
+        .subscribe();
     });
   };
 }
@@ -210,7 +211,7 @@ export class FormlyConfig {
       {
         name: 'textarea-auto-resize',
         component: ResizeTextareaComponent,
-        wrappers: ['form-field']
+        wrappers: ['form-field'],
       },
     ],
     validators: [
@@ -218,7 +219,7 @@ export class FormlyConfig {
       {name: 'email', validation: EmailValidator},
       {name: 'url', validation: UrlValidator},
       {name: 'multicheckbox', validation: MulticheckboxValidator},
-      {name: 'emailConfirm', validation: EmailMatchValidator}
+      {name: 'emailConfirm', validation: EmailMatchValidator},
     ],
     validationMessages: [
       {name: 'phone', message: PhoneValidatorMessage},
@@ -233,8 +234,8 @@ export class FormlyConfig {
     wrappers: [
       {name: 'help', component: HelpWrapperComponent},
       {name: 'card', component: CardWrapperComponent},
-      { name: 'group-validation', component: GroupValidationWrapperComponent },
-    ]
+      {name: 'group-validation', component: GroupValidationWrapperComponent},
+    ],
   };
 }
 
@@ -408,11 +409,10 @@ export class FormlyConfig {
     InvestigatorFormComponent,
     RegisterDialogComponent,
     RepeatSectionDialogComponent,
-  ]
+  ],
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {
     overlayContainer.getContainerElement().classList.add('stardrive-theme');
   }
 }
-

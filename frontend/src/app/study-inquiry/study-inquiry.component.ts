@@ -10,10 +10,9 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
 @Component({
   selector: 'app-study-inquiry',
   templateUrl: './study-inquiry.component.html',
-  styleUrls: ['./study-inquiry.component.scss']
+  styleUrls: ['./study-inquiry.component.scss'],
 })
 export class StudyInquiryComponent implements OnInit {
-
   currentUser: User;
   @Input() study: Study;
   haveUserContact = false;
@@ -24,9 +23,9 @@ export class StudyInquiryComponent implements OnInit {
     private api: ApiService,
     private authenticationService: AuthenticationService,
     private router: Router,
-    private googleAnalytics: GoogleAnalyticsService
+    private googleAnalytics: GoogleAnalyticsService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
   }
 
   ngOnInit() {
@@ -49,7 +48,6 @@ export class StudyInquiryComponent implements OnInit {
       });
     }
   }
-
 
   goLogin() {
     this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});

@@ -1,10 +1,11 @@
-
-<input matInput
+<input
+  matInput
   [matAutocomplete]="auto"
   [formControl]="formControl"
   [formlyAttributes]="field"
   [placeholder]="to.placeholder"
-  [errorStateMatcher]="errorStateMatcher">
+  [errorStateMatcher]="errorStateMatcher"
+/>
 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
   <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
     {{ option.name }}

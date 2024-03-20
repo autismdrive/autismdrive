@@ -11,10 +11,7 @@ export class UserDataSource implements DataSource<User> {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(
-    private api: ApiService
-  ) {
-  }
+  constructor(private api: ApiService) {}
 
   connect(collectionViewer: CollectionViewer): Observable<User[]> {
     return this.userSubject.asObservable();
@@ -26,20 +23,20 @@ export class UserDataSource implements DataSource<User> {
     this.countSubject.complete();
   }
 
-  loadUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0,
-            pageSize = 10) {
+  loadUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
     this.loadingSubject.next(true);
-    this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize)
-      .subscribe(results => {
-          console.log('UserDataSource loadUsers results', results);
-          this.userSubject.next(results.items);
-          this.countSubject.next(results.total);
-          this.loadingSubject.next(false);
-        },
-        error1 => {
-          this.userSubject.next(null);
-          this.countSubject.next(0);
-          this.loadingSubject.next(false);
-        });
+    this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize).subscribe(
+      results => {
+        console.log('UserDataSource loadUsers results', results);
+        this.userSubject.next(results.items);
+        this.countSubject.next(results.total);
+        this.loadingSubject.next(false);
+      },
+      error1 => {
+        this.userSubject.next(null);
+        this.countSubject.next(0);
+        this.loadingSubject.next(false);
+      },
+    );
   }
 }

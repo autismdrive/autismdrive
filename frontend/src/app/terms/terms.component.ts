@@ -1,20 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ParticipantRelationship } from '../_models/participantRelationship';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Participant} from '../_models/participant';
-import {ApiService} from '../_services/api/api.service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {ParticipantRelationship} from '../_models/participantRelationship';
 import {User} from '../_models/user';
-
+import {ApiService} from '../_services/api/api.service';
+import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-terms',
   templateUrl: './terms.component.html',
-  styleUrls: ['./terms.component.scss']
+  styleUrls: ['./terms.component.scss'],
 })
 export class TermsComponent implements OnInit {
-
   user: User;
   relationship: ParticipantRelationship;
   preview = false;
@@ -24,7 +22,7 @@ export class TermsComponent implements OnInit {
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
     private api: ApiService,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
   ) {
     this.route.params.subscribe(params => {
       this.relationship = params.relationship;
@@ -36,14 +34,15 @@ export class TermsComponent implements OnInit {
     this.authenticationService.currentUser.subscribe(
       user => {
         this.user = user;
-      }, error1 => {
+      },
+      error1 => {
         console.error(error1);
         this.user = null;
-      });
+      },
+    );
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   goProfile($event) {
     $event.preventDefault();
@@ -70,7 +69,7 @@ export class TermsComponent implements OnInit {
       user: this.user,
       last_updated: new Date(),
       relationship: this.relationship,
-      has_consented: true
+      has_consented: true,
     });
 
     const flow = this.getFlow(this.relationship);
@@ -79,7 +78,7 @@ export class TermsComponent implements OnInit {
       this.googleAnalyticsService.flowStartEvent(flow);
       this.user.participants.push(participant);
       console.log('Navigating to flow/', flow, '/', participant.id);
-      this.router.navigate(['flow', flow,  participant.id]);
+      this.router.navigate(['flow', flow, participant.id]);
     });
   }
 }

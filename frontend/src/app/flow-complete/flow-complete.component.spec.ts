@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FlowCompleteComponent } from './flow-complete.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {FlowCompleteComponent} from './flow-complete.component';
 
 describe('FlowCompleteComponent', () => {
   let component: FlowCompleteComponent;
@@ -8,9 +7,8 @@ describe('FlowCompleteComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [FlowCompleteComponent]
-    })
-      .compileComponents();
+      declarations: [FlowCompleteComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

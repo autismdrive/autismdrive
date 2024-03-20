@@ -42,7 +42,7 @@ export class Query {
   languages: String[] = [];
   sort: Sort = {
     field: '_score',
-    order: 'asc'
+    order: 'asc',
   };
   hits?: Array<Hit> = [];
   category: Category;
@@ -54,7 +54,6 @@ export class Query {
   map_data_only = false;
   geo_box: GeoBox;
 
-
   constructor(private _props: QueryProps) {
     const clonedProps = JSON.parse(JSON.stringify(this._props));
     for (const propName in clonedProps) {
@@ -63,7 +62,7 @@ export class Query {
       }
     }
 
-    if (this.hits && (this.hits.length > 0)) {
+    if (this.hits && this.hits.length > 0) {
       this.hits = this.hits.map(h => new Hit(h));
     }
   }
@@ -73,19 +72,19 @@ export class Query {
   }
 
   public get hasWords(): boolean {
-    return !!(this.words && (this.words.length > 0));
+    return !!(this.words && this.words.length > 0);
   }
 
   public get hasTypes(): boolean {
-    return !!(this.types && ((this.types.length === 1 || (this.types.length === 2))));
+    return !!(this.types && (this.types.length === 1 || this.types.length === 2));
   }
 
   public get hasAges(): boolean {
-    return !!(this.ages && (this.ages.length > 0));
+    return !!(this.ages && this.ages.length > 0);
   }
 
   public get hasLanguages(): boolean {
-    return !!(this.languages && (this.languages.length > 0));
+    return !!(this.languages && this.languages.length > 0);
   }
 
   public get hasCategory(): boolean {
@@ -93,13 +92,7 @@ export class Query {
   }
 
   public get hasFilters(): boolean {
-    return !!(
-      this.hasWords ||
-      this.hasTypes ||
-      this.hasLanguages ||
-      this.hasAges ||
-      this.hasCategory
-    );
+    return !!(this.hasWords || this.hasTypes || this.hasLanguages || this.hasAges || this.hasCategory);
   }
 
   public get hitTypes(): HitType[] {
@@ -123,9 +116,8 @@ export class Query {
     if (this.category && otherQuery.category) {
       sameCategory = this.category.id === otherQuery.category.id;
     }
-    return (sameWords && sameTypes && sameAges && sameLanguages && sameCategory);
+    return sameWords && sameTypes && sameAges && sameLanguages && sameCategory;
   }
-
 }
 
 export class Aggregation {
@@ -169,5 +161,3 @@ export interface Sort {
   latitude?: number;
   longitude?: number;
 }
-
-

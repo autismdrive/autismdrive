@@ -1,5 +1,5 @@
-import { ActivatedRoute } from '@angular/router';
-import { SpyObject, SDSpy } from './helper.mock';
+import {ActivatedRoute} from '@angular/router';
+import {SDSpy, SpyObject} from './helper.mock';
 
 export class MockActivatedRoute extends SpyObject {
   urlSpy: SDSpy;
@@ -28,6 +28,6 @@ export class MockActivatedRoute extends SpyObject {
   }
 
   spyAndReturnFake(methodName: string, fakeResponse: any) {
-    this.spy(methodName).andReturn({ subscribe: callback => callback(fakeResponse) });
+    this.spy(methodName).andReturn({subscribe: callback => callback(fakeResponse)});
   }
 }

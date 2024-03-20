@@ -1,28 +1,26 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {ConfigService} from '../config/config.service';
-import {Study} from '../../_models/study';
 import {StarError} from '../../star-error';
 import {Query} from '../../_models/query';
+import {Study} from '../../_models/study';
+import {ConfigService} from '../config/config.service';
 
 declare var gtag: Function;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GoogleAnalyticsService {
+  constructor(private router: Router, private configService: ConfigService) {}
 
-  constructor(private router: Router, private configService: ConfigService) {
-  }
-
-//  private event(eventName: string, params: {}) {
- //   gtag('event', eventName, params);
-//  }
+  //  private event(eventName: string, params: {}) {
+  //   gtag('event', eventName, params);
+  //  }
 
   private event(action: string, category: string, label: string) {
     gtag('event', action, {
-      'event_category': category,
-      'event_label': label
+      event_category: category,
+      event_label: label,
     });
   }
 
@@ -89,7 +87,7 @@ export class GoogleAnalyticsService {
   }
 
   public set_user(user_id) {
-    gtag('set', {'user_id': user_id}); // Set the user ID using signed-in user_id.
+    gtag('set', {user_id: user_id}); // Set the user ID using signed-in user_id.
   }
 
   public init() {
@@ -104,11 +102,14 @@ export class GoogleAnalyticsService {
       document.head.appendChild(script1);
 
       const script2 = document.createElement('script');
-      script2.innerHTML = `
+      script2.innerHTML =
+        `
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '` + analysticsKey + `', {'send_page_view': false});
+        gtag('config', '` +
+        analysticsKey +
+        `', {'send_page_view': false});
       `;
       document.head.appendChild(script2);
     } catch (ex) {
@@ -122,7 +123,7 @@ export class GoogleAnalyticsService {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         gtag('config', analyticsKey, {
-          'page_path': event.urlAfterRedirects,
+          page_path: event.urlAfterRedirects,
         });
       }
     });

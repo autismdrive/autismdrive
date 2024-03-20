@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MirrorComponent } from './mirror.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MirrorComponent} from './mirror.component';
 
 describe('MirrorComponent', () => {
   let component: MirrorComponent;
@@ -8,9 +7,8 @@ describe('MirrorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MirrorComponent ]
-    })
-    .compileComponents();
+      declarations: [MirrorComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

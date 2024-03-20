@@ -25,10 +25,9 @@ enum FlowState {
 @Component({
   selector: 'app-flow',
   templateUrl: './flow.component.html',
-  styleUrls: ['./flow.component.scss']
+  styleUrls: ['./flow.component.scss'],
 })
 export class FlowComponent implements OnInit, OnDestroy {
-
   mobileQuery: MediaQueryList;
   user: User;
   participant: Participant;
@@ -81,8 +80,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this._updateSidenavState();
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
@@ -93,25 +91,21 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   loadFlow(flowName: string) {
-    this.api
-      .getFlow(flowName, this.participant.id)
-      .subscribe(f => {
-        this.flow = new Flow(f);
-        if (this.flow.percentComplete() === 0) {
-          this.state = this.flowState.INTRO;
-        } else {
-          this.goToNextAvailableStep();
-        }
-        scrollToTop(this.deviceDetectorService);
-      });
+    this.api.getFlow(flowName, this.participant.id).subscribe(f => {
+      this.flow = new Flow(f);
+      if (this.flow.percentComplete() === 0) {
+        this.state = this.flowState.INTRO;
+      } else {
+        this.goToNextAvailableStep();
+      }
+      scrollToTop(this.deviceDetectorService);
+    });
   }
 
   updateParticipant(participantId: number) {
-    this.api.getParticipant(participantId).subscribe(
-      p => {
-        this.participant = p;
-      }
-    );
+    this.api.getParticipant(participantId).subscribe(p => {
+      this.participant = p;
+    });
   }
 
   goToNextAvailableStep() {
@@ -177,12 +171,10 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.hideForm = true;
         this.renderForm(step, q);
       } else if (step.questionnaire_id > 0) {
-        this.api
-          .getQuestionnaire(step.name, step.questionnaire_id)
-          .subscribe(qData => {
-            this.model = qData;
-            this.renderForm(step, q);
-          });
+        this.api.getQuestionnaire(step.name, step.questionnaire_id).subscribe(qData => {
+          this.model = qData;
+          this.renderForm(step, q);
+        });
       } else {
         this.renderForm(step, q);
       }
@@ -207,20 +199,20 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
-    if ((this.currentStep().questionnaire_id > 0) && (this.currentStep().type !== 'sensitive')) {
-      this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
+    if (this.currentStep().questionnaire_id > 0 && this.currentStep().type !== 'sensitive') {
+      this.api
+        .updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
           this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
           scrollToTop(this.deviceDetectorService);
         });
     } else {
-      this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
-        .subscribe(() => {
-          this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
-          this.loadFlow(this.flow.name);
-          scrollToTop(this.deviceDetectorService);
-        });
+      this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model).subscribe(() => {
+        this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
+        this.loadFlow(this.flow.name);
+        scrollToTop(this.deviceDetectorService);
+      });
     }
   }
 
@@ -246,8 +238,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.options = {
       formState: {
         mainModel: this.model,
-        preferredName: this.participant.name
-      }
+        preferredName: this.participant.name,
+      },
     };
     this.state = this.flowState.SHOW_FORM;
     scrollToTop(this.deviceDetectorService);

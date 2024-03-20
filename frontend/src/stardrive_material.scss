@@ -1,6 +1,6 @@
 @use '~@angular/material' as mat;
-@import "material";
-@import "mixins";
+@import 'material';
+@import 'mixins';
 @include mat.core($custom-typography);
 @include mat.all-component-themes($stardrive-theme);
 
@@ -42,14 +42,23 @@
       position: relative;
 
       max-width: 100vw;
-      @media (min-width: 576px) { max-width: calc(100% - 40px); }
-      @media (min-width: 768px) { max-width: calc(100% - 80px); }
-      @media (min-width: 992px) { max-width: calc(100% - 100px); }
-      @media (min-width: 1200px) { max-width: calc(100% - 120px); }
+      @media (min-width: 576px) {
+        max-width: calc(100% - 40px);
+      }
+      @media (min-width: 768px) {
+        max-width: calc(100% - 80px);
+      }
+      @media (min-width: 992px) {
+        max-width: calc(100% - 100px);
+      }
+      @media (min-width: 1200px) {
+        max-width: calc(100% - 120px);
+      }
     }
   }
 
-  button, a.btn {
+  button,
+  a.btn {
     &.btn-xl {
       font-size: 24px;
       padding-left: 24px;
@@ -95,12 +104,12 @@
   }
 
   formly-field.vertical-radio-group {
-      mat-radio-button {
-        display: block;
-        label.mat-radio-label {
-          white-space: normal;
-        }
+    mat-radio-button {
+      display: block;
+      label.mat-radio-label {
+        white-space: normal;
       }
+    }
   }
 
   // This handles the proper display of multi-checkbox
@@ -160,17 +169,18 @@
     right: 0px;
     bottom: 0px;
     background: linear-gradient(
-      rgba(0, 0, 0, 0.5) 0%,
-      rgba(0, 0, 0, 0.15) 40%,
-      rgba(0, 0, 0, 0.05) 60%,
-      rgba(0, 0, 0, 0) 100%
-    ), linear-gradient(
-      90deg,
-      mat.get-color-from-palette($stardrive-primary, 600, 0.8) 0%,
-      mat.get-color-from-palette($stardrive-primary, 600, 0) 40%,
-      mat.get-color-from-palette($stardrive-accent, 600, 0) 60%,
-      mat.get-color-from-palette($stardrive-accent, 600, 0.8) 100%
-    );
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.15) 40%,
+        rgba(0, 0, 0, 0.05) 60%,
+        rgba(0, 0, 0, 0) 100%
+      ),
+      linear-gradient(
+        90deg,
+        mat.get-color-from-palette($stardrive-primary, 600, 0.8) 0%,
+        mat.get-color-from-palette($stardrive-primary, 600, 0) 40%,
+        mat.get-color-from-palette($stardrive-accent, 600, 0) 60%,
+        mat.get-color-from-palette($stardrive-accent, 600, 0.8) 100%
+      );
     background-blend-mode: saturation;
     z-index: 1;
     mix-blend-mode: multiply;
@@ -181,42 +191,84 @@
   .hero-slide {
     background-size: cover;
 
-    &.top-left { background-position: top left; }
-    &.top-center { background-position: top center; }
-    &.top-right { background-position: top right; }
-    &.center-left { background-position: center left; }
-    &.center-center { background-position: center center; }
-    &.center-right { background-position: center right; }
-    &.bottom-left { background-position: bottom left; }
-    &.bottom-center { background-position: bottom center; }
-    &.bottom-right { background-position: bottom right; }
+    &.top-left {
+      background-position: top left;
+    }
+    &.top-center {
+      background-position: top center;
+    }
+    &.top-right {
+      background-position: top right;
+    }
+    &.center-left {
+      background-position: center left;
+    }
+    &.center-center {
+      background-position: center center;
+    }
+    &.center-right {
+      background-position: center right;
+    }
+    &.bottom-left {
+      background-position: bottom left;
+    }
+    &.bottom-center {
+      background-position: bottom center;
+    }
+    &.bottom-right {
+      background-position: bottom right;
+    }
 
     .hero-content {
+      @media (min-width: 576px) {
+        max-width: calc(100% - 40px);
+      }
+      @media (min-width: 768px) {
+        max-width: calc(100% - 80px);
+      }
+      @media (min-width: 992px) {
+        max-width: calc(100% - 100px);
+      }
+      @media (min-width: 1200px) {
+        max-width: calc(100% - 120px);
+      }
 
-      @media (min-width: 576px) { max-width: calc(100% - 40px); }
-      @media (min-width: 768px) { max-width: calc(100% - 80px); }
-      @media (min-width: 992px) { max-width: calc(100% - 100px); }
-      @media (min-width: 1200px) { max-width: calc(100% - 120px); }
-
-      & > h1, & > p {
+      & > h1,
+      & > p {
         color: white;
         font-weight: 700;
-        text-shadow: 0px 0px 8px rgba(0,0,0,0.5);
+        text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
 
         max-width: calc(100% - 40px);
-        @media (min-width: 576px) { max-width: calc(100% - 40px); }
-        @media (min-width: 768px) { max-width: calc(100% - 80px); }
-        @media (min-width: 992px) { max-width: calc(100% - 100px); }
-        @media (min-width: 1200px) { max-width: calc(100% - 120px); }
+        @media (min-width: 576px) {
+          max-width: calc(100% - 40px);
+        }
+        @media (min-width: 768px) {
+          max-width: calc(100% - 80px);
+        }
+        @media (min-width: 992px) {
+          max-width: calc(100% - 100px);
+        }
+        @media (min-width: 1200px) {
+          max-width: calc(100% - 120px);
+        }
       }
 
       & > h1 {
         margin-bottom: 0px;
         font-size: 1.5rem;
-        @media (min-width: 576px) { font-size: 2rem; }
-        @media (min-width: 768px) { font-size: 3rem; }
-        @media (min-width: 992px) { font-size: 4rem; }
-        @media (min-width: 1200px) { font-size: 5rem; }
+        @media (min-width: 576px) {
+          font-size: 2rem;
+        }
+        @media (min-width: 768px) {
+          font-size: 3rem;
+        }
+        @media (min-width: 992px) {
+          font-size: 4rem;
+        }
+        @media (min-width: 1200px) {
+          font-size: 5rem;
+        }
       }
     }
 
@@ -250,7 +302,7 @@
   #hero.with-escaping-tiles {
     margin-bottom: ($tile-height-1x * 0.5);
 
-    &.margin-bottom-none   {
+    &.margin-bottom-none {
       margin-bottom: ($tile-height-1x * 0.25);
 
       @media (max-width: 967px) {
@@ -277,23 +329,53 @@
       }
     }
 
-    .row.escaping-tiles-1x { margin-bottom: -($tile-height-1x * 0.5); }
-    .row.escaping-tiles-2x { margin-bottom: -($tile-height-2x * 0.75); }
+    .row.escaping-tiles-1x {
+      margin-bottom: -($tile-height-1x * 0.5);
+    }
+    .row.escaping-tiles-2x {
+      margin-bottom: -($tile-height-2x * 0.75);
+    }
   }
 
-  .pad-0 { padding: 0px; }
-  .pad-1 { padding: 1em; }
-  .pad-2 { padding: 2em; }
-  .pad-3 { padding: 3em; }
-  .pad-4 { padding: 4em; }
-  .pad-5 { padding: 5em; }
-  .pad-6 { padding: 6em; }
-  .pad-7 { padding: 7em; }
-  .pad-8 { padding: 8em; }
+  .pad-0 {
+    padding: 0px;
+  }
+  .pad-1 {
+    padding: 1em;
+  }
+  .pad-2 {
+    padding: 2em;
+  }
+  .pad-3 {
+    padding: 3em;
+  }
+  .pad-4 {
+    padding: 4em;
+  }
+  .pad-5 {
+    padding: 5em;
+  }
+  .pad-6 {
+    padding: 6em;
+  }
+  .pad-7 {
+    padding: 7em;
+  }
+  .pad-8 {
+    padding: 8em;
+  }
 
-  .margin-top-none, .row.margin-top-none        { margin-top: 0px !important; }
-  .margin-bottom-none, .row.margin-bottom-none  { margin-bottom: 0px !important; }
-  .ghost { opacity: 0; }
+  .margin-top-none,
+  .row.margin-top-none {
+    margin-top: 0px !important;
+  }
+  .margin-bottom-none,
+  .row.margin-bottom-none {
+    margin-bottom: 0px !important;
+  }
+  .ghost {
+    opacity: 0;
+  }
 
   // XS
   @media (max-width: 575px) {
@@ -355,9 +437,7 @@
     }
   }
 
-
   .mat-dialog-content[mat-dialog-content] {
     max-height: 85vh;
   }
-
 }

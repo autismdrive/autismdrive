@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { UvaEducationComponent } from './uva-education.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {UvaEducationComponent} from './uva-education.component';
 
 describe('UvaEducationComponent', () => {
   let component: UvaEducationComponent;
@@ -8,9 +7,8 @@ describe('UvaEducationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UvaEducationComponent ]
-    })
-    .compileComponents();
+      declarations: [UvaEducationComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

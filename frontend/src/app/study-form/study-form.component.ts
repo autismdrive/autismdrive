@@ -2,14 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {AgeRange, Language} from '../_models/hit_type';
 import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';
 import {StudyInvestigator} from '../_models/study_investigator';
 import {ApiService} from '../_services/api/api.service';
-import {scrollToFirstInvalidField} from '../../util/scrollToTop';
-import {DeviceDetectorService} from 'ngx-device-detector';
-import {AgeRange, Language} from '../_models/hit_type';
-
 
 enum PageState {
   LOADING = 'loading',
@@ -19,7 +18,7 @@ enum PageState {
 @Component({
   selector: 'app-study-form',
   templateUrl: './study-form.component.html',
-  styleUrls: ['./study-form.component.scss']
+  styleUrls: ['./study-form.component.scss'],
 })
 export class StudyFormComponent implements OnInit {
   study: Study;
@@ -38,10 +37,10 @@ export class StudyFormComponent implements OnInit {
         label: 'Study Status',
         placeholder: 'Please select the study status',
         options: [
-          {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
-          {'value': 'study_in_progress', 'label': 'Study in progress'},
-          {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
-          {'value': 'study_results_published', 'label': 'Study results published'}
+          {value: 'currently_enrolling', label: 'Currently Enrolling'},
+          {value: 'study_in_progress', label: 'Study in progress'},
+          {value: 'results_being_analyzed', label: 'Results being analyzed'},
+          {value: 'study_results_published', label: 'Study results published'},
         ],
         required: true,
       },
@@ -92,8 +91,8 @@ export class StudyFormComponent implements OnInit {
         placeholder: 'Who are you looking for to participate in your study?',
       },
       expressionProperties: {
-        'templateOptions.required': 'model.status === "currently_enrolling"'
-      }
+        'templateOptions.required': 'model.status === "currently_enrolling"',
+      },
     },
     {
       key: 'benefit_description',
@@ -103,8 +102,8 @@ export class StudyFormComponent implements OnInit {
         placeholder: 'How will participants benefit from your study?',
       },
       expressionProperties: {
-        'templateOptions.required': 'model.status === "currently_enrolling"'
-      }
+        'templateOptions.required': 'model.status === "currently_enrolling"',
+      },
     },
     {
       key: 'investigators',
@@ -128,7 +127,7 @@ export class StudyFormComponent implements OnInit {
       wrappers: ['card'],
       templateOptions: {
         label: 'Additional Investigator',
-        description: 'If your investigator does not appear in the list above, please add them here'
+        description: 'If your investigator does not appear in the list above, please add them here',
       },
       fieldGroup: [
         {
@@ -194,9 +193,9 @@ export class StudyFormComponent implements OnInit {
         placeholder: 'Please enter the email address to which study inquires will be sent',
       },
       expressionProperties: {
-        'templateOptions.required': 'model.status === "currently_enrolling"'
+        'templateOptions.required': 'model.status === "currently_enrolling"',
       },
-      validators: {'validation': ['email']},
+      validators: {validation: ['email']},
     },
     {
       key: 'eligibility_url',
@@ -205,7 +204,7 @@ export class StudyFormComponent implements OnInit {
         label: 'Eligibility Link',
         placeholder: 'If you have an eligibilty screener, please enter the link',
       },
-      validators: {'validation': ['url']},
+      validators: {validation: ['url']},
     },
     {
       key: 'survey_url',
@@ -214,7 +213,7 @@ export class StudyFormComponent implements OnInit {
         label: 'Survey Link',
         placeholder: 'If this is an online survey study, please enter the link',
       },
-      validators: {'validation': ['url']},
+      validators: {validation: ['url']},
     },
     {
       key: 'results_url',
@@ -223,7 +222,7 @@ export class StudyFormComponent implements OnInit {
         label: 'Results Url',
         placeholder: 'Link to published results of the study',
       },
-      validators: {'validation': ['url']},
+      validators: {validation: ['url']},
     },
     {
       key: 'image_url',
@@ -231,7 +230,7 @@ export class StudyFormComponent implements OnInit {
       templateOptions: {
         label: 'Image Url',
         placeholder: 'This is the link to the image used for current study display',
-        description: 'Something like: /assets/home/study7.jpg'
+        description: 'Something like: /assets/home/study7.jpg',
       },
     },
     {
@@ -273,8 +272,7 @@ export class StudyFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private deviceDetectorService: DeviceDetectorService,
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
     this.model.createNew = false;
@@ -285,7 +283,7 @@ export class StudyFormComponent implements OnInit {
     const opts = [];
     for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {
-        opts.push({'value': key, 'label': modelLabels[key]});
+        opts.push({value: key, label: modelLabels[key]});
       }
     }
     return opts;
@@ -293,7 +291,6 @@ export class StudyFormComponent implements OnInit {
 
   loadData() {
     this.route.params.subscribe(params => {
-
       if (params['studyId']) {
         const studyId = params['studyId'];
         this.createNew = false;
@@ -308,8 +305,14 @@ export class StudyFormComponent implements OnInit {
         this.createNew = true;
         this.model.createNew = true;
         this.study = {
-          'title': '', 'description': '', 'participant_description': '', 'benefit_description': '',
-          'investigators': [], 'location': '', 'categories': [], 'status': ''
+          title: '',
+          description: '',
+          participant_description: '',
+          benefit_description: '',
+          investigators: [],
+          location: '',
+          categories: [],
+          status: '',
         } as Study;
         this.loadForm();
       }
@@ -341,8 +344,8 @@ export class StudyFormComponent implements OnInit {
     this.form = new FormGroup({});
     this.options = {
       formState: {
-        mainModel: this.model
-      }
+        mainModel: this.model,
+      },
     };
     this.state = this.pageState.SHOW_FORM;
   }
@@ -399,7 +402,7 @@ export class StudyFormComponent implements OnInit {
       this.updatedStudy = s;
       this.model.id = s.id;
       if (this.model.additional_investigators.name) {
-        this.addStudyInvestigator().subscribe((i) => {
+        this.addStudyInvestigator().subscribe(i => {
           this.model.investigators.push(i.id);
           this.updateStudyInvestigators(s.id).subscribe(() => {
             this.updateStudyCategories(s.id).subscribe(() => this.close());
@@ -435,7 +438,6 @@ export class StudyFormComponent implements OnInit {
   onCancel() {
     this.close();
   }
-
 
   highlightRequiredFields() {
     for (const fieldName of Object.keys(this.form.controls)) {

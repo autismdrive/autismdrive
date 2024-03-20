@@ -1,27 +1,24 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import createClone from 'rfdc';
+import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {GeoBox, Query} from 'src/app/_models/query';
-import createClone from 'rfdc';
 import {ConfigService} from '../config/config.service';
-
 
 @Injectable({providedIn: 'root'})
 export class SearchService {
   query_url = '/api/search/resources';
 
-  constructor(private _http: HttpClient, private config: ConfigService) {
-  }
-
+  constructor(private _http: HttpClient, private config: ConfigService) {}
 
   search(query: Query): Observable<Query> {
     const url = this.config.apiUrl + this.query_url;
-    return this._http
-      .post<any>(url, query)
-      .pipe(map(queryDict => {
+    return this._http.post<any>(url, query).pipe(
+      map(queryDict => {
         return this._loadQuery(queryDict);
-      }));
+      }),
+    );
   }
 
   mapSearch(query: Query, geoBox: GeoBox): Observable<Query> {

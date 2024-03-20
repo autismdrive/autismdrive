@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MultiselectTreeComponent } from './multiselect-tree.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MultiselectTreeComponent} from './multiselect-tree.component';
 
 describe('MultiselectTreeComponent', () => {
   let component: MultiselectTreeComponent;
@@ -8,9 +7,8 @@ describe('MultiselectTreeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MultiselectTreeComponent ]
-    })
-    .compileComponents();
+      declarations: [MultiselectTreeComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

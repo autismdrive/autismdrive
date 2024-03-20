@@ -7,43 +7,43 @@ $heading-font-family: '"franklin-gothic-urw", serif';
 // gray
 $brand-gray: #4e4e4e;
 $brand-gray-tint-1: #666666;
-$brand-gray-tint-2: #DADADA;
-$brand-gray-tint-3: #F1F1EF;
+$brand-gray-tint-2: #dadada;
+$brand-gray-tint-3: #f1f1ef;
 $brand-gray-tint-4: scale-color($brand-gray, $lightness: 90%);
 $body-color: $brand-gray;
 $body-color-muted: $brand-gray-tint-1;
 $body-color-light: $brand-gray-tint-4;
 
 // primary (UVA "Jefferson Blue")
-$brand-primary: #232D4B;
-$brand-primary-tint-1: #394E79;
-$brand-primary-tint-2: #6C799C;
-$brand-primary-tint-3: #A9AFC7;
+$brand-primary: #232d4b;
+$brand-primary-tint-1: #394e79;
+$brand-primary-tint-2: #6c799c;
+$brand-primary-tint-3: #a9afc7;
 $brand-primary-tint-4: scale-color($brand-primary, $lightness: 90%);
 $brand-primary-shade-1: #092255;
-$brand-primary-shade-2: #041D4F;
-$brand-primary-shade-3: #02194A;
+$brand-primary-shade-2: #041d4f;
+$brand-primary-shade-3: #02194a;
 $brand-primary-shade-4: #021745;
-$brand-primary-shade-5: #03143E;
+$brand-primary-shade-5: #03143e;
 $brand-primary-muted: $brand-primary-tint-1;
 $brand-primary-light: $brand-primary-tint-4;
 
 // accent (UVA "Rotunda Orange")
-$brand-accent: #E57200;
-$brand-accent-tint-1: #F69350;
-$brand-accent-tint-2: #FAB584;
-$brand-accent-tint-3: #FDD8BB;
+$brand-accent: #e57200;
+$brand-accent-tint-1: #f69350;
+$brand-accent-tint-2: #fab584;
+$brand-accent-tint-3: #fdd8bb;
 $brand-accent-tint-4: scale-color($brand-accent, $lightness: 90%);
-$brand-accent-shade-1: #E76E25;
-$brand-accent-shade-2: #DD6923;
-$brand-accent-shade-3: #D36421;
-$brand-accent-shade-4: #C8601F;
-$brand-accent-shade-5: #C05B1D;
+$brand-accent-shade-1: #e76e25;
+$brand-accent-shade-2: #dd6923;
+$brand-accent-shade-3: #d36421;
+$brand-accent-shade-4: #c8601f;
+$brand-accent-shade-5: #c05b1d;
 $brand-accent-muted: $brand-accent-tint-1;
 $brand-accent-light: $brand-accent-tint-4;
 
 // warning (UVA "Emergency Red")
-$brand-warning: #DF1E43;
+$brand-warning: #df1e43;
 $brand-warning-muted: desaturate(scale-color($brand-warning, $lightness: 30%), 20%);
 $brand-warning-light: scale-color($brand-warning, $lightness: 90%);
 $easeDuration: 300ms;

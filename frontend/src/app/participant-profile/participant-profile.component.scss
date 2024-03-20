@@ -15,7 +15,7 @@ mat-card-header {
 }
 
 [mat-card-avatar]:hover {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .change_text {
@@ -26,7 +26,7 @@ mat-card-header {
 }
 
 .change_text:hover {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 ::ng-deep .mat-card-header-text {
@@ -36,11 +36,15 @@ mat-card-header {
 ::ng-deep mat-progress-bar {
   height: 16px;
 
-  .mat-progress-bar-buffer { background-color: $brand-gray-tint-2; }
+  .mat-progress-bar-buffer {
+    background-color: $brand-gray-tint-2;
+  }
 
   .mat-progress-bar-background {
     fill: $brand-gray-tint-2;
-    pattern { fill: $brand-gray-tint-2; }
+    pattern {
+      fill: $brand-gray-tint-2;
+    }
   }
 }
 
@@ -51,7 +55,6 @@ mat-card-header {
   .mat-subheading-2 {
     color: black;
   }
-
 }
 
 button {

@@ -8,61 +8,21 @@
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
 >
-  <div
-    class="form"
-    fxFlex.gt-md="50%"
-    fxFlex.lt-lg="80%"
-  >
+  <div class="form" fxFlex.gt-md="50%" fxFlex.lt-lg="80%">
     <app-logo variant="dark-lg"></app-logo>
     <h1>Sign in</h1>
-    <form
-      [formGroup]="form"
-      (ngSubmit)="submit(model)"
-    >
-      <formly-form
-        [form]="form"
-        [fields]="fields"
-        [model]="model"
-      >
-        <div
-          fxLayout="column"
-          fxLayoutGap="2%"
-          fxLayoutAlign="center"
-        >
-          <div
-            id="error_message"
-            class="display mat-error"
-          >{{errorEmitter | async}}</div>
-          <button
-            mat-flat-button
-            type="submit"
-            color="primary"
-            id="submit"
-          >Submit</button>
-          <a
-            mat-flat-button
-            [routerLink]="[ '/home' ]"
-            color="accent"
-            id="cancel"
-          >Cancel</a>
+    <form [formGroup]="form" (ngSubmit)="submit(model)">
+      <formly-form [form]="form" [fields]="fields" [model]="model">
+        <div fxLayout="column" fxLayoutGap="2%" fxLayoutAlign="center">
+          <div id="error_message" class="display mat-error">{{ errorEmitter | async }}</div>
+          <button mat-flat-button type="submit" color="primary" id="submit">Submit</button>
+          <a mat-flat-button [routerLink]="['/home']" color="accent" id="cancel">Cancel</a>
         </div>
       </formly-form>
     </form>
-    <div
-      class="footer"
-      fxLayout="row"
-      fxLayoutAlign="space-between"
-    >
-      <a
-        mat-button
-        [routerLink]="[ '/register' ]"
-        id="register"
-      >Join Autism DRIVE</a>
-      <a
-        mat-button
-        [routerLink]="[ '/forgot-password' ]"
-        id="forgot_password"
-      >Forgot password?</a>
+    <div class="footer" fxLayout="row" fxLayoutAlign="space-between">
+      <a mat-button [routerLink]="['/register']" id="register">Join Autism DRIVE</a>
+      <a mat-button [routerLink]="['/forgot-password']" id="forgot_password">Forgot password?</a>
     </div>
   </div>
 </div>

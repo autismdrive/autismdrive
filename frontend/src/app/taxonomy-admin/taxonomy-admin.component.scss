@@ -1,4 +1,4 @@
-@import "../../config";
+@import '../../config';
 
 .tree-select-invisible {
   display: none;
@@ -28,6 +28,10 @@
 }
 
 @keyframes fade-out {
-  0% { background-color: $brand-primary-light; }
-  100% { background-color: transparent; }
+  0% {
+    background-color: $brand-primary-light;
+  }
+  100% {
+    background-color: transparent;
+  }
 }

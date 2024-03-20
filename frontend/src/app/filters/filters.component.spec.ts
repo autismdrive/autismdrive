@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FiltersComponent } from './filters.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {FiltersComponent} from './filters.component';
 
 describe('FiltersComponent', () => {
   let component: FiltersComponent;
@@ -8,9 +7,8 @@ describe('FiltersComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FiltersComponent ]
-    })
-    .compileComponents();
+      declarations: [FiltersComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

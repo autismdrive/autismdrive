@@ -1,25 +1,21 @@
-import { Component, HostBinding, OnInit } from '@angular/core';
-import { fadeTransition } from '../_animations/animations';
-import { ApiService } from '../_services/api/api.service';
-import { Router } from '@angular/router';
+import {Component, HostBinding, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {fadeTransition} from '../_animations/animations';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-logout',
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.scss'],
-  animations: [fadeTransition()]
+  animations: [fadeTransition()],
 })
 export class LogoutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 
-  constructor(
-    private api: ApiService,
-    private router: Router
-  ) {
-  }
+  constructor(private api: ApiService, private router: Router) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   goHome($event) {
     $event.preventDefault();

@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AutocompleteSectionComponent } from './autocomplete-section.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AutocompleteSectionComponent} from './autocomplete-section.component';
 
 describe('AutocompleteSectionComponent', () => {
   let component: AutocompleteSectionComponent;
@@ -8,9 +7,8 @@ describe('AutocompleteSectionComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AutocompleteSectionComponent ]
-    })
-    .compileComponents();
+      declarations: [AutocompleteSectionComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

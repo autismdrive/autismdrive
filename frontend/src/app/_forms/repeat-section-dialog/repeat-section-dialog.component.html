@@ -1,6 +1,4 @@
-<div
-  class="mat-typography"
->
+<div class="mat-typography">
   <div mat-dialog-content>
     <div fxLayout="row" fxLayout.lt-md="column">
       <h1>{{ data.title }}</h1>
@@ -10,26 +8,22 @@
         id="highlight-required-fields-in-dialog"
         (click)="highlightRequiredFields(data.fields)"
         color="warn"
-      >*Required</button>
+      >
+        *Required
+      </button>
     </div>
-<!--    <h1 mat-dialog-title>{{data.title}}</h1>-->
-    <formly-form
-      [fields]="data.fields"
-      [model]="data.model"
-      (change)="updateDisableSave()"
-    ></formly-form>
+    <!--    <h1 mat-dialog-title>{{data.title}}</h1>-->
+    <formly-form [fields]="data.fields" [model]="data.model" (change)="updateDisableSave()"></formly-form>
   </div>
   <div mat-dialog-actions>
     <button
       mat-flat-button
       color="primary"
       (click)="disableSave ? onInvalidFields() : onSubmit()"
-      [ngClass]="{'repeat-section-dialog-save': true, 'disabled': !noErrors()}"
-    >Save</button>
-    <button
-      mat-button
-      (click)="onNoClick()"
-      [ngClass]="{'repeat-section-dialog-cancel': true}"
-    >Cancel</button>
+      [ngClass]="{'repeat-section-dialog-save': true, disabled: !noErrors()}"
+    >
+      Save
+    </button>
+    <button mat-button (click)="onNoClick()" [ngClass]="{'repeat-section-dialog-cancel': true}">Cancel</button>
   </div>
 </div>

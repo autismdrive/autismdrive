@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { SearchSortComponent } from './search-sort.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SearchSortComponent} from './search-sort.component';
 
 describe('SearchSortComponent', () => {
   let component: SearchSortComponent;
@@ -8,9 +7,8 @@ describe('SearchSortComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchSortComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchSortComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

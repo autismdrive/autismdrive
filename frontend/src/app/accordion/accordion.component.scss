@@ -2,10 +2,9 @@
 @import '../../mixins';
 
 ::ng-deep mat-expansion-panel.accordion-link {
-
   mat-expansion-panel-header .mat-content {
     display: grid;
-    grid-template-areas: "icon title";
+    grid-template-areas: 'icon title';
     grid-template-columns: 2rem auto;
     align-items: center;
     position: relative;
@@ -17,7 +16,7 @@
       left: 42px;
     }
 
-    &>.accordion-icon {
+    & > .accordion-icon {
       grid-area: icon;
       width: 2rem;
       height: 2rem;
@@ -39,7 +38,7 @@
       }
     }
 
-    &>mat-panel-title.mat-title {
+    & > mat-panel-title.mat-title {
       grid-area: title;
       align-self: center;
       justify-self: start;

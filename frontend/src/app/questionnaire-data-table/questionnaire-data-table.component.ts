@@ -7,7 +7,7 @@ import {ApiService} from '../_services/api/api.service';
 @Component({
   selector: 'app-questionnaire-data-table',
   templateUrl: './questionnaire-data-table.component.html',
-  styleUrls: ['./questionnaire-data-table.component.scss']
+  styleUrls: ['./questionnaire-data-table.component.scss'],
 })
 export class QuestionnaireDataTableComponent implements OnChanges {
   @Input()
@@ -18,11 +18,7 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   displayedColumns = [];
   columnNames = [];
 
-
-  constructor(
-    private api: ApiService,
-  ) {
-  }
+  constructor(private api: ApiService) {}
 
   get snakeToUpperCase() {
     return snakeToUpperCase;
@@ -43,20 +39,16 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   load_columns() {
     this.displayedColumns = [];
     this.columnNames = [];
-    this.api
-      .getQuestionnaireListMeta(this.selected_info.table_name)
-      .subscribe(
-      result => {
-        for (const column of result['fields']) {
-          if (!this.displayedColumns.includes(column.name)) {
-            this.displayedColumns.push({'name': column.name, 'type': column.type});
-          }
-          if (!this.columnNames.includes(column.name)) {
-            this.columnNames.push(column.name);
-          }
+    this.api.getQuestionnaireListMeta(this.selected_info.table_name).subscribe(result => {
+      for (const column of result['fields']) {
+        if (!this.displayedColumns.includes(column.name)) {
+          this.displayedColumns.push({name: column.name, type: column.type});
+        }
+        if (!this.columnNames.includes(column.name)) {
+          this.columnNames.push(column.name);
         }
       }
-    );
+    });
   }
 
   format_element(element, column) {
@@ -71,7 +63,9 @@ export class QuestionnaireDataTableComponent implements OnChanges {
     this.api.exportQuestionnaire(info.table_name).subscribe(response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
-      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
 
       const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;

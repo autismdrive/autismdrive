@@ -3,11 +3,12 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let c of favoriteTopics"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'category': c.id}"
+      [routerLink]="['/search']"
+      [queryParams]="{category: c.id}"
       color="primary"
       selected
-    >{{c.name}}</mat-chip>
+      >{{ c.name }}</mat-chip
+    >
   </mat-chip-list>
 </div>
 
@@ -16,11 +17,12 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let age of favoriteAges"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'ages': age}"
+      [routerLink]="['/search']"
+      [queryParams]="{ages: age}"
       color="primary"
       selected
-    >{{ageLabels[age]}}</mat-chip>
+      >{{ ageLabels[age] }}</mat-chip
+    >
   </mat-chip-list>
 </div>
 
@@ -29,11 +31,12 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let language of favoriteLanguages"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'languages': language}"
+      [routerLink]="['/search']"
+      [queryParams]="{languages: language}"
       color="primary"
       selected
-    >{{languageLabels[language]}}</mat-chip>
+      >{{ languageLabels[language] }}</mat-chip
+    >
   </mat-chip-list>
 </div>
 
@@ -42,10 +45,11 @@
   <mat-chip-list>
     <mat-chip
       *ngFor="let cat of favoriteCovid19Topics"
-      [routerLink]="['/covid19-resources/', {'category': cat}]"
+      [routerLink]="['/covid19-resources/', {category: cat}]"
       color="accent"
       selected
-    >{{covid19Labels[cat].split(': ')[0]}}</mat-chip>
+      >{{ covid19Labels[cat].split(': ')[0] }}</mat-chip
+    >
   </mat-chip-list>
 </div>
 <p>To add or remove topics, please click Manage My Topics below</p>

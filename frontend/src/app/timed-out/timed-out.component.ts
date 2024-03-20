@@ -1,22 +1,19 @@
-import { Component, HostBinding, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { fadeTransition } from '../_animations/animations';
+import {Component, HostBinding, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {fadeTransition} from '../_animations/animations';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 @Component({
   selector: 'app-timedout',
   templateUrl: './timed-out.component.html',
   styleUrls: ['./timed-out.component.scss'],
-  animations: [fadeTransition()]
+  animations: [fadeTransition()],
 })
 export class TimedoutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 
-  constructor(private router: Router,
-              private authenticationService: AuthenticationService
-  ) {
-  }
+  constructor(private router: Router, private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.authenticationService.logout();

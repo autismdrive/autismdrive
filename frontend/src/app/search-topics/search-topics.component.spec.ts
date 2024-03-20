@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { SearchTopicsComponent } from './search-topics.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SearchTopicsComponent} from './search-topics.component';
 
 describe('SearchTopicsComponent', () => {
   let component: SearchTopicsComponent;
@@ -8,9 +7,8 @@ describe('SearchTopicsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchTopicsComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchTopicsComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

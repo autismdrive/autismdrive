@@ -4,13 +4,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {scrollToFirstInvalidField} from '../../util/scrollToTop';
-import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
+import {AgeRange, Language} from '../_models/hit_type';
 import {Resource} from '../_models/resource';
 import {ResourceCategory} from '../_models/resource_category';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
-
 
 enum PageState {
   LOADING = 'loading',
@@ -20,7 +19,7 @@ enum PageState {
 @Component({
   selector: 'app-resource-form',
   templateUrl: './resource-form.component.html',
-  styleUrls: ['./resource-form.component.scss']
+  styleUrls: ['./resource-form.component.scss'],
 })
 export class ResourceFormComponent implements OnInit {
   resource: Resource;
@@ -39,9 +38,9 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Type',
         options: [
-          {'value': 'resource', 'label': 'Online Information'},
-          {'value': 'location', 'label': 'Local Services'},
-          {'value': 'event', 'label': 'Events and Training'},
+          {value: 'resource', label: 'Online Information'},
+          {value: 'location', label: 'Local Services'},
+          {value: 'event', label: 'Events and Training'},
         ],
         required: true,
       },
@@ -103,10 +102,10 @@ export class ResourceFormComponent implements OnInit {
         options: [
           {value: true, label: 'Autism DRIVE'},
           {value: false, label: 'External system'},
-        ]
+        ],
       },
       expressionProperties: {
-        'templateOptions.required': 'model.type === "event"'
+        'templateOptions.required': 'model.type === "event"',
       },
       hideExpression: 'model.type != "event"',
     },
@@ -138,7 +137,7 @@ export class ResourceFormComponent implements OnInit {
         label: 'Event Date',
       },
       expressionProperties: {
-        'templateOptions.required': 'model.type === "event"'
+        'templateOptions.required': 'model.type === "event"',
       },
       hideExpression: 'model.type != "event"',
     },
@@ -150,7 +149,7 @@ export class ResourceFormComponent implements OnInit {
         placeholder: 'Please enter the start time or time-frame for your event',
       },
       expressionProperties: {
-        'templateOptions.required': 'model.type === "event"'
+        'templateOptions.required': 'model.type === "event"',
       },
       hideExpression: 'model.type != "event"',
     },
@@ -171,7 +170,7 @@ export class ResourceFormComponent implements OnInit {
         placeholder: 'Please enter the link to attend the webinar',
       },
       hideExpression: 'model.type != "event"',
-      validators: {'validation': ['url']},
+      validators: {validation: ['url']},
     },
     {
       key: 'post_survey_link',
@@ -181,7 +180,7 @@ export class ResourceFormComponent implements OnInit {
         placeholder: 'Please enter the link to the post-event survey',
       },
       hideExpression: 'model.type != "event"',
-      validators: {'validation': ['url']},
+      validators: {validation: ['url']},
     },
     {
       key: 'max_users',
@@ -189,7 +188,7 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Maximum attendees',
         placeholder: 'Please enter the maximum number of users allowed to register',
-        type: 'number'
+        type: 'number',
       },
       hideExpression: 'model.type != "event"',
     },
@@ -217,20 +216,16 @@ export class ResourceFormComponent implements OnInit {
       templateOptions: {
         label: 'Contact Email',
       },
-      validators: {'validation': ['email']},
+      validators: {validation: ['email']},
       hideExpression: '!model.type',
       expressionProperties: {
         'templateOptions.description': (model, formState, field) => {
-          if (
-            model.type === 'event' &&
-            !model.includes_registration &&
-            !model.registration_link
-          ) {
+          if (model.type === 'event' && !model.includes_registration && !model.registration_link) {
             return 'This contact email will be used for attendees to request information about registering for this event.';
           } else {
             return 'This contact email will not be displayed on the site and is intended for admin use only';
           }
-        }
+        },
       },
     },
     {
@@ -295,7 +290,7 @@ export class ResourceFormComponent implements OnInit {
         placeholder: 'Please enter the phone number',
       },
       hideExpression: '!model.type',
-      validators: {'validation': ['phone']},
+      validators: {validation: ['phone']},
     },
     {
       key: 'phone_extension',
@@ -314,7 +309,7 @@ export class ResourceFormComponent implements OnInit {
         placeholder: 'Please enter the website',
       },
       hideExpression: '!model.type',
-      validators: {'validation': ['url']},
+      validators: {validation: ['url']},
     },
     {
       key: 'video_code',
@@ -335,7 +330,7 @@ export class ResourceFormComponent implements OnInit {
         options: [
           {value: true, label: 'Yes'},
           {value: false, label: 'No'},
-        ]
+        ],
       },
       hideExpression: '!model.type',
     },
@@ -381,12 +376,11 @@ export class ResourceFormComponent implements OnInit {
         options: [
           {value: true, label: 'Yes'},
           {value: false, label: 'No'},
-        ]
+        ],
       },
       hideExpression: '!model.type',
     },
   ];
-
 
   options: FormlyFormOptions;
 
@@ -399,8 +393,7 @@ export class ResourceFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
   }
 
   ngOnInit() {
@@ -412,7 +405,7 @@ export class ResourceFormComponent implements OnInit {
     const opts = [];
     for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {
-        opts.push({'value': key, 'label': modelLabels[key]});
+        opts.push({value: key, label: modelLabels[key]});
       }
     }
     return opts;
@@ -420,7 +413,6 @@ export class ResourceFormComponent implements OnInit {
 
   loadData() {
     this.route.params.subscribe(params => {
-
       if (params['resourceId'] && params['resourceType']) {
         const resourceId = params['resourceId'];
         const resourceType = params['resourceType'].charAt(0).toUpperCase() + params['resourceType'].slice(1);
@@ -435,7 +427,7 @@ export class ResourceFormComponent implements OnInit {
         this.createNew = true;
         this.model.createNew = true;
         this.model.categories = [];
-        this.resource = new Resource({'type': '', 'title': '', 'description': '', 'phone': '', 'website': ''});
+        this.resource = new Resource({type: '', title: '', description: '', phone: '', website: ''});
         this.loadForm();
       }
     });
@@ -457,8 +449,8 @@ export class ResourceFormComponent implements OnInit {
     this.form = new FormGroup({});
     this.options = {
       formState: {
-        mainModel: this.model
-      }
+        mainModel: this.model,
+      },
     };
     this.state = this.pageState.SHOW_FORM;
   }
@@ -472,7 +464,7 @@ export class ResourceFormComponent implements OnInit {
         selectedCategories.push({
           resource_id: resource_id,
           category_id: i,
-          type: this.model.type
+          type: this.model.type,
         });
       }
     });
@@ -544,7 +536,6 @@ export class ResourceFormComponent implements OnInit {
     this.model.is_draft = false;
     this.form.valid ? this.submit() : this.highlightRequiredFields();
   }
-
 
   highlightRequiredFields() {
     for (const fieldName of Object.keys(this.form.controls)) {

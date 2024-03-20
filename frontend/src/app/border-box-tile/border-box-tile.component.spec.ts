@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { BorderBoxTileComponent } from './border-box-tile.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {BorderBoxTileComponent} from './border-box-tile.component';
 
 describe('BorderBoxTileComponent', () => {
   let component: BorderBoxTileComponent;
@@ -8,9 +7,8 @@ describe('BorderBoxTileComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BorderBoxTileComponent ]
-    })
-    .compileComponents();
+      declarations: [BorderBoxTileComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

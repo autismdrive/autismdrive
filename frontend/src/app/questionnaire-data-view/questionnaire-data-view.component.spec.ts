@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { QuestionnaireDataViewComponent } from './questionnaire-data-view.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {QuestionnaireDataViewComponent} from './questionnaire-data-view.component';
 
 describe('QuestionnaireDataViewComponent', () => {
   let component: QuestionnaireDataViewComponent;
@@ -8,9 +7,8 @@ describe('QuestionnaireDataViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuestionnaireDataViewComponent ]
-    })
-    .compileComponents();
+      declarations: [QuestionnaireDataViewComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

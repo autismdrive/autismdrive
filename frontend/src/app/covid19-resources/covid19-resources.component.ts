@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {ApiService} from '../_services/api/api.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Covid19Categories} from '../_models/hit_type';
 import {Hit, Query} from '../_models/query';
 import {Resource} from '../_models/resource';
 import {User} from '../_models/user';
+import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 interface C19ResourceCategoryObj {
@@ -16,7 +16,7 @@ interface C19ResourceCategoryObj {
 @Component({
   selector: 'app-covid19-resources',
   templateUrl: './covid19-resources.component.html',
-  styleUrls: ['./covid19-resources.component.scss']
+  styleUrls: ['./covid19-resources.component.scss'],
 })
 export class Covid19ResourcesComponent implements OnInit {
   query: Query;
@@ -29,13 +29,13 @@ export class Covid19ResourcesComponent implements OnInit {
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
   ) {
     this.C19Categories = Object.keys(Covid19Categories.labels).map(k => {
       return {
         name: k,
         label: Covid19Categories.labels[k].split(': ')[0],
-        description: Covid19Categories.labels[k].split(': ')[1]
+        description: Covid19Categories.labels[k].split(': ')[1],
       };
     });
     this.route.params.subscribe(params => {
@@ -48,11 +48,10 @@ export class Covid19ResourcesComponent implements OnInit {
       }
     });
     this.loadResources();
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   loadResources() {
     this.api.getCovid19ResourcesByCategory(this.selectedCategory.name).subscribe(resources => {
@@ -66,23 +65,21 @@ export class Covid19ResourcesComponent implements OnInit {
     this.loadResources();
   }
 
-   private _resourcesToHits(resources: Resource[]): Hit[] {
-      return resources
-        .map(r => {
-          return new Hit({
-            id: r.id,
-            type: 'resource',
-            ages: r.ages,
-            title: r.title,
-            content: r.description,
-            description: r.description,
-            last_updated: r.last_updated,
-            highlights: null,
-            url: `/resource/${r.id}`,
-            label: 'Research Studies',
-            status: this.C19Categories.find(cat => r.covid19_categories.includes(cat.name)).label
-          });
-        });
+  private _resourcesToHits(resources: Resource[]): Hit[] {
+    return resources.map(r => {
+      return new Hit({
+        id: r.id,
+        type: 'resource',
+        ages: r.ages,
+        title: r.title,
+        content: r.description,
+        description: r.description,
+        last_updated: r.last_updated,
+        highlights: null,
+        url: `/resource/${r.id}`,
+        label: 'Research Studies',
+        status: this.C19Categories.find(cat => r.covid19_categories.includes(cat.name)).label,
+      });
+    });
   }
-
 }

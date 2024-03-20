@@ -1,8 +1,7 @@
 import {AppPage} from '../app-page.po';
 
 export class SearchUseCases {
-  constructor(private page: AppPage) {
-  }
+  constructor(private page: AppPage) {}
 
   async enterKeywordsInSearchField(keywordString = 'autism', autocomplete = true) {
     const searchFieldSelector = '#search-field input';
@@ -19,7 +18,10 @@ export class SearchUseCases {
     await this.page.waitForVisible(resultSelector);
 
     // Verify that type tabs and search results are displayed.
-    const numResultsBefore = parseInt(await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute), 10);
+    const numResultsBefore = parseInt(
+      await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute),
+      10,
+    );
     expect(numResultsBefore).toBeGreaterThan(0, 'Search results should be visible.');
     const numTypeTabsBefore = await this.page.getElements(typeTabSelector).count();
     expect(numTypeTabsBefore).toEqual(4, 'All type tabs should be present.');
@@ -52,13 +54,16 @@ export class SearchUseCases {
     }
 
     this.page.waitForVisible(resultSelector);
-    const numResultsAfter = parseInt(await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute), 10);
+    const numResultsAfter = parseInt(
+      await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute),
+      10,
+    );
     expect(numResultsAfter).toBeGreaterThan(0, 'Keyword search should return results.');
     expect(numResultsAfter).toBeLessThan(numResultsBefore, 'Keyword search should filter the results.');
 
     // First type tab should be selected.
     const numTypeTabsAfter = await this.page.getElements(typeTabSelector).count();
-    const numFirstTabSelectedAfter  = await this.page.getElements(activeFirstTabSelector).count();
+    const numFirstTabSelectedAfter = await this.page.getElements(activeFirstTabSelector).count();
     expect(numTypeTabsAfter).toEqual(numTypeTabsBefore, 'All type tabs should be present.');
     expect(numFirstTabSelectedAfter).toEqual(numFirstTabSelectedBefore, 'First type tab should be selected.');
 
@@ -245,8 +250,10 @@ export class SearchUseCases {
     this.page.waitForVisible(iconTypeSelector);
 
     if (showAll) {
-      expect(this.page.getElements(appliedFilterSelector).count())
-        .toEqual(0, 'Should not filter by type when All Resources tab is clicked.');
+      expect(this.page.getElements(appliedFilterSelector).count()).toEqual(
+        0,
+        'Should not filter by type when All Resources tab is clicked.',
+      );
     } else {
       expect(this.page.getElements(appliedFilterSelector).count()).toEqual(1, `Should filter by '${keepType}'`);
       const numAllResults = await this.page.getElements(iconSelector).count();

@@ -1,14 +1,14 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 import {Participant} from '../_models/participant';
 import {ParticipantRelationship} from '../_models/participantRelationship';
 import {ApiService} from '../_services/api/api.service';
-import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
 @Component({
   selector: 'app-avatar-dialog',
   templateUrl: './avatar-dialog.component.html',
-  styleUrls: ['./avatar-dialog.component.scss']
+  styleUrls: ['./avatar-dialog.component.scss'],
 })
 export class AvatarDialogComponent implements OnInit {
   avatarImages: string[] = [];
@@ -19,7 +19,7 @@ export class AvatarDialogComponent implements OnInit {
   constructor(
     private api: ApiService,
     public dialogRef: MatDialogRef<ParticipantProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { participant: Participant }
+    @Inject(MAT_DIALOG_DATA) public data: {participant: Participant},
   ) {
     for (let i = 0; i < 104; i++) {
       this.avatarImages[i] = (i + 1).toLocaleString('en', {minimumIntegerDigits: 3});
@@ -47,8 +47,7 @@ export class AvatarDialogComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   onNoClick(): void {
     this.dialogRef.close();

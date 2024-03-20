@@ -1,6 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { GroupValidationWrapperComponent } from './group-validation-wrapper.component';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {GroupValidationWrapperComponent} from './group-validation-wrapper.component';
 
 describe('GroupValidationWrapperComponent', () => {
   let component: GroupValidationWrapperComponent;
@@ -8,9 +7,8 @@ describe('GroupValidationWrapperComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GroupValidationWrapperComponent ]
-    })
-    .compileComponents();
+      declarations: [GroupValidationWrapperComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -1,6 +1,6 @@
-import { User } from './user';
-import {Resource} from './resource';
 import {Category} from './category';
+import {Resource} from './resource';
+import {User} from './user';
 
 export class UserFavorite {
   id: number;

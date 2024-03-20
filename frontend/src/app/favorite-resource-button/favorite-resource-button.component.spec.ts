@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FavoriteResourceButtonComponent } from './favorite-resource-button.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {FavoriteResourceButtonComponent} from './favorite-resource-button.component';
 
 describe('FavoriteButtonComponent', () => {
   let component: FavoriteResourceButtonComponent;
@@ -8,9 +7,8 @@ describe('FavoriteButtonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FavoriteResourceButtonComponent ]
-    })
-    .compileComponents();
+      declarations: [FavoriteResourceButtonComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

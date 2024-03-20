@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { TypeIconComponent } from './type-icon.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TypeIconComponent} from './type-icon.component';
 
 describe('TypeIconComponent', () => {
   let component: TypeIconComponent;
@@ -8,9 +7,8 @@ describe('TypeIconComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TypeIconComponent ]
-    })
-    .compileComponents();
+      declarations: [TypeIconComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

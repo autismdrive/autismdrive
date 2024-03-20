@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { SearchFiltersBreadcrumbsComponent } from './search-filters-breadcrumbs.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SearchFiltersBreadcrumbsComponent} from './search-filters-breadcrumbs.component';
 
 describe('SearchFiltersBreadcrumbsComponent', () => {
   let component: SearchFiltersBreadcrumbsComponent;
@@ -8,9 +7,8 @@ describe('SearchFiltersBreadcrumbsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchFiltersBreadcrumbsComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchFiltersBreadcrumbsComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,7 +1,7 @@
-import { ParticipantRelationship } from './participantRelationship';
-import { StepLog } from './step_log';
-import { ContactQ } from './contact_q';
-import { IdentificationQ } from './identification_q';
+import {ContactQ} from './contact_q';
+import {IdentificationQ} from './identification_q';
+import {ParticipantRelationship} from './participantRelationship';
+import {StepLog} from './step_log';
 
 export class Participant {
   id?: number;

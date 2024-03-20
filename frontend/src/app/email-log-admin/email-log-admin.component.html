@@ -1,8 +1,5 @@
 <div class="email-log-admin" *ngIf="currentUser && currentUser.role == 'admin'">
-  <div
-    class="spinner-container"
-    *ngIf="loading"
-  >
+  <div class="spinner-container" *ngIf="loading">
     <mat-spinner></mat-spinner>
   </div>
 
@@ -11,48 +8,42 @@
 
     <mat-form-field>
       <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event)">
+      <input matInput (keyup)="applyFilter($event)" />
     </mat-form-field>
 
-    <mat-table
-      [dataSource]="dataSource"
-      class="mat-elevation-z8"
-      matSort
-      matSortActive="id"
-      matSortDirection="asc"
-    >
+    <mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort matSortActive="id" matSortDirection="asc">
       <ng-container matColumnDef="id">
         <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.id }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="user_id">
         <mat-header-cell *matHeaderCellDef mat-sort-header> User ID </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.user_id}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.user_id }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="type">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.type }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="viewed">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Viewed </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.viewed}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.viewed }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="date_viewed">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Date Viewed </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.date_viewed | date:'short'}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.date_viewed | date: 'short' }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="last_updated">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Date Sent </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.last_updated | date:'short'}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.last_updated | date: 'short' }} </mat-cell>
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
     </mat-table>
   </div>
 </div>

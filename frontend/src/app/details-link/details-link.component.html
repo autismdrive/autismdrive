@@ -1,27 +1,27 @@
 <a
   *ngIf="!externalLink"
   [routerLink]="[url]"
-  [ngClass]="{'hover': hover || shouldHover, 'selected': selected, 'inverted': inverted, 'all-caps': allCaps}"
+  [ngClass]="{hover: hover || shouldHover, selected: selected, inverted: inverted, 'all-caps': allCaps}"
   (mouseenter)="onMouseOver()"
   (mouseleave)="onMouseOut()"
 >
-  <i class="icofont-circled-right icofont-{{size}}x details-link-icon"></i>
-  <span class="details-link-text-{{size}}x">
-    {{label}}
-    <span class="muted" *ngIf="subtitle">{{subtitle}}</span>
+  <i class="icofont-circled-right icofont-{{ size }}x details-link-icon"></i>
+  <span class="details-link-text-{{ size }}x">
+    {{ label }}
+    <span class="muted" *ngIf="subtitle">{{ subtitle }}</span>
   </span>
 </a>
 <a
   *ngIf="externalLink"
   [href]="url"
-  [ngClass]="{'hover': hover || shouldHover, 'selected': selected, 'inverted': inverted, 'all-caps': allCaps}"
+  [ngClass]="{hover: hover || shouldHover, selected: selected, inverted: inverted, 'all-caps': allCaps}"
   (mouseenter)="onMouseOver()"
   (mouseleave)="onMouseOut()"
   target="_blank"
 >
-  <i class="icofont-circled-right icofont-{{size}}x details-link-icon"></i>
-  <span class="details-link-text-{{size}}x">
-    {{label}}
-    <span class="muted" *ngIf="subtitle">{{subtitle}}</span>
+  <i class="icofont-circled-right icofont-{{ size }}x details-link-icon"></i>
+  <span class="details-link-text-{{ size }}x">
+    {{ label }}
+    <span class="muted" *ngIf="subtitle">{{ subtitle }}</span>
   </span>
 </a>

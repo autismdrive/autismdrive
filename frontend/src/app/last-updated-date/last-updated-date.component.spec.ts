@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { LastUpdatedDateComponent } from './last-updated-date.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {LastUpdatedDateComponent} from './last-updated-date.component';
 
 describe('LastUpdatedDateComponent', () => {
   let component: LastUpdatedDateComponent;
@@ -8,9 +7,8 @@ describe('LastUpdatedDateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LastUpdatedDateComponent ]
-    })
-    .compileComponents();
+      declarations: [LastUpdatedDateComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

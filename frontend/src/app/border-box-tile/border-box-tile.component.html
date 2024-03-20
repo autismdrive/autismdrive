@@ -1,24 +1,25 @@
 <div
-  class="border-box-tile border-box-tile-{{linkSize}}x {{iconType}}"
+  class="border-box-tile border-box-tile-{{ linkSize }}x {{ iconType }}"
   (mouseover)="hover = true"
   (mouseout)="hover = false"
 >
   <div
     [ngClass]="{
       'border-box-tile-inner': true,
-      'selected': isSelected === true,
-      'deselected': isSelected === false,
-      'hover': hover
+      selected: isSelected === true,
+      deselected: isSelected === false,
+      hover: hover
     }"
   >
-    <app-type-icon
-      *ngIf="iconType"
-      [iconType]="iconType"
-      [size]="iconSize"
-    ></app-type-icon>
-    <div *ngIf="title" class="border-box-tile-label border-box-tile-label-{{linkSize}}x">{{title}}</div>
-    <p *ngIf="subtitle" class="intro">{{subtitle}}</p>
-    <app-details-link [url]="url" [label]="linkLabel" [size]="linkSize" [hover]="hover" [selected]="isSelected"></app-details-link>
+    <app-type-icon *ngIf="iconType" [iconType]="iconType" [size]="iconSize"></app-type-icon>
+    <div *ngIf="title" class="border-box-tile-label border-box-tile-label-{{ linkSize }}x">{{ title }}</div>
+    <p *ngIf="subtitle" class="intro">{{ subtitle }}</p>
+    <app-details-link
+      [url]="url"
+      [label]="linkLabel"
+      [size]="linkSize"
+      [hover]="hover"
+      [selected]="isSelected"
+    ></app-details-link>
   </div>
 </div>
-

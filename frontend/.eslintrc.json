@@ -1,0 +1,77 @@
+{
+  "root": true,
+  "ignorePatterns": ["projects/**/*", "dist/**/*", "*.min.*"],
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "parserOptions": {
+        "ecmaVersion": 2020
+      },
+      "env": {
+        "es6": true
+      },
+      "extends": ["plugin:prettier/recommended"]
+    },
+    {
+      "files": ["*.json"],
+      "extends": ["plugin:json/recommended", "plugin:prettier/recommended"]
+    },
+    {
+      "files": ["cypress/**/*.ts"],
+      "plugins": ["cypress"],
+      "extends": ["plugin:cypress/recommended", "plugin:chai-friendly/recommended"]
+    },
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["tsconfig.json"],
+        "createDefaultProgram": true,
+        "ecmaVersion": 2020,
+        "sourceType": "module"
+      },
+      "extends": [
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:prettier/recommended"
+      ],
+      "rules": {
+        "@angular-eslint/component-selector": [
+          "warn",
+          {
+            "prefix": "app",
+            "style": "kebab-case",
+            "type": "element"
+          }
+        ],
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "prefix": "app",
+            "style": "camelCase",
+            "type": "attribute"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended"],
+      "rules": {
+        "@angular-eslint/template/no-duplicate-attributes": "error"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "excludedFiles": ["*inline-template-*.component.html"],
+      "extends": ["plugin:prettier/recommended"],
+      "rules": {
+        "prettier/prettier": [
+          "error",
+          {
+            "parser": "angular"
+          }
+        ]
+      }
+    }
+  ]
+}

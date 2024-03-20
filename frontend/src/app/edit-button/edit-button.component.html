@@ -1,11 +1,5 @@
 <div *ngIf="currentUser && currentUser.permissions.includes('edit_resource' || 'edit_study')">
-  <button
-    mat-mini-fab
-    color="accent"
-    matTooltip={{editLabel}}
-    (click)="openEdit()"
-    aria-label="Edit"
-  >
+  <button mat-mini-fab color="accent" matTooltip="{{ editLabel }}" (click)="openEdit()" aria-label="Edit">
     <mat-icon>edit</mat-icon>
   </button>
 </div>

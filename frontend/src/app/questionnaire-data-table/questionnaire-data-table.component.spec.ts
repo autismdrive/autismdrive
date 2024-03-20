@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { QuestionnaireDataTableComponent } from './questionnaire-data-table.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {QuestionnaireDataTableComponent} from './questionnaire-data-table.component';
 
 describe('QuestionnaireDataTableComponent', () => {
   let component: QuestionnaireDataTableComponent;
@@ -8,9 +7,8 @@ describe('QuestionnaireDataTableComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuestionnaireDataTableComponent ]
-    })
-    .compileComponents();
+      declarations: [QuestionnaireDataTableComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

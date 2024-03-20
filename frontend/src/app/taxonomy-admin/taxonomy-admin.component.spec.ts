@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { TaxonomyAdminComponent } from './taxonomy-admin.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TaxonomyAdminComponent} from './taxonomy-admin.component';
 
 describe('TaxonomyAdminComponent', () => {
   let component: TaxonomyAdminComponent;
@@ -8,9 +7,8 @@ describe('TaxonomyAdminComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TaxonomyAdminComponent ]
-    })
-    .compileComponents();
+      declarations: [TaxonomyAdminComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

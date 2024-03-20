@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AdminNoteFormComponent } from './admin-note-form.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AdminNoteFormComponent} from './admin-note-form.component';
 
 describe('AdminNoteFormComponent', () => {
   let component: AdminNoteFormComponent;
@@ -8,9 +7,8 @@ describe('AdminNoteFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AdminNoteFormComponent ]
-    })
-    .compileComponents();
+      declarations: [AdminNoteFormComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ResourceDetailComponent } from './resource-detail.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ResourceDetailComponent} from './resource-detail.component';
 
 describe('ResourceDetailComponent', () => {
   let component: ResourceDetailComponent;
@@ -8,9 +7,8 @@ describe('ResourceDetailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ResourceDetailComponent ]
-    })
-    .compileComponents();
+      declarations: [ResourceDetailComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

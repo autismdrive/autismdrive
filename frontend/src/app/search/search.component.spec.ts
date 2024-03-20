@@ -19,14 +19,12 @@ describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
 
-  beforeEach(waitForAsync(() => {
-    const route: Route = {path: 'search', component: SearchComponent, data: {title: 'Search Resources'}};
+  beforeEach(
+    waitForAsync(() => {
+      const route: Route = {path: 'search', component: SearchComponent, data: {title: 'Search Resources'}};
 
-    TestBed
-      .configureTestingModule({
-        declarations: [
-          SearchComponent,
-        ],
+      TestBed.configureTestingModule({
+        declarations: [SearchComponent],
         imports: [
           BrowserAnimationsModule,
           MatExpansionModule,
@@ -38,25 +36,26 @@ describe('SearchComponent', () => {
           MatSidenavModule,
           MatTooltipModule,
           ReactiveFormsModule,
-          RouterTestingModule.withRoutes([route])
+          RouterTestingModule.withRoutes([route]),
         ],
         providers: [
           {
             provide: ActivatedRoute,
             useValue: {
               queryParamMap: observableOf({query: '', keys: []}),
-            }
+            },
           },
         ],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
       })
-      .compileComponents()
-      .then(() => {
-        fixture = TestBed.createComponent(SearchComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-      });
-  }));
+        .compileComponents()
+        .then(() => {
+          fixture = TestBed.createComponent(SearchComponent);
+          component = fixture.componentInstance;
+          fixture.detectChanges();
+        });
+    }),
+  );
 
   it('should create', () => {
     expect(component).toBeTruthy();

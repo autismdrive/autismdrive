@@ -1,17 +1,9 @@
 <div class="userList">
-
   <mat-form-field>
-    <input
-      matInput
-      placeholder="Search Users"
-      #input
-    >
+    <input matInput placeholder="Search Users" #input />
   </mat-form-field>
 
-  <div
-    class="spinner-container"
-    *ngIf="dataSource.loading$ | async"
-  >
+  <div class="spinner-container" *ngIf="dataSource.loading$ | async">
     <mat-spinner></mat-spinner>
   </div>
 
@@ -23,139 +15,68 @@
     matSortDirection="asc"
     matSortDisableClear
   >
-
-
     <ng-container matColumnDef="id">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >ID</mat-header-cell>
-      <mat-cell
-        class="id-cell"
-        *matCellDef="let user"
-      >{{user.id}}
-      </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>ID</mat-header-cell>
+      <mat-cell class="id-cell" *matCellDef="let user">{{ user.id }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="role">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Role</mat-header-cell>
-      <mat-cell
-        class="role-cell"
-        *matCellDef="let user"
-      >{{user.role}}
-      </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Role</mat-header-cell>
+      <mat-cell class="role-cell" *matCellDef="let user">{{ user.role }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="registration_date">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Account Creation Date</mat-header-cell>
-      <mat-cell
-        class="role-cell"
-        *matCellDef="let user"
-      >{{user.registration_date | date:'short'}}
-      </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Account Creation Date</mat-header-cell>
+      <mat-cell class="role-cell" *matCellDef="let user">{{ user.registration_date | date: 'short' }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="last_updated">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Last Updated</mat-header-cell>
-      <mat-cell
-        class="role-cell"
-        *matCellDef="let user"
-      >{{user.last_updated | date:'short'}}
-      </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Last Updated</mat-header-cell>
+      <mat-cell class="role-cell" *matCellDef="let user">{{ user.last_updated | date: 'short' }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="last_login">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Last Login</mat-header-cell>
-      <mat-cell
-        class="role-cell"
-        *matCellDef="let user"
-      >{{user.last_login | date:'short'}}
-      </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Last Login</mat-header-cell>
+      <mat-cell class="role-cell" *matCellDef="let user">{{ user.last_login | date: 'short' }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="email">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Email</mat-header-cell>
-      <mat-cell
-        class="email-cell"
-        *matCellDef="let user"
-      >{{user.email}}
-      </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
+      <mat-cell class="email-cell" *matCellDef="let user">{{ user.email }} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="participant_count">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Number of Participants</mat-header-cell>
-      <mat-cell
-        class="participants-cell"
-        *matCellDef="let user"
-      >
-        {{user.participant_count}}
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Number of Participants</mat-header-cell>
+      <mat-cell class="participants-cell" *matCellDef="let user">
+        {{ user.participant_count }}
       </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="created_password">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Created Password</mat-header-cell>
-      <mat-cell
-        *matCellDef="let user"
-      >
-        {{user.created_password}}
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Created Password</mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.created_password }}
       </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="identity">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Identity</mat-header-cell>
-      <mat-cell
-        *matCellDef="let user"
-      >
-        {{user.identity}}
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Identity</mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.identity }}
       </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="percent_self_registration_complete">
-      <mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header
-      >Percent Self Registration Complete</mat-header-cell>
-      <mat-cell
-        *matCellDef="let user"
-      >
-        {{user.percent_self_registration_complete | percent}}
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Percent Self Registration Complete</mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.percent_self_registration_complete | percent }}
       </mat-cell>
     </ng-container>
 
-
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 
-    <mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      (click)="onRowClicked(row)"
-      id="user_row_{{row.id}}"
-    >
+    <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClicked(row)" id="user_row_{{ row.id }}">
     </mat-row>
-
   </mat-table>
 
   <mat-paginator

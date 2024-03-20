@@ -1,9 +1,6 @@
-<div
-  [class]="'search-bar ' + variant"
-  fxLayout="column"
->
+<div [class]="'search-bar ' + variant" fxLayout="column">
   <div
-    *ngIf="searchInput.value!='Search for Autism Resources'"
+    *ngIf="searchInput.value != 'Search for Autism Resources'"
     class="search-bar-header"
     fxLayout="row wrap"
     fxLayoutAlign="center center"
@@ -27,7 +24,7 @@
         [formControl]="searchBoxControl"
         [matAutocomplete]="auto"
         (click)="openAutocompletePanel($event)"
-      >
+      />
       <mat-autocomplete
         #auto="matAutocomplete"
         #autocompletePanel
@@ -35,10 +32,9 @@
         (optionSelected)="selectCategory($event)"
         [displayWith]="optionText"
       >
-        <mat-option
-          *ngFor="let option of filteredOptions | async"
-          [value]="option"
-        >{{optionText(option)}}</mat-option>
+        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">{{
+          optionText(option)
+        }}</mat-option>
       </mat-autocomplete>
       <div matSuffix fxLayout="row">
         <button
@@ -46,16 +42,13 @@
           matSuffix
           fxHide
           [fxShow]="hasWords"
-          [ngClass]="{'btn-cancel': true, 'hidden': !hasWords}"
+          [ngClass]="{'btn-cancel': true, hidden: !hasWords}"
           (click)="updateSearch(true)"
-        ><mat-icon>cancel</mat-icon>
+        >
+          <mat-icon>cancel</mat-icon>
         </button>
-        <button
-          mat-icon-button
-          matSuffix
-          (click)="updateSearch(false)"
-          [ngClass]="{'btn-search': true}"
-        ><mat-icon>search</mat-icon>
+        <button mat-icon-button matSuffix (click)="updateSearch(false)" [ngClass]="{'btn-search': true}">
+          <mat-icon>search</mat-icon>
         </button>
       </div>
     </mat-form-field>
@@ -65,6 +58,8 @@
       [fxHide]="!videoIsVisible"
       (click)="showVideo()"
       matTooltip="Watch a video with tips about resources"
-    ><mat-icon>ondemand_video</mat-icon></button>
+    >
+      <mat-icon>ondemand_video</mat-icon>
+    </button>
   </div>
 </div>

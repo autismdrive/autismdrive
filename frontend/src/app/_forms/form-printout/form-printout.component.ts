@@ -9,13 +9,12 @@ interface SelectFieldOption {
 @Component({
   selector: 'app-form-printout',
   templateUrl: './form-printout.component.html',
-  styleUrls: ['./form-printout.component.scss']
+  styleUrls: ['./form-printout.component.scss'],
 })
 export class FormPrintoutComponent {
   @Input() field: FormlyFieldConfig;
 
-  constructor() {
-  }
+  constructor() {}
 
   getModelValue(key: string) {
     let val = this.field.model[key];
@@ -53,7 +52,6 @@ export class FormPrintoutComponent {
       const parentVal = this.field.model[parentKey];
       return this._isOther(parentVal) || otherPattern.test(parentVal) ? val : null;
     } else {
-
       // It's a human-readable value. Just return it now, unless the value is "Other".
       return this._isOther(val) ? null : val;
     }
@@ -62,6 +60,4 @@ export class FormPrintoutComponent {
   private _isOther(value: string): boolean {
     return value && typeof value === 'string' && value.toLowerCase() === 'other';
   }
-
-
 }

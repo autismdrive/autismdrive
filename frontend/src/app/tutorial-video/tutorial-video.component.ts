@@ -9,7 +9,7 @@ import ShowInfo = YT.ShowInfo;
 @Component({
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
-  styleUrls: ['./tutorial-video.component.scss']
+  styleUrls: ['./tutorial-video.component.scss'],
 })
 export class TutorialVideoComponent implements OnInit {
   @Input() videoSize: string;
@@ -23,8 +23,7 @@ export class TutorialVideoComponent implements OnInit {
     showinfo: ShowInfo.Hide,
   };
 
-  constructor() {
-  }
+  constructor() {}
 
   get windowWidthFactor(): number {
     const windowWidthPx = window.innerWidth;
@@ -61,8 +60,7 @@ export class TutorialVideoComponent implements OnInit {
     return Math.floor(baseSize * this.videoWidthFactor * this.windowWidthFactor);
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   hideVideo() {
     localStorage.setItem('shouldHideTutorialVideo', 'true');

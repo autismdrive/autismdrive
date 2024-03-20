@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PasswordResetComponent } from './password-reset.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {PasswordResetComponent} from './password-reset.component';
 
 describe('PasswordResetComponent', () => {
   let component: PasswordResetComponent;
@@ -8,9 +7,8 @@ describe('PasswordResetComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PasswordResetComponent ]
-    })
-    .compileComponents();
+      declarations: [PasswordResetComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

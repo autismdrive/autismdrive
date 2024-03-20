@@ -6,7 +6,7 @@ import {
   Input,
   OnInit,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
@@ -22,7 +22,7 @@ import {SearchService} from '../_services/search/search.service';
 @Component({
   selector: 'app-search-box',
   templateUrl: './search-box.component.html',
-  styleUrls: ['./search-box.component.scss']
+  styleUrls: ['./search-box.component.scss'],
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {
   @Input() variant: string;
@@ -44,17 +44,11 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     private searchService: SearchService,
     private api: ApiService,
     private categoryService: CategoriesService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
-    this.route
-      .queryParams
-      .pipe(debounce(() => timer(1000)))
-      .subscribe(qp => this.queryParams = qp);
+    this.route.queryParams.pipe(debounce(() => timer(1000))).subscribe(qp => (this.queryParams = qp));
 
-    this.searchUpdate.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    ).subscribe(() => this.updateSearch(false));
+    this.searchUpdate.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => this.updateSearch(false));
   }
 
   get videoIsVisible(): boolean {
@@ -77,23 +71,18 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   }
 
   get hasWords(): boolean {
-    return !!(
-      this.searchInputElement &&
-      this.searchInputElement.value &&
-      (this.searchInputElement.value.length > 0)
-    );
+    return !!(this.searchInputElement && this.searchInputElement.value && this.searchInputElement.value.length > 0);
   }
 
   ngOnInit() {
-    this.filteredOptions = this.searchBoxControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(value))
-      );
+    this.filteredOptions = this.searchBoxControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value)),
+    );
   }
 
   ngAfterViewInit() {
-        this.searchInputElement.value = this.words;
+    this.searchInputElement.value = this.words;
   }
 
   optionText(option: Category) {
@@ -101,7 +90,6 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   }
 
   updateSearch(removeWords: boolean): Promise<boolean> {
-
     if (this.skipUpdate) {
       // Stupid hack to prevent submitting a keyword search when the user is selecting
       // a topic from the autocomplete panel.
@@ -115,7 +103,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     }
 
     const newParams = JSON.parse(JSON.stringify(this.queryParams));
-    const words: string = this.searchInputElement && this.searchInputElement.value || '';
+    const words: string = (this.searchInputElement && this.searchInputElement.value) || '';
     newParams.words = removeWords ? undefined : words;
     newParams.pageStart = 0;
 
@@ -126,13 +114,15 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     const hasFilters = Object.keys(newParams).length > 0;
 
     if (hasFilters) {
-      return this.router.navigate(['/search'], {
-        relativeTo: this.route,
-        queryParams: newParams,
-      }).finally(() => {
-        this.searchUpdated.emit(newParams);
-        this.changeDetectorRef.detectChanges();
-      });
+      return this.router
+        .navigate(['/search'], {
+          relativeTo: this.route,
+          queryParams: newParams,
+        })
+        .finally(() => {
+          this.searchUpdated.emit(newParams);
+          this.changeDetectorRef.detectChanges();
+        });
     } else {
       return this.router.navigateByUrl('/search').finally(() => this.searchUpdated.emit(newParams));
     }
@@ -175,19 +165,12 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
 
   private _filter(value: string): Category[] {
     if (value && value.length > 0) {
-      const words = value
-        .replace(/\W+/gi, ' ')
-        .toLowerCase()
-        .split(' ');
+      const words = value.replace(/\W+/gi, ' ').toLowerCase().split(' ');
       const patternString = words.map(w => `(?=.*${w})`).join('');
       const filterPattern = new RegExp(patternString, 'gi');
-      return this.categoryService.categoryList
-        .filter(option => {
-          return (
-            (option.all_resource_count > 0) &&
-            filterPattern.test(option.indentedString)
-          );
-        });
+      return this.categoryService.categoryList.filter(option => {
+        return option.all_resource_count > 0 && filterPattern.test(option.indentedString);
+      });
     } else {
       return this.categoryService.categoryList;
     }

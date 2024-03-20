@@ -1,5 +1,5 @@
 export const URL_REGEX = new RegExp(
-    '^' +
+  '^' +
     '(?:(?:https?|ftp)://)' +
     '(?:\\S+(?::\\S*)?@)?' +
     '(?:' +
@@ -17,7 +17,8 @@ export const URL_REGEX = new RegExp(
     ')' +
     '(?::\\d{2,5})?' +
     '(?:[/?#]\\S*)?' +
-    '$', 'i'
-  );
+    '$',
+  'i',
+);
 
 export default URL_REGEX;

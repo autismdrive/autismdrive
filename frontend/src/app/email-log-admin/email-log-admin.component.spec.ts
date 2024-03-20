@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { EmailLogAdminComponent } from './email-log-admin.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {EmailLogAdminComponent} from './email-log-admin.component';
 
 describe('EmailLogAdminComponent', () => {
   let component: EmailLogAdminComponent;
@@ -8,9 +7,8 @@ describe('EmailLogAdminComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EmailLogAdminComponent ]
-    })
-    .compileComponents();
+      declarations: [EmailLogAdminComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

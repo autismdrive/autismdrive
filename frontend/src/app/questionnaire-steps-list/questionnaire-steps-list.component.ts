@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { ApiService } from '../_services/api/api.service';
-import { Flow } from '../_models/flow';
-import { Step } from '../_models/step';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Flow} from '../_models/flow';
+import {Step} from '../_models/step';
+import {ApiService} from '../_services/api/api.service';
 
 @Component({
   selector: 'app-questionnaire-steps-list',
@@ -15,8 +15,7 @@ export class QuestionnaireStepsListComponent implements OnInit, OnChanges {
   stepSelected: EventEmitter<Step> = new EventEmitter();
   stepName: string;
 
-  constructor(private api: ApiService) {
-  }
+  constructor(private api: ApiService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.stepName = this.flow.steps[this.stepIndex].name;
@@ -30,5 +29,4 @@ export class QuestionnaireStepsListComponent implements OnInit, OnChanges {
     this.stepName = step.name;
     this.stepSelected.emit(step);
   }
-
 }

@@ -1,5 +1,5 @@
-import { StudyCategory } from './study_category';
-import { StudyInvestigator } from './study_investigator';
+import {StudyCategory} from './study_category';
+import {StudyInvestigator} from './study_investigator';
 
 export enum StudyStatus {
   currently_enrolling = 'Currently enrolling',

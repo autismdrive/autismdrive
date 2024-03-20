@@ -1,48 +1,13 @@
-<div
-  id="hero"
-  class="gradient-overlay container with-escaping-tiles"
->
-  <div
-    class="hero-content"
-    fxLayoutAlign="center"
-    class="row escaping-tiles-2x"
-    id="TopOfJoin"
-  >
+<div id="hero" class="gradient-overlay container with-escaping-tiles">
+  <div class="hero-content" fxLayoutAlign="center" class="row escaping-tiles-2x" id="TopOfJoin">
     <div class="form border-box">
       <h1>Join Autism DRIVE</h1>
-      <form
-        [formGroup]="form"
-        (ngSubmit)="submit()"
-      >
-        <formly-form
-          [form]="form"
-          [fields]="fields"
-          [model]="model"
-          *ngIf="registerStateValue !== 'wait_for_email'"
-        >
-          <div
-            id="error_message"
-            class="display mat-error"
-            *ngIf="errorMessage"
-          >{{errorMessage}}</div>
-          <footer
-            fxLayout="column"
-            fxLayoutGap="2%"
-            fxLayoutAlign="center"
-            *ngIf="registerStateValue === 'form'"
-          >
-            <button
-              mat-flat-button
-              type="submit"
-              color="primary"
-              id="submit"
-            >Next</button>
-            <button
-              mat-flat-button
-              (click)="goHome($event)"
-              color="accent"
-              id="cancel"
-            >Cancel</button>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <formly-form [form]="form" [fields]="fields" [model]="model" *ngIf="registerStateValue !== 'wait_for_email'">
+          <div id="error_message" class="display mat-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+          <footer fxLayout="column" fxLayoutGap="2%" fxLayoutAlign="center" *ngIf="registerStateValue === 'form'">
+            <button mat-flat-button type="submit" color="primary" id="submit">Next</button>
+            <button mat-flat-button (click)="goHome($event)" color="accent" id="cancel">Cancel</button>
           </footer>
           <footer *ngIf="registerStateValue === 'submitting'">
             <app-loading></app-loading>
@@ -51,41 +16,35 @@
         <footer *ngIf="registerStateValue === 'wait_for_email'" id="confirmation_message">
           <h2>Account Created!</h2>
           <p>Please check your email to complete the signin process.</p>
-          <button
-            color="primary"
-            (click)="goHome($event)"
-            mat-flat-button
-            id="continue"
-          >
-            Continue to browse
-          </button>
+          <button color="primary" (click)="goHome($event)" mat-flat-button id="continue">Continue to browse</button>
         </footer>
       </form>
     </div>
   </div>
 </div>
 <div class="register-container">
-  <div
-    class="row mat-typography"
-    fxLayout="column"
-    fxLayoutGap="10px"
-    fxFlex.gt-md="80%"
-  >
+  <div class="row mat-typography" fxLayout="column" fxLayoutGap="10px" fxFlex.gt-md="80%">
     <div>
-      <h1 class="bold-title">The more people take part in autism research, the faster we can promote positive outcomes</h1>
-      <p>We are seeking adults with autism, children with autism and their families, and professionals to join us! If you complete our short registration process, you can be connected with researchers about
-        study opportunities that <i>are relevant to you.</i>
+      <h1 class="bold-title">
+        The more people take part in autism research, the faster we can promote positive outcomes
+      </h1>
+      <p>
+        We are seeking adults with autism, children with autism and their families, and professionals to join us! If you
+        complete our short registration process, you can be connected with researchers about study opportunities that
+        <i>are relevant to you.</i>
       </p>
     </div>
     <div>
       <h2>Many studies involve incentives like gift cards, testing reports, or access to interventions for free.</h2>
-      <p>Visit our <a href="/#/studies">studies page</a> and contact the study teams to learn more about what each study offers. Creating an account also gives you free access to content of our <a href="/#/uva-education">education</a> page and
-        the opportunity to save your favorite resources from our <a href="/#/search">statewide resources directory.</a>
+      <p>
+        Visit our <a href="/#/studies">studies page</a> and contact the study teams to learn more about what each study
+        offers. Creating an account also gives you free access to content of our
+        <a href="/#/uva-education">education</a> page and the opportunity to save your favorite resources from our
+        <a href="/#/search">statewide resources directory.</a>
       </p>
     </div>
     <div>
       <h2>We can’t make a difference without you. Let’s transform outcomes. Together.</h2>
     </div>
   </div>
-
 </div>

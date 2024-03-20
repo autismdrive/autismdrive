@@ -1,4 +1,4 @@
-import { Participant } from './participant';
+import {Participant} from './participant';
 
 export interface ParticipantAdminList {
   num_self_participants: number;

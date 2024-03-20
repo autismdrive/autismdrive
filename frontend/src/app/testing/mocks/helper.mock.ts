@@ -21,8 +21,8 @@ export class SpyObject {
     }
 
     const m = {};
-    Object.keys(config).forEach((key) => m[key] = config[key]);
-    Object.keys(overrides).forEach((key) => m[key] = overrides[key]);
+    Object.keys(config).forEach(key => (m[key] = config[key]));
+    Object.keys(overrides).forEach(key => (m[key] = overrides[key]));
     for (const key in m) {
       if (m.hasOwnProperty(key)) {
         object.spy(key).andReturn(m[key]);
@@ -59,7 +59,9 @@ export class SpyObject {
     return this[name];
   }
 
-  prop(name, value) { this[name] = value; }
+  prop(name, value) {
+    this[name] = value;
+  }
 
   /** @internal */
   _createSDSpy(name): SDSpy {

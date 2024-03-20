@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AdminNoteDisplayComponent } from './admin-note-display.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AdminNoteDisplayComponent} from './admin-note-display.component';
 
 describe('AdminNoteDisplayComponent', () => {
   let component: AdminNoteDisplayComponent;
@@ -8,9 +7,8 @@ describe('AdminNoteDisplayComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AdminNoteDisplayComponent ]
-    })
-    .compileComponents();
+      declarations: [AdminNoteDisplayComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

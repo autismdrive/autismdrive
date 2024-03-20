@@ -50,9 +50,11 @@ describe('Admin', () => {
   it('should display admin link', () => globalHeaderUseCases.displayAdminLink());
   it('should navigate to admin screen', () => adminUseCases.navigateToAdmin());
   it('should navigate to user admin tab', () => adminUseCases.navigateToTab('#user-admin', '.users-table'));
-  it('should navigate to participant admin tab', () => adminUseCases.navigateToTab('#participant-admin', '.participant-admin'));
+  it('should navigate to participant admin tab', () =>
+    adminUseCases.navigateToTab('#participant-admin', '.participant-admin'));
   it('should navigate to taxonomy admin tab', () => adminUseCases.navigateToTab('#taxonomy-admin', '.taxonomy-admin'));
-  it('should navigate to import/export status tab', () => adminUseCases.navigateToTab('#import-export-status', '.logs'));
+  it('should navigate to import/export status tab', () =>
+    adminUseCases.navigateToTab('#import-export-status', '.logs'));
   it('should navigate to email log tab', () => adminUseCases.navigateToTab('#email-log', '.email-log-admin'));
   it('should navigate to data admin tab', () => adminUseCases.navigateToTab('#data-admin', '.data-list'));
   it('should export all questionnaire data');
@@ -82,7 +84,6 @@ describe('Admin', () => {
   it('should save and be directed to the study detail page');
   it('should click and open the study form');
   it('should delete and be directed to studies');
-
 
   // Log out
   it('should log out', () => loginUseCases.logout());

@@ -1,8 +1,7 @@
 import {AppPage} from '../app-page.po';
 
 export class StudiesUseCases {
-  constructor(private page: AppPage) {
-  }
+  constructor(private page: AppPage) {}
 
   navigateToStudiesPage() {
     this.page.clickLinkToVariation('/studies');
@@ -23,7 +22,7 @@ export class StudiesUseCases {
     await this.filterBy(selectStatus);
     const selectedStatus = this.page.getElement('data-study-status');
     expect(selectedStatus).toBeTruthy();
-    if (!selectStatus || (selectStatus && (selectStatus === await selectedStatus))) {
+    if (!selectStatus || (selectStatus && selectStatus === (await selectedStatus))) {
       this.filterBy(selectStatus);
       await this.checkResultsMatchStatus(selectStatus);
     }
@@ -43,7 +42,9 @@ export class StudiesUseCases {
       });
     } else {
       // Check that the "no results" message matches the selected status
-      return expect(this.page.getElement('p[data-study-status]').getAttribute('data-study-status')).toEqual(selectedStatus);
+      return expect(this.page.getElement('p[data-study-status]').getAttribute('data-study-status')).toEqual(
+        selectedStatus,
+      );
     }
   }
 }

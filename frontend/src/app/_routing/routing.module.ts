@@ -20,7 +20,6 @@ import {RegisterComponent} from '../register/register.component';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
 import {ResourceFormComponent} from '../resource-form/resource-form.component';
 import {SearchComponent} from '../search/search.component';
-import {SkillstarAdminComponent} from '../skillstar-admin/skillstar-admin.component';
 import {StudiesComponent} from '../studies/studies.component';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
 import {StudyFormComponent} from '../study-form/study-form.component';
@@ -41,41 +40,42 @@ const routes: Routes = [
     path: 'uva-education',
     component: UvaEducationComponent,
     data: {title: 'Autism DRIVE UVA Education'},
-    canActivate: [NotMirroredGuard]
+    canActivate: [NotMirroredGuard],
   },
   {
     path: 'about',
     component: AboutComponent,
     data: {title: 'About Autism DRIVE'},
-    canActivate: [NotMirroredGuard]
+    canActivate: [NotMirroredGuard],
   },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
-    data: {title: 'Log in to Autism DRIVE', hideHeader: true}
+    data: {title: 'Log in to Autism DRIVE', hideHeader: true},
   },
   {path: 'login', component: LoginComponent, data: {title: 'Log in to Autism DRIVE', hideHeader: true}},
   {
-    path: 'reset_password/:role/:email_token', component: PasswordResetComponent,
-    data: {title: 'Reset your Autism DRIVE password', hideHeader: true}
+    path: 'reset_password/:role/:email_token',
+    component: PasswordResetComponent,
+    data: {title: 'Reset your Autism DRIVE password', hideHeader: true},
   },
   {
     path: 'profile',
     component: ProfileComponent,
     data: {title: 'Your Autism DRIVE Account'},
-    canActivate: [AuthGuard, NotMirroredGuard]
+    canActivate: [AuthGuard, NotMirroredGuard],
   },
   {
     path: 'flow/complete',
     component: FlowCompleteComponent,
     data: {title: 'Enrollment complete'},
-    canActivate: [AuthGuard, NotMirroredGuard]
+    canActivate: [AuthGuard, NotMirroredGuard],
   },
   {
     path: 'flow/:flowName/:participantId',
     component: FlowComponent,
     data: {title: 'Your Autism DRIVE Account'},
-    canActivate: [AuthGuard, NotMirroredGuard]
+    canActivate: [AuthGuard, NotMirroredGuard],
   },
   {path: 'register', component: RegisterComponent, data: {title: 'Create an Autism DRIVE Account', hideHeader: true}},
   {path: 'event/:resourceId', component: ResourceDetailComponent, data: {title: 'Autism DRIVE Event Details'}},
@@ -85,26 +85,26 @@ const routes: Routes = [
     path: ':resourceType/:resourceId/edit',
     component: ResourceFormComponent,
     data: {title: 'Edit Resource', roles: ['admin', 'editor']},
-    canActivate: [RoleGuard]
+    canActivate: [RoleGuard],
   },
   {
     path: 'resources/add',
     component: ResourceFormComponent,
     data: {title: 'Add Resource', roles: ['admin', 'editor']},
-    canActivate: [RoleGuard]
+    canActivate: [RoleGuard],
   },
   {path: 'covid19-resources', component: Covid19ResourcesComponent, data: {title: 'Autism DRIVE COVID-19 Resources'}},
   {
     path: 'covid19-resources/:category',
     component: Covid19ResourcesComponent,
-    data: {title: 'Autism DRIVE COVID-19 Resources'}
+    data: {title: 'Autism DRIVE COVID-19 Resources'},
   },
   {path: 'studies', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {
     path: 'studies/add',
     component: StudyFormComponent,
-    data: {title: 'Create an Autism DRIVE Study', roles: ['admin', ]},
-    canActivate: [RoleGuard]
+    data: {title: 'Create an Autism DRIVE Study', roles: ['admin']},
+    canActivate: [RoleGuard],
   },
   {path: 'studies/:studyStatus', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
   {path: 'studies/:studyStatus/:age', component: StudiesComponent, data: {title: 'Autism DRIVE Studies'}},
@@ -112,13 +112,13 @@ const routes: Routes = [
   {
     path: 'study/edit/:studyId',
     component: StudyFormComponent,
-    data: {title: 'Edit Study', roles: ['admin', ]},
-    canActivate: [RoleGuard]
+    data: {title: 'Edit Study', roles: ['admin']},
+    canActivate: [RoleGuard],
   },
   {
     path: 'terms/:relationship',
     component: TermsComponent,
-    data: {title: 'Agree to Terms and Conditions for an Autism DRIVE Account', hideHeader: true}
+    data: {title: 'Agree to Terms and Conditions for an Autism DRIVE Account', hideHeader: true},
   },
   {path: 'logout', component: LogoutComponent, data: {title: 'You have been logged out.', hideHeader: true}},
   {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
@@ -127,45 +127,45 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminHomeComponent,
-    data: {title: 'Autism DRIVE Admin Home', roles: ['admin', ]},
+    data: {title: 'Autism DRIVE Admin Home', roles: ['admin']},
     canActivate: [RoleGuard],
     children: [
       {path: '', redirectTo: 'data-admin', pathMatch: 'full'},
       {
         path: 'data-admin',
         component: QuestionnaireDataViewComponent,
-        data: {title: 'Autism DRIVE Data Admin', roles: ['admin', ]},
-        canActivate: [RoleGuard]
+        data: {title: 'Autism DRIVE Data Admin', roles: ['admin']},
+        canActivate: [RoleGuard],
       },
       {
         path: 'user-admin',
         component: UserAdminComponent,
-        data: {title: 'Autism DRIVE User Admin', roles: ['admin', ]},
-        canActivate: [RoleGuard]
+        data: {title: 'Autism DRIVE User Admin', roles: ['admin']},
+        canActivate: [RoleGuard],
       },
       {
         path: 'participant-admin',
         component: ParticipantAdminComponent,
-        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin', ]},
-        canActivate: [RoleGuard]
+        data: {title: 'Autism DRIVE Participant Admin', roles: ['admin']},
+        canActivate: [RoleGuard],
       },
       {
         path: 'taxonomy-admin',
         component: TaxonomyAdminComponent,
-        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin', ]},
-        canActivate: [RoleGuard]
+        data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin']},
+        canActivate: [RoleGuard],
       },
       {
         path: 'import-export-status',
         component: AdminExportComponent,
-        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin', ]},
-        canActivate: [RoleGuard]
+        data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin']},
+        canActivate: [RoleGuard],
       },
       {
         path: 'email-log',
         component: EmailLogAdminComponent,
-        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin', ]},
-        canActivate: [RoleGuard]
+        data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin']},
+        canActivate: [RoleGuard],
       },
       // {
       //   path: 'skillstar-admin',
@@ -173,7 +173,7 @@ const routes: Routes = [
       //   data: {title: 'SkillSTAR Admin', roles: ['admin',]},
       //   canActivate: [RoleGuard]
       // },
-    ]
+    ],
   },
   {
     path: 'admin/user/:userId',
@@ -185,11 +185,12 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {
-    useHash: true,
-    scrollPositionRestoration: 'enabled'
-  })],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      scrollPositionRestoration: 'enabled',
+    }),
+  ],
+  exports: [RouterModule],
 })
-export class RoutingModule {
-}
+export class RoutingModule {}

@@ -1,16 +1,7 @@
-import {
-  browser,
-  by,
-  element,
-  ElementArrayFinder,
-  ElementFinder,
-  ExpectedConditions,
-} from 'protractor';
-import { protractor } from 'protractor/built/ptor';
-
+import {browser, by, element, ElementArrayFinder, ElementFinder, ExpectedConditions} from 'protractor';
+import {protractor} from 'protractor/built/ptor';
 
 export class AppPage {
-
   constructor() {
     this.maximize();
   }
@@ -69,7 +60,7 @@ export class AppPage {
       return browser.wait(
         ExpectedConditions.visibilityOf(e),
         5000,
-        `Element "${selector}" is still not visible after waiting for 5 seconds.`
+        `Element "${selector}" is still not visible after waiting for 5 seconds.`,
       );
     } else if (maxLoops > 0) {
       await this.waitFor(1000);
@@ -126,7 +117,7 @@ export class AppPage {
 
   async isVisible(selector: string) {
     const numElements = await this.getElements(selector).count();
-    return (numElements > 0) ? this.getElement(selector).isDisplayed() : false;
+    return numElements > 0 ? this.getElement(selector).isDisplayed() : false;
   }
 
   getElement(selector: string): ElementFinder {
@@ -211,12 +202,20 @@ export class AppPage {
 
   getRandomString(length: number) {
     const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    return Array(length).join().split(',').map(() => s.charAt(Math.floor(Math.random() * s.length))).join('');
+    return Array(length)
+      .join()
+      .split(',')
+      .map(() => s.charAt(Math.floor(Math.random() * s.length)))
+      .join('');
   }
 
   getRandomNumString(length: number) {
     const s = '123456789';
-    return Array(length).join().split(',').map(() => s.charAt(Math.floor(Math.random() * s.length))).join('');
+    return Array(length)
+      .join()
+      .split(',')
+      .map(() => s.charAt(Math.floor(Math.random() * s.length)))
+      .join('');
   }
 
   getRandomDate(start: Date, end: Date): Date {
@@ -232,7 +231,8 @@ export class AppPage {
   tabThroughAllFields() {
     this.focus('formly-form');
 
-    const selector = '' +
+    const selector =
+      '' +
       'formly-field [id*="_input_"],' +
       'formly-field [id*="_datepicker_"],' +
       'formly-field [id*="_radio_"],' +

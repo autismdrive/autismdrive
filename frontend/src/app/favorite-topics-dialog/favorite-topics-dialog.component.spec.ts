@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FavoriteTopicsDialogComponent } from './favorite-topics-dialog.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {FavoriteTopicsDialogComponent} from './favorite-topics-dialog.component';
 
 describe('FavoriteTopicsDialogComponent', () => {
   let component: FavoriteTopicsDialogComponent;
@@ -8,9 +7,8 @@ describe('FavoriteTopicsDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FavoriteTopicsDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [FavoriteTopicsDialogComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

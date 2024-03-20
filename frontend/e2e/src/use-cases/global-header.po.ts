@@ -1,9 +1,8 @@
-import {AppPage} from '../app-page.po';
 import {ElementFinder} from 'protractor';
+import {AppPage} from '../app-page.po';
 
 export class GlobalHeaderUseCases {
-  constructor(private page: AppPage) {
-  }
+  constructor(private page: AppPage) {}
 
   displaySitewideHeader() {
     expect(this.page.getElements('#menu-bar').count()).toEqual(1);
@@ -94,6 +93,6 @@ export class GlobalHeaderUseCases {
   }
 
   displayAdminLink() {
-      expect(this.page.getElements('#admin-button').count()).toEqual(1);
+    expect(this.page.getElements('#admin-button').count()).toEqual(1);
   }
 }

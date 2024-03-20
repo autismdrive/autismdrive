@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ResourceFormComponent } from './resource-form.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ResourceFormComponent} from './resource-form.component';
 
 describe('ResourceFormComponent', () => {
   let component: ResourceFormComponent;
@@ -8,9 +7,8 @@ describe('ResourceFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ResourceFormComponent ]
-    })
-    .compileComponents();
+      declarations: [ResourceFormComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

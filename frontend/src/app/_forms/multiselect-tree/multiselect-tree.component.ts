@@ -10,7 +10,7 @@ import {Category} from '../../_models/category';
 @Component({
   selector: 'app-multiselect-tree',
   templateUrl: './multiselect-tree.component.html',
-  styleUrls: ['./multiselect-tree.component.scss']
+  styleUrls: ['./multiselect-tree.component.scss'],
 })
 export class MultiselectTreeComponent extends FieldType implements OnInit {
   @Input() to: FormlyTemplateOptions;
@@ -35,7 +35,6 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
     });
   }
 
-
   updateSelection() {
     if (this.isReady()) {
       if (this.model.categories) {
@@ -58,14 +57,13 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
       const descendants = this.treeControl.getDescendants(dataCat);
       descendants.forEach(d => allNodes.push(d));
       allNodes.push(dataCat);
-
     });
     return allNodes.find(i => i.id === cat_id);
   }
 
   hasNestedChild = (_: number, node: Category) => {
-    return (node.children && (node.children.length > 0));
-  }
+    return node.children && node.children.length > 0;
+  };
 
   numSelectedDescendants(node: Category): number {
     const descendants: Category[] = this.treeControl.getDescendants(node);
@@ -101,15 +99,11 @@ export class MultiselectTreeComponent extends FieldType implements OnInit {
   }
 
   isReady(): boolean {
-    return !!(
-      this.field &&
-      this.field.form &&
-      this.field.form.controls
-    );
+    return !!(this.field && this.field.form && this.field.form.controls);
   }
 
   private _updateModelCategories() {
     this.model.categories = [];
-    this.checklistSelection.selected.forEach(c => this.model.categories[c.id] = true);
+    this.checklistSelection.selected.forEach(c => (this.model.categories[c.id] = true));
   }
 }

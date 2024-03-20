@@ -13,8 +13,12 @@
   text-align: center;
   color: $brand-primary;
 
-  &.border-box-tile-1x { height: $tile-height-1x; }
-  &.border-box-tile-2x { height: $tile-height-2x; }
+  &.border-box-tile-1x {
+    height: $tile-height-1x;
+  }
+  &.border-box-tile-2x {
+    height: $tile-height-2x;
+  }
 
   .border-box-tile-inner {
     &.hover {
@@ -94,16 +98,18 @@
         margin-bottom: 1em;
         font-style: italic;
         text-transform: uppercase;
-
-
       }
     }
 
     // XS - MD
     @media (max-width: 1023px) {
       padding: 1em;
-      .border-box-tile-label.border-box-tile-label-1x { font-size: 1em; }
-      .border-box-tile-label.border-box-tile-label-2x { font-size: 2em; }
+      .border-box-tile-label.border-box-tile-label-1x {
+        font-size: 1em;
+      }
+      .border-box-tile-label.border-box-tile-label-2x {
+        font-size: 2em;
+      }
     }
 
     // LG & XL

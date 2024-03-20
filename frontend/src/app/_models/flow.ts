@@ -17,9 +17,9 @@ export class Flow {
   }
 
   percentComplete(): number {
-    if (this.steps && (this.steps.length > 0)) {
+    if (this.steps && this.steps.length > 0) {
       const completeSteps = this.steps.filter(s => s.status === 'COMPLETE');
-      return completeSteps.length / this.steps.length * 100;
+      return (completeSteps.length / this.steps.length) * 100;
     } else {
       return 0;
     }

@@ -7,13 +7,10 @@ button.mat-mini-fab.mat-accent {
   @include mat.elevation(1);
 
   mat-icon {
-   -webkit-text-stroke: 1px $brand-primary;
-   color: white;
-   text-shadow:
-     -1px -1px 0 $brand-primary,
-      1px -1px 0 $brand-primary,
-      -1px 1px 0 $brand-primary,
-       1px 1px 0 $brand-primary;
+    -webkit-text-stroke: 1px $brand-primary;
+    color: white;
+    text-shadow: -1px -1px 0 $brand-primary, 1px -1px 0 $brand-primary, -1px 1px 0 $brand-primary,
+      1px 1px 0 $brand-primary;
 
     &.active {
       color: $brand-primary;

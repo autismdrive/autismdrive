@@ -1,4 +1,4 @@
-@import "../../config";
+@import '../../config';
 
 $lg-factor: 1;
 $md-factor: 0.9;
@@ -30,7 +30,11 @@ $video-padding-width: $video-padding * 2;
   background-color: $brand-primary;
   color: white;
 
-  p { margin: 0; text-align: center; padding: 0.5em; }
+  p {
+    margin: 0;
+    text-align: center;
+    padding: 0.5em;
+  }
 
   &.large {
     // XS

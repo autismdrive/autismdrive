@@ -1,9 +1,7 @@
-import { SpyObject, SDSpy } from './helper.mock';
-import { ApiService } from '../../_services/api/api.service';
-
+import {ApiService} from '../../_services/api/api.service';
+import {SDSpy, SpyObject} from './helper.mock';
 
 export class MockApiService extends SpyObject {
-
   addStudySpy: SDSpy;
   updateStudySpy: SDSpy;
   deleteStudySpy: SDSpy;
@@ -62,6 +60,6 @@ export class MockApiService extends SpyObject {
   }
 
   spyAndReturnFake(methodName: string, fakeResponse: any) {
-    this.spy(methodName).andReturn({ subscribe: callback => callback(fakeResponse) });
+    this.spy(methodName).andReturn({subscribe: callback => callback(fakeResponse)});
   }
 }

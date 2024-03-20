@@ -7,7 +7,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 @Component({
   selector: 'app-search-result',
   templateUrl: './search-result.component.html',
-  styleUrls: ['./search-result.component.scss']
+  styleUrls: ['./search-result.component.scss'],
 })
 export class SearchResultComponent implements OnInit {
   @Input() hit: Hit;
@@ -16,19 +16,13 @@ export class SearchResultComponent implements OnInit {
 
   hover = false;
 
-  constructor() {
-  }
+  constructor() {}
 
   get isPastEvent(): boolean {
-    return !!(
-      this.hit.date &&
-      (new Date(this.hit.date) < new Date()) &&
-      this.hit.post_event_description
-    );
+    return !!(this.hit.date && new Date(this.hit.date) < new Date() && this.hit.post_event_description);
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   isEnrolling(status: string) {
     return status === StudyStatus.currently_enrolling;

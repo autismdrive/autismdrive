@@ -1,10 +1,4 @@
-<div
-  id="hero"
-  #searchHeader
-  [class]="searchBgClass"
-  fxLayout="column"
->
-
+<div id="hero" #searchHeader [class]="searchBgClass" fxLayout="column">
   <app-tutorial-video
     *ngIf="videoPlacement === 'above' && !shouldHideVideo"
     [videoSize]="videoSize"
@@ -13,11 +7,7 @@
     [links]="videoLinks"
     fxFlexAlign="center"
   ></app-tutorial-video>
-  <div
-    fxLayout="row"
-    fxLayout.lt-md="column"
-    fxLayoutAlign="center center"
-  >
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="center center">
     <app-tutorial-video
       *ngIf="videoPlacement === 'left' && !shouldHideVideo"
       [videoSize]="videoSize"
@@ -34,9 +24,9 @@
       ></app-search-box>
       <app-add-button
         *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
-        [addLabel]='"Add Resource"'
-        [addLink]='"resources/add"'
-        [currentUser]=currentUser
+        [addLabel]="'Add Resource'"
+        [addLink]="'resources/add'"
+        [currentUser]="currentUser"
       ></app-add-button>
       <button
         id="show-filters-button"
@@ -49,16 +39,8 @@
         <mat-icon>filter_alt</mat-icon>
         Filter Search Results
       </button>
-      <div
-        fxLayout="column"
-        fxLayoutAlign="center center"
-        id="filters-container"
-      >
-        <div
-          id="filters"
-          fxFlex.gt-sm="60%"
-          [ngClass.lt-md]="filtersPanelStyles"
-        >
+      <div fxLayout="column" fxLayoutAlign="center center" id="filters-container">
+        <div id="filters" fxFlex.gt-sm="60%" [ngClass.lt-md]="filtersPanelStyles">
           <div fxHide fxShow.lt-md>
             <div fxLayoutAlign="end end">
               <button class="done-button" mat-button (click)="toggleShowFilters()">Done</button>
@@ -66,9 +48,14 @@
             <h2>Filter Resources</h2>
           </div>
           <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
-
-            <div class="filter-select" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="2em" fxLayoutGap.lt-lg="1em" fxShow>
-
+            <div
+              class="filter-select"
+              fxLayout="row"
+              fxLayout.lt-lg="column"
+              fxLayoutGap="2em"
+              fxLayoutGap.lt-lg="1em"
+              fxShow
+            >
               <div fxHide fxShow.lt-md id="type-filter">
                 <mat-form-field>
                   <mat-label>Resource types</mat-label>
@@ -79,15 +66,11 @@
                         [iconType]="selectedType && selectedType.name"
                         [size]="1"
                       ></app-type-icon>
-                      <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
+                      <span class="type-label" *ngIf="selectedType">{{ selectedType.label }}</span>
                     </mat-select-trigger>
-                    <mat-option
-                      *ngFor="let type of resourceTypes"
-                      [value]="type"
-                      (click)="selectType(type.name)"
-                    >
+                    <mat-option *ngFor="let type of resourceTypes" [value]="type" (click)="selectType(type.name)">
                       <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-                      <span class="type-label">{{type.label}}</span>
+                      <span class="type-label">{{ type.label }}</span>
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
@@ -142,7 +125,7 @@
             ></app-search-sort>
           </div>
           <div fxHide fxShow.lt-md fxLayoutAlign="center center">
-            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults}} Results</button>
+            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{ numTotalResults }} Results</button>
           </div>
         </div>
       </div>
@@ -163,14 +146,7 @@
     [links]="videoLinks"
     fxFlexAlign="center"
   ></app-tutorial-video>
-  <div
-    class="type-tabs-container"
-    fxShow
-    fxHide.lt-md
-    fxLayout="row"
-    fxLayoutGap="2em"
-    fxLayoutAlign="start end"
-  >
+  <div class="type-tabs-container" fxShow fxHide.lt-md fxLayout="row" fxLayoutGap="2em" fxLayoutAlign="start end">
     <mat-tab-group
       mat-align-tabs="start"
       fxHide.lt-md
@@ -182,13 +158,11 @@
       <mat-tab>
         <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
       </mat-tab>
-      <mat-tab
-        *ngFor="let type of resourceTypesFiltered"
-      >
+      <mat-tab *ngFor="let type of resourceTypesFiltered">
         <ng-template mat-tab-label>
-          <div class="type-buttons {{type.name}}">
+          <div class="type-buttons {{ type.name }}">
             <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-            {{type.label}}
+            {{ type.label }}
           </div>
         </ng-template>
       </mat-tab>
@@ -198,8 +172,8 @@
 <div fxHide fxShow.lt-md id="results-vs-map">
   <mat-button-toggle-group [value]="expandResults" (change)="expandResults = !expandResults">
     <mat-button-toggle [value]="true">
-      <ng-container *ngIf="!restrictToMappedResults">{{numTotalResults}} results</ng-container>
-      <ng-container *ngIf="restrictToMappedResults">{{hits.length}} mapped results</ng-container>
+      <ng-container *ngIf="!restrictToMappedResults">{{ numTotalResults }} results</ng-container>
+      <ng-container *ngIf="restrictToMappedResults">{{ hits.length }} mapped results</ng-container>
     </mat-button-toggle>
     <mat-button-toggle [value]="false" [disabled]="!shouldShowMap">Map</mat-button-toggle>
   </mat-button-toggle-group>
@@ -217,14 +191,27 @@
     [fxShow.lt-md]="!!expandResults"
   >
     <ng-container *ngIf="!loading; else loadingMessage">
-      <div *ngIf="query?.hits.length === 0" fxLayout="column" fxLayoutGap="20px"
-           fxLayoutAlign="center center" class="pad-4">
+      <div
+        *ngIf="query?.hits.length === 0"
+        fxLayout="column"
+        fxLayoutGap="20px"
+        fxLayoutAlign="center center"
+        class="pad-4"
+      >
         <h2>No results currently available.</h2>
-        <p>We could not find any results for your search. Please try removing some of the conditions
-          by clicking on the 'x' in the filter tiles above. This will broaden the search and give you more results.</p>
+        <p>
+          We could not find any results for your search. Please try removing some of the conditions by clicking on the
+          'x' in the filter tiles above. This will broaden the search and give you more results.
+        </p>
         <h3>Check back soon for more updates!</h3>
       </div>
-      <div *ngIf="query?.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
+      <div
+        *ngIf="query?.total != 0"
+        id="sort-and-status"
+        fxLayout="row"
+        fxLayout.lt-md="column"
+        fxLayoutAlign="space-between end"
+      >
         <div
           class="search-result-status"
           [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults"
@@ -232,8 +219,12 @@
           fxHide.lt-md
           *ngIf="paginatorElement"
         >
-          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} results</h4>
-          <h4 *ngIf="restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} mapped results.</h4>
+          <h4 *ngIf="!restrictToMappedResults">
+            Showing {{ numResultsFrom }}-{{ numResultsTo }} of {{ numTotalResults }} results
+          </h4>
+          <h4 *ngIf="restrictToMappedResults">
+            Showing {{ numResultsFrom }}-{{ numResultsTo }} of {{ numTotalResults }} mapped results.
+          </h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
           <app-search-sort
@@ -280,7 +271,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
-      [ngClass]="{'ghost': (!query || (numTotalResults === 0))}"
+      [ngClass]="{ghost: !query || numTotalResults === 0}"
     >
     </mat-paginator>
   </div>
@@ -318,7 +309,7 @@
     >
       <mat-expansion-panel-header>
         <ng-container *ngIf="locationMode === locationModes.default">Set Location</ng-container>
-        <ng-container *ngIf="locationMode === locationModes.zipcode">Location: {{storedZip}}</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.zipcode">Location: {{ storedZip }}</ng-container>
         <ng-container *ngIf="locationMode === locationModes.gps">Your current location</ng-container>
         <ng-container *ngIf="locationMode === locationModes.map">Using Map's Center</ng-container>
       </mat-expansion-panel-header>
@@ -330,21 +321,20 @@
             [(ngModel)]="storedZip"
             (keyup.enter)="submitZip($event, setLocationExpansionPanel)"
             #zipCodeInput
-          >
+          />
         </mat-form-field>
         <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
-            <button
-              mat-flat-button
-              color="accent"
-              (click)="submitZip($event, setLocationExpansionPanel)"
-              id="btn_save"
-            >Save</button>
-            <button
-              *ngIf="gpsEnabled"
-              mat-flat-button
-              (click)="useGPSLocation($event, setLocationExpansionPanel)"
-              id="btn_gps"
-            >Current Location</button>
+          <button mat-flat-button color="accent" (click)="submitZip($event, setLocationExpansionPanel)" id="btn_save">
+            Save
+          </button>
+          <button
+            *ngIf="gpsEnabled"
+            mat-flat-button
+            (click)="useGPSLocation($event, setLocationExpansionPanel)"
+            id="btn_gps"
+          >
+            Current Location
+          </button>
         </div>
       </div>
     </mat-expansion-panel>
@@ -401,18 +391,21 @@
           </ng-container>
         </agm-marker-cluster>
         <ng-container *ngIf="selectedMapResource">
-          <agm-info-window [isOpen]="isInfoWindowOpen" [latitude]="selectedMapHit.latitude"
-                           [longitude]="selectedMapHit.longitude" (infoWindowClose)="closeInfoWindow()">
+          <agm-info-window
+            [isOpen]="isInfoWindowOpen"
+            [latitude]="selectedMapHit.latitude"
+            [longitude]="selectedMapHit.longitude"
+            (infoWindowClose)="closeInfoWindow()"
+          >
             <a
               class="title mat-h2"
-              href="/#/{{selectedMapResource.type.toLowerCase()}}/{{selectedMapResource.id}}"
+              href="/#/{{ selectedMapResource.type.toLowerCase() }}/{{ selectedMapResource.id }}"
               (click)="goSelectedMapResource(selectedMapResource)"
-            >{{selectedMapResource.title}}</a>
-            <a
-              class="chevron-link"
-              (click)="goSelectedMapResource(selectedMapResource)"
+              >{{ selectedMapResource.title }}</a
             >
-              {{selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type}} Details</a>
+            <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
+              {{ selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type }} Details</a
+            >
           </agm-info-window>
         </ng-container>
       </agm-map>
@@ -420,13 +413,13 @@
       <div *ngIf="highlightedStudy" id="studies-highlight">
         <mat-card>
           <mat-card-content>
-            <h3>Highlighted Study: <a href="/#/study/{{highlightedStudy.id}}">{{highlightedStudy.short_title}}</a></h3>
-            <p>{{highlightedStudy.short_description}}</p>
-            <a
-              class="chevron-link"
-              [routerLink]="['/studies']"
-              routerLinkActive="router-link-active">
-              Explore other studies</a>
+            <h3>
+              Highlighted Study: <a href="/#/study/{{ highlightedStudy.id }}">{{ highlightedStudy.short_title }}</a>
+            </h3>
+            <p>{{ highlightedStudy.short_description }}</p>
+            <a class="chevron-link" [routerLink]="['/studies']" routerLinkActive="router-link-active">
+              Explore other studies</a
+            >
           </mat-card-content>
         </mat-card>
       </div>
@@ -444,29 +437,25 @@
 >
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>
-    <p class="pad-0">We are partnering with the following initiatives and organizations to identify
-      resources that will improve outcomes for individuals with autism and their families.</p>
+    <p class="pad-0">
+      We are partnering with the following initiatives and organizations to identify resources that will improve
+      outcomes for individuals with autism and their families.
+    </p>
     <div fxLayoutAlign.gt-xs="row" fxLayout.lt-sm="row wrap" fxLayoutAlign="space-between center" fxLayoutGap="40px">
-      <span
-        *ngFor="let rg of resourceGatherers"
-        fxFlex.lt-md="40%"
-        fxLayoutAlign="center center"
-      >
+      <span *ngFor="let rg of resourceGatherers" fxFlex.lt-md="40%" fxLayoutAlign="center center">
         <a
           [href]="rg.url"
           [title]="rg.name"
           [matTooltip]="rg.shortName + ' - ' + rg.description"
           class="resource-gatherer"
         >
-          <img
-            [alt]="rg.shortName"
-            [src]="rg.image"
-          >
+          <img [alt]="rg.shortName" [src]="rg.image" />
         </a>
       </span>
     </div>
   </div>
-  <app-border-box-tile *ngIf="!loading"
+  <app-border-box-tile
+    *ngIf="!loading"
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"
@@ -475,15 +464,15 @@
 </div>
 <span id="scroll-spy" #scrollSpy></span>
 
-<p style="padding: 2em; text-align: center;" >The listings included in the Autism DRIVE Resource Directory are provided for informational
-    purposes only. Most of the resources are not affiliated with the University of Virginia (UVA),
-    and their inclusion does not reflect a recommendation, referral or endorsement of a specific
-    organization or professional. For questions about information or content listed on external sites,
-    contact the external organization directly. The views and opinions expressed by external organizations
-    linked through on our website do not necessarily reflect the views of the UVA Supporting Transformative
-    Research (STAR) Initiative.</p>
+<p style="padding: 2em; text-align: center">
+  The listings included in the Autism DRIVE Resource Directory are provided for informational purposes only. Most of the
+  resources are not affiliated with the University of Virginia (UVA), and their inclusion does not reflect a
+  recommendation, referral or endorsement of a specific organization or professional. For questions about information or
+  content listed on external sites, contact the external organization directly. The views and opinions expressed by
+  external organizations linked through on our website do not necessarily reflect the views of the UVA Supporting
+  Transformative Research (STAR) Initiative.
+</p>
 
 <ng-template #loadingMessage>
   <app-loading></app-loading>
 </ng-template>
-

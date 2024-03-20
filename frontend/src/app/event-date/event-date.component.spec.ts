@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { EventDateComponent } from './event-date.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {EventDateComponent} from './event-date.component';
 
 describe('EventDateComponent', () => {
   let component: EventDateComponent;
@@ -8,9 +7,8 @@ describe('EventDateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventDateComponent ]
-    })
-    .compileComponents();
+      declarations: [EventDateComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

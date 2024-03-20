@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AvatarDialogComponent } from './avatar-dialog.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AvatarDialogComponent} from './avatar-dialog.component';
 
 describe('AvatarDialogComponent', () => {
   let component: AvatarDialogComponent;
@@ -8,9 +7,8 @@ describe('AvatarDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AvatarDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [AvatarDialogComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

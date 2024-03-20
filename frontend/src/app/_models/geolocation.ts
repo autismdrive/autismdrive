@@ -1,5 +1,5 @@
-import { getDistance, convertDistance } from 'geolib';
-import { UserInputCoordinates } from 'geolib/es/types';
+import {convertDistance, getDistance} from 'geolib';
+import {UserInputCoordinates} from 'geolib/es/types';
 
 export class GeoLocation {
   latitude?: number;
@@ -17,8 +17,8 @@ export class GeoLocation {
   }
 
   hasCoords(): boolean {
-    const _isSet = n => (typeof n === 'number') && isFinite(n);
-    return (_isSet(this.latitude) && _isSet(this.longitude));
+    const _isSet = n => typeof n === 'number' && isFinite(n);
+    return _isSet(this.latitude) && _isSet(this.longitude);
   }
 
   milesFrom(there: UserInputCoordinates) {

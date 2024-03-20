@@ -1,10 +1,7 @@
 module.exports = {
   packages: {
     '@agm/markerclusterer': {
-      ignorableDeepImportMatchers: [
-        /@agm\//,
-        /@google\//,
-      ]
-    }
-  }
+      ignorableDeepImportMatchers: [/@agm\//, /@google\//],
+    },
+  },
 };

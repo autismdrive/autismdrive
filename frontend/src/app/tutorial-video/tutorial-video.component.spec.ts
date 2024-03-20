@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { TutorialVideoComponent } from './tutorial-video.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TutorialVideoComponent} from './tutorial-video.component';
 
 describe('TutorialVideoComponent', () => {
   let component: TutorialVideoComponent;
@@ -8,9 +7,8 @@ describe('TutorialVideoComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TutorialVideoComponent ]
-    })
-    .compileComponents();
+      declarations: [TutorialVideoComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

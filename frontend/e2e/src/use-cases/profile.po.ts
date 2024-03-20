@@ -1,33 +1,32 @@
-import { AppPage } from '../app-page.po';
-import {$$, browser, by, element} from 'protractor';
+import {$$, browser} from 'protractor';
+import {AppPage} from '../app-page.po';
 
 export class ProfileUseCases {
-  constructor(private page: AppPage) {
-  }
+  constructor(private page: AppPage) {}
 
   clickFormlyBox() {
     const formlyInputs = $$('input');
     const desiredModel = 'modelName';
-    const desiredInput = formlyInputs.filter(function (input) {
-      return input.evaluate('model[options.key]').then(function (model) {
-        return model === desiredModel;
-      });
-    }).first();
-    desiredInput.sendKeys("some text");
+    const desiredInput = formlyInputs
+      .filter(function (input) {
+        return input.evaluate('model[options.key]').then(function (model) {
+          return model === desiredModel;
+        });
+      })
+      .first();
+    desiredInput.sendKeys('some text');
   }
-
 
   async completeProfileMetaFormAsGuardian() {
     expect(this.page.getElements('#meta-form').count()).toEqual(1);
     // Get  'formly-field [id*="_checkbox_"],' +
-    this.page.getElement( 'formly-field.guardian label').click();
+    this.page.getElement('formly-field.guardian label').click();
     expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
 
-    this.page.getElement( 'formly-field.guardian_has_dependent label').click();
+    this.page.getElement('formly-field.guardian_has_dependent label').click();
     expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
 
     this.page.getElement('#submit_meta').click();
-
 
     expect(this.page.getElements('#self_guardian').count()).toEqual(1);
     /**
@@ -45,7 +44,10 @@ export class ProfileUseCases {
 
   async checkDependentButtonDisabled() {
     const numButtons = await this.page.getElements('#enroll_first_dependent').count();
-    return expect(numButtons).toEqual(0, 'No dependent enroll button should be visible if guardian has not completed their profile yet.');
+    return expect(numButtons).toEqual(
+      0,
+      'No dependent enroll button should be visible if guardian has not completed their profile yet.',
+    );
   }
 
   navigateToProfile() {

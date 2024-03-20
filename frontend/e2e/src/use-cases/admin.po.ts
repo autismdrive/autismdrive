@@ -1,9 +1,7 @@
 import {AppPage} from '../app-page.po';
 
 export class AdminUseCases {
-  constructor(private page: AppPage) {
-  }
-
+  constructor(private page: AppPage) {}
 
   navigateToAdmin() {
     this.page.clickAndExpectRoute('#admin-button', '/admin/data-admin');

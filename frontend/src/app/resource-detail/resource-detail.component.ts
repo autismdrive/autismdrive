@@ -14,7 +14,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 @Component({
   selector: 'app-resource-detail',
   templateUrl: './resource-detail.component.html',
-  styleUrls: ['./resource-detail.component.scss']
+  styleUrls: ['./resource-detail.component.scss'],
 })
 export class ResourceDetailComponent implements OnInit {
   resource: Resource;
@@ -34,7 +34,7 @@ export class ResourceDetailComponent implements OnInit {
     return !!(
       this.resource &&
       this.resource.type === 'event' &&
-      (eventDate < now) &&
+      eventDate < now &&
       this.resource.post_event_description
     );
   }
@@ -46,7 +46,7 @@ export class ResourceDetailComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.route.params.subscribe(params => {
       this.loading = true;
       this.safeVideoLink = null;
@@ -64,8 +64,9 @@ export class ResourceDetailComponent implements OnInit {
           this.loadMapLocation();
           this.loading = false;
           if (this.resource.video_code) {
-            this.safeVideoLink = this._sanitizer
-              .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(
+              'https://www.youtube.com/embed/' + this.resource.video_code,
+            );
           }
           if (this.currentUser && this.currentUser.permissions.includes('edit_resource')) {
             this.api.getResourceChangeLog(this.resource.id).subscribe(log => {
@@ -78,26 +79,21 @@ export class ResourceDetailComponent implements OnInit {
   }
 
   get userCanEdit(): boolean {
-    return (
-      this.currentUser &&
-      this.currentUser.permissions.includes('edit_resource')
-    );
+    return this.currentUser && this.currentUser.permissions.includes('edit_resource');
   }
 
   get resourceIsDraft(): boolean {
-    return (this.resource.is_draft === true);
+    return this.resource.is_draft === true;
   }
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   loadMapLocation() {
     if (this.resource && this.resource.hasCoords() && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         this.mapLoc = {
           lat: p.coords.latitude,
-          lng: p.coords.longitude
+          lng: p.coords.longitude,
         };
       });
     }
@@ -137,28 +133,33 @@ export class ResourceDetailComponent implements OnInit {
       {
         condition: !!r.primary_contact,
         icon: 'person_pin',
-        details: [r.primary_contact]
+        details: [r.primary_contact],
       },
       {
         condition: !!r.organization_name,
         icon: 'business',
-        details: [r.organization_name]
+        details: [r.organization_name],
       },
       {
         condition: !!r.date,
         icon: 'access_time',
-        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US', '-0')}: ${r.time}`]
+        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US', '-0')}: ${r.time}`],
       },
       {
         condition: !!(r.location_name || r.street_address1 || r.street_address2 || r.city || r.state || r.zip),
         icon: 'location_on',
-        details: [r.location_name, r.street_address1, r.street_address2, `${r.city ? r.city + ',' : r.city} ${r.state} ${r.zip}`],
+        details: [
+          r.location_name,
+          r.street_address1,
+          r.street_address2,
+          `${r.city ? r.city + ',' : r.city} ${r.state} ${r.zip}`,
+        ],
         type: 'address',
       },
       {
         condition: !!r.ticket_cost,
         icon: 'monetization_on',
-        details: [r.ticket_cost]
+        details: [r.ticket_cost],
       },
       {
         condition: !!r.phone,
@@ -184,5 +185,4 @@ export class ResourceDetailComponent implements OnInit {
   toggleInfoWindow($event) {
     this.showInfoWindow = !this.showInfoWindow;
   }
-
 }

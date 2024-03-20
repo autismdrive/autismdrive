@@ -1,17 +1,17 @@
 <div
   [ngClass]="{
     'news-item': true,
-    'even': isEven(index),
-    'odd': !isEven(index)
+    even: isEven(index),
+    odd: !isEven(index)
   }"
 >
   <div class="image">
-    <a [routerLink]="[ item.url ]"><img src="{{item.img}}"></a>
+    <a [routerLink]="[item.url]"><img src="{{ item.img }}" /></a>
   </div>
   <div class="content">
-    <span class="item-type">{{item.type.label}}</span>
-    <a class="item-title" [routerLink]="[ item.url ]">{{item.title}}</a>
-    <p>{{item.description}}</p>
+    <span class="item-type">{{ item.type.label }}</span>
+    <a class="item-title" [routerLink]="[item.url]">{{ item.title }}</a>
+    <p>{{ item.description }}</p>
     <app-details-link [url]="item.url" [label]="item.label"></app-details-link>
   </div>
 </div>

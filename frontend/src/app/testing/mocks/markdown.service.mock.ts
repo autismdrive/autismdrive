@@ -1,8 +1,7 @@
-import { MarkdownService } from 'ngx-markdown';
-import { SpyObject, SDSpy } from './helper.mock';
+import {MarkdownService} from 'ngx-markdown';
+import {SDSpy, SpyObject} from './helper.mock';
 
 export class MockMarkdownService extends SpyObject {
-
   compileSpy: SDSpy;
   getSourceSpy: SDSpy;
   highlightSpy: SDSpy;
@@ -25,6 +24,6 @@ export class MockMarkdownService extends SpyObject {
   }
 
   spyAndReturnFake(methodName: string, fakeResponse: any) {
-    this.spy(methodName).andReturn({ subscribe: callback => callback(fakeResponse) });
+    this.spy(methodName).andReturn({subscribe: callback => callback(fakeResponse)});
   }
 }

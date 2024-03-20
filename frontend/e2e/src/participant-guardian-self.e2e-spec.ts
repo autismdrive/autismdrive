@@ -1,9 +1,9 @@
-import { AppPage } from './app-page.po';
-import { GlobalHeaderUseCases } from './use-cases/global-header.po';
-import { LoginUseCases } from './use-cases/login.po';
-import { ProfileUseCases } from './use-cases/profile.po';
-import { EnrollUseCases } from './use-cases/enroll.po';
-import { SearchUseCases } from './use-cases/search.po';
+import {AppPage} from './app-page.po';
+import {EnrollUseCases} from './use-cases/enroll.po';
+import {GlobalHeaderUseCases} from './use-cases/global-header.po';
+import {LoginUseCases} from './use-cases/login.po';
+import {ProfileUseCases} from './use-cases/profile.po';
+import {SearchUseCases} from './use-cases/search.po';
 
 describe('Participant (Guardian - Self)', () => {
   let page: AppPage;
@@ -42,15 +42,18 @@ describe('Participant (Guardian - Self)', () => {
   it('should display confirmation message on submit', () => loginUseCases.displayRegisterConfirmation(randomEmail));
   it('should send registration email to user');
   it('should navigate to reset password screen', () => loginUseCases.displayResetPasswordForm());
-  it('should display error if insecure password is entered', () => loginUseCases.displayErrorOnInsecurePassword(badPassword));
+  it('should display error if insecure password is entered', () =>
+    loginUseCases.displayErrorOnInsecurePassword(badPassword));
   it('should not display error if secure password is entered', () => loginUseCases.fillOutPasswordForm(goodPassword));
   it('should log user in after setting a new password', () => loginUseCases.submitResetPasswordForm(goodPassword));
   it('should log out', () => loginUseCases.logout());
   it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
   it('should display register form', () => loginUseCases.displayRegisterForm());
 
-  it('should display error message when submitting a duplicate email address', () => loginUseCases.displayRegisterError(randomEmail));
-  it('should display Forgot Password form confirmation message', () => loginUseCases.displayForgotPasswordConfirmation(randomEmail));
+  it('should display error message when submitting a duplicate email address', () =>
+    loginUseCases.displayRegisterError(randomEmail));
+  it('should display Forgot Password form confirmation message', () =>
+    loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
   it('should see error on bad password', () => loginUseCases.loginWithBadPassword(email));
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(randomEmail, goodPassword));
@@ -114,7 +117,8 @@ describe('Participant (Guardian - Self)', () => {
   // Search - Logged In
   it('should visit home page', () => globalHeaderUseCases.visitHomePage());
   it('should visit resources page', () => globalHeaderUseCases.visitResourcesPage());
-  it('should suggest categories when keywords entered in the search field', () => searchUseCases.enterKeywordsInSearchField('ad'));
+  it('should suggest categories when keywords entered in the search field', () =>
+    searchUseCases.enterKeywordsInSearchField('ad'));
   it('should clear search filter', () => searchUseCases.removeFilter('topic', 'type'));
   it('should display results filtered by age', () => searchUseCases.displaySelectedCategory('age'));
   it('should sort results by distance from me', () => searchUseCases.sortByDistance());
@@ -138,12 +142,14 @@ describe('Participant (Guardian - Self)', () => {
   it('should sort results by last date updated', () => searchUseCases.sortByLastUpdated());
   it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
   it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
-  it('should enter some other keywords in the search field', () => searchUseCases.enterKeywordsInSearchField('staunton', false));
+  it('should enter some other keywords in the search field', () =>
+    searchUseCases.enterKeywordsInSearchField('staunton', false));
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('staunton'));
   it('should display only events again', () => searchUseCases.filterByType('event'));
   it('should sort results by event date', () => searchUseCases.sortByEventDate());
   it('should display all resources again', () => searchUseCases.filterByType('all'));
-  it('should display resource details and return to search when chip selected', () => searchUseCases.displayResourceAndClickChip());
+  it('should display resource details and return to search when chip selected', () =>
+    searchUseCases.displayResourceAndClickChip());
   it('should go back to the home page again', () => globalHeaderUseCases.visitHomePage());
   it('should go back to the search page again', () => globalHeaderUseCases.visitResourcesPage());
   it('should go to second page of results', () => searchUseCases.goToNextResultsPage());

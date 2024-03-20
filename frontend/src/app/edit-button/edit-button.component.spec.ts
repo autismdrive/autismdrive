@@ -1,6 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { EditButtonComponent } from './edit-button.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {EditButtonComponent} from './edit-button.component';
 
 describe('EditButtonComponent', () => {
   let component: EditButtonComponent;
@@ -8,9 +7,8 @@ describe('EditButtonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditButtonComponent ]
-    })
-    .compileComponents();
+      declarations: [EditButtonComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

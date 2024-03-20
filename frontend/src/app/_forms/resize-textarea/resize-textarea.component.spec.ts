@@ -1,6 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ResizeTextareaComponent } from './resize-textarea.component';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ResizeTextareaComponent} from './resize-textarea.component';
 
 describe('ResizeTextareaComponent', () => {
   let component: ResizeTextareaComponent;
@@ -8,9 +7,8 @@ describe('ResizeTextareaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ResizeTextareaComponent ]
-    })
-    .compileComponents();
+      declarations: [ResizeTextareaComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
