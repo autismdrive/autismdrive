@@ -1,10 +1,9 @@
-import datetime
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
-from flask import g, jsonify, request
 import jwt
-from app import app, auth
+from flask import g, request
+
+from app.auth import auth
+from config.load import settings
 
 
 class SessionStatusEndpoint(flask_restful.Resource):
@@ -17,14 +16,11 @@ class SessionStatusEndpoint(flask_restful.Resource):
     def get(self):
         # We don't need to send in the auth token as an argument, it is in the
         # header.
-        auth_token = request.headers['AUTHORIZATION'].split(' ')[1];
+        auth_token = request.headers["AUTHORIZATION"].split(" ")[1]
         if "user" in g and auth_token:
             try:
-                payload = jwt.decode(
-                    auth_token,
-                    app.config.get('SECRET_KEY'),
-                    algorithms='HS256')
-                return payload['exp']
+                payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms="HS256")
+                return payload["exp"]
             except Exception as e:
                 return 0
         else:

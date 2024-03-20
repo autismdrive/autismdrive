@@ -1,35 +1,34 @@
 import datetime
 
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
 
-from app import RestException, db
-from app.model.investigator import Investigator
-from app.model.study_investigator import StudyInvestigator
-from app.schema.schema import InvestigatorSchema
+from app.database import session
+from app.models import Investigator, StudyInvestigator
+from app.rest_exception import RestException
+from app.schemas import SchemaRegistry
 
 
 class InvestigatorEndpoint(flask_restful.Resource):
 
-    schema = InvestigatorSchema()
+    schema = SchemaRegistry.InvestigatorSchema()
 
-    def get(self, id):
-        model = db.session.query(Investigator).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+    def get(self, investigator_id: int):
+        model = session.query(Investigator).filter_by(id=investigator_id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        db.session.query(StudyInvestigator).filter_by(investigator_id=id).delete()
-        db.session.query(Investigator).filter_by(id=id).delete()
-        db.session.commit()
+    def delete(self, investigator_id: int):
+        session.query(StudyInvestigator).filter_by(investigator_id=investigator_id).delete()
+        session.query(Investigator).filter_by(id=investigator_id).delete()
+        session.commit()
         return None
 
-    def put(self, id):
+    def put(self, investigator_id: int):
         request_data = request.get_json()
-        instance = db.session.query(Investigator).filter_by(id=id).first()
+        instance = session.query(Investigator).filter_by(id=investigator_id).first()
 
         try:
             updated = self.schema.load(request_data, instance=instance)
@@ -37,31 +36,30 @@ class InvestigatorEndpoint(flask_restful.Resource):
             raise RestException(RestException.INVALID_OBJECT, details=errors)
 
         updated.last_updated = datetime.datetime.utcnow()
-        db.session.add(updated)
-        db.session.commit()
+        session.add(updated)
+        session.commit()
         return self.schema.dump(updated)
 
 
 class InvestigatorListEndpoint(flask_restful.Resource):
 
-    investigatorsSchema = InvestigatorSchema(many=True)
-    investigatorSchema = InvestigatorSchema()
+    investigatorsSchema = SchemaRegistry.InvestigatorSchema(many=True)
+    investigatorSchema = SchemaRegistry.InvestigatorSchema()
 
     def get(self):
-        investigators = db.session.query(Investigator).order_by(Investigator.name).all()
+        investigators = session.query(Investigator).order_by(Investigator.name).all()
         return self.investigatorsSchema.dump(investigators)
 
     def post(self):
         request_data = request.get_json()
         try:
             load_result = self.investigatorSchema.load(request_data)
-            model = db.session.query(Investigator).filter_by(name=load_result.name).first()
+            model = session.query(Investigator).filter_by(name=load_result.name).first()
             if model:
                 return self.investigatorSchema.dump(model)
             else:
-                db.session.add(load_result)
-                db.session.commit()
+                session.add(load_result)
+                session.commit()
             return self.investigatorSchema.dump(load_result)
         except ValidationError as err:
-            raise RestException(RestException.INVALID_OBJECT,
-                                details=load_result.errors)
+            raise RestException(RestException.INVALID_OBJECT, details=err.messages)

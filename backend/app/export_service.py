@@ -1,15 +1,15 @@
 import datetime
 import importlib
-import re
 import logging
+import typing
 
-from dateutil.tz import UTC
 from flask import url_for
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, select
+from sqlalchemy.orm import joinedload
 
-from app import db, EmailService, app
-from app.model.data_transfer_log import DataTransferLog
-from app.model.export_info import ExportInfo
+from app.database import session, Base, get_class_for_table, get_class
+from app.email_service import email_service
+from app.utils import snake_case_it
 
 
 class ExportService:
@@ -17,35 +17,21 @@ class ExportService:
     logger = logging.getLogger("ExportService")
 
     QUESTION_PACKAGE = "app.model.questionnaires"
-    SCHEMA_PACKAGE = "app.schema.schema"
-    APP_PACKAGE = "app.schema"
-    EXPORT_SCHEMA_PACKAGE = "app.schema.export_schema"
+    SCHEMA_PACKAGE = "app.schemas"
+    EXPORT_SCHEMA_CLASS = "ExportSchemas"
 
-    TYPE_SENSITIVE = 'sensitive'
-    TYPE_IDENTIFYING = 'identifying'
-    TYPE_UNRESTRICTED = 'unrestricted'
-    TYPE_SUB_TABLE = 'sub-table'
+    TYPE_SENSITIVE = "sensitive"
+    TYPE_IDENTIFYING = "identifying"
+    TYPE_UNRESTRICTED = "unrestricted"
+    TYPE_SUB_TABLE = "sub-table"
 
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
     @staticmethod
-    def get_class_for_table(table):
-        for c in db.Model._decl_class_registry.values():
-            if hasattr(c, '__tablename__') and c.__tablename__ == table.name:
-                return c
-
-    @staticmethod
-    def get_class(class_name):
-        # class_name = ExportService.camel_case_it(name)
-        for c in db.Model._decl_class_registry.values():
-            if hasattr(c, '__name__') and c.__name__ == class_name:
-                return c
-
-    @staticmethod
-    def get_schema(name, many=False, session=None, is_import=False):
-        model = ExportService.get_class(name)
+    def get_schema(name, many=False, is_import=False):
+        schema_module = importlib.import_module(ExportService.SCHEMA_PACKAGE)
+        model = get_class(name)
         class_name = None if model is None else model.__name__
-        schema_name = ''
         schema_class = None
 
         if class_name is None:
@@ -53,24 +39,15 @@ class ExportService:
 
         if not is_import:
             # Check for an 'ExportSchema'
-            schema_name = class_name + "ExportSchema"
-            schema_class = ExportService.str_to_class(ExportService.EXPORT_SCHEMA_PACKAGE, schema_name)
+            schema_name = f"{class_name}ExportSchema"
+            export_class = getattr(schema_module, ExportService.EXPORT_SCHEMA_CLASS)
+            schema_class = getattr(export_class, schema_name, None)
+
+        schema_name = class_name + "Schema"
 
         # If that doesn't work, then look in the resources schema file.
         if schema_class is None:
-            schema_name = class_name + "Schema"
-            schema_class = ExportService.str_to_class(ExportService.SCHEMA_PACKAGE, schema_name)
-
-        # If that doesn't work, then look in the app.schema package.
-        if schema_class is None:
-            schema_name = class_name + "Schema"
-            package = ExportService.APP_PACKAGE + "." + model.__tablename__ + "_schema"
-            schema_class = ExportService.str_to_class(package, schema_name)
-
-        # If that doesn't work, check for a general schema in the class itself.
-        if schema_class is None:
-            schema_name = class_name + "Schema"
-            schema_class = ExportService.str_to_class(model.__module__, schema_name)
+            schema_class = getattr(schema_module, schema_name, None)
 
         if schema_class is None:
             raise Exception("Unable to locate schema for class " + class_name)
@@ -78,65 +55,68 @@ class ExportService:
         return schema_class(many=many, session=session)
 
     @staticmethod
-    def camel_case_it(name):
-        first, *rest = name.split('_')
-        return first.capitalize() + ''.join(word.capitalize() for word in rest)
+    def get_data(name, user_id=None, last_updated: datetime.datetime = None):
+        model_class = get_class(name)
+        select_with_joins = select(model_class)
 
-    @staticmethod
-    def snake_case_it(name):
-        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+        for relationship in model_class.__mapper__.relationships:
+            select_with_joins = select_with_joins.options(joinedload(getattr(model_class, relationship.key)))
 
-    @staticmethod
-    def get_data(name, user_id=None, last_updated=None):
-        model = ExportService.get_class(name)
-        query = db.session.query(model)
         if last_updated:
-            query = query.filter(model.last_updated > last_updated)
-        if hasattr(model, '__mapper_args__') \
-                and 'polymorphic_identity' in model.__mapper_args__:
-            query = query.filter(model.type == model.__mapper_args__['polymorphic_identity'])
-        query = query.order_by(model.id)
+            select_with_joins = select_with_joins.where(
+                typing.cast("ColumnElement[bool]", model_class.last_updated > last_updated)
+            )
+        if hasattr(model_class, "__mapper_args__") and "polymorphic_identity" in model_class.__mapper_args__:
+            select_with_joins = select_with_joins.where(
+                typing.cast(
+                    "ColumnElement[bool]", model_class.type == model_class.__mapper_args__["polymorphic_identity"]
+                )
+            )
+        select_with_joins = select_with_joins.order_by(model_class.id)
         if user_id:
-            if hasattr(model, 'user_id'):
-                return query.filter(model.user_id == user_id)
+            if hasattr(model_class, "user_id"):
+                user_id = int(user_id)
+                select_with_joins = select_with_joins.where(
+                    typing.cast("ColumnElement[bool]", model_class.user_id == user_id)
+                )
             else:
                 return []
-        else:
-            return query.all()
+
+        return session.execute(select_with_joins).unique().scalars().all()
 
     # Returns a list of classes/tables with information about how they should be exported.
     @staticmethod
     def get_table_info(last_updated=None):
         export_infos = []
-        sorted_tables = db.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
+        sorted_tables = Base.metadata.sorted_tables  # Tables in an order that should correctly manage dependencies
 
         # This moves the resource_categories table to the end of the list.
         rc = next((t for t in sorted_tables if t.fullname == "resource_category"), None)
         sorted_tables.append(sorted_tables.pop(sorted_tables.index(rc)))
 
         for table in sorted_tables:
-            db_model = ExportService.get_class_for_table(table)
+            db_model = get_class_for_table(table)
             export_infos.append(ExportService.get_single_table_info(db_model, last_updated))
         return export_infos
 
     @staticmethod
     def get_single_table_info(db_model, last_updated):
+        from .models import ExportInfo
+
         export_info = ExportInfo(table_name=db_model.__tablename__, class_name=db_model.__name__)
-        query = (db.session.query(func.count(db_model.id)))
+        query = session.query(func.count(db_model.id))
         if last_updated:
             query = query.filter(db_model.last_updated > last_updated)
-        if hasattr(db_model, '__mapper_args__') \
-                and 'polymorphic_identity' in db_model.__mapper_args__:
-            query = query.filter(db_model.type == db_model.__mapper_args__['polymorphic_identity'])
+        if hasattr(db_model, "__mapper_args__") and "polymorphic_identity" in db_model.__mapper_args__:
+            query = query.filter(db_model.type == db_model.__mapper_args__["polymorphic_identity"])
 
         export_info.size = query.all()[0][0]
-        export_info.url = url_for("api.exportendpoint", name=ExportService.snake_case_it(db_model.__name__))
-        if hasattr(db_model, '__question_type__'):
+        export_info.url = url_for("api.exportendpoint", name=snake_case_it(db_model.__name__))
+        if hasattr(db_model, "__question_type__"):
             export_info.question_type = db_model.__question_type__
         # Do not include sub-tables that will fall through from quiestionnaire schemas,
         # or logs that don't make sense to export.
-        if hasattr(db_model, '__no_export__') and db_model.__no_export__:
+        if hasattr(db_model, "__no_export__") and db_model.__no_export__:
             export_info.exportable = False
 
         if hasattr(db_model, "get_field_groups"):
@@ -150,70 +130,57 @@ class ExportService:
         return export_info
 
     @staticmethod
-    def class_exists(module_name, class_name):
-        try:
-            module_ = importlib.import_module(module_name)
-            try:
-                return getattr(module_, class_name)
-            except AttributeError:
-                return None
-        except ImportError:
-            return None
-
-    # Given a string, creates an instance of that class
-    @staticmethod
-    def str_to_class(module_name, class_name):
-        return ExportService.class_exists(module_name, class_name)
-
-    @staticmethod
     def get_meta(questionnaire, relationship):
         meta = {"table": {}}
         try:
-            meta["table"]['question_type'] = questionnaire.__question_type__
+            meta["table"]["question_type"] = questionnaire.__question_type__
             meta["table"]["label"] = questionnaire.__label__
         except:
             pass  # If these fields don't exist, just keep going.
         meta["fields"] = []
 
         groups = questionnaire.get_field_groups()
-        if groups is None: groups = {}
+        if groups is None:
+            groups = {}
 
         # This will move fields referenced by the field groups into the group, but will otherwise add them
         # the base meta object if they are not contained within a group.
         for c in questionnaire.__table__.columns:
             if c.info:
-                c.info['name'] = c.name
-                c.info['key'] = c.name
+                c.info["name"] = c.name
+                c.info["key"] = c.name
                 added = False
                 for group, values in groups.items():
                     if "fields" in values:
-                        if c.name in values['fields']:
-                            values['fields'].remove(c.name)
-                            if 'fieldGroup' not in values: values['fieldGroup'] = []
-                            values['fieldGroup'].append(c.info)
-                            values['fieldGroup'] = sorted(values['fieldGroup'],
-                                                          key=lambda field: field['display_order'])
+                        if c.name in values["fields"]:
+                            values["fields"].remove(c.name)
+                            if "fieldGroup" not in values:
+                                values["fieldGroup"] = []
+                            values["fieldGroup"].append(c.info)
+                            values["fieldGroup"] = sorted(
+                                values["fieldGroup"], key=lambda field: field["display_order"]
+                            )
                             added = True
                     # Sort the fields
 
                 if not added:
-                    meta['fields'].append(c.info)
+                    meta["fields"].append(c.info)
 
         for group, values in groups.items():
-            values['name'] = group
+            values["name"] = group
             #            if value['type'] == 'repeat':
             #                value['fieldArray'] = value.pop('fields')
             if "repeat_class" in values:
-                values['key'] = group  # Only include the key on the group if an actual sub-class exists.
-                values['fields'] = ExportService.get_meta(values["repeat_class"](), relationship)['fields']
-                values.pop('repeat_class')
+                values["key"] = group  # Only include the key on the group if an actual sub-class exists.
+                values["fields"] = ExportService.get_meta(values["repeat_class"](), relationship)["fields"]
+                values.pop("repeat_class")
 
-            if 'type' in values and values['type'] == 'repeat':
-                values['fieldArray'] = {'fieldGroup': values.pop('fields')}
-            meta['fields'].append(values)
+            if "type" in values and values["type"] == "repeat":
+                values["fieldArray"] = {"fieldGroup": values.pop("fields")}
+            meta["fields"].append(values)
 
         # Sort the fields
-        meta['fields'] = sorted(meta['fields'], key=lambda field: field['display_order'])
+        meta["fields"] = sorted(meta["fields"], key=lambda field: field["display_order"])
 
         # loops through the depths, checks, and replaces ....
         meta_relationed = ExportService._recursive_relationship_changes(meta, relationship)
@@ -231,10 +198,10 @@ class ExportService:
         for k, v in meta.items():
             if type(v) is dict:
                 if "RELATIONSHIP_SPECIFIC" in v:
-                    if relationship.name in meta[k]['RELATIONSHIP_SPECIFIC']:
-                        meta_copy[k] = meta[k]['RELATIONSHIP_SPECIFIC'][relationship.name]
+                    if relationship.name in meta[k]["RELATIONSHIP_SPECIFIC"]:
+                        meta_copy[k] = meta[k]["RELATIONSHIP_SPECIFIC"][relationship.name]
                 elif "RELATIONSHIP_REQUIRED" in v:
-                    if relationship.name in meta[k]['RELATIONSHIP_REQUIRED']:
+                    if relationship.name in meta[k]["RELATIONSHIP_REQUIRED"]:
                         meta_copy[k] = ExportService._recursive_relationship_changes(v, relationship)
                         # Otherwise, it should not be included in the copy.
                 else:
@@ -243,7 +210,7 @@ class ExportService:
                 meta_copy[k] = []
                 for sv in v:
                     if type(sv) is dict:
-                        if "RELATIONSHIP_REQUIRED" in sv and not relationship.name in sv['RELATIONSHIP_REQUIRED']:
+                        if "RELATIONSHIP_REQUIRED" in sv and relationship.name not in sv["RELATIONSHIP_REQUIRED"]:
                             # skip it.
                             pass
                         else:
@@ -263,46 +230,67 @@ class ExportService:
         hours, the PI will also be emailed notifications every 8 hours until the fault is corrected or the system
         taken down.
         """
+        from .models import DataTransferLog
+
         alert_principal_investigator = False
-        last_log = db.session.query(DataTransferLog).filter(DataTransferLog.type == 'export')\
-            .order_by(desc(DataTransferLog.last_updated)).limit(1).first()
+        last_log = (
+            session.execute(
+                select(DataTransferLog)
+                .options(joinedload(DataTransferLog.details))
+                .where(DataTransferLog.type == "exporting")
+                .order_by(desc(DataTransferLog.last_updated))
+            )
+            .unique()
+            .scalar_one_or_none()
+        )
+        session.close()
+
         if not last_log:
             # If the export logs are empty, create one with the current date.
             seed_log = DataTransferLog(total_records=0)
-            db.session.add(seed_log)
-            db.session.commit()
+            session.add(seed_log)
+            session.commit()
+            session.close()
         else:
             msg = None
             subject = "Autism DRIVE: Error - "
-            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)  # Make date timezone aware
-            time_difference = now - last_log.last_updated
-            hours = int(time_difference.total_seconds()/3600)
-            minutes = int(time_difference.total_seconds()/60)
-            if hours >= 24 and hours% 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
+            time_difference = datetime.datetime.utcnow() - last_log.last_updated
+            hours = int(time_difference.total_seconds() / 3600)
+            minutes = int(time_difference.total_seconds() / 60)
+            if hours >= 24 and hours % 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):
                 alert_principal_investigator = hours % 8 == 0
                 subject = subject + str(hours) + " hours since last successful export"
-                msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
-                    " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \
-                    " email about this issue.  You will receive an email every 2 hours for the first " + \
-                    "24 hours, and every 4 hours there-after."
+                msg = (
+                    "Exports should occur every 5 minutes.  It has been "
+                    + str(hours)
+                    + " hours since the last export was requested. This is the "
+                    + str(last_log.alerts_sent)
+                    + " email about this issue.  You will receive an email every 2 hours for the first "
+                    + "24 hours, and every 4 hours there-after."
+                )
 
             elif hours >= 2 and hours % 2 == 0 and hours / 2 >= last_log.alerts_sent:
                 subject = subject + str(hours) + " hours since last successful export"
-                msg = "Exports should occur every 5 minutes.  It has been " + str(hours) + \
-                    " hours since the last export was requested. This is the " + str(last_log.alerts_sent) + \
-                    " email about this issue.  You will receive an email every 2 hours for the first " \
+                msg = (
+                    "Exports should occur every 5 minutes.  It has been "
+                    + str(hours)
+                    + " hours since the last export was requested. This is the "
+                    + str(last_log.alerts_sent)
+                    + " email about this issue.  You will receive an email every 2 hours for the first "
                     "24 hours, and every 4 hours there-after."
+                )
 
             elif minutes >= 30 and last_log.alerts_sent == 0:
                 subject = subject + str(minutes) + " minutes since last successful export"
-                msg = "Exports should occur every 5 minutes.  It has been " + str(minutes) + \
-                    " minutes since the last export was requested."
+                msg = (
+                    "Exports should occur every 5 minutes.  It has been "
+                    + str(minutes)
+                    + " minutes since the last export was requested."
+                )
             if msg:
-                email_server = EmailService(app)
-                email_server.admin_alert_email(subject, msg,
-                                               alert_principal_investigator=alert_principal_investigator)
+                email_service.admin_alert_email(subject, msg, alert_principal_investigator=alert_principal_investigator)
+
                 last_log.alerts_sent = last_log.alerts_sent + 1
-                db.session.add(last_log)
-                db.session.commit()
-
-
+                session.add(last_log)
+                session.commit()
+                session.close()

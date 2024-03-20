@@ -1,77 +1,80 @@
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
 
-from app import db, RestException
-from app.model.category import Category
-from app.model.study import Study
-from app.model.study_category import StudyCategory
-from app.schema.schema import StudyCategorySchema, CategoryStudiesSchema, StudyCategoriesSchema
+from app.database import session
+from app.models import Category, Study
+from app.models import StudyCategory
+from app.rest_exception import RestException
+from app.schemas import SchemaRegistry
 
 
 class StudyByCategoryEndpoint(flask_restful.Resource):
 
-    schema = CategoryStudiesSchema()
+    schema = SchemaRegistry.CategoryStudiesSchema()
 
-    def get(self, category_id):
-        study_categories = db.session.query(StudyCategory)\
-            .join(StudyCategory.study)\
-            .filter(StudyCategory.category_id == category_id)\
-            .order_by(Study.title)\
+    def get(self, category_id: int):
+        study_categories = (
+            session.query(StudyCategory)
+            .join(StudyCategory.study)
+            .filter(StudyCategory.category_id == category_id)
+            .order_by(Study.title)
             .all()
+        )
         return self.schema.dump(study_categories, many=True)
 
 
 class CategoryByStudyEndpoint(flask_restful.Resource):
 
-    schema = StudyCategoriesSchema()
+    schema = SchemaRegistry.StudyCategoriesSchema()
 
-    def get(self, study_id):
-        study_categories = db.session.query(StudyCategory).\
-            join(StudyCategory.category).\
-            filter(StudyCategory.study_id == study_id).\
-            order_by(Category.name).\
-            all()
-        return self.schema.dump(study_categories,many=True)
+    def get(self, study_id: int):
+        study_categories = (
+            session.query(StudyCategory)
+            .join(StudyCategory.category)
+            .filter(StudyCategory.study_id == study_id)
+            .order_by(Category.name)
+            .all()
+        )
+        return self.schema.dump(study_categories, many=True)
 
-    def post(self, study_id):
+    def post(self, study_id: int):
         request_data = request.get_json()
 
         for item in request_data:
-            item['study_id'] = study_id
+            item["study_id"] = study_id
 
         study_categories = self.schema.load(request_data, many=True)
-        db.session.query(StudyCategory).filter_by(study_id=study_id).delete()
+        session.query(StudyCategory).filter_by(study_id=study_id).delete()
         for c in study_categories:
-            db.session.add(StudyCategory(study_id=study_id,
-                           category_id=c.category_id))
-        db.session.commit()
+            session.add(StudyCategory(study_id=study_id, category_id=c.category_id))
+        session.commit()
         return self.get(study_id)
 
 
 class StudyCategoryEndpoint(flask_restful.Resource):
-    schema = StudyCategorySchema()
+    schema = SchemaRegistry.StudyCategorySchema()
 
-    def get(self, id):
-        model = db.session.query(StudyCategory).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+    def get(self, study_category_id: int):
+        model = session.query(StudyCategory).filter_by(id=study_category_id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        db.session.query(StudyCategory).filter_by(id=id).delete()
-        db.session.commit()
+    def delete(self, study_category_id: int):
+        session.query(StudyCategory).filter_by(id=study_category_id).delete()
+        session.commit()
         return None
 
 
 class StudyCategoryListEndpoint(flask_restful.Resource):
-    schema = StudyCategorySchema()
+    schema = SchemaRegistry.StudyCategorySchema()
 
     def post(self):
         request_data = request.get_json()
         load_result = self.schema.load(request_data)
-        db.session.query(StudyCategory).filter_by(study_id=load_result.study_id,
-                                                  category_id=load_result.category_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
+        session.query(StudyCategory).filter_by(
+            study_id=load_result.study_id, category_id=load_result.category_id
+        ).delete()
+        session.add(load_result)
+        session.commit()
         return self.schema.dump(load_result)
