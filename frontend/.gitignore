@@ -1,8 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-
 # compiled output
 /dist
+/dist-server
 /tmp
 /out-tsc
 
@@ -17,6 +17,8 @@
 *.launch
 .settings/
 *.sublime-workspace
+.run
+venv
 
 # IDE - VSCode
 .vscode/*
@@ -26,6 +28,7 @@
 !.vscode/extensions.json
 
 # misc
+/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -36,11 +39,17 @@ testem.log
 /typings
 
 # e2e
-!/e2e/protractor.conf.js
 /e2e/*.js
 /e2e/*.map
-/e2e/node_modules/
 
 # System Files
 .DS_Store
 Thumbs.db
+/shibboleth/
+/ssl/
+cypress/screenshots
+cypress/videos
+
+# CI files dynamically created for end-to-end testing
+/docker/ci/elasticsearch/*
+/docker/ci/postgres/*
