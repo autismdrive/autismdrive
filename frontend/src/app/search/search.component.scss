@@ -477,11 +477,11 @@ app-search-filters-breadcrumbs {
 .sky, #filters.sky, #hero.sky { background-color: #E5EEF3; }
 .energy-burst-dark, #hero.energy-burst-dark {
   @extend %invert-headings;
-  background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst.jpg');
+  background-image: url('/assets/theme/sunrise-burst.jpg');
 }
 .energy-burst-light, #hero.energy-burst-light {
   @extend %invert-headings;
-  background-image: url('https://curry.virginia.edu/sites/all/themes/curry/_files/css/i/sunrise-burst-footer-crop.jpg');
+  background-image: url('/assets/theme/sunrise-burst-footer-crop.jpg');
 }
 .color-swatch {
   display: inline-block;
