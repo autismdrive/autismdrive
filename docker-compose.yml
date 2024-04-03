@@ -11,7 +11,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_USER=ed_user
       - POSTGRES_PASSWORD=ed_pass
-      - POSTGRES_MULTIPLE_DATABASES=autismdrive,autismdrive_test
+      - POSTGRES_MULTIPLE_DATABASES=stardrive,stardrive_test
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23
