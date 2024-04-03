@@ -53,13 +53,13 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self._load_and_assert_success(Category, "load_categories")
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
-    def test_load_events(self):
+    def test_load_events(self, mock_gmaps_client):
         self.test_load_categories()
         self.test_load_users()
         self._load_and_assert_success(Event, "load_events", ResourceCategory, "event")
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
-    def test_load_locations(self):
+    def test_load_locations(self, mock_gmaps_client):
         self.test_load_categories()
         self._load_and_assert_success(Location, "load_locations", ResourceCategory, "location")
 
