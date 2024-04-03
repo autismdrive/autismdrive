@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.8]
     steps:
       - uses: actions/checkout@v3
       - name: Configure VM for Elasticsearch
@@ -47,6 +47,4 @@ jobs:
           export FLASK_APP="${BACKEND_PATH}/app/__init__.py"
           flask db upgrade
           flask initindex
-      - name: Run tests
-        run: |
           python -m unittest discover -s tests -t tests
