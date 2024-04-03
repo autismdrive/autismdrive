@@ -24,6 +24,7 @@ cmake==3.29.0.1
 elasticsearch-dsl==6.4.0
 elasticsearch~=6.8.2
 et-xmlfile==1.1.0
+faker==23.1.0
 flask-marshmallow==0.14.0
 googlemaps==3.0.2
 httpretty==1.1.1
