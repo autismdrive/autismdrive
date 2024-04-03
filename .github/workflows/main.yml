@@ -31,6 +31,7 @@ jobs:
           cd backend
           mkdir -p instance
           cp config/default.py instance/config.py
+          cp config/testing.py instance/testing.py
           python -m pip install --upgrade pip
           pip install flake8
           pip install -r requirements.txt
