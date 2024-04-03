@@ -92,7 +92,8 @@ class TestDataLoader(BaseTest, unittest.TestCase):
         self.assertIsNotNone(cat)
         self.assertEqual(cat.name, expected_name)
 
-    def test_build_index(self):
+    @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
+    def test_build_index(self, mock_gmaps_client):
         elastic_index.clear()
 
         # Populate the database
