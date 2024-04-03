@@ -29,6 +29,7 @@ jobs:
         run: |
           sudo apt-get -y install apache2 apache2-utils apache2-dev
           cd backend
+          mkdir -p instance
           cp config/default.py instance/config.py
           python -m pip install --upgrade pip
           pip install flake8
