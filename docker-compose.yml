@@ -17,9 +17,17 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23
     environment:
       - "discovery.type=single-node"
+      - "http.max_content_length=10MB"
       - "bootstrap.memory_lock=true"
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
       - "TAKE_FILE_OWNERSHIP=1"
+      - "http.port=9200"
+      - "http.cors.allow-origin=*"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
+      - "http.cors.allow-credentials=true"
+      - "network.publish_host=localhost"
+      - "xpack.security.enabled=false"
     ulimits:
       memlock:
         soft: -1
