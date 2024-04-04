@@ -66,17 +66,18 @@ jobs:
       - name: Export coverage report to XML
         shell: bash
         run: |
+          cd $BACKEND_PATH
           pwd
-          ls -al
+          ls -al .
           coverage xml
-          ls -al
+          ls -al .
       # Hack to rewrite paths in coverage support so SonarCloud can parse them properly.
       - name: Rewrite coverage source path for SonarCloud
         shell: bash
         run: |
           sed -i \
           's/<source>\/home\/runner\/work\/autismdrive\/autismdrive/<source>\/github\/workspace/g' \
-          /home/runner/work/autismdrive/autismdrive/coverage.xml
+          /home/runner/work/autismdrive/autismdrive/backend/coverage.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
