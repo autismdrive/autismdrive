@@ -1,6 +1,8 @@
 name: CI
 on: [push, pull_request, workflow_dispatch]
 env:
+  FRONTEND_PATH: ${{ github.workspace }}/frontend
+  BACKEND_PATH: ${{ github.workspace }}/backend
   FLASK_APP: ${{ github.workspace }}/backend/app/__init__.py
   FLASK_ENV: test
 permissions:
@@ -11,6 +13,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
+        node-version: [14.21.3]
     steps:
       - uses: actions/checkout@v3
       - name: Configure VM for Elasticsearch
@@ -25,6 +28,9 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: |
           sudo apt-get -y install apache2 apache2-utils apache2-dev
@@ -38,13 +44,40 @@ jobs:
           cd ..
       - name: Initialize database and search index
         run: |
-          # Set the home directory
-          export HOME_DIR=`pwd`
-          BACKEND_PATH="${HOME_DIR}/backend"
-  
-          echo -e '\n\n*** Starting tests in backend ***\n\n'
           cd $BACKEND_PATH
-          export FLASK_APP="${BACKEND_PATH}/app/__init__.py"
+          pwd
+          ls -al .
+
+          echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
+
+          echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
           flask db upgrade
+
+          echo -e '\n\n*** Updating Elasticsearch index... ***\n\n'
           flask initindex
-          python -m unittest discover -s tests -t tests
+      - name: Run backend unit tests
+        run: |
+          cd $BACKEND_PATH
+          pwd
+          ls -al .
+          
+          echo -e '\n\n*** Running backend unit tests... ***\n\n'
+          coverage -m unittest discover -s tests -t tests
+      - name: Export coverage report to XML
+        shell: bash
+        run: |
+          pwd
+          ls -al
+          coverage xml
+          ls -al
+      # Hack to rewrite paths in coverage support so SonarCloud can parse them properly.
+      - name: Rewrite coverage source path for SonarCloud
+        shell: bash
+        run: |
+          sed -i \
+          's/<source>\/home\/runner\/work\/autismdrive\/autismdrive/<source>\/github\/workspace/g' \
+          /home/runner/work/autismdrive/autismdrive/coverage.xml
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
