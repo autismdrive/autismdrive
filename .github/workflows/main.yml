@@ -62,7 +62,7 @@ jobs:
           ls -al .
           
           echo -e '\n\n*** Running backend unit tests... ***\n\n'
-          coverage -m unittest discover -s tests -t tests
+          coverage run -m unittest discover -s tests -t tests
       - name: Export coverage report to XML
         shell: bash
         run: |
