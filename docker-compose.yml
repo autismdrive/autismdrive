@@ -1,29 +1,45 @@
 version: "3.7"
 services:
   db:
-    image: sartography/cr-connect-db
+    image: postgres:13
     volumes:
-      - $HOME/docker/volumes/stardrive/postgres:/var/lib/postgresql/data
+      - $HOME/docker/volumes/autismdrive/postgres:/var/lib/postgresql/data
+      - ./initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
     ports:
       - 127.0.0.1:5432:5432
     environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_USER=ed_user
       - POSTGRES_PASSWORD=ed_pass
       - POSTGRES_MULTIPLE_DATABASES=stardrive,stardrive_test
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.11
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23
     environment:
       - "discovery.type=single-node"
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "http.max_content_length=10MB"
+      - "bootstrap.memory_lock=true"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "TAKE_FILE_OWNERSHIP=1"
+      - "http.port=9200"
+      - "http.cors.allow-origin=*"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
+      - "http.cors.allow-credentials=true"
+      - "network.publish_host=localhost"
+      - "xpack.security.enabled=false"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     volumes:
-      - $HOME/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
+      - $HOME/docker/volumes/autismdrive/elasticsearch:/usr/share/elasticsearch/data
     ports:
       - 127.0.0.1:9200:9200
       - 127.0.0.1:9300:9300
 
   backend:
-    image: stardrive-test-backend:latest
+    image: autismdrive-test-backend:latest
     ports:
       - 127.0.0.1:5000:5000
     restart: unless-stopped
@@ -33,9 +49,9 @@ services:
 
 
   frontend:
-    image: stardrive-test-frontend:latest
+    image: autismdrive-test-frontend:latest
     environment:
-      - "API_URL=http://star-drive_backend_1:5000"
+      - "API_URL=http://autismdrive_backend_1:5000"
     ports:
       - 127.0.0.1:4200:4200
     depends_on:

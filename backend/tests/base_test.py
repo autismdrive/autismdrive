@@ -50,8 +50,8 @@ class BaseTest:
 
     @classmethod
     def setUpClass(cls):
-        app.config.from_object('config.testing')
-        app.config.from_pyfile('testing.py')
+        app.config.from_object("config.testing")
+        app.config.from_pyfile("testing.py")
 
         cls.ctx = app.test_request_context()
         cls.app = app.test_client()
@@ -84,8 +84,7 @@ class BaseTest:
         if existing_user.id in self.auths:
             return self.auths[existing_user.id]
 
-        self.auths[existing_user.id] = dict(
-            Authorization='Bearer ' + existing_user.encode_auth_token().decode())
+        self.auths[existing_user.id] = dict(Authorization="Bearer " + existing_user.encode_auth_token())
 
         return self.auths[existing_user.id]
 
@@ -94,12 +93,11 @@ class BaseTest:
         Useful for checking the content of email messages
         (which we store in an array for testing)
         """
-        encoded_word_regex = r'=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}='
-        charset, encoding, encoded_text = re.match(encoded_word_regex,
-                                                   encoded_words).groups()
-        if encoding == 'b':
+        encoded_word_regex = r"=\?{1}(.+)\?{1}([b|q])\?{1}(.+)\?{1}="
+        charset, encoding, encoded_text = re.match(encoded_word_regex, encoded_words).groups()
+        if encoding == "b":
             byte_string = base64.b64decode(encoded_text)
-        elif encoding == 'q':
+        elif encoding == "q":
             byte_string = quopri.decodestring(encoded_text)
         text = byte_string.decode(charset)
         text = text.replace("_", " ")
@@ -109,6 +107,7 @@ class BaseTest:
         """
         Returns given data as JSON string, converting dates to ISO format.
         """
+
         class DateTimeEncoder(JSONEncoder):
             def default(self, obj):
                 if isinstance(obj, (datetime.date, datetime.datetime)):
@@ -119,12 +118,14 @@ class BaseTest:
     def assert_success(self, rv, msg=""):
         try:
             data = json.loads(rv.get_data(as_text=True))
-            self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
-                            "BAD Response: %i. \n %s" %
-                            (rv.status_code, self.jsonify(data)) + ". " + msg)
+            self.assertTrue(
+                rv.status_code >= 200 and rv.status_code < 300,
+                "BAD Response: %i. \n %s" % (rv.status_code, self.jsonify(data)) + ". " + msg,
+            )
         except:
-            self.assertTrue(rv.status_code >= 200 and rv.status_code < 300,
-                            "BAD Response: %i." % rv.status_code + ". " + msg)
+            self.assertTrue(
+                rv.status_code >= 200 and rv.status_code < 300, "BAD Response: %i." % rv.status_code + ". " + msg
+            )
 
     def construct_user(self, email="stan@staunton.com", role=Role.user, last_login=datetime.datetime.now()):
         db_user = db.session.query(User).filter_by(email=email).first()
@@ -140,8 +141,8 @@ class BaseTest:
         participant = Participant(user=user, relationship=relationship)
         db.session.add(participant)
         db.session.commit()
-#        db_participant = db.session.query(Participant).filter_by(id=participant.id).first()
-#        self.assertEqual(db_participant.relationship, participant.relationship)
+        #        db_participant = db.session.query(Participant).filter_by(id=participant.id).first()
+        #        self.assertEqual(db_participant.relationship, participant.relationship)
         return participant
 
     def construct_usermeta(self, user):
@@ -150,7 +151,9 @@ class BaseTest:
         db.session.commit()
         return usermeta
 
-    def construct_admin_note(self, user, resource, id=976, note="I think all sorts of things about this resource and I'm telling you now."):
+    def construct_admin_note(
+        self, user, resource, id=976, note="I think all sorts of things about this resource and I'm telling you now."
+    ):
         admin_note = AdminNote(id=id, user_id=user.id, resource_id=resource.id, note=note)
         db.session.add(admin_note)
         db.session.commit()
@@ -169,35 +172,77 @@ class BaseTest:
         self.assertIsNotNone(db_category.id)
         return db_category
 
-    def construct_resource(self, title="A+ Resource", description="A delightful Resource destined to create rejoicing",
-                           phone="555-555-5555", website="http://stardrive.org", is_draft=False,
-                           organization_name="Some Org", categories=[], ages=[], languages=[], covid19_categories=[], is_uva_education_content=False):
+    def construct_resource(
+        self,
+        title="A+ Resource",
+        description="A delightful Resource destined to create rejoicing",
+        phone="555-555-5555",
+        website="http://stardrive.org",
+        is_draft=False,
+        organization_name="Some Org",
+        categories=[],
+        ages=[],
+        languages=[],
+        covid19_categories=[],
+        is_uva_education_content=False,
+    ):
 
-        resource = Resource(title=title, description=description, phone=phone, website=website, ages=ages,
-                            organization_name=organization_name, is_draft=is_draft, languages=languages,
-                            covid19_categories=covid19_categories, is_uva_education_content=is_uva_education_content)
+        resource = Resource(
+            title=title,
+            description=description,
+            phone=phone,
+            website=website,
+            ages=ages,
+            organization_name=organization_name,
+            is_draft=is_draft,
+            languages=languages,
+            covid19_categories=covid19_categories,
+            is_uva_education_content=is_uva_education_content,
+        )
         db.session.add(resource)
         db.session.commit()
         for category in categories:
-            rc = ResourceCategory(resource_id=resource.id, category=category, type='resource')
+            rc = ResourceCategory(resource_id=resource.id, category=category, type="resource")
             db.session.add(rc)
 
         db_resource = db.session.query(Resource).filter_by(title=resource.title).first()
         self.assertEqual(db_resource.website, resource.website)
 
-        elastic_index.add_document(db_resource, 'Resource')
+        elastic_index.add_document(db_resource, "Resource")
         return db_resource
 
-    def construct_location(self, title="A+ location", description="A delightful location destined to create rejoicing",
-                           street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False,
-                           city="Stauntonville", state="QX", zip="99775", phone="555-555-5555",
-                           website="http://stardrive.org", latitude=38.98765, longitude=-93.12345,
-                           organization_name="Location Org"):
+    def construct_location(
+        self,
+        title="A+ location",
+        description="A delightful location destined to create rejoicing",
+        street_address1="123 Some Pl",
+        street_address2="Apt. 45",
+        is_draft=False,
+        city="Stauntonville",
+        state="QX",
+        zip="99775",
+        phone="555-555-5555",
+        website="http://stardrive.org",
+        latitude=38.98765,
+        longitude=-93.12345,
+        organization_name="Location Org",
+    ):
 
-        location = Location(title=title, description=description, street_address1=street_address1,
-                            street_address2=street_address2, city=city, state=state, zip=zip,phone=phone,
-                            website=website, latitude=latitude, longitude=longitude, is_draft=is_draft,
-                            organization_name=organization_name)
+        location = Location(
+            title=title,
+            description=description,
+            street_address1=street_address1,
+            street_address2=street_address2,
+            city=city,
+            state=state,
+            zip=zip,
+            phone=phone,
+            website=website,
+            latitude=latitude,
+            longitude=longitude,
+            is_draft=is_draft,
+            organization_name=organization_name,
+        )
         db.session.add(location)
         db.session.commit()
 
@@ -208,7 +253,7 @@ class BaseTest:
 
     def construct_location_category(self, location_id, category_name):
         c = self.construct_category(name=category_name)
-        rc = ResourceCategory(resource_id=location_id, category=c, type='location')
+        rc = ResourceCategory(resource_id=location_id, category=c, type="location")
         db.session.add(rc)
         db.session.commit()
         return c
@@ -220,14 +265,26 @@ class BaseTest:
         db.session.commit()
         return c
 
-    def construct_study(self, title="Fantastic Study", description="A study that will go down in history",
-                        participant_description="Even your pet hamster could benefit from participating in this study",
-                        benefit_description="You can expect to have your own rainbow following you around afterwards",
-                        coordinator_email="hello@study.com", categories=[], organization_name="Study Org"):
+    def construct_study(
+        self,
+        title="Fantastic Study",
+        description="A study that will go down in history",
+        participant_description="Even your pet hamster could benefit from participating in this study",
+        benefit_description="You can expect to have your own rainbow following you around afterwards",
+        coordinator_email="hello@study.com",
+        categories=[],
+        organization_name="Study Org",
+    ):
 
-        study = Study(title=title, description=description, participant_description=participant_description,
-                      benefit_description=benefit_description, status=Status.currently_enrolling,
-                      coordinator_email=coordinator_email, organization_name=organization_name)
+        study = Study(
+            title=title,
+            description=description,
+            participant_description=participant_description,
+            benefit_description=benefit_description,
+            status=Status.currently_enrolling,
+            coordinator_email=coordinator_email,
+            organization_name=organization_name,
+        )
 
         db.session.add(study)
         db.session.commit()
@@ -239,7 +296,7 @@ class BaseTest:
             db.session.add(sc)
 
         db.session.commit()
-        elastic_index.add_document(db_study, 'Study')
+        elastic_index.add_document(db_study, "Study")
 
         db_study = db.session.query(Study).filter_by(id=db_study.id).first()
         self.assertEqual(len(db_study.categories), len(categories))
@@ -257,21 +314,52 @@ class BaseTest:
         self.assertEqual(db_inv.title, investigator.title)
         return db_inv
 
-    def construct_event(self, title="A+ Event", description="A delightful event destined to create rejoicing",
-                        street_address1="123 Some Pl", street_address2="Apt. 45", is_draft=False, city="Stauntonville",
-                        state="QX", zip="99775", phone="555-555-5555", website="http://stardrive.org",
-                        date=datetime.datetime.now() + datetime.timedelta(days=7), organization_name="Event Org",
-                        post_survey_link="http://stardrive.org/survey", webinar_link="http://stardrive.org/event",
-                        includes_registration=True, max_users=35, registered_users=None, post_event_description=None):
+    def construct_event(
+        self,
+        title="A+ Event",
+        description="A delightful event destined to create rejoicing",
+        street_address1="123 Some Pl",
+        street_address2="Apt. 45",
+        is_draft=False,
+        city="Stauntonville",
+        state="QX",
+        zip="99775",
+        phone="555-555-5555",
+        website="http://stardrive.org",
+        date=datetime.datetime.now() + datetime.timedelta(days=7),
+        organization_name="Event Org",
+        post_survey_link="http://stardrive.org/survey",
+        webinar_link="http://stardrive.org/event",
+        includes_registration=True,
+        max_users=35,
+        registered_users=None,
+        post_event_description=None,
+    ):
 
         if registered_users is None:
-            registered_users = [self.construct_user(email="e1@sartography.com"),
-                                self.construct_user("e2@sartography.com")]
-        event = Event(title=title, description=description, street_address1=street_address1,
-                      street_address2=street_address2, city=city, state=state, zip=zip, phone=phone, website=website,
-                      date=date, is_draft=is_draft, organization_name=organization_name, webinar_link=webinar_link,
-                      post_survey_link=post_survey_link, includes_registration=includes_registration, max_users=max_users,
-                      post_event_description=post_event_description)
+            registered_users = [
+                self.construct_user(email="e1@sartography.com"),
+                self.construct_user("e2@sartography.com"),
+            ]
+        event = Event(
+            title=title,
+            description=description,
+            street_address1=street_address1,
+            street_address2=street_address2,
+            city=city,
+            state=state,
+            zip=zip,
+            phone=phone,
+            website=website,
+            date=date,
+            is_draft=is_draft,
+            organization_name=organization_name,
+            webinar_link=webinar_link,
+            post_survey_link=post_survey_link,
+            includes_registration=includes_registration,
+            max_users=max_users,
+            post_event_description=post_event_description,
+        )
         db.session.add(event)
 
         db_event = db.session.query(Event).filter_by(title=event.title).first()
@@ -281,7 +369,7 @@ class BaseTest:
             eu = EventUser(event_id=db_event.id, user_id=user.id)
             db.session.add(eu)
 
-        elastic_index.add_document(db_event, 'Event')
+        elastic_index.add_document(db_event, "Event")
         return db_event
 
     def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):
@@ -306,7 +394,9 @@ class BaseTest:
 
         return db.session.query(ChainStep).all()
 
-    def construct_chain_step(self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=datetime.datetime.now()):
+    def construct_chain_step(
+        self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=datetime.datetime.now()
+    ):
         db.session.add(ChainStep(id=id, name=name, instruction=instruction, last_updated=last_updated))
         db.session.commit()
         return db.session.query(ChainStep).filter(ChainStep.id == id).first()
@@ -324,7 +414,7 @@ class BaseTest:
         investigator = Investigator(name="Sam I am")
         db.session.add(StudyInvestigator(study=study, investigator=investigator))
         db.session.add(StudyUser(study=study, user=self.construct_user()))
-        db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=''))
+        db.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=""))
         db.session.add(UserFavorite(user_id=self.construct_user().id))
         db.session.add(investigator)
         db.session.add(EmailLog())
@@ -334,14 +424,13 @@ class BaseTest:
 
     def get_identification_questionnaire(self, participant_id):
         return {
-            'first_name': "Darah",
-            'middle_name': "Soo",
-            'last_name': "Ubway",
-            'is_first_name_preferred': True,
-            'birthdate': '2002-02-02T00:00:00.000000Z',
-            'birth_city': 'Staunton',
-            'birth_state': 'VA',
-            'is_english_primary': True,
-            'participant_id': participant_id
+            "first_name": "Darah",
+            "middle_name": "Soo",
+            "last_name": "Ubway",
+            "is_first_name_preferred": True,
+            "birthdate": "2002-02-02T00:00:00.000000Z",
+            "birth_city": "Staunton",
+            "birth_state": "VA",
+            "is_english_primary": True,
+            "participant_id": participant_id,
         }
-

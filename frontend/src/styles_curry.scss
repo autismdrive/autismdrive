@@ -2027,7 +2027,7 @@ div.more {
     display: block !important;
   }
   a[href^="/"]:after {
-    content: " (https://curry.virginia.edu" attr(href) ")";
+    content: " (https://education.virginia.edu" attr(href) ")";
   }
   .img a:after {
     content: '';
