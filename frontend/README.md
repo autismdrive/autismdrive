@@ -31,13 +31,13 @@ Make sure you have the database, backend, and frontend all running.
 
 ### From PyCharm
 Open the Edit Configurations menu (Run > Edit Configurations...) and add a Protractor configuration with the following settings:
-* Configuration File: `[path-to-your-files]/star-drive/frontend/e2e/protractor.conf.js`
+* Configuration File: `[path-to-your-files]/autismdrive/frontend/e2e/protractor.conf.mjs`
 * Protractor Options: `--dev-server-target=`
 
 Save the configuration. Now you can run end-to-end tests with the play button.
 
 ### From command line
-Edit the tsconfig file path in the Protractor config file (frontend/e2e/protractor.conf.js):
+Edit the tsconfig file path in the Protractor config file (frontend/e2e/protractor.conf.mjs):
 ```
     require('ts-node').register({
       project: './e2e/tsconfig.e2e.json'

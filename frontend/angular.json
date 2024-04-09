@@ -3,14 +3,16 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "star-drive": {
+    "autismdrive": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "name": "",
+          "project": ""
         }
       },
       "architect": {
@@ -23,19 +25,14 @@
               "rxjs-compat"
             ],
             "aot": true,
-            "outputPath": "dist/star-drive",
+            "outputPath": "dist/autismdrive",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              {
-                "glob": "**/*",
-                "input": "node_modules/ng2-pdfjs-viewer/pdfjs",
-                "output": "/assets/pdfjs"
-              }
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
@@ -138,24 +135,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "star-drive:build"
+            "browserTarget": "autismdrive:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "star-drive:build:production"
+              "browserTarget": "autismdrive:build:production"
             },
             "mirror": {
-              "browserTarget": "star-drive:build:mirror"
+              "browserTarget": "autismdrive:build:mirror"
             },
             "es5": {
-              "browserTarget": "star-drive:build:es5"
+              "browserTarget": "autismdrive:build:es5"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "star-drive:build"
+            "browserTarget": "autismdrive:build"
           }
         },
         "test": {
@@ -189,7 +186,7 @@
         }
       }
     },
-    "star-drive-e2e": {
+    "autismdrive-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -197,12 +194,12 @@
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "star-drive:serve"
+            "protractorConfig": "e2e/protractor.conf.mjs",
+            "devServerTarget": "autismdrive:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "star-drive:serve:production"
+              "devServerTarget": "autismdrive:serve:production"
             }
           }
         },
@@ -218,7 +215,7 @@
       }
     }
   },
-  "defaultProject": "star-drive",
+  "defaultProject": "autismdrive",
   "cli": {
     "analytics": false
   }

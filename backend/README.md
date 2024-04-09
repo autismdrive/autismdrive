@@ -214,13 +214,13 @@ token, and then redirect again to the front end, passing that token along as a G
 
 ### Run backend tests
 Make sure you have set up your test database (see Database Setup above)
-You can use nose2 to execute all of tests, or you can run them individually using
+You can use unittest to execute all of the tests, or you can run them individually using
 Pycharm or other IDE.
 In the `backend` directory, execute the following command:
 ```BASH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
-nose2
+unittest
 ```
 
 ### Run frontend tests
@@ -256,16 +256,16 @@ variable to specify this when you fire up the mirroring instance.
 APP_CONFIG_FILE=/full/path/to/config/mirror.py
 ```
   
-Note that it should be the full path.  You'll be running both instances, 
+Note that it should be the full absolute path. You'll be running both instances, 
 so don't set this environment variable for all commands, just for running the instance.
-For me, I have it set as an environment variable under the Run Configuration within
-PyCharm.  I copied by existing run command and added this environment variable
-there.  You will also need to add a port (5001) argument so you aren't running on the 
-same port as the primary server.  Below are the settings in my Run configuration:
+You can set the environment variable under the Run Configuration within
+PyCharm. Specify the port argument as 5001 so you aren't running on the 
+same port as the primary server. In PyCharm, go to Run > Edit Configurations... > + > Python:
 
+```
 Parameters: 5001
-Environment Variable: PYTHONUNBUFFERED=1;MIRRORING=true
-
+Environment Variables: PYTHONUNBUFFERED=1;MIRRORING=true
+```
 You will need to build the basic data structures in the database in order to
 load data for this you will need to run the init_db flask command, but
 you will need to make that specific to the mirror instance.  You'll need to provide
@@ -280,20 +280,25 @@ You will need to install:
   * Python 3
   * Elastic Search 6
   * Apache Web Server
-     * mod-wsgi  (for running flask apps within apache)
+     * mod-wsgi  (for running Flask apps within Apache)
   * Postgres 
  
-I've tended to set up the website under /var/www/star or /var/www/autismdrive (the new name and url)
-In the /var/www/autismdrive/ I create a python virtual enviroment with the command:
+In Production, the deployed files are located at `/var/www/autismdrive`:
+```bash
+mkdir -p /var/www/autismdrive
+```
+
+In the `/var/www/autismdrive/` directory, create a Python virtual enviroment with the command:
 ```
 python3 -m venv python-env
 ```
-When pushing to production please create a new 'Release' on gitHub describing the changes that were rolled out.
 
-Currently we are using a separate repository for deployment: star-drive-dist. To prepare this for deployment, you should have a
-copy of star-drive-dist in the same directory as your local copy of star-drive. Your local star-drive should be on master, 
+When pushing to production please create a new 'Release' on GitHub describing the changes that were rolled out.
+
+Currently we are using a separate repository for deployment: `autismdrive-dist`. To prepare this for deployment, you should have a
+copy of `autismdrive-dist` in the same directory as your local copy of `autismdrive`. Your local `autismdrive` should be on the `master` branch, 
 up to date with all the changes for the release. Once this is ready, run the ```prepare_for_deploy.sh``` script in 
-star-drive-dist to prepare the release. Commit these changes referencing the release number and push them up. 
+`autismdrive-dist` to prepare the release. Commit these changes referencing the release number and push them up. 
 
 
 

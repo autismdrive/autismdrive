@@ -44,7 +44,7 @@ import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
 import {TruncateModule} from '@yellowspot/ng-truncate';
-import {PdfJsViewerModule} from 'ng2-pdfjs-viewer/dist';
+import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
 import {NgProgressModule} from 'ngx-progressbar';
