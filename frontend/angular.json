@@ -196,7 +196,6 @@
       }
     }
   },
-  "defaultProject": "autismdrive",
   "cli": {
     "analytics": false
   }
