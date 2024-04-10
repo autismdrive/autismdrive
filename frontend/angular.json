@@ -176,9 +176,8 @@
       "prefix": "",
       "architect": {
         "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
+          "builder": "@angular-devkit/build-angular:nightwatch",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.mjs",
             "devServerTarget": "autismdrive:serve"
           },
           "configurations": {

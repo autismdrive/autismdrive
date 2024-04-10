@@ -17,11 +17,6 @@
       "extends": ["plugin:json/recommended", "plugin:prettier/recommended"]
     },
     {
-      "files": ["cypress/**/*.ts"],
-      "plugins": ["cypress"],
-      "extends": ["plugin:cypress/recommended", "plugin:chai-friendly/recommended"]
-    },
-    {
       "files": ["*.ts"],
       "parserOptions": {
         "project": ["tsconfig.json"],
