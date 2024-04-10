@@ -2016,8 +2016,8 @@ div.more {
   .accordion-content {
     display: block !important;
   }
-  a[href^='/']:after {
-    content: ' (https://curry.virginia.edu' attr(href) ')';
+  a[href^="/"]:after {
+    content: " (https://education.virginia.edu" attr(href) ")";
   }
   .img a:after {
     content: '';

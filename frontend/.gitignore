@@ -39,6 +39,7 @@ testem.log
 /typings
 
 # e2e
+!/e2e/protractor.conf.mjs
 /e2e/*.js
 /e2e/*.map
 

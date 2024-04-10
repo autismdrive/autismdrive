@@ -13,7 +13,7 @@ import {GoogleAnalyticsService} from './_services/google-analytics/google-analyt
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'star-drive';
+  title = 'Autism DRIVE';
   hideHeader = false;
   currentUser: User;
 

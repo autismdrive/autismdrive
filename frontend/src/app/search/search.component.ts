@@ -165,7 +165,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     },
     {
       label: 'Contact a Family Navigator for resource help',
-      url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/star/resources/star-family-navigation',
+      url: 'https://education.virginia.edu/research-initiatives/research-centers-labs/supporting-transformative-autism-research/star-family-navigation',
     },
   ];
   queryParamMap: ParamMap;

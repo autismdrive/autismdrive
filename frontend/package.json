@@ -1,5 +1,5 @@
 {
-  "name": "star-drive",
+  "name": "autismdrive",
   "version": "0.0.0",
   "scripts": {
     "backend-reset": "cd .. && ./reset-backend.sh --skip_update && cd ..",
@@ -17,6 +17,9 @@
     "test": "ng test",
     "test:watch": "jest -o --watch --config ./jest.config.js",
     "test_headless": "jest --coverage --config ./jest.config.js"
+  },
+  "engines": {
+    "node": "14.21.3"
   },
   "private": true,
   "dependencies": {

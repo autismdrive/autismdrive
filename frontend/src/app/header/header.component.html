@@ -9,15 +9,24 @@
     fxLayoutAlign="center center"
     id="uva-header"
   >
-    <div class="uva-logo" fxFlex>
-      <a
-        href="https://curry.virginia.edu/faculty-research/centers-labs-projects/supporting-transformative-autism-research-star"
-        target="_blank"
-      >
-        <span fxHide fxShow.lt-lg>About UVA STAR</span>
-        <span fxHide fxShow.gt-lg fxShow.lg>Learn about the UVA STAR project</span>
-      </a>
-    </div>
+    <div
+      class="uva-logo"
+      fxFlex
+    ><a
+      href="https://education.virginia.edu/research-initiatives/research-centers-labs/supporting-transformative-autism-research"
+      target="_blank"
+    >
+        <span
+          fxHide
+          fxShow.lt-lg
+        >About UVA STAR</span>
+      <span
+        fxHide
+        fxShow.gt-lg
+        fxShow.lg
+      >Learn about the UVA STAR project</span>
+
+    </a></div>
     <span fxFlex></span>
     <div *ngIf="config.mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
   </mat-toolbar-row>

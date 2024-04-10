@@ -1,6 +1,8 @@
 name: CI
 on: [push, pull_request, workflow_dispatch]
 env:
+  FRONTEND_PATH: ${{ github.workspace }}/frontend
+  BACKEND_PATH: ${{ github.workspace }}/backend
   FLASK_APP: ${{ github.workspace }}/backend/app/__init__.py
   FLASK_ENV: test
 permissions:
@@ -10,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11]
+        python-version: [3.8]
+        node-version: [14.21.3]
     steps:
       - uses: actions/checkout@v3
       - name: Configure VM for Elasticsearch
@@ -20,26 +23,68 @@ jobs:
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
       - name: Start Elasticsearch and PostgreSQL
-        run: docker-compose up -d db es
+        run: docker compose up -d db es
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: |
           sudo apt-get -y install apache2 apache2-utils apache2-dev
           cd backend
+          mkdir -p instance
+          cp config/default.py instance/config.py
+          cp config/testing.py instance/testing.py
           python -m pip install --upgrade pip
           pip install flake8
           pip install -r requirements.txt
           cd ..
-      - name: Run tests
+      - name: Initialize database and search index
         run: |
-          # Set the home directory
-          export HOME_DIR=`pwd`
-          BACKEND_PATH="${HOME_DIR}/backend"
-  
-          echo -e '\n\n*** Starting tests in backend ***\n\n'
           cd $BACKEND_PATH
-          export FLASK_APP="${BACKEND_PATH}/app/__init__.py"
-          python -m unittest discover -s tests -t tests
+          pwd
+          ls -al .
+
+          echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
+
+          echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
+          flask db upgrade
+
+          echo -e '\n\n*** Updating Elasticsearch index... ***\n\n'
+          flask initindex
+      - name: Run backend unit tests
+        run: |
+          cd $BACKEND_PATH
+          pwd
+          ls -al .
+          
+          echo -e '\n\n*** Running backend unit tests... ***\n\n'
+          coverage run -m unittest discover -s tests -t tests
+      - name: Install frontend dependencies
+        run: |
+          cd $FRONTEND_PATH
+          npm install --legacy-peer-deps
+      - name: Export coverage report to XML
+        shell: bash
+        run: |
+          cd $BACKEND_PATH
+          pwd
+          ls -al .
+          coverage xml
+          ls -al .
+      # Hack to rewrite paths in coverage support so SonarCloud can parse them properly.
+      - name: Rewrite coverage source path for SonarCloud
+        shell: bash
+        run: |
+          sed -i \
+          's/<source>\/home\/runner\/work\/autismdrive\/autismdrive/<source>\/github\/workspace/g' \
+          /home/runner/work/autismdrive/autismdrive/backend/coverage.xml
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.SONARCLOUD_GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
