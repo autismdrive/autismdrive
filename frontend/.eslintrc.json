@@ -1,11 +1,10 @@
 {
   "root": true,
-  "ignorePatterns": ["projects/**/*", "dist/**/*", "*.min.*"],
   "overrides": [
     {
       "files": ["*.js"],
       "parserOptions": {
-        "ecmaVersion": 2020
+        "ecmaVersion": 11
       },
       "env": {
         "es6": true
@@ -21,7 +20,7 @@
       "parserOptions": {
         "project": ["tsconfig.json"],
         "createDefaultProgram": true,
-        "ecmaVersion": 2020,
+        "ecmaVersion": 11,
         "sourceType": "module"
       },
       "extends": [
@@ -29,6 +28,7 @@
         "plugin:@angular-eslint/template/process-inline-templates",
         "plugin:prettier/recommended"
       ],
+
       "rules": {
         "@angular-eslint/component-selector": [
           "warn",

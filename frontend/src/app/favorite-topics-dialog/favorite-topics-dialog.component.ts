@@ -1,21 +1,21 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {of} from 'rxjs';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
 import {Category} from '../_models/category';
 import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
+import {TreeComponent} from '@App/app/_forms/tree/tree.component';
 
 @Component({
   selector: 'app-favorite-topics-dialog',
   templateUrl: './favorite-topics-dialog.component.html',
   styleUrls: ['./favorite-topics-dialog.component.scss'],
 })
-export class FavoriteTopicsDialogComponent implements OnInit {
+export class FavoriteTopicsDialogComponent extends TreeComponent implements OnInit {
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
   covid19Labels = Covid19Categories.labels;
@@ -42,8 +42,7 @@ export class FavoriteTopicsDialogComponent implements OnInit {
       covid19_categories: string[];
     },
   ) {
-    this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
-    this.dataSource = new MatTreeNestedDataSource();
+    super();
   }
 
   ngOnInit() {
@@ -73,17 +72,6 @@ export class FavoriteTopicsDialogComponent implements OnInit {
         this._updateModelCategories();
       });
     }
-  }
-
-  findNode(cat_id: number) {
-    const allNodes = [];
-
-    this.dataSource.data.forEach(dataCat => {
-      const descendants = this.treeControl.getDescendants(dataCat);
-      descendants.forEach(d => allNodes.push(d));
-      allNodes.push(dataCat);
-    });
-    return allNodes.find(i => i.id === cat_id);
   }
 
   /** Toggle the category item selection. */

@@ -1,10 +1,10 @@
-import {AgmCoreModule, LAZY_MAPS_API_CONFIG} from '@agm/core';
-import {AgmJsMarkerClustererModule} from '@agm/js-marker-clusterer';
+import {NgMapsCoreModule} from '@ng-maps/core';
+import {GOOGLE_MAPS_API_CONFIG} from '@ng-maps/google';
+import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule, DatePipe} from '@angular/common';
-import {HttpClient, HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {APP_INITIALIZER, Injectable, NgModule} from '@angular/core';
-import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatBadgeModule} from '@angular/material/badge';
@@ -17,7 +17,7 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
+import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule} from '@angular/material/form-field';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
@@ -134,6 +134,7 @@ import {FormPrintoutComponent} from './_forms/form-printout/form-printout.compon
 import {GroupValidationWrapperComponent} from './_forms/group-validation-wrapper/group-validation-wrapper.component';
 import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component';
 import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
+import {TreeComponent} from './_forms/tree/tree.component';
 import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
 import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
 import {ResizeTextareaComponent} from './_forms/resize-textarea/resize-textarea.component';
@@ -163,7 +164,7 @@ import {IntervalService} from './_services/interval/interval.service';
 import {SearchService} from './_services/search/search.service';
 
 // Attempt to load the configuration from a file called config.json right next to
-// this index page, it if exists.  Otherwise assume we are connecting to port
+// this index page, it if exists. Otherwise, assume we are connecting to port
 // 5000 on the local server.
 export function load(http: HttpClient, config: ConfigService): () => Promise<boolean> {
   return (): Promise<boolean> => {
@@ -179,7 +180,7 @@ export function load(http: HttpClient, config: ConfigService): () => Promise<boo
             config.fromProperties(fromServer);
             resolve(true);
           }),
-          catchError((x: {status: number}, caught: Observable<void>): ObservableInput<{}> => {
+          catchError((_x: {status: number}, _caught: Observable<void>): ObservableInput<{}> => {
             console.log('Failed to load configuration, unable to find ./api/config');
             resolve(false);
             return of({});
@@ -324,6 +325,7 @@ export class FormlyConfig {
     TaxonomyAdminComponent,
     TermsComponent,
     TimedoutComponent,
+    TreeComponent,
     TutorialVideoComponent,
     TypeIconComponent,
     UserAdminComponent,
@@ -335,18 +337,17 @@ export class FormlyConfig {
     GroupValidationWrapperComponent,
   ],
   imports: [
-    AgmCoreModule.forRoot(), // Config provided by ConfService (see providers below)
-    AgmJsMarkerClustererModule,
+    NgMapsCoreModule,
+    NgMapsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
     CommonModule,
-    FlexLayoutModule,
     FormlyMatDatepickerModule,
     FormlyMaterialModule,
-    FormlyModule.forRoot(FormlyConfig.config),
+    FormlyModule,
     FormsModule,
     HttpClientModule,
-    MarkdownModule.forRoot(),
+    MarkdownModule,
     MatAutocompleteModule,
     MatBadgeModule,
     MatButtonModule,
@@ -396,20 +397,10 @@ export class FormlyConfig {
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
-    {provide: LAZY_MAPS_API_CONFIG, useExisting: ConfigService},
+    {provide: GOOGLE_MAPS_API_CONFIG, useExisting: ConfigService},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
   ],
   bootstrap: [AppComponent],
-  entryComponents: [
-    AdminExportDetailsComponent,
-    AdminNoteFormComponent,
-    AvatarDialogComponent,
-    EventRegistrationFormComponent,
-    FavoriteTopicsDialogComponent,
-    InvestigatorFormComponent,
-    RegisterDialogComponent,
-    RepeatSectionDialogComponent,
-  ],
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {

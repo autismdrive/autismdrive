@@ -14,15 +14,15 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "lib": [
-      "es2018",
+      "es2022",
       "dom"
     ],
-    "module": "es2020",
+    "module": "es2022",
     "moduleResolution": "node",
     "outDir": "./dist/out-tsc",
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "ES2022",
+    "target": "es2022",
     "typeRoots": [
       "node_modules/@types"
     ],

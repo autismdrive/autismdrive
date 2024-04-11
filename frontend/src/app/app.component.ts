@@ -1,11 +1,11 @@
+import {bootstrapApplication, Meta, provideProtractorTestingSupport} from '@angular/platform-browser';
 import {Component, OnInit} from '@angular/core';
-import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router} from '@angular/router';
 import {User} from './_models/user';
 import {ApiService} from './_services/api/api.service';
 import {AuthenticationService} from './_services/authentication/authentication-service';
-import {ConfigService} from './_services/config/config.service';
 import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
+import {ConfigService} from './_services/config/config.service';
 
 @Component({
   selector: 'app-root',
@@ -59,3 +59,5 @@ export class AppComponent implements OnInit {
     });
   }
 }
+
+await bootstrapApplication(AppComponent, {providers: [provideProtractorTestingSupport()]});

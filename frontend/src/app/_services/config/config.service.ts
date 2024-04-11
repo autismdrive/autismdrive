@@ -1,4 +1,4 @@
-import {LazyMapsAPILoaderConfigLiteral} from '@agm/core';
+import {LazyMapsAPILoaderConfigLiteral} from '@ng-maps/core';
 import {Injectable} from '@angular/core';
 
 @Injectable({

@@ -206,7 +206,7 @@
         <h3>Check back soon for more updates!</h3>
       </div>
       <div
-        *ngIf="query?.total != 0"
+        *ngIf="query?.total !== 0"
         id="sort-and-status"
         fxLayout="row"
         fxLayout.lt-md="column"
@@ -339,7 +339,7 @@
       </div>
     </mat-expansion-panel>
     <div id="map" fxLayout="column" fxLayoutGap="2em">
-      <agm-map
+      <map-view
         #mapTemplate
         *ngIf="shouldShowMap"
         [latitude]="loc.lat"
@@ -408,7 +408,7 @@
             >
           </agm-info-window>
         </ng-container>
-      </agm-map>
+      </map-view>
 
       <div *ngIf="highlightedStudy" id="studies-highlight">
         <mat-card>

@@ -1,16 +1,7 @@
-import {AgmMap, LatLngBounds} from '@agm/core';
+import {NgMapsViewComponent} from '@ng-maps/core';
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  HostBinding,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnInit, ViewChild} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTabChangeEvent} from '@angular/material/tabs';
@@ -34,6 +25,8 @@ import {AuthenticationService} from '../_services/authentication/authentication-
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
 import {SearchService} from '../_services/search/search.service';
 import LatLngLiteral = google.maps.LatLngLiteral;
+import LatLngBounds = google.maps.LatLngBounds;
+import GoogleMap = google.maps.Map;
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -61,7 +54,7 @@ enum LocationMode {
     ]),
   ],
 })
-export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
+export class SearchComponent implements AfterViewInit, OnInit {
   @HostBinding('@pageAnimations')
   public animatePage = true;
 
@@ -103,7 +96,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   sortMethods: {[key: string]: SortMethod};
   selectedSort: SortMethod;
   paginatorElement: MatPaginator;
-  mapTemplateElement: AgmMap;
+  mapTemplateElement: NgMapsViewComponent<any>;
   currentUser: User;
   highlightedStudy: Study;
   resourceGatherers: AccordionItem[] = [
@@ -133,7 +126,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         education programming and related services to nine school districts under an umbrella of a regional program.
       `,
       image: '/assets/partners/prep.png',
-      url: 'http://www.prepivycreek.com/',
+      url: 'https://www.prepivycreek.com/',
     },
     {
       name: 'Virginia Institute of Autism',
@@ -179,7 +172,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     private googleAnalyticsService: GoogleAnalyticsService,
     private location: Location,
     private meta: Meta,
-    private renderer: Renderer2,
     private route: ActivatedRoute,
     private router: Router,
     private searchService: SearchService,
@@ -247,6 +239,95 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `name='twitter:image'`,
     );
+  }
+
+  @ViewChild('paginator')
+  set paginator(value: MatPaginator) {
+    this.paginatorElement = value;
+  }
+
+  @ViewChild('mapTemplate')
+  set mapTemplate(value: NgMapsViewComponent<GoogleMap>) {
+    this.mapTemplateElement = value;
+  }
+
+  get circleRadius(): number {
+    const maxMiles = 100;
+    const metersPerMi = 1609.34;
+    return (maxMiles * metersPerMi) / (this.mapZoomLevel || 1);
+  }
+
+  get filtersPanelStyles() {
+    const styles = {
+      'full-screen': this.showFilters,
+      minimized: !this.showFilters,
+    };
+
+    styles[this.searchBgClass] = true;
+    return styles;
+  }
+
+  get hits(): Hit[] {
+    return this.query.hits;
+  }
+
+  get isDistanceSort(): boolean {
+    return this.selectedSort && this.selectedSort.name === 'Distance';
+  }
+
+  get isInfoWindowOpen(): boolean {
+    return this.selectedMapResource != null;
+  }
+
+  get isLastPage(): boolean {
+    if (this.paginatorElement) {
+      return !this.paginatorElement.hasNextPage();
+    } else {
+      return true;
+    }
+  }
+
+  get numResultsFrom(): number {
+    if (this.paginatorElement) {
+      return this.paginatorElement.pageIndex * this.pageSize + 1;
+    } else {
+      return 0;
+    }
+  }
+
+  get numResultsTo(): number {
+    if (this.paginatorElement) {
+      return this.isLastPage ? this.numTotalResults : (this.paginatorElement.pageIndex + 1) * this.pageSize;
+    } else {
+      return this.numTotalResults;
+    }
+  }
+
+  get numTotalResults() {
+    if (this.query && this.query.total) {
+      return this.query.total;
+    } else {
+      return 0;
+    }
+  }
+
+  get shouldHideVideo() {
+    return !!localStorage.getItem('shouldHideTutorialVideo');
+  }
+
+  get shouldShowMap() {
+    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
+    return isLocation || this.isDistanceSort;
+  }
+
+  get selectedCategory() {
+    if (this.query) {
+      return this.query.category;
+    }
+  }
+
+  get resourceTypesFiltered(): HitType[] {
+    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
   }
 
   ngOnInit() {
@@ -334,7 +415,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.locationMode = mode;
   }
 
-  setZipLocation(zipCode, callback?: () => void) {
+  setZipLocation(zipCode: string, callback?: () => void) {
     this.storedZip = zipCode;
     this.api.getZipCoords(this.storedZip).subscribe(z => {
       this.setLocation(LocationMode.zipcode, {lat: z.latitude, lng: z.longitude});
@@ -357,6 +438,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           }
         },
         error => {
+          console.error(error);
           this.gpsEnabled = false;
           if (callback) {
             callback();
@@ -371,99 +453,11 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private _updateDistanceSort() {
-    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
-    distanceSortQuery.latitude = this.loc.lat;
-    distanceSortQuery.longitude = this.loc.lng;
-    this.query.sort = distanceSortQuery;
-  }
-
-  @ViewChild('paginator')
-  set paginator(value: MatPaginator) {
-    this.paginatorElement = value;
-  }
-
-  @ViewChild('mapTemplate')
-  set mapTemplate(value: AgmMap) {
-    this.mapTemplateElement = value;
-  }
-
-  get circleRadius(): number {
-    const maxMiles = 100;
-    const metersPerMi = 1609.34;
-    return (maxMiles * metersPerMi) / (this.mapZoomLevel || 1);
-  }
-
-  get filtersPanelStyles() {
-    const styles = {
-      'full-screen': this.showFilters,
-      minimized: !this.showFilters,
-    };
-
-    styles[this.searchBgClass] = true;
-    return styles;
-  }
-
-  get hits(): Hit[] {
-    return this.query.hits;
-  }
-
-  get isDistanceSort(): boolean {
-    return this.selectedSort && this.selectedSort.name === 'Distance';
-  }
-
-  get isInfoWindowOpen(): boolean {
-    return this.selectedMapResource != null;
-  }
-
-  get isLastPage(): boolean {
-    if (this.paginatorElement) {
-      return !this.paginatorElement.hasNextPage();
-    } else {
-      return true;
-    }
-  }
-
-  get numResultsFrom(): number {
-    if (this.paginatorElement) {
-      return this.paginatorElement.pageIndex * this.pageSize + 1;
-    } else {
-      return 0;
-    }
-  }
-
-  get numResultsTo(): number {
-    if (this.paginatorElement) {
-      return this.isLastPage ? this.numTotalResults : (this.paginatorElement.pageIndex + 1) * this.pageSize;
-    } else {
-      return this.numTotalResults;
-    }
-  }
-
-  get numTotalResults() {
-    if (this.query && this.query.total) {
-      return this.query.total;
-    } else {
-      return 0;
-    }
-  }
-
-  get shouldHideVideo() {
-    return !!localStorage.getItem('shouldHideTutorialVideo');
-  }
-
-  get shouldShowMap() {
-    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    return isLocation || this.isDistanceSort;
-  }
-
   ngAfterViewInit() {
     this.watchScrollEvents();
   }
 
-  ngOnDestroy(): void {}
-
-  getOptions(modelLabels) {
+  getOptions(modelLabels: {[key: string]: string}) {
     const opts = [];
     for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {
@@ -603,16 +597,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  get selectedCategory() {
-    if (this.query) {
-      return this.query.category;
-    }
-  }
-
-  get resourceTypesFiltered(): HitType[] {
-    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
-  }
-
   resourceTypesFilteredNames(): string[] {
     return this.resourceTypesFiltered.map(t => t.name);
   }
@@ -624,56 +608,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.query.sort = this.selectedSort.sortQuery;
     this.scrollToTopOfSearch();
     this.querySubject.next(this.query);
-  }
-
-  protected mapLoad(m: google.maps.Map) {
-    const controlDiv: MapControlDiv = document.createElement('div');
-
-    // Set CSS for the control border.
-    const controlUI = document.createElement('div');
-    controlUI.style.backgroundColor = '#fff';
-    controlUI.style.border = '2px solid #fff';
-    controlUI.style.borderRadius = '3px';
-    controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-    controlUI.style.cursor = 'pointer';
-    controlUI.style.marginBottom = '6px';
-    controlUI.style.marginRight = '12px';
-    controlUI.style.textAlign = 'center';
-    controlUI.title = 'Your Location';
-    controlDiv.appendChild(controlUI);
-
-    // Set CSS for the control interior.
-    const controlText = document.createElement('div');
-    controlText.style.fontSize = '16px';
-    controlText.style.lineHeight = '38px';
-    controlText.style.paddingLeft = '5px';
-    controlText.style.paddingRight = '5px';
-    controlText.innerHTML = '<img src="/assets/map/my-location.svg">';
-    controlUI.appendChild(controlText);
-
-    // Set the center to the user's location on click
-    controlUI.addEventListener('click', () => {
-      // fixme: maybe we should requery when clicking.
-      console.log('map clicked.');
-      this.mapQuerySubject.next(this.query);
-    });
-
-    controlDiv.index = 1;
-    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
-
-    m.addListener('dragend', () => {
-      this.setLocation(LocationMode.map, {
-        lat: this.mapBounds.getCenter().lat(),
-        lng: this.mapBounds.getCenter().lng(),
-      });
-      this.mapQuerySubject.next(this.query);
-      console.log('Map Dragged');
-      if (this.isDistanceSort) {
-        console.log('Map Dragged, re-sorting');
-        this._updateDistanceSort();
-        this.querySubject.next(this.query);
-      }
-    });
   }
 
   showBreadcrumbs(): boolean {
@@ -806,7 +740,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   watchScrollEvents() {
     const scroll$ = fromEvent(window, 'scroll').pipe(
       throttleTime(10),
-      map((e: Event) => window.pageYOffset),
+      map(e => window.scrollY),
       pairwise(),
       map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
       share(),
@@ -855,8 +789,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   showLocationWindow() {
-    return this.locationMode === LocationMode.default;
-    return !this.isZipCode(this.storedZip) && !this.gpsEnabled;
+    return this.locationMode === LocationMode.default && !this.isZipCode(this.storedZip) && !this.gpsEnabled;
   }
 
   updateUrl() {
@@ -867,6 +800,63 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       preserveFragment: true,
     });
     this.location.replaceState(urlTree.toString());
+  }
+
+  protected mapLoad(m: GoogleMap) {
+    const controlDiv: MapControlDiv = document.createElement('div');
+
+    // Set CSS for the control border.
+    const controlUI = document.createElement('div');
+    controlUI.style.backgroundColor = '#fff';
+    controlUI.style.border = '2px solid #fff';
+    controlUI.style.borderRadius = '3px';
+    controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+    controlUI.style.cursor = 'pointer';
+    controlUI.style.marginBottom = '6px';
+    controlUI.style.marginRight = '12px';
+    controlUI.style.textAlign = 'center';
+    controlUI.title = 'Your Location';
+    controlDiv.appendChild(controlUI);
+
+    // Set CSS for the control interior.
+    const controlText = document.createElement('div');
+    controlText.style.fontSize = '16px';
+    controlText.style.lineHeight = '38px';
+    controlText.style.paddingLeft = '5px';
+    controlText.style.paddingRight = '5px';
+    controlText.innerHTML = '<img src="/assets/map/my-location.svg" alt="Your Location">';
+    controlUI.appendChild(controlText);
+
+    // Set the center to the user's location on click
+    controlUI.addEventListener('click', () => {
+      // fixme: maybe we should requery when clicking.
+      console.log('map clicked.');
+      this.mapQuerySubject.next(this.query);
+    });
+
+    controlDiv.index = 1;
+    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+
+    m.addListener('dragend', () => {
+      this.setLocation(LocationMode.map, {
+        lat: this.mapBounds.getCenter().lat(),
+        lng: this.mapBounds.getCenter().lng(),
+      });
+      this.mapQuerySubject.next(this.query);
+      console.log('Map Dragged');
+      if (this.isDistanceSort) {
+        console.log('Map Dragged, re-sorting');
+        this._updateDistanceSort();
+        this.querySubject.next(this.query);
+      }
+    });
+  }
+
+  private _updateDistanceSort() {
+    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
+    distanceSortQuery.latitude = this.loc.lat;
+    distanceSortQuery.longitude = this.loc.lng;
+    this.query.sort = distanceSortQuery;
   }
 
   private _queryToQueryParams(qBefore: Query): Params {

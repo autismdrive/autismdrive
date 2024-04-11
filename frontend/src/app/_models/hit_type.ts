@@ -15,7 +15,10 @@ export class HitType {
   static ALL = new HitType('all', HitType.labels.all);
   static ALL_RESOURCES = new HitType('all_resources', HitType.labels.all_resources);
 
-  constructor(public name: string, public label: string) {}
+  constructor(
+    public name: string,
+    public label: string,
+  ) {}
 
   static all(): HitType[] {
     return [this.LOCATION, this.RESOURCE, this.EVENT, this.STUDY];
