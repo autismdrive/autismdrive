@@ -1,21 +1,12 @@
-import {
-  Component,
-  ComponentFactory,
-  ComponentFactoryResolver,
-  OnInit,
-  ViewChild,
-  ViewChildren,
-  ViewContainerRef,
-} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewChildren, ViewContainerRef} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
-import {Router} from '@angular/router';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 import {DataTransferDataSource} from '../_models/data_transfer_data_source';
 import {DataTransferLog} from '../_models/data_transfer_log';
 import {ApiService} from '../_services/api/api.service';
 import {ConfigService} from '../_services/config/config.service';
+import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({
   selector: 'app-admin-export',
@@ -37,8 +28,6 @@ export class AdminExportComponent implements OnInit {
   constructor(
     private api: ApiService,
     private configService: ConfigService,
-    private router: Router,
-    private resolver: ComponentFactoryResolver,
   ) {}
 
   ngOnInit(): void {
@@ -88,8 +77,7 @@ export class AdminExportComponent implements OnInit {
       this.expandedRow = null;
     } else {
       const container = this.rowContainers.toArray()[index];
-      const factory: ComponentFactory<any> = this.resolver.resolveComponentFactory(AdminExportDetailsComponent);
-      const inlineComponent = container.createComponent(factory);
+      const inlineComponent = container.createComponent(AdminExportDetailsComponent);
       this.dataTransferDataSource.logs$.subscribe(logs => {
         inlineComponent.instance.exportDetails = logs[index].details;
         this.expandedRow = index;
