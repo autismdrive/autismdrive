@@ -122,7 +122,7 @@ export class SearchUseCases {
 
   async sortByDistance() {
     this.sortBy('distance');
-    expect(this.page.getElements('agm-map').count()).toEqual(1);
+    expect(this.page.getElements('map-view').count()).toEqual(1);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
   }
 

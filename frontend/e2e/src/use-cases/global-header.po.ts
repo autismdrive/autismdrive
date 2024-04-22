@@ -69,9 +69,6 @@ export class GlobalHeaderUseCases {
       expect(this.page.getElements(`.type-tabs .${t}`).count()).toEqual(1);
     });
 
-    // TODO: Re-enable this when we support no-address locations
-    // expect(this.page.getElements('agm-map').count()).toEqual(1);
-
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
     expect(this.page.getElements('.resource-gatherer').count()).toBeGreaterThan(1);
   }

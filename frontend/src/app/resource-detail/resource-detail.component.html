@@ -118,7 +118,7 @@
     </div>
     <div id="resource-meta" fxFlex.gt-md="40%" fxLayout="column" fxLayoutGap="20px">
       <div *ngIf="resource && resource.hasCoords()" id="resource-map">
-        <agm-map
+        <map-view
           [latitude]="resource.latitude"
           [longitude]="resource.longitude"
           [streetViewControl]="false"
@@ -126,7 +126,7 @@
           [zoom]="7"
           [scrollwheel]="null"
         >
-          <agm-circle
+          <map-circle
             *ngIf="resource.hasCoords() && !resource.street_address1"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
@@ -136,7 +136,7 @@
             [clickable]="true"
             (circleClick)="toggleInfoWindow($event)"
           >
-          </agm-circle>
+          </map-circle>
           <agm-marker
             *ngIf="resource.hasCoords()"
             [latitude]="resource.latitude"
@@ -147,7 +147,7 @@
             }"
             (markerClick)="toggleInfoWindow($event)"
           >
-            <agm-info-window [isOpen]="showInfoWindow" [latitude]="resource.latitude" [latitude]="resource.longitude">
+            <map-info-window [isOpen]="showInfoWindow" [latitude]="resource.latitude" [latitude]="resource.longitude">
               <h5>{{ resource.title }}</h5>
               <ng-container *ngIf="resource.street_address1">
                 <p>About {{ resource.milesFrom(mapLoc) }} miles away</p>
@@ -171,9 +171,9 @@
                   Visit website
                 </a>
               </ng-container>
-            </agm-info-window>
+            </map-info-window>
           </agm-marker>
-        </agm-map>
+        </map-view>
       </div>
       <div id="resource-categories">
         <app-filter-chips

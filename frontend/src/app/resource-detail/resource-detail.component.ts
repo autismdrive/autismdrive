@@ -1,6 +1,5 @@
-/// <reference types="@types/googlemaps" />
 import {formatDate} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContactItem} from '../_models/contact_item';
@@ -16,7 +15,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
   templateUrl: './resource-detail.component.html',
   styleUrls: ['./resource-detail.component.scss'],
 })
-export class ResourceDetailComponent implements OnInit {
+export class ResourceDetailComponent {
   resource: Resource;
   mapLoc: LatLngLiteral;
   currentUser: User;
@@ -85,8 +84,6 @@ export class ResourceDetailComponent implements OnInit {
   get resourceIsDraft(): boolean {
     return this.resource.is_draft === true;
   }
-
-  ngOnInit() {}
 
   loadMapLocation() {
     if (this.resource && this.resource.hasCoords() && navigator.geolocation) {

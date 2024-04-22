@@ -1,12 +1,12 @@
-import {LazyMapsAPILoaderConfigLiteral} from '@ng-maps/core';
+import {GoogleModuleOptions} from '@ng-maps/google';
 import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ConfigService implements LazyMapsAPILoaderConfigLiteral {
+export class ConfigService implements GoogleModuleOptions {
   public apiUrl: string;
-  public apiKey: string; // The google maps api key, to implement LazyMapsAPI
+  public apiKey: string; // The Google Maps api key, to implement GoogleModuleOptions
   public development: boolean;
   public testing: boolean;
   public mirroring: boolean;

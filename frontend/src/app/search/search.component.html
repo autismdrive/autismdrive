@@ -353,15 +353,15 @@
         (zoomChange)="updateZoom($event)"
         (boundsChange)="updateResultsList($event)"
       >
-        <agm-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
-          <agm-marker
+        <map-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
+          <map-marker
             *ngIf="loc"
             [latitude]="loc.lat"
             [longitude]="loc.lng"
             [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
-          ></agm-marker>
+          ></map-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <agm-circle
+            <map-circle
               [latitude]="hit.latitude + mapJitter(hit.id, true)"
               [longitude]="hit.longitude + mapJitter(hit.id, false)"
               [radius]="circleRadius"
@@ -372,26 +372,26 @@
               (circleClick)="showInfoWindow(hit)"
               zIndex="-1"
             >
-            </agm-circle>
-            <agm-marker
+            </map-circle>
+            <map-marker
               [latitude]="hit.latitude + mapJitter(hit.id, true)"
               [longitude]="hit.longitude + mapJitter(hit.id, false)"
               [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: {x: 24, y: 24}}"
               (markerClick)="showInfoWindow(hit)"
             >
-            </agm-marker>
+            </map-marker>
           </ng-container>
           <ng-container *ngFor="let hit of hitsWithAddress">
-            <agm-marker
+            <map-marker
               [latitude]="hit.latitude"
               [longitude]="hit.longitude"
               [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
               (markerClick)="showInfoWindow(hit)"
-            ></agm-marker>
+            ></map-marker>
           </ng-container>
-        </agm-marker-cluster>
+        </map-marker-cluster>
         <ng-container *ngIf="selectedMapResource">
-          <agm-info-window
+          <map-info-window
             [isOpen]="isInfoWindowOpen"
             [latitude]="selectedMapHit.latitude"
             [longitude]="selectedMapHit.longitude"
@@ -406,7 +406,7 @@
             <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
               {{ selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type }} Details</a
             >
-          </agm-info-window>
+          </map-info-window>
         </ng-container>
       </map-view>
 
