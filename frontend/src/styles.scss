@@ -1,4 +1,5 @@
 @import './styles_curry.scss';
 @import './stardrive_material.scss';
-@import './icofont.min.css';
+@import 'assets/css/icofont.css';
+@import './materialicons.css';
 @include stardrive-theme($stardrive-theme);

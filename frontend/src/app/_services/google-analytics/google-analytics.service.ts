@@ -13,10 +13,6 @@ declare var gtag: Function;
 export class GoogleAnalyticsService {
   constructor(private router: Router, private configService: ConfigService) {}
 
-  //  private event(eventName: string, params: {}) {
-  //   gtag('event', eventName, params);
-  //  }
-
   private event(action: string, category: string, label: string) {
     gtag('event', action, {
       event_category: category,
@@ -94,11 +90,11 @@ export class GoogleAnalyticsService {
     this.listenForRouteChanges();
 
     try {
-      const analysticsKey = this.configService.googleAnalyticsKey;
+      const apiKey = this.configService.googleAnalyticsKey;
 
       const script1 = document.createElement('script');
       script1.async = true;
-      script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + analysticsKey;
+      script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + apiKey;
       document.head.appendChild(script1);
 
       const script2 = document.createElement('script');
@@ -108,7 +104,7 @@ export class GoogleAnalyticsService {
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', '` +
-        analysticsKey +
+        apiKey +
         `', {'send_page_view': false});
       `;
       document.head.appendChild(script2);

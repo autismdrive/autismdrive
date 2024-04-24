@@ -1,5 +1,6 @@
 import {GoogleModuleOptions} from '@ng-maps/google';
 import {Injectable} from '@angular/core';
+import { GoogleMapsScriptProtocol } from "@ng-maps/google/lib/options";
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,10 @@ export class ConfigService implements GoogleModuleOptions {
   public mirroring: boolean;
   public production: boolean;
   public googleAnalyticsKey: string;
+
+  toGoogleModuleOptions(): GoogleModuleOptions {
+    return { apiKey: this.apiKey }
+  }
 
   fromProperties(props) {
     for (const propName in props) {

@@ -340,8 +340,8 @@
     </mat-expansion-panel>
     <div id="map" fxLayout="column" fxLayoutGap="2em">
       <map-view
-        #mapTemplate
         *ngIf="shouldShowMap"
+        #mapTemplate
         [latitude]="loc.lat"
         [longitude]="loc.lng"
         [streetViewControl]="false"
@@ -353,7 +353,7 @@
         (zoomChange)="updateZoom($event)"
         (boundsChange)="updateResultsList($event)"
       >
-        <map-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
+        <map-marker-cluster [renderer]="clusterRenderer" [algorithm]="clusterAlgorithm">
           <map-marker
             *ngIf="loc"
             [latitude]="loc.lat"
@@ -433,7 +433,7 @@
   fxLayoutGap="3em"
   fxLayoutAlign="auto center"
   #searchFooter
-  [ngStyle.lt-md]="{marginTop: '120vh'}"
+  [ngStyle]="{'.lt-md.marginTop': '120vh'}"
 >
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>

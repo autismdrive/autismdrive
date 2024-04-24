@@ -1,5 +1,5 @@
 import {NgMapsCoreModule} from '@ng-maps/core';
-import {GOOGLE_MAPS_API_CONFIG} from '@ng-maps/google';
+import { GOOGLE_MAPS_API_CONFIG, NgMapsGoogleModule } from "@ng-maps/google";
 import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule, DatePipe} from '@angular/common';
@@ -379,6 +379,7 @@ export class FormlyConfig {
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
+    NgMapsGoogleModule,
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,

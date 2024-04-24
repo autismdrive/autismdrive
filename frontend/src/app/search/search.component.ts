@@ -27,6 +27,7 @@ import {SearchService} from '../_services/search/search.service';
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLngBounds = google.maps.LatLngBounds;
 import GoogleMap = google.maps.Map;
+import { Algorithm, SuperClusterViewportAlgorithm, Renderer, DefaultRenderer } from '@googlemaps/markerclusterer';
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -164,6 +165,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
   queryParamMap: ParamMap;
   private mapBounds: LatLngBounds;
   private scrollDirection: Direction;
+  clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
+  clusterRenderer: Renderer = new DefaultRenderer();
+
 
   constructor(
     private api: ApiService,
