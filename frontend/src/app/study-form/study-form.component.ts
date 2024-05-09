@@ -3,7 +3,7 @@ import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {scrollToFirstInvalidField} from '../../util/scrollToTop';
+import {scrollToFirstInvalidField} from '@util/scrollToTop';
 import {AgeRange, Language} from '../_models/hit_type';
 import {Study} from '../_models/study';
 import {StudyCategory} from '../_models/study_category';

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
-import {snakeToUpperCase} from '../../util/snakeToUpper';
+import {snakeToUpperCase} from '@util/snakeToUpper';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 import {Study} from '../_models/study';
 import {User} from '../_models/user';

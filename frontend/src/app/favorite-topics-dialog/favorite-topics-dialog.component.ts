@@ -8,7 +8,7 @@ import {Category} from '../_models/category';
 import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
-import {TreeComponent} from '@App/app/_forms/tree/tree.component';
+import {TreeComponent} from '@app/_forms/tree/tree.component';
 
 @Component({
   selector: 'app-favorite-topics-dialog',
@@ -23,8 +23,6 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
   languageOptions = this.getOptions(this.languageLabels);
   covid19Options = this.getOptions(this.covid19Labels);
 
-  treeControl: NestedTreeControl<Category>;
-  dataSource: MatTreeNestedDataSource<Category>;
   nodes = {};
 
   /** The selection for checklist */

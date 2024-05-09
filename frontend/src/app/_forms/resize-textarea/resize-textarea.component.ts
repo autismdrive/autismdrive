@@ -9,11 +9,11 @@ import {FieldType} from '@ngx-formly/core';
       matInput
       [id]="id"
       [formControl]="formControl"
-      [cols]="to.cols"
-      [rows]="to.rows"
-      [placeholder]="to.placeholder"
+      [cols]="props.cols"
+      [rows]="props.rows"
+      [placeholder]="props.placeholder"
       [formlyAttributes]="field"
-      [matTextareaAutosize]="true"
+      [cdkTextareaAutosize]="true"
     >
     </textarea>
   `,

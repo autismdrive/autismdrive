@@ -1,10 +1,8 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {NestedTreeControl} from '@angular/cdk/tree';
 import {Component, OnInit} from '@angular/core';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {Observable, of} from 'rxjs';
-import {Category} from '../../_models/category';
-import {TreeComponent} from '@App/app/_forms/tree/tree.component';
+import {TreeComponent} from '@app/_forms/tree/tree.component';
+import {Category} from '@models/category';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-multiselect-tree',

@@ -127,7 +127,6 @@ export class Aggregation {
 }
 
 export class Hit extends GeoLocation {
-  id: number;
   type: string;
   ages: string[];
   languages: string[];

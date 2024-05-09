@@ -3,7 +3,6 @@ import {GeoLocation} from './geolocation';
 import {ResourceCategory} from './resource_category';
 
 export class Resource extends GeoLocation {
-  id?: number;
   type: string;
   title: string;
   description: string;

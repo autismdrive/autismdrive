@@ -50,7 +50,7 @@ import {MarkdownModule} from 'ngx-markdown';
 import {NgProgressModule} from 'ngx-progressbar';
 import {Observable, ObservableInput, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {environment} from '../environments/environment';
+import {environment} from '@environments/environment';
 import {AboutComponent} from './about/about.component';
 import {AccordionComponent} from './accordion/accordion.component';
 import {AddButtonComponent} from './add-button/add-button.component';

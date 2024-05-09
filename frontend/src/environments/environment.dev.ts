@@ -1,4 +1,4 @@
-import {AppEnvironment} from '@shared/types/environment';
+import {AppEnvironment} from '@models/environment';
 
 export const SERVICE_HOST = 'dev.autismdrive.virginia.edu';
 

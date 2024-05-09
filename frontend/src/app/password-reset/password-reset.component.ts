@@ -3,7 +3,7 @@ import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {scrollToTop} from '../../util/scrollToTop';
+import {scrollToTop} from '@util/scrollToTop';
 import {PasswordRequirements} from '../_models/password_requirements';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';

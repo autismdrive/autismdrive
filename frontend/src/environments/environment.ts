@@ -1,4 +1,4 @@
-import {AppEnvironment} from '@shared/types/environment';
+import {AppEnvironment} from '@models/environment';
 
 // This is the environment file for running the frontend in the local dev environment.
 //

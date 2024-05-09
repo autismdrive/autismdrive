@@ -1,11 +1,11 @@
 import {bootstrapApplication, Meta, provideProtractorTestingSupport} from '@angular/platform-browser';
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router} from '@angular/router';
-import {User} from './_models/user';
-import {ApiService} from './_services/api/api.service';
-import {AuthenticationService} from './_services/authentication/authentication-service';
-import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
-import {ConfigService} from './_services/config/config.service';
+import {User} from "@models/user";
+import {ApiService} from "@services/api/api.service";
+import {AuthenticationService} from "@services/authentication/authentication-service";
+import {GoogleAnalyticsService} from "@services/google-analytics/google-analytics.service";
+import {ConfigService} from "@services/config/config.service";
 
 @Component({
   selector: 'app-root',
