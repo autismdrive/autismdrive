@@ -10,7 +10,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {ActivatedRoute, Route} from '@angular/router';
+import { ActivatedRoute, Route, RouterModule } from "@angular/router";
 import {RouterTestingModule} from '@angular/router/testing';
 import {of as observableOf} from 'rxjs';
 import {SearchComponent} from './search.component';
@@ -36,7 +36,7 @@ describe('SearchComponent', () => {
           MatSidenavModule,
           MatTooltipModule,
           ReactiveFormsModule,
-          RouterTestingModule.withRoutes([route]),
+          RouterModule
         ],
         providers: [
           {

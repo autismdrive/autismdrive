@@ -18,7 +18,7 @@
             "budgets": [
               {
                 "type": "anyComponentStyle",
-                "maximumWarning": "6kb"
+                "maximumWarning": "64kb"
               }
             ],
             "outputPath": "dist",
@@ -160,7 +160,11 @@
           }
         },
         "test": {
-          "builder": "@angular-builders/jest:run"
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
         },
         "e2e": {
           "builder": "@cypress/schematic:cypress",

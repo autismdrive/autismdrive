@@ -84,7 +84,7 @@
 
     .border-box-tile-label {
       &.border-box-tile-label-1x {
-        @include mat.typography-level($custom-typography, title);
+        @include mat.typography-level($stardrive-typography, title);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;
@@ -93,7 +93,7 @@
       }
 
       &.border-box-tile-label-2x {
-        @include mat.typography-level($custom-typography, display-1);
+        @include mat.typography-level($stardrive-typography, display-1);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;

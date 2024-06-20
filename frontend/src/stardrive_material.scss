@@ -1,10 +1,12 @@
 @use '@angular/material' as mat;
 @import 'material';
 @import 'mixins';
-@include mat.core($custom-typography);
+@include mat.core();
+
+@include mat.core-theme($stardrive-theme);
 @include mat.all-component-themes($stardrive-theme);
 
-@mixin stardrive-theme($theme) {
+@mixin stardrive-theme-mixin($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent); // Global style overrides
 

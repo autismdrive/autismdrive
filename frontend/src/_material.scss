@@ -2,7 +2,7 @@
 @import 'config';
 
 // Define a custom typography config that overrides the font-family
-$custom-typography: mat.define-typography-config(
+$stardrive-typography: mat.define-legacy-typography-config(
   $font-family: $body-font-family,
   $display-4: mat.define-typography-level(2.5rem, 1, 800, $heading-font-family),
   $display-3: mat.define-typography-level(2.25rem, 1, 800, $heading-font-family),
@@ -19,7 +19,7 @@ $custom-typography: mat.define-typography-config(
   $input: mat.define-typography-level(1rem, 1.5, 500, $body-font-family),
 );
 
-mat.$blue-palette: (
+$blue-palette: (
   50: #f1f5f7,
   100: #b3c1d3,
   200: $brand-primary-tint-3,
@@ -52,7 +52,7 @@ mat.$blue-palette: (
   )
 );
 
-mat.$orange-palette: (
+$orange-palette: (
   50: #fceee0,
   100: $brand-accent-tint-3,
   200: $brand-accent-tint-2,
@@ -85,7 +85,17 @@ mat.$orange-palette: (
   )
 );
 
-$stardrive-primary: mat.define-palette(mat.$blue-palette);
-$stardrive-accent: mat.define-palette(mat.$orange-palette);
+$stardrive-primary: mat.define-palette($blue-palette);
+$stardrive-accent: mat.define-palette($orange-palette);
 $stardrive-warn: mat.define-palette(mat.$red-palette);
-$stardrive-theme: mat.define-light-theme($stardrive-primary, $stardrive-accent, $stardrive-warn);
+
+$stardrive-theme: mat.define-light-theme((
+ color: (
+   primary: $stardrive-primary,
+   accent: $stardrive-accent,
+   warn: $stardrive-warn,
+ ),
+ typography: $stardrive-typography,
+ density: 0,
+));
+

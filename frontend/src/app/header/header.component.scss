@@ -28,7 +28,7 @@
     color: $brand-primary;
 
     .uva-logo a {
-      @include mat.typography-level($custom-typography, button);
+      @include mat.typography-level($stardrive-typography, button);
       color: $brand-primary;
       text-transform: uppercase;
     }

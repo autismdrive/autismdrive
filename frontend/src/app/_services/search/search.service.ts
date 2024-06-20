@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import createClone from 'rfdc';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {GeoBox, Query} from 'src/app/_models/query';
+import {GeoBox, Query} from '@models/query';
 import {ConfigService} from '../config/config.service';
 
 @Injectable({providedIn: 'root'})
