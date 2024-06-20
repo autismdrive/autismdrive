@@ -1,6 +1,5 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 @import 'config';
-@import '../node_modules/@angular/material/theming';
 
 // Define a custom typography config that overrides the font-family
 $custom-typography: mat.define-typography-config(

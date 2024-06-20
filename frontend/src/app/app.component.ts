@@ -59,5 +59,3 @@ export class AppComponent implements OnInit {
     });
   }
 }
-
-await bootstrapApplication(AppComponent, {providers: [provideProtractorTestingSupport()]});

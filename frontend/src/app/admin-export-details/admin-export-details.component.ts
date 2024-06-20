@@ -7,7 +7,7 @@ import {DataTransferDetail} from '../_models/data_transfer_log';
   styleUrls: ['./admin-export-details.component.scss'],
 })
 export class AdminExportDetailsComponent implements OnInit {
-  @Input() exportDetails: DataTransferDetail;
+  @Input() exportDetails: DataTransferDetail[];
   displayedColumns = ['class_name', 'successful', 'success_count', 'failure_count', 'errors'];
 
   constructor() {}

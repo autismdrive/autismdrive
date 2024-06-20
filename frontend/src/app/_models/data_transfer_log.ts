@@ -1,3 +1,5 @@
+import { CdkTableDataSourceInput } from "@node_modules/@angular/cdk/table";
+
 export interface DataTransferLog {
   id: number;
   type: string;
