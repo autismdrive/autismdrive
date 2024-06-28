@@ -1,9 +1,9 @@
-import {Component, EventEmitter, OnInit} from '@angular/core';
+import {Component, EventEmitter} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
-import {DeviceDetectorService} from 'ngx-device-detector';
 import {scrollToTop} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
@@ -13,7 +13,7 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   loading = false;
   emailToken: string;
   errorEmitter = new EventEmitter<string>();
@@ -68,8 +68,6 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-
-  ngOnInit() {}
 
   submit(model) {
     this.loading = true;

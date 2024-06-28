@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {SortMethod} from '../_models/sort_method';
 
 @Component({
@@ -6,14 +6,12 @@ import {SortMethod} from '../_models/sort_method';
   templateUrl: './search-sort.component.html',
   styleUrls: ['./search-sort.component.scss'],
 })
-export class SearchSortComponent implements OnInit {
+export class SearchSortComponent {
   @Input() selectedSort: SortMethod;
   @Input() sortMethods: {[key: string]: SortMethod};
   @Output() sortMethodSelected = new EventEmitter<SortMethod>();
 
   constructor() {}
-
-  ngOnInit() {}
 
   get sortMethodsList() {
     return Object.values(this.sortMethods);

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Covid19Categories} from '../_models/hit_type';
 import {Hit, Query} from '../_models/query';
@@ -18,7 +18,7 @@ interface C19ResourceCategoryObj {
   templateUrl: './covid19-resources.component.html',
   styleUrls: ['./covid19-resources.component.scss'],
 })
-export class Covid19ResourcesComponent implements OnInit {
+export class Covid19ResourcesComponent {
   query: Query;
   C19Categories: C19ResourceCategoryObj[];
   selectedCategory: C19ResourceCategoryObj;
@@ -50,8 +50,6 @@ export class Covid19ResourcesComponent implements OnInit {
     this.loadResources();
     this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
   }
-
-  ngOnInit() {}
 
   loadResources() {
     this.api.getCovid19ResourcesByCategory(this.selectedCategory.name).subscribe(resources => {

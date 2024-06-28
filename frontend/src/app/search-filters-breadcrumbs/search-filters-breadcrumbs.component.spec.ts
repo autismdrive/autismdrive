@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {SearchFiltersBreadcrumbsComponent} from './search-filters-breadcrumbs.component';
 
 describe('SearchFiltersBreadcrumbsComponent', () => {
   let component: SearchFiltersBreadcrumbsComponent;
-  let fixture: ComponentFixture<SearchFiltersBreadcrumbsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [SearchFiltersBreadcrumbsComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<SearchFiltersBreadcrumbsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SearchFiltersBreadcrumbsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(SearchFiltersBreadcrumbsComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(SearchFiltersBreadcrumbsComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

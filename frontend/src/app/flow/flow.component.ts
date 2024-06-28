@@ -1,12 +1,12 @@
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {MatDrawer} from '@angular/material/sidenav';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {DeviceDetectorService} from 'ngx-device-detector';
-import {keysToCamel} from '@util/snakeToCamel';
 import {scrollToFirstInvalidField, scrollToTop} from '@util/scrollToTop';
+import {keysToCamel} from '@util/snakeToCamel';
+import {DeviceDetectorService} from 'ngx-device-detector';
 import {Flow} from '../_models/flow';
 import {Participant} from '../_models/participant';
 import {Step, StepStatus} from '../_models/step';
@@ -27,7 +27,7 @@ enum FlowState {
   templateUrl: './flow.component.html',
   styleUrls: ['./flow.component.scss'],
 })
-export class FlowComponent implements OnInit, OnDestroy {
+export class FlowComponent implements OnDestroy {
   mobileQuery: MediaQueryList;
   user: User;
   participant: Participant;
@@ -79,8 +79,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.sidenavElement = value;
     this._updateSidenavState();
   }
-
-  ngOnInit() {}
 
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone

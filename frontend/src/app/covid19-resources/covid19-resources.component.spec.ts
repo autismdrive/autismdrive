@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {Covid19ResourcesComponent} from './covid19-resources.component';
 
 describe('Covid19ResourcesComponent', () => {
   let component: Covid19ResourcesComponent;
-  let fixture: ComponentFixture<Covid19ResourcesComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [Covid19ResourcesComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<Covid19ResourcesComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(Covid19ResourcesComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(Covid19ResourcesComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(Covid19ResourcesComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

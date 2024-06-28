@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ChainStep} from '../_models/chain_step';
 import {ApiService} from '../_services/api/api.service';
 
@@ -7,7 +7,7 @@ import {ApiService} from '../_services/api/api.service';
   templateUrl: './skillstar-admin.component.html',
   styleUrls: ['./skillstar-admin.component.scss'],
 })
-export class SkillstarAdminComponent implements OnInit {
+export class SkillstarAdminComponent {
   chainSteps: ChainStep[] = [];
 
   constructor(private api: ApiService) {
@@ -20,8 +20,6 @@ export class SkillstarAdminComponent implements OnInit {
       .map(s => s.instruction)
       .join('\n');
   }
-
-  ngOnInit(): void {}
 
   save(formField: HTMLTextAreaElement) {
     console.log('formField', formField.value);

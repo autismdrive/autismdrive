@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {NewsItem} from '../_models/news-item';
 import {IntervalService} from '../_services/interval/interval.service';
 
@@ -7,7 +7,7 @@ import {IntervalService} from '../_services/interval/interval.service';
   templateUrl: './hero-slides.component.html',
   styleUrls: ['./hero-slides.component.scss'],
 })
-export class HeroSlidesComponent implements OnInit {
+export class HeroSlidesComponent {
   @Input() slides: NewsItem[];
   activeIndex = 0;
   delayMs = 5000;
@@ -17,8 +17,6 @@ export class HeroSlidesComponent implements OnInit {
       this._incrementActiveIndex();
     }, this.delayMs);
   }
-
-  ngOnInit() {}
 
   _incrementActiveIndex() {
     if (this.activeIndex < this.slides.length - 1) {

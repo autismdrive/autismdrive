@@ -1,9 +1,9 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
-import {DeviceDetectorService} from 'ngx-device-detector';
 import {scrollToTop} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 import {PasswordRequirements} from '../_models/password_requirements';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
@@ -15,7 +15,7 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
   templateUrl: './password-reset.component.html',
   styleUrls: ['./password-reset.component.scss'],
 })
-export class PasswordResetComponent implements OnInit {
+export class PasswordResetComponent {
   token: string;
   formState = 'form';
   errorMessage = '';
@@ -89,8 +89,6 @@ export class PasswordResetComponent implements OnInit {
       });
     });
   }
-
-  ngOnInit() {}
 
   goHome($event) {
     $event.preventDefault();

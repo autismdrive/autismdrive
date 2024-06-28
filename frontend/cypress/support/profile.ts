@@ -5,37 +5,28 @@ export class ProfileUseCases {
   constructor(private page: AppPage) {}
 
   clickFormlyBox() {
-    const formlyInputs = cy.get('input');
-    const desiredModel = 'modelName';
-    const desiredInput = formlyInputs
-      .filter(function (input) {
-        return input.evaluate('model[options.key]').then(function (model) {
-          return model === desiredModel;
-        });
-      })
-      .first();
-    desiredInput.sendKeys('some text');
+    cy.get('input')
+      .as('inputs')
+      .filter((index, input) => document.evaluate('model[options.key]', input).stringValue === 'modelName')
+      .first()
+      .type('some text');
   }
 
   async completeProfileMetaFormAsGuardian() {
-    expect(this.page.getElements('#meta-form').count()).toEqual(1);
+    cy.get('#meta-form').should('have.length', 1);
+
     // Get  'formly-field [id*="_checkbox_"],' +
-    this.page.getElement('formly-field.guardian label').click();
-    expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
+    cy.get('formly-field.guardian label').click();
+    cy.get('formly-field.guardian input').should('be.selected');
 
-    this.page.getElement('formly-field.guardian_has_dependent label').click();
-    expect(this.page.getElement('formly-field.guardian input').isSelected()).toBeTruthy();
+    cy.get('formly-field.guardian_has_dependent label').click();
+    cy.get('formly-field.guardian input').should('be.selected');
 
-    this.page.getElement('#submit_meta').click();
+    cy.get('#submit_meta').click();
+    cy.get('#self_guardian').should('have.length', 1);
 
-    expect(this.page.getElements('#self_guardian').count()).toEqual(1);
-    /**
-    const radio = this.page.getElement( 'formly-field.guardian_has_dependent').all('mat-radio-button');
-    radio.click();
-
-
-    await this.page.clickElement('#submit_meta');
-***/
+    cy.get('formly-field.guardian_has_dependent').get('mat-radio-button').click({multiple: true});
+    cy.get('#submit_meta').click();
   }
 
   startDependentFlow() {
@@ -82,37 +73,27 @@ export class ProfileUseCases {
     expect(this.page.getElements('app-avatar-dialog').count()).toEqual(1);
   }
 
-  async editAvatarImg() {
-    const btnEls = await this.page.getElements('.avatar-image');
-
-    for (let i = 0; i < btnEls.length; i++) {
-      const btnEl = btnEls[i];
-
-      if (i < 2) {
-        btnEl.click();
-        const avImgEl = this.page.getElement('.avatar img');
-        const imgEl = this.page.getChildElement('img', btnEl);
-        const expectedSrc = await imgEl.getAttribute('src');
-        const actualSrc = await avImgEl.getAttribute('src');
-        expect(expectedSrc).toEqual(actualSrc);
-      }
-    }
+  editAvatarImg() {
+    return cy
+      .get('.avatar-image')
+      .as('btnEl')
+      .each(($el, index) => {
+        if (index < 2) {
+          cy.wrap($el).click();
+          cy.get('.avatar img')
+            .invoke('attr', 'src')
+            .then(avImgSrc => {
+              cy.get('@btnEl').get('img').should('have.attr', 'src', avImgSrc);
+            });
+        }
+      });
   }
 
-  async editAvatarColor() {
-    const swatchEls = await this.page.getElements('.color-swatch');
-
-    for (let i = 0; i < swatchEls.length; i++) {
-      const swatchEl = swatchEls[i];
-
-      if (i < 2) {
-        swatchEl.click();
-        const avatar = this.page.getElement('.avatar');
-        const expectedColor = await swatchEl.getCssValue('background-color');
-        const actualColor = await avatar.getCssValue('background-color');
-        expect(expectedColor).toEqual(actualColor);
-      }
-    }
+  editAvatarColor() {
+    return cy.get('.color-swatch').each(($el, index) => {
+      cy.wrap($el).click();
+      cy.get('.avatar').should('have.css', 'background-color', $el.css('background-color'));
+    });
   }
 
   async saveAvatar() {

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {QuestionnaireDataTableComponent} from './questionnaire-data-table.component';
 
 describe('QuestionnaireDataTableComponent', () => {
   let component: QuestionnaireDataTableComponent;
-  let fixture: ComponentFixture<QuestionnaireDataTableComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [QuestionnaireDataTableComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<QuestionnaireDataTableComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(QuestionnaireDataTableComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(QuestionnaireDataTableComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(QuestionnaireDataTableComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

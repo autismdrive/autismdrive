@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {QuestionnaireStepComponent} from './questionnaire-step.component';
 
 describe('QuestionnaireStepComponent', () => {
   let component: QuestionnaireStepComponent;
-  let fixture: ComponentFixture<QuestionnaireStepComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [QuestionnaireStepComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<QuestionnaireStepComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(QuestionnaireStepComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(QuestionnaireStepComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(QuestionnaireStepComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

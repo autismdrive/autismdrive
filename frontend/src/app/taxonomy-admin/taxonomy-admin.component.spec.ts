@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {TaxonomyAdminComponent} from './taxonomy-admin.component';
 
 describe('TaxonomyAdminComponent', () => {
   let component: TaxonomyAdminComponent;
-  let fixture: ComponentFixture<TaxonomyAdminComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [TaxonomyAdminComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<TaxonomyAdminComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TaxonomyAdminComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(TaxonomyAdminComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(TaxonomyAdminComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

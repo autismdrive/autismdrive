@@ -162,8 +162,8 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "tsConfig": "tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "detectOpenHandles": true,
+            "forceExit": true
           }
         },
         "e2e": {

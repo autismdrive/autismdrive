@@ -1,6 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {Observable, of} from 'rxjs';
 import {Category} from '../_models/category';
@@ -13,7 +13,7 @@ import {AuthenticationService} from '../_services/authentication/authentication-
   templateUrl: './taxonomy-admin.component.html',
   styleUrls: ['./taxonomy-admin.component.scss'],
 })
-export class TaxonomyAdminComponent implements OnInit {
+export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;
   dataSource: MatTreeNestedDataSource<Category>;
   dataLoaded = false;
@@ -27,14 +27,15 @@ export class TaxonomyAdminComponent implements OnInit {
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
 
-  constructor(private api: ApiService, private authenticationService: AuthenticationService) {
+  constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
+  ) {
     this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
     this.dataSource = new MatTreeNestedDataSource();
     this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.getCategoryTree(true);
   }
-
-  ngOnInit() {}
 
   getCategoryTree(updateDisplayOrder = false, done?: () => void) {
     this.api.getCategoryTree().subscribe(async (categories: Category[]) => {

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {FavoriteTopicsComponent} from './favorite-topics.component';
 
 describe('FavoriteTopicsComponent', () => {
   let component: FavoriteTopicsComponent;
-  let fixture: ComponentFixture<FavoriteTopicsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [FavoriteTopicsComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<FavoriteTopicsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FavoriteTopicsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(FavoriteTopicsComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(FavoriteTopicsComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

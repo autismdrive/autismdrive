@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
 import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
 import {ResourceCategory} from '../_models/resource_category';
@@ -10,7 +10,7 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
   templateUrl: './filter-chips.component.html',
   styleUrls: ['./filter-chips.component.scss'],
 })
-export class FilterChipsComponent implements OnInit {
+export class FilterChipsComponent {
   @Input() categories: StudyCategory[] | ResourceCategory[] = [];
   @Input() ages: string[] = [];
   @Input() languages: string[] = [];
@@ -21,9 +21,10 @@ export class FilterChipsComponent implements OnInit {
   languageLabels = Language.labels;
   covid19Labels = Covid19Categories.labels;
 
-  constructor(private router: Router, private googleAnalytics: GoogleAnalyticsService) {}
-
-  ngOnInit() {}
+  constructor(
+    private router: Router,
+    private googleAnalytics: GoogleAnalyticsService,
+  ) {}
 
   goFilter(routerLink, type: string, queryParams) {
     this.googleAnalytics.relatedContentEvent(type, this.parentComponent);

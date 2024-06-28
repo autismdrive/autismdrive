@@ -16,7 +16,10 @@ export class AdminNoteDisplayComponent implements OnInit {
   @Input() currentResource: Resource;
   notes: AdminNote[];
 
-  constructor(private api: ApiService, public dialog: MatDialog) {}
+  constructor(
+    private api: ApiService,
+    public dialog: MatDialog,
+  ) {}
 
   ngOnInit() {
     this.getNotes();

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {ForgotPasswordComponent} from './forgot-password.component';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
-  let fixture: ComponentFixture<ForgotPasswordComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ForgotPasswordComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<ForgotPasswordComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ForgotPasswordComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(ForgotPasswordComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(ForgotPasswordComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {AvatarDialogComponent} from './avatar-dialog.component';
 
 describe('AvatarDialogComponent', () => {
   let component: AvatarDialogComponent;
-  let fixture: ComponentFixture<AvatarDialogComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [AvatarDialogComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AvatarDialogComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AvatarDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AvatarDialogComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AvatarDialogComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

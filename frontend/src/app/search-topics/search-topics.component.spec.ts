@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {SearchTopicsComponent} from './search-topics.component';
 
 describe('SearchTopicsComponent', () => {
   let component: SearchTopicsComponent;
-  let fixture: ComponentFixture<SearchTopicsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [SearchTopicsComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<SearchTopicsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SearchTopicsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(SearchTopicsComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(SearchTopicsComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

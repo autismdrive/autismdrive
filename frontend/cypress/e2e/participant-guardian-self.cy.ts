@@ -27,13 +27,8 @@ describe('Participant (Guardian - Self)', () => {
     profileUseCases = new ProfileUseCases(page);
     enrollUseCases = new EnrollUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
-    await page.waitForAngularEnabled(true);
     await page.navigateToHome();
     await loginUseCases.refreshAndRedirectToReturnUrl();
-  });
-
-  after(async () => {
-    await page.waitForAngularEnabled(true);
   });
 
   // Login & Register

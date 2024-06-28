@@ -10,7 +10,10 @@ import {ConfigService} from '../config/config.service';
 export class SearchService {
   query_url = '/api/search/resources';
 
-  constructor(private _http: HttpClient, private config: ConfigService) {}
+  constructor(
+    private _http: HttpClient,
+    private config: ConfigService,
+  ) {}
 
   search(query: Query): Observable<Query> {
     const url = this.config.apiUrl + this.query_url;

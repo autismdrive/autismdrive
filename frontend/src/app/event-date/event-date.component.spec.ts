@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {EventDateComponent} from './event-date.component';
 
 describe('EventDateComponent', () => {
   let component: EventDateComponent;
-  let fixture: ComponentFixture<EventDateComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [EventDateComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<EventDateComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EventDateComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(EventDateComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(EventDateComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

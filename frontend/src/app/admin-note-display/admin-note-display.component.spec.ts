@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {AdminNoteDisplayComponent} from './admin-note-display.component';
 
 describe('AdminNoteDisplayComponent', () => {
   let component: AdminNoteDisplayComponent;
-  let fixture: ComponentFixture<AdminNoteDisplayComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [AdminNoteDisplayComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AdminNoteDisplayComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdminNoteDisplayComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AdminNoteDisplayComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AdminNoteDisplayComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

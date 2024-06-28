@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
 import {AdminNote} from '../_models/admin_note';
@@ -13,7 +13,7 @@ import {AuthenticationService} from '../_services/authentication/authentication-
   templateUrl: './user-admin-details.component.html',
   styleUrls: ['./user-admin-details.component.scss'],
 })
-export class UserAdminDetailsComponent implements OnInit {
+export class UserAdminDetailsComponent {
   user: User;
   currentUser: User;
   dataSource: MatTableDataSource<EmailLog>;
@@ -58,8 +58,6 @@ export class UserAdminDetailsComponent implements OnInit {
       }
     });
   }
-
-  ngOnInit() {}
 
   exportUserData() {
     console.log('clicking the button for export user data');

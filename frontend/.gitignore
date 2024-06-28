@@ -38,19 +38,17 @@ yarn-error.log
 testem.log
 /typings
 
-# e2e
-!/e2e/protractor.conf.mjs
-/e2e/*.js
-/e2e/*.map
-
 # System Files
 .DS_Store
 Thumbs.db
 /shibboleth/
 /ssl/
-cypress/screenshots
-cypress/videos
 
 # CI files dynamically created for end-to-end testing
 /docker/ci/elasticsearch/*
 /docker/ci/postgres/*
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
+
+.nx

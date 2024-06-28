@@ -1,11 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-border-box-tile',
   templateUrl: './border-box-tile.component.html',
   styleUrls: ['./border-box-tile.component.scss'],
 })
-export class BorderBoxTileComponent implements OnInit {
+export class BorderBoxTileComponent {
   @Input() iconType: string;
   @Input() isSelected: boolean;
   @Input() url: string;
@@ -17,6 +17,4 @@ export class BorderBoxTileComponent implements OnInit {
   hover = false;
 
   constructor() {}
-
-  ngOnInit() {}
 }

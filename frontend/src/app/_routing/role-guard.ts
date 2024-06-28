@@ -1,13 +1,16 @@
 import {Injectable} from '@angular/core';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
 import {User} from '../_models/user';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 
 @Injectable({providedIn: 'root'})
-export class RoleGuard  {
+export class RoleGuard {
   private currentUser: User;
 
-  constructor(private router: Router, private authenticationService: AuthenticationService) {
+  constructor(
+    private router: Router,
+    private authenticationService: AuthenticationService,
+  ) {
     this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
   }
 

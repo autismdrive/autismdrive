@@ -1,5 +1,5 @@
 /// <reference types="@types/youtube" />
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {NavItem} from '../_models/nav-item';
 import ClosedCaptionsLoadPolicy = YT.ClosedCaptionsLoadPolicy;
 import ModestBranding = YT.ModestBranding;
@@ -11,7 +11,7 @@ import ShowInfo = YT.ShowInfo;
   templateUrl: './tutorial-video.component.html',
   styleUrls: ['./tutorial-video.component.scss'],
 })
-export class TutorialVideoComponent implements OnInit {
+export class TutorialVideoComponent {
   @Input() videoSize: string;
   @Input() videoId: string;
   @Input() instructions: string;
@@ -59,8 +59,6 @@ export class TutorialVideoComponent implements OnInit {
     const baseSize = 315;
     return Math.floor(baseSize * this.videoWidthFactor * this.windowWidthFactor);
   }
-
-  ngOnInit() {}
 
   hideVideo() {
     localStorage.setItem('shouldHideTutorialVideo', 'true');

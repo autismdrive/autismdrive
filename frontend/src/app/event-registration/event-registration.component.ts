@@ -1,21 +1,22 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
-import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 import {Resource} from '../_models/resource';
+import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 
 @Component({
   selector: 'app-event-registration',
   templateUrl: './event-registration.component.html',
   styleUrls: ['./event-registration.component.scss'],
 })
-export class EventRegistrationComponent implements OnInit {
+export class EventRegistrationComponent {
   @Input() resource: Resource;
   @Input() hasCurrentUser = false;
 
-  constructor(private router: Router, public dialog: MatDialog) {}
-
-  ngOnInit() {}
+  constructor(
+    private router: Router,
+    public dialog: MatDialog,
+  ) {}
 
   goLogin() {
     this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});

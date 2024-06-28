@@ -5,47 +5,49 @@ export class StudiesUseCases {
   constructor(private page: AppPage) {}
 
   navigateToStudiesPage() {
-    this.page.clickLinkToVariation('/studies');
-    expect(this.page.getElements('.studies').count()).toEqual(1);
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
+    this.page.clickLinkTo('/studies');
+    this.page.getElements('.studies').should('have.length', 1);
+    this.page.getElements('app-search-result').should('have.length.gt', 1);
   }
 
-  async filterBy(selectStatus?: string) {
+  filterBy(selectStatus?: string) {
     const menuSelector = '#set-status';
     const optionSelector = `.mat-option.sort-by-${selectStatus}`;
     this.page.clickElement(menuSelector);
-    await this.page.waitForVisible(optionSelector);
+    this.page.waitForVisible(optionSelector);
     this.page.clickElement(optionSelector);
-    await this.page.waitForNotVisible(optionSelector);
-    await this.page.waitForAnimations();
+    this.page.waitForNotVisible(optionSelector);
+    this.page.waitForAnimations();
   }
-  async filterByStatus(selectStatus?: string) {
-    await this.filterBy(selectStatus);
-    const selectedStatus = this.page.getElement('data-study-status');
-    expect(selectedStatus).toBeTruthy();
-    if (!selectStatus || (selectStatus && selectStatus === (await selectedStatus))) {
-      this.filterBy(selectStatus);
-      await this.checkResultsMatchStatus(selectStatus);
-    }
+  filterByStatus(selectStatus?: string) {
+    this.filterBy(selectStatus);
+
+    this.page.getElement('[data-study-status]').then($el => {
+      const selectedStatus = $el.attr('data-study-status');
+      expect(selectedStatus).not.to.be.empty;
+
+      if (!selectStatus || (selectStatus && selectStatus === selectedStatus)) {
+        this.filterBy(selectStatus);
+        this.checkResultsMatchStatus(selectStatus);
+      }
+    });
   }
 
-  async checkResultsMatchStatus(selectedStatus: string) {
-    const numResults = await this.page.getElements('app-search-result').count();
+  checkResultsMatchStatus(selectedStatus: string) {
+    this.page.getElements('app-search-result').then($els => {
+      if ($els.length > 0) {
+        // Check that status of all displayed results matches selected status
+        this.page.getElements('app-search-result').each(result => {
+          cy.wrap(result).should('have.attr', 'data-study-status', selectedStatus);
 
-    if (numResults > 0) {
-      // Check that status of all displayed results matches selected status
-      return this.page.getElements('app-search-result').each(result => {
-        expect(result.getAttribute('data-study-status')).toEqual(selectedStatus);
-
-        if (selectedStatus === 'currently_enrolling') {
-          expect(this.page.getElements('.status-badge.status-currently-enrolling').count()).toBeGreaterThan(0);
-        }
-      });
-    } else {
-      // Check that the "no results" message matches the selected status
-      return expect(this.page.getElement('p[data-study-status]').getAttribute('data-study-status')).toEqual(
-        selectedStatus,
-      );
-    }
+          if (selectedStatus === 'currently_enrolling') {
+            this.page.getElements('.status-badge.status-currently-enrolling').should('have.length.gt', 0);
+          }
+        });
+      } else {
+        // Check that the "no results" message matches the selected status
+        this.page.getElement('p[data-study-status]').should('have.attr', 'data-study-status', selectedStatus);
+      }
+    });
   }
 }

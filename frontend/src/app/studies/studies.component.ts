@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AgeRange} from '../_models/hit_type';
@@ -23,7 +23,7 @@ interface AgeObj {
   templateUrl: './studies.component.html',
   styleUrls: ['./studies.component.scss'],
 })
-export class StudiesComponent implements OnInit {
+export class StudiesComponent {
   query: Query;
   studyStatuses: StudyStatusObj[];
   selectedStatus: StudyStatusObj;
@@ -76,8 +76,6 @@ export class StudiesComponent implements OnInit {
     });
     this.loadStudies();
   }
-
-  ngOnInit() {}
 
   loadStudies() {
     if (this.selectedAge) {

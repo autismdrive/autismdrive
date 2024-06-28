@@ -1,20 +1,18 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {GroupValidationWrapperComponent} from './group-validation-wrapper.component';
 
 describe('GroupValidationWrapperComponent', () => {
   let component: GroupValidationWrapperComponent;
-  let fixture: ComponentFixture<GroupValidationWrapperComponent>;
+  let fixture: MockedComponentFixture<GroupValidationWrapperComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [GroupValidationWrapperComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    return MockBuilder(GroupValidationWrapperComponent, AppModule);
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GroupValidationWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = MockRender(GroupValidationWrapperComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

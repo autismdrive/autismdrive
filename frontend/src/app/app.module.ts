@@ -1,5 +1,6 @@
+import {MaterialModule} from '@app/material/material.module';
 import {NgMapsCoreModule} from '@ng-maps/core';
-import { GOOGLE_MAPS_API_CONFIG, NgMapsGoogleModule } from "@ng-maps/google";
+import {GOOGLE_MAPS_API_CONFIG, NgMapsGoogleModule} from '@ng-maps/google';
 import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule, DatePipe} from '@angular/common';
@@ -348,37 +349,7 @@ export class FormlyConfig {
     FormsModule,
     HttpClientModule,
     MarkdownModule,
-    MatAutocompleteModule,
-    MatBadgeModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatChipsModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatGridListModule,
-    MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatMenuModule,
-    MatNativeDateModule,
-    MatPaginatorModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
-    MatRadioModule,
-    MatSelectModule,
-    MatSidenavModule,
-    MatSlideToggleModule,
-    MatSortModule,
-    MatStepperModule,
-    MatTableModule,
-    MatTabsModule,
-    MatToolbarModule,
-    MatTooltipModule,
-    MatTreeModule,
+    MaterialModule,
     NgMapsGoogleModule,
     NgProgressModule,
     PdfJsViewerModule,

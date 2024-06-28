@@ -7,7 +7,6 @@
       "@animations/*": ["src/app/_animations/*"],
       "@app/*": ["src/app/*"],
       "@cypress/*": ["cypress/*"],
-      "@e2e/*": ["e2e/*"],
       "@environments/*": ["src/environments/*"],
       "@forms/*": ["src/app/_forms/*"],
       "@models/*": ["src/app/_models/*"],
@@ -42,3 +41,4 @@
     "cypress"
   ]
 }
+

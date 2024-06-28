@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {RepeatSectionComponent} from './repeat-section.component';
 
 describe('RepeatSectionComponent', () => {
   let component: RepeatSectionComponent;
-  let fixture: ComponentFixture<RepeatSectionComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [RepeatSectionComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<RepeatSectionComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RepeatSectionComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(RepeatSectionComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(RepeatSectionComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

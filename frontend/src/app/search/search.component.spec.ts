@@ -1,5 +1,3 @@
-import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -10,52 +8,41 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { ActivatedRoute, Route, RouterModule } from "@angular/router";
-import {RouterTestingModule} from '@angular/router/testing';
-import {of as observableOf} from 'rxjs';
+import {ActivatedRoute, RouterModule} from '@angular/router';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
+import {of} from 'rxjs';
 import {SearchComponent} from './search.component';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
-  let fixture: ComponentFixture<SearchComponent>;
+  let fixture: MockedComponentFixture<SearchComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      const route: Route = {path: 'search', component: SearchComponent, data: {title: 'Search Resources'}};
+  beforeEach(() => {
+    return MockBuilder(SearchComponent, AppModule)
+      .keep(BrowserAnimationsModule)
+      .keep(MatExpansionModule)
+      .keep(MatFormFieldModule)
+      .keep(MatIconModule)
+      .keep(MatInputModule)
+      .keep(MatListModule)
+      .keep(MatPaginatorModule)
+      .keep(MatSidenavModule)
+      .keep(MatTooltipModule)
+      .keep(ReactiveFormsModule)
+      .keep(RouterModule)
+      .provide({
+        provide: ActivatedRoute,
+        useValue: {
+          queryParamMap: of({query: '', keys: []}),
+        },
+      });
+  });
 
-      TestBed.configureTestingModule({
-        declarations: [SearchComponent],
-        imports: [
-          BrowserAnimationsModule,
-          MatExpansionModule,
-          MatFormFieldModule,
-          MatIconModule,
-          MatInputModule,
-          MatListModule,
-          MatPaginatorModule,
-          MatSidenavModule,
-          MatTooltipModule,
-          ReactiveFormsModule,
-          RouterModule
-        ],
-        providers: [
-          {
-            provide: ActivatedRoute,
-            useValue: {
-              queryParamMap: observableOf({query: '', keys: []}),
-            },
-          },
-        ],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      })
-        .compileComponents()
-        .then(() => {
-          fixture = TestBed.createComponent(SearchComponent);
-          component = fixture.componentInstance;
-          fixture.detectChanges();
-        });
-    }),
-  );
+  beforeEach(() => {
+    fixture = MockRender(SearchComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();

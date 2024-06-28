@@ -141,7 +141,7 @@ export class LoginUseCases {
   }
 
   async refreshAndRedirectToReturnUrl() {
-    const previousRoute = await this.page.getRoute();
+    const previousRoute = this.page.getRoute();
     this.page.refresh().then(() => expect(this.page.getRoute()).toEqual(previousRoute));
   }
 }

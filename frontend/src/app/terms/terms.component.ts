@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Participant} from '../_models/participant';
 import {ParticipantRelationship} from '../_models/participantRelationship';
@@ -12,7 +12,7 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss'],
 })
-export class TermsComponent implements OnInit {
+export class TermsComponent {
   user: User;
   relationship: ParticipantRelationship;
   preview = false;
@@ -41,8 +41,6 @@ export class TermsComponent implements OnInit {
       },
     );
   }
-
-  ngOnInit() {}
 
   goProfile($event) {
     $event.preventDefault();

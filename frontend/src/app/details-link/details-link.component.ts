@@ -1,11 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-details-link',
   templateUrl: './details-link.component.html',
   styleUrls: ['./details-link.component.scss'],
 })
-export class DetailsLinkComponent implements OnInit {
+export class DetailsLinkComponent {
   @Input() url: string;
   @Input() label = 'Details';
   @Input() size = 1;
@@ -18,8 +18,6 @@ export class DetailsLinkComponent implements OnInit {
   shouldHover = false;
 
   constructor() {}
-
-  ngOnInit() {}
 
   onMouseOver() {
     if (this.hover === undefined) {

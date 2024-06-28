@@ -1,20 +1,17 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {AutocompleteSectionComponent} from './autocomplete-section.component';
 
 describe('AutocompleteSectionComponent', () => {
   let component: AutocompleteSectionComponent;
-  let fixture: ComponentFixture<AutocompleteSectionComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [AutocompleteSectionComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AutocompleteSectionComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AutocompleteSectionComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AutocompleteSectionComponent);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AutocompleteSectionComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

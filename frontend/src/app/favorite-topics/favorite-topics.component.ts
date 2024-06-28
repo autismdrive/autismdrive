@@ -23,7 +23,10 @@ export class FavoriteTopicsComponent implements OnInit {
   languageLabels = Language.labels;
   covid19Labels = Covid19Categories.labels;
 
-  constructor(private api: ApiService, public dialog: MatDialog) {}
+  constructor(
+    private api: ApiService,
+    public dialog: MatDialog,
+  ) {}
 
   ngOnInit() {
     this.loadFavorites();

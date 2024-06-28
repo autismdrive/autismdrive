@@ -11,7 +11,10 @@ declare var gtag: Function;
   providedIn: 'root',
 })
 export class GoogleAnalyticsService {
-  constructor(private router: Router, private configService: ConfigService) {}
+  constructor(
+    private router: Router,
+    private configService: ConfigService,
+  ) {}
 
   private event(action: string, category: string, label: string) {
     gtag('event', action, {

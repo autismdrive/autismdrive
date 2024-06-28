@@ -168,7 +168,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
   clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
   clusterRenderer: Renderer = new DefaultRenderer();
 
-
   constructor(
     private api: ApiService,
     private authenticationService: AuthenticationService,

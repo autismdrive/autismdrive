@@ -20,7 +20,6 @@ import {FieldType} from '@ngx-formly/core';
 
   styleUrls: ['./resize-textarea.component.scss'],
 })
-export class ResizeTextareaComponent extends FieldType implements OnInit {
+export class ResizeTextareaComponent extends FieldType {
   @ViewChild(MatInput) formFieldControl: MatInput;
-  ngOnInit(): void {}
 }

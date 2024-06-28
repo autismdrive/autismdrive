@@ -14,7 +14,7 @@
           <mat-list-item>
             <mat-icon matListIcon>{{ info.getIcon() }}</mat-icon>
             ({{ info.size }})
-            <button mat-button [disabled]="info.size == 0" (click)="selectQuestionnaire(info)">
+            <button mat-button [disabled]="info.size === 0" (click)="selectQuestionnaire(info)">
               {{ info.display_name }}
             </button>
           </mat-list-item>

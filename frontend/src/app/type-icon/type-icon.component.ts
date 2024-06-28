@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {HitType} from '../_models/hit_type';
 
 @Component({
@@ -6,15 +6,13 @@ import {HitType} from '../_models/hit_type';
   templateUrl: './type-icon.component.html',
   styleUrls: ['./type-icon.component.scss'],
 })
-export class TypeIconComponent implements OnInit {
+export class TypeIconComponent {
   @Input() iconType: string;
   @Input() size: number;
 
   iconTypes: string[] = HitType.all().map(ht => ht.name);
 
   constructor() {}
-
-  ngOnInit() {}
 
   is(actual: string, expected: string) {
     return actual === expected;

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {EmailLogAdminComponent} from './email-log-admin.component';
 
 describe('EmailLogAdminComponent', () => {
   let component: EmailLogAdminComponent;
-  let fixture: ComponentFixture<EmailLogAdminComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [EmailLogAdminComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<EmailLogAdminComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EmailLogAdminComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(EmailLogAdminComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(EmailLogAdminComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

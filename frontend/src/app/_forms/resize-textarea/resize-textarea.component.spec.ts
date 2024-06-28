@@ -1,20 +1,18 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {ResizeTextareaComponent} from './resize-textarea.component';
 
 describe('ResizeTextareaComponent', () => {
   let component: ResizeTextareaComponent;
-  let fixture: ComponentFixture<ResizeTextareaComponent>;
+  let fixture: MockedComponentFixture<ResizeTextareaComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ResizeTextareaComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    return MockBuilder(ResizeTextareaComponent, AppModule);
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResizeTextareaComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = MockRender(ResizeTextareaComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

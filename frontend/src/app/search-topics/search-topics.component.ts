@@ -13,7 +13,10 @@ export class SearchTopicsComponent {
   categoriesById: CategoriesById = {};
   loading = true;
 
-  constructor(private categoriesService: CategoriesService, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(
+    private categoriesService: CategoriesService,
+    private changeDetectorRef: ChangeDetectorRef,
+  ) {
     if (this.categoriesService.categoriesById) {
       this.categoriesById = this.categoriesService.categoriesById;
       this.loading = false;

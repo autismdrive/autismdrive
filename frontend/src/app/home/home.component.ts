@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 import {HitType} from '../_models/hit_type';
@@ -12,7 +12,7 @@ import {ConfigService} from '../_services/config/config.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   currentStudies: Study[];
   newsItems: NewsItem[];
 
@@ -42,8 +42,6 @@ export class HomeComponent implements OnInit {
       `name='twitter:image'`,
     );
   }
-
-  ngOnInit() {}
 
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
     if (this.currentStudies && this.currentStudies.length > 0) {

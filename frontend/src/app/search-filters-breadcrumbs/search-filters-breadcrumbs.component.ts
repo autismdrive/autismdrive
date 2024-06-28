@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Query} from '../_models/query';
 
 @Component({
@@ -6,7 +6,7 @@ import {Query} from '../_models/query';
   templateUrl: './search-filters-breadcrumbs.component.html',
   styleUrls: ['./search-filters-breadcrumbs.component.scss'],
 })
-export class SearchFiltersBreadcrumbsComponent implements OnInit {
+export class SearchFiltersBreadcrumbsComponent {
   @Input() query: Query;
   @Input() restrictToMappedResults: boolean;
   @Input() ageLabels: {[key: string]: string};
@@ -21,6 +21,4 @@ export class SearchFiltersBreadcrumbsComponent implements OnInit {
   @Output() clearAllClicked = new EventEmitter();
 
   constructor() {}
-
-  ngOnInit() {}
 }

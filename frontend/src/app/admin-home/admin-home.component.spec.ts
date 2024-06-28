@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {AdminHomeComponent} from './admin-home.component';
 
 describe('AdminHomeComponent', () => {
   let component: AdminHomeComponent;
-  let fixture: ComponentFixture<AdminHomeComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [AdminHomeComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AdminHomeComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdminHomeComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AdminHomeComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AdminHomeComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

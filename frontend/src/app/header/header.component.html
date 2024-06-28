@@ -9,24 +9,15 @@
     fxLayoutAlign="center center"
     id="uva-header"
   >
-    <div
-      class="uva-logo"
-      fxFlex
-    ><a
-      href="https://education.virginia.edu/research-initiatives/research-centers-labs/supporting-transformative-autism-research"
-      target="_blank"
-    >
-        <span
-          fxHide
-          fxShow.lt-lg
-        >About UVA STAR</span>
-      <span
-        fxHide
-        fxShow.gt-lg
-        fxShow.lg
-      >Learn about the UVA STAR project</span>
-
-    </a></div>
+    <div class="uva-logo" fxFlex>
+      <a
+        href="https://education.virginia.edu/research-initiatives/research-centers-labs/supporting-transformative-autism-research"
+        target="_blank"
+      >
+        <span fxHide fxShow.lt-lg>About UVA STAR</span>
+        <span fxHide fxShow.gt-lg fxShow.lg>Learn about the UVA STAR project</span>
+      </a>
+    </div>
     <span fxFlex></span>
     <div *ngIf="config.mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
   </mat-toolbar-row>
@@ -87,7 +78,7 @@
             Logout
           </a>
         </li>
-        <li *ngIf="currentUser && currentUser.role == 'admin'">
+        <li *ngIf="currentUser && currentUser.role === 'admin'">
           <a
             [routerLink]="['/admin']"
             color="accent"
@@ -197,7 +188,7 @@
   </a>
   <a
     (click)="toggleMenu()"
-    *ngIf="currentUser && currentUser.role == 'admin'"
+    *ngIf="currentUser && currentUser.role === 'admin'"
     [routerLink]="['/admin']"
     id="admin-button-mobile"
     mat-button

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 
@@ -7,8 +7,11 @@ import {Router} from '@angular/router';
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss'],
 })
-export class AboutComponent implements OnInit {
-  constructor(private router: Router, private meta: Meta) {
+export class AboutComponent {
+  constructor(
+    private router: Router,
+    private meta: Meta,
+  ) {
     this.meta.updateTag(
       {property: 'og:image', content: location.origin + '/assets/about/diversity.jpg'},
       `property='og:image'`,
@@ -22,8 +25,6 @@ export class AboutComponent implements OnInit {
       `name='twitter:image'`,
     );
   }
-
-  ngOnInit() {}
 
   goRegister($event) {
     $event.preventDefault();

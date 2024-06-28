@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
@@ -9,7 +9,7 @@ import {ApiService} from '../_services/api/api.service';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent {
   errorMessage: string;
   formStatus = 'form';
   form = new FormGroup({});
@@ -26,9 +26,11 @@ export class ForgotPasswordComponent implements OnInit {
       },
     },
   ];
-  constructor(private api: ApiService, private changeDetectorRef: ChangeDetectorRef, private router: Router) {}
-
-  ngOnInit() {}
+  constructor(
+    private api: ApiService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private router: Router,
+  ) {}
 
   submit() {
     localStorage.removeItem('token_url');

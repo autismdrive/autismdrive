@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -13,7 +13,7 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent {
   private _stateSubject: BehaviorSubject<string>;
   public registerState: Observable<string>;
 
@@ -64,8 +64,6 @@ export class RegisterComponent implements OnInit {
       `name='twitter:image'`,
     );
   }
-
-  ngOnInit() {}
 
   submit() {
     localStorage.removeItem('token_url');

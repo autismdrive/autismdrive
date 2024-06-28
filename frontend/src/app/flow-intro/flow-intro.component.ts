@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Flow} from '../_models/flow';
 
 @Component({
@@ -6,7 +6,7 @@ import {Flow} from '../_models/flow';
   templateUrl: './flow-intro.component.html',
   styleUrls: ['./flow-intro.component.scss'],
 })
-export class FlowIntroComponent implements OnInit {
+export class FlowIntroComponent {
   @Input()
   flow: Flow;
 
@@ -14,8 +14,6 @@ export class FlowIntroComponent implements OnInit {
   next: EventEmitter<any> = new EventEmitter();
 
   constructor() {}
-
-  ngOnInit() {}
 
   continue() {
     this.next.emit();

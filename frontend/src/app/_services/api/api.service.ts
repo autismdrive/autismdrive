@@ -126,7 +126,10 @@ export class ApiService {
     zip_code_coords: '/api/zip_code_coords/<id>',
   };
 
-  constructor(private httpClient: HttpClient, private configService: ConfigService) {
+  constructor(
+    private httpClient: HttpClient,
+    private configService: ConfigService,
+  ) {
     this.apiRoot = configService.apiUrl;
   }
 
@@ -628,11 +631,9 @@ export class ApiService {
   /** Get Favorites By User and Type */
   getFavoritesByUserAndType(user: User, type: string): Observable<UserFavorite[]> {
     return this.httpClient
-      .get<UserFavorite[]>(
-        this._endpointUrl('favoritesbyuserandtypelist')
-          .replace('<user_id>', user.id.toString())
-          .replace('<favorite_type>', type),
-      )
+      .get<
+        UserFavorite[]
+      >(this._endpointUrl('favoritesbyuserandtypelist').replace('<user_id>', user.id.toString()).replace('<favorite_type>', type))
       .pipe(catchError(this._handleError));
   }
 

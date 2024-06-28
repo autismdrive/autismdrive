@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {TimedoutComponent} from './timed-out.component';
 
 describe('TimedoutComponent', () => {
   let component: TimedoutComponent;
-  let fixture: ComponentFixture<TimedoutComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [TimedoutComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<TimedoutComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TimedoutComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(TimedoutComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(TimedoutComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

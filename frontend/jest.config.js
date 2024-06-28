@@ -1,6 +1,5 @@
 const {pathsToModuleNameMapper} = require('ts-jest');
 const {compilerOptions} = require('./tsconfig');
-
 const esModules = ['@angular', '@testing-library', 'ngx-markdown'];
 
 class StorageMock {
@@ -44,7 +43,7 @@ module.exports = {
   collectCoverage: true,
   coverageReporters: ['lcov', 'html'],
   coverageDirectory: 'coverage',
-  maxWorkers: 2,
+  maxWorkers: 8,
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, {
     prefix: '<rootDir>/',
   }),

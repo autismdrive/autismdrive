@@ -29,13 +29,9 @@ describe('Admin', () => {
     enrollUseCases = new EnrollUseCases(page);
     adminUseCases = new AdminUseCases(page);
     studiesUseCases = new StudiesUseCases(page);
-    await page.waitForAngularEnabled(true);
+
     await page.navigateToHome();
     await loginUseCases.refreshAndRedirectToReturnUrl();
-  });
-
-  after(async () => {
-    await page.waitForAngularEnabled(true);
   });
 
   // Login & Register

@@ -32,7 +32,10 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild('input', {static: true}) input: ElementRef;
 
-  constructor(private api: ApiService, private router: Router) {
+  constructor(
+    private api: ApiService,
+    private router: Router,
+  ) {
     this.dataSource = new UserDataSource(this.api);
   }
 

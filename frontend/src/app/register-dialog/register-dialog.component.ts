@@ -1,20 +1,20 @@
-import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Inject} from '@angular/core';
 import {FormGroup} from '@angular/forms';
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
 @Component({
   selector: 'app-register-dialog',
   templateUrl: './register-dialog.component.html',
   styleUrls: ['./register-dialog.component.scss'],
 })
-export class RegisterDialogComponent implements OnInit {
+export class RegisterDialogComponent {
   private _stateSubject: BehaviorSubject<string>;
   public registerState: Observable<string>;
 
@@ -86,8 +86,6 @@ export class RegisterDialogComponent implements OnInit {
       role: 'User',
     });
   }
-
-  ngOnInit() {}
 
   submit() {
     localStorage.removeItem('token_url');

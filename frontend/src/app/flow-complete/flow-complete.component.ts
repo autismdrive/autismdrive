@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
 import {Flow} from '../_models/flow';
 import {ParticipantRelationship} from '../_models/participantRelationship';
@@ -8,13 +8,11 @@ import {ParticipantRelationship} from '../_models/participantRelationship';
   templateUrl: './flow-complete.component.html',
   styleUrls: ['./flow-complete.component.scss'],
 })
-export class FlowCompleteComponent implements OnInit {
+export class FlowCompleteComponent {
   @Input()
   flow: Flow;
 
   constructor(private router: Router) {}
-
-  ngOnInit() {}
 
   goProfile($event) {
     $event.preventDefault();

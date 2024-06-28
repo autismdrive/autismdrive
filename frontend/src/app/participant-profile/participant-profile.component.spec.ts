@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {ParticipantProfileComponent} from './participant-profile.component';
 
 describe('ParticipantProfileComponent', () => {
   let component: ParticipantProfileComponent;
-  let fixture: ComponentFixture<ParticipantProfileComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ParticipantProfileComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<ParticipantProfileComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ParticipantProfileComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(ParticipantProfileComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(ParticipantProfileComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

@@ -10,7 +10,10 @@ import {GoogleAnalyticsService} from '../_services/google-analytics/google-analy
 export class ErrorInterceptor implements HttpInterceptor {
   isSession = new RegExp('.*/api/session');
 
-  constructor(private router: Router, private googleAnalyticsService: GoogleAnalyticsService) {}
+  constructor(
+    private router: Router,
+    private googleAnalyticsService: GoogleAnalyticsService,
+  ) {}
 
   private logError(error: StarError) {
     this.googleAnalyticsService.errorEvent(error);

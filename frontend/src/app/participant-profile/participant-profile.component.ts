@@ -1,24 +1,26 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
-import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
 import {Participant} from '../_models/participant';
 import {ParticipantRelationship} from '../_models/participantRelationship';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
+import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
 
 @Component({
   selector: 'app-participant-profile',
   templateUrl: './participant-profile.component.html',
   styleUrls: ['./participant-profile.component.scss'],
 })
-export class ParticipantProfileComponent implements OnInit {
+export class ParticipantProfileComponent {
   @Input() participant: Participant;
   @Input() user: User;
 
-  constructor(private api: ApiService, private router: Router, public dialog: MatDialog) {}
-
-  ngOnInit() {}
+  constructor(
+    private api: ApiService,
+    private router: Router,
+    public dialog: MatDialog,
+  ) {}
 
   goEditEnroll($event) {
     if (this.participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {TutorialVideoComponent} from './tutorial-video.component';
 
 describe('TutorialVideoComponent', () => {
   let component: TutorialVideoComponent;
-  let fixture: ComponentFixture<TutorialVideoComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [TutorialVideoComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<TutorialVideoComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TutorialVideoComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(TutorialVideoComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(TutorialVideoComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

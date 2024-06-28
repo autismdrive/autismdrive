@@ -13,12 +13,12 @@
     mat-flat-button
     (click)="changeTable(questionnaire_info)"
     color="accent"
-    [ngClass]="{selected: selected_info == questionnaire_info}"
+    [ngClass]="{selected: selected_info === questionnaire_info}"
   >
     {{ questionnaire_info.display_name }}
   </button>
   <span *ngFor="let table of questionnaire_info.sub_tables">
-    <button mat-flat-button (click)="changeTable(table)" color="accent" [ngClass]="{selected: selected_info == table}">
+    <button mat-flat-button (click)="changeTable(table)" color="accent" [ngClass]="{selected: selected_info === table}">
       {{ table.display_name }}
     </button>
   </span>

@@ -1,21 +1,21 @@
-import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Inject} from '@angular/core';
 import {FormGroup} from '@angular/forms';
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {EventRegistrationComponent} from '../event-registration/event-registration.component';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {EventRegistrationComponent} from '../event-registration/event-registration.component';
 
 @Component({
   selector: 'app-event-registration-form',
   templateUrl: './event-registration-form.component.html',
   styleUrls: ['./event-registration-form.component.scss'],
 })
-export class EventRegistrationFormComponent implements OnInit {
+export class EventRegistrationFormComponent {
   private _stateSubject: BehaviorSubject<string>;
   public registerState: Observable<string>;
 
@@ -174,8 +174,6 @@ export class EventRegistrationFormComponent implements OnInit {
       }
     });
   }
-
-  ngOnInit() {}
 
   submit() {
     localStorage.removeItem('token_url');

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {AdminExportDetailsComponent} from './admin-export-details.component';
 
 describe('AdminExportDetailsComponent', () => {
   let component: AdminExportDetailsComponent;
-  let fixture: ComponentFixture<AdminExportDetailsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [AdminExportDetailsComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AdminExportDetailsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdminExportDetailsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AdminExportDetailsComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AdminExportDetailsComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

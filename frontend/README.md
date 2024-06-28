@@ -25,9 +25,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Running unit tests
 
-If we had unit tests, you would run
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-But we just have e2e tests on the front end at this time.
+Run `ng test` to execute the unit tests via [Jest](https://https://jestjs.io/).
 
 ## Running end-to-end tests
 
@@ -35,23 +33,13 @@ Make sure you have the database, backend, and frontend all running.
 
 ### From PyCharm
 
-Open the Edit Configurations menu (Run > Edit Configurations...) and add a Protractor configuration with the following settings:
-* Configuration File: `[path-to-your-files]/autismdrive/frontend/e2e/protractor.conf.mjs`
-* Protractor Options: `--dev-server-target=`
-
-- Configuration File: `[path-to-your-files]/star-drive/frontend/e2e/protractor.conf.js`
-- Protractor Options: `--dev-server-target=`
+Open the Edit Configurations menu (Run > Edit Configurations...) and add a Cypress configuration with the following settings:
+* Configuration File: `[path-to-your-files]/autismdrive/frontend/cypress.config.ts`
+* Cypress Options: `--dev-server-target=`
 
 Save the configuration. Now you can run end-to-end tests with the play button.
 
 ### From command line
-Edit the tsconfig file path in the Protractor config file (frontend/e2e/protractor.conf.mjs):
-```
-    require('ts-node').register({
-      project: './e2e/tsconfig.e2e.json'
-    });
-```
-
 Execute the following at the top level of the repository, which will clear and re-seed the database, then run all e2e tests:
 
 ```BASH

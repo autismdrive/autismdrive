@@ -55,14 +55,14 @@ export class GlobalHeaderUseCases {
   }
 
   visitStudiesPage() {
-    this.page.clickLinkToVariation('/studies');
-    expect(this.page.getElements('.studies').count()).toEqual(1);
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
+    this.page.clickLinkTo('/studies');
+    this.page.getElements('.studies').should('have.length', 1);
+    this.page.getElements('app-search-result').should('have.length.gt', 1);
     this.page.clickLinkTo('/home');
   }
 
   visitResourcesPage() {
-    this.page.clickLinkToVariation('/search');
+    this.page.clickLinkTo('/search');
     this.page.waitForVisible('app-search-result');
 
     ['resource', 'location', 'event'].forEach(t => {

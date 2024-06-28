@@ -17,7 +17,11 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   sidebarOpen = true;
   private _mobileQueryListener: () => void;
 
-  constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
+  constructor(
+    private api: ApiService,
+    changeDetectorRef: ChangeDetectorRef,
+    media: MediaMatcher,
+  ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();

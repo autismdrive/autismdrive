@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {CardWrapperComponent} from './card-wrapper.component';
 
 describe('CardWrapperComponent', () => {
   let component: CardWrapperComponent;
-  let fixture: ComponentFixture<CardWrapperComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [CardWrapperComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<CardWrapperComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CardWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(CardWrapperComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(CardWrapperComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

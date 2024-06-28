@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {TypeIconComponent} from './type-icon.component';
 
 describe('TypeIconComponent', () => {
   let component: TypeIconComponent;
-  let fixture: ComponentFixture<TypeIconComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [TypeIconComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<TypeIconComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TypeIconComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(TypeIconComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(TypeIconComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

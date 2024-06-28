@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {User} from '../_models/user';
 import {UserFavorite} from '../_models/user_favorite';
 import {ApiService} from '../_services/api/api.service';
@@ -8,14 +8,12 @@ import {ApiService} from '../_services/api/api.service';
   templateUrl: './favorite-resource-button.component.html',
   styleUrls: ['./favorite-resource-button.component.scss'],
 })
-export class FavoriteResourceButtonComponent implements OnInit {
+export class FavoriteResourceButtonComponent {
   @Input() resource_id: number;
   favorite: UserFavorite;
   @Input() user: User;
 
   constructor(private api: ApiService) {}
-
-  ngOnInit() {}
 
   userFavorite() {
     for (const f of this.user.user_favorites) {

@@ -1,3 +1,3 @@
 module.exports = {
-  plugins: ['@nightwatch/angular']
-}
+  plugins: ['@nightwatch/angular'],
+};

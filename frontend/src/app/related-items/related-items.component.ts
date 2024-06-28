@@ -19,7 +19,11 @@ export class RelatedItemsComponent implements OnInit {
   relatedResources: Resource[] = [];
   relatedStudies: Study[] = [];
 
-  constructor(private api: ApiService, private router: Router, private googleAnalytics: GoogleAnalyticsService) {}
+  constructor(
+    private api: ApiService,
+    private router: Router,
+    private googleAnalytics: GoogleAnalyticsService,
+  ) {}
 
   ngOnInit() {
     const options: RelatedOptions = {

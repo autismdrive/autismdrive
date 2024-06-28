@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {HitType} from '../_models/hit_type';
 import {NewsItem} from '../_models/news-item';
@@ -12,13 +12,17 @@ import {AuthenticationService} from '../_services/authentication/authentication-
   templateUrl: './uva-education.component.html',
   styleUrls: ['./uva-education.component.scss'],
 })
-export class UvaEducationComponent implements OnInit {
+export class UvaEducationComponent {
   edResources: Resource[];
   newsItems: NewsItem[];
   currentUser: User;
   loading = true;
 
-  constructor(private api: ApiService, private authenticationService: AuthenticationService, private meta: Meta) {
+  constructor(
+    private api: ApiService,
+    private authenticationService: AuthenticationService,
+    private meta: Meta,
+  ) {
     this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.meta.updateTag(
       {property: 'og:image', content: location.origin + '/assets/education/uva_education.jpg'},
@@ -34,8 +38,6 @@ export class UvaEducationComponent implements OnInit {
     );
     this.loadResources();
   }
-
-  ngOnInit() {}
 
   loadResources() {
     this.api.getEducationResources().subscribe(resources => {

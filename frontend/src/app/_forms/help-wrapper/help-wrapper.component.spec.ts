@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {HelpWrapperComponent} from './help-wrapper.component';
 
 describe('HelpWrapperComponent', () => {
   let component: HelpWrapperComponent;
-  let fixture: ComponentFixture<HelpWrapperComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [HelpWrapperComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<HelpWrapperComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(HelpWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(HelpWrapperComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(HelpWrapperComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

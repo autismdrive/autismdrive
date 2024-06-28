@@ -1,80 +1,117 @@
 /// <reference types="cypress" />
 import {AppPage} from './util';
 
+interface SearchFieldSelectors {
+  searchField: string;
+  result: string;
+  numResultsAttribute: string;
+  numResults: string;
+  autocomplete: string;
+  suggestion: string;
+  typeTab: string;
+  activeFirstTab: string;
+}
+
 export class SearchUseCases {
   constructor(private page: AppPage) {}
 
-  async enterKeywordsInSearchField(keywordString = 'autism', autocomplete = true) {
-    const searchFieldSelector = '#search-field input';
-    const resultSelector = 'app-search-result';
+  get searchFieldSelectors(): SearchFieldSelectors {
+    const autocomplete = '.mat-autocomplete-panel';
+    const typeTab = '.type-tabs-container .type-tabs .mat-tab-label';
     const numResultsAttribute = 'data-num-results';
-    const numResultsSelector = '[data-num-results]';
-    const autocompleteSelector = '.mat-autocomplete-panel';
-    const suggestionSelector = autocompleteSelector + ' .mat-option';
-    const typeTabSelector = '.type-tabs-container .type-tabs .mat-tab-label';
-    const activeFirstTabSelector = typeTabSelector + '.mat-tab-label-active[tabindex="0"]';
+    return {
+      searchField: '#search-field input',
+      result: 'app-search-result',
+      numResultsAttribute,
+      numResults: `[${numResultsAttribute}]`,
+      autocomplete,
+      suggestion: autocomplete + ' .mat-option',
+      typeTab,
+      activeFirstTab: typeTab + '.mat-tab-label-active[tabindex="0"]',
+    };
+  }
 
+  checkTypeTabsAndResults(selectors: SearchFieldSelectors) {
     // Wait for type tabs and results to load.
-    await this.page.waitForVisible(typeTabSelector);
-    await this.page.waitForVisible(resultSelector);
+    this.page.waitForVisible(selectors.typeTab);
+    this.page.waitForVisible(selectors.result);
 
     // Verify that type tabs and search results are displayed.
-    const numResultsBefore = parseInt(
-      await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute),
-      10,
-    );
-    expect(numResultsBefore).toBeGreaterThan(0, 'Search results should be visible.');
-    const numTypeTabsBefore = await this.page.getElements(typeTabSelector).count();
-    expect(numTypeTabsBefore).toEqual(4, 'All type tabs should be present.');
-    const numFirstTabSelectedBefore = await this.page.getElements(activeFirstTabSelector).count();
-    expect(numFirstTabSelectedBefore).toEqual(1, 'First type tab should be selected.');
+    this.page.getElements(selectors.typeTab).should('have.length', 4).as('numTypeTabsBefore');
+    this.page.getElements(selectors.activeFirstTab).should('have.length', 1).as('numFirstTabSelectedAfter');
+    return this.page
+      .getElement(selectors.numResults)
+      .should('be.visible')
+      .should('have.attr', selectors.numResultsAttribute)
+      .as('numResultsBefore');
+  }
 
+  enterKeyword(keywordString: string, selectors: SearchFieldSelectors) {
     // Click the search field.
-    this.page.clickElement(searchFieldSelector);
-    const autocompleteIsVisibleBefore = await this.page.isVisible(autocompleteSelector);
-    expect(autocompleteIsVisibleBefore).toEqual(true, 'Autocomplete panel should be visible.');
-    const numSuggestionsBefore = await this.page.getElements(suggestionSelector).count();
-    expect(numSuggestionsBefore).toBeGreaterThan(0, 'Search suggestions should be visible.');
+    this.page.clickElement(selectors.searchField);
+    this.page.isVisible(selectors.autocomplete);
+    this.page.getElements(selectors.suggestion).should('have.length.gt', 0).should('be.visible');
 
     // Input keyword
-    this.page.inputText(searchFieldSelector, keywordString);
+    this.page.inputText(selectors.searchField, keywordString, true);
+  }
 
-    if (autocomplete) {
-      const autocompleteIsVisibleAfter = await this.page.isVisible(autocompleteSelector);
-      expect(autocompleteIsVisibleAfter).toEqual(true);
-      const suggestionIsVisibleAfter = await this.page.isVisible(suggestionSelector);
-      expect(suggestionIsVisibleAfter).toEqual(true);
-      const numSuggestionsAfter = await this.page.getElements(suggestionSelector).count();
-      expect(numSuggestionsAfter).toBeGreaterThan(0, 'Search suggestions should be visible.');
-
-      // Select the first suggestion
-      this.page.clickElement(suggestionSelector);
-    } else {
-      // Submit the search
-      this.page.pressKey('ENTER');
-    }
-
-    this.page.waitForVisible(resultSelector);
-    const numResultsAfter = parseInt(
-      await this.page.getElement(numResultsSelector).getWebElement().getAttribute(numResultsAttribute),
-      10,
-    );
-    expect(numResultsAfter).toBeGreaterThan(0, 'Keyword search should return results.');
-    expect(numResultsAfter).toBeLessThan(numResultsBefore, 'Keyword search should filter the results.');
+  checkForResults(selectors: SearchFieldSelectors) {
+    this.page.waitForVisible(selectors.result);
+    this.page
+      .getElement(selectors.numResults)
+      .should('be.visible')
+      .should('have.attr', selectors.numResultsAttribute)
+      .as('numResultsAfter')
+      .then(function (numResultsAfter) {
+        expect(this.numResultsAfter).to.be.gt(0, 'Keyword search should return results.');
+        expect(this.numResultsAfter).to.be.lt(this.numResultsBefore, 'Keyword search should filter the results.');
+      });
 
     // First type tab should be selected.
-    const numTypeTabsAfter = await this.page.getElements(typeTabSelector).count();
-    const numFirstTabSelectedAfter = await this.page.getElements(activeFirstTabSelector).count();
-    expect(numTypeTabsAfter).toEqual(numTypeTabsBefore, 'All type tabs should be present.');
-    expect(numFirstTabSelectedAfter).toEqual(numFirstTabSelectedBefore, 'First type tab should be selected.');
+    this.page.getElements(selectors.typeTab).should('have.length', 4).as('numTypeTabsAfter');
+    this.page.getElements(selectors.activeFirstTab).should('have.length', 1).as('numFirstTabSelectedAfter');
+    cy.get('@numTypeTabsBefore').then(function (numTypeTabsBefore) {
+      expect(this.numTypeTabsAfter).to.equal(this.numTypeTabsBefore, 'All type tabs should be present.');
+      expect(this.numFirstTabSelectedAfter).to.equal(
+        this.numFirstTabSelectedBefore,
+        'First type tab should be selected.',
+      );
+    });
+  }
 
-    if (!autocomplete) {
-      // Results should be sorted by Relevance
-      const selectedSortSelector = '.sort-order app-search-sort mat-select-trigger .selected-sort-label';
-      await this.page.waitForVisible(selectedSortSelector);
-      const selectEl = await this.page.getElement(selectedSortSelector);
-      expect(selectEl.getText()).toEqual('Relevance');
-    }
+  enterAutocompleteSearch(keywordString = 'autism') {
+    const selectors = this.searchFieldSelectors;
+
+    this.checkTypeTabsAndResults(selectors);
+    this.enterKeyword(keywordString, selectors);
+
+    // Select the first autocomplete suggestion
+    this.page.isVisible(selectors.autocomplete);
+    this.page.isVisible(selectors.suggestion);
+    this.page.getElements(selectors.suggestion).should('have.length.gt', 0);
+    this.page.clickElement(selectors.suggestion);
+
+    // Verify that the search results are displayed.
+    this.checkForResults(selectors);
+  }
+
+  enterKeywordsInSearchField(keywordString = 'autism') {
+    const selectors = this.searchFieldSelectors;
+
+    this.checkTypeTabsAndResults(selectors).as('numResultsBefore');
+    this.enterKeyword(keywordString, selectors);
+
+    // Submit the search
+    this.page.pressKey('ENTER');
+
+    // Verify that the search results are displayed.
+    this.checkForResults(selectors);
+
+    // Results should be sorted by Relevance
+    const selectedSortSelector = '.sort-order app-search-sort mat-select-trigger .selected-sort-label';
+    this.page.waitForVisible(selectedSortSelector);
+    this.page.getElement(selectedSortSelector).should('have.text', 'Relevance');
   }
 
   async displaySelectedCategory(filterBy: string) {
@@ -82,32 +119,32 @@ export class SearchUseCases {
     const filterMenuSelector = `.filter-by-${filterBy} .mat-menu-trigger`;
     const filterMenuOptionSelector = '.mat-menu-panel .mat-menu-item:nth-child(2)';
     const appliedFilterChipSelector = `${appliedFilterSelector}-${filterBy}`;
-    const numAppliedFiltersBefore = await this.page.getElements(appliedFilterSelector).count();
-    const numFilterMenus = await this.page.getElements(filterMenuSelector).count();
+    const numAppliedFiltersBefore = this.page.getElements(appliedFilterSelector).count();
+    const numFilterMenus = this.page.getElements(filterMenuSelector).count();
     expect(numFilterMenus).toEqual(1, `Filter menu for ${filterBy} should be visible.`);
 
     // Open dropdown menu & select first option
     this.page.clickElement(filterMenuSelector);
-    await this.page.waitForVisible(filterMenuOptionSelector);
+    this.page.waitForVisible(filterMenuOptionSelector);
     this.page.clickElement(filterMenuOptionSelector);
-    await this.page.waitForNotVisible(filterMenuOptionSelector);
-    await this.page.waitForVisible(appliedFilterChipSelector);
-    const numAppliedFiltersAfter = await this.page.getElements(appliedFilterSelector).count();
+    this.page.waitForNotVisible(filterMenuOptionSelector);
+    this.page.waitForVisible(appliedFilterChipSelector);
+    const numAppliedFiltersAfter = this.page.getElements(appliedFilterSelector).count();
     expect(numAppliedFiltersAfter).toBeGreaterThan(numAppliedFiltersBefore);
     expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 
   async clearSearchBox(keywordString = 'autism') {
     const searchFieldSelector = '#search-field input';
-    const input_text_before = await this.page.getElement(searchFieldSelector).getAttribute('value');
+    const input_text_before = this.page.getElement(searchFieldSelector).getAttribute('value');
     expect(input_text_before.toLowerCase()).toContain(keywordString);
 
     this.page.clickAndExpectRoute('#logo', '/home');
     this.page.waitForVisible('app-news-item');
-    this.page.clickLinkToVariation('/search');
+    this.page.clickLinkTo('/search');
     this.page.waitForVisible('app-search-result');
 
-    const input_text_after = await this.page.getElement(searchFieldSelector).getAttribute('value');
+    const input_text_after = this.page.getElement(searchFieldSelector).getAttribute('value');
     expect(input_text_after).toEqual('');
   }
 
@@ -115,10 +152,10 @@ export class SearchUseCases {
     const menuSelector = '#sort-and-status .sort-order mat-select';
     const optionSelector = `.mat-option.sort-by-${sortMethod}`;
     this.page.clickElement(menuSelector);
-    await this.page.waitForVisible(optionSelector);
+    this.page.waitForVisible(optionSelector);
     this.page.clickElement(optionSelector);
-    await this.page.waitForNotVisible(optionSelector);
-    await this.page.waitForAnimations();
+    this.page.waitForNotVisible(optionSelector);
+    this.page.waitForAnimations();
   }
 
   async sortByDistance() {
@@ -130,14 +167,14 @@ export class SearchUseCases {
   // Checks the distance calculation for the each result against the next result.
   // Each result should be closer than the next.
   async checkResultsDistance() {
-    const results = await this.page.getElements('app-search-result');
+    const results = this.page.getElements('app-search-result');
     let numChecked = 0;
 
     for (let i = 0; i < results.length - 1; i++) {
       const thisResult = results[i];
       const nextResult = results[i + 1];
-      const thisDistance: string = await this.page.getChildElement('app-details-link span.muted', thisResult).getText();
-      const nextDistance: string = await this.page.getChildElement('app-details-link span.muted', nextResult).getText();
+      const thisDistance: string = this.page.getChildElement('app-details-link span.muted', thisResult).getText();
+      const nextDistance: string = this.page.getChildElement('app-details-link span.muted', nextResult).getText();
 
       // Extract number of miles from details link text: (1.23MI) --> 1.23
       const pattern = /\(([\d]+)\.([\d]+)MI\)/;
@@ -173,14 +210,14 @@ export class SearchUseCases {
   }
 
   async clearZipCode(zipCode = '24401') {
-    await this.openZipCodeDialog();
+    this.openZipCodeDialog();
     this.page.clickElement('#btn_gps');
-    const newText = await this.page.getElement('#set-location mat-expansion-panel-header').getText();
+    const newText = this.page.getElement('#set-location mat-expansion-panel-header').getText();
     expect(newText.includes(zipCode)).toBeFalsy();
   }
 
   displayResourceAndClickChip() {
-    this.page.clickLinkToVariation('/search');
+    this.page.clickLinkTo('/search');
     this.displayResource();
     this.page.clickElement('mat-chip');
     this.page.waitForVisible('.applied-filter');
@@ -210,28 +247,28 @@ export class SearchUseCases {
     const searchResultSelector = `app-search-result[class*='sort-order-']`;
     const sortOrderSelector = '.sort-order-';
     const selectorWithDate = selector + `[${dateAttribute}]`;
-    await this.page.waitForVisible(searchResultSelector);
-    await this.page.waitForVisible(sortOrderSelector + 0 + ' ' + selector);
-    await this.page.waitForVisible(selectorWithDate);
-    const numResults = await this.page.getElements(searchResultSelector).count();
-    const numWithDate = await this.page.getElements(selectorWithDate).count();
+    this.page.waitForVisible(searchResultSelector);
+    this.page.waitForVisible(sortOrderSelector + 0 + ' ' + selector);
+    this.page.waitForVisible(selectorWithDate);
+    const numResults = this.page.getElements(searchResultSelector).count();
+    const numWithDate = this.page.getElements(selectorWithDate).count();
     expect(numResults).toBeGreaterThanOrEqual(numWithDate);
     let numChecked = 0;
 
     for (let i = 0; i < numWithDate - 1; i++) {
-      const thisResult = await this.page.getElement(sortOrderSelector + i + ' ' + selector);
-      const nextResult = await this.page.getElement(sortOrderSelector + (i + 1) + ' ' + selector);
+      const thisResult = this.page.getElement(sortOrderSelector + i + ' ' + selector);
+      const nextResult = this.page.getElement(sortOrderSelector + (i + 1) + ' ' + selector);
       expect(thisResult).toBeTruthy();
       expect(nextResult).toBeTruthy();
-      const thisDateStr: string = await thisResult.getWebElement().getAttribute(dateAttribute);
-      const nextDateStr: string = await nextResult.getWebElement().getAttribute(dateAttribute);
+      const thisDateStr: string = thisResult.getWebElement().getAttribute(dateAttribute);
+      const nextDateStr: string = nextResult.getWebElement().getAttribute(dateAttribute);
       const thisDateInt = new Date(thisDateStr).getTime();
       const nextDateInt = new Date(nextDateStr).getTime();
 
       if (direction === 'asc') {
-        await expect(thisDateInt).toBeLessThanOrEqual(nextDateInt);
+        expect(thisDateInt).toBeLessThanOrEqual(nextDateInt);
       } else {
-        await expect(thisDateInt).toBeGreaterThanOrEqual(nextDateInt);
+        expect(thisDateInt).toBeGreaterThanOrEqual(nextDateInt);
       }
       numChecked++;
     }
@@ -257,8 +294,8 @@ export class SearchUseCases {
       );
     } else {
       expect(this.page.getElements(appliedFilterSelector).count()).toEqual(1, `Should filter by '${keepType}'`);
-      const numAllResults = await this.page.getElements(iconSelector).count();
-      const numTypeResults = await this.page.getElements(iconTypeSelector).count();
+      const numAllResults = this.page.getElements(iconSelector).count();
+      const numTypeResults = this.page.getElements(iconTypeSelector).count();
       expect(numAllResults).toEqual(numTypeResults, `All result icons should match type '${keepType}'`);
     }
   }
@@ -268,50 +305,50 @@ export class SearchUseCases {
     const removeChipSelector = `${chipSelector}${chipSelector}-${removeChip}`;
     const preserveChipSelector = `${chipSelector}${chipSelector}-${preserveChip}`;
 
-    const numFiltersBefore = await this.page.getElements(chipSelector).count();
-    const numRemoveChipsBefore = await this.page.getElements(removeChipSelector).count();
-    const numPreserveChipsBefore = await this.page.getElements(preserveChipSelector).count();
-    await expect(numRemoveChipsBefore).toEqual(1);
+    const numFiltersBefore = this.page.getElements(chipSelector).count();
+    const numRemoveChipsBefore = this.page.getElements(removeChipSelector).count();
+    const numPreserveChipsBefore = this.page.getElements(preserveChipSelector).count();
+    expect(numRemoveChipsBefore).toEqual(1);
 
-    await this.page.clickElement(removeChipSelector);
-    await this.page.waitFor(500);
-    const numFiltersAfter = await this.page.getElements(chipSelector).count();
-    const numRemoveChipsAfter = await this.page.getElements(removeChipSelector).count();
-    const numPreserveChipsAfter = await this.page.getElements(preserveChipSelector).count();
+    this.page.clickElement(removeChipSelector);
+    this.page.waitFor(500);
+    const numFiltersAfter = this.page.getElements(chipSelector).count();
+    const numRemoveChipsAfter = this.page.getElements(removeChipSelector).count();
+    const numPreserveChipsAfter = this.page.getElements(preserveChipSelector).count();
 
-    await expect(numRemoveChipsAfter).toEqual(0);
-    await expect(numFiltersAfter).toEqual(numFiltersBefore - 1);
-    await expect(numPreserveChipsAfter).toEqual(numPreserveChipsBefore);
+    expect(numRemoveChipsAfter).toEqual(0);
+    expect(numFiltersAfter).toEqual(numFiltersBefore - 1);
+    expect(numPreserveChipsAfter).toEqual(numPreserveChipsBefore);
     return expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
   }
 
   focusAndBlurSearchBox() {
     const searchSelector = '#search-field input';
-    expect(this.page.isFocused(searchSelector)).toBeTruthy();
+    this.page.isFocused(searchSelector);
     this.page.pressKey('ESCAPE');
   }
 
   async goToNextResultsPage() {
     const selector = '.mat-paginator-range-label';
     const headingSelector = '.search-result-status h4';
-    await expect(this.page.getElement(selector).getText()).toMatch(/^1 – 20 of/);
-    await expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 1-20 of/);
-    await this.page.clickElement('button[aria-label="Next page"]');
-    await this.page.waitForVisible('app-search-result');
-    await expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
-    await expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
+    expect(this.page.getElement(selector).getText()).toMatch(/^1 – 20 of/);
+    expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 1-20 of/);
+    this.page.clickElement('button[aria-label="Next page"]');
+    this.page.waitForVisible('app-search-result');
+    expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
+    expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
   }
 
   async goBackAndCheckPageNum() {
     const resultSelector = 'app-search-result a.title';
     const selector = '.mat-paginator-range-label';
     const headingSelector = '.search-result-status h4';
-    const titleBefore = await this.page.getElement('h1').getText();
-    await this.page.goBack();
-    await this.page.waitForVisible(resultSelector);
-    const titleAfter = await this.page.getElement(resultSelector).getText();
+    const titleBefore = this.page.getElement('h1').getText();
+    this.page.goBack();
+    this.page.waitForVisible(resultSelector);
+    const titleAfter = this.page.getElement(resultSelector).getText();
     expect(titleBefore).toEqual(titleAfter);
-    await expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
-    await expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
+    expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
+    expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
   }
 }

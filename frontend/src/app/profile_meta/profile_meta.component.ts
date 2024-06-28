@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
 import {ParticipantRelationship} from '../_models/participantRelationship';
 import {User} from '../_models/user';
@@ -16,7 +16,7 @@ import {AuthenticationService} from '../_services/authentication/authentication-
   templateUrl: './profile_meta.component.html',
   styleUrls: ['./profile_meta.component.scss'],
 })
-export class ProfileMetaComponent implements OnInit {
+export class ProfileMetaComponent {
   @Input()
   user: User;
   @Input()
@@ -24,9 +24,11 @@ export class ProfileMetaComponent implements OnInit {
 
   relationships = ParticipantRelationship;
 
-  constructor(private authenticationService: AuthenticationService, private api: ApiService, private router: Router) {}
-
-  ngOnInit(): void {}
+  constructor(
+    private authenticationService: AuthenticationService,
+    private api: ApiService,
+    private router: Router,
+  ) {}
 
   goFlow($event) {
     $event.preventDefault();

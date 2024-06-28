@@ -1,19 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
 import {snakeToUpperCase} from '@util/snakeToUpper';
-import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 import {Study} from '../_models/study';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
 import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
 @Component({
   selector: 'app-study-detail',
   templateUrl: './study-detail.component.html',
   styleUrls: ['./study-detail.component.scss'],
 })
-export class StudyDetailComponent implements OnInit {
+export class StudyDetailComponent {
   study: Study;
   loading = true;
   currentUser: User;
@@ -42,8 +42,6 @@ export class StudyDetailComponent implements OnInit {
   get snakeToUpperCase() {
     return snakeToUpperCase;
   }
-
-  ngOnInit() {}
 
   openDialog(si): void {
     const dialogRef = this.dialog.open(InvestigatorFormComponent, {

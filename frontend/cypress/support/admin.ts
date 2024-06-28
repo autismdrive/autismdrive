@@ -9,14 +9,13 @@ export class AdminUseCases {
   }
 
   async navigateToTab(tabId: string, selector: string) {
-    const tab = this.page.getElement(tabId);
-    await tab.click();
-    await this.page.waitForVisible(selector);
-    await expect(tab.getAttribute('ng-reflect-active')).toEqual('true');
+    this.page.clickElement(tabId);
+    this.page.waitForVisible(selector);
+    this.page.getElement(tabId).should('have.attr', 'ng-reflect-active', 'true');
   }
 
   viewAddButton() {
-    expect(this.page.getElements('.add-button').count()).toBeGreaterThan(0);
+    this.page.getElements('.add-button').should('have.length.gt', 0);
   }
 
   openForm(buttonSelector, route) {

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {UvaEducationComponent} from './uva-education.component';
 
 describe('UvaEducationComponent', () => {
   let component: UvaEducationComponent;
-  let fixture: ComponentFixture<UvaEducationComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [UvaEducationComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<UvaEducationComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UvaEducationComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(UvaEducationComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(UvaEducationComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

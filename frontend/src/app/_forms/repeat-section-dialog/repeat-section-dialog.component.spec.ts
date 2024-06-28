@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {RepeatSectionDialogComponent} from './repeat-section-dialog.component';
 
 describe('RepeatSectionDialogComponent', () => {
   let component: RepeatSectionDialogComponent;
-  let fixture: ComponentFixture<RepeatSectionDialogComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [RepeatSectionDialogComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<RepeatSectionDialogComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RepeatSectionDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(RepeatSectionDialogComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(RepeatSectionDialogComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

@@ -8,5 +8,8 @@ import {ConfigService} from '../_services/config/config.service';
   styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent {
-  constructor(public config: ConfigService, public router: Router) {}
+  constructor(
+    public config: ConfigService,
+    public router: Router,
+  ) {}
 }

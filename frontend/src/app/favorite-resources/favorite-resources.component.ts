@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Resource} from '../_models/resource';
 
 @Component({
@@ -6,10 +6,8 @@ import {Resource} from '../_models/resource';
   templateUrl: './favorite-resources.component.html',
   styleUrls: ['./favorite-resources.component.scss'],
 })
-export class FavoriteResourcesComponent implements OnInit {
+export class FavoriteResourcesComponent {
   @Input() favoriteResources: Resource[];
 
   constructor() {}
-
-  ngOnInit() {}
 }

@@ -1,20 +1,18 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
 import {MultiselectTreeComponent} from './multiselect-tree.component';
 
 describe('MultiselectTreeComponent', () => {
   let component: MultiselectTreeComponent;
-  let fixture: ComponentFixture<MultiselectTreeComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [MultiselectTreeComponent],
-    }).compileComponents();
-  }));
+  let fixture: MockedComponentFixture<MultiselectTreeComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MultiselectTreeComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(MultiselectTreeComponent, AppModule);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(MultiselectTreeComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {
