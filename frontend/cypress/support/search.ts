@@ -114,14 +114,13 @@ export class SearchUseCases {
     this.page.getElement(selectedSortSelector).should('have.text', 'Relevance');
   }
 
-  async displaySelectedCategory(filterBy: string) {
+  displaySelectedCategory(filterBy: string) {
     const appliedFilterSelector = '.applied-filters .applied-filter';
     const filterMenuSelector = `.filter-by-${filterBy} .mat-menu-trigger`;
     const filterMenuOptionSelector = '.mat-menu-panel .mat-menu-item:nth-child(2)';
     const appliedFilterChipSelector = `${appliedFilterSelector}-${filterBy}`;
-    const numAppliedFiltersBefore = this.page.getElements(appliedFilterSelector).count();
-    const numFilterMenus = this.page.getElements(filterMenuSelector).count();
-    expect(numFilterMenus).toEqual(1, `Filter menu for ${filterBy} should be visible.`);
+    this.page.getElements(appliedFilterSelector).invoke('length').as('numAppliedFiltersBefore');
+    this.page.getElements(filterMenuSelector).should('have.length', 1);
 
     // Open dropdown menu & select first option
     this.page.clickElement(filterMenuSelector);
@@ -129,26 +128,23 @@ export class SearchUseCases {
     this.page.clickElement(filterMenuOptionSelector);
     this.page.waitForNotVisible(filterMenuOptionSelector);
     this.page.waitForVisible(appliedFilterChipSelector);
-    const numAppliedFiltersAfter = this.page.getElements(appliedFilterSelector).count();
-    expect(numAppliedFiltersAfter).toBeGreaterThan(numAppliedFiltersBefore);
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
+    this.page.getElements(appliedFilterSelector).then(function (appliedFilters) {
+      expect(appliedFilters.length).to.be.greaterThan(this.numAppliedFiltersBefore);
+      cy.get('app-search-result').should('have.length.gt', 0);
+    });
   }
 
-  async clearSearchBox(keywordString = 'autism') {
+  clearSearchBox(keywordString = 'autism') {
     const searchFieldSelector = '#search-field input';
-    const input_text_before = this.page.getElement(searchFieldSelector).getAttribute('value');
-    expect(input_text_before.toLowerCase()).toContain(keywordString);
-
+    this.page.getElement(searchFieldSelector).should('contain.value', keywordString, {matchCase: false});
     this.page.clickAndExpectRoute('#logo', '/home');
     this.page.waitForVisible('app-news-item');
     this.page.clickLinkTo('/search');
     this.page.waitForVisible('app-search-result');
-
-    const input_text_after = this.page.getElement(searchFieldSelector).getAttribute('value');
-    expect(input_text_after).toEqual('');
+    this.page.getElement(searchFieldSelector).should('have.value', '');
   }
 
-  async sortBy(sortMethod: string) {
+  sortBy(sortMethod: string) {
     const menuSelector = '#sort-and-status .sort-order mat-select';
     const optionSelector = `.mat-option.sort-by-${sortMethod}`;
     this.page.clickElement(menuSelector);
@@ -158,42 +154,45 @@ export class SearchUseCases {
     this.page.waitForAnimations();
   }
 
-  async sortByDistance() {
+  sortByDistance() {
     this.sortBy('distance');
-    expect(this.page.getElements('map-view').count()).toEqual(1);
-    expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(1);
+    this.page.getElements('map-view').should('have.length', 1);
+    this.page.getElements('app-search-result').should('have.length.gt', 1);
   }
 
-  // Checks the distance calculation for the each result against the next result.
+  // Checks the distance calculation for each result against the next result.
   // Each result should be closer than the next.
-  async checkResultsDistance() {
-    const results = this.page.getElements('app-search-result');
-    let numChecked = 0;
+  checkResultsDistance() {
+    const distSelector = 'app-details-link span.muted';
+    const distPattern = /\(([\d]+)\.([\d]+)MI\)/;
+    this.page.getElements('app-search-result').each(function ($resultEl, i, $allResults) {
+      if (i === $allResults.length - 1) return;
 
-    for (let i = 0; i < results.length - 1; i++) {
-      const thisResult = results[i];
-      const nextResult = results[i + 1];
-      const thisDistance: string = this.page.getChildElement('app-details-link span.muted', thisResult).getText();
-      const nextDistance: string = this.page.getChildElement('app-details-link span.muted', nextResult).getText();
+      const $thisResult = $allResults[i];
+      const $nextResult = $allResults[i + 1];
 
-      // Extract number of miles from details link text: (1.23MI) --> 1.23
-      const pattern = /\(([\d]+)\.([\d]+)MI\)/;
-      const thisNum = parseFloat(thisDistance.replace(pattern, '$1.$2'));
-      const nextNum = parseFloat(nextDistance.replace(pattern, '$1.$2'));
-      expect(thisNum).toBeLessThanOrEqual(nextNum);
-      numChecked++;
-    }
-
-    expect(numChecked).toEqual(results.length - 1);
+      cy.wrap($thisResult)
+        .get(distSelector)
+        .invoke('text')
+        .then(function (thisDistance) {
+          cy.wrap($nextResult)
+            .get(distSelector)
+            .invoke('text')
+            .then(function (nextDistance) {
+              const thisNum = parseFloat(thisDistance.replace(distPattern, '$1.$2'));
+              const nextNum = parseFloat(nextDistance.replace(distPattern, '$1.$2'));
+              expect(thisNum).to.be.lte(nextNum);
+            });
+        });
+    });
   }
 
-  async openZipCodeDialog() {
-    expect(this.page.isVisible('#set-location')).toEqual(true);
-    expect(this.page.isVisible('.zipCodeSetButton')).toEqual(true);
-    expect(this.page.isVisible('.zipCodeField')).toEqual(false);
-
+  openZipCodeDialog() {
+    this.page.waitForVisible('#set-location');
+    this.page.waitForVisible('.zipCodeSetButton');
+    this.page.waitForVisible('.zipCodeField');
     this.page.clickElement('.zipCodeSetButton');
-    expect(this.page.isVisible('.zipCodeField')).toEqual(true);
+    this.page.waitForVisible('.zipCodeField');
   }
 
   enterZipCode(zipCode = '24401') {
@@ -205,15 +204,14 @@ export class SearchUseCases {
     const distSelector = '#set-location mat-expansion-panel-header';
     this.page.waitForText(distSelector, zipCode);
     this.page.waitFor(500);
-    expect(this.page.getLocalStorageVar('zipCode')).toEqual(zipCode);
-    expect(this.page.getElement(distSelector).getText()).toContain(zipCode);
+    this.page.getLocalStorageVar('zipCode').should('equal', zipCode);
+    this.page.getElement(distSelector).should('contain.text', zipCode);
   }
 
-  async clearZipCode(zipCode = '24401') {
+  clearZipCode(zipCode = '24401') {
     this.openZipCodeDialog();
     this.page.clickElement('#btn_gps');
-    const newText = this.page.getElement('#set-location mat-expansion-panel-header').getText();
-    expect(newText.includes(zipCode)).toBeFalsy();
+    this.page.getElement('#set-location mat-expansion-panel-header').should('not.contain.text', zipCode);
   }
 
   displayResourceAndClickChip() {
@@ -221,7 +219,7 @@ export class SearchUseCases {
     this.displayResource();
     this.page.clickElement('mat-chip');
     this.page.waitForVisible('.applied-filter');
-    expect(this.page.getElements('.applied-filter').count()).toEqual(1);
+    this.page.getElements('.applied-filter').should('have.length', 1);
   }
 
   displayResource() {
@@ -242,7 +240,7 @@ export class SearchUseCases {
 
   // Checks each date in the search results with the date of the result after it.
   // Each date should be less than the next one.
-  async checkResultsDates(selector: string, direction: string) {
+  checkResultsDates(selector: string, direction: string) {
     const dateAttribute = 'data-iso-date-string';
     const searchResultSelector = `app-search-result[class*='sort-order-']`;
     const sortOrderSelector = '.sort-order-';
@@ -276,7 +274,7 @@ export class SearchUseCases {
     return expect(numChecked).toEqual(numWithDate - 1);
   }
 
-  async filterByType(keepType: string) {
+  filterByType(keepType: string) {
     const showAll = keepType === 'all';
     const tabSelector = `.type-buttons.${keepType}`;
     const selectedTabSelector = `.mat-tab-label-active ${tabSelector}`;
@@ -300,7 +298,7 @@ export class SearchUseCases {
     }
   }
 
-  async removeFilter(removeChip: string, preserveChip: string) {
+  removeFilter(removeChip: string, preserveChip: string) {
     const chipSelector = '.applied-filter';
     const removeChipSelector = `${chipSelector}${chipSelector}-${removeChip}`;
     const preserveChipSelector = `${chipSelector}${chipSelector}-${preserveChip}`;
@@ -328,7 +326,7 @@ export class SearchUseCases {
     this.page.pressKey('ESCAPE');
   }
 
-  async goToNextResultsPage() {
+  goToNextResultsPage() {
     const selector = '.mat-paginator-range-label';
     const headingSelector = '.search-result-status h4';
     expect(this.page.getElement(selector).getText()).toMatch(/^1 – 20 of/);
@@ -339,7 +337,7 @@ export class SearchUseCases {
     expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
   }
 
-  async goBackAndCheckPageNum() {
+  goBackAndCheckPageNum() {
     const resultSelector = 'app-search-result a.title';
     const selector = '.mat-paginator-range-label';
     const headingSelector = '.search-result-status h4';

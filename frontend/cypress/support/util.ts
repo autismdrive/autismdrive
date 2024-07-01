@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 import Chainable = Cypress.Chainable;
+import {faker} from '@node_modules/@faker-js/faker';
 
 export type ElementResults = Cypress.Chainable<JQuery<HTMLElement>>;
 
@@ -46,6 +47,10 @@ export class AppPage {
   // element becomes present.
   waitForVisible(selector: string) {
     return cy.get(selector).should('be.visible', {timeout: 5000});
+  }
+
+  waitForNetworkIdle(waitMs: number = 5000) {
+    return cy.waitForNetworkIdle(waitMs);
   }
 
   getLocalStorageVar(name: string): Cypress.Chainable<string> {
@@ -131,6 +136,29 @@ export class AppPage {
     return cy.get(selector).should('be.focused');
   }
 
+  getInputStringForFieldId(id: string, fieldType: string): string {
+    const d = faker.date.past();
+    const dStr = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+
+    const patternMap = [
+      {pattern: '_input_email_', type: 'text', str: faker.internet.email()},
+      {pattern: '_input_phone_', type: 'text', str: faker.phone.number()},
+      {pattern: '_input_zip_', type: 'text', str: faker.location.zipCode()},
+      {pattern: '_input_', type: 'number', str: faker.number.int().toString()},
+      {pattern: '_input_', type: 'text', str: faker.internet.password({length: 16})},
+      {pattern: '_datepicker_', type: 'text', str: dStr},
+      {pattern: '_radio_', type: 'text', str: ' '},
+      {pattern: '_checkbox_', type: 'text', str: ' '},
+      {pattern: '_select_', type: 'text', str: ' '},
+    ];
+
+    for (const {pattern, type, str} of patternMap) {
+      if (id.includes(pattern) && fieldType === type) {
+        return str;
+      }
+    }
+  }
+
   inputText(selector: string, textToEnter: string, clearFirst?: boolean) {
     this.waitForClickable(selector);
     this.clickElement(selector);
@@ -211,75 +239,30 @@ export class AppPage {
   fillOutFields(selector: string) {
     const _page = this;
     this.getElements(selector).each(function ($el) {
-      const _e = cy.wrap($el);
-      _e.should('have.attr', 'id').as('fieldId');
-      _page.scrollTo(`#${this.fieldId}`);
+      cy.wrap($el).as('fieldEl');
+      cy.get('@fieldEl').should('have.attr', 'id').as('fieldId');
+      cy.get('@fieldEl').should('have.attr', 'type').as('fieldType');
+      const fieldSelector = `#${this.fieldId}`;
+      _page.scrollTo(fieldSelector);
+      const inputString = _page.getInputStringForFieldId(this.fieldId, this.fieldType);
+      _page.inputText(fieldSelector, inputString, true);
 
+      if (/_select_/.test(this.fieldId)) {
+        cy.get('@fieldEl').click();
 
-      const id = _e.getAttribute('id');
-      if (id) {
-        this.scrollTo(`#${id}`);
+        const optionSelector = 'mat-option:first-of-type';
+        _page.waitForVisible(optionSelector);
+        _page.getElement(optionSelector).click();
+        _page.waitForNotVisible(optionSelector);
 
-        if (/_input_email_/.test(id)) {
-          const email = this.getRandomString(8) + '@whatever.com';
-          _e.sendKeys(email);
-        } else if (/_input_phone_/.test(id)) {
-          const phone = this.getRandomNumString(10);
-          _e.sendKeys(phone);
-        } else if (/_input_zip_/.test(id)) {
-          const zip = this.getRandomNumString(5);
-          _e.sendKeys(zip);
-        } else if (/_input_/.test(id)) {
-          _e.getAttribute('type').then(eType => {
-            let str = '';
-
-            if (eType === 'number') {
-              str = this.getRandomNumString(2);
-            } else {
-              str = this.getRandomString(16);
-            }
-            _e.sendKeys(str);
-          });
-        } else if (/_datepicker_/.test(id)) {
-          const date = this.getRandomDate(new Date(2000, 0, 1), new Date());
-          const mm = date.getMonth() + 1;
-          const dd = date.getDate();
-          const yyyy = date.getFullYear();
-          const dateStr = `${mm}/${dd}/${yyyy}`;
-          _e.clear();
-          _e.sendKeys(dateStr);
-        } else if (/_radio_/.test(id)) {
-          _e.$(`#${id}_0 .mat-radio-container`).click();
-        } else if (/_checkbox_/.test(id)) {
-          _e.$(`#${id}_0`).click();
-        } else if (/_select_/.test(id)) {
-          _e.click();
-          const optionSelector = 'mat-option:first-of-type';
-          await this.waitForVisible(optionSelector);
-          await this.getElement(optionSelector).click();
-          await this.waitForNotVisible(optionSelector);
-        }
+        const multicheckboxSelector = `${selector} formly-field-mat-multicheckbox mat-checkbox:first-of-type`;
+        _page.getElements(multicheckboxSelector).should('have.length.greaterThan', 0);
+        _page.getElements(`${multicheckboxSelector} .mat-checkbox-inner-container`).click({multiple: true});
       }
-    }
-
-    const multicheckboxSelector = `${selector} formly-field-mat-multicheckbox mat-checkbox:first-of-type`;
-    const numCheckboxes = await this.getElements(multicheckboxSelector).count();
-    if (numCheckboxes > 0) {
-      this.getElements(`${multicheckboxSelector} .mat-checkbox-inner-container`).each(c => {
-        c.click();
-      });
-    }
-
-
-    })
-
-
-
-
-
+    });
   }
 
   goBack() {
-    return browser.executeScript('window.history.back()');
+    cy.go('back');
   }
 }

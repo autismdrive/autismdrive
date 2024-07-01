@@ -8,7 +8,7 @@ export class AdminUseCases {
     this.page.clickAndExpectRoute('#admin-button', '/admin/data-admin');
   }
 
-  async navigateToTab(tabId: string, selector: string) {
+  navigateToTab(tabId: string, selector: string) {
     this.page.clickElement(tabId);
     this.page.waitForVisible(selector);
     this.page.getElement(tabId).should('have.attr', 'ng-reflect-active', 'true');

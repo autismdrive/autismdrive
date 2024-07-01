@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import {faker} from '@node_modules/@faker-js/faker';
 import {AppPage} from '../support/util';
 import {GlobalHeaderUseCases} from '../support/global-header';
 import {LoginUseCases} from '../support/login';
@@ -13,20 +14,21 @@ describe('Anonymous User', () => {
   let studiesUseCases: StudiesUseCases;
   let randomEmail;
 
-  before(async () => {
+  before(() => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
     searchUseCases = new SearchUseCases(page);
     studiesUseCases = new StudiesUseCases(page);
-    randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
-    await page.waitForAngularEnabled(true);
-    await page.navigateToHome();
-    await loginUseCases.refreshAndRedirectToReturnUrl();
+    randomEmail = faker.internet.email();
+    page.waitForNetworkIdle();
+    page.navigateToHome();
+    page.waitForNetworkIdle();
+    loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
-  after(async () => {
-    await page.waitForAngularEnabled(true);
+  after(() => {
+    page.waitForNetworkIdle();
   });
 
   // Global Header
@@ -66,7 +68,7 @@ describe('Anonymous User', () => {
   it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
   it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
   it('should enter some other keywords in the search field', () =>
-    searchUseCases.enterKeywordsInSearchField('staunton', false));
+    searchUseCases.enterKeywordsInSearchField('staunton'));
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('staunton'));
   it('should display only events again', () => searchUseCases.filterByType('event'));
   it('should sort results by event date', () => searchUseCases.sortByEventDate());

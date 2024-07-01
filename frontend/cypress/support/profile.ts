@@ -12,9 +12,7 @@ export class ProfileUseCases {
       .type('some text');
   }
 
-  async completeProfileMetaFormAsGuardian() {
-    cy.get('#meta-form').should('have.length', 1);
-
+  completeProfileMetaFormAsGuardian() {
     // Get  'formly-field [id*="_checkbox_"],' +
     cy.get('formly-field.guardian label').click();
     cy.get('formly-field.guardian input').should('be.selected');
@@ -33,44 +31,41 @@ export class ProfileUseCases {
     this.page.clickAndExpectRoute('#enroll_dependent', '/terms/dependent');
   }
 
-  async checkDependentButtonDisabled() {
-    const numButtons = await this.page.getElements('#enroll_first_dependent').count();
-    return expect(numButtons).toEqual(
-      0,
-      'No dependent enroll button should be visible if guardian has not completed their profile yet.',
-    );
+  checkDependentButtonDisabled() {
+    this.page.getElements('#enroll_first_dependent').should('have.length', 0);
   }
 
   navigateToProfile() {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
   }
 
-  async navigateToProfileMeta() {
+  navigateToProfileMeta() {
     this.page.clickAndExpectRoute('#profile-button', '/profile');
-    let currentLoc = await browser.getCurrentUrl();
-    browser.get(currentLoc + '?meta=true');
-    await this.page.getElements('#meta-form');
+    cy.url().then(function (url) {
+      cy.visit(url + '?meta=true');
+      cy.get('#meta-form').should('have.length', 1);
+    });
   }
 
-  async joinRegistry() {
+  joinRegistry() {
     this.page.clickAndExpectRoute('#join', '/terms/self_guardian');
   }
 
-  async displayAvatars() {
-    expect(this.page.getElements('[id^=self_participant_').count()).toBeGreaterThan(0);
-    const btnEls = await this.page.getElements('[id^=self_participant_');
-    for (const btnEl of btnEls) {
-      const btnId: string = await btnEl.getAttribute('id');
-      const participantId = btnId.replace('self_participant_', '');
-      expect(this.page.getElements('#self_participant_' + participantId).count()).toEqual(1);
-    }
+  displayAvatars() {
+    this.page.getElements('[id^=self_participant_').should('have.length.gt', 0);
+    this.page.getElements('[id^=self_participant_').each(function ($btnEl) {
+      cy.wrap($btnEl)
+        .invoke('attr', 'id')
+        .then(function (btnId) {
+          const participantId = btnId.replace('self_participant_', '');
+          cy.get(`#self_participant_${participantId}`).should('have.length', 1);
+        });
+    });
   }
 
-  async displayAvatarDialog() {
-    const btnEl = this.page.getElement('[id^=avatar_');
-    const btnId: string = await btnEl.getAttribute('id');
-    this.page.clickElement(`#${btnId}`);
-    expect(this.page.getElements('app-avatar-dialog').count()).toEqual(1);
+  displayAvatarDialog() {
+    this.page.getElement('[id^=avatar_').click();
+    this.page.getElements('app-avatar-dialog').should('have.length', 1);
   }
 
   editAvatarImg() {
@@ -96,33 +91,45 @@ export class ProfileUseCases {
     });
   }
 
-  async saveAvatar() {
-    const avatarEl = this.page.getElement('.avatar');
-    const avImgEl = this.page.getChildElement('img', avatarEl);
-    const expectedColor = await avatarEl.getCssValue('background-color');
-    const expectedImg = await avImgEl.getAttribute('src');
-    this.page.clickElement('#save_avatar_changes');
-    expect(this.page.getElements('app-avatar-dialog').count()).toEqual(0);
-    const avatarBtnEl = this.page.getElement('[id^=avatar_');
-    const actualColor = await avatarBtnEl.getCssValue('background-color');
-    const actualImg = await avatarBtnEl.getAttribute('src');
-    expect(expectedColor).toEqual(actualColor);
-    expect(expectedImg).toEqual(actualImg);
+  saveAvatar() {
+    cy.get('.avatar').first().as('avatarEl');
+    cy.get('@avatarEl').get('img').first().as('avImgEl');
+    cy.get('@avImgEl').invoke('css', 'background-color').as('expectedColor');
+    cy.get('@avImgEl').invoke('attr', 'src').as('expectedImg');
+
+    cy.get('#save_avatar_changes').click();
+
+    cy.get('app-avatar-dialog').should('have.length', 0);
+    cy.get('[id^=avatar_')
+      .first()
+      .then(function ($avatarBtnEl) {
+        const actualColor = $avatarBtnEl.css('background-color');
+        const actualImg = $avatarBtnEl.find('img').attr('src');
+        cy.wrap($avatarBtnEl).should('have.css', 'background-color', this.expectedColor);
+        cy.wrap($avatarBtnEl).get('img').should('have.attr', 'src', this.expectedImg);
+        expect(actualImg).to.equal(this.expectedImg);
+      });
   }
 
-  async navigateToGuardianFlow() {
-    this.page.waitForVisible('[id^=edit_enroll_self_guardian_]');
-    const btnEl = this.page.getElement('[id^=edit_enroll_self_guardian_]');
-    const btnId: string = await btnEl.getAttribute('id');
-    const participantId = btnId.replace('edit_enroll_self_guardian_', '');
-    this.page.clickAndExpectRoute(`#${btnId}`, `/flow/guardian_intake/${participantId}`);
+  navigateToGuardianFlow() {
+    const _page = this.page;
+    cy.get('[id^=edit_enroll_self_guardian_]')
+      .should('be.visible', {timeout: 5000})
+      .invoke('attr', 'id')
+      .then(function (btnId) {
+        const participantId = btnId.replace('edit_enroll_self_guardian_', '');
+        _page.clickAndExpectRoute(`#${btnId}`, `/flow/guardian_intake/${participantId}`);
+      });
   }
 
-  async navigateToDependentFlow() {
-    this.page.waitForVisible('[id^=edit_enroll_dependent_]');
-    const btnEl = this.page.getElement('[id^=edit_enroll_dependent_]');
-    const btnId: string = await btnEl.getAttribute('id');
-    const participantId = btnId.replace('edit_enroll_dependent_', '');
-    this.page.clickAndExpectRoute(`#${btnId}`, `/flow/dependent_intake/${participantId}`);
+  navigateToDependentFlow() {
+    const _page = this.page;
+    cy.get('[id^=edit_enroll_dependent_]')
+      .should('be.visible', {timeout: 5000})
+      .invoke('attr', 'id')
+      .then(function (btnId) {
+        const participantId = btnId.replace('edit_enroll_dependent_', '');
+        _page.clickAndExpectRoute(`#${btnId}`, `/flow/dependent_intake/${participantId}`);
+      });
   }
 }

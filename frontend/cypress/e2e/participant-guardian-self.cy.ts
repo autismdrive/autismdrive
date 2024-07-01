@@ -19,7 +19,7 @@ describe('Participant (Guardian - Self)', () => {
   const email = 'aaron@sartography.com';
   const password = 'Zarquon Disaster Area 78';
 
-  before(async () => {
+  before(() => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
@@ -27,8 +27,8 @@ describe('Participant (Guardian - Self)', () => {
     profileUseCases = new ProfileUseCases(page);
     enrollUseCases = new EnrollUseCases(page);
     randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
-    await page.navigateToHome();
-    await loginUseCases.refreshAndRedirectToReturnUrl();
+    page.navigateToHome();
+    loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
   // Login & Register
@@ -139,7 +139,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should go back to home page', () => globalHeaderUseCases.visitHomePage());
   it('should return to the search page', () => globalHeaderUseCases.visitResourcesPage());
   it('should enter some other keywords in the search field', () =>
-    searchUseCases.enterKeywordsInSearchField('staunton', false));
+    searchUseCases.enterKeywordsInSearchField('staunton'));
   it('should clear the search box when leaving the search page', () => searchUseCases.clearSearchBox('staunton'));
   it('should display only events again', () => searchUseCases.filterByType('event'));
   it('should sort results by event date', () => searchUseCases.sortByEventDate());

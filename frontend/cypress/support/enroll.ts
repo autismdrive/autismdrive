@@ -4,190 +4,197 @@ import {AppPage} from './util';
 export class EnrollUseCases {
   constructor(private page: AppPage) {}
 
-  async displayMenuLinks() {
-    const numStepsStr: string = await this.page.getElement('#num_total_steps').getText();
-    const numSteps = parseInt(numStepsStr, 10);
-    const menuLinks = await this.page.getElements('app-questionnaire-steps-list .step-link');
-    expect(menuLinks.length).toEqual(numSteps);
+  displayMenuLinks() {
+    this.page.getElement('#num_total_steps').invoke('text').as('numSteps');
+    this.page.getElements('app-questionnaire-steps-list .step-link').then(function ($links) {
+      expect($links.length).to.equal(parseInt(this.numSteps));
+    });
   }
 
-  async displayCompletedStatus() {
-    const numStepsStr: string = await this.page.getElement('#num_total_steps').getText();
-    const numSteps = parseInt(numStepsStr, 10);
-    const numCompletedStepsStr: string = await this.page.getElement('#num_completed_steps').getText();
-    const numCompletedSteps = parseInt(numCompletedStepsStr, 10);
-    const incompleteLinks = await this.page.getElements(
-      'app-questionnaire-steps-list .step-link .done mat-icon.hidden',
-    );
-    const completeLinks = await this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.visible');
-    expect(completeLinks.length).toEqual(numCompletedSteps);
-    const totalNumLinks = incompleteLinks.length + completeLinks.length;
-    expect(totalNumLinks).toEqual(numSteps);
+  displayCompletedStatus() {
+    this.page.getElement('#num_total_steps').invoke('text').as('numSteps');
+    this.page.getElement('#num_completed_steps').invoke('text').as('numCompletedSteps');
+    this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.hidden').as('incompleteLinks');
+    this.page.getElements('app-questionnaire-steps-list .step-link .done mat-icon.visible').as('completeLinks');
+    cy.get('@completeLinks').then(function ($completeLinks) {
+      expect($completeLinks.length).to.equal(parseInt(this.numCompletedSteps));
+
+      cy.get('@incompleteLinks').then(function ($incompleteLinks) {
+        expect($incompleteLinks.length + $completeLinks.length).to.equal(parseInt(this.numSteps));
+      });
+    });
   }
 
   navigateToEachStep() {
-    this.page.getElements('app-questionnaire-steps-list .step-link').each(link => {
-      const link_span = link.element(by.css('.step-link-text')).getWebElement();
-      link.click();
-      this.page.waitForVisible('form');
-      this.page.waitForVisible('form h1');
-      // this.page.waitForAnimations();
-      expect(
-        this.page
-          .getElement('form h1')
-          .getText()
-          .then(s => s.toLowerCase()),
-      ).toEqual(link_span.getText().then(s => s.toLowerCase()));
-      expect(this.page.getElements('form mat-form-field').count()).toBeGreaterThan(0);
+    const _page = this.page;
+    _page.getElements('app-questionnaire-steps-list .step-link').each(function ($el) {
+      cy.wrap($el).get('.step-link-text').click();
+      _page.waitForVisible('form');
+      _page
+        .waitForVisible('form h1')
+        .invoke('text')
+        .then(function (s) {
+          cy.wrap($el).should('have.text', s, {matchCase: false});
+        });
+      _page.getElements('form mat-form-field').should('have.length.gt', 0);
     });
   }
 
   cancelIntro() {
     this.page.waitFor(3000);
-    expect(this.page.getElements('#intro-cancel-button').count()).toEqual(1);
+    this.page.getElements('#intro-cancel-button').should('have.length', 1);
     this.page.clickAndExpectRoute('#intro-cancel-button', '/profile');
   }
 
   cancelEditing() {
     this.page.waitForVisible('#flow-cancel-button');
-    expect(this.page.getElements('#flow-cancel-button').count()).toEqual(1);
+    this.page.getElements('#flow-cancel-button').should('have.length', 1);
     this.page.clickAndExpectRoute('#flow-cancel-button', '/profile');
   }
 
   displayGuardianTerms() {
-    expect(this.page.getElements('app-terms').count()).toEqual(1);
-    expect(this.page.getElements('#guardian-terms').count()).toEqual(1);
-    expect(this.page.getElements('#agree-button').count()).toEqual(1);
-    expect(this.page.getElements('#terms-cancel-button').count()).toEqual(1);
+    this.page.getElements('app-terms').should('have.length', 1);
+    this.page.getElements('#guardian-terms').should('have.length', 1);
+    this.page.getElements('#agree-button').should('have.length', 1);
+    this.page.getElements('#terms-cancel-button').should('have.length', 1);
   }
 
   cancelTerms() {
-    expect(this.page.getElements('#terms-cancel-button').count()).toEqual(1);
+    this.page.getElements('#terms-cancel-button').should('have.length', 1);
     this.page.clickAndExpectRoute('#terms-cancel-button', '/profile');
   }
 
   acceptTerms() {
-    expect(this.page.getElements('#agree-button').count()).toEqual(1);
+    this.page.getElements('#agree-button').should('have.length', 1);
     this.page.clickElement('#agree-button');
-    expect(this.page.getElements('app-flow-intro').count()).toEqual(1);
+    this.page.getElements('app-flow-intro').should('have.length', 1);
   }
 
   displayInstructions() {
     this.page.waitForVisible('app-flow-intro');
-    expect(this.page.getElements('app-flow-intro').count()).toEqual(1);
-    expect(this.page.getElements('#instructions').count()).toEqual(1);
-    expect(this.page.getElements('#next-button').count()).toEqual(1);
-    expect(this.page.getElements('[id*="_input_"]').count()).toEqual(0);
+    this.page.getElements('app-flow-intro').should('have.length', 1);
+    this.page.getElements('#instructions').should('have.length', 1);
+    this.page.getElements('#next-button').should('have.length', 1);
+    this.page.getElements('[id*="_input_"]').should('have.length', 0);
     this.page.clickElement('#next-button');
-    expect(this.page.getElements('[id*="_input_"]').count()).toBeGreaterThanOrEqual(1);
+    this.page.getElements('[id*="_input_"]').should('have.length.gte', 1);
   }
 
-  async fillOutRequiredFields(
+  fillOutRequiredFields(
+    self,
     reqSelector: string,
     btnSelector: string,
     invalidSelector: string,
     highlightSelector: string,
   ) {
-    await this._fillOutRequiredFieldsRecursive(reqSelector, btnSelector, invalidSelector, highlightSelector);
-    return expect(this.page.getElements(btnSelector).count()).toEqual(0);
+    this._fillOutRequiredFieldsRecursive(self, reqSelector, btnSelector, invalidSelector, highlightSelector);
+    this.page.getElements(btnSelector).should('have.length', 0);
   }
 
-  async _fillOutRequiredFieldsRecursive(
+  _fillOutRequiredFieldsRecursive(
+    self,
     reqSelector: string,
     btnSelector: string,
     invalidSelector: string,
     highlightSelector: string,
   ) {
-    await this.page.clickElement(highlightSelector);
-    await this.page.waitFor(300);
-    const numInvalidBefore = await this.page.getElements(invalidSelector).count();
-
-    if (numInvalidBefore > 0) {
-      await expect(this.page.getElements(btnSelector).count()).toEqual(1);
-      await this.page.fillOutFields(invalidSelector);
-      return this._fillOutRequiredFieldsRecursive(reqSelector, btnSelector, invalidSelector, highlightSelector);
-    } else {
-      await expect(this.page.getElements(invalidSelector).count()).toEqual(0);
-      await expect(this.page.getElements(btnSelector).count()).toEqual(0);
-    }
+    const _self = self;
+    const _page = _self.page;
+    _page.clickElement(highlightSelector);
+    _page.waitFor(300);
+    _page
+      .getElements(invalidSelector)
+      .invoke('length')
+      .then(function (numInvalidBefore) {
+        if (numInvalidBefore > 0) {
+          _page.getElements(btnSelector).should('have.length', 1);
+          _page.fillOutFields(invalidSelector);
+          return _self._fillOutRequiredFieldsRecursive(
+            _self,
+            reqSelector,
+            btnSelector,
+            invalidSelector,
+            highlightSelector,
+          );
+        } else {
+          _page.getElements(invalidSelector).should('have.length', 0);
+          _page.getElements(btnSelector).should('have.length', 0);
+        }
+      });
   }
 
-  async saveStep(stepIndex: number) {
+  saveStep(stepIndex: number) {
     const selector = `#step_link_${stepIndex}`;
-    const currentStepId = await this.page.getElement(selector).getAttribute('id');
-    await this.page.clickElement('#save-next-button');
-    await this.page.waitFor(500);
-    await this.page.waitForVisible('#save-next-button, app-flow-complete');
-    return expect(this.page.getElements(`#${currentStepId} .done .visible`).count()).toEqual(1);
+    const _page = this.page;
+    _page.getElement(selector).invoke('attr', 'id').as('currentStepId');
+    _page.clickElement('#save-next-button');
+    _page.waitFor(500);
+    _page.waitForVisible('#save-next-button, app-flow-complete').then(function (_) {
+      _page.getElements(`#${this.currentStepId} .done .visible`).should('have.length', 1);
+    });
   }
 
-  async completeStep(stepIndex: number) {
+  completeStep(stepIndex: number) {
     const selector = `#step_link_${stepIndex}`;
     this.page.getElement(selector).click();
-    expect(this.page.getElements(`${selector} .done .visible`).count()).toEqual(0);
+    this.page.getElements(`${selector} .done .visible`).should('have.length', 0);
 
-    await this.fillOutRequiredFields(
+    this.fillOutRequiredFields(
+      this,
       '.mat-form-field-required-marker',
       '#save-next-button.disabled',
       '.ng-invalid',
       '#highlight-required-fields',
     );
-    await this.fillOutRepeatSections();
-    await this.page.waitFor(1000);
-    await this.saveStep(stepIndex);
-    await this.page.waitFor(1000);
-    expect(this.page.getElements(`${selector} .done .visible`).count()).toEqual(1);
+    this.fillOutRepeatSections();
+    this.page.waitFor(1000);
+    this.saveStep(stepIndex);
+    this.page.waitFor(1000);
+    this.page.getElements(`${selector} .done .visible`).should('have.length', 1);
   }
 
-  async fillOutRepeatSections() {
+  fillOutRepeatSections() {
+    const _self = this;
+    const _page = this.page;
     const itemSelector = 'mat-card.repeat';
     const dialogSelector = 'app-repeat-section-dialog .mat-dialog-content';
     const saveBtnSelector = 'app-repeat-section-dialog .repeat-section-dialog-save';
-    const numRepeats = await this.page.getElements('app-repeat-section').count();
-    if (numRepeats > 0) {
-      const repeatSections: ElementFinder[] = await this.page.getElements('app-repeat-section');
-      for (const e of repeatSections) {
-        const numDialogs = await this.page.getElements(dialogSelector).count();
-        if (numDialogs > 0) {
-          await expect(this.page.getElement(dialogSelector).isDisplayed()).toBeFalsy();
-        } else {
-          await expect(this.page.getElements(dialogSelector).count()).toEqual(0);
-        }
-        await expect(e.$$(itemSelector).count()).toEqual(0);
-        await e.$('.repeat-action button').click();
-        await this.page.waitForVisible(dialogSelector);
-        await expect(this.page.getElement(dialogSelector).isDisplayed()).toBeTruthy();
-        await this.page.waitFor(100);
-        await this.fillOutRequiredFields(
-          `${dialogSelector} .mat-form-field-required-marker`,
-          `${saveBtnSelector}.disabled`,
-          `${dialogSelector} .ng-invalid`,
-          '#highlight-required-fields-in-dialog',
-        );
-        await this.page.waitFor(100).then(async () => {
-          await this.page.waitForNotVisible(`${saveBtnSelector}.disabled`);
-          await this.page.waitForClickable(saveBtnSelector);
-          await this.page.waitFor(100);
+    cy.get('app-repeat-section').as('repeatSections');
+    cy.get('@repeatSections').then(function ($repeatSections) {
+      const numRepeats = $repeatSections.length;
+      cy.get(itemSelector).should('have.length', numRepeats);
+    });
 
-          // Silly hack to force mat-dialog to notice click
-          for (let i = 0; i < 10; i++) {
-            const numDialogs2 = await this.page.getElements(dialogSelector).count();
-            if (numDialogs2 > 0) {
-              await this.page.waitFor(100);
-              await this.page.clickElement(saveBtnSelector);
-              await this.page.waitFor(100);
-            } else {
-              break;
-            }
-          }
-          await this.page.waitForNotVisible(dialogSelector);
-          await expect(e.$$(itemSelector).count()).toEqual(1);
-          await expect(this.page.getElements(dialogSelector).count()).toEqual(0);
-          await this.page.waitFor(100);
-        });
-      }
-    }
+    cy.get('@repeatSections').each(function ($repeatSection) {
+      _page.getElements(dialogSelector).should('not.be.visible');
+      cy.wrap($repeatSection).get(itemSelector).should('have.length', 0);
+      cy.wrap($repeatSection).get('.repeat-action button').click();
+      _page.waitForVisible(dialogSelector);
+      _page.waitFor(100);
 
-    return expect(this.page.getElements(itemSelector).count()).toEqual(numRepeats);
+      _self.fillOutRequiredFields(
+        _self,
+        `${dialogSelector} .mat-form-field-required-marker`,
+        `${saveBtnSelector}.disabled`,
+        `${dialogSelector} .ng-invalid`,
+        '#highlight-required-fields-in-dialog',
+      );
+      _page.waitFor(100);
+      _page.waitForNotVisible(`${saveBtnSelector}.disabled`);
+      _page.waitForClickable(saveBtnSelector);
+      _page.waitFor(100);
+
+      // Click dialog
+      _page.getElements(dialogSelector).each(function ($el) {
+        _page.waitFor(100);
+        cy.wrap($el).click();
+        _page.waitFor(100);
+      });
+
+      _page.waitForNotVisible(dialogSelector);
+      cy.wrap($repeatSection).get(itemSelector).should('have.length', 1);
+      _page.getElements(dialogSelector).should('have.length', 0);
+      _page.waitFor(100);
+    });
   }
 }

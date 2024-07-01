@@ -1,35 +1,67 @@
 {
   "root": true,
-  "ignorePatterns": ["projects/**/*", "dist/**/*", "*.min.*","jest.setup.ts","cypress.config.ts"],
+  "ignorePatterns": [
+    "projects/**/*",
+    "dist/**/*",
+    "*.min.*",
+    "jest.setup.ts",
+    "cypress.config.ts"
+  ],
   "overrides": [
     {
-      "files": ["*.js"],
+      "files": [
+        "*.js"
+      ],
       "parserOptions": {
         "ecmaVersion": 2022
       },
       "env": {
         "es6": true
       },
-      "extends": ["plugin:prettier/recommended"]
+      "extends": [
+        "plugin:prettier/recommended"
+      ]
     },
     {
-      "files": ["*.json"],
-      "extends": ["plugin:json/recommended", "plugin:prettier/recommended"]
+      "files": [
+        "*.json"
+      ],
+      "extends": [
+        "plugin:json/recommended",
+        "plugin:prettier/recommended"
+      ]
     },
     {
-      "files": ["cypress/**/*.ts"],
+      "files": [
+        "cypress/**/*.ts"
+      ],
       "plugins": [
         "cypress"
       ],
       "extends": [
         "plugin:cypress/recommended",
         "plugin:chai-friendly/recommended"
-      ]
+      ],
+      "rules": {
+        "max-len": [
+          "error",
+          {
+            "code": 120,
+            "tabWidth": 2,
+            "ignoreUrls": true
+          }
+        ]
+      }
     },
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "parserOptions": {
-        "project": ["./tsconfig.json", "cypress/tsconfig.json"],
+        "project": [
+          "./tsconfig.json",
+          "cypress/tsconfig.json"
+        ],
         "tsconfigRootDir": "./",
         "createDefaultProgram": true,
         "ecmaVersion": 2022,
@@ -60,9 +92,16 @@
       }
     },
     {
-      "files": ["*.html"],
-      "excludedFiles": ["*inline-template-*.component.html"],
-      "extends": ["plugin:@angular-eslint/template/recommended", "plugin:prettier/recommended"],
+      "files": [
+        "*.html"
+      ],
+      "excludedFiles": [
+        "*inline-template-*.component.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended",
+        "plugin:prettier/recommended"
+      ],
       "rules": {
         "@angular-eslint/template/no-duplicate-attributes": "error",
         "prettier/prettier": [

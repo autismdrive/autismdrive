@@ -20,7 +20,7 @@ describe('Admin', () => {
   const email = 'eleanorcjkgraham@gmail.com';
   const password = 'Random Frequent Flyer Dent 34';
 
-  before(async () => {
+  before(() => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
@@ -30,8 +30,8 @@ describe('Admin', () => {
     adminUseCases = new AdminUseCases(page);
     studiesUseCases = new StudiesUseCases(page);
 
-    await page.navigateToHome();
-    await loginUseCases.refreshAndRedirectToReturnUrl();
+    page.navigateToHome();
+    loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
   // Login & Register
