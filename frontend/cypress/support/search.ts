@@ -245,33 +245,35 @@ export class SearchUseCases {
     const searchResultSelector = `app-search-result[class*='sort-order-']`;
     const sortOrderSelector = '.sort-order-';
     const selectorWithDate = selector + `[${dateAttribute}]`;
-    this.page.waitForVisible(searchResultSelector);
-    this.page.waitForVisible(sortOrderSelector + 0 + ' ' + selector);
-    this.page.waitForVisible(selectorWithDate);
-    const numResults = this.page.getElements(searchResultSelector).count();
-    const numWithDate = this.page.getElements(selectorWithDate).count();
-    expect(numResults).toBeGreaterThanOrEqual(numWithDate);
-    let numChecked = 0;
+    const _nthResultSelector = (i: number): string => {
+      return `${sortOrderSelector}${i} ${selector}`;
+    };
+    const _page = this.page;
 
-    for (let i = 0; i < numWithDate - 1; i++) {
-      const thisResult = this.page.getElement(sortOrderSelector + i + ' ' + selector);
-      const nextResult = this.page.getElement(sortOrderSelector + (i + 1) + ' ' + selector);
-      expect(thisResult).toBeTruthy();
-      expect(nextResult).toBeTruthy();
-      const thisDateStr: string = thisResult.getWebElement().getAttribute(dateAttribute);
-      const nextDateStr: string = nextResult.getWebElement().getAttribute(dateAttribute);
+    _page.waitForVisible(searchResultSelector);
+    _page.waitForVisible(_nthResultSelector(0));
+    _page.waitForVisible(selectorWithDate);
+    _page.getElements(searchResultSelector).invoke('length').as('numResults');
+    _page
+      .getElements(selectorWithDate)
+      .invoke('length')
+      .should(function (numResults) {
+        expect(numResults).to.be.gte(this.numWithDate);
+      });
+
+    _page.getElements(selectorWithDate).each(function ($el, i, $allResults) {
+      if (i === $allResults.length - 1) return;
+      const thisDateStr: string = $el.attr(dateAttribute);
+      const nextDateStr: string = $allResults[i + 1].getAttribute(dateAttribute);
       const thisDateInt = new Date(thisDateStr).getTime();
       const nextDateInt = new Date(nextDateStr).getTime();
 
       if (direction === 'asc') {
-        expect(thisDateInt).toBeLessThanOrEqual(nextDateInt);
+        expect(thisDateInt).to.be.lte(nextDateInt);
       } else {
-        expect(thisDateInt).toBeGreaterThanOrEqual(nextDateInt);
+        expect(thisDateInt).to.be.gte(nextDateInt);
       }
-      numChecked++;
-    }
-
-    return expect(numChecked).toEqual(numWithDate - 1);
+    });
   }
 
   filterByType(keepType: string) {
@@ -281,43 +283,50 @@ export class SearchUseCases {
     const iconSelector = `app-search-result app-type-icon`;
     const iconTypeSelector = iconSelector + `[ng-reflect-icon-type='${showAll ? 'location' : keepType}']`;
     const appliedFilterSelector = '.applied-filter.applied-filter-type';
-    this.page.clickElement(tabSelector);
-    expect(this.page.isVisible(selectedTabSelector)).toEqual(true);
-    this.page.waitForVisible(iconTypeSelector);
+    const _page = this.page;
 
-    if (showAll) {
-      expect(this.page.getElements(appliedFilterSelector).count()).toEqual(
-        0,
-        'Should not filter by type when All Resources tab is clicked.',
-      );
-    } else {
-      expect(this.page.getElements(appliedFilterSelector).count()).toEqual(1, `Should filter by '${keepType}'`);
-      const numAllResults = this.page.getElements(iconSelector).count();
-      const numTypeResults = this.page.getElements(iconTypeSelector).count();
-      expect(numAllResults).toEqual(numTypeResults, `All result icons should match type '${keepType}'`);
-    }
+    // Click the given type tab and wait for the UI to update with the filtered results.
+    _page.clickElement(tabSelector);
+    _page.waitForVisible(selectedTabSelector);
+    _page.waitForVisible(iconTypeSelector);
+
+    // Check that the applied filter is displayed and that the results match the filter.
+    _page.getElements(iconSelector).invoke('length').as('numAllResults');
+    _page.getElements(iconTypeSelector).invoke('length').as('numTypeResults');
+    _page.getElements(appliedFilterSelector).should(function ($appliedFilters) {
+      if (showAll) {
+        // If "all" was selected, no filters should be applied
+        expect($appliedFilters.length).to.equal(0);
+      } else {
+        // Otherwise, one filter should be selected, and all results types should match the selected type.
+        expect($appliedFilters.length).to.equal(1);
+        expect(this.numAllResults).to.equal(this.numTypeResults);
+      }
+    });
   }
 
   removeFilter(removeChip: string, preserveChip: string) {
     const chipSelector = '.applied-filter';
     const removeChipSelector = `${chipSelector}${chipSelector}-${removeChip}`;
     const preserveChipSelector = `${chipSelector}${chipSelector}-${preserveChip}`;
+    const _page = this.page;
 
-    const numFiltersBefore = this.page.getElements(chipSelector).count();
-    const numRemoveChipsBefore = this.page.getElements(removeChipSelector).count();
-    const numPreserveChipsBefore = this.page.getElements(preserveChipSelector).count();
-    expect(numRemoveChipsBefore).toEqual(1);
+    _page.getElements(chipSelector).invoke('length').as('numFiltersBefore');
+    _page.getElements(removeChipSelector).invoke('length').as('numRemoveChipsBefore').should('equal', 1);
+    _page.getElements(preserveChipSelector).invoke('length').as('numPreserveChipsBefore');
 
-    this.page.clickElement(removeChipSelector);
-    this.page.waitFor(500);
-    const numFiltersAfter = this.page.getElements(chipSelector).count();
-    const numRemoveChipsAfter = this.page.getElements(removeChipSelector).count();
-    const numPreserveChipsAfter = this.page.getElements(preserveChipSelector).count();
+    _page.clickElement(removeChipSelector);
+    _page.waitForStale(removeChipSelector);
+    _page.getElements(chipSelector).invoke('length').as('numFiltersAfter');
+    _page.getElements(removeChipSelector).invoke('length').as('numRemoveChipsAfter').should('equal', 0);
+    _page.getElements(preserveChipSelector).invoke('length').as('numPreserveChipsAfter');
 
-    expect(numRemoveChipsAfter).toEqual(0);
-    expect(numFiltersAfter).toEqual(numFiltersBefore - 1);
-    expect(numPreserveChipsAfter).toEqual(numPreserveChipsBefore);
-    return expect(this.page.getElements('app-search-result').count()).toBeGreaterThan(0);
+    cy.get('@numFiltersBefore').should(function (_) {
+      expect(this.numFiltersAfter).to.equal(this.numFiltersBefore - 1);
+      expect(this.numPreserveChipsAfter).to.equal(this.numPreserveChipsBefore);
+    });
+
+    _page.getElements('app-search-result').should('have.length.gt', 0);
   }
 
   focusAndBlurSearchBox() {
@@ -329,24 +338,29 @@ export class SearchUseCases {
   goToNextResultsPage() {
     const selector = '.mat-paginator-range-label';
     const headingSelector = '.search-result-status h4';
-    expect(this.page.getElement(selector).getText()).toMatch(/^1 – 20 of/);
-    expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 1-20 of/);
-    this.page.clickElement('button[aria-label="Next page"]');
-    this.page.waitForVisible('app-search-result');
-    expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
-    expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
+    const _page = this.page;
+
+    _page.getText(selector).should('match', /^1 – 20 of/);
+    _page.getText(headingSelector).should('match', /^Showing 1-20 of/);
+    _page.clickElement('button[aria-label="Next page"]');
+    _page.waitForVisible('app-search-result');
+    _page.getText(selector).should('match', /^21 – 40 of/);
+    _page.getText(headingSelector).should('match', /^Showing 21-40 of/);
   }
 
   goBackAndCheckPageNum() {
     const resultSelector = 'app-search-result a.title';
     const selector = '.mat-paginator-range-label';
     const headingSelector = '.search-result-status h4';
-    const titleBefore = this.page.getElement('h1').getText();
-    this.page.goBack();
-    this.page.waitForVisible(resultSelector);
-    const titleAfter = this.page.getElement(resultSelector).getText();
-    expect(titleBefore).toEqual(titleAfter);
-    expect(this.page.getElement(selector).getText()).toMatch(/^21 – 40 of/);
-    expect(this.page.getElement(headingSelector).getText()).toMatch(/^Showing 21-40 of/);
+    const _page = this.page;
+
+    _page.getText('h1').as('titleBefore');
+    _page.goBack();
+    _page.waitForVisible(resultSelector);
+    _page.getText(resultSelector).should(function (titleAfter) {
+      expect(titleAfter).to.equal(this.titleBefore);
+    });
+    _page.getText(selector).should('match', /^21 – 40 of/);
+    _page.getText(headingSelector).should('match', /^Showing 21-40 of/);
   }
 }

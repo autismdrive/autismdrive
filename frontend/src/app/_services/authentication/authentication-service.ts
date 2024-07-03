@@ -29,10 +29,8 @@ export class AuthenticationService {
 
     this.currentUser = this.currentUserSubject.asObservable();
     if (token) {
-      console.log('A token is set.  Grabbing the user.');
       this._refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
     } else {
-      console.log('No Token.  Current user is null.');
       this.currentUserSubject.next(null);
     }
   }

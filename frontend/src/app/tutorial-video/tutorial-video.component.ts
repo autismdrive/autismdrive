@@ -1,10 +1,6 @@
 /// <reference types="@types/youtube" />
 import {Component, Input} from '@angular/core';
-import {NavItem} from '../_models/nav-item';
-import ClosedCaptionsLoadPolicy = YT.ClosedCaptionsLoadPolicy;
-import ModestBranding = YT.ModestBranding;
-import RelatedVideos = YT.RelatedVideos;
-import ShowInfo = YT.ShowInfo;
+import {NavItem} from '@models/nav-item';
 
 @Component({
   selector: 'app-tutorial-video',
@@ -17,10 +13,10 @@ export class TutorialVideoComponent {
   @Input() instructions: string;
   @Input() links: NavItem[];
   playerVars: YT.PlayerVars = {
-    cc_load_policy: ClosedCaptionsLoadPolicy.ForceOn,
-    modestbranding: ModestBranding.Modest,
-    rel: RelatedVideos.Hide,
-    showinfo: ShowInfo.Hide,
+    cc_load_policy: YT.ClosedCaptionsLoadPolicy.ForceOn,
+    modestbranding: YT.ModestBranding.Modest,
+    rel: YT.RelatedVideos.Hide,
+    showinfo: YT.ShowInfo.Hide,
   };
 
   constructor() {}

@@ -75,6 +75,10 @@ export class AppPage {
     this.getRoute().should('equal', route);
   }
 
+  getText(selector: string) {
+    return this.getElement(selector).invoke('text');
+  }
+
   getParagraphText() {
     return this.getElement('app-root h1').invoke('text');
   }

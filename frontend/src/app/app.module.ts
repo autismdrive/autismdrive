@@ -1,57 +1,62 @@
-import {MaterialModule} from '@app/material/material.module';
-import {NgMapsCoreModule} from '@ng-maps/core';
-import {GOOGLE_MAPS_API_CONFIG, NgMapsGoogleModule} from '@ng-maps/google';
-import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {CommonModule, DatePipe} from '@angular/common';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {APP_INITIALIZER, Injectable, NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {MatBadgeModule} from '@angular/material/badge';
-import {MatButtonModule} from '@angular/material/button';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatCardModule} from '@angular/material/card';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatChipsModule} from '@angular/material/chips';
-import {MatNativeDateModule} from '@angular/material/core';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatDialogModule} from '@angular/material/dialog';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule} from '@angular/material/form-field';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatRadioModule} from '@angular/material/radio';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatSortModule} from '@angular/material/sort';
-import {MatStepperModule} from '@angular/material/stepper';
-import {MatTableModule} from '@angular/material/table';
-import {MatTabsModule} from '@angular/material/tabs';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatTreeModule} from '@angular/material/tree';
+import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {YouTubePlayerModule} from '@angular/youtube-player';
+import {MaterialModule} from '@app/material/material.module';
+import {environment} from '@environments/environment';
+import {AutocompleteSectionComponent} from '@forms/autocomplete-section/autocomplete-section.component';
+import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
+import {FormPrintoutComponent} from '@forms/form-printout/form-printout.component';
+import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
+import {HelpWrapperComponent} from '@forms/help-wrapper/help-wrapper.component';
+import {MultiselectTreeComponent} from '@forms/multiselect-tree/multiselect-tree.component';
+import {RepeatSectionDialogComponent} from '@forms/repeat-section-dialog/repeat-section-dialog.component';
+import {RepeatSectionComponent} from '@forms/repeat-section/repeat-section.component';
+import {ResizeTextareaComponent} from '@forms/resize-textarea/resize-textarea.component';
+import {TreeComponent} from '@forms/tree/tree.component';
+import {
+  EmailMatchValidator,
+  EmailMatchValidatorMessage,
+  EmailValidator,
+  EmailValidatorMessage,
+  MaxValidationMessage,
+  MinValidationMessage,
+  MulticheckboxValidator,
+  MulticheckboxValidatorMessage,
+  PhoneValidator,
+  PhoneValidatorMessage,
+  ShowError,
+  UrlValidator,
+  UrlValidatorMessage,
+} from '@forms/validators/formly.validator';
+import {NgMapsCoreModule} from '@ng-maps/core';
+import {GOOGLE_MAPS_API_CONFIG, NgMapsGoogleModule} from '@ng-maps/google';
+import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
+import {FlexLayoutModule} from '@node_modules/@angular/flex-layout';
+import {ErrorInterceptor} from '@routing/error-interceptor';
+import {JwtInterceptor} from '@routing/jwt-interceptor';
+import {RoutingModule} from '@routing/routing.module';
+import {ApiService} from '@services/api/api.service';
+import {CategoriesService} from '@services/categories/categories.service';
+import {ConfigService} from '@services/config/config.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {IntervalService} from '@services/interval/interval.service';
+import {SearchService} from '@services/search/search.service';
 import {TruncateModule} from '@yellowspot/ng-truncate';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
 import {NgProgressModule} from 'ngx-progressbar';
-import {Observable, ObservableInput, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import {environment} from '@environments/environment';
+import {lastValueFrom, of} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 import {AboutComponent} from './about/about.component';
 import {AccordionComponent} from './accordion/accordion.component';
 import {AddButtonComponent} from './add-button/add-button.component';
@@ -129,68 +134,34 @@ import {TypeIconComponent} from './type-icon/type-icon.component';
 import {UserAdminDetailsComponent} from './user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from './user-admin/user-admin.component';
 import {UvaEducationComponent} from './uva-education/uva-education.component';
-import {AutocompleteSectionComponent} from './_forms/autocomplete-section/autocomplete-section.component';
-import {CardWrapperComponent} from './_forms/card-wrapper/card-wrapper.component';
-import {FormPrintoutComponent} from './_forms/form-printout/form-printout.component';
-import {GroupValidationWrapperComponent} from './_forms/group-validation-wrapper/group-validation-wrapper.component';
-import {HelpWrapperComponent} from './_forms/help-wrapper/help-wrapper.component';
-import {MultiselectTreeComponent} from './_forms/multiselect-tree/multiselect-tree.component';
-import {TreeComponent} from './_forms/tree/tree.component';
-import {RepeatSectionDialogComponent} from './_forms/repeat-section-dialog/repeat-section-dialog.component';
-import {RepeatSectionComponent} from './_forms/repeat-section/repeat-section.component';
-import {ResizeTextareaComponent} from './_forms/resize-textarea/resize-textarea.component';
-import {
-  EmailMatchValidator,
-  EmailMatchValidatorMessage,
-  EmailValidator,
-  EmailValidatorMessage,
-  MaxValidationMessage,
-  MinValidationMessage,
-  MulticheckboxValidator,
-  MulticheckboxValidatorMessage,
-  PhoneValidator,
-  PhoneValidatorMessage,
-  ShowError,
-  UrlValidator,
-  UrlValidatorMessage,
-} from './_forms/validators/formly.validator';
-import {ErrorInterceptor} from './_routing/error-interceptor';
-import {JwtInterceptor} from './_routing/jwt-interceptor';
-import {RoutingModule} from './_routing/routing.module';
-import {ApiService} from './_services/api/api.service';
-import {CategoriesService} from './_services/categories/categories.service';
-import {ConfigService} from './_services/config/config.service';
-import {GoogleAnalyticsService} from './_services/google-analytics/google-analytics.service';
-import {IntervalService} from './_services/interval/interval.service';
-import {SearchService} from './_services/search/search.service';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists. Otherwise, assume we are connecting to port
 // 5000 on the local server.
-export function load(http: HttpClient, config: ConfigService): () => Promise<boolean> {
-  return (): Promise<boolean> => {
-    return new Promise<boolean>((resolve: (a: boolean) => void): void => {
-      let url = './api/config';
-      if ('override_config_url' in environment) {
-        url = environment['override_config_url'];
+export const load = (http: HttpClient, config: ConfigService): (() => Promise<boolean>) => {
+  return async (): Promise<boolean> => {
+    let url = './api/config';
+    if ('override_config_url' in environment) {
+      url = environment['override_config_url'];
+    }
+
+    try {
+      const configFromJsonFile = await lastValueFrom(
+        http.get(url, {responseType: 'json'}).pipe(
+          catchError(() => {
+            return of(false);
+          }),
+        ),
+      );
+      if (configFromJsonFile) {
+        config.fromProperties(configFromJsonFile);
       }
-      http
-        .get(url)
-        .pipe(
-          map(fromServer => {
-            config.fromProperties(fromServer);
-            resolve(true);
-          }),
-          catchError((_x: {status: number}, _caught: Observable<void>): ObservableInput<{}> => {
-            console.log('Failed to load configuration, unable to find ./api/config');
-            resolve(false);
-            return of({});
-          }),
-        )
-        .subscribe();
-    });
+      return !!configFromJsonFile;
+    } catch (e) {
+      return false;
+    }
   };
-}
+};
 
 @Injectable()
 export class FormlyConfig {
@@ -343,6 +314,7 @@ export class FormlyConfig {
     BrowserAnimationsModule,
     BrowserModule,
     CommonModule,
+    FlexLayoutModule,
     FormlyMatDatepickerModule,
     FormlyMaterialModule,
     FormlyModule,
