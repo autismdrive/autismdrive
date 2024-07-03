@@ -8,10 +8,11 @@ export default defineConfig({
     baseUrl: 'http://localhost:4200',
     fixturesFolder: 'cypress/fixtures',
     screenshotsFolder: 'cypress/screenshots',
+    video: true,
     supportFile: 'cypress/support/e2e.ts',
     videosFolder: 'cypress/videos',
     defaultCommandTimeout: 30000,
-    viewportHeight: 768,
+    viewportHeight: 900,
     viewportWidth: 1440,
     waitForAnimations: true,
     setupNodeEvents(on, config) {

@@ -1,18 +1,17 @@
 <div id="hero" class="gradient-overlay container with-escaping-tiles">
-  <div class="hero-content" fxLayoutAlign="center" class="row escaping-tiles-2x" id="TopOfJoin">
+  <div fxLayoutAlign="center" class="hero-content row escaping-tiles-2x" id="TopOfJoin">
     <div class="form border-box">
       <h1>Join Autism DRIVE</h1>
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <formly-form [form]="form" [fields]="fields" [model]="model" *ngIf="registerStateValue !== 'wait_for_email'">
-          <div id="error_message" class="display mat-error" *ngIf="errorMessage">{{ errorMessage }}</div>
-          <footer fxLayout="column" fxLayoutGap="2%" fxLayoutAlign="center" *ngIf="registerStateValue === 'form'">
-            <button mat-flat-button type="submit" color="primary" id="submit">Next</button>
-            <button mat-flat-button (click)="goHome($event)" color="accent" id="cancel">Cancel</button>
-          </footer>
-          <footer *ngIf="registerStateValue === 'submitting'">
-            <app-loading></app-loading>
-          </footer>
-        </formly-form>
+        <formly-form [form]="form" [fields]="fields" [model]="model" *ngIf="registerStateValue !== 'wait_for_email'" />
+        <div id="error_message" class="display mat-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+        <footer fxLayout="column" fxLayoutGap="2%" fxLayoutAlign="center" *ngIf="registerStateValue === 'form'">
+          <button mat-flat-button type="submit" color="primary" id="submit">Next</button>
+          <button mat-flat-button (click)="goHome($event)" color="accent" id="cancel">Cancel</button>
+        </footer>
+        <footer *ngIf="registerStateValue === 'submitting'">
+          <app-loading></app-loading>
+        </footer>
         <footer *ngIf="registerStateValue === 'wait_for_email'" id="confirmation_message">
           <h2>Account Created!</h2>
           <p>Please check your email to complete the signin process.</p>

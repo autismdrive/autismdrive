@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import {faker} from '@node_modules/@faker-js/faker';
 import {AppPage} from '../support/util';
 import {EnrollUseCases} from '../support/enroll';
 import {GlobalHeaderUseCases} from '../support/global-header';
@@ -13,11 +14,9 @@ describe('Participant (Guardian - Self)', () => {
   let searchUseCases: SearchUseCases;
   let profileUseCases: ProfileUseCases;
   let enrollUseCases: EnrollUseCases;
-  let randomEmail;
-  const badPassword = 'abc123';
-  const goodPassword = 'Max Quordlepleen 90';
-  const email = 'aaron@sartography.com';
-  const password = 'Zarquon Disaster Area 78';
+  const randomEmail = faker.internet.email();
+  const badPassword = faker.internet.password({length: 6});
+  const goodPassword = faker.internet.password({length: 24});
 
   before(() => {
     page = new AppPage();
@@ -26,9 +25,13 @@ describe('Participant (Guardian - Self)', () => {
     searchUseCases = new SearchUseCases(page);
     profileUseCases = new ProfileUseCases(page);
     enrollUseCases = new EnrollUseCases(page);
-    randomEmail = `aaron_${page.getRandomString(16)}@sartography.com`;
+    page.waitForNetworkIdle();
     page.navigateToHome();
     loginUseCases.refreshAndRedirectToReturnUrl();
+  });
+
+  after(() => {
+    page.waitForNetworkIdle();
   });
 
   // Login & Register
@@ -51,7 +54,7 @@ describe('Participant (Guardian - Self)', () => {
   it('should display Forgot Password form confirmation message', () =>
     loginUseCases.displayForgotPasswordConfirmation(randomEmail));
   it('should display Forgot Password form error message', () => loginUseCases.displayForgotPasswordError());
-  it('should see error on bad password', () => loginUseCases.loginWithBadPassword(email));
+  it('should see error on bad password', () => loginUseCases.loginWithBadPassword(randomEmail, badPassword));
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(randomEmail, goodPassword));
 
   // Global Header - Logged In

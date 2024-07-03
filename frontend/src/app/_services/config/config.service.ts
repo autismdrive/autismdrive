@@ -14,10 +14,6 @@ export class ConfigService implements GoogleModuleOptions {
   public production: boolean;
   public googleAnalyticsKey: string;
 
-  toGoogleModuleOptions(): GoogleModuleOptions {
-    return {apiKey: this.apiKey};
-  }
-
   fromProperties(props) {
     for (const propName in props) {
       if (props.hasOwnProperty(propName)) {

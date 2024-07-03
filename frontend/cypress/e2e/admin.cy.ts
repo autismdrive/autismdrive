@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import {faker} from '@node_modules/@faker-js/faker';
 import {AppPage} from '../support/util';
 import {AdminUseCases} from '../support/admin';
 import {EnrollUseCases} from '../support/enroll';
@@ -17,8 +18,8 @@ describe('Admin', () => {
   let enrollUseCases: EnrollUseCases;
   let adminUseCases: AdminUseCases;
   let studiesUseCases: StudiesUseCases;
-  const email = 'eleanorcjkgraham@gmail.com';
-  const password = 'Random Frequent Flyer Dent 34';
+  const email = faker.internet.email();
+  const password = faker.internet.password({length: 24});
 
   before(() => {
     page = new AppPage();
@@ -29,9 +30,13 @@ describe('Admin', () => {
     enrollUseCases = new EnrollUseCases(page);
     adminUseCases = new AdminUseCases(page);
     studiesUseCases = new StudiesUseCases(page);
-
+    page.waitForNetworkIdle();
     page.navigateToHome();
     loginUseCases.refreshAndRedirectToReturnUrl();
+  });
+
+  after(() => {
+    page.waitForNetworkIdle();
   });
 
   // Login & Register

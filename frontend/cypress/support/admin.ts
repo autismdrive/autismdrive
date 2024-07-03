@@ -5,7 +5,7 @@ export class AdminUseCases {
   constructor(private page: AppPage) {}
 
   navigateToAdmin() {
-    this.page.clickAndExpectRoute('#admin-button', '/admin/data-admin');
+    this.page.clickAndExpectRoute('#admin-button', '#/admin/data-admin');
   }
 
   navigateToTab(tabId: string, selector: string) {

@@ -31,7 +31,7 @@ export class GlobalHeaderUseCases {
   }
 
   visitHomePage() {
-    this.page.clickAndExpectRoute('#logo', '/home');
+    this.page.clickAndExpectRoute('#logo', '#/home');
     this.page.waitForVisible('app-news-item');
     this.page.getElements('#hero').should('have.length', 1);
     this.page.getElements('.border-box-tile').should('have.length.gt', 1);

@@ -4,7 +4,7 @@
   <form *ngIf="state === pageState.SHOW_FORM" [formGroup]="form" class="pad-2">
     <h1>Study Details</h1>
 
-    <formly-form [form]="form" [model]="model" [fields]="fields" [options]="options"> </formly-form>
+    <formly-form [form]="form" [model]="model" [fields]="fields" [options]="options" />
 
     <div class="button-row" fxLayoutGap="2em">
       <button
@@ -40,7 +40,6 @@
         mat-flat-button
         (click)="onDelete()"
         color="warn"
-        id="permanently-delete-button"
       >
         Permanently Delete This Study!!!
       </button>

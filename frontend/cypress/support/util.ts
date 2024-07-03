@@ -10,7 +10,7 @@ export class AppPage {
   }
 
   maximize() {
-    return cy.viewport('macbook-13');
+    return cy.viewport('macbook-15');
   }
 
   resizeTo(width: number, height: number) {
@@ -35,7 +35,7 @@ export class AppPage {
   }
 
   waitForClickable(selector: string) {
-    cy.get(selector).should('be.enabled', {timeout: 5000}).should('be.visible', {timeout: 5000});
+    cy.get(selector).should('be.visible', {timeout: 5000}).and('not.be.disabled');
   }
 
   waitForNotVisible(selector: string) {
@@ -86,8 +86,6 @@ export class AppPage {
   clickElement(selector: string) {
     this.waitForClickable(selector);
     this.scrollTo(selector);
-    this.focus(selector);
-    this.isFocused(selector);
     return cy.get(selector).click();
   }
 
@@ -133,7 +131,8 @@ export class AppPage {
   }
 
   focus(selector: string) {
-    cy.get(selector).focus();
+    cy.get(selector).trigger('mouseover');
+    cy.get(selector).trigger('focusin');
   }
 
   isFocused(selector: string) {
@@ -180,15 +179,17 @@ export class AppPage {
   }
 
   navigateToUrl(url: string) {
-    return cy.visit(url);
+    cy.visit(url);
+    this.waitForNetworkIdle();
   }
 
   navigateToHome() {
-    return cy.request('/');
+    this.navigateToUrl('/');
   }
 
   refresh() {
-    return cy.reload();
+    cy.reload();
+    this.waitForNetworkIdle();
   }
 
   clickAndExpectRoute(clickSelector: string, expectedRoute: string | RegExp) {

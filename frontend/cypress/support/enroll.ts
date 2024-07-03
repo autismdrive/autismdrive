@@ -43,13 +43,13 @@ export class EnrollUseCases {
   cancelIntro() {
     this.page.waitFor(3000);
     this.page.getElements('#intro-cancel-button').should('have.length', 1);
-    this.page.clickAndExpectRoute('#intro-cancel-button', '/profile');
+    this.page.clickAndExpectRoute('#intro-cancel-button', '#/profile');
   }
 
   cancelEditing() {
     this.page.waitForVisible('#flow-cancel-button');
     this.page.getElements('#flow-cancel-button').should('have.length', 1);
-    this.page.clickAndExpectRoute('#flow-cancel-button', '/profile');
+    this.page.clickAndExpectRoute('#flow-cancel-button', '#/profile');
   }
 
   displayGuardianTerms() {
@@ -61,7 +61,7 @@ export class EnrollUseCases {
 
   cancelTerms() {
     this.page.getElements('#terms-cancel-button').should('have.length', 1);
-    this.page.clickAndExpectRoute('#terms-cancel-button', '/profile');
+    this.page.clickAndExpectRoute('#terms-cancel-button', '#/profile');
   }
 
   acceptTerms() {

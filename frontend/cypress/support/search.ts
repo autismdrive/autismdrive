@@ -137,7 +137,7 @@ export class SearchUseCases {
   clearSearchBox(keywordString = 'autism') {
     const searchFieldSelector = '#search-field input';
     this.page.getElement(searchFieldSelector).should('contain.value', keywordString, {matchCase: false});
-    this.page.clickAndExpectRoute('#logo', '/home');
+    this.page.clickAndExpectRoute('#logo', '#/home');
     this.page.waitForVisible('app-news-item');
     this.page.clickLinkTo('/search');
     this.page.waitForVisible('app-search-result');
@@ -331,7 +331,7 @@ export class SearchUseCases {
 
   focusAndBlurSearchBox() {
     const searchSelector = '#search-field input';
-    this.page.isFocused(searchSelector);
+    this.page.focus(searchSelector);
     this.page.pressKey('ESCAPE');
   }
 

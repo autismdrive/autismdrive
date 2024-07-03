@@ -12,7 +12,7 @@ describe('Anonymous User', () => {
   let loginUseCases: LoginUseCases;
   let searchUseCases: SearchUseCases;
   let studiesUseCases: StudiesUseCases;
-  let randomEmail;
+  const randomEmail = faker.internet.email();
 
   before(() => {
     page = new AppPage();
@@ -20,10 +20,8 @@ describe('Anonymous User', () => {
     loginUseCases = new LoginUseCases(page);
     searchUseCases = new SearchUseCases(page);
     studiesUseCases = new StudiesUseCases(page);
-    randomEmail = faker.internet.email();
     page.waitForNetworkIdle();
     page.navigateToHome();
-    page.waitForNetworkIdle();
     loginUseCases.refreshAndRedirectToReturnUrl();
   });
 
