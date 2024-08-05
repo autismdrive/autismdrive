@@ -13,6 +13,7 @@ from marshmallow.fields import (
     Str,
     String,
 )
+from marshmallow.schema import SchemaMeta
 from marshmallow.utils import EXCLUDE
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import func
@@ -184,7 +185,7 @@ class CategorySchema(ModelSchema):
     all_resource_count = Method("get_all_resource_count", dump_only=True)
     study_count = Method("get_study_count", dump_only=True)
     children = List(Nested("CategorySchema", dump_only=True, exclude=("parent", "color")))
-    parent = Nested("ParentCategorySchema", dump_only=True)
+    parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
 
     _links = Hyperlinks(
         {
@@ -1703,93 +1704,93 @@ class DataTransferLogPageSchema(Schema):
 
 
 class SchemaRegistry(object):
-    AdminExportSchema = ExportSchemas.AdminExportSchema
-    AdminNoteSchema = AdminNoteSchema
-    AggCountSchema = AggCountSchema
-    AlternativeAugmentativeSchema = AlternativeAugmentativeSchema
-    AssistiveDeviceSchema = AssistiveDeviceSchema
-    CategoriesOnEventSchema = CategoriesOnEventSchema
-    CategoriesOnLocationSchema = CategoriesOnLocationSchema
-    CategoriesOnResourceSchema = CategoriesOnResourceSchema
-    CategoriesOnStudySchema = CategoriesOnStudySchema
-    CategoryEventsSchema = CategoryEventsSchema
-    CategoryInSearchSchema = CategoryInSearchSchema
-    CategoryLocationsSchema = CategoryLocationsSchema
-    CategoryResourcesSchema = CategoryResourcesSchema
-    CategorySchema = CategorySchema
-    CategoryStudiesSchema = CategoryStudiesSchema
-    CategoryUpdateSchema = CategoryUpdateSchema
-    ChainQuestionnaireSchema = ChainQuestionnaireSchema
-    ChainSessionSchema = ChainSessionSchema
-    ChainSessionStepSchema = ChainSessionStepSchema
-    ChainStepSchema = ChainStepSchema
-    ChallengingBehaviorSchema = ChallengingBehaviorSchema
-    ChildCategoryInSearchSchema = ChildCategoryInSearchSchema
-    ClinicalDiagnosesQuestionnaireSchema = ClinicalDiagnosesQuestionnaireSchema
-    ContactQuestionnaireSchema = ContactQuestionnaireSchema
-    CurrentBehaviorsDependentQuestionnaireSchema = CurrentBehaviorsDependentQuestionnaireSchema
-    CurrentBehaviorsSelfQuestionnaireSchema = CurrentBehaviorsSelfQuestionnaireSchema
-    DataTransferLogDetailSchema = DataTransferLogDetailSchema
-    DataTransferLogPageSchema = DataTransferLogPageSchema
-    DataTransferLogSchema = DataTransferLogSchema
-    DemographicsQuestionnaireSchema = DemographicsQuestionnaireSchema
-    DevelopmentalQuestionnaireSchema = DevelopmentalQuestionnaireSchema
-    EducationDependentQuestionnaireSchema = EducationDependentQuestionnaireSchema
-    EducationSelfQuestionnaireSchema = EducationSelfQuestionnaireSchema
-    EmailLogSchema = EmailLogSchema
-    EmploymentQuestionnaireSchema = EmploymentQuestionnaireSchema
-    EvaluationHistoryDependentQuestionnaireSchema = EvaluationHistoryDependentQuestionnaireSchema
-    EvaluationHistorySelfQuestionnaireSchema = EvaluationHistorySelfQuestionnaireSchema
-    EventCategoriesSchema = EventCategoriesSchema
-    EventCategorySchema = EventCategorySchema
-    EventSchema = EventSchema
-    EventUserSchema = EventUserSchema
-    ExportInfoSchema = ExportInfoSchema
-    ExportSchemas = ExportSchemas()
-    FlowSchema = FlowSchema
-    FrontendConfigSchema = FrontendConfigSchema
-    GeoboxSchema = GeoboxSchema
-    GeopointSchema = GeopointSchema
-    HitSchema = HitSchema
-    HomeDependentQuestionnaireSchema = HomeDependentQuestionnaireSchema
-    HomeSelfQuestionnaireSchema = HomeSelfQuestionnaireSchema
-    HousemateSchema = HousemateSchema
-    IdentificationQuestionnaireSchema = IdentificationQuestionnaireSchema
-    InvestigatorSchema = InvestigatorSchema
-    InvestigatorStudiesSchema = InvestigatorStudiesSchema
-    LocationCategoriesSchema = LocationCategoriesSchema
-    LocationCategorySchema = LocationCategorySchema
-    LocationSchema = LocationSchema
-    MedicationSchema = MedicationSchema
-    ModelSchema = ModelSchema
-    ParentCategorySchema = ParentCategorySchema
-    ParticipantExportSchema = ExportSchemas.ParticipantExportSchema
-    ParticipantSchema = ParticipantSchema
-    ProfessionalProfileQuestionnaireSchema = ProfessionalProfileQuestionnaireSchema
-    RegistrationQuestionnaireSchema = RegistrationQuestionnaireSchema
-    ResourceCategoriesSchema = ResourceCategoriesSchema
-    ResourceCategorySchema = ResourceCategorySchema
-    ResourceChangeLogSchema = ResourceChangeLogSchema
-    ResourceSchema = ResourceSchema
-    SearchSchema = SearchSchema
-    SortSchema = SortSchema
-    StepLogSchema = StepLogSchema
-    StepSchema = StepSchema
-    StudyCategoriesSchema = StudyCategoriesSchema
-    StudyCategorySchema = StudyCategorySchema
-    StudyChangeLogSchema = StudyChangeLogSchema
-    StudyInvestigatorSchema = StudyInvestigatorSchema
-    StudySchema = StudySchema
-    StudyUserSchema = StudyUserSchema
-    StudyUsersSchema = StudyUsersSchema
-    SupportsBaseSchema = SupportsBaseSchema
-    SupportsQuestionnaireSchema = SupportsQuestionnaireSchema
-    TherapySchema = TherapySchema
-    TotalSchema = TotalSchema
-    UserExportSchema = ExportSchemas.UserExportSchema
-    UserFavoriteSchema = UserFavoriteSchema
-    UserMetaSchema = UserMetaSchema
-    UserSchema = UserSchema
-    UserSearchSchema = UserSearchSchema
-    UserStudiesSchema = UserStudiesSchema
-    ZipCodeSchema = ZipCodeSchema
+    AdminExportSchema: SchemaMeta = ExportSchemas.AdminExportSchema
+    AdminNoteSchema: SchemaMeta = AdminNoteSchema
+    AggCountSchema: SchemaMeta = AggCountSchema
+    AlternativeAugmentativeSchema: SchemaMeta = AlternativeAugmentativeSchema
+    AssistiveDeviceSchema: SchemaMeta = AssistiveDeviceSchema
+    CategoriesOnEventSchema: SchemaMeta = CategoriesOnEventSchema
+    CategoriesOnLocationSchema: SchemaMeta = CategoriesOnLocationSchema
+    CategoriesOnResourceSchema: SchemaMeta = CategoriesOnResourceSchema
+    CategoriesOnStudySchema: SchemaMeta = CategoriesOnStudySchema
+    CategoryEventsSchema: SchemaMeta = CategoryEventsSchema
+    CategoryInSearchSchema: SchemaMeta = CategoryInSearchSchema
+    CategoryLocationsSchema: SchemaMeta = CategoryLocationsSchema
+    CategoryResourcesSchema: SchemaMeta = CategoryResourcesSchema
+    CategorySchema: SchemaMeta = CategorySchema
+    CategoryStudiesSchema: SchemaMeta = CategoryStudiesSchema
+    CategoryUpdateSchema: SchemaMeta = CategoryUpdateSchema
+    ChainQuestionnaireSchema: SchemaMeta = ChainQuestionnaireSchema
+    ChainSessionSchema: SchemaMeta = ChainSessionSchema
+    ChainSessionStepSchema: SchemaMeta = ChainSessionStepSchema
+    ChainStepSchema: SchemaMeta = ChainStepSchema
+    ChallengingBehaviorSchema: SchemaMeta = ChallengingBehaviorSchema
+    ChildCategoryInSearchSchema: SchemaMeta = ChildCategoryInSearchSchema
+    ClinicalDiagnosesQuestionnaireSchema: SchemaMeta = ClinicalDiagnosesQuestionnaireSchema
+    ContactQuestionnaireSchema: SchemaMeta = ContactQuestionnaireSchema
+    CurrentBehaviorsDependentQuestionnaireSchema: SchemaMeta = CurrentBehaviorsDependentQuestionnaireSchema
+    CurrentBehaviorsSelfQuestionnaireSchema: SchemaMeta = CurrentBehaviorsSelfQuestionnaireSchema
+    DataTransferLogDetailSchema: SchemaMeta = DataTransferLogDetailSchema
+    DataTransferLogPageSchema: SchemaMeta = DataTransferLogPageSchema
+    DataTransferLogSchema: SchemaMeta = DataTransferLogSchema
+    DemographicsQuestionnaireSchema: SchemaMeta = DemographicsQuestionnaireSchema
+    DevelopmentalQuestionnaireSchema: SchemaMeta = DevelopmentalQuestionnaireSchema
+    EducationDependentQuestionnaireSchema: SchemaMeta = EducationDependentQuestionnaireSchema
+    EducationSelfQuestionnaireSchema: SchemaMeta = EducationSelfQuestionnaireSchema
+    EmailLogSchema: SchemaMeta = EmailLogSchema
+    EmploymentQuestionnaireSchema: SchemaMeta = EmploymentQuestionnaireSchema
+    EvaluationHistoryDependentQuestionnaireSchema: SchemaMeta = EvaluationHistoryDependentQuestionnaireSchema
+    EvaluationHistorySelfQuestionnaireSchema: SchemaMeta = EvaluationHistorySelfQuestionnaireSchema
+    EventCategoriesSchema: SchemaMeta = EventCategoriesSchema
+    EventCategorySchema: SchemaMeta = EventCategorySchema
+    EventSchema: SchemaMeta = EventSchema
+    EventUserSchema: SchemaMeta = EventUserSchema
+    ExportInfoSchema: SchemaMeta = ExportInfoSchema
+    ExportSchemas: ExportSchemas = ExportSchemas()
+    FlowSchema: SchemaMeta = FlowSchema
+    FrontendConfigSchema: SchemaMeta = FrontendConfigSchema
+    GeoboxSchema: SchemaMeta = GeoboxSchema
+    GeopointSchema: SchemaMeta = GeopointSchema
+    HitSchema: SchemaMeta = HitSchema
+    HomeDependentQuestionnaireSchema: SchemaMeta = HomeDependentQuestionnaireSchema
+    HomeSelfQuestionnaireSchema: SchemaMeta = HomeSelfQuestionnaireSchema
+    HousemateSchema: SchemaMeta = HousemateSchema
+    IdentificationQuestionnaireSchema: SchemaMeta = IdentificationQuestionnaireSchema
+    InvestigatorSchema: SchemaMeta = InvestigatorSchema
+    InvestigatorStudiesSchema: SchemaMeta = InvestigatorStudiesSchema
+    LocationCategoriesSchema: SchemaMeta = LocationCategoriesSchema
+    LocationCategorySchema: SchemaMeta = LocationCategorySchema
+    LocationSchema: SchemaMeta = LocationSchema
+    MedicationSchema: SchemaMeta = MedicationSchema
+    ModelSchema: SchemaMeta = ModelSchema
+    ParentCategorySchema: SchemaMeta = ParentCategorySchema
+    ParticipantExportSchema: SchemaMeta = ExportSchemas.ParticipantExportSchema
+    ParticipantSchema: SchemaMeta = ParticipantSchema
+    ProfessionalProfileQuestionnaireSchema: SchemaMeta = ProfessionalProfileQuestionnaireSchema
+    RegistrationQuestionnaireSchema: SchemaMeta = RegistrationQuestionnaireSchema
+    ResourceCategoriesSchema: SchemaMeta = ResourceCategoriesSchema
+    ResourceCategorySchema: SchemaMeta = ResourceCategorySchema
+    ResourceChangeLogSchema: SchemaMeta = ResourceChangeLogSchema
+    ResourceSchema: SchemaMeta = ResourceSchema
+    SearchSchema: SchemaMeta = SearchSchema
+    SortSchema: SchemaMeta = SortSchema
+    StepLogSchema: SchemaMeta = StepLogSchema
+    StepSchema: SchemaMeta = StepSchema
+    StudyCategoriesSchema: SchemaMeta = StudyCategoriesSchema
+    StudyCategorySchema: SchemaMeta = StudyCategorySchema
+    StudyChangeLogSchema: SchemaMeta = StudyChangeLogSchema
+    StudyInvestigatorSchema: SchemaMeta = StudyInvestigatorSchema
+    StudySchema: SchemaMeta = StudySchema
+    StudyUserSchema: SchemaMeta = StudyUserSchema
+    StudyUsersSchema: SchemaMeta = StudyUsersSchema
+    SupportsBaseSchema: SchemaMeta = SupportsBaseSchema
+    SupportsQuestionnaireSchema: SchemaMeta = SupportsQuestionnaireSchema
+    TherapySchema: SchemaMeta = TherapySchema
+    TotalSchema: SchemaMeta = TotalSchema
+    UserExportSchema: SchemaMeta = ExportSchemas.UserExportSchema
+    UserFavoriteSchema: SchemaMeta = UserFavoriteSchema
+    UserMetaSchema: SchemaMeta = UserMetaSchema
+    UserSchema: SchemaMeta = UserSchema
+    UserSearchSchema: SchemaMeta = UserSearchSchema
+    UserStudiesSchema: SchemaMeta = UserStudiesSchema
+    ZipCodeSchema: SchemaMeta = ZipCodeSchema

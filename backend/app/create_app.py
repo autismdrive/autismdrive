@@ -4,7 +4,6 @@ from inspect import getargvalues, currentframe, getouterframes
 
 import click
 import flask_restful
-import traceback_with_variables
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import jsonify, Blueprint
 from flask_cors import CORS
@@ -38,7 +37,7 @@ def create_app(settings=None):
     # Enable CORS
     if _settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
-        origins_re = [r"^https?:\/\/%s(.*)" % o.replace(".", "\.") for o in _settings.CORS_ALLOW_ORIGINS]
+        origins_re = [r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS]
         CORS(_app, origins=origins_re)
 
     # Database
@@ -91,6 +90,7 @@ def create_app(settings=None):
                 elif hasattr(details, "__dict__"):
                     error_dict["details"] = details.__dict__
         except Exception as _:
+            import traceback_with_variables
             error_dict = {"details": traceback_with_variables.format_exc(error)}
 
         error_location = None

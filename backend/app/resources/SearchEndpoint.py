@@ -1,3 +1,5 @@
+from typing import Literal
+
 import elasticsearch
 import flask_restful
 from elasticsearch_dsl.response import Response as ElasticsearchResponse, AggResponse
@@ -12,9 +14,11 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils.category_utils import search_path
 
+ResultType = Literal["resource", "location", "event", "study"]
+
 
 class SearchEndpoint(flask_restful.Resource):
-    def __post__(self, result_types=None) -> Search:
+    def __post__(self, result_types: list[ResultType] = None) -> Search:
         request_data = request.get_json()
 
         # Handle some sloppy category data.
@@ -78,16 +82,26 @@ class SearchEndpoint(flask_restful.Resource):
         for bucket in aggregations.type.buckets:
             search.add_aggregation("types", bucket.key, bucket.doc_count, bucket.key in search.types)
 
-    # given a results of a search, creates the appropriate category.
-    # Also assures that there is a category at the top called "TOP".
     def update_category_counts(self, category: Category, results: ElasticsearchResponse):
+        """
+        Adds category counts found in the given results object to the given
+        category and returns the updated category.
+
+        If no category is given, returns a dummy category called "Topics",
+        which includes counts for top-level categories.
+        """
+
         from app.resources.CategoryEndpoint import add_joins_to_statement, get_category_by_id
         from app.database import session
 
-        "Make a fake category to hold all the other categories."
+        # Make a fake category to hold all the other categories.
         topic_category = Category(id=99999, name="Topics", children=[], parent=None)
+
+        # If no category is given, include top-level categories.
         if not category:
             category = topic_category
+
+            # Add all top-level categories as children of the Topics category.
             category.children = (
                 session.execute(
                     add_joins_to_statement(select(Category))
@@ -100,16 +114,19 @@ class SearchEndpoint(flask_restful.Resource):
                 .all()
             )
         else:
+            #
             c_id = category.id
             category = topic_category if c_id == topic_category.id else get_category_by_id(c_id, with_joins=True)
 
-            # Add the Topics bucket to the top of the category tree.
             c = category
 
+            # Travel to the top of the category tree.
             while c and c.parent:
                 c = c.parent
 
-            c.parent = topic_category
+            if c:
+                # Add the Topics bucket to the top of the category tree.
+                c.parent = topic_category
 
         for child in category.children:
             for bucket in results.aggregations.category.buckets:

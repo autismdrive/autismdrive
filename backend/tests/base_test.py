@@ -289,8 +289,8 @@ class BaseTest(TestCase):
         self.assertEqual(db_admin_note.note, admin_note.note)
         return db_admin_note
 
-    def construct_category(self, name="Ultimakers", parent_id: int = None) -> Category:
-        category = Category(name=name)
+    def construct_category(self, name="Ultimakers", parent_id: int = None, display_order: int = None) -> Category:
+        category = Category(name=name, display_order=display_order)
         if parent_id is not None:
             category.parent_id = parent_id
         self.session.add(category)

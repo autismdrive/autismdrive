@@ -14,7 +14,7 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=stardrive,stardrive_test
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.3
     environment:
       - "discovery.type=single-node"
       - "http.max_content_length=10MB"

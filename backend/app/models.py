@@ -89,7 +89,7 @@ class Category(Base):
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("category.id"))
     last_updated: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
     display_order: Mapped[Optional[int]]
-    parent: Mapped["Category"] = relationship(back_populates="children", remote_side=[id])
+    parent: Mapped[Optional["Category"]] = relationship(back_populates="children", remote_side="Category.id")
     children: Mapped[list["Category"]] = relationship(
         back_populates="parent", order_by="Category.display_order,Category.name"
     )

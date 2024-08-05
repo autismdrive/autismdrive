@@ -277,7 +277,7 @@ class TestStudy(BaseTest):
         s = self.construct_study(title="The Best Study")
         u = self.construct_user()
 
-        self.assertEquals(0, len(s.study_users))
+        self.assertEqual(0, len(s.study_users))
 
         guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")

@@ -395,7 +395,7 @@ class TestSearch(BaseTest):
             _top = i <= 1
             parent_index = None if _top else floor((i - 1) / 2)
             categories.append(
-                self.construct_category(name=name, parent_id=None if _top else categories[parent_index].id)
+                self.construct_category(name=name, parent_id=None if _top else categories[parent_index].id, display_order=i)
             )
 
         for i in range(num_resources):
@@ -441,7 +441,7 @@ class TestSearch(BaseTest):
 
         for i, cat in enumerate(search_results["category"]["children"]):
             self.assertEqual(
-                categories[i].name, cat["name"], f"The {ordinal(i)} category should be {categories[i].name}"
+                categories[i].name, cat["name"], f"The {ordinal(i+1)} category should be {categories[i].name}"
             )
             self.assertEqual(2, cat["hit_count"], f"There should be 2 resources in {categories[i].name}")
 

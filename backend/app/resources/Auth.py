@@ -3,7 +3,7 @@
 import datetime
 from functools import wraps
 
-from flask import g, request, Blueprint, jsonify
+from flask import g, request, Blueprint, jsonify, has_request_context
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import joinedload
@@ -208,11 +208,18 @@ def verify_token(token):
     return "user" in g and g.user
 
 
+def get_token():
+    if has_request_context() and request.method != "OPTIONS":
+        auth_header = request.headers.get("AUTHORIZATION")
+        if auth_header:
+            return auth_header.split(" ")[1]
+    return None
+
+
 def login_optional(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if request.method != "OPTIONS":  # pragma: no cover
-            verify_token(request.headers["AUTHORIZATION"].split(" ")[1])
+        verify_token(get_token())
 
         return f(*args, **kwargs)
 
