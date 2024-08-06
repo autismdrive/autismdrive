@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {Router} from '@angular/router';
-import {HitType} from '../_models/hit_type';
-import {NewsItem} from '../_models/news-item';
-import {Study} from '../_models/study';
-import {ApiService} from '../_services/api/api.service';
-import {ConfigService} from '../_services/config/config.service';
+import {HitType} from '@models/hit_type';
+import {NewsItem} from '@models/news-item';
+import {Study} from '@models/study';
+import {ApiService} from '@services/api/api.service';
+import {ConfigService} from '@services/config/config.service';
+import {lastValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -22,25 +23,13 @@ export class HomeComponent {
     private configService: ConfigService,
     private meta: Meta,
   ) {
-    this.api.getStudiesByStatus('currently_enrolling').subscribe(studies => {
-      this.currentStudies = studies;
-      this.newsItems = this._studiesToNewsItems(studies);
-    });
+    this.loadStudies();
+
     if (this.configService.mirroring) {
-      router.navigate(['mirrored']);
+      this.router.navigate(['mirrored']);
     }
-    this.meta.updateTag(
-      {property: 'og:image', content: location.origin + '/assets/home/hero-family.jpg'},
-      `property='og:image'`,
-    );
-    this.meta.updateTag(
-      {property: 'og:image:secure_url', content: location.origin + '/assets/home/hero-family.jpg'},
-      `property='og:image:secure_url'`,
-    );
-    this.meta.updateTag(
-      {name: 'twitter:image', content: location.origin + '/assets/home/hero-family.jpg'},
-      `name='twitter:image'`,
-    );
+
+    this.updateTags();
   }
 
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
@@ -58,5 +47,25 @@ export class HomeComponent {
         return n;
       });
     }
+  }
+
+  private async loadStudies() {
+    this.currentStudies = await lastValueFrom(this.api.getStudiesByStatus('currently_enrolling'));
+    this.newsItems = this._studiesToNewsItems(this.currentStudies);
+  }
+
+  private updateTags() {
+    this.meta.updateTag(
+      {property: 'og:image', content: location.origin + '/assets/home/hero-family.jpg'},
+      `property='og:image'`,
+    );
+    this.meta.updateTag(
+      {property: 'og:image:secure_url', content: location.origin + '/assets/home/hero-family.jpg'},
+      `property='og:image:secure_url'`,
+    );
+    this.meta.updateTag(
+      {name: 'twitter:image', content: location.origin + '/assets/home/hero-family.jpg'},
+      `name='twitter:image'`,
+    );
   }
 }

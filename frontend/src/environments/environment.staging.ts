@@ -7,6 +7,6 @@ export const environment: AppEnvironment = {
   envName: 'staging',
   production: true,
   api: RESOURCE_API,
-  google_tag_manager_id: 'GOOGLE_TAG_MANAGER_ID',
-  google_maps_api_key: 'GOOGLE_MAPS_API_KEY',
+  google_tag_manager_id: '__GOOGLE_TAG_MANAGER_ID__',
+  google_maps_api_key: '__GOOGLE_MAPS_API_KEY__',
 };

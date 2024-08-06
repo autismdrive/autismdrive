@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import {faker} from '@node_modules/@faker-js/faker';
 import {AppPage} from './util';
 
 export class LoginUseCases {
@@ -97,7 +98,7 @@ export class LoginUseCases {
   }
 
   displayForgotPasswordError() {
-    const nonExistentEmail = this.page.getRandomString(8) + '@' + this.page.getRandomString(8) + '.com';
+    const nonExistentEmail = faker.internet.email();
     this.page.clickAndExpectRoute('#login-button', '#/login');
     this.page.clickAndExpectRoute('#forgot_password', '#/forgot-password');
     this.page.inputText('[id*="input_email"]', nonExistentEmail);

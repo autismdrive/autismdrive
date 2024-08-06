@@ -40,7 +40,7 @@ import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
-import {FlexLayoutModule} from '@node_modules/@angular/flex-layout';
+import {FlexLayoutModule} from '@node_modules/@ngbracket/ngx-layout';
 import {ErrorInterceptor} from '@routing/error-interceptor';
 import {JwtInterceptor} from '@routing/jwt-interceptor';
 import {RoutingModule} from '@routing/routing.module';
@@ -309,8 +309,6 @@ export class FormlyConfig {
     GroupValidationWrapperComponent,
   ],
   imports: [
-    NgMapsCoreModule,
-    NgMapsMarkerClustererModule,
     BrowserAnimationsModule,
     BrowserModule,
     CommonModule,
@@ -320,9 +318,11 @@ export class FormlyConfig {
     FormlyModule,
     FormsModule,
     HttpClientModule,
-    MarkdownModule,
+    MarkdownModule.forRoot(),
     MaterialModule,
+    NgMapsCoreModule,
     NgMapsGoogleModule,
+    NgMapsMarkerClustererModule,
     NgProgressModule,
     PdfJsViewerModule,
     ReactiveFormsModule,
@@ -341,7 +341,7 @@ export class FormlyConfig {
     {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
-    {provide: GOOGLE_MAPS_API_CONFIG, useExisting: ConfigService},
+    {provide: GOOGLE_MAPS_API_CONFIG, useValue: {apiKey: environment.google_maps_api_key}},
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
   ],
   bootstrap: [AppComponent],

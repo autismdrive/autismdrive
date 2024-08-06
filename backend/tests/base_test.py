@@ -123,8 +123,8 @@ class BaseTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.reset_db()
-        cls.reset_indices()
+        # cls.reset_db()
+        # cls.reset_indices()
         cls.ctx.pop()
 
     def setUp(self):

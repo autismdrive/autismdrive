@@ -18,7 +18,7 @@ export const RESOURCE_API = `http://${SERVICE_HOST}:5000`;
 export const environment: AppEnvironment = {
   production: false,
   api: RESOURCE_API,
-  google_tag_manager_id: 'GOOGLE_TAG_MANAGER_ID',
-  google_maps_api_key: 'GOOGLE_MAPS_API_KEY',
+  google_tag_manager_id: '__GOOGLE_TAG_MANAGER_ID__',
+  google_maps_api_key: '__GOOGLE_MAPS_API_KEY__',
   override_config_url: `${RESOURCE_API}/api/config`,
 };

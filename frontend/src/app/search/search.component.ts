@@ -25,6 +25,7 @@ import {SearchService} from '@services/search/search.service';
 import createClone from 'rfdc';
 import {fromEvent, Subject} from 'rxjs';
 import {debounceTime, filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
+import LatLngBoundsLiteral = google.maps.LatLngBoundsLiteral;
 import LatLngBounds = google.maps.LatLngBounds;
 import LatLngLiteral = google.maps.LatLngLiteral;
 import GoogleMap = google.maps.Map;
@@ -163,7 +164,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     },
   ];
   queryParamMap: ParamMap;
-  private mapBounds: LatLngBounds;
+  private mapBounds: LatLngBoundsLiteral;
   private scrollDirection: Direction;
   clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
   clusterRenderer: Renderer = new DefaultRenderer();
@@ -683,20 +684,21 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.selectType(resourceType.name);
   }
 
-  updateResultsList($event: LatLngBounds) {
+  updateResultsList($event: LatLngBoundsLiteral) {
     this.mapBounds = $event;
   }
 
   geoBox(): GeoBox {
     if (this.mapBounds) {
+      const latLngBounds = new LatLngBounds(this.mapBounds);
       return {
         top_left: {
-          lat: this.mapBounds.getNorthEast().lat(),
-          lon: this.mapBounds.getSouthWest().lng(),
+          lat: latLngBounds.getNorthEast().lat(),
+          lon: latLngBounds.getSouthWest().lng(),
         },
         bottom_right: {
-          lat: this.mapBounds.getSouthWest().lat(),
-          lon: this.mapBounds.getNorthEast().lng(),
+          lat: latLngBounds.getSouthWest().lat(),
+          lon: latLngBounds.getNorthEast().lng(),
         },
       };
     }
@@ -841,9 +843,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
     m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 
     m.addListener('dragend', () => {
+      const latLngBounds = new LatLngBounds(this.mapBounds);
       this.setLocation(LocationMode.map, {
-        lat: this.mapBounds.getCenter().lat(),
-        lng: this.mapBounds.getCenter().lng(),
+        lat: latLngBounds.getCenter().lat(),
+        lng: latLngBounds.getCenter().lng(),
       });
       this.mapQuerySubject.next(this.query);
       console.log('Map Dragged');

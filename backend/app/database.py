@@ -1,12 +1,9 @@
 import datetime
 import enum
-import sys
 import typing
-from random import randint
 
 import click
-import sqlalchemy
-from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select
+from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
 from sqlalchemy_utils import database_exists
@@ -46,7 +43,7 @@ def _create_tables(base_metadata: MetaData, engine_: Engine):
 
 
 def _delete_tables(base_metadata: MetaData, engine_: Engine):
-    # Delete all tables in reverse dependency order
+    """Deletes all tables in the given database in reverse dependency order"""
 
     # Clear out any tables that may have been created
     click.secho(f"Deleting tables from database {engine_.url.database}...")
@@ -57,20 +54,9 @@ def _delete_tables(base_metadata: MetaData, engine_: Engine):
                 # Check if table exists
                 if engine.dialect.has_table(conn, table.name):
                     conn.execute(table.delete())
+
         except Exception as e:
             click.secho(f"Error cleaning table {table.name}: {e}")
-
-
-def _delete_db(base_metadata: MetaData, engine_: Engine):
-    """Deletes the database to reset any auto-increment id values"""
-    from sqlalchemy_utils import drop_database
-
-    try:
-        click.secho(f"Dropping database: {engine.url.database}...")
-        drop_database(engine.url)
-        click.secho(f"Dropped database: {engine.url.database}.")
-    except Exception as e:
-        click.secho(f"Error deleting database: {e}")
 
 
 class Base(DeclarativeBase):
@@ -84,9 +70,7 @@ class Base(DeclarativeBase):
 
 Base.metadata.bind = engine
 
-
 if not database_exists(engine.url):
-
     _create_db(engine)
     _create_tables(Base.metadata, engine)
 
@@ -101,18 +85,30 @@ session = scoped_session(
 inspector = inspect(engine)
 
 
+def _reset_table_id_sequences(base_metadata: MetaData, engine_: Engine):
+    click.secho(f"Resetting id sequences for {engine_.url.database} tables...")
+    for table in reversed(base_metadata.sorted_tables):
+        try:
+            with engine.begin() as conn:
+                if engine.dialect.has_table(conn, table.name):
+                    sequence_name = f"{table.name}_id_seq"
+                    conn.execute(text(f"ALTER SEQUENCE IF EXISTS {sequence_name} RESTART WITH 1"))
+
+        except Exception as e:
+            click.secho(f"Error resetting table {table.name}: {e}")
+
+
 def clear_db(base_metadata: MetaData = Base.metadata):
     base_metadata.bind = engine
 
     if database_exists(engine.url):
         # Delete all tables in reverse dependency order
         _delete_tables(base_metadata, engine)
+    else:
+        _create_db(engine)
 
-        # Delete the database itself to reset any auto-increment id values
-        _delete_db(base_metadata, engine)
-
-    _create_db(engine)
     _create_tables(base_metadata, engine)
+    _reset_table_id_sequences(base_metadata, engine)
 
 
 def migrate_db():

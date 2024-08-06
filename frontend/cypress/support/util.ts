@@ -201,28 +201,6 @@ export class AppPage {
     }
   }
 
-  getRandomString(length: number) {
-    const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    return Array(length)
-      .join()
-      .split(',')
-      .map(() => s.charAt(Math.floor(Math.random() * s.length)))
-      .join('');
-  }
-
-  getRandomNumString(length: number) {
-    const s = '123456789';
-    return Array(length)
-      .join()
-      .split(',')
-      .map(() => s.charAt(Math.floor(Math.random() * s.length)))
-      .join('');
-  }
-
-  getRandomDate(start: Date, end: Date): Date {
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  }
-
   scrollTo(selector: string) {
     return cy.get(selector).scrollIntoView();
   }

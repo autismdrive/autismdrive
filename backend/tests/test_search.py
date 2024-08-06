@@ -388,7 +388,7 @@ class TestSearch(BaseTest):
                     self.assertTrue(value["count"] == 0)
 
     def setup_category_aggregations(self, num_cats=7, num_resources=4) -> tuple[list[Category], list[Resource]]:
-        names: list[str] = fake.words(nb=num_cats, part_of_speech="noun")
+        names: list[str] = fake.words(nb=num_cats, unique=True)
         categories = []
         resources = []
         for i, name in enumerate(names):

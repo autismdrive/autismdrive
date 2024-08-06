@@ -1,6 +1,14 @@
 const {pathsToModuleNameMapper} = require('ts-jest');
 const {compilerOptions} = require('./tsconfig');
-const esModules = ['@angular', '@testing-library', 'ngx-markdown'];
+const esModules = [
+  '@angular',
+  '@testing-library',
+  'ngx-markdown',
+  '@ngx-formly',
+  'ngx-device-detector',
+  '@ng-maps',
+  '@ngbracket',
+];
 
 class StorageMock {
   constructor() {
@@ -52,6 +60,8 @@ module.exports = {
   },
   transformIgnorePatterns: [`node_modules/(?!(${esModules.join('|')})/)`],
   globals: {
-    addeventatc: {refresh: () => {}},
+    addeventatc: {
+      refresh: () => {},
+    },
   },
 };
