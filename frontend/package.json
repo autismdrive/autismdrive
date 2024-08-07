@@ -96,6 +96,7 @@
     "prettier-plugin-organize-imports": "3.2.4",
     "rxjs-compat": "6.6.7",
     "ts-node": "10.9.2",
+    "ts-jest": "29.2.4",
     "typescript": "5.4.5",
     "webpack-bundle-analyzer": "4.10.2"
   }

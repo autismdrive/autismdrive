@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {StarError} from '../../star-error';
-import {Query} from '../../_models/query';
-import {Study} from '../../_models/study';
-import {ConfigService} from '../config/config.service';
+import {StarError} from '@app/star-error';
+import {Query} from '@models/query';
+import {Study} from '@models/study';
+import {ConfigService} from '@services/config/config.service';
 
 declare var gtag: Function;
 

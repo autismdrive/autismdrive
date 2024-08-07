@@ -29,7 +29,7 @@ import {User} from '../../_models/user';
 import {UserFavorite} from '../../_models/user_favorite';
 import {UserMeta} from '../../_models/user_meta';
 import {UserSearchResults} from '../../_models/user_search_results';
-import {ConfigService} from '../config/config.service';
+import {ConfigService} from '@services/config/config.service';
 
 @Injectable({
   providedIn: 'root',

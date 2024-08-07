@@ -10,7 +10,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {of} from 'rxjs';
 import {SearchComponent} from './search.component';
 

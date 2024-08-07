@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {EventRegistrationFormComponent} from './event-registration-form.component';
 
 describe('EventRegistrationFormComponent', () => {

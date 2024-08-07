@@ -1,9 +1,8 @@
+/// <reference types="google.maps" />
 import {Component, Input} from '@angular/core';
-import {Hit} from '../_models/query';
-import {StudyStatus} from '../_models/study';
-import {User} from '../_models/user';
-import LatLngLiteral = google.maps.LatLngLiteral;
-
+import {Hit} from '@models/query';
+import {StudyStatus} from '@models/study';
+import {User} from '@models/user';
 @Component({
   selector: 'app-search-result',
   templateUrl: './search-result.component.html',
@@ -11,7 +10,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 })
 export class SearchResultComponent {
   @Input() hit: Hit;
-  @Input() mapLoc: LatLngLiteral;
+  @Input() mapLoc: google.maps.LatLngLiteral;
   @Input() currentUser: User;
 
   hover = false;

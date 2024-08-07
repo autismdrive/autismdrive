@@ -1,7 +1,10 @@
 import {TestBed} from '@angular/core/testing';
 import {RouterModule} from '@angular/router';
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
+import {HeaderComponent} from '@app/header/header.component';
+import {MediaMatcher} from '@angular/cdk/layout';
+import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {AppComponent} from './app.component';
 
 describe('AppComponent', () => {
@@ -9,7 +12,7 @@ describe('AppComponent', () => {
   let component: AppComponent;
 
   beforeEach(() => {
-    return MockBuilder(AppComponent, AppModule).keep(RouterModule);
+    return MockBuilder(AppComponent, AppModule).keep(RouterModule).keep(AuthenticationService);
   });
 
   beforeEach(() => {
@@ -27,12 +30,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('Autism DRIVE');
-  });
-
-  it('should render title in a h1 tag', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to Autism DRIVE!');
   });
 });

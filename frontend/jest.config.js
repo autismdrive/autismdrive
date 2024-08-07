@@ -8,6 +8,10 @@ const esModules = [
   'ngx-device-detector',
   '@ng-maps',
   '@ngbracket',
+  '@types/google.maps',
+  '@yellowspot/ng-truncate',
+  'ng2-pdfjs-viewer',
+  'ngx-progressbar',
 ];
 
 class StorageMock {

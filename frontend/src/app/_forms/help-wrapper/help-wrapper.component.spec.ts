@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {HelpWrapperComponent} from './help-wrapper.component';
 
 describe('HelpWrapperComponent', () => {

@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
 import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnInit, ViewChild} from '@angular/core';
@@ -25,10 +26,6 @@ import {SearchService} from '@services/search/search.service';
 import createClone from 'rfdc';
 import {fromEvent, Subject} from 'rxjs';
 import {debounceTime, filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
-import LatLngBoundsLiteral = google.maps.LatLngBoundsLiteral;
-import LatLngBounds = google.maps.LatLngBounds;
-import LatLngLiteral = google.maps.LatLngLiteral;
-import GoogleMap = google.maps.Map;
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -83,11 +80,11 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   storedZip: string;
   gpsEnabled = true;
-  defaultLoc: LatLngLiteral = {
+  defaultLoc: google.maps.LatLngLiteral = {
     lat: 37.32248,
     lng: -78.36926,
   };
-  loc: LatLngLiteral = createClone()(this.defaultLoc);
+  loc: google.maps.LatLngLiteral = createClone()(this.defaultLoc);
   locationModes = LocationMode;
   locationMode = LocationMode.default;
 
@@ -164,7 +161,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     },
   ];
   queryParamMap: ParamMap;
-  private mapBounds: LatLngBoundsLiteral;
+  private mapBounds: google.maps.LatLngBoundsLiteral;
   private scrollDirection: Direction;
   clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
   clusterRenderer: Renderer = new DefaultRenderer();
@@ -251,7 +248,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   @ViewChild('mapTemplate')
-  set mapTemplate(value: NgMapsViewComponent<GoogleMap>) {
+  set mapTemplate(value: NgMapsViewComponent<google.maps.Map>) {
     this.mapTemplateElement = value;
   }
 
@@ -414,7 +411,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     });
   }
 
-  setLocation(mode: LocationMode, loc: LatLngLiteral) {
+  setLocation(mode: LocationMode, loc: google.maps.LatLngLiteral) {
     this.loc = loc;
     this.locationMode = mode;
   }
@@ -684,13 +681,13 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.selectType(resourceType.name);
   }
 
-  updateResultsList($event: LatLngBoundsLiteral) {
+  updateResultsList($event: google.maps.LatLngBoundsLiteral) {
     this.mapBounds = $event;
   }
 
   geoBox(): GeoBox {
     if (this.mapBounds) {
-      const latLngBounds = new LatLngBounds(this.mapBounds);
+      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
       return {
         top_left: {
           lat: latLngBounds.getNorthEast().lat(),
@@ -807,7 +804,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.location.replaceState(urlTree.toString());
   }
 
-  protected mapLoad(m: GoogleMap) {
+  protected mapLoad(m: google.maps.Map) {
     const controlDiv: MapControlDiv = document.createElement('div');
 
     // Set CSS for the control border.
@@ -843,7 +840,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 
     m.addListener('dragend', () => {
-      const latLngBounds = new LatLngBounds(this.mapBounds);
+      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
       this.setLocation(LocationMode.map, {
         lat: latLngBounds.getCenter().lat(),
         lng: latLngBounds.getCenter().lng(),

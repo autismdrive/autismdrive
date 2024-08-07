@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import {faker} from '@node_modules/@faker-js/faker';
+import {faker} from '@faker-js/faker';
 import {AppPage} from '../support/util';
 import {EnrollUseCases} from '../support/enroll';
 import {GlobalHeaderUseCases} from '../support/global-header';

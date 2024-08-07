@@ -4,7 +4,7 @@ import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {StarError} from '../../star-error';
 import {User} from '../../_models/user';
-import {ConfigService} from '../config/config.service';
+import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '../google-analytics/google-analytics.service';
 
 @Injectable({providedIn: 'root'})

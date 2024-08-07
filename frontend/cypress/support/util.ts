@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 import Chainable = Cypress.Chainable;
-import {faker} from '@node_modules/@faker-js/faker';
+import {faker} from '@faker-js/faker';
 
 export type ElementResults = Cypress.Chainable<JQuery<HTMLElement>>;
 

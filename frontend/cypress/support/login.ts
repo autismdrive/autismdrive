@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import {faker} from '@node_modules/@faker-js/faker';
+import {faker} from '@faker-js/faker';
 import {AppPage} from './util';
 
 export class LoginUseCases {

@@ -1,4 +1,4 @@
-import {MockBuilder, MockedComponentFixture, MockRender} from '@node_modules/ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {AutocompleteSectionComponent} from './autocomplete-section.component';
 
 describe('AutocompleteSectionComponent', () => {

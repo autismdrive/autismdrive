@@ -40,7 +40,7 @@ import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
-import {FlexLayoutModule} from '@node_modules/@ngbracket/ngx-layout';
+import {FlexLayoutModule} from '@ngbracket/ngx-layout';
 import {ErrorInterceptor} from '@routing/error-interceptor';
 import {JwtInterceptor} from '@routing/jwt-interceptor';
 import {RoutingModule} from '@routing/routing.module';
@@ -145,6 +145,30 @@ export const load = (http: HttpClient, config: ConfigService): (() => Promise<bo
       url = environment['override_config_url'];
     }
 
+    let hasLocalConfig = false;
+
+    // Check if a file called `config.json` is available in this file's directory.
+    // If it is, load the configuration from there.
+    try {
+      const localConfig = await lastValueFrom(
+        http.get('./config.json', {responseType: 'json'}).pipe(
+          catchError(() => {
+            return of(false);
+          }),
+        ),
+      );
+
+      if (localConfig) {
+        config.fromProperties(localConfig);
+        hasLocalConfig = true;
+      }
+    } catch (e) {
+      hasLocalConfig = false;
+    }
+
+    if (hasLocalConfig) return hasLocalConfig;
+
+    // Check with the backend to see if there is a configuration override available.
     try {
       const configFromJsonFile = await lastValueFrom(
         http.get(url, {responseType: 'json'}).pipe(

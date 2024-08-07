@@ -1,14 +1,14 @@
+/// <reference types="google.maps" />
 import {formatDate} from '@angular/common';
 import {Component} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContactItem} from '../_models/contact_item';
-import {Resource} from '../_models/resource';
-import {ResourceChangeLog} from '../_models/resource_change_log';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import LatLngLiteral = google.maps.LatLngLiteral;
+import {ContactItem} from '@models/contact_item';
+import {Resource} from '@models/resource';
+import {ResourceChangeLog} from '@models/resource_change_log';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
   selector: 'app-resource-detail',
@@ -17,7 +17,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 })
 export class ResourceDetailComponent {
   resource: Resource;
-  mapLoc: LatLngLiteral;
+  mapLoc: google.maps.LatLngLiteral;
   currentUser: User;
   changeLog: ResourceChangeLog[];
   loading = true;

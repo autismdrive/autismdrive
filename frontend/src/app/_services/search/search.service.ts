@@ -4,7 +4,7 @@ import createClone from 'rfdc';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {GeoBox, Query} from '@models/query';
-import {ConfigService} from '../config/config.service';
+import {ConfigService} from '@services/config/config.service';
 
 @Injectable({providedIn: 'root'})
 export class SearchService {

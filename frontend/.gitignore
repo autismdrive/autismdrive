@@ -52,3 +52,7 @@ Thumbs.db
 /cypress/downloads
 
 .nx
+
+# Local configuration files
+.env
+config.json
