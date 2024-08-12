@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "module": "CommonJs",
-    "allowJs": true
+    "allowJs": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

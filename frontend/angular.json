@@ -163,7 +163,8 @@
           "builder": "@angular-builders/jest:run",
           "options": {
             "detectOpenHandles": true,
-            "forceExit": true
+            "forceExit": true,
+            "tsConfig": "tsconfig.spec.json"
           }
         },
         "e2e": {

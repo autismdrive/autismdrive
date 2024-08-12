@@ -55,7 +55,7 @@ module.exports = {
   collectCoverage: true,
   coverageReporters: ['lcov', 'html'],
   coverageDirectory: 'coverage',
-  maxWorkers: 8,
+  maxWorkers: 1,
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, {
     prefix: '<rootDir>/',
   }),
@@ -66,6 +66,13 @@ module.exports = {
   globals: {
     addeventatc: {
       refresh: () => {},
+    },
+    YT: {
+      PlayerVars: {},
+      ClosedCaptionsLoadPolicy: {ForceOn: 1},
+      ModestBranding: {Modest: 1},
+      RelatedVideos: {Hide: 0},
+      ShowInfo: {Hide: 0},
     },
   },
 };

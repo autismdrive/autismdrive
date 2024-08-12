@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {DeviceDetectorService} from 'ngx-device-detector';
 import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 import {AgeRange, Language} from '../_models/hit_type';
-import {Resource} from '../_models/resource';
+import {Resource, ResourceType} from '../_models/resource';
 import {ResourceCategory} from '../_models/resource_category';
 import {User} from '../_models/user';
 import {ApiService} from '../_services/api/api.service';
@@ -428,7 +428,7 @@ export class ResourceFormComponent implements OnInit {
         this.createNew = true;
         this.model.createNew = true;
         this.model.categories = [];
-        this.resource = new Resource({type: '', title: '', description: '', phone: '', website: ''});
+        this.resource = new Resource({type: ResourceType.RESOURCE, title: '', description: '', phone: '', website: ''});
         this.loadForm();
       }
     });

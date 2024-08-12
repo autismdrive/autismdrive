@@ -52,7 +52,7 @@
     "zone.js": "0.14.7"
   },
   "devDependencies": {
-    "@angular-builders/jest": "17.0.3",
+    "@angular-builders/jest": "17.0.4-beta.3",
     "@angular-devkit/build-angular": "17.3.4",
     "@angular-eslint/builder": "17.3.0",
     "@angular-eslint/eslint-plugin": "17.3.0",
