@@ -3,10 +3,10 @@ import {NestedTreeControl} from '@angular/cdk/tree';
 import {Component} from '@angular/core';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {Observable, of} from 'rxjs';
-import {Category} from '../_models/category';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {Category} from '@models/category';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
   selector: 'app-taxonomy-admin',

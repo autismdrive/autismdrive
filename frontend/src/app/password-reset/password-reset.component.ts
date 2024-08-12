@@ -4,11 +4,11 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {scrollToTop} from '@util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {PasswordRequirements} from '../_models/password_requirements';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {PasswordRequirements} from '@models/password_requirements';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-password-reset',

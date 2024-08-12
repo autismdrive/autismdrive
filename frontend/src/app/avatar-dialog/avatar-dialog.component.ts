@@ -1,8 +1,8 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {Participant} from '../_models/participant';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {ApiService} from '../_services/api/api.service';
+import {Participant} from '@models/participant';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {ApiService} from '@services/api/api.service';
 import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
 @Component({

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Flow} from '../_models/flow';
-import {Step} from '../_models/step';
-import {ApiService} from '../_services/api/api.service';
+import {Flow} from '@models/flow';
+import {Step} from '@models/step';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-questionnaire-steps-list',

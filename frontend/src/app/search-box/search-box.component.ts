@@ -14,10 +14,10 @@ import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subject, timer} from 'rxjs';
 import {debounce, debounceTime, distinctUntilChanged, map, startWith} from 'rxjs/operators';
-import {Category} from '../_models/category';
-import {ApiService} from '../_services/api/api.service';
-import {CategoriesService} from '../_services/categories/categories.service';
-import {SearchService} from '../_services/search/search.service';
+import {Category} from '@models/category';
+import {ApiService} from '@services/api/api.service';
+import {CategoriesService} from '@services/categories/categories.service';
+import {SearchService} from '@services/search/search.service';
 
 @Component({
   selector: 'app-search-box',

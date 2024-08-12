@@ -2,10 +2,10 @@ import {Component} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
 import {snakeToUpperCase} from '@util/snakeToUpper';
-import {Study} from '../_models/study';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {Study} from '@models/study';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
 @Component({

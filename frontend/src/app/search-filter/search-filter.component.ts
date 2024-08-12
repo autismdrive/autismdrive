@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Aggregation} from '../_models/query';
+import {Aggregation} from '@models/query';
 
 @Component({
   selector: 'app-search-filter',

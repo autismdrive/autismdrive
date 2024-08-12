@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Query} from '../_models/query';
+import {Query} from '@models/query';
 
 @Component({
   selector: 'app-search-filters-breadcrumbs',

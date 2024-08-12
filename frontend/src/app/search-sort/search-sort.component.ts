@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {SortMethod} from '../_models/sort_method';
+import {SortMethod} from '@models/sort_method';
 
 @Component({
   selector: 'app-search-sort',

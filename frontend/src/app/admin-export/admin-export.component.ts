@@ -2,10 +2,10 @@ import {Component, OnInit, ViewChild, ViewChildren, ViewContainerRef} from '@ang
 import {MatPaginator} from '@angular/material/paginator';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {DataTransferDataSource} from '../_models/data_transfer_data_source';
-import {DataTransferLog} from '../_models/data_transfer_log';
-import {ApiService} from '../_services/api/api.service';
-import {ConfigService} from '../_services/config/config.service';
+import {DataTransferDataSource} from '@models/data_transfer_data_source';
+import {DataTransferLog} from '@models/data_transfer_log';
+import {ApiService} from '@services/api/api.service';
+import {ConfigService} from '@services/config/config.service';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({

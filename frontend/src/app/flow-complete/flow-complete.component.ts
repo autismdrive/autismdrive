@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {Flow} from '../_models/flow';
-import {ParticipantRelationship} from '../_models/participantRelationship';
+import {Flow} from '@models/flow';
+import {ParticipantRelationship} from '@models/participantRelationship';
 
 @Component({
   selector: 'app-flow-complete',

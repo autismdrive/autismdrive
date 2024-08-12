@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
-import {ResourceCategory} from '../_models/resource_category';
-import {StudyCategory} from '../_models/study_category';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
+import {ResourceCategory} from '@models/resource_category';
+import {StudyCategory} from '@models/study_category';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-filter-chips',

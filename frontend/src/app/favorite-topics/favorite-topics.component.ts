@@ -1,11 +1,11 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
-import {Category} from '../_models/category';
-import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
-import {User} from '../_models/user';
-import {UserFavorite} from '../_models/user_favorite';
-import {ApiService} from '../_services/api/api.service';
+import {Category} from '@models/category';
+import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
+import {User} from '@models/user';
+import {UserFavorite} from '@models/user_favorite';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-favorite-topics',

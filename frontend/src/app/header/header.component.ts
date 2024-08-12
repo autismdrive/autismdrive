@@ -4,11 +4,11 @@ import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy} from '@an
 import {Router} from '@angular/router';
 import {fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
-import {Direction, HeaderState, MenuState, ViewportWidth} from '../_models/scroll';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {ConfigService} from '../_services/config/config.service';
+import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {ConfigService} from '@services/config/config.service';
 
 const boxShadow = '0px 5px 5px 0px rgba(0, 0, 0, 0.3)';
 const stateHiddenCollapsed = MenuState.Hidden + '-' + HeaderState.Collapsed;

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {ChainStep} from '../_models/chain_step';
-import {ApiService} from '../_services/api/api.service';
+import {ChainStep} from '@models/chain_step';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-skillstar-admin',

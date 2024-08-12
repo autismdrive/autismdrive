@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {User} from '../_models/user';
+import {User} from '@models/user';
 
 @Component({
   selector: 'app-edit-button',

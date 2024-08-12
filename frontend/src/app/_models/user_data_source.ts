@@ -1,7 +1,7 @@
 import {CollectionViewer} from '@angular/cdk/collections';
 import {DataSource} from '@angular/cdk/table';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {ApiService} from '../_services/api/api.service';
+import {ApiService} from '@services/api/api.service';
 import {User} from './user';
 
 export class UserDataSource implements DataSource<User> {

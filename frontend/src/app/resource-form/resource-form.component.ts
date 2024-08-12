@@ -4,12 +4,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {scrollToFirstInvalidField} from '@util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AgeRange, Language} from '../_models/hit_type';
-import {Resource, ResourceType} from '../_models/resource';
-import {ResourceCategory} from '../_models/resource_category';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {AgeRange, Language} from '@models/hit_type';
+import {Resource, ResourceType} from '@models/resource';
+import {ResourceCategory} from '@models/resource_category';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 enum PageState {
   LOADING = 'loading',

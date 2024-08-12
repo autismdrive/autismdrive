@@ -1,12 +1,30 @@
+import {User} from '@models/user';
 import {ContactQ} from './contact_q';
 import {IdentificationQ} from './identification_q';
 import {ParticipantRelationship} from './participantRelationship';
 import {StepLog} from './step_log';
 
+export interface ParticipantProps {
+  id?: number;
+  user_id: number;
+  user?: User;
+  relationship: ParticipantRelationship;
+  last_updated?: Date;
+  percent_complete?: number;
+  name?: string;
+  avatar_color?: string;
+  avatar_icon?: string;
+  has_consented: boolean;
+  step_log?: StepLog[];
+  contact?: ContactQ;
+  identification?: IdentificationQ;
+}
+
 export class Participant {
   id?: number;
   user_id: number;
-  relationship: string;
+  user?: User;
+  relationship: ParticipantRelationship;
   last_updated?: Date;
   percent_complete?: number;
   name?: string;
@@ -17,7 +35,7 @@ export class Participant {
   contact?: ContactQ;
   identification?: IdentificationQ;
 
-  constructor(private _props) {
+  constructor(private _props: Partial<ParticipantProps>) {
     for (const propName in this._props) {
       if (this._props.hasOwnProperty(propName)) {
         this[propName] = this._props[propName];

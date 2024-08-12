@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Covid19Categories} from '../_models/hit_type';
-import {Hit, Query} from '../_models/query';
-import {Resource} from '../_models/resource';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {Covid19Categories} from '@models/hit_type';
+import {Hit, Query} from '@models/query';
+import {Resource} from '@models/resource';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 interface C19ResourceCategoryObj {
   name: string;

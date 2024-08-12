@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
-import {CategoriesById, Category} from '../_models/category';
-import {CategoriesService} from '../_services/categories/categories.service';
+import {CategoriesById, Category} from '@models/category';
+import {CategoriesService} from '@services/categories/categories.service';
 
 @Component({
   selector: 'app-search-topics',

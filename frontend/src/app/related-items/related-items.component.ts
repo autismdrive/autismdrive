@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {RelatedOptions} from '../_models/related_results';
-import {Resource} from '../_models/resource';
-import {Study} from '../_models/study';
-import {ApiService} from '../_services/api/api.service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {RelatedOptions} from '@models/related_results';
+import {Resource} from '@models/resource';
+import {Study} from '@models/study';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-related-items',

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
-import {ConfigService} from '../_services/config/config.service';
+import {ConfigService} from '@services/config/config.service';
 
 @Injectable({providedIn: 'root'})
 export class NotMirroredGuard {

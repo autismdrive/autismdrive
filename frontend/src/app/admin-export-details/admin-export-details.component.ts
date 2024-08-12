@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {DataTransferDetail} from '../_models/data_transfer_log';
+import {DataTransferDetail} from '@models/data_transfer_log';
 
 @Component({
   selector: 'app-admin-export-details',

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {Resource} from '../_models/resource';
+import {Resource} from '@models/resource';
 
 @Component({
   selector: 'app-favorite-resources',

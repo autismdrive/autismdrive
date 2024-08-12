@@ -4,9 +4,9 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
 @Component({

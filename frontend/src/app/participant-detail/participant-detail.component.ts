@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {Participant} from '../_models/participant';
-import {StepLog} from '../_models/step_log';
-import {ApiService} from '../_services/api/api.service';
+import {Participant} from '@models/participant';
+import {StepLog} from '@models/step_log';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-participant-detail',

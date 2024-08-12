@@ -1,8 +1,8 @@
 import {MediaMatcher} from '@angular/cdk/layout';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {snakeToUpperCase} from '@util/snakeToUpper';
-import {TableInfo} from '../_models/table_info';
-import {ApiService} from '../_services/api/api.service';
+import {TableInfo} from '@models/table_info';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-questionnaire-data-view',

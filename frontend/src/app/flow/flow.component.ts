@@ -7,13 +7,13 @@ import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
 import {scrollToFirstInvalidField, scrollToTop} from '@util/scrollToTop';
 import {keysToCamel} from '@util/snakeToCamel';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {Flow} from '../_models/flow';
-import {Participant} from '../_models/participant';
-import {Step, StepStatus} from '../_models/step';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {Flow} from '@models/flow';
+import {Participant} from '@models/participant';
+import {Step, StepStatus} from '@models/step';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 enum FlowState {
   INTRO = 'intro',

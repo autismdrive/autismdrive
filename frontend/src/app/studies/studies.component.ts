@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AgeRange} from '../_models/hit_type';
-import {Hit, Query} from '../_models/query';
-import {Study, StudyStatus} from '../_models/study';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {AgeRange} from '@models/hit_type';
+import {Hit, Query} from '@models/query';
+import {Study, StudyStatus} from '@models/study';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 interface StudyStatusObj {
   name: string;

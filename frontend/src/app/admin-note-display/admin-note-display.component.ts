@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
-import {AdminNote} from '../_models/admin_note';
-import {Resource} from '../_models/resource';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
+import {AdminNote} from '@models/admin_note';
+import {Resource} from '@models/resource';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-admin-note-display',

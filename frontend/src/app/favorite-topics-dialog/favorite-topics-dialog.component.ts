@@ -4,10 +4,10 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
-import {Category} from '../_models/category';
-import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
+import {Category} from '@models/category';
+import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
 import {TreeComponent} from '@app/_forms/tree/tree.component';
 
 @Component({

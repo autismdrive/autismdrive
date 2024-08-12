@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {StarError} from '../star-error';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {

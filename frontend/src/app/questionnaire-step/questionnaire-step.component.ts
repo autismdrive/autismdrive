@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {Step} from '../_models/step';
-import {User} from '../_models/user';
+import {Step} from '@models/step';
+import {User} from '@models/user';
 
 @Component({
   selector: 'app-questionnaire-step',

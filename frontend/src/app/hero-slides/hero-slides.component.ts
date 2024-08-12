@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {NewsItem} from '../_models/news-item';
-import {IntervalService} from '../_services/interval/interval.service';
+import {NewsItem} from '@models/news-item';
+import {IntervalService} from '@services/interval/interval.service';
 
 @Component({
   selector: 'app-hero-slides',

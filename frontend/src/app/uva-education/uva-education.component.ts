@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
-import {HitType} from '../_models/hit_type';
-import {NewsItem} from '../_models/news-item';
-import {Resource} from '../_models/resource';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {HitType} from '@models/hit_type';
+import {NewsItem} from '@models/news-item';
+import {Resource} from '@models/resource';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
   selector: 'app-uva-education',

@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {User} from '../_models/user';
-import {UserMeta} from '../_models/user_meta';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {User} from '@models/user';
+import {UserMeta} from '@models/user_meta';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 /**
  * Provides some messaging based on the profile meta information, this should be displayed

@@ -1,8 +1,8 @@
 import {Component, Input, OnChanges} from '@angular/core';
 import {snakeToUpperCase} from '@util/snakeToUpper';
-import {QuestionnaireDataSource} from '../_models/questionnaire_data_source';
-import {TableInfo} from '../_models/table_info';
-import {ApiService} from '../_services/api/api.service';
+import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
+import {TableInfo} from '@models/table_info';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-questionnaire-data-table',

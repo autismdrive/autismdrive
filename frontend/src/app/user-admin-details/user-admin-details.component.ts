@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
-import {AdminNote} from '../_models/admin_note';
-import {EmailLog} from '../_models/email_log';
-import {ResourceChangeLog} from '../_models/resource_change_log';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {AdminNote} from '@models/admin_note';
+import {EmailLog} from '@models/email_log';
+import {ResourceChangeLog} from '@models/resource_change_log';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
   selector: 'app-user-admin-details',

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {HitType} from '../_models/hit_type';
+import {HitType} from '@models/hit_type';
 
 @Component({
   selector: 'app-type-icon',

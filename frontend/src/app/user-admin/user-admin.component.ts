@@ -4,8 +4,8 @@ import {MatSort} from '@angular/material/sort';
 import {Router} from '@angular/router';
 import {fromEvent, merge} from 'rxjs';
 import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
-import {UserDataSource} from '../_models/user_data_source';
-import {ApiService} from '../_services/api/api.service';
+import {UserDataSource} from '@models/user_data_source';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-user-admin',

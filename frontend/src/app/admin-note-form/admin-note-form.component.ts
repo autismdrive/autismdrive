@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {AdminNote} from '../_models/admin_note';
+import {AdminNote} from '@models/admin_note';
 import {AdminNoteDisplayComponent} from '../admin-note-display/admin-note-display.component';
 
 @Component({

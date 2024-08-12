@@ -2,15 +2,15 @@ import {Component, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {Participant} from '../_models/participant';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {Resource} from '../_models/resource';
-import {Study} from '../_models/study';
-import {StudyUser} from '../_models/study_user';
-import {User} from '../_models/user';
-import {UserMeta} from '../_models/user_meta';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {Participant} from '@models/participant';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {Resource} from '@models/resource';
+import {Study} from '@models/study';
+import {StudyUser} from '@models/study_user';
+import {User} from '@models/user';
+import {UserMeta} from '@models/user_meta';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 enum ProfileState {
   NEEDS_USER = 'NEEDS_USER',

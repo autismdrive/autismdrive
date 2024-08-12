@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
-import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {User} from '@models/user';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Injectable({providedIn: 'root'})
 export class RoleGuard {

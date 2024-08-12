@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
-import {User} from '../_models/user';
-import {UserFavorite} from '../_models/user_favorite';
-import {ApiService} from '../_services/api/api.service';
+import {User} from '@models/user';
+import {UserFavorite} from '@models/user_favorite';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-favorite-resource-button',

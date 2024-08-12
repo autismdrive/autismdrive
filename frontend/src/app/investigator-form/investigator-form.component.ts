@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {StudyInvestigator} from '../_models/study_investigator';
+import {StudyInvestigator} from '@models/study_investigator';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
 
 @Component({

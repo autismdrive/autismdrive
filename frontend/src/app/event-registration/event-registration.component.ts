@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
-import {Resource} from '../_models/resource';
+import {Resource} from '@models/resource';
 import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 
 @Component({
