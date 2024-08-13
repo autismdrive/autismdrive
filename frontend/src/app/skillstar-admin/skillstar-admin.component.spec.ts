@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {SkillstarAdminComponent} from './skillstar-admin.component';
 
 describe('SkillstarAdminComponent', () => {
@@ -7,7 +7,7 @@ describe('SkillstarAdminComponent', () => {
   let fixture: MockedComponentFixture<SkillstarAdminComponent>;
 
   beforeEach(() => {
-    return MockBuilder(SkillstarAdminComponent, AppModule);
+    return MockBuilder(SkillstarAdminComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

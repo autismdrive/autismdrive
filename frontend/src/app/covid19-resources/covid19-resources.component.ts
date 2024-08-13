@@ -31,11 +31,11 @@ export class Covid19ResourcesComponent {
     private router: Router,
     private authenticationService: AuthenticationService,
   ) {
-    this.C19Categories = Object.keys(Covid19Categories.labels).map(k => {
+    this.C19Categories = Object.entries(Covid19Categories.labels).map(([k, v]) => {
       return {
         name: k,
-        label: Covid19Categories.labels[k].split(': ')[0],
-        description: Covid19Categories.labels[k].split(': ')[1],
+        label: v.split(': ')[0],
+        description: v.split(': ')[1],
       };
     });
     this.route.params.subscribe(params => {

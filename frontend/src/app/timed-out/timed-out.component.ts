@@ -1,6 +1,6 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {fadeTransition} from '../_animations/animations';
+import {fadeTransition} from '@animations/animations';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({

@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {LastUpdatedDateComponent} from './last-updated-date.component';
 
 describe('LastUpdatedDateComponent', () => {
@@ -7,7 +7,7 @@ describe('LastUpdatedDateComponent', () => {
   let fixture: MockedComponentFixture<LastUpdatedDateComponent>;
 
   beforeEach(() => {
-    return MockBuilder(LastUpdatedDateComponent, AppModule);
+    return MockBuilder(LastUpdatedDateComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

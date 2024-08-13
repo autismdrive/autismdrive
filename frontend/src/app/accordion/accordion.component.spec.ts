@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {AccordionComponent} from './accordion.component';
 
 describe('AccordionComponent', () => {
@@ -7,7 +7,7 @@ describe('AccordionComponent', () => {
   let fixture: MockedComponentFixture<AccordionComponent>;
 
   beforeEach(() => {
-    return MockBuilder(AccordionComponent, AppModule);
+    return MockBuilder(AccordionComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

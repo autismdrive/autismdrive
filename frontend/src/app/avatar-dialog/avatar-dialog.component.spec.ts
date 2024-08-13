@@ -20,7 +20,13 @@ describe('AvatarDialogComponent', () => {
       .mock(ApiService, {
         updateParticipant: jest.fn().mockReturnValue(of(mockParticipant)),
       })
-      .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
+      .provide({
+        provide: MatDialogRef,
+        useValue: {
+          close: (_: any) => {},
+          afterOpened: (_: any) => of({}),
+        },
+      })
       .provide({
         provide: MAT_DIALOG_DATA,
         useValue: {participant: mockParticipant},

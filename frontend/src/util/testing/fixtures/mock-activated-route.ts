@@ -1,8 +1,11 @@
 import {convertToParamMap} from '@angular/router';
+import {Covid19Categories} from '@models/hit_type';
+import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {of} from 'rxjs';
 
 export const mockParamsWithStudyId = {study: mockStudy.id};
+export const mockParamsWithCategoryName = {category: 'Supports_with_Living'};
 
 export const makeMockActivatedRoute = (queryParams?: any, params?: any, url?: any[], pathFromRoot?: any[]) => {
   return {
@@ -24,4 +27,8 @@ export const makeMockActivatedRoute = (queryParams?: any, params?: any, url?: an
 // Mock Activated Route for Portal Event
 export const mockActivatedRouteWithStudyId = makeMockActivatedRoute({}, mockParamsWithStudyId, [
   {path: 'study/:study'},
+]);
+
+export const mockCovidRouteWithCategoryName = makeMockActivatedRoute({}, mockParamsWithCategoryName, [
+  {path: 'covid19-resources/:category'},
 ]);

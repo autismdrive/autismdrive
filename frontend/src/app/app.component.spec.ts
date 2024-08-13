@@ -3,7 +3,7 @@ import {RouterModule} from '@angular/router';
 import {AppModule} from '@app/app.module';
 import {HeaderComponent} from '@app/header/header.component';
 import {MediaMatcher} from '@angular/cdk/layout';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {AppComponent} from './app.component';
 

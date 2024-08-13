@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {UserAdminComponent} from './user-admin.component';
 
 describe('UserAdminComponent', () => {
@@ -7,7 +7,7 @@ describe('UserAdminComponent', () => {
   let fixture: MockedComponentFixture<UserAdminComponent>;
 
   beforeEach(() => {
-    return MockBuilder(UserAdminComponent, AppModule);
+    return MockBuilder(UserAdminComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

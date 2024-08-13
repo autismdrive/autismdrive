@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {GroupValidationWrapperComponent} from './group-validation-wrapper.component';
 
 describe('GroupValidationWrapperComponent', () => {
@@ -7,7 +7,7 @@ describe('GroupValidationWrapperComponent', () => {
   let fixture: MockedComponentFixture<GroupValidationWrapperComponent>;
 
   beforeEach(() => {
-    return MockBuilder(GroupValidationWrapperComponent, AppModule);
+    return MockBuilder(GroupValidationWrapperComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

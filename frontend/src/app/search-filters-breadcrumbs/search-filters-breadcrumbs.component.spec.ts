@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {SearchFiltersBreadcrumbsComponent} from './search-filters-breadcrumbs.component';
 
 describe('SearchFiltersBreadcrumbsComponent', () => {
@@ -7,7 +7,7 @@ describe('SearchFiltersBreadcrumbsComponent', () => {
   let fixture: MockedComponentFixture<SearchFiltersBreadcrumbsComponent>;
 
   beforeEach(() => {
-    return MockBuilder(SearchFiltersBreadcrumbsComponent, AppModule);
+    return MockBuilder(SearchFiltersBreadcrumbsComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {BorderBoxTileComponent} from './border-box-tile.component';
 
 describe('BorderBoxTileComponent', () => {
@@ -7,7 +7,7 @@ describe('BorderBoxTileComponent', () => {
   let fixture: MockedComponentFixture<BorderBoxTileComponent>;
 
   beforeEach(() => {
-    return MockBuilder(BorderBoxTileComponent, AppModule);
+    return MockBuilder(BorderBoxTileComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

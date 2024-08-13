@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {MultiselectTreeComponent} from './multiselect-tree.component';
 
 describe('MultiselectTreeComponent', () => {
@@ -7,7 +7,7 @@ describe('MultiselectTreeComponent', () => {
   let fixture: MockedComponentFixture<MultiselectTreeComponent>;
 
   beforeEach(() => {
-    return MockBuilder(MultiselectTreeComponent, AppModule);
+    return MockBuilder(MultiselectTreeComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

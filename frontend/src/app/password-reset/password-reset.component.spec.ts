@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {PasswordResetComponent} from './password-reset.component';
 
 describe('PasswordResetComponent', () => {
@@ -7,7 +7,7 @@ describe('PasswordResetComponent', () => {
   let fixture: MockedComponentFixture<PasswordResetComponent>;
 
   beforeEach(() => {
-    return MockBuilder(PasswordResetComponent, AppModule);
+    return MockBuilder(PasswordResetComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

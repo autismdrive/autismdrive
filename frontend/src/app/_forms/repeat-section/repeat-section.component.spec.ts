@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {RepeatSectionComponent} from './repeat-section.component';
 
 describe('RepeatSectionComponent', () => {
@@ -7,7 +7,7 @@ describe('RepeatSectionComponent', () => {
   let fixture: MockedComponentFixture<RepeatSectionComponent>;
 
   beforeEach(() => {
-    return MockBuilder(RepeatSectionComponent, AppModule);
+    return MockBuilder(RepeatSectionComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

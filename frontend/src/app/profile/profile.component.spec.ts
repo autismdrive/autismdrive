@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {ProfileComponent} from './profile.component';
 
 describe('ProfileComponent', () => {
@@ -7,7 +7,7 @@ describe('ProfileComponent', () => {
   let fixture: MockedComponentFixture<ProfileComponent>;
 
   beforeEach(() => {
-    return MockBuilder(ProfileComponent, AppModule);
+    return MockBuilder(ProfileComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

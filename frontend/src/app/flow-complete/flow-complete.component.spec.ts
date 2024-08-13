@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FlowCompleteComponent} from './flow-complete.component';
 
 describe('FlowCompleteComponent', () => {
@@ -7,7 +7,7 @@ describe('FlowCompleteComponent', () => {
   let fixture: MockedComponentFixture<FlowCompleteComponent>;
 
   beforeEach(() => {
-    return MockBuilder(FlowCompleteComponent, AppModule);
+    return MockBuilder(FlowCompleteComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

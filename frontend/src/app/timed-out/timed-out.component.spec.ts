@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {TimedoutComponent} from './timed-out.component';
 
 describe('TimedoutComponent', () => {
@@ -7,7 +7,7 @@ describe('TimedoutComponent', () => {
   let fixture: MockedComponentFixture<TimedoutComponent>;
 
   beforeEach(() => {
-    return MockBuilder(TimedoutComponent, AppModule);
+    return MockBuilder(TimedoutComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

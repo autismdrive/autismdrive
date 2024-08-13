@@ -4,7 +4,7 @@ import {FormlyFieldConfig} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {clone} from '@util/clone';
 import {scrollToFirstInvalidField} from '@util/scrollToTop';
-import {RepeatSectionDialogData} from '../../_models/repeat_section_dialog_data';
+import {RepeatSectionDialogData} from '@models/repeat_section_dialog_data';
 
 @Component({
   selector: 'app-repeat-section-dialog',

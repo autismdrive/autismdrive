@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {SearchFilterComponent} from './search-filter.component';
 
 describe('SearchFilterComponent', () => {
@@ -7,7 +7,7 @@ describe('SearchFilterComponent', () => {
   let fixture: MockedComponentFixture<SearchFilterComponent>;
 
   beforeEach(() => {
-    return MockBuilder(SearchFilterComponent, AppModule);
+    return MockBuilder(SearchFilterComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

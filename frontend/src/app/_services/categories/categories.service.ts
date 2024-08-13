@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
-import {CategoriesByDisplayOrder, CategoriesById, Category} from '../../_models/category';
+import {CategoriesByDisplayOrder, CategoriesById, Category} from '@models/category';
 import {ApiService} from '../api/api.service';
 
 @Injectable({

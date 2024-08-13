@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {TutorialVideoComponent} from './tutorial-video.component';
 
 describe('TutorialVideoComponent', () => {
@@ -7,7 +7,7 @@ describe('TutorialVideoComponent', () => {
   let fixture: MockedComponentFixture<TutorialVideoComponent>;
 
   beforeEach(() => {
-    return MockBuilder(TutorialVideoComponent, AppModule);
+    return MockBuilder(TutorialVideoComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

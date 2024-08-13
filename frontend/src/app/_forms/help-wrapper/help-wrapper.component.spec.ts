@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {HelpWrapperComponent} from './help-wrapper.component';
 
 describe('HelpWrapperComponent', () => {
@@ -7,7 +7,7 @@ describe('HelpWrapperComponent', () => {
   let fixture: MockedComponentFixture<HelpWrapperComponent>;
 
   beforeEach(() => {
-    return MockBuilder(HelpWrapperComponent, AppModule);
+    return MockBuilder(HelpWrapperComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

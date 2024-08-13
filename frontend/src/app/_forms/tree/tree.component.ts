@@ -2,7 +2,7 @@
 import {Component} from '@angular/core';
 import {FieldType, FormlyFieldConfig} from '@ngx-formly/core';
 import {NestedTreeControl} from '@angular/cdk/tree';
-import {Category} from '@app/_models/category';
+import {Category} from '@models/category';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {of} from 'rxjs';
 

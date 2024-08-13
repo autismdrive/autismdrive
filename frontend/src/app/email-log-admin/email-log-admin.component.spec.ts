@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {EmailLogAdminComponent} from './email-log-admin.component';
 
 describe('EmailLogAdminComponent', () => {
@@ -7,7 +7,7 @@ describe('EmailLogAdminComponent', () => {
   let fixture: MockedComponentFixture<EmailLogAdminComponent>;
 
   beforeEach(() => {
-    return MockBuilder(EmailLogAdminComponent, AppModule);
+    return MockBuilder(EmailLogAdminComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import {AdminNote} from '@app/_models/admin_note';
+import {AdminNote} from '@models/admin_note';
 import {faker} from '@faker-js/faker';
 import {mockResource} from '@util/testing/fixtures/mock-resource';
 import {mockUser} from './mock-user';

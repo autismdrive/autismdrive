@@ -1,5 +1,5 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {QuestionnaireDataTableComponent} from './questionnaire-data-table.component';
 
 describe('QuestionnaireDataTableComponent', () => {
@@ -7,7 +7,7 @@ describe('QuestionnaireDataTableComponent', () => {
   let fixture: MockedComponentFixture<QuestionnaireDataTableComponent>;
 
   beforeEach(() => {
-    return MockBuilder(QuestionnaireDataTableComponent, AppModule);
+    return MockBuilder(QuestionnaireDataTableComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {
