@@ -32,3 +32,5 @@ export const mockActivatedRouteWithStudyId = makeMockActivatedRoute({}, mockPara
 export const mockCovidRouteWithCategoryName = makeMockActivatedRoute({}, mockParamsWithCategoryName, [
   {path: 'covid19-resources/:category'},
 ]);
+
+export const mockFlowCompleteRoute = makeMockActivatedRoute({}, {}, [{path: 'flow/complete'}]);
