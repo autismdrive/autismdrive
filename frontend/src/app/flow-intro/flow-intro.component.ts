@@ -7,11 +7,8 @@ import {Flow} from '@models/flow';
   styleUrls: ['./flow-intro.component.scss'],
 })
 export class FlowIntroComponent {
-  @Input()
-  flow: Flow;
-
-  @Output()
-  next: EventEmitter<any> = new EventEmitter();
+  @Input() flow: Flow;
+  @Output() next: EventEmitter<any> = new EventEmitter();
 
   constructor() {}
 

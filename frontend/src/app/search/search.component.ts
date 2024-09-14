@@ -155,10 +155,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
       label: 'Read about scientifically-supported interventions',
       url: 'https://www.nationalautismcenter.org/resources/for-families/',
     },
-    {
-      label: 'Contact a Family Navigator for resource help',
-      url: 'https://education.virginia.edu/research-initiatives/research-centers-labs/supporting-transformative-autism-research/star-family-navigation',
-    },
   ];
   queryParamMap: ParamMap;
   private mapBounds: google.maps.LatLngBoundsLiteral;

@@ -49,7 +49,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'type',
         type: 'select',
-        templateOptions: {
+        props: {
           label: 'Type',
           options: [
             {value: 'resource', label: 'Online Information'},
@@ -63,34 +63,34 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'title',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Title',
           placeholder: 'Please enter the title',
           required: true,
         },
         expressionProperties: {
-          'templateOptions.placeholder': '"Please enter the title of your " + (model.type || "resource")',
+          'props.placeholder': '"Please enter the title of your " + (model.type || "resource")',
         },
         hideExpression: '!model.type',
       },
       {
         key: 'description',
         type: 'textarea',
-        templateOptions: {
+        props: {
           label: 'Description',
           placeholder: 'Please enter a description',
           description: 'You may use Markdown syntax to insert simple formatting, text links, and images',
           required: true,
         },
         expressionProperties: {
-          'templateOptions.placeholder': '"Please enter a description of your " + (model.type || "resource")',
+          'props.placeholder': '"Please enter a description of your " + (model.type || "resource")',
         },
         hideExpression: '!model.type',
       },
       {
         key: 'post_event_description',
         type: 'textarea',
-        templateOptions: {
+        props: {
           label: 'Post-Event Description',
           placeholder: 'Description to display after event has occurred',
           description: 'You may use Markdown syntax to insert simple formatting, text links, and images',
@@ -100,7 +100,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'insurance',
         type: 'textarea',
-        templateOptions: {
+        props: {
           label: 'Insurance',
           placeholder: 'Please enter the type of insurance if applicable (e.g., private, medicaid, Tricare)',
         },
@@ -110,7 +110,7 @@ export class ResourceFormComponent implements OnInit {
         key: 'includes_registration',
         type: 'radio',
         defaultValue: false,
-        templateOptions: {
+        props: {
           label: 'Use Autism DRIVE or an external system for registration?',
           description: 'Should users be able to register for this event through Autism DRIVE?',
           options: [
@@ -119,14 +119,14 @@ export class ResourceFormComponent implements OnInit {
           ],
         },
         expressionProperties: {
-          'templateOptions.required': 'model.type === "event"',
+          'props.required': 'model.type === "event"',
         },
         hideExpression: 'model.type != "event"',
       },
       {
         key: 'registration_url',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Registration Link',
           description: 'If this is left blank, the contact email address will be used for registration.',
           placeholder: 'https://link.to/external/website',
@@ -137,7 +137,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'image_url',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Feature Image',
           placeholder: 'https://link.to/external/website/file.jpg',
           type: 'url',
@@ -147,30 +147,30 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'date',
         type: 'datepicker',
-        templateOptions: {
+        props: {
           label: 'Event Date',
         },
         expressionProperties: {
-          'templateOptions.required': 'model.type === "event"',
+          'props.required': 'model.type === "event"',
         },
         hideExpression: 'model.type != "event"',
       },
       {
         key: 'time',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Event Time',
           placeholder: 'Please enter the start time or time-frame for your event',
         },
         expressionProperties: {
-          'templateOptions.required': 'model.type === "event"',
+          'props.required': 'model.type === "event"',
         },
         hideExpression: 'model.type != "event"',
       },
       {
         key: 'ticket_cost',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Event Ticket Cost',
           placeholder: 'Please enter the ticket cost for your event',
         },
@@ -179,7 +179,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'webinar_link',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Webinar Link',
           placeholder: 'Please enter the link to attend the webinar',
         },
@@ -189,7 +189,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'post_survey_link',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Survey Link',
           placeholder: 'Please enter the link to the post-event survey',
         },
@@ -199,7 +199,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'max_users',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Maximum attendees',
           placeholder: 'Please enter the maximum number of users allowed to register',
           type: 'number',
@@ -209,7 +209,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'organization_name',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Organization Name',
           placeholder: 'Please enter the name of the organization for your resource',
         },
@@ -218,7 +218,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'primary_contact',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Primary Contact',
           placeholder: 'Please enter the primary contact for your location or event',
         },
@@ -227,13 +227,13 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'contact_email',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Contact Email',
         },
         validators: {validation: ['email']},
         hideExpression: '!model.type',
         expressionProperties: {
-          'templateOptions.description': (model, formState, field) => {
+          'props.description': (model, formState, field) => {
             if (model.type === 'event' && !model.includes_registration && !model.registration_link) {
               return 'This contact email will be used for attendees to request information about registering for this event.';
             } else {
@@ -245,7 +245,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'location_name',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Location Name',
           placeholder: 'Please enter the name for your event venue',
         },
@@ -254,7 +254,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'street_address1',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Street Address',
           placeholder: 'Please enter the street address',
         },
@@ -263,7 +263,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'street_address2',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Street Address Details',
           placeholder: 'Please enter any additional details for the street address',
         },
@@ -272,7 +272,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'city',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'City',
           placeholder: 'Please enter the city',
         },
@@ -281,7 +281,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'state',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'State',
           placeholder: 'Please enter the state',
         },
@@ -290,7 +290,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'zip',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Zip Code',
           placeholder: 'Please enter the zip code',
         },
@@ -299,7 +299,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'phone',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Phone Number',
           placeholder: 'Please enter the phone number',
         },
@@ -309,7 +309,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'phone_extension',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Phone Number Extension',
           placeholder: 'Please enter any extension to the phone number',
         },
@@ -318,7 +318,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'website',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Website',
           placeholder: 'Please enter the website',
         },
@@ -328,7 +328,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'video_code',
         type: 'input',
-        templateOptions: {
+        props: {
           label: 'Video Code',
           placeholder: 'Please enter the YouTube code for a video of this content',
         },
@@ -338,7 +338,7 @@ export class ResourceFormComponent implements OnInit {
         key: 'is_uva_education_content',
         type: 'radio',
         defaultValue: false,
-        templateOptions: {
+        props: {
           label: 'UVA Education Content',
           description: 'Should this resource be displayed on the UVA Education page?',
           options: [
@@ -351,7 +351,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'categories',
         type: 'multiselecttree',
-        templateOptions: {
+        props: {
           label: 'Topics',
           description: 'This field is required',
           options: this.api.getCategoryTree(),
@@ -363,7 +363,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'ages',
         type: 'multicheckbox',
-        templateOptions: {
+        props: {
           label: 'Age Ranges',
           type: 'array',
           options: this.getOptions(AgeRange.labels),
@@ -373,7 +373,7 @@ export class ResourceFormComponent implements OnInit {
       {
         key: 'languages',
         type: 'multicheckbox',
-        templateOptions: {
+        props: {
           label: 'Languages',
           type: 'array',
           options: this.getOptions(Language.labels),
@@ -384,7 +384,7 @@ export class ResourceFormComponent implements OnInit {
         key: 'should_hide_related_resources',
         type: 'radio',
         defaultValue: false,
-        templateOptions: {
+        props: {
           label: 'Hide Related Resources',
           description: 'Should related resources be displayed alongside this resource on the details page?',
           options: [

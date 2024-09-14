@@ -1,21 +1,22 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {HelpWrapperComponent} from './help-wrapper.component';
+import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('HelpWrapperComponent', () => {
-  let component: HelpWrapperComponent;
-  let fixture: MockedComponentFixture<HelpWrapperComponent>;
+  it('should render help wrapper', () => {
+    const {query} = createFieldComponent(
+      {
+        wrappers: ['help'],
+        props: {
+          label: 'Name',
+          required: true,
+          description: 'Name description',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(() => {
-    return MockBuilder(HelpWrapperComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
-  });
-
-  beforeEach(() => {
-    fixture = MockRender(HelpWrapperComponent, null, {detectChanges: true});
-    component = fixture.point.componentInstance;
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-help-wrapper')).not.toBeNull();
   });
 });

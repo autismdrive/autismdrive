@@ -326,7 +326,7 @@ export class FormlyConfig {
     FlexLayoutModule,
     FormlyMatDatepickerModule,
     FormlyMaterialModule,
-    FormlyModule.forRoot(),
+    FormlyModule.forRoot(FormlyConfig.config),
     FormsModule,
     HttpClientModule,
     MarkdownModule.forRoot(),
@@ -349,13 +349,26 @@ export class FormlyConfig {
     GoogleAnalyticsService,
     IntervalService,
     SearchService,
-    {provide: APP_INITIALIZER, useFactory: load, deps: [HttpClient, ConfigService], multi: true},
-    {provide: GOOGLE_MAPS_API_CONFIG, useValue: {apiKey: environment.google_maps_api_key}},
+    {
+      provide: APP_INITIALIZER,
+      useFactory: load,
+      deps: [HttpClient, ConfigService],
+      multi: true,
+    },
+    {
+      provide: GOOGLE_MAPS_API_CONFIG,
+      useValue: {apiKey: environment.google_maps_api_key},
+    },
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
-    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true,
+    },
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
   ],
   bootstrap: [AppComponent],
+  exports: [FavoriteTopicsDialogComponent],
 })
 export class AppModule {
   constructor(overlayContainer: OverlayContainer) {

@@ -18,7 +18,7 @@ export class ForgotPasswordComponent {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',

@@ -15,7 +15,7 @@ export class RepeatSectionComponent extends FieldArrayType {
 
   openDialog(i: number, f?: FormlyFieldConfig) {
     const isEdit = !!f;
-    const title = this.field.templateOptions.description;
+    const title = this.field.props.description;
     const dialogRef = this.dialog.open(RepeatSectionDialogComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',

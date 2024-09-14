@@ -27,7 +27,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'first_name',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'First Name:',
         required: true,
       },
@@ -35,7 +35,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'last_name',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'Last Name:',
         required: true,
       },
@@ -43,7 +43,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',
@@ -56,7 +56,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'emailConfirm',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Confirm Email',
         placeholder: 'Please re-enter your email',
@@ -69,7 +69,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'zip_code',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'number',
         label: 'Zip Code:',
         max: 99999,
@@ -81,7 +81,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'relationship_to_autism',
       type: 'multicheckbox',
-      templateOptions: {
+      props: {
         label: 'Relationship to Autism:',
         description: '(select all that apply)',
         type: 'array',
@@ -98,7 +98,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'relationship_other',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'How else are you related to Autism',
       },
       hideExpression: '!(model.relationship_to_autism && model.relationship_to_autism.includes("other"))',
@@ -106,7 +106,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'marketing_channel',
       type: 'multicheckbox',
-      templateOptions: {
+      props: {
         label: 'How did you find about the virtual event?:',
         description: '(select all that apply)',
         type: 'array',
@@ -124,7 +124,7 @@ export class EventRegistrationFormComponent {
     {
       key: 'marketing_other',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'What other ways did you find out about this event',
       },
       hideExpression: '!(model.marketing_channel && model.marketing_channel.includes("other"))',
@@ -133,7 +133,7 @@ export class EventRegistrationFormComponent {
       key: 'newsletter_consent',
       type: 'checkbox',
       defaultValue: true,
-      templateOptions: {
+      props: {
         label: 'Please sign me up for the STAR E-newsletter',
         description:
           'Send me notifications of workshops, information, events, and research opportunities offered ' +

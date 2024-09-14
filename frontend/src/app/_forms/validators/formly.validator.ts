@@ -55,11 +55,11 @@ export function MulticheckboxValidatorMessage(err, field: FormlyFieldConfig) {
 }
 
 export function MinValidationMessage(err, field) {
-  return `This value should be more than ${field.templateOptions.min}`;
+  return `This value should be more than ${field.props.min}`;
 }
 
 export function MaxValidationMessage(err, field) {
-  return `This value should be less than ${field.templateOptions.max}`;
+  return `This value should be less than ${field.props.max}`;
 }
 
 export function ShowError(field: FieldType) {

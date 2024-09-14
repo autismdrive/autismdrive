@@ -61,12 +61,12 @@ export class ProfileComponent implements OnInit {
         {
           key: 'self_participant',
           type: 'checkbox',
-          templateOptions: {label: 'I am autistic/I have autism', indeterminate: false, class: 'self_participant'},
+          props: {label: 'I am autistic/I have autism', indeterminate: false, class: 'self_participant'},
         },
         {
           key: 'self_has_guardian',
           type: 'radio',
-          templateOptions: {
+          props: {
             label: 'Do you have a legal guardian?',
             options: [
               {value: true, label: 'Yes', id: '1'},
@@ -74,7 +74,7 @@ export class ProfileComponent implements OnInit {
             ],
           },
           expressionProperties: {
-            'templateOptions.required': 'model.self_participant',
+            'props.required': 'model.self_participant',
           },
           hideExpression: '!model.self_participant',
         },
@@ -82,13 +82,13 @@ export class ProfileComponent implements OnInit {
           key: 'guardian',
           type: 'checkbox',
           className: 'guardian',
-          templateOptions: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
+          props: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
         },
         {
           key: 'guardian_has_dependent',
           type: 'radio',
           className: 'guardian_has_dependent',
-          templateOptions: {
+          props: {
             label: 'Are you their legal guardian?',
             options: [
               {value: true, label: 'Yes', id: '3'},
@@ -96,19 +96,19 @@ export class ProfileComponent implements OnInit {
             ],
           },
           expressionProperties: {
-            'templateOptions.required': 'model.guardian',
+            'props.required': 'model.guardian',
           },
           hideExpression: '!model.guardian',
         },
         {
           key: 'professional',
           type: 'checkbox',
-          templateOptions: {label: 'I am a professional who works with the autism community', indeterminate: false},
+          props: {label: 'I am a professional who works with the autism community', indeterminate: false},
         },
         {
           key: 'interested',
           type: 'checkbox',
-          templateOptions: {
+          props: {
             label: 'None of the above, but I am interested in autism research and resources',
             indeterminate: false,
           },

@@ -24,7 +24,7 @@ export class FormPrintoutComponent {
       let selectLabel: string;
       this.field.fieldGroup.forEach(f => {
         if (f.type === 'select' || f.type === 'multicheckbox' || f.type === 'radio') {
-          const opts = f.templateOptions.options as SelectFieldOption[];
+          const opts = f.props.options as SelectFieldOption[];
           opts.forEach(o => {
             if (!this._isOther(o.value) && !this._isOther(o.label) && o.value === val) {
               selectLabel = o.label;

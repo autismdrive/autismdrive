@@ -24,7 +24,7 @@ export class LoginComponent {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',
@@ -34,7 +34,7 @@ export class LoginComponent {
     {
       key: 'password',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'Password:',
         type: 'password',
         required: true,

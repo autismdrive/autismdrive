@@ -1708,8 +1708,8 @@ class AssistiveDevice(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.options": 'field.templateOptions.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
-                "model.type": 'model.type_group === "other" ? "other" : (field.templateOptions.options.find(o => o.value === model.type) ? model.type : null)',
+                "template_options.options": 'field.props.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
+                "model.type": 'model.type_group === "other" ? "other" : (field.props.options.find(o => o.value === model.type) ? model.type : null)',
             },
         },
     )

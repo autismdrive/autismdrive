@@ -44,7 +44,7 @@ export class PasswordResetComponent {
           key: 'password',
           type: 'input',
           className: 'password',
-          templateOptions: {
+          props: {
             type: 'password',
             label: 'Password',
             required: true,
@@ -60,7 +60,7 @@ export class PasswordResetComponent {
           key: 'passwordConfirm',
           type: 'input',
           className: 'passwordConfirm',
-          templateOptions: {
+          props: {
             type: 'password',
             label: 'Confirm Password',
             placeholder: 'Please re-enter your password',

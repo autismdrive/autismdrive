@@ -41,7 +41,7 @@ export class RegisterDialogComponent {
         {
           key: 'email',
           type: 'input',
-          templateOptions: {
+          props: {
             type: 'email',
             label: 'Email Address:',
             placeholder: 'Enter email',
@@ -54,7 +54,7 @@ export class RegisterDialogComponent {
         {
           key: 'emailConfirm',
           type: 'input',
-          templateOptions: {
+          props: {
             type: 'email',
             label: 'Confirm Email',
             placeholder: 'Please re-enter your email',

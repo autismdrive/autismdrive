@@ -12,12 +12,9 @@ import {FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Observable, Subject, timer} from 'rxjs';
-import {debounce, debounceTime, distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {Category} from '@models/category';
-import {ApiService} from '@services/api/api.service';
 import {CategoriesService} from '@services/categories/categories.service';
-import {SearchService} from '@services/search/search.service';
+import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, timer} from 'rxjs';
 
 @Component({
   selector: 'app-search-box',
@@ -25,7 +22,7 @@ import {SearchService} from '@services/search/search.service';
   styleUrls: ['./search-box.component.scss'],
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {
-  @Input() variant: string;
+  @Input() variant: 'dark-bg' | 'light-bg' = 'light-bg';
   @Input() words: string;
   @Output() categorySelected = new EventEmitter<Category>();
   @Output() searchUpdated = new EventEmitter<Params>();
@@ -41,8 +38,6 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private searchService: SearchService,
-    private api: ApiService,
     private categoryService: CategoriesService,
     private changeDetectorRef: ChangeDetectorRef,
   ) {
