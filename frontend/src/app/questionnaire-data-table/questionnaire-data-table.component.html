@@ -3,7 +3,7 @@
   Export {{ questionnaire_info.display_name }} Data
 </button>
 
-<div *ngIf="questionnaire_info.sub_tables.length > 0">
+<div *ngIf="questionnaire_info?.sub_tables?.length > 0">
   <h3>Related Tables</h3>
   <p>
     This questionnaire contains some related tables that contain additional details. Use these buttons to change the

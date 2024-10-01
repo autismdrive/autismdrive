@@ -10,8 +10,7 @@ import {ApiService} from '@services/api/api.service';
   styleUrls: ['./questionnaire-data-table.component.scss'],
 })
 export class QuestionnaireDataTableComponent implements OnChanges {
-  @Input()
-  questionnaire_info: TableInfo;
+  @Input() questionnaire_info: TableInfo;
   selected_info: TableInfo;
 
   dataSource: QuestionnaireDataSource;

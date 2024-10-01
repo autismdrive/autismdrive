@@ -1,6 +1,6 @@
 import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
-import {mockChainStep} from '@util/testing/fixtures/mockChainStep';
+import {mockChainStep} from '@util/testing/fixtures/mock-chain-step';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {SkillstarAdminComponent} from './skillstar-admin.component';
 import {of} from 'rxjs';

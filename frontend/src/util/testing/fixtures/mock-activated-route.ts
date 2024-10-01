@@ -36,3 +36,5 @@ export const mockCovidRouteWithCategoryName = makeMockActivatedRoute({}, mockPar
 export const mockFlowCompleteRoute = makeMockActivatedRoute({}, {}, [{path: 'flow/complete'}]);
 
 export const mockSearchQueryRoute = makeMockActivatedRoute({}, {}, [{path: 'search'}]);
+
+export const mockProfileRoute = makeMockActivatedRoute({meta: true}, {}, [{path: 'profile'}]);

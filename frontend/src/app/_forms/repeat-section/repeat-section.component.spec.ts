@@ -1,21 +1,26 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {RepeatSectionComponent} from './repeat-section.component';
+import {createFieldComponent} from '@ngx-formly/core/testing';
+import {mockCategory} from '@util/testing/fixtures/mock-category';
+import {of} from 'rxjs';
 
 describe('RepeatSectionComponent', () => {
-  let component: RepeatSectionComponent;
-  let fixture: MockedComponentFixture<RepeatSectionComponent>;
+  it('should render repeat section', () => {
+    const {query} = createFieldComponent(
+      {
+        type: 'repeat',
+        props: {
+          label: 'Topics',
+          description: 'This field is required',
+          options: of([mockCategory]),
+          valueProp: 'id',
+          labelProp: 'name',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(() => {
-    return MockBuilder(RepeatSectionComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
-  });
-
-  beforeEach(() => {
-    fixture = MockRender(RepeatSectionComponent, null, {detectChanges: true});
-    component = fixture.point.componentInstance;
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-repeat-section')).not.toBeNull();
   });
 });
