@@ -1,21 +1,24 @@
 import {AppModule} from '@app/app.module';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {ResizeTextareaComponent} from './resize-textarea.component';
+import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('ResizeTextareaComponent', () => {
-  let component: ResizeTextareaComponent;
-  let fixture: MockedComponentFixture<ResizeTextareaComponent>;
+  it('should render resizable textarea field', () => {
+    const {query} = createFieldComponent(
+      {
+        key: 'some_field_key',
+        type: 'textarea-auto-resize',
+        props: {
+          label: 'Some Field Label',
+          placeholder: 'This is the placeholder for this field',
+          cols: 200,
+          rows: 20,
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(() => {
-    return MockBuilder(ResizeTextareaComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
-  });
-
-  beforeEach(() => {
-    fixture = MockRender(ResizeTextareaComponent, null, {detectChanges: true});
-    component = fixture.point.componentInstance;
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-resize-textarea')).not.toBeNull();
   });
 });

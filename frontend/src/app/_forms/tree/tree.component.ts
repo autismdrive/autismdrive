@@ -1,6 +1,7 @@
 // Base class for MultiSelectTreeComponent and FavoriteTopicsDialogComponent
 import {Component} from '@angular/core';
-import {FieldType, FormlyFieldConfig} from '@ngx-formly/core';
+import {FieldType} from '@ngx-formly/material';
+import {FormlyFieldConfig} from '@ngx-formly/core';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {Category} from '@models/category';
 import {MatTreeNestedDataSource} from '@angular/material/tree';

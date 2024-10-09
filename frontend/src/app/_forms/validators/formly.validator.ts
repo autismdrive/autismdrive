@@ -1,5 +1,6 @@
 import {FormControl, ValidationErrors} from '@angular/forms';
-import {FieldType, FormlyFieldConfig} from '@ngx-formly/core';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {FieldType} from '@ngx-formly/material';
 import EMAIL_REGEX from './email.regex';
 import PHONE_REGEX from './phone.regex';
 import URL_REGEX from './url.regex';
@@ -62,7 +63,7 @@ export function MaxValidationMessage(err, field) {
   return `This value should be less than ${field.props.max}`;
 }
 
-export function ShowError(field: FieldType) {
+export function ShowError(field: FieldType<FormlyFieldConfig>) {
   return (
     field.formControl &&
     field.formControl.invalid &&

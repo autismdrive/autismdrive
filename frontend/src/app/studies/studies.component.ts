@@ -58,7 +58,6 @@ export class StudiesComponent {
     this.Ages = Object.keys(AgeRange.labels).map(k => {
       return {name: k, label: AgeRange.labels[k]};
     });
-    console.log(this.Ages);
     this.route.params.subscribe(params => {
       if ('studyStatus' in params) {
         this.selectedStatus = this.studyStatuses.find(x => x.name === params['studyStatus']);

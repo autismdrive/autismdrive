@@ -15,7 +15,7 @@ import {NavItem} from '@models/nav-item';
 import {GeoBox, Hit, Query} from '@models/query';
 import {Resource} from '@models/resource';
 import {Direction} from '@models/scroll';
-import {SortMethod} from '@models/sort_method';
+import {SortMethod, sortMethods} from '@models/sort_method';
 import {Study} from '@models/study';
 import {User} from '@models/user';
 import {NgMapsViewComponent} from '@ng-maps/core';
@@ -173,52 +173,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
     private router: Router,
     private searchService: SearchService,
   ) {
-    this.sortMethods = {
-      RELEVANCE: {
-        name: 'Relevance',
-        label: 'Relevance',
-        sortQuery: {
-          field: '_score',
-          order: 'desc',
-        },
-      },
-      DISTANCE: {
-        name: 'Distance',
-        label: 'Distance',
-        sortQuery: {
-          field: 'geo_point',
-          latitude: this.loc.lat,
-          longitude: this.loc.lng,
-          order: 'asc',
-          unit: 'mi',
-        },
-      },
-      UPDATED: {
-        name: 'Updated',
-        label: 'Recently Updated',
-        sortQuery: {
-          field: 'last_updated',
-          order: 'desc',
-        },
-      },
-      DATE: {
-        name: 'Date',
-        label: 'Happening Soon',
-        sortQuery: {
-          field: 'date',
-          order: 'asc',
-        },
-      },
-      DRAFTS: {
-        name: 'Drafts',
-        label: 'Drafts',
-        sortQuery: {
-          field: 'is_draft',
-          order: 'desc',
-        },
-      },
-    };
-
+    this.sortMethods = createClone()(sortMethods);
+    this.sortMethods.DISTANCE.sortQuery.latitude = this.loc.lat;
+    this.sortMethods.DISTANCE.sortQuery.longitude = this.loc.lng;
     this.selectedSort = this.sortMethods.DISTANCE;
     this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.languageOptions = this.getOptions(Language.labels);

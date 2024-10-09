@@ -1,6 +1,7 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {MatInput} from '@angular/material/input';
-import {FieldType} from '@ngx-formly/core';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {FieldType} from '@ngx-formly/material';
 
 @Component({
   selector: 'app-resize-textarea',
@@ -20,6 +21,10 @@ import {FieldType} from '@ngx-formly/core';
 
   styleUrls: ['./resize-textarea.component.scss'],
 })
-export class ResizeTextareaComponent extends FieldType {
+export class ResizeTextareaComponent extends FieldType<FormlyFieldConfig> {
   @ViewChild(MatInput) formFieldControl: MatInput;
+
+  constructor() {
+    super();
+  }
 }

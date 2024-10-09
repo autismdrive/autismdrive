@@ -1,6 +1,4 @@
 import {convertToParamMap} from '@angular/router';
-import {Covid19Categories} from '@models/hit_type';
-import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {of} from 'rxjs';
 
@@ -24,10 +22,22 @@ export const makeMockActivatedRoute = (queryParams?: any, params?: any, url?: an
   };
 };
 
+// Mock Activated Route for User Admin Details
+export const mockActivatedRouteWithUserId = makeMockActivatedRoute({}, mockParamsWithStudyId, [
+  {path: 'admin/user/:userId'},
+]);
+
 // Mock Activated Route for Portal Event
 export const mockActivatedRouteWithStudyId = makeMockActivatedRoute({}, mockParamsWithStudyId, [
   {path: 'study/:study'},
 ]);
+
+// Mock Activated Route for Studies Page
+export const mockActivatedRouteForStudies = makeMockActivatedRoute(
+  {},
+  {studyStatus: 'study_in_progress', age: 'school'},
+  [{path: 'studies/:studyStatus/:age'}],
+);
 
 export const mockCovidRouteWithCategoryName = makeMockActivatedRoute({}, mockParamsWithCategoryName, [
   {path: 'covid19-resources/:category'},

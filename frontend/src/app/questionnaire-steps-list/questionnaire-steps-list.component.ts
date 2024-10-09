@@ -15,7 +15,7 @@ export class QuestionnaireStepsListComponent implements OnInit, OnChanges {
   stepSelected: EventEmitter<Step> = new EventEmitter();
   stepName: string;
 
-  constructor(private api: ApiService) {}
+  constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.stepName = this.flow.steps[this.stepIndex].name;
