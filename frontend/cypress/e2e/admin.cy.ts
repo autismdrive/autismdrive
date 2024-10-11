@@ -18,8 +18,12 @@ describe('Admin', () => {
   let enrollUseCases: EnrollUseCases;
   let adminUseCases: AdminUseCases;
   let studiesUseCases: StudiesUseCases;
-  const email = faker.internet.email();
-  const password = faker.internet.password({length: 24});
+
+  const adminEmail = 'ajlouie@gmail.com';
+  const adminPassword = 'Total Perspective Vortex 56';
+
+  const userEmail = faker.internet.email();
+  const userPassword = faker.internet.password({length: 24});
 
   before(() => {
     page = new AppPage();
@@ -41,7 +45,7 @@ describe('Admin', () => {
 
   // Login & Register
   it('should display login form', () => loginUseCases.displayLoginForm());
-  it('should log in with email and password', () => loginUseCases.loginWithCredentials(email, password));
+  it('should log in with email and password', () => loginUseCases.loginWithCredentials(adminEmail, adminPassword));
 
   // Global Header - Logged In
   it('should display sitewide header', () => globalHeaderUseCases.displaySitewideHeader());

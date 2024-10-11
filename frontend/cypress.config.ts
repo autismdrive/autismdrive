@@ -1,4 +1,5 @@
 import {defineConfig} from 'cypress';
+import {faker} from '@faker-js/faker';
 
 export default defineConfig({
   e2e: {
@@ -8,13 +9,14 @@ export default defineConfig({
     baseUrl: 'http://localhost:4200',
     fixturesFolder: 'cypress/fixtures',
     screenshotsFolder: 'cypress/screenshots',
-    video: true,
     supportFile: 'cypress/support/e2e.ts',
     videosFolder: 'cypress/videos',
-    defaultCommandTimeout: 30000,
-    viewportHeight: 900,
+    video: true,
+    defaultCommandTimeout: 60000,
+    viewportHeight: 768,
     viewportWidth: 1440,
     waitForAnimations: true,
+    includeShadowDom: false,
     setupNodeEvents(on, config) {
       require('cypress-terminal-report/src/installLogsPrinter')(on, {
         printLogsToConsole: 'always',
@@ -29,6 +31,8 @@ export default defineConfig({
       FAIL_FAST_PLUGIN: true,
       FAIL_FAST_ENABLED: true,
       FAIL_FAST_BAIL: 1,
+      TEST_RUN_UUID: crypto.randomUUID(),
+      TEST_RUN_UNIQUE_STRING: faker.helpers.multiple(faker.word.noun, {count: 3}).join(''),
     },
   },
 });

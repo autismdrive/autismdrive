@@ -1,5 +1,5 @@
 export interface AppEnvironment {
-  envName?: string;
+  env_name: string;
   production: boolean;
   api: string;
   google_tag_manager_id: string;

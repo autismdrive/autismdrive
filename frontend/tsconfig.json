@@ -29,7 +29,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "es2022",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node"]
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

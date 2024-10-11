@@ -56,14 +56,15 @@ class Settings(BaseSettings):
     MAIL_PORT: int = 2525
     MAIL_USE_SSL: bool = False
     MAIL_USE_TLS: bool = True
-    MAIL_USERNAME: str = "YOUR-MAILTRAP-NAME - Copy these lines to your instance/config! edit there."
-    MAIL_PASSWORD: str = "YOUR-MAILTRAP-PASSWORD - Copy these lines to your instance/config! edit there."
+    MAIL_USERNAME: str = "__MAIL_USERNAME__"
+    MAIL_PASSWORD: str = "__MAIL_PASSWORD__"
     MAIL_DEFAULT_SENDER: str = "someaddress@fake.com"
     MAIL_DEFAULT_USER: str = "someaddress@fake.com"
     MAIL_TIMEOUT: int = 10
 
-    GOOGLE_MAPS_API_KEY: str = "PRODUCTION_API_KEY_GOES_HERE"
-    GOOGLE_ANALYTICS_API_KEY: str = "PRODUCTION_API_KEY_GOES_HERE"
+    GOOGLE_MAPS_API_KEY: str = "__GOOGLE_MAPS_API_KEY__"
+    GOOGLE_ANALYTICS_API_KEY: str = "__GOOGLE_ANALYTICS_API_KEY__"
+    GOOGLE_TAG_MANAGER_ID: str = "__GOOGLE_TAG_MANAGER_ID__"
 
     ADMIN_EMAIL: str = "admin@tester.com"
     PRINCIPAL_INVESTIGATOR_EMAIL: str = "pi@tester.com"  # Receives some high level alerts per agreement with InfoSec.
