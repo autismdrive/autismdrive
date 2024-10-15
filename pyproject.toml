@@ -1,12 +1,12 @@
+[tool.setuptools.packages.find]
+where = ["backend"]
+
 [tool.poetry]
 authors = ["Aaron Louie <4656575+ajlouie@users.noreply.github.com>"]
 description = "Autism DRIVE backend API"
 name = "autismdrive"
 readme = "README.md"
 version = "1.0"
-packages = [
-    {include = "backend"},
-]
 
 [tool.poetry.urls]
 icon = "https://autismdrive.virginia.edu/favicon.ico"
