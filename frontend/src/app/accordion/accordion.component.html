@@ -12,14 +12,9 @@
       <mat-icon *ngIf="item.expanded">remove</mat-icon>
     </div>
     <mat-panel-title [ngClass]="{'mat-title': true}">
-      {{item.name}}
+      {{ item.name }}
     </mat-panel-title>
   </mat-expansion-panel-header>
-  <p>{{item.description}}</p>
-  <a
-    class="chevron-link"
-    [routerLink]="[ item.url ]"
-  >
-    Visit {{item.shortName }} website
-  </a>
+  <p>{{ item.description }}</p>
+  <a class="chevron-link" [routerLink]="[item.url]"> Visit {{ item.shortName }} website </a>
 </mat-expansion-panel>

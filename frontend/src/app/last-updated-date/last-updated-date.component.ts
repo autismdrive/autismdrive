@@ -1,17 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-last-updated-date',
   templateUrl: './last-updated-date.component.html',
-  styleUrls: ['./last-updated-date.component.scss']
+  styleUrls: ['./last-updated-date.component.scss'],
 })
-export class LastUpdatedDateComponent implements OnInit {
+export class LastUpdatedDateComponent {
   @Input() lastUpdatedDate: Date;
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
+  constructor() {}
 }

@@ -1,16 +1,16 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {Participant} from '../_models/participant';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {ApiService} from '../_services/api/api.service';
+import {Participant} from '@models/participant';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {ApiService} from '@services/api/api.service';
 import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
 @Component({
   selector: 'app-avatar-dialog',
   templateUrl: './avatar-dialog.component.html',
-  styleUrls: ['./avatar-dialog.component.scss']
+  styleUrls: ['./avatar-dialog.component.scss'],
 })
-export class AvatarDialogComponent implements OnInit {
+export class AvatarDialogComponent {
   avatarImages: string[] = [];
   avatarColors: string[] = [];
   selectedIcon: string;
@@ -19,7 +19,7 @@ export class AvatarDialogComponent implements OnInit {
   constructor(
     private api: ApiService,
     public dialogRef: MatDialogRef<ParticipantProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { participant: Participant }
+    @Inject(MAT_DIALOG_DATA) public data: {participant: Participant},
   ) {
     for (let i = 0; i < 104; i++) {
       this.avatarImages[i] = (i + 1).toLocaleString('en', {minimumIntegerDigits: 3});
@@ -45,9 +45,6 @@ export class AvatarDialogComponent implements OnInit {
         colorEl.parentElement.scrollTo({left: x});
       }
     });
-  }
-
-  ngOnInit(): void {
   }
 
   onNoClick(): void {

@@ -1,8 +1,5 @@
 <div class="participant-admin">
-  <div
-    class="spinner-container"
-    *ngIf="loading"
-  >
+  <div class="spinner-container" *ngIf="loading">
     <mat-spinner></mat-spinner>
   </div>
 
@@ -13,37 +10,69 @@
       <p>The filtered totals filter out all participants associated with Admin and Test User Accounts.</p>
       <p>The subtotals reflect all guardians, self advocates, and dependents, but not professionals.</p>
       <mat-divider></mat-divider>
-      <div
-        fxLayout="row"
-        fxLayout.lt-sm="column"
-        fxLayoutGap="2em"
-      >
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="2em">
         <div>
-          <p><i>Total Self Participants:</i> {{userParticipantList.num_self_participants}}</p>
-          <p><i>Total Self Guardians:</i> {{userParticipantList.num_self_guardians}}</p>
-          <p><i>Total Dependents:</i> {{userParticipantList.num_dependents}}</p>
-          <p><b>SubTotal: {{userParticipantList.num_self_participants + userParticipantList.num_self_guardians + userParticipantList.num_dependents}}</b></p>
-          <hr>
-          <p><i>Total Self Professionals:</i> {{userParticipantList.num_self_professionals}}</p>
-          <p><b>Total: {{userParticipantList.num_self_participants + userParticipantList.num_self_professionals
-          + userParticipantList.num_self_guardians + userParticipantList.num_dependents}}</b></p>
+          <p><i>Total Self Participants:</i> {{ userParticipantList.num_self_participants }}</p>
+          <p><i>Total Self Guardians:</i> {{ userParticipantList.num_self_guardians }}</p>
+          <p><i>Total Dependents:</i> {{ userParticipantList.num_dependents }}</p>
+          <p>
+            <b
+              >SubTotal:
+              {{
+                userParticipantList.num_self_participants +
+                  userParticipantList.num_self_guardians +
+                  userParticipantList.num_dependents
+              }}</b
+            >
+          </p>
+          <hr />
+          <p><i>Total Self Professionals:</i> {{ userParticipantList.num_self_professionals }}</p>
+          <p>
+            <b
+              >Total:
+              {{
+                userParticipantList.num_self_participants +
+                  userParticipantList.num_self_professionals +
+                  userParticipantList.num_self_guardians +
+                  userParticipantList.num_dependents
+              }}</b
+            >
+          </p>
         </div>
         <div>
-          <p><i>Filtered Self Participants:</i> {{userParticipantList.filtered_self_participants}}</p>
-          <p><i>Filtered Self Guardians:</i> {{userParticipantList.filtered_self_guardians}}</p>
-          <p><i>Filtered Dependents:</i> {{userParticipantList.filtered_dependents}}</p>
-          <p><b>Filtered SubTotal: {{userParticipantList.filtered_self_participants + userParticipantList.filtered_self_guardians + userParticipantList.filtered_dependents}}</b></p>
-          <hr>
-          <p><i>Filtered Self Professionals:</i> {{userParticipantList.filtered_self_professionals}}</p>
-          <p><b>Filtered Total: {{userParticipantList.filtered_self_participants + userParticipantList.filtered_self_professionals
-          + userParticipantList.filtered_self_guardians + userParticipantList.filtered_dependents}}</b></p>
+          <p><i>Filtered Self Participants:</i> {{ userParticipantList.filtered_self_participants }}</p>
+          <p><i>Filtered Self Guardians:</i> {{ userParticipantList.filtered_self_guardians }}</p>
+          <p><i>Filtered Dependents:</i> {{ userParticipantList.filtered_dependents }}</p>
+          <p>
+            <b
+              >Filtered SubTotal:
+              {{
+                userParticipantList.filtered_self_participants +
+                  userParticipantList.filtered_self_guardians +
+                  userParticipantList.filtered_dependents
+              }}</b
+            >
+          </p>
+          <hr />
+          <p><i>Filtered Self Professionals:</i> {{ userParticipantList.filtered_self_professionals }}</p>
+          <p>
+            <b
+              >Filtered Total:
+              {{
+                userParticipantList.filtered_self_participants +
+                  userParticipantList.filtered_self_professionals +
+                  userParticipantList.filtered_self_guardians +
+                  userParticipantList.filtered_dependents
+              }}</b
+            >
+          </p>
         </div>
       </div>
     </mat-card>
 
     <mat-form-field>
       <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event)" >
+      <input matInput (keyup)="applyFilter($event)" />
     </mat-form-field>
 
     <mat-table
@@ -53,51 +82,50 @@
       matSortActive="id"
       matSortDirection="asc"
     >
-
       <!-- Id Column -->
       <ng-container matColumnDef="id">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Id </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.id }} </mat-cell>
       </ng-container>
 
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
       </ng-container>
 
       <!-- User Id Column -->
       <ng-container matColumnDef="user_id">
         <mat-header-cell *matHeaderCellDef mat-sort-header> User Id </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.user_id}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.user_id }} </mat-cell>
       </ng-container>
 
       <!-- Relationship Column -->
       <ng-container matColumnDef="relationship">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Relationship </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.relationship}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.relationship }} </mat-cell>
       </ng-container>
 
       <!-- Percent Complete Column -->
       <ng-container matColumnDef="percent_complete">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Percent Complete </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.percent_complete | percent}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.percent_complete | percent }} </mat-cell>
       </ng-container>
 
       <!-- Has Consented Column -->
       <ng-container matColumnDef="has_consented">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Has Consented </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.has_consented}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.has_consented }} </mat-cell>
       </ng-container>
 
       <!-- Last Updated Column -->
       <ng-container matColumnDef="last_updated">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.last_updated}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{ element.last_updated }} </mat-cell>
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
     </mat-table>
   </div>
 </div>

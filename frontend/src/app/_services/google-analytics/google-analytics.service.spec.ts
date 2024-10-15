@@ -1,6 +1,5 @@
-import { TestBed } from '@angular/core/testing';
-
-import { GoogleAnalyticsService } from './google-analytics.service';
+import {TestBed} from '@angular/core/testing';
+import {GoogleAnalyticsService} from './google-analytics.service';
 
 describe('GoogleAnalyticsService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

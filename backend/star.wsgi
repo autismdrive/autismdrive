@@ -1,4 +1,4 @@
 import os
 import sys
 
-from app import app as application
+from app.main import app as application

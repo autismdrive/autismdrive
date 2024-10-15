@@ -1,5 +1,5 @@
-import { User } from './user';
-import { Resource } from './resource';
+import {Resource} from './resource';
+import {User} from './user';
 
 export interface AdminNote {
   id?: number;

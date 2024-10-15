@@ -1,79 +1,85 @@
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
-from app import db, RestException, elastic_index
-from app.model.category import Category
-from app.model.location import Location
-from app.model.resource_category import ResourceCategory
-from app.schema.schema import LocationCategorySchema, CategoryLocationsSchema, LocationCategoriesSchema
+from app.database import session
+from app.elastic_index import elastic_index
+from app.models import Category, ResourceCategory, Location
+from app.rest_exception import RestException
+from app.schemas import SchemaRegistry
+from app.utils.resource_utils import to_database_object_dict
 
 
 class LocationByCategoryEndpoint(flask_restful.Resource):
 
-    schema = CategoryLocationsSchema()
+    schema = SchemaRegistry.CategoryLocationsSchema()
 
     def get(self, category_id):
-        location_categories = db.session.query(ResourceCategory)\
-            .join(ResourceCategory.resource)\
-            .filter(ResourceCategory.category_id == category_id, ResourceCategory.type == 'location')\
-            .order_by(Location.title)\
+        c_id = cast(category_id, Integer)
+        location_categories = (
+            session.query(ResourceCategory)
+            .join(ResourceCategory.resource)
+            .filter(ResourceCategory.category_id == c_id, ResourceCategory.type == "location")
+            .order_by(Location.title)
             .all()
+        )
         return self.schema.dump(location_categories, many=True)
 
 
 class CategoryByLocationEndpoint(flask_restful.Resource):
 
-    schema = LocationCategoriesSchema()
+    schema = SchemaRegistry.LocationCategoriesSchema()
 
     def get(self, location_id):
-        location_categories = db.session.query(ResourceCategory).\
-            join(ResourceCategory.category).\
-            filter(ResourceCategory.resource_id == location_id).\
-            order_by(Category.name).\
-            all()
-        return self.schema.dump(location_categories,many=True)
+        location_categories = (
+            session.query(ResourceCategory)
+            .join(ResourceCategory.category)
+            .filter(ResourceCategory.resource_id == cast(location_id, Integer))
+            .order_by(Category.name)
+            .all()
+        )
+        return self.schema.dump(location_categories, many=True)
 
     def post(self, location_id):
         request_data = request.get_json()
 
         for item in request_data:
-            item['resource_id'] = location_id
+            item["resource_id"] = location_id
 
         location_categories = self.schema.load(request_data, many=True)
-        db.session.query(ResourceCategory).filter_by(resource_id=location_id).delete()
+        session.query(ResourceCategory).filter_by(resource_id=cast(location_id, Integer)).delete()
         for c in location_categories:
-            db.session.add(ResourceCategory(resource_id=location_id,
-                           category_id=c.category_id, type='location'))
-        db.session.commit()
-        instance = db.session.query(Location).filter_by(id=location_id).first()
-        elastic_index.update_document(instance, 'Location', latitude=instance.latitude, longitude=instance.longitude)
+            session.add(ResourceCategory(resource_id=location_id, category_id=c.category_id, type="location"))
+        session.commit()
+        instance = session.query(Location).filter_by(id=cast(location_id, Integer)).first()
+        elastic_index.update_document(document=to_database_object_dict(self.schema, instance))
         return self.get(location_id)
 
 
 class LocationCategoryEndpoint(flask_restful.Resource):
-    schema = LocationCategorySchema()
+    schema = SchemaRegistry.LocationCategorySchema()
 
-    def get(self, id):
-        model = db.session.query(ResourceCategory).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+    def get(self, location_category_id: int):
+        model = session.query(ResourceCategory).filter_by(id=location_category_id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        db.session.query(ResourceCategory).filter_by(id=id).delete()
-        db.session.commit()
+    def delete(self, location_category_id: int):
+        session.query(ResourceCategory).filter_by(id=location_category_id).delete()
+        session.commit()
         return None
 
 
 class LocationCategoryListEndpoint(flask_restful.Resource):
-    schema = LocationCategorySchema()
+    schema = SchemaRegistry.LocationCategorySchema()
 
     def post(self):
         request_data = request.get_json()
         load_result = self.schema.load(request_data).data
-        db.session.query(ResourceCategory).filter_by(resource_id=load_result.resource_id,
-                                                     category_id=load_result.category_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
+        session.query(ResourceCategory).filter_by(
+            resource_id=load_result.resource_id, category_id=load_result.category_id
+        ).delete()
+        session.add(load_result)
+        session.commit()
         return self.schema.dump(load_result)

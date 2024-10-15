@@ -1,22 +1,26 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { QuestionnaireStepsListComponent } from './questionnaire-steps-list.component';
+import {AppModule} from '@app/app.module';
+import {mockFlow} from '@util/testing/fixtures/mock-flow';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {QuestionnaireStepsListComponent} from './questionnaire-steps-list.component';
 
 describe('QuestionnaireStepsListComponent', () => {
   let component: QuestionnaireStepsListComponent;
-  let fixture: ComponentFixture<QuestionnaireStepsListComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ QuestionnaireStepsListComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(QuestionnaireStepsListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(QuestionnaireStepsListComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(
+      QuestionnaireStepsListComponent,
+      {
+        flow: mockFlow,
+        stepIndex: 0,
+      },
+      {detectChanges: true},
+    );
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

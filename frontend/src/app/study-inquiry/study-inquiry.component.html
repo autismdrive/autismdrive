@@ -1,91 +1,64 @@
-<div
-  *ngIf="!inquirySent"
-  fxFlex.gt-md="60%"
->
+<div *ngIf="!inquirySent" fxFlex.gt-md="60%">
   <h2>Interested in Enrolling?</h2>
-  <div
-    *ngIf="!currentUser"
-    fxLayout="column"
-    fxLayoutGap="20px"
-  >
+  <div *ngIf="!currentUser" fxLayout="column" fxLayoutGap="20px">
     <p>Joining Autism DRIVE is the first step toward participating in our clinical research.</p>
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="goRegister()"
-    >Join Autism DRIVE</button>
+    <button mat-flat-button color="primary" (click)="goRegister()">Join Autism DRIVE</button>
     <p>Already a user? Sign in</p>
-    <button
-      mat-flat-button
-      color="accent"
-      (click)="goLogin()"
-    >Sign In</button>
+    <button mat-flat-button color="accent" (click)="goLogin()">Sign In</button>
   </div>
-  <div
-    *ngIf="currentUser"
-    fxLayout="column"
-    fxLayoutGap="20px"
-  >
+  <div *ngIf="currentUser" fxLayout="column" fxLayoutGap="20px">
     <div *ngIf="!alreadyInquired">
-      <p>Please make sure that your profile is complete before indicating your interest in this study. The researchers
-        have a much better chance of determining your eligibility if they can see complete details about you and/or
-        your dependant.</p>
+      <p>
+        Please make sure that your profile is complete before indicating your interest in this study. The researchers
+        have a much better chance of determining your eligibility if they can see complete details about you and/or your
+        dependant.
+      </p>
       <div *ngFor="let p of currentUser.participants">
         <mat-card [class.mat-elevation-z0]="true">
-          <mat-card-title>{{p.name || "No User Name Set"}}</mat-card-title>
-          <mat-card-subtitle>{{currentUser.isSelf(p)? 'You' : p.relationship | titlecase}}</mat-card-subtitle>
-          <div
-            fxLayout="column"
-            fxLayoutGap="1em"
-          >
-          <mat-progress-bar
-            [mode]="'determinate'"
-            [value]="p.percent_complete * 100"
-          ></mat-progress-bar>
+          <mat-card-title>{{ p.name || 'No User Name Set' }}</mat-card-title>
+          <mat-card-subtitle>{{ currentUser.isSelf(p) ? 'You' : (p.relationship | titlecase) }}</mat-card-subtitle>
+          <div fxLayout="column" fxLayoutGap="1em">
+            <mat-progress-bar [mode]="'determinate'" [value]="p.percent_complete * 100"></mat-progress-bar>
             <button
               mat-flat-button
               color="primary"
               (click)="goEditEnroll($event, p)"
-              id="edit_enroll_{{p.relationship}}_{{p.id}}"
-            >Edit {{p.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</button>
+              id="edit_enroll_{{ p.relationship }}_{{ p.id }}"
+            >
+              Edit {{ p.relationship === 'self_guardian' ? 'guardian' : 'enrollment' }} info
+            </button>
           </div>
         </mat-card>
       </div>
       <div *ngIf="haveUserContact">
         <h4>Send Inquiry</h4>
         <p>Select the “Learn More” button for a member of the research team to contact you to learn more.</p>
-        <button
-          mat-flat-button
-          color="accent"
-          (click)="sendInquiry()"
-        >Learn More</button>
+        <button mat-flat-button color="accent" (click)="sendInquiry()">Learn More</button>
       </div>
     </div>
     <div *ngIf="alreadyInquired">
-      <p>You have already sent an inquiry about this study. We’ve let the researchers know that you are interested and they will contact you about next steps.</p>
+      <p>
+        You have already sent an inquiry about this study. We’ve let the researchers know that you are interested and
+        they will contact you about next steps.
+      </p>
       <div *ngIf="study.eligibility_url">
-        <p>This study has an additional screener to complete in order to determine if you are eligible to participate. If you haven't already completed that screener, you can click the "Go to screener" button to be directed there.</p>
-        <button
-          mat-flat-button
-          color="accent"
-          (click)="goEligibility()"
-        >Go to screener</button>
+        <p>
+          This study has an additional screener to complete in order to determine if you are eligible to participate. If
+          you haven't already completed that screener, you can click the "Go to screener" button to be directed there.
+        </p>
+        <button mat-flat-button color="accent" (click)="goEligibility()">Go to screener</button>
       </div>
     </div>
   </div>
 </div>
-<div
-  *ngIf="inquirySent"
-  fxFlex.gt-md="60%"
->
+<div *ngIf="inquirySent" fxFlex.gt-md="60%">
   <h2>Thank You</h2>
   <p>We’ve let the researchers know that you are interested in the study.</p>
   <div *ngIf="study.eligibility_url">
-    <p>This study has an additional screener to complete in order to determine if you are eligible to participate. Click the "Go to screener" button to be directed there.</p>
-    <button
-      mat-flat-button
-      color="accent"
-      (click)="goEligibility()"
-    >Go to screener</button>
+    <p>
+      This study has an additional screener to complete in order to determine if you are eligible to participate. Click
+      the "Go to screener" button to be directed there.
+    </p>
+    <button mat-flat-button color="accent" (click)="goEligibility()">Go to screener</button>
   </div>
 </div>

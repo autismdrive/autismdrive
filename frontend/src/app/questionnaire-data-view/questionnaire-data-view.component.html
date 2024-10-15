@@ -1,47 +1,28 @@
-<div
-  class="mat-typography"
->
+<div class="mat-typography">
   <div>
-    <div
-      fxLayout="row"
-      fxLayoutAlign="auto center"
-    >
+    <div fxLayout="row" fxLayoutAlign="auto center">
       <h1>
-        <button
-          mat-fab
-          color="primary"
-          (click)="sidenav.toggle()"
-        >
+        <button mat-fab color="primary" (click)="sidenav.toggle()">
           <mat-icon>menu</mat-icon>
         </button>
       </h1>
-      <button
-        mat-flat-button
-        (click)="exportAll()"
-        color="accent"
-      >
-        Export All
-      </button>
+      <button mat-flat-button (click)="exportAll()" color="accent">Export All</button>
     </div>
     <mat-drawer-container>
-      <mat-drawer #sidenav
-        [mode]='"over"'
-        [(opened)]="sidebarOpen">
-          <mat-list class="data-list" *ngFor="let info of questionnaire_info" dense>
-            <mat-list-item>
-              <mat-icon matListIcon>{{info.getIcon()}}</mat-icon>
-              ({{ info.size }})
-              <button mat-button  [disabled]="info.size == 0" (click)="selectQuestionnaire(info)">{{ info.display_name }}</button>
-            </mat-list-item>
-          </mat-list>
+      <mat-drawer #sidenav [mode]="'over'" [(opened)]="sidebarOpen">
+        <mat-list class="data-list" *ngFor="let info of questionnaire_info" dense>
+          <mat-list-item>
+            <mat-icon matListIcon>{{ info.getIcon() }}</mat-icon>
+            ({{ info.size }})
+            <button mat-button [disabled]="info.size === 0" (click)="selectQuestionnaire(info)">
+              {{ info.display_name }}
+            </button>
+          </mat-list-item>
+        </mat-list>
       </mat-drawer>
-      <mat-drawer-content
-        *ngIf="currentQuestionnaire"
-        class="pad-2"
-      >
+      <mat-drawer-content *ngIf="currentQuestionnaire" class="pad-2">
         <app-questionnaire-data-table [questionnaire_info]="currentQuestionnaire"></app-questionnaire-data-table>
       </mat-drawer-content>
     </mat-drawer-container>
   </div>
-
 </div>

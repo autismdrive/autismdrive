@@ -1,0 +1,27 @@
+/*
+ * The Typekit service used to deliver this font or fonts for use on websites
+ * is provided by Adobe and is subject to these Terms of Use
+ * http://www.adobe.com/products/eulas/tou_typekit. For font license
+ * information, see the list below.
+ *
+ * TypeKit Project ID: ato2zta
+ * https://use.typekit.net/ato2zta.css
+ *
+ * bodoni-urw:
+ *   - http://typekit.com/eulas/000000000000000000017943
+ *
+ * © 2009-2024 Adobe Systems Incorporated. All Rights Reserved.
+ */
+/*{"last_published":"2019-04-01 21:00:54 UTC"}*/
+@font-face {
+    font-family: "bodoni-urw";
+    src: url(/assets/fonts/bodoni-urw/bodoni-urw-700.woff2) format("woff2");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 700;
+    font-stretch: normal;
+}
+
+.tk-bodoni-urw {
+    font-family: "bodoni-urw",serif;
+}

@@ -1,25 +1,45 @@
 <div *ngIf="currentUser && currentUser.permissions.includes('publish_resource')">
   <h1>Topics Taxonomy</h1>
   <p>To add a topic, click the plus sign next to the parent topic and fill in the name</p>
-  <p>To delete a topic, use the button directly next to the topic; it is only possible to delete one topic at a time and
-    only possible to delete topics with no associated children topics.</p>
+  <p>
+    To delete a topic, use the button directly next to the topic; it is only possible to delete one topic at a time and
+    only possible to delete topics with no associated children topics.
+  </p>
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="tree-select taxonomy-admin">
     <!-- Child node-->
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
       <li [ngClass]="{'mat-tree-node': true, 'highlight-node': node.id === highlightedNode}">
         <!-- use a disabled button to provide padding for tree leaf -->
         <button disabled mat-icon-button></button>
-        <button matTreeNodeToggle mat-button>{{node.name}}</button>
-        <a [queryParams]="{'category': node.id}" [routerLink]="[ '/search' ]" class="associated-records">
-          {{node.all_resource_count}} associated resources
-        </a> & {{node.study_count}} associated studies
-        <button [disabled]="node.display_order <= 0" (click)="moveItem(node, -1)" mat-icon-button color="primary" matTooltip="Move up">
+        <button matTreeNodeToggle mat-button>{{ node.name }}</button>
+        <a [queryParams]="{category: node.id}" [routerLink]="['/search']" class="associated-records">
+          {{ node.all_resource_count }} associated resources
+        </a>
+        & {{ node.study_count }} associated studies
+        <button
+          [disabled]="node.display_order <= 0"
+          (click)="moveItem(node, -1)"
+          mat-icon-button
+          color="primary"
+          matTooltip="Move up"
+        >
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button [disabled]="node.display_order >= getSiblings(node).length - 1" (click)="moveItem(node, 1)" mat-icon-button color="primary" matTooltip="Move down">
+        <button
+          [disabled]="node.display_order >= getSiblings(node).length - 1"
+          (click)="moveItem(node, 1)"
+          mat-icon-button
+          color="primary"
+          matTooltip="Move down"
+        >
           <mat-icon>arrow_downward</mat-icon>
         </button>
-        <button (click)="addNewItem(node)" mat-icon-button color="primary" [matTooltip]="'Add sub-category to ' + node.name">
+        <button
+          (click)="addNewItem(node)"
+          mat-icon-button
+          color="primary"
+          [matTooltip]="'Add sub-category to ' + node.name"
+        >
           <mat-icon>add_circle</mat-icon>
         </button>
         <button
@@ -33,22 +53,12 @@
           <mat-icon>delete</mat-icon>
         </button>
 
-        <ng-container *ngIf="showConfirmDelete && (node.id===nodeToDelete.id)">
-          <button
-            (click)="deleteNode(node)"
-            color="warn"
-            mat-flat-button
-            type="button"
-          >Permanently Delete {{node.name}}!!!
+        <ng-container *ngIf="showConfirmDelete && node.id === nodeToDelete.id">
+          <button (click)="deleteNode(node)" color="warn" mat-flat-button type="button">
+            Permanently Delete {{ node.name }}!!!
           </button>
-          <button
-            (click)="cancelDelete()"
-            mat-flat-button
-            type="button"
-          >Cancel
-          </button>
+          <button (click)="cancelDelete()" mat-flat-button type="button">Cancel</button>
         </ng-container>
-
       </li>
     </mat-tree-node>
 
@@ -57,7 +67,7 @@
       <button disabled mat-icon-button></button>
       <mat-form-field>
         <mat-label>New item...</mat-label>
-        <input #itemValue matInput placeholder="Ex. Topic Name">
+        <input #itemValue matInput placeholder="Ex. Topic Name" />
       </mat-form-field>
       <button (click)="saveNode(node, itemValue.value)" mat-button color="primary">Save</button>
       <button (click)="cancelAdd()" mat-button>Cancel</button>
@@ -74,17 +84,30 @@
             matTreeNodeToggle
           >
             <mat-icon class="mat-icon-rtl-mirror">
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
             </mat-icon>
           </button>
-          <button matTreeNodeToggle mat-button>{{node.name}}</button>
-          <a [queryParams]="{'category': node.id}" [routerLink]="[ '/search' ]" class="associated-records">
-            {{node.all_resource_count}} associated resources
-          </a> & {{node.study_count}} associated studies
-          <button [disabled]="node.display_order <= 0" (click)="moveItem(node, -1)" mat-icon-button color="primary" matTooltip="Move up">
+          <button matTreeNodeToggle mat-button>{{ node.name }}</button>
+          <a [queryParams]="{category: node.id}" [routerLink]="['/search']" class="associated-records">
+            {{ node.all_resource_count }} associated resources
+          </a>
+          & {{ node.study_count }} associated studies
+          <button
+            [disabled]="node.display_order <= 0"
+            (click)="moveItem(node, -1)"
+            mat-icon-button
+            color="primary"
+            matTooltip="Move up"
+          >
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button [disabled]="node.display_order >= getSiblings(node).length - 1" (click)="moveItem(node, 1)" mat-icon-button color="primary" matTooltip="Move down">
+          <button
+            [disabled]="node.display_order >= getSiblings(node).length - 1"
+            (click)="moveItem(node, 1)"
+            mat-icon-button
+            color="primary"
+            matTooltip="Move down"
+          >
             <mat-icon>arrow_downward</mat-icon>
           </button>
           <button (click)="addNewItem(node)" mat-icon-button [matTooltip]="'Add sub-category to ' + node.name">
@@ -101,7 +124,7 @@
   <div fxLayout="row">
     <mat-form-field>
       <mat-label>New root item...</mat-label>
-      <input matInput placeholder="Ex. Topic Name" [(ngModel)]="rootValue">
+      <input matInput placeholder="Ex. Topic Name" [(ngModel)]="rootValue" />
     </mat-form-field>
     <button (click)="saveNode({name: '', parent_id: null}, rootValue)" mat-button color="primary">Save</button>
     <button (click)="rootValue = ''" mat-button>Cancel</button>

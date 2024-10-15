@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @import '../../material';
 
 .news-item {
@@ -9,7 +10,7 @@
   }
 
   @media screen and (min-width: 768px) {
-    grid-template-areas: "leftCol rightCol";
+    grid-template-areas: 'leftCol rightCol';
     grid-template-columns: 1fr 1fr;
   }
 
@@ -46,7 +47,7 @@
     }
 
     .item-title {
-      @include mat-typography-level-to-styles($custom-typography, headline);
+      @include mat.typography-level($stardrive-typography, headline);
       font-style: italic;
       color: $brand-primary;
       cursor: pointer;
@@ -56,7 +57,7 @@
         content: '';
         background-color: $brand-accent;
         width: 6.25rem;
-        height: .125rem;
+        height: 0.125rem;
         display: block;
 
         @media screen and (max-width: 767px) {
@@ -67,7 +68,6 @@
         @media screen and (min-width: 768px) {
           margin: 0.45em 0;
         }
-
       }
     }
 

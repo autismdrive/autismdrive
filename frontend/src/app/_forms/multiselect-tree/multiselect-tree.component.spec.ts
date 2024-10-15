@@ -1,25 +1,26 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MultiselectTreeComponent } from './multiselect-tree.component';
+import {AppModule} from '@app/app.module';
+import {createFieldComponent} from '@ngx-formly/core/testing';
+import {mockCategory} from '@util/testing/fixtures/mock-category';
+import {of} from 'rxjs';
 
 describe('MultiselectTreeComponent', () => {
-  let component: MultiselectTreeComponent;
-  let fixture: ComponentFixture<MultiselectTreeComponent>;
+  it('should render multi-select tree', () => {
+    const {query} = createFieldComponent(
+      {
+        type: 'multiselecttree',
+        props: {
+          label: 'Topics',
+          description: 'This field is required',
+          options: of([mockCategory]),
+          valueProp: 'id',
+          labelProp: 'name',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ MultiselectTreeComponent ]
-    })
-    .compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(MultiselectTreeComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-multiselect-tree')).not.toBeNull();
   });
 });

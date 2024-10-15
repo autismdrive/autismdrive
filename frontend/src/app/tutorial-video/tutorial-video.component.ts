@@ -1,30 +1,25 @@
 /// <reference types="@types/youtube" />
-import {Component, Input, OnInit} from '@angular/core';
-import {NavItem} from '../_models/nav-item';
-import ClosedCaptionsLoadPolicy = YT.ClosedCaptionsLoadPolicy;
-import ModestBranding = YT.ModestBranding;
-import RelatedVideos = YT.RelatedVideos;
-import ShowInfo = YT.ShowInfo;
+import {Component, Input} from '@angular/core';
+import {NavItem} from '@models/nav-item';
 
 @Component({
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
-  styleUrls: ['./tutorial-video.component.scss']
+  styleUrls: ['./tutorial-video.component.scss'],
 })
-export class TutorialVideoComponent implements OnInit {
+export class TutorialVideoComponent {
   @Input() videoSize: string;
   @Input() videoId: string;
   @Input() instructions: string;
   @Input() links: NavItem[];
   playerVars: YT.PlayerVars = {
-    cc_load_policy: ClosedCaptionsLoadPolicy.ForceOn,
-    modestbranding: ModestBranding.Modest,
-    rel: RelatedVideos.Hide,
-    showinfo: ShowInfo.Hide,
+    cc_load_policy: YT.ClosedCaptionsLoadPolicy.ForceOn,
+    modestbranding: YT.ModestBranding.Modest,
+    rel: YT.RelatedVideos.Hide,
+    showinfo: YT.ShowInfo.Hide,
   };
 
-  constructor() {
-  }
+  constructor() {}
 
   get windowWidthFactor(): number {
     const windowWidthPx = window.innerWidth;
@@ -59,9 +54,6 @@ export class TutorialVideoComponent implements OnInit {
   get videoHeight() {
     const baseSize = 315;
     return Math.floor(baseSize * this.videoWidthFactor * this.windowWidthFactor);
-  }
-
-  ngOnInit() {
   }
 
   hideVideo() {

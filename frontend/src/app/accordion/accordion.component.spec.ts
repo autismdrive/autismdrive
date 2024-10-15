@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AccordionComponent } from './accordion.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {AccordionComponent} from './accordion.component';
 
 describe('AccordionComponent', () => {
   let component: AccordionComponent;
-  let fixture: ComponentFixture<AccordionComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ AccordionComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AccordionComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AccordionComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AccordionComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AccordionComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

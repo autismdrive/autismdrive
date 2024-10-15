@@ -1,31 +1,31 @@
-import {AgmMap, LatLngBounds} from '@agm/core';
+/// <reference types="google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnInit, ViewChild} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatTabChangeEvent} from '@angular/material/tabs';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, convertToParamMap, ParamMap, Params, Router} from '@angular/router';
+import {Algorithm, DefaultRenderer, Renderer, SuperClusterViewportAlgorithm} from '@googlemaps/markerclusterer';
+import {AccordionItem} from '@models/accordion-item';
+import {Category} from '@models/category';
+import {AgeRange, HitType, Language} from '@models/hit_type';
+import {NavItem} from '@models/nav-item';
+import {GeoBox, Hit, Query} from '@models/query';
+import {Resource} from '@models/resource';
+import {Direction} from '@models/scroll';
+import {SortMethod, sortMethods} from '@models/sort_method';
+import {Study} from '@models/study';
+import {User} from '@models/user';
+import {NgMapsViewComponent} from '@ng-maps/core';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {SearchService} from '@services/search/search.service';
 import createClone from 'rfdc';
 import {fromEvent, Subject} from 'rxjs';
 import {debounceTime, filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
-import {AccordionItem} from '../_models/accordion-item';
-import {Category} from '../_models/category';
-import {AgeRange, HitType, Language} from '../_models/hit_type';
-import {NavItem} from '../_models/nav-item';
-import {GeoBox, Hit, Query} from '../_models/query';
-import {Resource} from '../_models/resource';
-import {Direction} from '../_models/scroll';
-import {SortMethod} from '../_models/sort_method';
-import {Study} from '../_models/study';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
-import {SearchService} from '../_services/search/search.service';
-import LatLngLiteral = google.maps.LatLngLiteral;
-
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -47,25 +47,20 @@ enum LocationMode {
       transition(':enter', [
         query('#age-filter, #language-filter, #topic-filter', [
           style({opacity: 0, transform: 'translateX(-100px)'}),
-          stagger(-30, [
-            animate('500ms cubic-bezier(0.35, 0, 0.25, 1)', style({opacity: 1, transform: 'none'}))
-          ])
-        ])
-      ])
+          stagger(-30, [animate('500ms cubic-bezier(0.35, 0, 0.25, 1)', style({opacity: 1, transform: 'none'}))]),
+        ]),
+      ]),
     ]),
-  ]
+  ],
 })
-export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
-
+export class SearchComponent implements AfterViewInit, OnInit {
   @HostBinding('@pageAnimations')
   public animatePage = true;
 
-
-
   query: Query;
-  prevQuery: Query;  // Used to tell if query parameters have changed, very unclear.  Consider removing.
+  prevQuery: Query; // Used to tell if query parameters have changed, very unclear.  Consider removing.
   mapQuery: Query; // The Map query is slightly different from the results query, and it returns a larger set of results.
-  querySubject: Subject<Query> = new Subject<Query>();  // Use this to update the query.
+  querySubject: Subject<Query> = new Subject<Query>(); // Use this to update the query.
   mapQuerySubject: Subject<Query> = new Subject<Query>(); // Use this to update the mapQuery.
 
   resourceTypes = HitType.all_resources();
@@ -83,14 +78,13 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   pageSizeOptions = [20, 60, 100];
   pageSize = this.pageSizeOptions[0];
 
-
   storedZip: string;
   gpsEnabled = true;
-  defaultLoc: LatLngLiteral = {
+  defaultLoc: google.maps.LatLngLiteral = {
     lat: 37.32248,
-    lng: -78.36926
+    lng: -78.36926,
   };
-  loc: LatLngLiteral = createClone()(this.defaultLoc);
+  loc: google.maps.LatLngLiteral = createClone()(this.defaultLoc);
   locationModes = LocationMode;
   locationMode = LocationMode.default;
 
@@ -98,10 +92,10 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   hitsWithAddress: Hit[] = [];
   defaultZoom = 7;
   mapZoomLevel: number;
-  sortMethods: { [key: string]: SortMethod };
+  sortMethods: {[key: string]: SortMethod};
   selectedSort: SortMethod;
   paginatorElement: MatPaginator;
-  mapTemplateElement: AgmMap;
+  mapTemplateElement: NgMapsViewComponent<any>;
   currentUser: User;
   highlightedStudy: Study;
   resourceGatherers: AccordionItem[] = [
@@ -131,7 +125,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         education programming and related services to nine school districts under an umbrella of a regional program.
       `,
       image: '/assets/partners/prep.png',
-      url: 'http://www.prepivycreek.com/',
+      url: 'https://www.prepivycreek.com/',
     },
     {
       name: 'Virginia Institute of Autism',
@@ -161,14 +155,12 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       label: 'Read about scientifically-supported interventions',
       url: 'https://www.nationalautismcenter.org/resources/for-families/',
     },
-    {
-      label: 'Contact a Family Navigator for resource help',
-      url: 'https://curry.virginia.edu/faculty-research/centers-labs-projects/star/resources/star-family-navigation',
-    },
   ];
   queryParamMap: ParamMap;
-  private mapBounds: LatLngBounds;
+  private mapBounds: google.maps.LatLngBoundsLiteral;
   private scrollDirection: Direction;
+  clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
+  clusterRenderer: Renderer = new DefaultRenderer();
 
   constructor(
     private api: ApiService,
@@ -177,202 +169,30 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     private googleAnalyticsService: GoogleAnalyticsService,
     private location: Location,
     private meta: Meta,
-    private renderer: Renderer2,
     private route: ActivatedRoute,
     private router: Router,
     private searchService: SearchService,
   ) {
-    this.sortMethods = {
-      RELEVANCE: {
-        name: 'Relevance',
-        label: 'Relevance',
-        sortQuery: {
-          field: '_score',
-          order: 'desc',
-        }
-      },
-      DISTANCE: {
-        name: 'Distance',
-        label: 'Distance',
-        sortQuery: {
-          field: 'geo_point',
-          latitude: this.loc.lat,
-          longitude: this.loc.lng,
-          order: 'asc',
-          unit: 'mi'
-        }
-      },
-      UPDATED: {
-        name: 'Updated',
-        label: 'Recently Updated',
-        sortQuery: {
-          field: 'last_updated',
-          order: 'desc'
-        }
-      },
-      DATE: {
-        name: 'Date',
-        label: 'Happening Soon',
-        sortQuery: {
-          field: 'date',
-          order: 'asc'
-        }
-      },
-      DRAFTS: {
-        name: 'Drafts',
-        label: 'Drafts',
-        sortQuery: {
-          field: 'is_draft',
-          order: 'desc'
-        }
-      },
-    };
-
+    this.sortMethods = createClone()(sortMethods);
+    this.sortMethods.DISTANCE.sortQuery.latitude = this.loc.lat;
+    this.sortMethods.DISTANCE.sortQuery.longitude = this.loc.lng;
     this.selectedSort = this.sortMethods.DISTANCE;
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.languageOptions = this.getOptions(Language.labels);
     this.ageOptions = this.getOptions(AgeRange.labels);
 
     this.meta.updateTag(
       {property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
-      `property='og:image'`);
+      `property='og:image'`,
+    );
     this.meta.updateTag(
       {property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
-      `property='og:image:secure_url'`);
+      `property='og:image:secure_url'`,
+    );
     this.meta.updateTag(
       {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
-      `name='twitter:image'`);
-
-  }
-
-
-  ngOnInit() {
-    if (localStorage.noFirstVisit === 'true') {
-      this.hideVideo();
-    }
-    localStorage.noFirstVisit = true;
-
-    /**
-     * On initialization, set up two subjects that will watch for, debouce, and depulicate all queries sent to
-     * the backend.  Then attempt to run a sensible search, either based on query params or using defaults.
-     * In the even we can fall back to the users current location, we may need to run the query again, but
-     * we don't want to wait for them to grant us access, so in the worst case, we just run the query using a
-     * default location in central Virginia, and if we get GPS, we run it again.
-     */
-
-    this.querySubject
-      .pipe(debounceTime(1000))
-      .subscribe(q => {
-        this.loading = true;
-        this.searchService
-          .search(q)
-          .subscribe(queryWithResults => {
-            this.prevQuery = createClone()(this.query);
-            this.query = queryWithResults;
-            this.googleAnalyticsService.searchEvent(this.query);
-            this.updateUrl();
-            this.loading = false;
-            this.changeDetectorRef.detectChanges();
-            this._loadRelatedStudies();
-            this._updatePaginator();
-          });
-      });
-
-     this.setDefaultMapLocation(() => {
-      this.route.queryParamMap
-        .subscribe(qParamMap => {
-          this.queryParamMap = qParamMap;
-          this.query = this._queryParamsToQuery(qParamMap);
-          const defaultZoomLevel = this.storedZip ? 10 : this.defaultZoom;
-          this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || defaultZoomLevel;
-          // parse lat and lng from URL
-          const qLat = qParamMap.get('lat');
-          const qLng = qParamMap.get('lng');
-          if (qLat && qLng) {
-            const lat = parseFloat(qLat);
-            const lng = parseFloat(qLng);
-            this.setLocation(LocationMode.map, { lat: lat, lng: lng });
-          }
-          const sortName = qParamMap.get('sort') || 'Distance';
-          const forceReSort = (this.prevQuery && this.query.start === 0);
-          if (forceReSort) {
-            if (sortName && this.sortMethods[sortName.toUpperCase()]) {
-              this.reSort(sortName, forceReSort);
-            } else {
-              this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
-            }
-          } else {
-            this.reSort(sortName,  true);
-            this.selectedSort = this.sortMethods[sortName.toUpperCase()];
-            this.querySubject.next(this.query);
-            this.mapQuerySubject.next(this.query);
-          }
-        });
-    });
-    this.mapQuerySubject
-      .pipe(debounceTime(1000))
-      .subscribe(q => {
-        this.loading = true;
-        const geoBox = this.geoBox();
-        this.searchService
-          .mapSearch(q, geoBox)
-          .subscribe(mapQueryWithResults => {
-            this.mapQuery = mapQueryWithResults;
-            if (this.mapQuery && this.mapQuery.hits && (this.mapQuery.hits.length > 0)) {
-              this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
-              this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
-            } else {
-              this.hitsWithAddress = [];
-              this.hitsWithNoAddress = [];
-            }
-            this.loading = false;
-            this.changeDetectorRef.detectChanges();
-            if (this.restrictToMappedResults) {
-              this.query.geo_box = geoBox;
-              this.querySubject.next(this.query);
-            }
-          });
-      });
-
-  }
-
-  setLocation(mode: LocationMode, loc: LatLngLiteral) {
-    this.loc = loc;
-    this.locationMode = mode;
-  }
-
-  setZipLocation(zipCode, callback?: () => void) {
-    this.storedZip = zipCode;
-    this.api.getZipCoords(this.storedZip).subscribe(z => {
-      this.setLocation(LocationMode.zipcode, { lat: z.latitude, lng: z.longitude});
-      this.mapZoomLevel = 10;
-      if (callback) { callback(); }
-    });
-  }
-
-  setGPSLocation(callback?: () => void) {
-    if (navigator.geolocation) {
-      this.gpsEnabled = true;
-      navigator.geolocation.getCurrentPosition(p => {
-        this.setLocation(LocationMode.gps, { lat: p.coords.latitude, lng: p.coords.longitude});
-        this.mapZoomLevel = 10;
-        if (callback) { callback(); }
-      },
-        error => {
-          this.gpsEnabled = false;
-          if (callback) { callback(); }
-      });
-    } else {
-      this.gpsEnabled = false;
-      if (callback) { callback(); }
-    }
-  }
-
-  private _updateDistanceSort() {
-    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
-    distanceSortQuery.latitude = this.loc.lat;
-    distanceSortQuery.longitude = this.loc.lng;
-    this.query.sort = distanceSortQuery;
+      `name='twitter:image'`,
+    );
   }
 
   @ViewChild('paginator')
@@ -381,20 +201,20 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   @ViewChild('mapTemplate')
-  set mapTemplate(value: AgmMap) {
+  set mapTemplate(value: NgMapsViewComponent<google.maps.Map>) {
     this.mapTemplateElement = value;
   }
 
   get circleRadius(): number {
     const maxMiles = 100;
     const metersPerMi = 1609.34;
-    return maxMiles * metersPerMi / (this.mapZoomLevel || 1);
+    return (maxMiles * metersPerMi) / (this.mapZoomLevel || 1);
   }
 
   get filtersPanelStyles() {
     const styles = {
       'full-screen': this.showFilters,
-      'minimized': !this.showFilters,
+      minimized: !this.showFilters,
     };
 
     styles[this.searchBgClass] = true;
@@ -406,7 +226,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   get isDistanceSort(): boolean {
-    return (this.selectedSort && (this.selectedSort.name === 'Distance'));
+    return this.selectedSort && this.selectedSort.name === 'Distance';
   }
 
   get isInfoWindowOpen(): boolean {
@@ -423,7 +243,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   get numResultsFrom(): number {
     if (this.paginatorElement) {
-      return (this.paginatorElement.pageIndex * this.pageSize) + 1;
+      return this.paginatorElement.pageIndex * this.pageSize + 1;
     } else {
       return 0;
     }
@@ -449,24 +269,153 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     return !!localStorage.getItem('shouldHideTutorialVideo');
   }
 
-
   get shouldShowMap() {
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    return (isLocation || this.isDistanceSort);
+    return isLocation || this.isDistanceSort;
+  }
+
+  get selectedCategory() {
+    if (this.query) {
+      return this.query.category;
+    }
+  }
+
+  get resourceTypesFiltered(): HitType[] {
+    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
+  }
+
+  ngOnInit() {
+    if (localStorage.noFirstVisit === 'true') {
+      this.hideVideo();
+    }
+    localStorage.noFirstVisit = true;
+
+    /**
+     * On initialization, set up two subjects that will watch for, debouce, and depulicate all queries sent to
+     * the backend.  Then attempt to run a sensible search, either based on query params or using defaults.
+     * In the even we can fall back to the users current location, we may need to run the query again, but
+     * we don't want to wait for them to grant us access, so in the worst case, we just run the query using a
+     * default location in central Virginia, and if we get GPS, we run it again.
+     */
+
+    this.querySubject.pipe(debounceTime(1000)).subscribe(q => {
+      this.loading = true;
+      this.searchService.search(q).subscribe(queryWithResults => {
+        this.prevQuery = createClone()(this.query);
+        this.query = queryWithResults;
+        this.googleAnalyticsService.searchEvent(this.query);
+        this.updateUrl();
+        this.loading = false;
+        this.changeDetectorRef.detectChanges();
+        this._loadRelatedStudies();
+        this._updatePaginator();
+      });
+    });
+
+    this.setDefaultMapLocation(() => {
+      this.route.queryParamMap.subscribe(qParamMap => {
+        this.queryParamMap = qParamMap;
+        this.query = this._queryParamsToQuery(qParamMap);
+        const defaultZoomLevel = this.storedZip ? 10 : this.defaultZoom;
+        this.mapZoomLevel = parseInt(qParamMap.get('zoom'), 10) || defaultZoomLevel;
+        // parse lat and lng from URL
+        const qLat = qParamMap.get('lat');
+        const qLng = qParamMap.get('lng');
+        if (qLat && qLng) {
+          const lat = parseFloat(qLat);
+          const lng = parseFloat(qLng);
+          this.setLocation(LocationMode.map, {lat: lat, lng: lng});
+        }
+        const sortName = qParamMap.get('sort') || 'Distance';
+        const forceReSort = this.prevQuery && this.query.start === 0;
+        if (forceReSort) {
+          if (sortName && this.sortMethods[sortName.toUpperCase()]) {
+            this.reSort(sortName, forceReSort);
+          } else {
+            this.reSort(this.query.hasWords ? 'Relevance' : 'Distance', forceReSort);
+          }
+        } else {
+          this.reSort(sortName, true);
+          this.selectedSort = this.sortMethods[sortName.toUpperCase()];
+          this.querySubject.next(this.query);
+          this.mapQuerySubject.next(this.query);
+        }
+      });
+    });
+    this.mapQuerySubject.pipe(debounceTime(1000)).subscribe(q => {
+      this.loading = true;
+      const geoBox = this.geoBox();
+      this.searchService.mapSearch(q, geoBox).subscribe(mapQueryWithResults => {
+        this.mapQuery = mapQueryWithResults;
+        if (this.mapQuery && this.mapQuery.hits && this.mapQuery.hits.length > 0) {
+          this.hitsWithAddress = this.mapQuery.hits.filter(h => !h.no_address);
+          this.hitsWithNoAddress = this.mapQuery.hits.filter(h => h.no_address);
+        } else {
+          this.hitsWithAddress = [];
+          this.hitsWithNoAddress = [];
+        }
+        this.loading = false;
+        this.changeDetectorRef.detectChanges();
+        if (this.restrictToMappedResults) {
+          this.query.geo_box = geoBox;
+          this.querySubject.next(this.query);
+        }
+      });
+    });
+  }
+
+  setLocation(mode: LocationMode, loc: google.maps.LatLngLiteral) {
+    this.loc = loc;
+    this.locationMode = mode;
+  }
+
+  setZipLocation(zipCode: string, callback?: () => void) {
+    this.storedZip = zipCode;
+    this.api.getZipCoords(this.storedZip).subscribe(z => {
+      this.setLocation(LocationMode.zipcode, {lat: z.latitude, lng: z.longitude});
+      this.mapZoomLevel = 10;
+      if (callback) {
+        callback();
+      }
+    });
+  }
+
+  setGPSLocation(callback?: () => void) {
+    if (navigator.geolocation) {
+      this.gpsEnabled = true;
+      navigator.geolocation.getCurrentPosition(
+        p => {
+          this.setLocation(LocationMode.gps, {lat: p.coords.latitude, lng: p.coords.longitude});
+          this.mapZoomLevel = 10;
+          if (callback) {
+            callback();
+          }
+        },
+        error => {
+          console.error(error);
+          this.gpsEnabled = false;
+          if (callback) {
+            callback();
+          }
+        },
+      );
+    } else {
+      this.gpsEnabled = false;
+      if (callback) {
+        callback();
+      }
+    }
   }
 
   ngAfterViewInit() {
     this.watchScrollEvents();
   }
 
-  ngOnDestroy(): void {
-  }
-
-  getOptions(modelLabels) {
+  getOptions(modelLabels: {[key: string]: string}) {
     const opts = [];
     for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {
-        opts.push({'value': key, 'label': modelLabels[key]});
+        opts.push({value: key, label: modelLabels[key]});
       }
     }
     return opts;
@@ -485,7 +434,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   scrollToTopOfSearch() {
     document.getElementById('TopOfSearch').scrollIntoView();
   }
-
 
   setDefaultMapLocation(callback?: () => void) {
     /**
@@ -523,7 +471,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     const qParamsHaveChanged = this._queryParamsHaveChanged(this.queryParamMap);
 
     // Don't re-sort if it's already selected, but allow override.
-    if ((qParamsHaveChanged && sortName && (sortName !== this.selectedSort.name)) || forceReSort) {
+    if ((qParamsHaveChanged && sortName && sortName !== this.selectedSort.name) || forceReSort) {
       this.selectedSort = this.sortMethods[sortName.toUpperCase()];
       this.query.start = 0;
       this.query.sort = this.selectedSort.sortQuery;
@@ -573,8 +521,8 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     } else {
       this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => t.name === keepType);
       this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
-      this.query.types = (keepType === all) ? this.resourceTypesFilteredNames() : [keepType];
-      this.query.date = keepType === HitType.EVENT.name ? new Date : undefined;
+      this.query.types = keepType === all ? this.resourceTypesFilteredNames() : [keepType];
+      this.query.date = keepType === HitType.EVENT.name ? new Date() : undefined;
 
       if (keepType === HitType.LOCATION.name) {
         this.selectedSort = this.sortMethods.DISTANCE;
@@ -595,20 +543,12 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   submitResource() {
     const popUp = window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
-    if (popUp == null || typeof(popUp) === 'undefined') {
-    alert('Please disable your pop-up blocker and try again. \nYou can also use following link to submit your resource: ' +
-      'https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP');
+    if (popUp == null || typeof popUp === 'undefined') {
+      alert(
+        'Please disable your pop-up blocker and try again. \nYou can also use following link to submit your resource: ' +
+          'https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP',
+      );
     }
-  }
-
-  get selectedCategory() {
-    if (this.query) {
-      return this.query.category;
-    }
-  }
-
-  get resourceTypesFiltered(): HitType[] {
-    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
   }
 
   resourceTypesFilteredNames(): string[] {
@@ -618,59 +558,10 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   updatePage(event: PageEvent) {
     this.query.size = event.pageSize;
     this.pageSize = event.pageSize;
-    this.query.start = (event.pageIndex * event.pageSize) + 1;
+    this.query.start = event.pageIndex * event.pageSize + 1;
     this.query.sort = this.selectedSort.sortQuery;
     this.scrollToTopOfSearch();
     this.querySubject.next(this.query);
-  }
-
-  protected mapLoad(m: google.maps.Map) {
-    const controlDiv: MapControlDiv = document.createElement('div');
-
-    // Set CSS for the control border.
-    const controlUI = document.createElement('div');
-    controlUI.style.backgroundColor = '#fff';
-    controlUI.style.border = '2px solid #fff';
-    controlUI.style.borderRadius = '3px';
-    controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-    controlUI.style.cursor = 'pointer';
-    controlUI.style.marginBottom = '6px';
-    controlUI.style.marginRight = '12px';
-    controlUI.style.textAlign = 'center';
-    controlUI.title = 'Your Location';
-    controlDiv.appendChild(controlUI);
-
-    // Set CSS for the control interior.
-    const controlText = document.createElement('div');
-    controlText.style.fontSize = '16px';
-    controlText.style.lineHeight = '38px';
-    controlText.style.paddingLeft = '5px';
-    controlText.style.paddingRight = '5px';
-    controlText.innerHTML = '<img src="/assets/map/my-location.svg">';
-    controlUI.appendChild(controlText);
-
-    // Set the center to the user's location on click
-    controlUI.addEventListener('click', () => {
-        // fixme: maybe we should requery when clicking.
-        console.log('map clicked.');
-        this.mapQuerySubject.next(this.query);
-      });
-
-    controlDiv.index = 1;
-    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
-
-    m.addListener('dragend', () => {
-        this.setLocation(LocationMode.map, {lat: this.mapBounds.getCenter().lat(),
-                                                  lng: this.mapBounds.getCenter().lng()});
-        this.mapQuerySubject.next(this.query);
-        console.log('Map Dragged');
-        if (this.isDistanceSort) {
-          console.log('Map Dragged, re-sorting');
-          this._updateDistanceSort();
-          this.querySubject.next(this.query);
-      }
-
-    });
   }
 
   showBreadcrumbs(): boolean {
@@ -704,7 +595,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   isZipCode(zipCode: string): boolean {
-    return (zipCode && (zipCode !== '') && (/^\d{5}$/.test(zipCode)));
+    return zipCode && zipCode !== '' && /^\d{5}$/.test(zipCode);
   }
 
   showInfoWindow(hit: Hit) {
@@ -730,7 +621,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       m = m * -1;
     }
     const x = Math.sin(seed) * 10000;
-    return (x - Math.floor(x)) / 100 * m;
+    return ((x - Math.floor(x)) / 100) * m;
   }
 
   updateZoom(zoomLevel: number) {
@@ -739,25 +630,27 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   selectTypeTab($event: MatTabChangeEvent) {
-    const resourceType = ($event.index > 0) ? this.resourceTypesFiltered[$event.index - 1] : HitType.ALL_RESOURCES;
+    const resourceType = $event.index > 0 ? this.resourceTypesFiltered[$event.index - 1] : HitType.ALL_RESOURCES;
     this.selectType(resourceType.name);
   }
 
-  updateResultsList($event: LatLngBounds) {
+  updateResultsList($event: google.maps.LatLngBoundsLiteral) {
     this.mapBounds = $event;
   }
 
   geoBox(): GeoBox {
     if (this.mapBounds) {
-      return ({
+      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
+      return {
         top_left: {
-          lat: this.mapBounds.getNorthEast().lat(),
-          lon: this.mapBounds.getSouthWest().lng()
+          lat: latLngBounds.getNorthEast().lat(),
+          lon: latLngBounds.getSouthWest().lng(),
         },
         bottom_right: {
-          lat: this.mapBounds.getSouthWest().lat(),
-          lon: this.mapBounds.getNorthEast().lng()}
-      });
+          lat: latLngBounds.getSouthWest().lat(),
+          lon: latLngBounds.getNorthEast().lng(),
+        },
+      };
     }
   }
 
@@ -802,23 +695,19 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   watchScrollEvents() {
     const scroll$ = fromEvent(window, 'scroll').pipe(
       throttleTime(10),
-      map((e: Event) => window.pageYOffset),
+      map(e => window.scrollY),
       pairwise(),
       map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
-      share()
+      share(),
     );
 
-    scroll$
-      .pipe(filter(direction => direction === Direction.Up))
-      .subscribe(() => {
-        this.scrollDirection = Direction.Up;
-      });
+    scroll$.pipe(filter(direction => direction === Direction.Up)).subscribe(() => {
+      this.scrollDirection = Direction.Up;
+    });
 
-    scroll$
-      .pipe(filter(direction => direction === Direction.Down))
-      .subscribe(() => {
-        this.scrollDirection = Direction.Down;
-      });
+    scroll$.pipe(filter(direction => direction === Direction.Down)).subscribe(() => {
+      this.scrollDirection = Direction.Down;
+    });
   }
 
   clearAllFilters() {
@@ -855,8 +744,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   showLocationWindow() {
-    return this.locationMode === LocationMode.default;
-    return (!this.isZipCode(this.storedZip) && !this.gpsEnabled);
+    return this.locationMode === LocationMode.default && !this.isZipCode(this.storedZip) && !this.gpsEnabled;
   }
 
   updateUrl() {
@@ -864,9 +752,67 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     const urlTree = this.router.createUrlTree([], {
       queryParams: qParams,
       queryParamsHandling: 'merge',
-      preserveFragment: true
+      preserveFragment: true,
     });
     this.location.replaceState(urlTree.toString());
+  }
+
+  protected mapLoad(m: google.maps.Map) {
+    const controlDiv: MapControlDiv = document.createElement('div');
+
+    // Set CSS for the control border.
+    const controlUI = document.createElement('div');
+    controlUI.style.backgroundColor = '#fff';
+    controlUI.style.border = '2px solid #fff';
+    controlUI.style.borderRadius = '3px';
+    controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+    controlUI.style.cursor = 'pointer';
+    controlUI.style.marginBottom = '6px';
+    controlUI.style.marginRight = '12px';
+    controlUI.style.textAlign = 'center';
+    controlUI.title = 'Your Location';
+    controlDiv.appendChild(controlUI);
+
+    // Set CSS for the control interior.
+    const controlText = document.createElement('div');
+    controlText.style.fontSize = '16px';
+    controlText.style.lineHeight = '38px';
+    controlText.style.paddingLeft = '5px';
+    controlText.style.paddingRight = '5px';
+    controlText.innerHTML = '<img src="/assets/map/my-location.svg" alt="Your Location">';
+    controlUI.appendChild(controlText);
+
+    // Set the center to the user's location on click
+    controlUI.addEventListener('click', () => {
+      // fixme: maybe we should requery when clicking.
+      console.log('map clicked.');
+      this.mapQuerySubject.next(this.query);
+    });
+
+    controlDiv.index = 1;
+    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+
+    m.addListener('dragend', () => {
+      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
+      this.setLocation(LocationMode.map, {
+        lat: latLngBounds.getCenter().lat(),
+        lng: latLngBounds.getCenter().lng(),
+      });
+      this.mapQuerySubject.next(this.query);
+      console.log('Map Dragged');
+      if (this.isDistanceSort) {
+        console.log('Map Dragged, re-sorting');
+        this._updateDistanceSort();
+        this.querySubject.next(this.query);
+      }
+    });
+  }
+
+  private _updateDistanceSort() {
+    const distanceSortQuery = this.sortMethods.DISTANCE.sortQuery;
+    distanceSortQuery.latitude = this.loc.lat;
+    distanceSortQuery.longitude = this.loc.lng;
+    this.query.sort = distanceSortQuery;
   }
 
   private _queryToQueryParams(qBefore: Query): Params {
@@ -884,7 +830,8 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     queryParams.pageStart = q.start || 0;
     queryParams.zoom = this.mapZoomLevel;
     queryParams.restrictToMap = this.restrictToMappedResults ? 'y' : 'n';
-    if (this.loc) {  // Only do this if there is a map location.
+    if (this.loc) {
+      // Only do this if there is a map location.
       queryParams.lat = this.loc.lat; // ? this.mapLoc.lat : this.defaultLoc.lat;
       queryParams.lng = this.loc.lng; // ? this.mapLoc.lng : this.defaultLoc.lng;
     }
@@ -903,7 +850,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       languages: [],
       sort: this.sortMethods.DISTANCE.sortQuery,
       start: 0,
-      types: this.resourceTypesFilteredNames()
+      types: this.resourceTypesFilteredNames(),
     });
     q.size = this.pageSize;
     if (qParams) {
@@ -911,32 +858,32 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         for (const key of qParams.keys) {
           if (qParams.get(key) !== undefined) {
             switch (key) {
-              case ('words'):
+              case 'words':
                 q.words = qParams.get(key);
                 q.sort = this.sortMethods.RELEVANCE.sortQuery;
                 break;
-              case ('category'):
+              case 'category':
                 q.category = {id: parseInt(qParams.get(key), 10)};
                 break;
-              case('ages'):
+              case 'ages':
                 q.ages = qParams.getAll(key);
                 break;
-              case('languages'):
+              case 'languages':
                 q.languages = qParams.getAll(key);
                 break;
-              case('sort'):
+              case 'sort':
                 const sortKey = qParams.get(key).toUpperCase();
                 if (this.sortMethods[sortKey]) {
                   q.sort = this.sortMethods[sortKey].sortQuery;
                 }
                 break;
-              case('pageStart'):
+              case 'pageStart':
                 q.start = parseInt(qParams.get(key), 10);
                 break;
-              case('types'):
+              case 'types':
                 q.types = qParams.getAll(key);
                 break;
-              case('restrictToMap'):
+              case 'restrictToMap':
                 this.restrictToMappedResults = qParams.get('restrictToMap') === 'y';
                 break;
             }
@@ -946,8 +893,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     return q;
   }
-
-
 
   private _goToFirstPage(skipUpdate = false) {
     this.query.start = 0;
@@ -961,20 +906,19 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private  _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
+  private _overlaps(a: ClientRect | DOMRect, b: ClientRect | DOMRect): boolean {
     return (
-      ((b.top < a.top) && (b.bottom > a.top)) ||      // b overlaps top edge of a
-      ((b.top > a.top) && (b.bottom < a.bottom)) ||   // b inside a
-      ((b.top < a.bottom) && (b.bottom > a.bottom))   // b overlaps bottom edge of a
+      (b.top < a.top && b.bottom > a.top) || // b overlaps top edge of a
+      (b.top > a.top && b.bottom < a.bottom) || // b inside a
+      (b.top < a.bottom && b.bottom > a.bottom) // b overlaps bottom edge of a
     );
   }
 
   private _queryParamsHaveChanged(qParamMapBefore: ParamMap) {
     const qBefore = this._queryParamsToQuery(qParamMapBefore);
     const qAfter = this._queryParamsToQuery(convertToParamMap(this._queryToQueryParams(this.query)));
-    return (!this.prevQuery || qBefore.equals(qAfter));
+    return !this.prevQuery || qBefore.equals(qAfter);
   }
-
 
   private _loadRelatedStudies() {
     const studyQuery = createClone()(this.query);
@@ -994,14 +938,12 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-
   private _updatePaginator() {
-    const queryStart = this.query && (this.query.start - 1);
+    const queryStart = this.query && this.query.start - 1;
     const paramStart = parseInt(this.queryParamMap.get('pageStart'), 10) - 1;
     const pageStart = this.queryParamMap.has('pageStart') ? paramStart : queryStart;
     this.paginatorElement.pageIndex = pageStart / this.pageSize;
     this.expandResults = true;
     this.changeDetectorRef.detectChanges();
   }
-
 }

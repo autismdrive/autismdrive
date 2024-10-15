@@ -1,37 +1,26 @@
 <mat-list *ngIf="category && parentList().length > 0" class="parent-topics" dense>
   <ng-container *ngFor="let parent of parentList()">
-    <mat-list-item
-      (click)="selectCategory(parent)"
-      class="show-all"
-    >
+    <mat-list-item (click)="selectCategory(parent)" class="show-all">
       <mat-icon>chevron_left</mat-icon>
       <span class="filter-facet-label">
-          {{parent.name}}
-        </span>
+        {{ parent.name }}
+      </span>
     </mat-list-item>
   </ng-container>
 </mat-list>
 
-<ng-container *ngIf="!loading && category && category.children && (category.children.length > 0); else loadingMessage">
+<ng-container *ngIf="!loading && category && category.children && category.children.length > 0; else loadingMessage">
   <button [matMenuTriggerFor]="topicMenu" [ngClass.gt-sm]="'select-topic'" mat-button>
     <mat-icon>topic</mat-icon>
-    Filter by {{category.level <= 0 ? 'Topic' : 'Subtopic'}}
+    Filter by {{ category.level <= 0 ? 'Topic' : 'Subtopic' }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
   <mat-menu #topicMenu>
-    <button
-      (click)="selectCategory(child)"
-      *ngFor="let child of categories"
-      mat-menu-item
-    >
-      <span *ngIf="child.hit_count == 1" class="child-label">{{child.name}} - {{child.hit_count}} result</span>
-      <span *ngIf="child.hit_count != 1" class="child-label">{{child.name}} - {{child.hit_count}} results</span>
+    <button (click)="selectCategory(child)" *ngFor="let child of categories" mat-menu-item>
+      <span *ngIf="child.hit_count == 1" class="child-label">{{ child.name }} - {{ child.hit_count }} result</span>
+      <span *ngIf="child.hit_count != 1" class="child-label">{{ child.name }} - {{ child.hit_count }} results</span>
 
-      <mat-icon
-        *ngIf="hasChildren(child)"
-        matTooltip="Subtopics"
-      >arrow_right
-      </mat-icon>
+      <mat-icon *ngIf="hasChildren(child)" matTooltip="Subtopics">arrow_right </mat-icon>
     </button>
   </mat-menu>
 </ng-container>

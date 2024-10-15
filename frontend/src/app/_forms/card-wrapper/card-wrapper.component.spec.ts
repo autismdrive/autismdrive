@@ -1,25 +1,22 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { CardWrapperComponent } from './card-wrapper.component';
+import {AppModule} from '@app/app.module';
+import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('CardWrapperComponent', () => {
-  let component: CardWrapperComponent;
-  let fixture: ComponentFixture<CardWrapperComponent>;
+  it('should render card wrapper', () => {
+    const {query} = createFieldComponent(
+      {
+        wrappers: ['card'],
+        props: {
+          label: 'Name',
+          required: true,
+          description: 'Name description',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CardWrapperComponent ]
-    })
-    .compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(CardWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-card-wrapper')).not.toBeNull();
   });
 });

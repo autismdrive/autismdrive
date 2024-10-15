@@ -2,14 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {Study} from '../_models/study';
-import {StudyCategory} from '../_models/study_category';
-import {StudyInvestigator} from '../_models/study_investigator';
-import {ApiService} from '../_services/api/api.service';
-import {scrollToFirstInvalidField} from '../../util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AgeRange, Language} from '../_models/hit_type';
-
+import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {AgeRange, Language} from '@models/hit_type';
+import {Study} from '@models/study';
+import {StudyCategory} from '@models/study_category';
+import {StudyInvestigator} from '@models/study_investigator';
+import {ApiService} from '@services/api/api.service';
 
 enum PageState {
   LOADING = 'loading',
@@ -19,7 +18,7 @@ enum PageState {
 @Component({
   selector: 'app-study-form',
   templateUrl: './study-form.component.html',
-  styleUrls: ['./study-form.component.scss']
+  styleUrls: ['./study-form.component.scss'],
 })
 export class StudyFormComponent implements OnInit {
   study: Study;
@@ -30,239 +29,7 @@ export class StudyFormComponent implements OnInit {
 
   model: any = {};
   form: FormGroup;
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'status',
-      type: 'select',
-      templateOptions: {
-        label: 'Study Status',
-        placeholder: 'Please select the study status',
-        options: [
-          {'value': 'currently_enrolling', 'label': 'Currently Enrolling'},
-          {'value': 'study_in_progress', 'label': 'Study in progress'},
-          {'value': 'results_being_analyzed', 'label': 'Results being analyzed'},
-          {'value': 'study_results_published', 'label': 'Study results published'}
-        ],
-        required: true,
-      },
-    },
-    {
-      key: 'title',
-      type: 'input',
-      templateOptions: {
-        label: 'Title',
-        placeholder: 'Please enter the title of your study',
-        required: true,
-      },
-    },
-    {
-      key: 'short_title',
-      type: 'input',
-      templateOptions: {
-        label: 'Short Title',
-        placeholder: 'Please enter the short display title of your study',
-        required: true,
-        maxLength: 55,
-      },
-    },
-    {
-      key: 'description',
-      type: 'textarea-auto-resize',
-      templateOptions: {
-        label: 'Description',
-        placeholder: 'Please enter the description of your study',
-        required: true,
-      },
-    },
-    {
-      key: 'short_description',
-      type: 'textarea',
-      templateOptions: {
-        label: 'Short Description',
-        placeholder: 'Please enter the short display description of your study',
-        required: true,
-        maxLength: 155,
-      },
-    },
-    {
-      key: 'participant_description',
-      type: 'textarea-auto-resize',
-      templateOptions: {
-        label: 'Participant Description',
-        placeholder: 'Who are you looking for to participate in your study?',
-      },
-      expressionProperties: {
-        'templateOptions.required': 'model.status === "currently_enrolling"'
-      }
-    },
-    {
-      key: 'benefit_description',
-      type: 'textarea',
-      templateOptions: {
-        label: 'Benefit Description',
-        placeholder: 'How will participants benefit from your study?',
-      },
-      expressionProperties: {
-        'templateOptions.required': 'model.status === "currently_enrolling"'
-      }
-    },
-    {
-      key: 'investigators',
-      type: 'select',
-      templateOptions: {
-        label: 'Investigators',
-        options: [],
-        valueProp: 'id',
-        labelProp: 'name',
-        required: true,
-        multiple: true,
-      },
-      hooks: {
-        onInit: field => {
-          field.templateOptions.options = this.api.getInvestigators();
-        },
-      },
-    },
-    {
-      key: 'additional_investigators',
-      wrappers: ['card'],
-      templateOptions: {
-        label: 'Additional Investigator',
-        description: 'If your investigator does not appear in the list above, please add them here'
-      },
-      fieldGroup: [
-        {
-          type: 'input',
-          key: 'name',
-          templateOptions: {
-            label: 'Name',
-          },
-        },
-        {
-          type: 'input',
-          key: 'title',
-          templateOptions: {
-            label: 'Title',
-          },
-        },
-        {
-          type: 'input',
-          key: 'organization_name',
-          templateOptions: {
-            label: 'Organization Name',
-          },
-        },
-        {
-          type: 'input',
-          key: 'bio_link',
-          templateOptions: {
-            label: 'Bio Link',
-          },
-        },
-      ],
-    },
-    {
-      key: 'organization_name',
-      type: 'input',
-      templateOptions: {
-        label: 'Organization',
-        placeholder: 'Please enter the name of the hosting organization',
-      },
-    },
-    {
-      key: 'location',
-      type: 'input',
-      templateOptions: {
-        label: 'Location Name',
-        placeholder: 'Please describe where the study will take place',
-      },
-    },
-    {
-      key: 'num_visits',
-      type: 'input',
-      templateOptions: {
-        label: 'Number of Visits',
-        type: 'number',
-        placeholder: 'Please list the number of visits required for participation in this study',
-      },
-    },
-    {
-      key: 'coordinator_email',
-      type: 'input',
-      templateOptions: {
-        label: 'Coordinator Email',
-        placeholder: 'Please enter the email address to which study inquires will be sent',
-      },
-      expressionProperties: {
-        'templateOptions.required': 'model.status === "currently_enrolling"'
-      },
-      validators: {'validation': ['email']},
-    },
-    {
-      key: 'eligibility_url',
-      type: 'input',
-      templateOptions: {
-        label: 'Eligibility Link',
-        placeholder: 'If you have an eligibilty screener, please enter the link',
-      },
-      validators: {'validation': ['url']},
-    },
-    {
-      key: 'survey_url',
-      type: 'input',
-      templateOptions: {
-        label: 'Survey Link',
-        placeholder: 'If this is an online survey study, please enter the link',
-      },
-      validators: {'validation': ['url']},
-    },
-    {
-      key: 'results_url',
-      type: 'input',
-      templateOptions: {
-        label: 'Results Url',
-        placeholder: 'Link to published results of the study',
-      },
-      validators: {'validation': ['url']},
-    },
-    {
-      key: 'image_url',
-      type: 'input',
-      templateOptions: {
-        label: 'Image Url',
-        placeholder: 'This is the link to the image used for current study display',
-        description: 'Something like: /assets/home/study7.jpg'
-      },
-    },
-    {
-      key: 'categories',
-      type: 'multiselecttree',
-      templateOptions: {
-        label: 'Topics',
-        options: this.api.getCategoryTree(),
-        valueProp: 'id',
-        labelProp: 'name',
-      },
-    },
-    {
-      key: 'ages',
-      type: 'multicheckbox',
-      templateOptions: {
-        label: 'Age Ranges',
-        type: 'array',
-        options: this.getOptions(AgeRange.labels),
-      },
-    },
-    {
-      key: 'languages',
-      type: 'multicheckbox',
-      templateOptions: {
-        label: 'Languages',
-        type: 'array',
-        options: this.getOptions(Language.labels),
-      },
-    },
-  ];
+  fields: FormlyFieldConfig[];
 
   options: FormlyFormOptions;
 
@@ -274,6 +41,239 @@ export class StudyFormComponent implements OnInit {
     private router: Router,
     private deviceDetectorService: DeviceDetectorService,
   ) {
+    this.fields = [
+      {
+        key: 'status',
+        type: 'select',
+        props: {
+          label: 'Study Status',
+          placeholder: 'Please select the study status',
+          options: [
+            {value: 'currently_enrolling', label: 'Currently Enrolling'},
+            {value: 'study_in_progress', label: 'Study in progress'},
+            {value: 'results_being_analyzed', label: 'Results being analyzed'},
+            {value: 'study_results_published', label: 'Study results published'},
+          ],
+          required: true,
+        },
+      },
+      {
+        key: 'title',
+        type: 'input',
+        props: {
+          label: 'Title',
+          placeholder: 'Please enter the title of your study',
+          required: true,
+        },
+      },
+      {
+        key: 'short_title',
+        type: 'input',
+        props: {
+          label: 'Short Title',
+          placeholder: 'Please enter the short display title of your study',
+          required: true,
+          maxLength: 55,
+        },
+      },
+      {
+        key: 'description',
+        type: 'textarea-auto-resize',
+        props: {
+          label: 'Description',
+          placeholder: 'Please enter the description of your study',
+          required: true,
+        },
+      },
+      {
+        key: 'short_description',
+        type: 'textarea',
+        props: {
+          label: 'Short Description',
+          placeholder: 'Please enter the short display description of your study',
+          required: true,
+          maxLength: 155,
+        },
+      },
+      {
+        key: 'participant_description',
+        type: 'textarea-auto-resize',
+        props: {
+          label: 'Participant Description',
+          placeholder: 'Who are you looking for to participate in your study?',
+        },
+        expressionProperties: {
+          'props.required': 'model.status === "currently_enrolling"',
+        },
+      },
+      {
+        key: 'benefit_description',
+        type: 'textarea',
+        props: {
+          label: 'Benefit Description',
+          placeholder: 'How will participants benefit from your study?',
+        },
+        expressionProperties: {
+          'props.required': 'model.status === "currently_enrolling"',
+        },
+      },
+      {
+        key: 'investigators',
+        type: 'select',
+        props: {
+          label: 'Investigators',
+          options: [],
+          valueProp: 'id',
+          labelProp: 'name',
+          required: true,
+          multiple: true,
+        },
+        hooks: {
+          onInit: field => {
+            field.props.options = this.api.getInvestigators();
+          },
+        },
+      },
+      {
+        key: 'additional_investigators',
+        wrappers: ['card'],
+        props: {
+          label: 'Additional Investigator',
+          description: 'If your investigator does not appear in the list above, please add them here',
+        },
+        fieldGroup: [
+          {
+            type: 'input',
+            key: 'name',
+            props: {
+              label: 'Name',
+            },
+          },
+          {
+            type: 'input',
+            key: 'title',
+            props: {
+              label: 'Title',
+            },
+          },
+          {
+            type: 'input',
+            key: 'organization_name',
+            props: {
+              label: 'Organization Name',
+            },
+          },
+          {
+            type: 'input',
+            key: 'bio_link',
+            props: {
+              label: 'Bio Link',
+            },
+          },
+        ],
+      },
+      {
+        key: 'organization_name',
+        type: 'input',
+        props: {
+          label: 'Organization',
+          placeholder: 'Please enter the name of the hosting organization',
+        },
+      },
+      {
+        key: 'location',
+        type: 'input',
+        props: {
+          label: 'Location Name',
+          placeholder: 'Please describe where the study will take place',
+        },
+      },
+      {
+        key: 'num_visits',
+        type: 'input',
+        props: {
+          label: 'Number of Visits',
+          type: 'number',
+          placeholder: 'Please list the number of visits required for participation in this study',
+        },
+      },
+      {
+        key: 'coordinator_email',
+        type: 'input',
+        props: {
+          label: 'Coordinator Email',
+          placeholder: 'Please enter the email address to which study inquires will be sent',
+        },
+        expressionProperties: {
+          'props.required': 'model.status === "currently_enrolling"',
+        },
+        validators: {validation: ['email']},
+      },
+      {
+        key: 'eligibility_url',
+        type: 'input',
+        props: {
+          label: 'Eligibility Link',
+          placeholder: 'If you have an eligibilty screener, please enter the link',
+        },
+        validators: {validation: ['url']},
+      },
+      {
+        key: 'survey_url',
+        type: 'input',
+        props: {
+          label: 'Survey Link',
+          placeholder: 'If this is an online survey study, please enter the link',
+        },
+        validators: {validation: ['url']},
+      },
+      {
+        key: 'results_url',
+        type: 'input',
+        props: {
+          label: 'Results Url',
+          placeholder: 'Link to published results of the study',
+        },
+        validators: {validation: ['url']},
+      },
+      {
+        key: 'image_url',
+        type: 'input',
+        props: {
+          label: 'Image Url',
+          placeholder: 'This is the link to the image used for current study display',
+          description: 'Something like: /assets/home/study7.jpg',
+        },
+      },
+      {
+        key: 'categories',
+        type: 'multiselecttree',
+        props: {
+          label: 'Topics',
+          options: this.api.getCategoryTree(),
+          valueProp: 'id',
+          labelProp: 'name',
+        },
+      },
+      {
+        key: 'ages',
+        type: 'multicheckbox',
+        props: {
+          label: 'Age Ranges',
+          type: 'array',
+          options: this.getOptions(AgeRange.labels),
+        },
+      },
+      {
+        key: 'languages',
+        type: 'multicheckbox',
+        props: {
+          label: 'Languages',
+          type: 'array',
+          options: this.getOptions(Language.labels),
+        },
+      },
+    ];
   }
 
   ngOnInit() {
@@ -285,7 +285,7 @@ export class StudyFormComponent implements OnInit {
     const opts = [];
     for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {
-        opts.push({'value': key, 'label': modelLabels[key]});
+        opts.push({value: key, label: modelLabels[key]});
       }
     }
     return opts;
@@ -293,7 +293,6 @@ export class StudyFormComponent implements OnInit {
 
   loadData() {
     this.route.params.subscribe(params => {
-
       if (params['studyId']) {
         const studyId = params['studyId'];
         this.createNew = false;
@@ -308,8 +307,14 @@ export class StudyFormComponent implements OnInit {
         this.createNew = true;
         this.model.createNew = true;
         this.study = {
-          'title': '', 'description': '', 'participant_description': '', 'benefit_description': '',
-          'investigators': [], 'location': '', 'categories': [], 'status': ''
+          title: '',
+          description: '',
+          participant_description: '',
+          benefit_description: '',
+          investigators: [],
+          location: '',
+          categories: [],
+          status: '',
         } as Study;
         this.loadForm();
       }
@@ -341,8 +346,8 @@ export class StudyFormComponent implements OnInit {
     this.form = new FormGroup({});
     this.options = {
       formState: {
-        mainModel: this.model
-      }
+        mainModel: this.model,
+      },
     };
     this.state = this.pageState.SHOW_FORM;
   }
@@ -399,7 +404,7 @@ export class StudyFormComponent implements OnInit {
       this.updatedStudy = s;
       this.model.id = s.id;
       if (this.model.additional_investigators.name) {
-        this.addStudyInvestigator().subscribe((i) => {
+        this.addStudyInvestigator().subscribe(i => {
           this.model.investigators.push(i.id);
           this.updateStudyInvestigators(s.id).subscribe(() => {
             this.updateStudyCategories(s.id).subscribe(() => this.close());
@@ -435,7 +440,6 @@ export class StudyFormComponent implements OnInit {
   onCancel() {
     this.close();
   }
-
 
   highlightRequiredFields() {
     for (const fieldName of Object.keys(this.form.controls)) {

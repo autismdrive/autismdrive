@@ -1,64 +1,48 @@
-<div
-  *ngIf="hit"
-  class="result-item"
->
-  <div
-    fxLayout="row"
-    fxLayoutAlign="space-between"
-  >
-    <div
-      fxLayout="row"
-      fxLayoutGap=".5em"
-      fxLayoutAlign="start center"
-    >
+<div *ngIf="hit" class="result-item">
+  <div fxLayout="row" fxLayoutAlign="space-between">
+    <div fxLayout="row" fxLayoutGap=".5em" fxLayoutAlign="start center">
       <p *ngIf="hit.is_draft === true">[DRAFT]</p>
-      <a
-        class="title mat-h2"
-        [routerLink]="['/' + hit.type.toLowerCase(), hit.id]"
-      >
-        {{hit.title}}
+      <a class="title mat-h2" [routerLink]="['/' + hit.type.toLowerCase(), hit.id]">
+        {{ hit.title }}
       </a>
       <app-favorite-resource-button [resource_id]="hit.id" [user]="currentUser"></app-favorite-resource-button>
     </div>
     <button
-      mat-button *ngIf="hit.type != 'study'"
-      [routerLink]="[ '/search' ]"
-      [queryParams]="{'Type': hit.label}"
+      mat-button
+      *ngIf="hit.type !== 'study'"
+      [routerLink]="['/search']"
+      [queryParams]="{Type: hit.label}"
       class="type"
       [disableRipple]="true"
       matTooltip="{{ hit.label }}"
       fxLayout="row"
       fxLayoutAlign="end end"
-    ><app-type-icon [iconType]="hit.type.toLowerCase()" [size]="3"></app-type-icon></button>
-    <app-type-icon *ngIf="hit.type == 'study'" [iconType]="hit.type.toLowerCase()" [size]="3"></app-type-icon>
+    >
+      <app-type-icon [iconType]="hit.type.toLowerCase()" [size]="3"></app-type-icon>
+    </button>
+    <app-type-icon *ngIf="hit.type === 'study'" [iconType]="hit.type.toLowerCase()" [size]="3"></app-type-icon>
   </div>
   <ng-container *ngIf="hit && hit.status && isEnrolling(hit.status)">
     <em [ngClass]="'status-badge status-' + statusKey()">
       <mat-icon>timer</mat-icon>
-      {{hit.status}}
+      {{ hit.status }}
     </em>
   </ng-container>
-  <markdown
-    *ngIf="hit.highlights"
-    class="highlights"
-  >
+  <markdown *ngIf="hit.highlights" class="highlights">
     <app-last-updated-date [lastUpdatedDate]="hit.last_updated"></app-last-updated-date>
-    {{hit.highlights}}
+    {{ hit.highlights }}
     <app-event-date *ngIf="hit.date" [eventDate]="hit.date"></app-event-date>
   </markdown>
-  <p
-    *ngIf="!hit.highlights"
-    class="description"
-  >
+  <p *ngIf="!hit.highlights" class="description">
     <app-last-updated-date [lastUpdatedDate]="hit.last_updated"></app-last-updated-date>
-    <markdown>{{isPastEvent ? hit.post_event_description : hit.description}}</markdown>
+    <markdown>{{ isPastEvent ? hit.post_event_description : hit.description }}</markdown>
     <app-event-date *ngIf="hit.date" [eventDate]="hit.date"></app-event-date>
   </p>
   <app-details-link
     [url]="'/' + hit.type.toLowerCase() + '/' + hit.id"
     size="1"
-    label="View {{hit.type}} Details"
-    subtitle="{{mapLoc && hit.hasCoords() ? '(' + hit.milesFrom(mapLoc) + 'mi)' : ''}}"
+    label="View {{ hit.type }} Details"
+    subtitle="{{ mapLoc && hit.hasCoords() ? '(' + hit.milesFrom(mapLoc) + 'mi)' : '' }}"
     (mouseover)="hover = true"
     (mouseout)="hover = false"
     [hover]="hover"

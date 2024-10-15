@@ -18,13 +18,13 @@
       content: '';
       background-color: #e57200;
       width: 6.25rem;
-      height: .125rem;
+      height: 0.125rem;
       display: block;
     }
   }
 }
 
-::ng-deep .mat-form-field-wrapper{
+::ng-deep .mat-form-field-wrapper {
   margin-bottom: -1.25em;
 }
 
@@ -43,7 +43,10 @@
 
 /* mobile display */
 @media only screen and (max-device-width: 480px) {
-  .mobile_device_480px{display: block;}
-  .desktop {display: none;}
+  .mobile_device_480px {
+    display: block;
+  }
+  .desktop {
+    display: none;
+  }
 }
-

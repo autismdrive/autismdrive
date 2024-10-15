@@ -1,0 +1,97 @@
+[tool.setuptools.packages.find]
+where = ["backend"]
+
+[tool.poetry]
+authors = ["Aaron Louie <4656575+ajlouie@users.noreply.github.com>"]
+description = "Autism DRIVE backend API"
+name = "autismdrive"
+readme = "README.md"
+version = "1.0"
+
+[tool.poetry.urls]
+icon = "https://autismdrive.virginia.edu/favicon.ico"
+
+[tool.poetry.dependencies]
+APScheduler = "3.6.3"
+Flask = "3.0.3"
+Flask-Bcrypt = "1.0.1"
+Flask-Cors = "3.0.10"
+Flask-HTTPAuth = "4.8.0"
+Flask-Migrate = "4.0.5"
+Flask-RESTful = "0.3.9"
+Flask-SSO = "0.4.0"
+Flask-Script = "2.0.6"
+Jinja2 = "3.1.2"
+Mako = "1.2.2"
+MarkupSafe = "2.1.1"
+PyJWT = "2.4.0"
+SQLAlchemy = "2.0.22"
+SQLAlchemy-Utils = "0.41.1"
+Werkzeug = "3.0.0"
+XlsxWriter = "3.2.0"
+alembic = "1.13.2"
+aniso8601 = "9.0.1"
+bcrypt = "4.2.0"
+certifi = "2024.7.4"
+cffi = "1.16.0"
+chardet = "5.2.0"
+click = "8.1.7"
+elasticsearch = "8.14.0"
+elasticsearch-dsl = "8.14.0"
+et-xmlfile = "1.1.0"
+flask-marshmallow = "1.2.1"
+googlemaps = "4.10.0"
+httpretty = "1.1.4"
+icecream = "2.1.3"
+idna = "3.7"
+itsdangerous = "2.2.0"
+jdcal = "1.4.1"
+marshmallow = "3.21.3"
+marshmallow-sqlalchemy = "1.0.0"
+mod-wsgi = "5.0.0"
+openpyxl = "3.1.5"
+psycopg = "3.2.1"
+pycparser = "2.22"
+pydantic = "2.8.2"
+pydantic-settings = "2.4.0"
+python = "3.12.1"
+python-dateutil = "2.9.0.post0"
+python-editor = "1.0.4"
+pytz = "2024.1"
+requests = "2.32.3"
+six = "1.16.0"
+tzlocal = "5.2"
+urllib3 = "2.2.2"
+psycopg-c = "^3.2.3"
+psycopg-binary = "^3.2.3"
+
+[tool.poetry.dev-dependencies]
+autoflake = "2.3.1"
+black = "24.8.0"
+coverage = "7.6.1"
+faker = "26.1.0"
+faker-biology = "0.6.4"
+flake8 = "7.1.1"
+flake8-pyproject = "1.2.3"
+gevent = "24.2.1"
+isort = "5.13.2"
+traceback-with-variables = "2.0.4"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+include = '\.pyi?$'
+line-length = 120 # longer lines are nicer for coding in PyCharm
+target-version = ['py312']
+
+# Exclude the following paths from Black's processing (but I don't think this is working yet)
+[tool.flake8]
+max-line-length = 120
+
+[tool.coverage.run]
+concurrency = ["gevent"]

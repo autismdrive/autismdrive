@@ -3,56 +3,40 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="/assets/avatars/{{participant.avatar_icon || '001'}}.svg"
+        src="/assets/avatars/{{ participant.avatar_icon || '001' }}.svg"
         [ngStyle]="{'background-color': participant.avatar_color || '#CCC'}"
         (click)="chooseAvatar($event, participant)"
-        id="avatar_{{participant.id}}"
-      >
-      <div
-        class="change_text"
-        (click)="chooseAvatar($event, participant)"
-      >change icon</div>
+        id="avatar_{{ participant.id }}"
+      />
+      <div class="change_text" (click)="chooseAvatar($event, participant)">change icon</div>
       <mat-card-title>
-        {{participant.name}}
+        {{ participant.name }}
       </mat-card-title>
       <mat-card-subtitle>
-        {{user.isSelf(participant)? 'You' : participant.relationship | titlecase}}
-        <div
-          *ngIf="participant.percent_complete < 1"
-          class="mat-subheading-2"
-        >
-          <mat-progress-bar
-            [mode]="'determinate'"
-            [value]="participant.percent_complete * 100"
-          ></mat-progress-bar>
+        {{ user.isSelf(participant) ? 'You' : (participant.relationship | titlecase) }}
+        <div *ngIf="participant.percent_complete < 1" class="mat-subheading-2">
+          <mat-progress-bar [mode]="'determinate'" [value]="participant.percent_complete * 100"></mat-progress-bar>
         </div>
-        <div
-          *ngIf="participant.percent_complete >= 1"
-          class="mat-subheading-2"
-        >
-          Profile Complete
-        </div>
-        <div
-          fxLayout="row"
-          fxLayout.xs="column"
-          fxLayoutAlign="start center"
-          fxLayoutGap="10px"
-        >
+        <div *ngIf="participant.percent_complete >= 1" class="mat-subheading-2">Profile Complete</div>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start center" fxLayoutGap="10px">
           <button
             mat-flat-button
             color="accent"
             (click)="goEditEnroll($event)"
-            id="edit_enroll_{{participant.relationship}}_{{participant.id}}"
-          >Edit {{participant.relationship === 'self_guardian' ? 'guardian'  : 'enrollment'}} info</button>
+            id="edit_enroll_{{ participant.relationship }}_{{ participant.id }}"
+          >
+            Edit {{ participant.relationship === 'self_guardian' ? 'guardian' : 'enrollment' }} info
+          </button>
           <button
             mat-stroked-button
             (click)="goTerms($event)"
-            id="view_terms_{{participant.relationship}}_{{participant.id}}"
-          >Terms and Conditions</button>
+            id="view_terms_{{ participant.relationship }}_{{ participant.id }}"
+          >
+            Terms and Conditions
+          </button>
         </div>
       </mat-card-subtitle>
     </mat-card-header>
-    <mat-card-content>
-    </mat-card-content>
+    <mat-card-content> </mat-card-content>
   </mat-card>
 </div>

@@ -1,25 +1,26 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RepeatSectionComponent } from './repeat-section.component';
+import {AppModule} from '@app/app.module';
+import {createFieldComponent} from '@ngx-formly/core/testing';
+import {mockCategory} from '@util/testing/fixtures/mock-category';
+import {of} from 'rxjs';
 
 describe('RepeatSectionComponent', () => {
-  let component: RepeatSectionComponent;
-  let fixture: ComponentFixture<RepeatSectionComponent>;
+  it('should render repeat section', () => {
+    const {query} = createFieldComponent(
+      {
+        type: 'repeat',
+        props: {
+          label: 'Topics',
+          description: 'This field is required',
+          options: of([mockCategory]),
+          valueProp: 'id',
+          labelProp: 'name',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ RepeatSectionComponent ]
-    })
-    .compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(RepeatSectionComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-repeat-section')).not.toBeNull();
   });
 });

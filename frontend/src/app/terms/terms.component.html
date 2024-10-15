@@ -1,36 +1,27 @@
-<div
-  class="container mat-typography terms"
-  fxLayoutAlign="center center"
->
+<div class="container mat-typography terms" fxLayoutAlign="center center">
   <div fxFlex="80%">
     <app-logo variant="dark-lg" (click)="goProfile($event)"></app-logo>
-    <h3 *ngIf="!preview" class="alert alert-warn">You must read and accept the following Terms & Conditions in order to continue
-      creating an Autism DRIVE account.</h3>
+    <h3 *ngIf="!preview" class="alert alert-warn">
+      You must read and accept the following Terms & Conditions in order to continue creating an Autism DRIVE account.
+    </h3>
     <h1>Terms and Conditions</h1>
-    <div
-      *ngIf="relationship == 'self_guardian'"
-      id="guardian-terms"
-    >
+    <div *ngIf="relationship === 'self_guardian'" id="guardian-terms">
       <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/guardian_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
     <div
-      *ngIf="relationship == 'self_participant' || relationship == 'self_professional' || relationship == 'self_interested' "
+      *ngIf="
+        relationship === 'self_participant' ||
+        relationship === 'self_professional' ||
+        relationship === 'self_interested'
+      "
       id="self-terms"
     >
       <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/adult_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
-    <div
-      *ngIf="relationship == 'dependent'"
-      id="dependent-terms"
-    >
+    <div *ngIf="relationship === 'dependent'" id="dependent-terms">
       <ng2-pdfjs-viewer pdfSrc="../../../assets/terms/child_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
-    <div
-      fxLayout="row"
-      fxLayout.xs="column"
-      fxLayoutGap="2%"
-      fxLayoutAlign="center center"
-    >
+    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="2%" fxLayoutAlign="center center">
       <button
         *ngIf="!preview"
         mat-flat-button

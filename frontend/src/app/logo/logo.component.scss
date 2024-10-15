@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @import '../../material';
 
 #logo {
@@ -5,24 +6,41 @@
   align-items: center;
   justify-content: center;
 
-  &.dark-lg .variant, &.dark .variant { color: $brand-primary; font-weight: bold; }
-  &.light-lg .variant, &.light .variant { color: white; font-weight: bold; }
+  &.dark-lg .variant,
+  &.dark .variant {
+    color: $brand-primary;
+    font-weight: bold;
+  }
+  &.light-lg .variant,
+  &.light .variant {
+    color: white;
+    font-weight: bold;
+  }
 
-  a { color: $brand-accent;}
+  a {
+    color: $brand-accent;
+  }
 
-  &.dark-lg, &.light-lg {
+  &.dark-lg,
+  &.light-lg {
     a {
-      @include mat-typography-level-to-styles($custom-typography, display-3);
-      font-family: "franklin-gothic-urw", serif;
+      @include mat.typography-level($stardrive-typography, display-3);
+      font-family: 'franklin-gothic-urw', serif;
       text-transform: uppercase;
       margin-top: 4rem;
       margin-bottom: 4rem;
       font-weight: lighter;
       font-size: 2.5rem;
 
-      @media (min-width: 959px) { font-size: 3rem; }
-      @media (min-width: 960px) { font-size: 3.5rem; }
-      @media (min-width: 1280px) { font-size: 4rem; }
+      @media (min-width: 959px) {
+        font-size: 3rem;
+      }
+      @media (min-width: 960px) {
+        font-size: 3.5rem;
+      }
+      @media (min-width: 1280px) {
+        font-size: 4rem;
+      }
     }
 
     img {
@@ -37,10 +55,11 @@
     }
   }
 
-  &.dark, &.light {
+  &.dark,
+  &.light {
     a {
-      @include mat-typography-level-to-styles($custom-typography, display-1);
-      font-family: "franklin-gothic-urw", serif;
+      @include mat.typography-level($stardrive-typography, display-1);
+      font-family: 'franklin-gothic-urw', serif;
       text-transform: uppercase;
       font-weight: lighter;
       font-size: 2rem;

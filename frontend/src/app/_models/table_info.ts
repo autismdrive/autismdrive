@@ -1,3 +1,14 @@
+export interface TableInfoProps {
+  display_name: string;
+  table_name: string;
+  class_name: string;
+  size: number;
+  url: string;
+  question_type: string;
+  exportable: boolean;
+  sub_tables: TableInfo[];
+}
+
 export class TableInfo {
   display_name: string;
   table_name: string;
@@ -8,7 +19,7 @@ export class TableInfo {
   exportable: boolean;
   sub_tables: TableInfo[];
 
-  constructor(private _props) {
+  constructor(private _props: TableInfoProps) {
     for (const propName in this._props) {
       if (this._props.hasOwnProperty(propName)) {
         this[propName] = this._props[propName];
@@ -32,5 +43,4 @@ export class TableInfo {
       }
     }
   }
-
 }

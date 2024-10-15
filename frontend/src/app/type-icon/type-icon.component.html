@@ -1,6 +1,10 @@
 <ng-container *ngIf="iconType">
-  <i *ngIf="is(iconType, 'study')" class="icofont-search-stock icofont-{{size}}x"></i>
-  <mat-icon *ngIf="is(iconType, 'resource')" [ngStyle]="{'font-size': pxSize, height: pxSize, width: pxSize}">important_devices</mat-icon>
-  <mat-icon *ngIf="is(iconType, 'event')" [ngStyle]="{'font-size': pxSize, height: pxSize, width: pxSize}">event_available</mat-icon>
-  <i *ngIf="is(iconType, 'location')" class="icofont-ui-map icofont-{{size}}x"></i>
+  <i *ngIf="is(iconType, 'study')" class="icofont-search-stock icofont-{{ size }}x"></i>
+  <mat-icon *ngIf="is(iconType, 'resource')" [ngStyle]="{'font-size': pxSize, height: pxSize, width: pxSize}"
+    >important_devices</mat-icon
+  >
+  <mat-icon *ngIf="is(iconType, 'event')" [ngStyle]="{'font-size': pxSize, height: pxSize, width: pxSize}"
+    >event_available</mat-icon
+  >
+  <i *ngIf="is(iconType, 'location')" class="icofont-ui-map icofont-{{ size }}x"></i>
 </ng-container>

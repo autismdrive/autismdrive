@@ -1,26 +1,31 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import {Participant} from '../_models/participant';
-import {ParticipantAdminList} from '../_models/participant_admin_list';
-import {ApiService} from '../_services/api/api.service';
+import {Participant} from '@models/participant';
+import {ParticipantAdminList} from '@models/participant_admin_list';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-participant-admin',
   templateUrl: './participant-admin.component.html',
-  styleUrls: ['./participant-admin.component.scss']
+  styleUrls: ['./participant-admin.component.scss'],
 })
 export class ParticipantAdminComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   userParticipantList: ParticipantAdminList;
   participantDataSource = new MatTableDataSource<Participant>([]);
-  displayedColumns: string[] = ['id', 'name', 'user_id', 'relationship', 'percent_complete', 'has_consented', 'last_updated'];
+  displayedColumns: string[] = [
+    'id',
+    'name',
+    'user_id',
+    'relationship',
+    'percent_complete',
+    'has_consented',
+    'last_updated',
+  ];
   loading = true;
 
-  constructor(
-    private api: ApiService,
-  ) {
-  }
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
     this.api.getParticipantAdminList().subscribe(pal => {

@@ -1,4 +1,3 @@
-
 export interface Investigator {
   id?: number;
   name: string;

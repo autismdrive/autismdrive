@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @import '../../material';
 
 a {
@@ -6,8 +7,8 @@ a {
   display: inline-flex;
   align-items: center;
 
-  [class*="details-link-text"] {
-    @include mat-typography-level-to-styles($custom-typography, title);
+  [class*='details-link-text'] {
+    @include mat.typography-level($stardrive-typography, title);
     font-style: italic;
     color: $brand-primary;
   }
@@ -22,7 +23,7 @@ a {
     margin-left: 0.75rem;
   }
 
-  [class*="icofont-"] {
+  [class*='icofont-'] {
     color: $brand-accent;
     transition: all 0.5s;
   }
@@ -54,11 +55,13 @@ a {
 
 .inverted {
   color: white;
-  [class*="details-link-text"] { color: white; }
+  [class*='details-link-text'] {
+    color: white;
+  }
 }
 
 .all-caps {
-  [class*="details-link-text"] {
+  [class*='details-link-text'] {
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }

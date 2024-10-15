@@ -1,6 +1,5 @@
-import { TestBed } from '@angular/core/testing';
-
-import { IntervalService } from './interval.service';
+import {TestBed} from '@angular/core/testing';
+import {IntervalService} from './interval.service';
 
 describe('IntervalService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

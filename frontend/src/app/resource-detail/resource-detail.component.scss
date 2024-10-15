@@ -1,18 +1,29 @@
 @import '../../config';
 
-agm-map {
+map-view {
   height: 50vh;
   width: 100%;
 }
 
-::ng-deep .gm-style-iw.gm-style-iw-c, ::ng-deep .gm-style-iw-d {
+::ng-deep .gm-style-iw.gm-style-iw-c,
+::ng-deep .gm-style-iw-d {
   max-height: 50vh !important;
 
-  @media (max-width: 575px) { max-width: 90vw !important; }
-  @media (min-width: 576px) { max-width: 80vw !important; }
-  @media (min-width: 768px) { max-width: 50vw !important; }
-  @media (min-width: 960px) { max-width: 40vw !important; }
-  @media (min-width: 1200px) { max-width: 30vw !important; }
+  @media (max-width: 575px) {
+    max-width: 90vw !important;
+  }
+  @media (min-width: 576px) {
+    max-width: 80vw !important;
+  }
+  @media (min-width: 768px) {
+    max-width: 50vw !important;
+  }
+  @media (min-width: 960px) {
+    max-width: 40vw !important;
+  }
+  @media (min-width: 1200px) {
+    max-width: 30vw !important;
+  }
 }
 
 .no-address-message {

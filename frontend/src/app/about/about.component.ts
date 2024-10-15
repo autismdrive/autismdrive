@@ -1,30 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Meta } from '@angular/platform-browser';
+import {Component} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
-  styleUrls: ['./about.component.scss']
+  styleUrls: ['./about.component.scss'],
 })
-export class AboutComponent implements OnInit {
-
+export class AboutComponent {
   constructor(
     private router: Router,
     private meta: Meta,
   ) {
     this.meta.updateTag(
-      { property: 'og:image', content: location.origin + '/assets/about/diversity.jpg' },
-      `property='og:image'`);
+      {property: 'og:image', content: location.origin + '/assets/about/diversity.jpg'},
+      `property='og:image'`,
+    );
     this.meta.updateTag(
-      { property: 'og:image:secure_url', content: location.origin + '/assets/about/diversity.jpg' },
-      `property='og:image:secure_url'`);
+      {property: 'og:image:secure_url', content: location.origin + '/assets/about/diversity.jpg'},
+      `property='og:image:secure_url'`,
+    );
     this.meta.updateTag(
-      { name: 'twitter:image', content: location.origin + '/assets/about/diversity.jpg' },
-      `name='twitter:image'`);
-  }
-
-  ngOnInit() {
+      {name: 'twitter:image', content: location.origin + '/assets/about/diversity.jpg'},
+      `name='twitter:image'`,
+    );
   }
 
   goRegister($event) {

@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RelatedItemsComponent } from './related-items.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {RelatedItemsComponent} from './related-items.component';
 
 describe('RelatedItemsComponent', () => {
   let component: RelatedItemsComponent;
-  let fixture: ComponentFixture<RelatedItemsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ RelatedItemsComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<RelatedItemsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RelatedItemsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(RelatedItemsComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(RelatedItemsComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

@@ -1,23 +1,9 @@
-<div
-  *ngIf="!loading && resource"
-  class="container"
-  id="resource"
->
-  <div
-    class="row"
-    fxLayout="row"
-    fxLayout.lt-lg="column"
-    fxLayoutGap="40px"
-  >
-    <div
-      id="resource-details"
-      fxFlex.gt-md="60%"
-      fxLayout="column"
-      fxLayoutGap="40px"
-    >
+<div *ngIf="!loading && resource" class="container" id="resource">
+  <div class="row" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="40px">
+    <div id="resource-details" fxFlex.gt-md="60%" fxLayout="column" fxLayoutGap="40px">
       <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="1em">
         <app-type-icon [iconType]="resource.type.toLowerCase()" [size]="3"></app-type-icon>
-        <h1>{{resource.title}}</h1>
+        <h1>{{ resource.title }}</h1>
       </div>
       <p *ngIf="resourceIsDraft">[DRAFT]</p>
       <app-edit-button
@@ -27,20 +13,21 @@
         [editLabel]="'Edit ' + resource.type"
       ></app-edit-button>
       <app-favorite-resource-button [resource_id]="resource.id" [user]="currentUser"></app-favorite-resource-button>
-      <p>Last Updated: {{resource.last_updated | date:'longDate'}}</p>
+      <p>Last Updated: {{ resource.last_updated | date: 'longDate' }}</p>
       <h2>About this resource</h2>
-      <p *ngIf="resourceIsDraft && !userCanEdit">This resource is being edited and is under review. Please check back for more up-to-date information soon.</p>
+      <p *ngIf="resourceIsDraft && !userCanEdit">
+        This resource is being edited and is under review. Please check back for more up-to-date information soon.
+      </p>
       <p *ngIf="resource.type === 'event' && resource.image_url">
-        <a [href]="resource.website" target="_blank"><img src="{{resource.image_url}}"></a>
+        <a [href]="resource.website" target="_blank"><img src="{{ resource.image_url }}" /></a>
       </p>
 
       <ng-container *ngIf="resource.type !== 'event'">
-        <markdown>{{resource.description}}</markdown>
+        <markdown>{{ resource.description }}</markdown>
       </ng-container>
       <ng-container *ngIf="resource.type === 'event'">
-        <markdown>{{isPastEvent ? resource.post_event_description : resource.description}}</markdown>
+        <markdown>{{ isPastEvent ? resource.post_event_description : resource.description }}</markdown>
       </ng-container>
-
 
       <div *ngIf="resource.type === 'event'" fxLayout="column" fxLayoutAlign="center center">
         <app-event-registration
@@ -54,39 +41,38 @@
           mat-flat-button
           class="btn btn-xl"
           color="accent"
-          [href]="resource.registration_url || 'mailto:' + resource.contact_email + '?subject=Registration+for+' + resource.title"
+          [href]="
+            resource.registration_url ||
+            'mailto:' + resource.contact_email + '?subject=Registration+for+' + resource.title
+          "
           target="_blank"
-        >Register Now</a>
+          >Register Now</a
+        >
       </div>
-      <p *ngIf="resource.insurance">Insurance accepted: {{resource.insurance}}</p>
+      <p *ngIf="resource.insurance">Insurance accepted: {{ resource.insurance }}</p>
 
       <div *ngIf="safeVideoLink">
         <div *ngIf="currentUser">
-          <iframe fxFlex="100%" height="500px" [src]='safeVideoLink' frameborder="0" allowfullscreen></iframe>
+          <iframe fxFlex="100%" height="500px" [src]="safeVideoLink" frameborder="0" allowfullscreen></iframe>
         </div>
         <div *ngIf="!currentUser">
           <h2>Interested in watching this video?</h2>
           <div class="video-image-box">
             <div class="gradient-overlay image">
-              <img [src]="'https://img.youtube.com/vi/' + resource.video_code +'/hqdefault.jpg'">
+              <img [src]="'https://img.youtube.com/vi/' + resource.video_code + '/hqdefault.jpg'" />
             </div>
-            <div
-              fxLayout="column"
-              fxLayoutGap="20px"
-              class="button-overlay"
-            >
+            <div fxLayout="column" fxLayoutGap="20px" class="button-overlay">
               <button
                 mat-flat-button
                 color="accent"
-                [routerLink]="[ '/register' ]"
-                [queryParams]="{ returnUrl: router.url }"
-              >Join Autism DRIVE</button>
-              <button
-                mat-flat-button
-                color="accent"
-                [routerLink]="[ '/login' ]"
-                [queryParams]="{ returnUrl: router.url }"
-              >Log In</button>
+                [routerLink]="['/register']"
+                [queryParams]="{returnUrl: router.url}"
+              >
+                Join Autism DRIVE
+              </button>
+              <button mat-flat-button color="accent" [routerLink]="['/login']" [queryParams]="{returnUrl: router.url}">
+                Log In
+              </button>
             </div>
           </div>
         </div>
@@ -96,49 +82,33 @@
         <mat-card-title><h4>Contact</h4></mat-card-title>
         <mat-card-content>
           <p *ngIf="mapLoc && !resource.street_address1" class="no-address-message">
-            {{resource.type === 'location' ? 'In-home therapy service.' : ''}}
-            Contact {{resource.organization_name}} for specific
-            {{resource.type === 'location' ? 'service area' : 'location'}}.
+            {{ resource.type === 'location' ? 'In-home therapy service.' : '' }}
+            Contact {{ resource.organization_name }} for specific
+            {{ resource.type === 'location' ? 'service area' : 'location' }}.
           </p>
-          <app-contact-item
-            *ngFor="let c of contactItems"
-            [contactItem]="c"
-          ></app-contact-item>
+          <app-contact-item *ngFor="let c of contactItems" [contactItem]="c"></app-contact-item>
         </mat-card-content>
       </mat-card>
 
-      <div
-        fxLayout="column"
-        fxLayoutGap="20px"
-      >
-        <button
-          *ngIf="resource.phone"
-          mat-flat-button
-          color="primary"
-          (click)="goPhone($event)"
-        >Call {{resource.phone}}</button>
-        <button
-          *ngIf="resource.website"
-          mat-stroked-button
-          color="primary"
-          (click)="goWebsite($event)"
-        >Visit website</button>
+      <div fxLayout="column" fxLayoutGap="20px">
+        <button *ngIf="resource.phone" mat-flat-button color="primary" (click)="goPhone($event)">
+          Call {{ resource.phone }}
+        </button>
+        <button *ngIf="resource.website" mat-stroked-button color="primary" (click)="goWebsite($event)">
+          Visit website
+        </button>
       </div>
 
-      <div
-        *ngIf="currentUser && currentUser.permissions.includes('edit_resource')"
-        fxLayout="column"
-        fxLayoutGap="2em"
-      >
+      <div *ngIf="currentUser && currentUser.permissions.includes('edit_resource')" fxLayout="column" fxLayoutGap="2em">
         <mat-card>
           <mat-card-title>Edit Log</mat-card-title>
           <div *ngIf="changeLog">
             <div *ngFor="let l of changeLog">
               <p mat-line>
                 <a [href]="'/#/admin/user/' + l.user_id">
-                  <b>User #{{l.user_id}} - {{l.user_email}}</b>
+                  <b>User #{{ l.user_id }} - {{ l.user_email }}</b>
                 </a>
-                - Edit Type: {{l.type | uppercase}} - Update Date: {{l.last_updated | date: "long"}}
+                - Edit Type: {{ l.type | uppercase }} - Update Date: {{ l.last_updated | date: 'long' }}
               </p>
             </div>
           </div>
@@ -146,14 +116,9 @@
         <app-admin-note-display [currentUser]="currentUser" [currentResource]="resource"></app-admin-note-display>
       </div>
     </div>
-    <div
-      id="resource-meta"
-      fxFlex.gt-md="40%"
-      fxLayout="column"
-      fxLayoutGap="20px"
-    >
+    <div id="resource-meta" fxFlex.gt-md="40%" fxLayout="column" fxLayoutGap="20px">
       <div *ngIf="resource && resource.hasCoords()" id="resource-map">
-        <agm-map
+        <map-view
           [latitude]="resource.latitude"
           [longitude]="resource.longitude"
           [streetViewControl]="false"
@@ -161,7 +126,7 @@
           [zoom]="7"
           [scrollwheel]="null"
         >
-          <agm-circle
+          <map-circle
             *ngIf="resource.hasCoords() && !resource.street_address1"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
@@ -171,64 +136,63 @@
             [clickable]="true"
             (circleClick)="toggleInfoWindow($event)"
           >
-          </agm-circle>
+          </map-circle>
           <agm-marker
             *ngIf="resource.hasCoords()"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
-            [iconUrl]="{url: '/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg', anchor: {x: 24, y: 24}}"
+            [iconUrl]="{
+              url: '/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg',
+              anchor: {x: 24, y: 24}
+            }"
             (markerClick)="toggleInfoWindow($event)"
           >
-            <agm-info-window
-              [isOpen]="showInfoWindow"
-              [latitude]="resource.latitude"
-              [latitude]="resource.longitude"
-            >
-              <h5>{{resource.title}}</h5>
+            <map-info-window [isOpen]="showInfoWindow" [latitude]="resource.latitude" [latitude]="resource.longitude">
+              <h5>{{ resource.title }}</h5>
               <ng-container *ngIf="resource.street_address1">
-                <p>About {{resource.milesFrom(mapLoc)}} miles away</p>
-                <a
-                  class="chevron-link"
-                  href="{{getGoogleMapsUrl()}}"
-                  target="_blank"
-                >Driving directions</a>
+                <p>About {{ resource.milesFrom(mapLoc) }} miles away</p>
+                <a class="chevron-link" href="{{ getGoogleMapsUrl() }}" target="_blank">Driving directions</a>
               </ng-container>
               <ng-container *ngIf="!resource.street_address1">
                 <p *ngIf="mapLoc && !resource.street_address1" class="no-address-message">
-                  {{resource.type === 'location' ? 'In-home therapy service.' : ''}}
-                  Contact {{resource.organization_name}} for specific
-                  {{resource.type === 'location' ? 'service area' : 'location'}}.
+                  {{ resource.type === 'location' ? 'In-home therapy service.' : '' }}
+                  Contact {{ resource.organization_name }} for specific
+                  {{ resource.type === 'location' ? 'service area' : 'location' }}.
                 </p>
-                <a
-                  *ngIf="resource.phone"
-                  class="chevron-link"
-                  target="_blank"
-                  href="tel://{{resource.phone}}"
-                >Call {{resource.phone}}</a>
+                <a *ngIf="resource.phone" class="chevron-link" target="_blank" href="tel://{{ resource.phone }}"
+                  >Call {{ resource.phone }}</a
+                >
                 <a
                   *ngIf="!resource.phone && resource.website"
                   class="chevron-link"
                   target="_blank"
-                  href="{{resource.website}}"
+                  href="{{ resource.website }}"
                 >
                   Visit website
                 </a>
               </ng-container>
-            </agm-info-window>
+            </map-info-window>
           </agm-marker>
-        </agm-map>
+        </map-view>
       </div>
       <div id="resource-categories">
-        <app-filter-chips [categories]="resource.resource_categories" [ages]="resource.ages" [languages]="resource.languages" [covid19_categories]="resource.covid19_categories" [parentComponent]="'resource_detail'"></app-filter-chips>
+        <app-filter-chips
+          [categories]="resource.resource_categories"
+          [ages]="resource.ages"
+          [languages]="resource.languages"
+          [covid19_categories]="resource.covid19_categories"
+          [parentComponent]="'resource_detail'"
+        ></app-filter-chips>
       </div>
       <div id="resource-related" *ngIf="!resource.should_hide_related_resources">
-        <app-related-items [resource]="resource" [loading]="loading" [parentComponent]="'resource-detail'"></app-related-items>
+        <app-related-items
+          [resource]="resource"
+          [loading]="loading"
+          [parentComponent]="'resource-detail'"
+        ></app-related-items>
       </div>
     </div>
   </div>
 </div>
 
-<app-loading
-  *ngIf="!resource"
-  message="Loading..."
-></app-loading>
+<app-loading *ngIf="!resource" message="Loading..."></app-loading>

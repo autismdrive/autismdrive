@@ -1,23 +1,45 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
-    "downlevelIteration": true,
-    "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": false,
-    "module": "es2020",
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2015",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2018",
-      "dom"
-    ]
-  }
+    "baseUrl": ".",
+    "paths": {
+      "@animations/*": ["src/app/_animations/*"],
+      "@app/*": ["src/app/*"],
+      "@cypress/*": ["cypress/*"],
+      "@environments/*": ["src/environments/*"],
+      "@forms/*": ["src/app/_forms/*"],
+      "@models/*": ["src/app/_models/*"],
+      "@node_modules/*": ["node_modules/*"],
+      "@routing/*": ["src/app/_routing/*"],
+      "@services/*": ["src/app/_services/*"],
+      "@src/*": ["src/*"],
+      "@util/*": ["src/util/*"]
+    },
+    "declaration": false,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "lib": ["es2022", "dom"],
+    "module": "es2022",
+    "moduleResolution": "node",
+    "outDir": "./dist/out-tsc",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "es2022",
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node"]
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "cypress"
+  ]
 }
+

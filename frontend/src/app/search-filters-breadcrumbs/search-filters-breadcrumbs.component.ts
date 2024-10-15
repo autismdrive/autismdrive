@@ -1,17 +1,17 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Query} from '../_models/query';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Query} from '@models/query';
 
 @Component({
   selector: 'app-search-filters-breadcrumbs',
   templateUrl: './search-filters-breadcrumbs.component.html',
-  styleUrls: ['./search-filters-breadcrumbs.component.scss']
+  styleUrls: ['./search-filters-breadcrumbs.component.scss'],
 })
-export class SearchFiltersBreadcrumbsComponent implements OnInit {
+export class SearchFiltersBreadcrumbsComponent {
   @Input() query: Query;
   @Input() restrictToMappedResults: boolean;
-  @Input() ageLabels: { [key: string]: string };
-  @Input() languageLabels: { [key: string]: string };
-  @Input() typeLabels: { [key: string]: string };
+  @Input() ageLabels: {[key: string]: string};
+  @Input() languageLabels: {[key: string]: string};
+  @Input() typeLabels: {[key: string]: string};
   @Output() mappedResultsChipClicked = new EventEmitter<boolean>();
   @Output() keywordChipClicked = new EventEmitter();
   @Output() ageRangeChipClicked = new EventEmitter();
@@ -20,10 +20,5 @@ export class SearchFiltersBreadcrumbsComponent implements OnInit {
   @Output() categoryChipClicked = new EventEmitter();
   @Output() clearAllClicked = new EventEmitter();
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
+  constructor() {}
 }

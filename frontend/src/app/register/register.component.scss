@@ -10,15 +10,20 @@
 
   .hero-content {
     display: grid;
-    @media (min-width: 768px) { grid-template-columns: 2fr 1fr; }
-    @media (min-width: 992px) { grid-template-columns: 1fr 1fr; }
-    @media (min-width: 1200px) { grid-template-columns: 1fr 1fr; }
-
+    @media (min-width: 768px) {
+      grid-template-columns: 2fr 1fr;
+    }
+    @media (min-width: 992px) {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (min-width: 1200px) {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .form.border-box {
     max-width: 100%;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     color: black;
     padding: 2em;
 
@@ -26,15 +31,14 @@
       text-transform: uppercase;
     }
   }
-
 }
 
-  .bold-title {
-    text-transform: uppercase;
-    font-size: 1.8em;
-    font-weight: bold;
-  }
+.bold-title {
+  text-transform: uppercase;
+  font-size: 1.8em;
+  font-weight: bold;
+}
 
-  .register-container {
-    margin: 1em;
-  }
+.register-container {
+  margin: 1em;
+}

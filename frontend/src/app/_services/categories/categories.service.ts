@@ -1,9 +1,9 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
-import {CategoriesByDisplayOrder, CategoriesById, Category} from '../../_models/category';
+import {CategoriesByDisplayOrder, CategoriesById, Category} from '@models/category';
 import {ApiService} from '../api/api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CategoriesService {
   categoryTree: Category[];
@@ -12,17 +12,16 @@ export class CategoriesService {
   categoriesById: CategoriesById = {};
   @Output() updated = new EventEmitter<boolean>();
 
-  constructor(
-    private api: ApiService
-  ) {
+  constructor(private api: ApiService) {
+    console.log('CategoriesService constructor');
     this.api.getCategoryTree().subscribe(categoryTree => {
+      console.log('CategoriesService > getCategoryTree.subscribe callback');
       this.categoryTree = categoryTree;
       this._populateCategoryIndices(this.categoryTree);
 
       // Sort options by category level and display order
-      this.categoryList = Object
-        .entries(this.categoriesByDisplayOrder) // each entry is an array containing [key, value]
-        .sort((a, b) => a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1)
+      this.categoryList = Object.entries(this.categoriesByDisplayOrder) // each entry is an array containing [key, value]
+        .sort((a, b) => (a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1))
         .map(entry => entry[1]);
 
       this._populateCategoryParents();
@@ -30,7 +29,7 @@ export class CategoriesService {
         cat.indentedString = this._indentedString(cat);
       });
 
-       this.updated.emit(true);
+      this.updated.emit(true);
     });
   }
 
@@ -77,7 +76,7 @@ export class CategoriesService {
 
     // Walk the tree, pushing the ancestors display orders into the array as we go down.
     categoryTree.forEach(c => {
-      const displayOrder = (c.display_order !== null && c.display_order !== undefined) ? c.display_order : c.id;
+      const displayOrder = c.display_order !== null && c.display_order !== undefined ? c.display_order : c.id;
       const indexArray = displayOrders.concat([displayOrder]);
       const indexStr = indexArray.join('.');
       if (!this.categoriesByDisplayOrder[indexStr]) {
@@ -102,5 +101,4 @@ export class CategoriesService {
       }
     });
   }
-
 }

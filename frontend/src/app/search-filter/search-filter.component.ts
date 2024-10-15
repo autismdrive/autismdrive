@@ -1,14 +1,12 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Category} from '../_models/category';
-import {Aggregation} from '../_models/query';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Aggregation} from '@models/query';
 
 @Component({
   selector: 'app-search-filter',
   templateUrl: './search-filter.component.html',
-  styleUrls: ['./search-filter.component.scss']
+  styleUrls: ['./search-filter.component.scss'],
 })
-export class SearchFilterComponent implements OnInit {
-
+export class SearchFilterComponent {
   @Input() label_title: string;
   @Input() label_icon: string;
   @Input() label_any: string;
@@ -18,11 +16,7 @@ export class SearchFilterComponent implements OnInit {
   @Input() notApplicableMessage: string;
   @Output() filterSelected = new EventEmitter<String>();
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   select(keepType?: string) {
     this.filterSelected.emit(keepType);

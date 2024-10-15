@@ -1,39 +1,15 @@
-<div
-  class="resource-detail mat-typography"
->
-  <app-loading
-    *ngIf="state === pageState.LOADING"
-    message="Loading..."
-  ></app-loading>
+<div class="resource-detail mat-typography">
+  <app-loading *ngIf="state === pageState.LOADING" message="Loading..."></app-loading>
 
-  <form
-    *ngIf="state === pageState.SHOW_FORM"
-    [formGroup]="form"
-    class="pad-2"
-  >
+  <form *ngIf="state === pageState.SHOW_FORM" [formGroup]="form" class="pad-2">
     <h1>Resource Details</h1>
 
-    <formly-form
-      [form]="form"
-      [model]="model"
-      [fields]="fields"
-      [options]="options"
-    >
-    </formly-form>
+    <formly-form [form]="form" [model]="model" [fields]="fields" [options]="options" />
 
-    <div
-      class="button-row"
-      fxLayout="row"
-      fxLayoutGap="2em"
-    >
-      <button
-        *ngIf="form"
-        mat-flat-button
-        type="button"
-        (click)="saveDraft()"
-        color="primary"
-        id="save-draft-button"
-      >Save As Draft</button>
+    <div class="button-row" fxLayout="row" fxLayoutGap="2em">
+      <button *ngIf="form" mat-flat-button type="button" (click)="saveDraft()" color="primary" id="save-draft-button">
+        Save As Draft
+      </button>
       <div *ngIf="currentUser && currentUser.permissions.includes('publish_resource')">
         <button
           *ngIf="form"
@@ -42,16 +18,13 @@
           (click)="savePublish()"
           color="primary"
           id="save-publish-button"
-        >Save & Publish</button>
+        >
+          Save & Publish
+        </button>
       </div>
-      <button
-        *ngIf="form"
-        mat-flat-button
-        type="button"
-        (click)="onCancel()"
-        color="accent"
-        id="cancel-button"
-      >Cancel</button>
+      <button *ngIf="form" mat-flat-button type="button" (click)="onCancel()" color="accent" id="cancel-button">
+        Cancel
+      </button>
 
       <button
         type="button"
@@ -60,7 +33,9 @@
         (click)="showDelete()"
         color="warn"
         id="delete-button"
-      >Delete</button>
+      >
+        Delete
+      </button>
 
       <button
         *ngIf="showConfirmDelete"
@@ -69,8 +44,8 @@
         mat-flat-button
         (click)="onDelete()"
         color="warn"
-        id="permanently-delete-button"
-      >Permanently Delete This Resource!!!
+      >
+        Permanently Delete This Resource!!!
       </button>
     </div>
   </form>

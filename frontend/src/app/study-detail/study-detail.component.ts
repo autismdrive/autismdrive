@@ -1,19 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {snakeToUpperCase} from '../../util/snakeToUpper';
-import {Study} from '../_models/study';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {Component} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
+import {ActivatedRoute, Router} from '@angular/router';
+import {snakeToUpperCase} from '@util/snakeToUpper';
+import {Study} from '@models/study';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
 @Component({
   selector: 'app-study-detail',
   templateUrl: './study-detail.component.html',
-  styleUrls: ['./study-detail.component.scss']
+  styleUrls: ['./study-detail.component.scss'],
 })
-export class StudyDetailComponent implements OnInit {
+export class StudyDetailComponent {
   study: Study;
   loading = true;
   currentUser: User;
@@ -23,10 +23,9 @@ export class StudyDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authenticationService: AuthenticationService,
-    public dialog: MatDialog
-
+    public dialog: MatDialog,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.route.params.subscribe(params => {
       this.loading = true;
       const studyId = params.studyId ? parseInt(params.studyId, 10) : null;
@@ -44,15 +43,12 @@ export class StudyDetailComponent implements OnInit {
     return snakeToUpperCase;
   }
 
-  ngOnInit() {
-  }
-
   openDialog(si): void {
     const dialogRef = this.dialog.open(InvestigatorFormComponent, {
       width: `${window.innerWidth}px`,
       data: {
-        si: si
-      }
+        si: si,
+      },
     });
 
     dialogRef.afterClosed().subscribe(result => {

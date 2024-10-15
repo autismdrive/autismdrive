@@ -1,19 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
-import {AdminNote} from '../_models/admin_note';
-import {EmailLog} from '../_models/email_log';
-import {ResourceChangeLog} from '../_models/resource_change_log';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {AdminNote} from '@models/admin_note';
+import {EmailLog} from '@models/email_log';
+import {ResourceChangeLog} from '@models/resource_change_log';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
   selector: 'app-user-admin-details',
   templateUrl: './user-admin-details.component.html',
-  styleUrls: ['./user-admin-details.component.scss']
+  styleUrls: ['./user-admin-details.component.scss'],
 })
-export class UserAdminDetailsComponent implements OnInit {
+export class UserAdminDetailsComponent {
   user: User;
   currentUser: User;
   dataSource: MatTableDataSource<EmailLog>;
@@ -27,7 +27,7 @@ export class UserAdminDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.route.params.subscribe(params => {
       const userId = params.userId ? parseInt(params.userId, 10) : null;
 
@@ -50,18 +50,13 @@ export class UserAdminDetailsComponent implements OnInit {
           });
 
           this.user.participants.forEach(pi => {
-            this.api
-              .getParticipantStepLog(pi)
-              .subscribe(log => {
-                pi.step_log = log;
-              });
+            this.api.getParticipantStepLog(pi).subscribe(log => {
+              pi.step_log = log;
+            });
           });
         });
       }
     });
-  }
-
-  ngOnInit() {
   }
 
   exportUserData() {
@@ -69,7 +64,9 @@ export class UserAdminDetailsComponent implements OnInit {
     this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe(response => {
       console.log('data', response);
       const filename = response.headers.get('x-filename');
-      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
 
       const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
@@ -87,5 +84,4 @@ export class UserAdminDetailsComponent implements OnInit {
     this.user.role = this.roleSelected;
     this.api.updateUser(this.user).subscribe();
   }
-
 }

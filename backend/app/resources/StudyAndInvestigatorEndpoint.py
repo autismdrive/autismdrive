@@ -1,77 +1,90 @@
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import request
+from sqlalchemy import cast, Integer
 
-from app import db, RestException
-from app.model.investigator import Investigator
-from app.model.study import Study
-from app.model.study_investigator import StudyInvestigator
-from app.schema.schema import StudyInvestigatorSchema, InvestigatorStudiesSchema, StudyInvestigatorsSchema
+from app.auth import auth
+from app.database import session
+from app.enums import Role, Permission
+from app.models import Investigator, Study, StudyInvestigator
+from app.models import StudyInvestigator
+from app.rest_exception import RestException
+from app.schemas import SchemaRegistry
+from app.wrappers import requires_roles, requires_permission
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):
 
-    schema = InvestigatorStudiesSchema()
+    schema = SchemaRegistry.InvestigatorStudiesSchema()
 
     def get(self, investigator_id):
-        study_investigators = db.session.query(StudyInvestigator)\
-            .join(StudyInvestigator.study)\
-            .filter(StudyInvestigator.investigator_id == investigator_id)\
-            .order_by(Study.title)\
+        study_investigators = (
+            session.query(StudyInvestigator)
+            .join(StudyInvestigator.study)
+            .filter(StudyInvestigator.investigator_id == cast(investigator_id, Integer))
+            .order_by(Study.title)
             .all()
+        )
         return self.schema.dump(study_investigators, many=True)
 
 
 class InvestigatorByStudyEndpoint(flask_restful.Resource):
 
-    schema = StudyInvestigatorsSchema()
+    schema = SchemaRegistry.StudyInvestigatorSchema()
 
-    def get(self, study_id):
-        study_investigators = db.session.query(StudyInvestigator).\
-            join(StudyInvestigator.investigator).\
-            filter(StudyInvestigator.study_id == study_id).\
-            order_by(Investigator.name).\
-            all()
-        return self.schema.dump(study_investigators,many=True)
+    def get(self, study_id: int):
+        study_investigators = (
+            session.query(StudyInvestigator)
+            .join(StudyInvestigator.investigator)
+            .filter(StudyInvestigator.study_id == study_id)
+            .order_by(Investigator.name)
+            .all()
+        )
+        return self.schema.dump(study_investigators, many=True)
 
-    def post(self, study_id):
+    @auth.login_required
+    @requires_permission(Permission.edit_study)
+    def post(self, study_id: int):
         request_data = request.get_json()
 
         for item in request_data:
-            item['study_id'] = study_id
+            item["study_id"] = study_id
 
         study_investigators = self.schema.load(request_data, many=True)
-        db.session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
+        session.query(StudyInvestigator).filter_by(study_id=study_id).delete()
         for c in study_investigators:
-            db.session.add(StudyInvestigator(study_id=study_id,
-                           investigator_id=c.investigator_id))
-        db.session.commit()
+            session.add(StudyInvestigator(study_id=study_id, investigator_id=c.investigator_id))
+        session.commit()
         return self.get(study_id)
 
 
 class StudyInvestigatorEndpoint(flask_restful.Resource):
-    schema = StudyInvestigatorSchema()
+    schema = SchemaRegistry.StudyInvestigatorSchema()
 
-    def get(self, id):
-        model = db.session.query(StudyInvestigator).filter_by(id=id).first()
-        if model is None: raise RestException(RestException.NOT_FOUND)
+    def get(self, study_investigator_id: int):
+        model = session.query(StudyInvestigator).filter_by(id=study_investigator_id).first()
+        if model is None:
+            raise RestException(RestException.NOT_FOUND)
         return self.schema.dump(model)
 
-    def delete(self, id):
-        db.session.query(StudyInvestigator).filter_by(id=id).delete()
-        db.session.commit()
+    @auth.login_required
+    @requires_permission(Permission.edit_study)
+    def delete(self, study_investigator_id: int):
+        session.query(StudyInvestigator).filter_by(id=study_investigator_id).delete()
+        session.commit()
         return None
 
 
 class StudyInvestigatorListEndpoint(flask_restful.Resource):
-    schema = StudyInvestigatorSchema()
+    schema = SchemaRegistry.StudyInvestigatorSchema()
 
+    @auth.login_required
+    @requires_permission(Permission.edit_study)
     def post(self):
         request_data = request.get_json()
         load_result = self.schema.load(request_data)
-        db.session.query(StudyInvestigator).filter_by(study_id=load_result.study_id,
-                                                      investigator_id=load_result.investigator_id).delete()
-        db.session.add(load_result)
-        db.session.commit()
+        session.query(StudyInvestigator).filter_by(
+            study_id=load_result.study_id, investigator_id=load_result.investigator_id
+        ).delete()
+        session.add(load_result)
+        session.commit()
         return self.schema.dump(load_result)

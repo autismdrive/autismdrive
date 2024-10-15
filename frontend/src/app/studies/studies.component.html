@@ -1,4 +1,4 @@
-<div fxLayoutAlign="center"  fxLayout="column">
+<div fxLayoutAlign="center" fxLayout="column">
   <div
     id="hero"
     class="center-center gradient-overlay container with-escaping-tiles"
@@ -16,9 +16,9 @@
       fxLayoutGap="40px"
       fxLayoutAlign="left auto"
       id="TopOfSearch"
-      style="padding-left:6em; padding-right:2em; padding-top:2em;"
+      style="padding-left: 6em; padding-right: 2em; padding-top: 2em"
     >
-      <mat-form-field style="margin-bottom:-1em" id="set-status">
+      <mat-form-field style="margin-bottom: -1em" id="set-status">
         <mat-label>Study Status</mat-label>
         <mat-select [(value)]="selectedStatus">
           <mat-select-trigger>
@@ -27,7 +27,7 @@
               [iconType]="selectedStatus && selectedStatus.name"
               [size]="1"
             ></app-type-icon>
-            <span class="type-label" *ngIf="selectedStatus">{{selectedStatus.label}}</span>
+            <span class="type-label" *ngIf="selectedStatus">{{ selectedStatus.label }}</span>
           </mat-select-trigger>
           <mat-option
             *ngFor="let status of studyStatuses"
@@ -35,7 +35,7 @@
             (click)="selectStatus(status)"
             [ngClass]="'sort-by-' + status.name.toLowerCase()"
           >
-            <span class="type-label">{{status.label}}</span>
+            <span class="type-label">{{ status.label }}</span>
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -44,32 +44,28 @@
         <mat-label>Age Range</mat-label>
         <mat-select [(value)]="selectedAge" placeholder="All Ages">
           <mat-select-trigger>
-            <span class="type-label" *ngIf="selectedAge">{{selectedAge.label}}</span>
+            <span class="type-label" *ngIf="selectedAge">{{ selectedAge.label }}</span>
           </mat-select-trigger>
           <mat-option [value]="undefined" (click)="selectAge(undefined)">All Ages</mat-option>
-          <mat-option
-            *ngFor="let age of Ages"
-            [value]="age"
-            (click)="selectAge(age)"
-          >
-            <span class="type-label">{{age.label}}</span>
+          <mat-option *ngFor="let age of Ages" [value]="age" (click)="selectAge(age)">
+            <span class="type-label">{{ age.label }}</span>
           </mat-option>
         </mat-select>
-       </mat-form-field>
-      </div>
+      </mat-form-field>
     </div>
+  </div>
 
   <div class="mobile_device_480px">
-    <p> </p>
+    <p></p>
     <div
       class="row escaping-tiles-1x"
       fxLayout="column"
       fxLayoutGap="2px"
       fxLayoutAlign="center auto"
       id="TopOfSearch"
-      style="padding-left:2em; padding-right:2em;"
+      style="padding-left: 2em; padding-right: 2em"
     >
-      <mat-form-field style="margin-bottom:-1em">
+      <mat-form-field style="margin-bottom: -1em">
         <mat-label>Study Status</mat-label>
         <mat-select [(value)]="selectedStatus">
           <mat-select-trigger>
@@ -78,14 +74,10 @@
               [iconType]="selectedStatus && selectedStatus.name"
               [size]="1"
             ></app-type-icon>
-            <span class="type-label" *ngIf="selectedStatus">{{selectedStatus.label}}</span>
+            <span class="type-label" *ngIf="selectedStatus">{{ selectedStatus.label }}</span>
           </mat-select-trigger>
-          <mat-option
-            *ngFor="let status of studyStatuses"
-            [value]="status"
-            (click)="selectStatus(status)"
-          >
-            <span class="type-label">{{status.label}}</span>
+          <mat-option *ngFor="let status of studyStatuses" [value]="status" (click)="selectStatus(status)">
+            <span class="type-label">{{ status.label }}</span>
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -94,40 +86,32 @@
         <mat-label>Age Range</mat-label>
         <mat-select [(value)]="selectedAge" placeholder="All Ages">
           <mat-select-trigger>
-            <span class="type-label" *ngIf="selectedAge">{{selectedAge.label}}</span>
+            <span class="type-label" *ngIf="selectedAge">{{ selectedAge.label }}</span>
           </mat-select-trigger>
           <mat-option [value]="undefined" (click)="selectAge(undefined)">All Ages</mat-option>
-          <mat-option
-            *ngFor="let age of Ages"
-            [value]="age"
-            (click)="selectAge(age)"
-          >
-            <span class="type-label">{{age.label}}</span>
+          <mat-option *ngFor="let age of Ages" [value]="age" (click)="selectAge(age)">
+            <span class="type-label">{{ age.label }}</span>
           </mat-option>
         </mat-select>
       </mat-form-field>
     </div>
   </div>
-  <div
-    class="studies"
-    fxLayout="column"
-    fxLayoutGap="40px"
-    ngStyle.gt-md="padding-top:10px;"
-  >
-    <app-add-button *ngIf="currentUser && currentUser.permissions.includes('create_study')" [addLabel]='"Add Study"' [addLink]='"studies/add"' [currentUser]=currentUser></app-add-button>
-    <h2>{{selectedStatus.label}}</h2>
-    <ng-container *ngIf="studyHits && (studyHits.length > 0)">
+  <div class="studies" fxLayout="column" fxLayoutGap="40px" ngStyle.gt-md="padding-top:10px;">
+    <app-add-button
+      *ngIf="currentUser && currentUser.permissions.includes('create_study')"
+      [addLabel]="'Add Study'"
+      [addLink]="'studies/add'"
+      [currentUser]="currentUser"
+    ></app-add-button>
+    <h2>{{ selectedStatus.label }}</h2>
+    <ng-container *ngIf="studyHits && studyHits.length > 0">
       <app-search-result
         *ngFor="let hit of studyHits"
         [hit]="hit"
         [attr.data-study-status]="selectedStatus.name"
       ></app-search-result>
     </ng-container>
-    <p
-      *ngIf="!studyHits || (studyHits.length === 0)"
-      class="no-results"
-      [attr.data-study-status]="selectedStatus.name"
-    >
+    <p *ngIf="!studyHits || studyHits.length === 0" class="no-results" [attr.data-study-status]="selectedStatus.name">
       We don't have any Autism DRIVE studies
       <span *ngIf="selectedStatus.name === 'currently_enrolling'">that are enrolling</span>
       <span *ngIf="selectedStatus.name === 'study_in_progress'">that are in progress</span>

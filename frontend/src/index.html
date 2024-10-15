@@ -1,44 +1,101 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Autism DRIVE</title>
+    <base href="/" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta property="og:site_name" content="Autism DRIVE" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Transform Outcomes. Together." />
+    <meta
+      property="og:description"
+      content="Transform Outcomes. Together. A centralized system for autism research & resources for individuals, families & professionals. "
+    />
+    <link
+      href="assets/css/icofont.css"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      crossorigin="anonymous"
+    />
+    <noscript>
+      <link rel="stylesheet" href="assets/css/icofont.css" />
+    </noscript>
+    <link
+      href="assets/css/material-icons.css"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      crossorigin="anonymous"
+    />
+    <noscript>
+      <link rel="stylesheet" href="assets/css/material-icons.css" />
+    </noscript>
+    <link
+      href="assets/css/franklin-gothic-urw.css"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      crossorigin="anonymous"
+    />
+    <noscript>
+      <link rel="stylesheet" href="assets/css/bodoni-urw.css" />
+    </noscript>
+    <link
+      href="assets/css/bodoni-urw.css"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      crossorigin="anonymous"
+    />
+    <noscript>
+      <link rel="stylesheet" href="assets/css/bodoni-urw.css" />
+    </noscript>
 
-<head>
-  <meta charset="utf-8">
-  <title>Autism DRIVE</title>
-  <base href="/">
+    <!-- Google Tag Manager -->
+    <script>
+      // prettier-ignore
+      ((w,d,s,l,i)=>{w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});let f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','__GOOGLE_TAG_MANAGER_ID__');
+    </script>
+    <!-- End Google Tag Manager -->
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
-  <meta property="og:site_name" content="Autism DRIVE" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Transform Outcomes. Together." />
-  <meta property="og:description" content="Transform Outcomes. Together. A centralized system for autism research & resources for individuals, families & professionals. " />
-  <meta name="twitter:text:title" content="Transform Outcomes. Together." />
-  <link
-    rel="icon"
-    type="image/x-icon"
-    href="/assets/favicon.ico"
-  >
-  <link
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet"
-  >
-  <link
-    rel="stylesheet"
-    href="https://use.typekit.net/ato2zta.css"
-  >
-</head>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
+    <link rel="icon" href="assets/icon.svg" sizes="all" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-16.png" sizes="16x16" type="image/png" />
+    <link rel="icon" href="assets/icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/manifest.webmanifest" />
+    <meta content="#ffffff" name="theme-color" />
+  </head>
 
-<body>
-  <app-root></app-root>
-  <script>
-    // YouTube IFrame Player API code
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  </script>
-</body>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=__GOOGLE_TAG_MANAGER_ID__"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
+    <app-root></app-root>
+
+    <!-- Google Maps -->
+    <script>
+      // prettier-ignore
+      (g=>{let h,a,k,p='The Google Maps JavaScript API',c='google',l='importLibrary',q='__ib__',m=document,b=window;b=b[c]||(b[c]={});let d=b.maps||(b.maps={}),r=new Set(),e=new URLSearchParams(),u=()=>h||(h=new Promise(async(f,n)=>{await(a=m.createElement('script'));e.set('libraries',[...r]+'');for(k in g) e.set(k.replace(/[A-Z]/g,t=>'_'+t[0].toLowerCase()),g[k],);e.set('callback',c+'.maps.'+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>(h=n(Error(p+' could not load.')));a.nonce=m.querySelector('script[nonce]')?.nonce||'';m.head.append(a);}));d[l]?console.warn(p+' only loads once. Ignoring:',g):(d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n)));})({v:'weekly',key:'__GOOGLE_MAPS_API_KEY__'});
+    </script>
+    <!-- End Google Maps -->
+
+    <!-- YouTube -->
+    <script>
+      // prettier-ignore
+      (_=>{let t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';let f=document.getElementsByTagName('script')[0];f.parentNode.insertBefore(t,f);})()
+    </script>
+    <!-- End YouTube -->
+  </body>
 </html>

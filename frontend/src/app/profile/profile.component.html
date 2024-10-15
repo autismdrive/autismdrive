@@ -1,33 +1,24 @@
-<div
-  *ngIf="user"
-  class="profile mat-typography"
->
-
+<div *ngIf="user" class="profile mat-typography">
   <div *ngIf="getState() === possibleStates.NEEDS_USER">
     <h1>Please Log in or Create an Account</h1>
     <p>You are not currently logged in.</p>
   </div>
 
   <div *ngIf="getState() === possibleStates.NEEDS_META">
-    <div class="meta-form"
-         fxLayout="row"
-         fxLayout.lt-lg="column"
-         fxLayoutGap="2em"
-    >
-      <div
-        fxFlex="100%"
-      >
+    <div class="meta-form" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="2em">
+      <div fxFlex="100%">
         <h2>Welcome!</h2>
-        <p>Thank you for creating an account on Autism DRIVE. We would like to learn a little more about you, so we can
+        <p>
+          Thank you for creating an account on Autism DRIVE. We would like to learn a little more about you, so we can
           connect you with the best possible resources. To create your profile, please select all the items below that
           describe you. If appropriate, you will have additional opportunities to create profiles for your children or
           dependents after completing your own profile. Once we have this information we can connect you to current and
-          future research studies, and together, find ways to improve the lives of people living with autism.</p>
+          future research studies, and together, find ways to improve the lives of people living with autism.
+        </p>
         <form [formGroup]="form" id="meta-form">
-          <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form"></formly-form>
+          <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form" />
           <button id="submit_meta" mat-flat-button type="submit" color="accent" (click)="createMeta()">Submit</button>
         </form>
-
       </div>
     </div>
   </div>
@@ -37,13 +28,12 @@
     <app-profile-meta [user]="user" [meta]="userMeta"></app-profile-meta>
   </div>
 
-
   <div *ngIf="getState() === possibleStates.HAS_PARTICIPANT">
     <h1>Manage Your Profiles</h1>
     <div>
       <p *ngIf="user.getSelf().relationship === relationships.SELF_PROFESSIONAL">
-        You indicated that you are a professional working in Autism research and treatment.
-        Once your profile is complete we will be able to notify you about important updates.
+        You indicated that you are a professional working in Autism research and treatment. Once your profile is
+        complete we will be able to notify you about important updates.
       </p>
       <p *ngIf="user.getSelf().relationship === relationships.SELF_INTERESTED">
         Once your profile is complete we will be able to notify you about important updates.
@@ -52,44 +42,32 @@
         Once your profile is complete, you’ll be able to enroll in any relevant currently-running studies.
       </p>
       <p *ngIf="user.getSelf().relationship === relationships.SELF_GUARDIAN">
-        Once your complete your profile and the profiles of your dependents, you’ll be able to enroll them in any relevant currently-running studies.
+        Once your complete your profile and the profiles of your dependents, you’ll be able to enroll them in any
+        relevant currently-running studies.
       </p>
 
+      <app-loading *ngIf="loading" message="Loading..."></app-loading>
 
-      <app-loading
-        *ngIf="loading"
-        message="Loading..."
-      ></app-loading>
-
-      <div
-        *ngIf="!loading"
-        fxLayout="column"
-        fxLayoutGap="40px grid"
-      >
-        <div
-          fxLayout="column"
-          fxLayoutGap="40px grid"
-        >
-          <div
-            fxLayout="row wrap"
-            fxLayoutGap="40px grid"
-          >
+      <div *ngIf="!loading" fxLayout="column" fxLayoutGap="40px grid">
+        <div fxLayout="column" fxLayoutGap="40px grid">
+          <div fxLayout="row wrap" fxLayoutGap="40px grid">
             <app-participant-profile
               [participant]="self"
               [user]="user"
-              id="self_participant_{{self.id}}"
+              id="self_participant_{{ self.id }}"
             ></app-participant-profile>
 
             <app-participant-profile
               *ngFor="let participant of dependents"
               [participant]="participant"
               [user]="user"
-              id="dependent_participant_{{participant.id}}"
+              id="dependent_participant_{{ participant.id }}"
             ></app-participant-profile>
           </div>
           <div fxFlex="60%" *ngIf="user.getSelf().relationship !== relationships.SELF_INTERESTED">
-            <p *ngIf="selfPercentComplete < 100">In order to add a dependent you must complete your own profile
-              first</p>
+            <p *ngIf="selfPercentComplete < 100">
+              In order to add a dependent you must complete your own profile first
+            </p>
             <button
               *ngIf="user.getSelf()"
               mat-flat-button
@@ -97,41 +75,29 @@
               [disabled]="selfPercentComplete < 100"
               (click)="enrollDependent($event)"
               id="enroll_dependent"
-            >Create another profile
+            >
+              Create another profile
             </button>
           </div>
         </div>
         <div>
           <mat-card>
             <mat-tab-group>
-
               <mat-tab label="My Studies">
                 <mat-card-title>Research Studies</mat-card-title>
                 <mat-card-content>
                   <mat-list>
-                    <div
-                      *ngIf="studyInquiries && studyInquiries.length > 0"
-                      id="study-inquiries"
-                    >
+                    <div *ngIf="studyInquiries && studyInquiries.length > 0" id="study-inquiries">
                       <mat-card-subtitle>Studies about which you have inquired</mat-card-subtitle>
                       <mat-list-item *ngFor="let s of studyInquiries">
-                        <a
-                          mat-line
-                          href="/#/study/{{s.study.id}}"
-                        >{{ s.study.short_title }}</a>
+                        <a mat-line href="/#/study/{{ s.study.id }}">{{ s.study.short_title }}</a>
                         <p mat-line>{{ s.study.short_description }}</p>
                       </mat-list-item>
                     </div>
-                    <div
-                      *ngIf="currentStudies && currentStudies.length > 0"
-                      id="current-studies"
-                    >
+                    <div *ngIf="currentStudies && currentStudies.length > 0" id="current-studies">
                       <mat-card-subtitle>All currently-enrolling studies</mat-card-subtitle>
                       <mat-list-item *ngFor="let s of currentStudies">
-                        <a
-                          mat-line
-                          href="/#/study/{{s.id}}"
-                        >{{ s.short_title }}</a>
+                        <a mat-line href="/#/study/{{ s.id }}">{{ s.short_title }}</a>
                         <p mat-line>{{ s.short_description }}</p>
                       </mat-list-item>
                     </div>
@@ -142,16 +108,12 @@
                 <app-favorite-resources [favoriteResources]="favoriteResources"></app-favorite-resources>
               </mat-tab>
               <mat-tab label="My Topics">
-                <app-favorite-topics
-                  [currentUser]="user"
-                ></app-favorite-topics>
+                <app-favorite-topics [currentUser]="user"></app-favorite-topics>
               </mat-tab>
             </mat-tab-group>
           </mat-card>
         </div>
       </div>
-
     </div>
   </div>
-
 </div>

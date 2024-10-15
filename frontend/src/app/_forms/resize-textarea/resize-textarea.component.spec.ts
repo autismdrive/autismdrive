@@ -1,25 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ResizeTextareaComponent } from './resize-textarea.component';
+import {AppModule} from '@app/app.module';
+import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('ResizeTextareaComponent', () => {
-  let component: ResizeTextareaComponent;
-  let fixture: ComponentFixture<ResizeTextareaComponent>;
+  it('should render resizable textarea field', () => {
+    const {query} = createFieldComponent(
+      {
+        key: 'some_field_key',
+        type: 'textarea-auto-resize',
+        props: {
+          label: 'Some Field Label',
+          placeholder: 'This is the placeholder for this field',
+          cols: 200,
+          rows: 20,
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ ResizeTextareaComponent ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ResizeTextareaComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-resize-textarea')).not.toBeNull();
   });
 });

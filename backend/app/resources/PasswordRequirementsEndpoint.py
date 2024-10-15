@@ -1,13 +1,10 @@
-import re
-import urllib
-
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import jsonify, request
 
-from app import password_requirements, RestException
-from app.model.user import Role, User
+from app.auth import password_requirements
+from app.models import User
+from app.enums import Role
+from app.rest_exception import RestException
 
 
 class PasswordRequirementsEndpoint(flask_restful.Resource):
@@ -25,10 +22,10 @@ class PasswordRequirementsEndpoint(flask_restful.Resource):
 
         if Role.has_name(role):
             reqs = password_requirements[role]
-            message = "Please enter a password. " + reqs['instructions']
+            message = "Please enter a password. " + reqs["instructions"]
 
-            if request_data and 'password' in request_data:
-                s = request_data['password']
+            if request_data and "password" in request_data:
+                s = request_data["password"]
                 if isinstance(s, str):
                     return jsonify(User.password_meets_requirements(role, s))
                 else:
@@ -37,5 +34,3 @@ class PasswordRequirementsEndpoint(flask_restful.Resource):
                 raise RestException(RestException.INVALID_INPUT, details=message)
         else:
             raise RestException(RestException.INVALID_INPUT, details="Please enter a valid user role.")
-
-

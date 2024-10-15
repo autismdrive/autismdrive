@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FlowComponent } from './flow.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {FlowComponent} from './flow.component';
 
 describe('EnrollmentFlowComponent', () => {
   let component: FlowComponent;
-  let fixture: ComponentFixture<FlowComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ FlowComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<FlowComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FlowComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(FlowComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(FlowComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

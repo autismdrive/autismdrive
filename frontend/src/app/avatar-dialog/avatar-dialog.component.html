@@ -1,29 +1,16 @@
-<div
-  class="mat-typography"
-  *ngIf="data.participant"
->
+<div class="mat-typography" *ngIf="data.participant">
   <div mat-dialog-content>
-    <h1 mat-dialog-title>{{getPrompt()}}</h1>
+    <h1 mat-dialog-title>{{ getPrompt() }}</h1>
 
-    <div
-      fxLayout="column"
-      fxLayoutAlign="center center"
-    >
-      <div
-        class="avatar"
-        [ngStyle]="{'background-color': selectedColor || data.participant.avatar_color}"
-      >
-        <img src="/assets/avatars/{{selectedIcon || data.participant.avatar_icon}}.svg">
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <div class="avatar" [ngStyle]="{'background-color': selectedColor || data.participant.avatar_color}">
+        <img src="/assets/avatars/{{ selectedIcon || data.participant.avatar_icon }}.svg" />
       </div>
     </div>
     <p>Pick an image</p>
 
     <div class="avatar-images-row">
-      <button
-        mat-button
-        class="scroll-left"
-        (click)="scroll($event, 'avatar-images', 'left')"
-      >
+      <button mat-button class="scroll-left" (click)="scroll($event, 'avatar-images', 'left')">
         <mat-icon>chevron_left</mat-icon>
       </button>
       <div class="avatar-images">
@@ -33,26 +20,17 @@
           (click)="setImage(avatarImage)"
           [ngClass]="{'avatar-image-active': isSelectedImage(avatarImage)}"
         >
-          <img src="/assets/avatars/{{avatarImage}}.svg" />
+          <img src="/assets/avatars/{{ avatarImage }}.svg" />
         </button>
       </div>
-      <button
-        mat-button
-        class="scroll-right"
-        (click)="scroll($event, 'avatar-images', 'right')"
-      >
+      <button mat-button class="scroll-right" (click)="scroll($event, 'avatar-images', 'right')">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
 
-
     <p>Pick a color</p>
     <div class="color-swatches-row">
-      <button
-        mat-button
-        class="scroll-left"
-        (click)="scroll($event, 'color-swatches', 'left')"
-      >
+      <button mat-button class="scroll-left" (click)="scroll($event, 'color-swatches', 'left')">
         <mat-icon>chevron_left</mat-icon>
       </button>
       <div class="color-swatches">
@@ -62,30 +40,17 @@
           class="color-swatch"
           [ngStyle]="{'background-color': avatarColor}"
           [ngClass]="{'color-swatch-active': isSelectedColor(avatarColor)}"
-        >&nbsp;
+        >
+          &nbsp;
         </button>
       </div>
-      <button
-        mat-button
-        class="scroll-right"
-        (click)="scroll($event, 'color-swatches', 'right')"
-      >
+      <button mat-button class="scroll-right" (click)="scroll($event, 'color-swatches', 'right')">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
-
   </div>
   <div mat-dialog-actions>
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="onSubmit()"
-      id="save_avatar_changes"
-    >Save</button>
-    <button
-      mat-button
-      (click)="onNoClick()"
-      id="cancel_avatar_changes"
-    >Cancel</button>
+    <button mat-flat-button color="primary" (click)="onSubmit()" id="save_avatar_changes">Save</button>
+    <button mat-button (click)="onNoClick()" id="cancel_avatar_changes">Cancel</button>
   </div>
 </div>

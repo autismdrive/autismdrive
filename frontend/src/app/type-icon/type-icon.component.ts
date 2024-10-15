@@ -1,21 +1,18 @@
-import { Component, OnInit, Input } from '@angular/core';
-import {HitType} from '../_models/hit_type';
+import {Component, Input} from '@angular/core';
+import {HitType} from '@models/hit_type';
 
 @Component({
   selector: 'app-type-icon',
   templateUrl: './type-icon.component.html',
-  styleUrls: ['./type-icon.component.scss']
+  styleUrls: ['./type-icon.component.scss'],
 })
-export class TypeIconComponent implements OnInit {
+export class TypeIconComponent {
   @Input() iconType: string;
   @Input() size: number;
 
   iconTypes: string[] = HitType.all().map(ht => ht.name);
 
-  constructor() { }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   is(actual: string, expected: string) {
     return actual === expected;
@@ -24,5 +21,4 @@ export class TypeIconComponent implements OnInit {
   get pxSize() {
     return `${this.size * 16}px`;
   }
-
 }

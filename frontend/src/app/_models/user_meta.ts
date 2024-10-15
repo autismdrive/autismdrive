@@ -1,6 +1,5 @@
 import {ParticipantRelationship} from './participantRelationship';
 
-
 export class UserMeta {
   id: number;
   last_updated?: Date;

@@ -21,39 +21,50 @@ footer {
   margin-bottom: -1em;
 
   // SM
-  @media (max-width: 959px) { width: 290px; }
+  @media (max-width: 959px) {
+    width: 290px;
+  }
 
   // MD - XL
-  @media (min-width: 960px) { width: 417px; }
+  @media (min-width: 960px) {
+    width: 417px;
+  }
 }
 
 .footer-logo {
   // SM
-  @media (max-width: 959px) { width: 320px; }
+  @media (max-width: 959px) {
+    width: 320px;
+  }
 
   // MD - XL
-  @media (min-width: 960px) { width: 457px; }
+  @media (min-width: 960px) {
+    width: 457px;
+  }
 }
 
 .footer-contact {
   margin: 0 auto 1.25rem;
   max-width: 15.625rem;
 
-  .address, .tel, .email {
-      color: $body-color;
-      line-height: 1.5;
-      font-style: italic;
-      display: inline;
+  .address,
+  .tel,
+  .email {
+    color: $body-color;
+    line-height: 1.5;
+    font-style: italic;
+    display: inline;
   }
 
-  .address:after, .tel:after {
-      content: '|';
-      display: inline-block;
-      margin: 0 0.325em 0 0.5em
+  .address:after,
+  .tel:after {
+    content: '|';
+    display: inline-block;
+    margin: 0 0.325em 0 0.5em;
   }
 
   @media screen and (min-width: 45em) {
-    max-width:none;
-    margin:0 auto .625rem;
+    max-width: none;
+    margin: 0 auto 0.625rem;
   }
 }

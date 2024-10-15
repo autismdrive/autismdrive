@@ -1,22 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ProfileMetaComponent } from './profile_meta.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {ProfileMetaComponent} from './profile_meta.component';
 
 describe('MetaComponent', () => {
   let component: ProfileMetaComponent;
-  let fixture: ComponentFixture<ProfileMetaComponent>;
+  let fixture: MockedComponentFixture<ProfileMetaComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ ProfileMetaComponent ]
-    })
-    .compileComponents();
+  beforeEach(() => {
+    return MockBuilder(ProfileMetaComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProfileMetaComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = MockRender(ProfileMetaComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

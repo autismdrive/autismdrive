@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {ApiService} from '../_services/api/api.service';
-import {Hit, Query} from '../_models/query';
-import {Study, StudyStatus} from '../_models/study';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {User} from '../_models/user';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
-import {AgeRange} from '../_models/hit_type';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AgeRange} from '@models/hit_type';
+import {Hit, Query} from '@models/query';
+import {Study, StudyStatus} from '@models/study';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 interface StudyStatusObj {
   name: string;
@@ -21,9 +21,9 @@ interface AgeObj {
 @Component({
   selector: 'app-studies',
   templateUrl: './studies.component.html',
-  styleUrls: ['./studies.component.scss']
+  styleUrls: ['./studies.component.scss'],
 })
-export class StudiesComponent implements OnInit {
+export class StudiesComponent {
   query: Query;
   studyStatuses: StudyStatusObj[];
   selectedStatus: StudyStatusObj;
@@ -39,23 +39,25 @@ export class StudiesComponent implements OnInit {
     private router: Router,
     private meta: Meta,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.meta.updateTag(
-        { property: 'og:image', content: location.origin + '/assets/studies/hero.jpg' },
-        `property='og:image'`);
+      {property: 'og:image', content: location.origin + '/assets/studies/hero.jpg'},
+      `property='og:image'`,
+    );
     this.meta.updateTag(
-      { property: 'og:image:secure_url', content: location.origin + '/assets/studies/hero.jpg' },
-      `property='og:image:secure_url'`);
+      {property: 'og:image:secure_url', content: location.origin + '/assets/studies/hero.jpg'},
+      `property='og:image:secure_url'`,
+    );
     this.meta.updateTag(
-      { name: 'twitter:image', content: location.origin + '/assets/studies/hero.jpg' },
-      `name='twitter:image'`);
+      {name: 'twitter:image', content: location.origin + '/assets/studies/hero.jpg'},
+      `name='twitter:image'`,
+    );
     this.studyStatuses = Object.keys(StudyStatus).map(k => {
       return {name: k, label: StudyStatus[k]};
     });
     this.Ages = Object.keys(AgeRange.labels).map(k => {
       return {name: k, label: AgeRange.labels[k]};
     });
-    console.log(this.Ages);
     this.route.params.subscribe(params => {
       if ('studyStatus' in params) {
         this.selectedStatus = this.studyStatuses.find(x => x.name === params['studyStatus']);
@@ -72,9 +74,6 @@ export class StudiesComponent implements OnInit {
       }
     });
     this.loadStudies();
-  }
-
-  ngOnInit() {
   }
 
   loadStudies() {
@@ -105,22 +104,21 @@ export class StudiesComponent implements OnInit {
     this.loadStudies();
   }
 
-   private _studiesToHits(studies: Study[]): Hit[] {
-      return studies
-        .map(s => {
-          return new Hit({
-            id: s.id,
-            type: 'study',
-            ages: s.ages,
-            title: s.short_title,
-            content: s.description,
-            description: s.short_description,
-            last_updated: s.last_updated,
-            highlights: null,
-            url: `/study/${s.id}`,
-            label: 'Research Studies',
-            status: this.studyStatuses.find(stat => stat.name === s.status).label
-          });
-        });
+  private _studiesToHits(studies: Study[]): Hit[] {
+    return studies.map(s => {
+      return new Hit({
+        id: s.id,
+        type: 'study',
+        ages: s.ages,
+        title: s.short_title,
+        content: s.description,
+        description: s.short_description,
+        last_updated: s.last_updated,
+        highlights: null,
+        url: `/study/${s.id}`,
+        label: 'Research Studies',
+        status: this.studyStatuses.find(stat => stat.name === s.status).label,
+      });
+    });
   }
 }

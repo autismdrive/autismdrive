@@ -1,25 +1,22 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Resource} from '../_models/resource';
-import {Router} from '@angular/router';
+import {Component, Input} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
+import {Router} from '@angular/router';
+import {Resource} from '@models/resource';
 import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 
 @Component({
   selector: 'app-event-registration',
   templateUrl: './event-registration.component.html',
-  styleUrls: ['./event-registration.component.scss']
+  styleUrls: ['./event-registration.component.scss'],
 })
-export class EventRegistrationComponent implements OnInit {
+export class EventRegistrationComponent {
   @Input() resource: Resource;
   @Input() hasCurrentUser = false;
 
   constructor(
     private router: Router,
-    public dialog: MatDialog
-  ) { }
-
-  ngOnInit() {
-  }
+    public dialog: MatDialog,
+  ) {}
 
   goLogin() {
     this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});
@@ -29,10 +26,10 @@ export class EventRegistrationComponent implements OnInit {
     const dialogRef = this.dialog.open(EventRegistrationFormComponent, {
       width: `${window.innerWidth}px`,
       data: {
-        'registered': false,
-        'title': 'Register for ' + this.resource.title,
-        'event_id': this.resource.id
-      }
+        registered: false,
+        title: 'Register for ' + this.resource.title,
+        event_id: this.resource.id,
+      },
     });
 
     dialogRef.afterClosed().subscribe(result => {

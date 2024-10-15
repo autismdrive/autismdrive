@@ -1,17 +1,15 @@
 import {Component} from '@angular/core';
-import {ConfigService} from '../_services/config/config.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
+import {ConfigService} from '@services/config/config.service';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent {
-
   constructor(
     public config: ConfigService,
     public router: Router,
   ) {}
-
 }

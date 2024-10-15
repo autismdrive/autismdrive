@@ -1,15 +1,15 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
-import { FormGroup } from '@angular/forms';
-import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../_services/api/api.service';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {FormGroup} from '@angular/forms';
+import {Router} from '@angular/router';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  styleUrls: ['./forgot-password.component.scss'],
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent {
   errorMessage: string;
   formStatus = 'form';
   form = new FormGroup({});
@@ -18,7 +18,7 @@ export class ForgotPasswordComponent implements OnInit {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',
@@ -29,30 +29,30 @@ export class ForgotPasswordComponent implements OnInit {
   constructor(
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private router: Router
-  ) { }
-
-  ngOnInit() {
-  }
+    private router: Router,
+  ) {}
 
   submit() {
     localStorage.removeItem('token_url');
     if (this.form.valid) {
       this.formStatus = 'submitting';
-      this.api.sendResetPasswordEmail(this.model['email']).subscribe(token_url => {
-        if (token_url) {
-          localStorage.setItem('token_url', token_url);
-        }
-        this.formStatus = 'complete';
-      }, error1 => {
-        if (error1) {
-          this.errorMessage = error1;
-        } else {
-          this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
-        }
-        this.formStatus = 'form';
-        this.changeDetectorRef.detectChanges();
-      });
+      this.api.sendResetPasswordEmail(this.model['email']).subscribe(
+        token_url => {
+          if (token_url) {
+            localStorage.setItem('token_url', token_url);
+          }
+          this.formStatus = 'complete';
+        },
+        error1 => {
+          if (error1) {
+            this.errorMessage = error1;
+          } else {
+            this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
+          }
+          this.formStatus = 'form';
+          this.changeDetectorRef.detectChanges();
+        },
+      );
     }
   }
 

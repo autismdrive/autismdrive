@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors } from '@angular/forms';
+import {AbstractControl, ValidationErrors} from '@angular/forms';
 
 export function ValidatePasswordsMatch(control: AbstractControl): ValidationErrors {
   // Verifies that this field matches a field on the same form called "password".

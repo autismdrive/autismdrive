@@ -1,10 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {ApiService} from '../_services/api/api.service';
+import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {UserMeta} from '../_models/user_meta';
-import {ParticipantRelationship} from '../_models/participantRelationship';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {User} from '@models/user';
+import {UserMeta} from '@models/user_meta';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 /**
  * Provides some messaging based on the profile meta information, this should be displayed
@@ -14,10 +14,9 @@ import {ParticipantRelationship} from '../_models/participantRelationship';
 @Component({
   selector: 'app-profile-meta',
   templateUrl: './profile_meta.component.html',
-  styleUrls: ['./profile_meta.component.scss']
+  styleUrls: ['./profile_meta.component.scss'],
 })
-export class ProfileMetaComponent implements OnInit {
-
+export class ProfileMetaComponent {
   @Input()
   user: User;
   @Input()
@@ -25,18 +24,14 @@ export class ProfileMetaComponent implements OnInit {
 
   relationships = ParticipantRelationship;
 
-  constructor(private authenticationService: AuthenticationService,
-              private api: ApiService,
-              private router: Router
-  ) {
-  }
-
-  ngOnInit(): void {
-  }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private api: ApiService,
+    private router: Router,
+  ) {}
 
   goFlow($event) {
     $event.preventDefault();
     this.router.navigate(['terms', this.meta.self_relationship]);
   }
-
 }

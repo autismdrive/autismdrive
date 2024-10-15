@@ -1,25 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { GroupValidationWrapperComponent } from './group-validation-wrapper.component';
+import {AppModule} from '@app/app.module';
+import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('GroupValidationWrapperComponent', () => {
-  let component: GroupValidationWrapperComponent;
-  let fixture: ComponentFixture<GroupValidationWrapperComponent>;
+  it('should render group-validation wrapper', () => {
+    const {query} = createFieldComponent(
+      {
+        wrappers: ['group-validation'],
+        props: {
+          label: 'Name',
+          required: true,
+          description: 'Name description',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ GroupValidationWrapperComponent ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(GroupValidationWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-group-validation-wrapper')).not.toBeNull();
   });
 });

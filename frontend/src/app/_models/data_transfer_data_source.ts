@@ -1,11 +1,10 @@
 import {CollectionViewer} from '@angular/cdk/collections';
 import {DataSource} from '@angular/cdk/table';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {ApiService} from '../_services/api/api.service';
+import {ApiService} from '@services/api/api.service';
 import {DataTransferLog} from './data_transfer_log';
 
 export class DataTransferDataSource implements DataSource<DataTransferLog> {
-
   private logSubject = new BehaviorSubject<DataTransferLog[]>([]);
   public logs$ = this.logSubject.asObservable();
   private countSubject = new BehaviorSubject<number>(0);
@@ -13,10 +12,7 @@ export class DataTransferDataSource implements DataSource<DataTransferLog> {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(
-    private api: ApiService
-  ) {
-  }
+  constructor(private api: ApiService) {}
 
   connect(collectionViewer: CollectionViewer): Observable<DataTransferLog[]> {
     return this.logSubject.asObservable();
@@ -30,16 +26,17 @@ export class DataTransferDataSource implements DataSource<DataTransferLog> {
 
   loadLogs(pageNumber = 0, pageSize = 10) {
     this.loadingSubject.next(true);
-    this.api.getDataTransferLogs(pageNumber, pageSize)
-      .subscribe(results => {
-          this.logSubject.next(results.items);
-          this.countSubject.next(results.total);
-          this.loadingSubject.next(false);
-        },
-        error1 => {
-          this.logSubject.next(null);
-          this.countSubject.next(0);
-          this.loadingSubject.next(false);
-        });
+    this.api.getDataTransferLogs(pageNumber, pageSize).subscribe(
+      results => {
+        this.logSubject.next(results.items);
+        this.countSubject.next(results.total);
+        this.loadingSubject.next(false);
+      },
+      error1 => {
+        this.logSubject.next(null);
+        this.countSubject.next(0);
+        this.loadingSubject.next(false);
+      },
+    );
   }
 }

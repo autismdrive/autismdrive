@@ -1,15 +1,15 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Resource} from '../_models/resource';
-import {Study} from '../_models/study';
-import {ApiService} from '../_services/api/api.service';
-import {RelatedOptions} from '../_models/related_results';
 import {Router} from '@angular/router';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {RelatedOptions} from '@models/related_results';
+import {Resource} from '@models/resource';
+import {Study} from '@models/study';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-related-items',
   templateUrl: './related-items.component.html',
-  styleUrls: ['./related-items.component.scss']
+  styleUrls: ['./related-items.component.scss'],
 })
 export class RelatedItemsComponent implements OnInit {
   @Input() resource: Resource;
@@ -22,9 +22,8 @@ export class RelatedItemsComponent implements OnInit {
   constructor(
     private api: ApiService,
     private router: Router,
-    private googleAnalytics: GoogleAnalyticsService
-    ) {
-  }
+    private googleAnalytics: GoogleAnalyticsService,
+  ) {}
 
   ngOnInit() {
     const options: RelatedOptions = {
@@ -48,5 +47,4 @@ export class RelatedItemsComponent implements OnInit {
     this.googleAnalytics.relatedContentEvent('related_study', this.parentComponent);
     this.router.navigate(['/study', studyId]);
   }
-
 }

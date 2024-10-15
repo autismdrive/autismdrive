@@ -1,142 +1,225 @@
 # Login
 # *****************************
-from functools import wraps
 import datetime
+from functools import wraps
 
+from flask import g, request, Blueprint, jsonify, has_request_context
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
-from sqlalchemy import func
-from app import app, RestException, db, auth, email_service, session
-from app.model.email_log import EmailLog
-from app.model.user import User
-from flask import g, request, Blueprint, jsonify
+from sqlalchemy import func, select, update
+from sqlalchemy.orm import joinedload
 
-from app.schema.schema import UserSchema
+from app.auth import auth
+from app.database import session
+from app.email_service import email_service
+from app.resources.UserEndpoint import get_user_by_id
+from app.rest_exception import RestException
+from app.schemas import SchemaRegistry
+from config.load import settings
 
-auth_blueprint = Blueprint('auth', __name__, url_prefix='/api')
+auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
+
+ONE_DAY = 86400
 
 
 def confirm_email(email_token):
     """When users create a new account with an email and a password, this
     allows the front end to confirm their email and log them into the system."""
+    from app.models import User
+
     try:
-        ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-        email = ts.loads(email_token, salt="email-confirm-key", max_age=86400)
+        ts = URLSafeTimedSerializer(settings.SECRET_KEY)
+        email = ts.loads(email_token, salt="email-confirm-key", max_age=ONE_DAY)
     except:
         raise RestException(RestException.EMAIL_TOKEN_INVALID)
 
-    user = session.query(User).filter_by(email=email).first_or_404()
+    user = (
+        session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
+        .unique()
+        .scalar_one_or_none()
+    )
+
+    if user is None:
+        raise RestException(RestException.EMAIL_NOT_REGISTERED)
+
+    user_id = user.id
     user.email_verified = True
-    db.session.add(user)
-    db.session.commit()
+    session.add(user)
+    session.commit()
+    session.close()
 
-    auth_token = user.encode_auth_token().decode()
-    user.token = auth_token
-    return user
+    user_to_update = (
+        session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
+        .unique()
+        .scalar_one_or_none()
+    )
+
+    user_to_update.token = User.encode_auth_token(user_id=user_id)
+    user_to_update.last_login = datetime.datetime.utcnow()
+    session.add(user_to_update)
+    session.commit()
+    session.close()
+
+    db_user = (
+        session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
+        .unique()
+        .scalar_one_or_none()
+    )
+    session.close()
+    return db_user
 
 
-@auth_blueprint.route('/login_password', methods=["GET", "POST"])
+@auth_blueprint.route("/login_password", methods=["GET", "POST"])
 def login_password():
+    from app.models import User
+
     request_data = request.get_json()
 
     if request_data is None:
         raise RestException(RestException.INVALID_INPUT)
 
-    email = request_data['email']
-    user = session.query(User).filter(func.lower(User.email) == email.lower()).first()
-    schema = UserSchema(many=False)
+    email = request_data["email"].lower()
+    db_user = (
+        session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
+        .unique()
+        .scalar_one_or_none()
+    )
+    schema = SchemaRegistry.UserSchema(many=False)
 
-    if user is None:
+    if db_user is None:
         raise RestException(RestException.LOGIN_FAILURE)
-    if user.email_verified:
-        if user.is_correct_password(request_data["password"]):
+    if db_user.email_verified:
+        user_id = db_user.id
+
+        if User.is_correct_password(user_id=user_id, plaintext=request_data["password"]):
             # redirect users back to the front end, include the new auth token.
-            auth_token = user.encode_auth_token().decode()
-            g.user = user
-            user.token = auth_token
-            user.last_login = datetime.datetime.utcnow()
-            db.session.add(user)
-            db.session.commit()
-            return schema.jsonify(user)
+            user_to_update = (
+                session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
+                .unique()
+                .scalar_one_or_none()
+            )
+            user_to_update.token = User.encode_auth_token(user_id=user_id)
+            user_to_update.last_login = datetime.datetime.utcnow()
+            session.add(user_to_update)
+            session.commit()
+            session.close()
+
+            updated_user = (
+                session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
+                .unique()
+                .scalar_one_or_none()
+            )
+
+            g.user = updated_user
+            return jsonify(schema.dump(updated_user))
         else:
             raise RestException(RestException.LOGIN_FAILURE)
     else:
-        if 'email_token' in request_data:
-            g.user = confirm_email(request_data['email_token'])
-            return schema.jsonify(user)
+        if "email_token" in request_data:
+            updated_user = confirm_email(request_data["email_token"])
+            g.user = updated_user
+            return jsonify(schema.dump(updated_user))
         else:
             raise RestException(RestException.CONFIRM_EMAIL)
 
 
-@auth_blueprint.route('/forgot_password', methods=["GET", "POST"])
+@auth_blueprint.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
+    from app.models import User
+    from app.models import EmailLog
+
     request_data = request.get_json()
-    email = request_data['email']
+    email = request_data["email"]
     user = session.query(User).filter(func.lower(User.email) == func.lower(email)).first()
 
     if user:
         tracking_code = email_service.reset_email(user)
 
         log = EmailLog(user_id=user.id, type="reset_email", tracking_code=tracking_code)
-        db.session.add(log)
-        db.session.commit()
+        session.add(log)
+        session.commit()
 
-        if (app.config.get('TESTING') or app.config.get('DEVELOPMENT')) and user.token_url:
+        if (settings.TESTING or settings.DEVELOPMENT) and user.token_url:
             return jsonify(user.token_url)
         else:
-            return ''
+            return ""
     else:
         raise RestException(RestException.EMAIL_NOT_REGISTERED)
 
 
-@auth_blueprint.route('/reset_password', methods=["GET", "POST"])
+@auth_blueprint.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
+    from app.models import User
+
     request_data = request.get_json()
-    password = request_data['password']
-    email_token = request_data['email_token']
+    password = request_data["password"]
+    email_token = request_data["email_token"]
     try:
-        ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-        email = ts.loads(email_token, salt="email-reset-key", max_age=86400) #24 hours
+        ts = URLSafeTimedSerializer(settings.SECRET_KEY)
+        email = ts.loads(email_token, salt="email-reset-key", max_age=ONE_DAY).lower()  # 24 hours
     except SignatureExpired:
         raise RestException(RestException.TOKEN_EXPIRED)
     except BadSignature:
         raise RestException(RestException.TOKEN_INVALID)
 
-    user = session.query(User).filter(func.lower(User.email) == email.lower()).first_or_404()
-    user.token_url = ''
-    user.email_verified = True
-    user.password = password
-    user.last_login = datetime.datetime.utcnow()
-    db.session.add(user)
-    db.session.commit()
-    auth_token = user.encode_auth_token().decode()
-    user.token = auth_token
-    return UserSchema().jsonify(user)
+    user = session.execute(select(User).filter_by(email=email)).unique().scalar_one_or_none()
+
+    if user is None:
+        raise RestException(RestException.EMAIL_NOT_REGISTERED)
+
+    user_id = user.id
+    session.close()
+
+    user_to_update = session.execute(select(User).filter_by(id=user_id)).unique().scalar_one()
+    user_to_update.token_url = ""
+    user_to_update.email_verified = True
+    user_to_update.password = password
+    user_to_update.token = User.encode_auth_token(user_id=user_id)
+    user_to_update.last_login = datetime.datetime.utcnow()
+    session.add(user_to_update)
+    session.commit()
+    session.close()
+
+    db_user = (
+        session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id)).unique().scalar_one()
+    )
+    return jsonify(SchemaRegistry.UserSchema().dump(user))
 
 
 @auth.verify_token
 def verify_token(token):
+    from app.models import User
+
+    user_id = None
     try:
-        resp = User.decode_auth_token(token)
-        if resp:
-            g.user = session.query(User).filter_by(id=resp).first()
+        user_id = User.decode_auth_token(token)
     except:
         g.user = None
 
-    if 'user' in g and g.user:
-        g.user.token_url = ''
-        return True
-    else:
-        return False
+    if user_id is not None:
+        db_user = get_user_by_id(user_id, with_joins=True)
+        db_user.token_url = ""
+        session.add(db_user)
+        session.commit()
+        session.close()
+
+        updated_user = get_user_by_id(user_id, with_joins=True)
+        g.user = updated_user
+
+    return "user" in g and g.user
+
+
+def get_token():
+    if has_request_context() and request.method != "OPTIONS":
+        auth_header = request.headers.get("AUTHORIZATION")
+        if auth_header:
+            return auth_header.split(" ")[1]
+    return None
 
 
 def login_optional(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if request.method != 'OPTIONS':  # pragma: no cover
-            try:
-                auth = verify_token(request.headers['AUTHORIZATION'].split(' ')[1])
-            except:
-                auth = False
+        verify_token(get_token())
 
         return f(*args, **kwargs)
 

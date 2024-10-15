@@ -1,15 +1,15 @@
 import {AfterContentInit, Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {scrollToFirstInvalidField} from '../../../util/scrollToTop';
-import {RepeatSectionDialogData} from '../../_models/repeat_section_dialog_data';
-import {clone} from '../../../util/clone';
+import {clone} from '@util/clone';
+import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {RepeatSectionDialogData} from '@models/repeat_section_dialog_data';
 
 @Component({
   selector: 'app-repeat-section-dialog',
   templateUrl: './repeat-section-dialog.component.html',
-  styleUrls: ['./repeat-section-dialog.component.scss']
+  styleUrls: ['./repeat-section-dialog.component.scss'],
 })
 export class RepeatSectionDialogComponent implements AfterContentInit {
   disableSave: boolean;
@@ -19,8 +19,7 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
     @Inject(MAT_DIALOG_DATA) public data: RepeatSectionDialogData,
     private deviceDetectorService: DeviceDetectorService,
     public dialogRef: MatDialogRef<RepeatSectionDialogComponent>,
-  ) {
-  }
+  ) {}
 
   ngAfterContentInit(): void {
     this.initialModel = clone(this.data.model);

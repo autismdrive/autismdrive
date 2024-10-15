@@ -1,24 +1,22 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HelpWrapperComponent } from './help-wrapper.component';
+import {AppModule} from '@app/app.module';
+import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('HelpWrapperComponent', () => {
-  let component: HelpWrapperComponent;
-  let fixture: ComponentFixture<HelpWrapperComponent>;
+  it('should render help wrapper', () => {
+    const {query} = createFieldComponent(
+      {
+        wrappers: ['help'],
+        props: {
+          label: 'Name',
+          required: true,
+          description: 'Name description',
+        },
+      },
+      {
+        imports: [AppModule],
+      },
+    );
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ HelpWrapperComponent ]
-    })
-    .compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(HelpWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(query('app-help-wrapper')).not.toBeNull();
   });
 });

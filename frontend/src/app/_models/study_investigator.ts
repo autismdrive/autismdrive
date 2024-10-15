@@ -1,4 +1,4 @@
-import { Investigator } from './investigator';
+import {Investigator} from './investigator';
 
 export interface StudyInvestigator {
   id?: number;

@@ -4,7 +4,7 @@ export const scrollToTop = function (deviceDetectorService: DeviceDetectorServic
   window.scroll({
     top: 0,
     left: 0,
-    behavior: 'smooth'
+    behavior: 'smooth',
   });
   if (deviceDetectorService.browser === 'Safari') {
     window.scroll(0, 0);

@@ -1,19 +1,19 @@
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {MatDrawer} from '@angular/material/sidenav';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
+import {scrollToFirstInvalidField, scrollToTop} from '@util/scrollToTop';
+import {keysToCamel} from '@util/snakeToCamel';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {keysToCamel} from 'src/util/snakeToCamel';
-import {scrollToFirstInvalidField, scrollToTop} from '../../util/scrollToTop';
-import {Flow} from '../_models/flow';
-import {Participant} from '../_models/participant';
-import {Step, StepStatus} from '../_models/step';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {Flow} from '@models/flow';
+import {Participant} from '@models/participant';
+import {Step, StepStatus} from '@models/step';
+import {User} from '@models/user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 enum FlowState {
   INTRO = 'intro',
@@ -25,10 +25,9 @@ enum FlowState {
 @Component({
   selector: 'app-flow',
   templateUrl: './flow.component.html',
-  styleUrls: ['./flow.component.scss']
+  styleUrls: ['./flow.component.scss'],
 })
-export class FlowComponent implements OnInit, OnDestroy {
-
+export class FlowComponent implements OnDestroy {
   mobileQuery: MediaQueryList;
   user: User;
   participant: Participant;
@@ -81,9 +80,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this._updateSidenavState();
   }
 
-  ngOnInit() {
-  }
-
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
@@ -93,25 +89,21 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   loadFlow(flowName: string) {
-    this.api
-      .getFlow(flowName, this.participant.id)
-      .subscribe(f => {
-        this.flow = new Flow(f);
-        if (this.flow.percentComplete() === 0) {
-          this.state = this.flowState.INTRO;
-        } else {
-          this.goToNextAvailableStep();
-        }
-        scrollToTop(this.deviceDetectorService);
-      });
+    this.api.getFlow(flowName, this.participant.id).subscribe(f => {
+      this.flow = new Flow(f);
+      if (this.flow.percentComplete() === 0) {
+        this.state = this.flowState.INTRO;
+      } else {
+        this.goToNextAvailableStep();
+      }
+      scrollToTop(this.deviceDetectorService);
+    });
   }
 
   updateParticipant(participantId: number) {
-    this.api.getParticipant(participantId).subscribe(
-      p => {
-        this.participant = p;
-      }
-    );
+    this.api.getParticipant(participantId).subscribe(p => {
+      this.participant = p;
+    });
   }
 
   goToNextAvailableStep() {
@@ -177,12 +169,10 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.hideForm = true;
         this.renderForm(step, q);
       } else if (step.questionnaire_id > 0) {
-        this.api
-          .getQuestionnaire(step.name, step.questionnaire_id)
-          .subscribe(qData => {
-            this.model = qData;
-            this.renderForm(step, q);
-          });
+        this.api.getQuestionnaire(step.name, step.questionnaire_id).subscribe(qData => {
+          this.model = qData;
+          this.renderForm(step, q);
+        });
       } else {
         this.renderForm(step, q);
       }
@@ -207,20 +197,20 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.model['time_on_task_ms'] = performance.now() - this.startTime;
 
     // Post to the questionnaire endpoint, and then reload the flow.
-    if ((this.currentStep().questionnaire_id > 0) && (this.currentStep().type !== 'sensitive')) {
-      this.api.updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
+    if (this.currentStep().questionnaire_id > 0 && this.currentStep().type !== 'sensitive') {
+      this.api
+        .updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
           this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
           scrollToTop(this.deviceDetectorService);
         });
     } else {
-      this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model)
-        .subscribe(() => {
-          this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
-          this.loadFlow(this.flow.name);
-          scrollToTop(this.deviceDetectorService);
-        });
+      this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model).subscribe(() => {
+        this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
+        this.loadFlow(this.flow.name);
+        scrollToTop(this.deviceDetectorService);
+      });
     }
   }
 
@@ -246,8 +236,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.options = {
       formState: {
         mainModel: this.model,
-        preferredName: this.participant.name
-      }
+        preferredName: this.participant.name,
+      },
     };
     this.state = this.flowState.SHOW_FORM;
     scrollToTop(this.deviceDetectorService);

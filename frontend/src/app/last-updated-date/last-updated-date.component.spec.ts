@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { LastUpdatedDateComponent } from './last-updated-date.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {LastUpdatedDateComponent} from './last-updated-date.component';
 
 describe('LastUpdatedDateComponent', () => {
   let component: LastUpdatedDateComponent;
-  let fixture: ComponentFixture<LastUpdatedDateComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ LastUpdatedDateComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<LastUpdatedDateComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LastUpdatedDateComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(LastUpdatedDateComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(LastUpdatedDateComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

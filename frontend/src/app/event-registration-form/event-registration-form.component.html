@@ -1,55 +1,26 @@
 <mat-dialog-content>
-<h1>{{data.title}}</h1>
-<form
-  [formGroup]="form"
-  (ngSubmit)="submit()"
->
-  <formly-form
-    [form]="form"
-    [fields]="fields"
-    [model]="model"
-    *ngIf="registerStateValue !== 'wait_for_email'"
-  >
-    <div
-      id="error_message"
-      class="display mat-error"
-      *ngIf="errorMessage"
-    >{{errorMessage}}</div>
-    <footer
-      fxLayout="column"
-      fxLayoutGap="2%"
-      fxLayoutAlign="center"
-      *ngIf="registerStateValue === 'form'"
-    >
-      <button
-        mat-flat-button
-        type="submit"
-        color="primary"
-        id="submit"
-      >Register</button>
-      <button
-        mat-flat-button
-        color="accent"
-        id="cancel"
-        [mat-dialog-close]="data.registered"
-      >Cancel</button>
+  <h1>{{ data.title }}</h1>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <formly-form [form]="form" [fields]="fields" [model]="model" *ngIf="registerStateValue !== 'wait_for_email'" />
+    <div id="error_message" class="display mat-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <footer fxLayout="column" fxLayoutGap="2%" fxLayoutAlign="center" *ngIf="registerStateValue === 'form'">
+      <button mat-flat-button type="submit" color="primary" id="submit">Register</button>
+      <button mat-flat-button color="accent" id="cancel" [mat-dialog-close]="data.registered">Cancel</button>
     </footer>
     <footer *ngIf="registerStateValue === 'submitting'">
       <app-loading></app-loading>
     </footer>
-  </formly-form>
-<!--  <footer *ngIf="registerStateValue === 'wait_for_email'" id="confirmation_message">-->
-<!--    <h2>Account Created!</h2>-->
-<!--    <p>Please check your email to complete the signin process.</p>-->
-<!--    <button-->
-<!--      color="primary"-->
-<!--      mat-flat-button-->
-<!--      id="continue"-->
-<!--      [mat-dialog-close]="data.registered"-->
-<!--    >-->
-<!--      Continue to survey-->
-<!--    </button>-->
-<!--  </footer>-->
-</form>
-
+    <!--  <footer *ngIf="registerStateValue === 'wait_for_email'" id="confirmation_message">-->
+    <!--    <h2>Account Created!</h2>-->
+    <!--    <p>Please check your email to complete the signin process.</p>-->
+    <!--    <button-->
+    <!--      color="primary"-->
+    <!--      mat-flat-button-->
+    <!--      id="continue"-->
+    <!--      [mat-dialog-close]="data.registered"-->
+    <!--    >-->
+    <!--      Continue to survey-->
+    <!--    </button>-->
+    <!--  </footer>-->
+  </form>
 </mat-dialog-content>

@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AdminExportDetailsComponent } from './admin-export-details.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {AdminExportDetailsComponent} from './admin-export-details.component';
 
 describe('AdminExportDetailsComponent', () => {
   let component: AdminExportDetailsComponent;
-  let fixture: ComponentFixture<AdminExportDetailsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ AdminExportDetailsComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AdminExportDetailsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdminExportDetailsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AdminExportDetailsComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AdminExportDetailsComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

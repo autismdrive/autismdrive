@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MirrorComponent } from './mirror.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {MirrorComponent} from './mirror.component';
 
 describe('MirrorComponent', () => {
   let component: MirrorComponent;
-  let fixture: ComponentFixture<MirrorComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ MirrorComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<MirrorComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MirrorComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(MirrorComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(MirrorComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

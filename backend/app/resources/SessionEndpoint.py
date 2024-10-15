@@ -1,20 +1,22 @@
-import flask.scaffold
-flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
 import flask_restful
 from flask import g, jsonify
 
-from app import auth
-from app.schema.schema import UserSchema
+from app.auth import auth
+from app.schemas import SchemaRegistry
 
 
 class SessionEndpoint(flask_restful.Resource):
     """Provides a way to get the current user, and to delete the user."""
-    schema = UserSchema()
+
+    schema = SchemaRegistry.UserSchema()
 
     @auth.login_required
     def get(self):
-        if "user" in g:
-            return jsonify(self.schema.dump(g.user))
+        if "user" in g and g.user.id is not None:
+            from app.resources.UserEndpoint import get_user_by_id
+
+            db_user = get_user_by_id(g.user.id)
+            return jsonify(self.schema.dump(db_user))
         else:
             return None
 

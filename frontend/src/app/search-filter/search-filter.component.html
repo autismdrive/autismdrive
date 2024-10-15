@@ -1,20 +1,16 @@
 <ng-container *ngIf="aggregations; else loadingMessage">
   <button mat-button [matMenuTriggerFor]="menuItems">
-    <mat-icon>{{label_icon}}</mat-icon>
-    {{hasSelection() ? label_map[selectedAgg().value] : label_title}}
+    <mat-icon>{{ label_icon }}</mat-icon>
+    {{ hasSelection() ? label_map[selectedAgg().value] : label_title }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
   <mat-menu #menuItems>
-    <button (click)="select()" mat-menu-item>{{label_any}}</button>
-    <button
-      *ngFor="let agg of aggregations"
-      (click)="select(agg.value)"
-      mat-menu-item
-    >
-      {{label_map[agg.value]}} - {{agg.count}} result{{agg.count === 1 ? '' : 's'}}
+    <button (click)="select()" mat-menu-item>{{ label_any }}</button>
+    <button *ngFor="let agg of aggregations" (click)="select(agg.value)" mat-menu-item>
+      {{ label_map[agg.value] }} - {{ agg.count }} result{{ agg.count === 1 ? '' : 's' }}
     </button>
   </mat-menu>
-  <mat-hint *ngIf="isNotApplicable">{{notApplicableMessage}}</mat-hint>
+  <mat-hint *ngIf="isNotApplicable">{{ notApplicableMessage }}</mat-hint>
 </ng-container>
 
 <ng-template #loadingMessage>

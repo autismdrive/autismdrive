@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { StudySurveyEntryComponent } from './study-survey-entry.component';
+import {AppModule} from '@app/app.module';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {StudySurveyEntryComponent} from './study-survey-entry.component';
 
 describe('StudySurveyEntryComponent', () => {
   let component: StudySurveyEntryComponent;
-  let fixture: ComponentFixture<StudySurveyEntryComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ StudySurveyEntryComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<StudySurveyEntryComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StudySurveyEntryComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(StudySurveyEntryComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(StudySurveyEntryComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

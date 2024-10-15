@@ -1,19 +1,19 @@
-import {Component, EventEmitter, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Component, EventEmitter} from '@angular/core';
 import {FormGroup} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormlyFieldConfig} from '@ngx-formly/core';
+import {scrollToTop} from '@util/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {scrollToTop} from '../../util/scrollToTop';
-import {User} from '../_models/user';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {User} from '@models/user';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   loading = false;
   emailToken: string;
   errorEmitter = new EventEmitter<string>();
@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',
@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
     {
       key: 'password',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'Password:',
         type: 'password',
         required: true,
@@ -69,16 +69,14 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-  }
-
   submit(model) {
     this.loading = true;
 
     if (this.form.valid) {
-      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(u => {
-        this._goToReturnUrl(u);
-        this.googleAnalytics.accountEvent('login');
+      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
+        u => {
+          this._goToReturnUrl(u);
+          this.googleAnalytics.accountEvent('login');
         },
         error => {
           if (error) {
@@ -87,7 +85,8 @@ export class LoginComponent implements OnInit {
             this.errorEmitter.emit('An unexpected error occurred. Please contact support');
           }
           this.loading = false;
-        });
+        },
+      );
     } else {
       this.loading = false;
       this.errorEmitter.emit('Please enter a valid email address and password.');
@@ -99,5 +98,4 @@ export class LoginComponent implements OnInit {
       this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop(this.deviceDetectorService));
     }
   }
-
 }
