@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@animations/*": ["src/app/_animations/*"],
@@ -17,7 +16,6 @@
       "@util/*": ["src/util/*"]
     },
     "declaration": false,
-    "downlevelIteration": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,

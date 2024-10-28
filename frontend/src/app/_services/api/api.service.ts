@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {StarError} from '@app/star-error';
 import {AdminNote} from '@models/admin_note';

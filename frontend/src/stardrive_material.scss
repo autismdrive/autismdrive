@@ -178,10 +178,10 @@
       ),
       linear-gradient(
         90deg,
-        mat.get-color-from-palette($stardrive-primary, 600, 0.8) 0%,
-        mat.get-color-from-palette($stardrive-primary, 600, 0) 40%,
-        mat.get-color-from-palette($stardrive-accent, 600, 0) 60%,
-        mat.get-color-from-palette($stardrive-accent, 600, 0.8) 100%
+        mat.m2-get-color-from-palette($stardrive-primary, 600, 0.8) 0%,
+        mat.m2-get-color-from-palette($stardrive-primary, 600, 0) 40%,
+        mat.m2-get-color-from-palette($stardrive-accent, 600, 0) 60%,
+        mat.m2-get-color-from-palette($stardrive-accent, 600, 0.8) 100%
       );
     background-blend-mode: saturation;
     z-index: 1;
@@ -280,7 +280,7 @@
       padding: 2.4375rem;
       margin: 0;
       background-color: rgba(255, 255, 255, 0.8);
-      color: mat.get-color-from-palette($stardrive-primary, 50, 1);
+      color: mat.m2-get-color-from-palette($stardrive-primary, 50, 1);
 
       h1 {
         color: $brand-primary;
