@@ -5,7 +5,7 @@ import {Query} from '@models/query';
 import {Study} from '@models/study';
 import {ConfigService} from '@services/config/config.service';
 
-declare var gtag: Function;
+declare let gtag: Function;
 
 @Injectable({
   providedIn: 'root',

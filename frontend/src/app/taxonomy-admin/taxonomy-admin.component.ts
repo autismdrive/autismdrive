@@ -17,7 +17,7 @@ export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;
   dataSource: MatTreeNestedDataSource<Category>;
   dataLoaded = false;
-  nodes: {[key: number]: Category} = {};
+  nodes: Record<number, Category> = {};
   showConfirmDelete = false;
   nodeToDelete: Category;
   currentUser: User;

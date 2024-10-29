@@ -8,10 +8,8 @@ import {SortMethod} from '@models/sort_method';
 })
 export class SearchSortComponent {
   @Input() selectedSort: SortMethod;
-  @Input() sortMethods: {[key: string]: SortMethod};
+  @Input() sortMethods: Record<string, SortMethod>;
   @Output() sortMethodSelected = new EventEmitter<SortMethod>();
-
-  constructor() {}
 
   get sortMethodsList() {
     return Object.values(this.sortMethods);

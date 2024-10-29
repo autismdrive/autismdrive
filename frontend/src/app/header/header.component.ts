@@ -234,13 +234,10 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     this._mdMediaQueryListener = () => changeDetectorRef.detectChanges();
     this._lgMediaQueryListener = () => changeDetectorRef.detectChanges();
 
-    // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
 
-    // tslint:disable-next-line:deprecation
     this.mdMediaQuery.addListener(this._mdMediaQueryListener);
 
-    // tslint:disable-next-line:deprecation
     this.lgMediaQuery.addListener(this._lgMediaQueryListener);
   }
 
@@ -250,13 +247,10 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
 
-    // tslint:disable-next-line:deprecation
     this.mdMediaQuery.removeListener(this._mdMediaQueryListener);
 
-    // tslint:disable-next-line:deprecation
     this.lgMediaQuery.removeListener(this._lgMediaQueryListener);
   }
 

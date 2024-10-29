@@ -17,9 +17,9 @@ export interface QueryProps {
   total?: number;
   start?: number;
   size?: number;
-  types?: String[];
-  ages?: String[];
-  languages?: String[];
+  types?: string[];
+  ages?: string[];
+  languages?: string[];
   sort?: Sort;
   hits?: Hit[];
   category?: Category;
@@ -37,14 +37,14 @@ export class Query {
   total?: number;
   start = 0;
   size = 20;
-  types: String[] = [];
-  ages: String[] = [];
-  languages: String[] = [];
+  types: string[] = [];
+  ages: string[] = [];
+  languages: string[] = [];
   sort: Sort = {
     field: '_score',
     order: 'asc',
   };
-  hits?: Array<Hit> = [];
+  hits?: Hit[] = [];
   category: Category;
   type_counts: Aggregation[] = [];
   age_counts: Aggregation[] = [];
@@ -123,7 +123,7 @@ export class Query {
 export class Aggregation {
   value: string;
   count: number;
-  is_selected: Boolean;
+  is_selected: boolean;
 }
 
 export class Hit extends GeoLocation {

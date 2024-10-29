@@ -9,9 +9,9 @@ import {Query} from '@models/query';
 export class SearchFiltersBreadcrumbsComponent {
   @Input() query: Query;
   @Input() restrictToMappedResults: boolean;
-  @Input() ageLabels: {[key: string]: string};
-  @Input() languageLabels: {[key: string]: string};
-  @Input() typeLabels: {[key: string]: string};
+  @Input() ageLabels: Record<string, string>;
+  @Input() languageLabels: Record<string, string>;
+  @Input() typeLabels: Record<string, string>;
   @Output() mappedResultsChipClicked = new EventEmitter<boolean>();
   @Output() keywordChipClicked = new EventEmitter();
   @Output() ageRangeChipClicked = new EventEmitter();

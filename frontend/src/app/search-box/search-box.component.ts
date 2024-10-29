@@ -32,7 +32,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   queryParams: Params;
   searchBoxControl = new FormControl();
   searchInputElement: MatInput;
-  searchUpdate = new Subject<String>();
+  searchUpdate = new Subject<string>();
   skipUpdate = false;
 
   constructor(

@@ -3,9 +3,9 @@ export interface QuestionnaireListMeta {
     question_type: string;
     label: string;
   };
-  fields: Array<{
+  fields: {
     name: string;
     key: string;
     display_order: number;
-  }>;
+  }[];
 }

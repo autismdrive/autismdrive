@@ -8,7 +8,7 @@ import {Flow} from '@models/flow';
 })
 export class FlowIntroComponent {
   @Input() flow: Flow;
-  @Output() next: EventEmitter<any> = new EventEmitter();
+  @Output() next = new EventEmitter<any>();
 
   constructor() {}
 

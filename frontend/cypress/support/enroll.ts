@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 import {AppPage} from './util';
 
 export class EnrollUseCases {
@@ -129,7 +128,7 @@ export class EnrollUseCases {
     _page.getElement(selector).invoke('attr', 'id').as('currentStepId');
     _page.clickElement('#save-next-button');
     _page.waitFor(500);
-    _page.waitForVisible('#save-next-button, app-flow-complete').then(function (_) {
+    _page.waitForVisible('#save-next-button, app-flow-complete').then(function () {
       _page.getElements(`#${this.currentStepId} .done .visible`).should('have.length', 1);
     });
   }
@@ -154,6 +153,7 @@ export class EnrollUseCases {
   }
 
   fillOutRepeatSections() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _self = this;
     const _page = this.page;
     const itemSelector = 'mat-card.repeat';

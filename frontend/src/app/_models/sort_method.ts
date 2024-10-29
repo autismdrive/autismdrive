@@ -6,7 +6,7 @@ export interface SortMethod {
   sortQuery: Sort;
 }
 
-export const sortMethods: {[key: string]: SortMethod} = {
+export const sortMethods = {
   RELEVANCE: {
     name: 'Relevance',
     label: 'Relevance',

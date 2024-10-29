@@ -49,7 +49,7 @@ export class AppPage {
     return cy.get(selector).should('be.visible', {timeout: 5000});
   }
 
-  waitForNetworkIdle(waitMs: number = 5000) {
+  waitForNetworkIdle(waitMs = 5000) {
     return cy.waitForNetworkIdle(waitMs);
   }
 

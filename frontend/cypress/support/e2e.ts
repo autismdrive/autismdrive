@@ -1,9 +1,11 @@
-/// <reference types="cypress" />
 import 'cypress-fail-fast';
 import 'cypress-network-idle';
-require('cypress-terminal-report/src/installLogsCollector')({xhr: {printHeaderData: true}});
+import installLogsCollector from 'cypress-terminal-report/src/installLogsCollector';
+
+installLogsCollector({xhr: {printHeaderData: true}});
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       saveLocalStorageCache: () => void;

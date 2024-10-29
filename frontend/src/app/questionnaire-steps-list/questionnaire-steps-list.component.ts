@@ -12,7 +12,7 @@ export class QuestionnaireStepsListComponent implements OnInit, OnChanges {
   @Input() flow: Flow;
   @Input() stepIndex: number;
   @Output()
-  stepSelected: EventEmitter<Step> = new EventEmitter();
+  stepSelected = new EventEmitter<Step>();
   stepName: string;
 
   constructor() {}

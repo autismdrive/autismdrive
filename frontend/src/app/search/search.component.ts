@@ -92,7 +92,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   hitsWithAddress: Hit[] = [];
   defaultZoom = 7;
   mapZoomLevel: number;
-  sortMethods: {[key: string]: SortMethod};
+  sortMethods: Record<string, SortMethod>;
   selectedSort: SortMethod;
   paginatorElement: MatPaginator;
   mapTemplateElement: NgMapsViewComponent<any>;
@@ -411,7 +411,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.watchScrollEvents();
   }
 
-  getOptions(modelLabels: {[key: string]: string}) {
+  getOptions(modelLabels: Record<string, string>) {
     const opts = [];
     for (const key in modelLabels) {
       if (modelLabels.hasOwnProperty(key)) {

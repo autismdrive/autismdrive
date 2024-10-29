@@ -1,37 +1,24 @@
 /// <reference types="cypress" />
-import {faker} from '@faker-js/faker';
-import {AppPage} from '../support/util';
 import {AdminUseCases} from '../support/admin';
-import {EnrollUseCases} from '../support/enroll';
 import {GlobalHeaderUseCases} from '../support/global-header';
 import {LoginUseCases} from '../support/login';
-import {ProfileUseCases} from '../support/profile';
-import {SearchUseCases} from '../support/search';
 import {StudiesUseCases} from '../support/studies';
+import {AppPage} from '../support/util';
 
 describe('Admin', () => {
   let page: AppPage;
   let globalHeaderUseCases: GlobalHeaderUseCases;
   let loginUseCases: LoginUseCases;
-  let searchUseCases: SearchUseCases;
-  let profileUseCases: ProfileUseCases;
-  let enrollUseCases: EnrollUseCases;
   let adminUseCases: AdminUseCases;
   let studiesUseCases: StudiesUseCases;
 
   const adminEmail = 'ajlouie@gmail.com';
   const adminPassword = 'Total Perspective Vortex 56';
 
-  const userEmail = faker.internet.email();
-  const userPassword = faker.internet.password({length: 24});
-
   before(() => {
     page = new AppPage();
     globalHeaderUseCases = new GlobalHeaderUseCases(page);
     loginUseCases = new LoginUseCases(page);
-    searchUseCases = new SearchUseCases(page);
-    profileUseCases = new ProfileUseCases(page);
-    enrollUseCases = new EnrollUseCases(page);
     adminUseCases = new AdminUseCases(page);
     studiesUseCases = new StudiesUseCases(page);
     page.waitForNetworkIdle();

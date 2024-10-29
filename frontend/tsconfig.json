@@ -27,14 +27,14 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "es2022",
-    "typeRoots": ["node_modules/@types"],
-    "types": ["node"]
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node", "jest"]
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
   },
-  "include": ["src/**/*"],
+  "include": ["./src/**/*"],
   "exclude": [
     "node_modules",
     "cypress"

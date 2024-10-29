@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 import {AppPage} from './util';
 
 export class GlobalHeaderUseCases {

@@ -1,10 +1,8 @@
 import {TestBed} from '@angular/core/testing';
 import {RouterModule} from '@angular/router';
 import {AppModule} from '@app/app.module';
-import {HeaderComponent} from '@app/header/header.component';
-import {MediaMatcher} from '@angular/cdk/layout';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {AppComponent} from './app.component';
 
 describe('AppComponent', () => {
@@ -21,7 +19,7 @@ describe('AppComponent', () => {
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+    expect(component).toBeTruthy();
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   });

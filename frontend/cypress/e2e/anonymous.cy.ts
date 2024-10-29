@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 import {faker} from '@faker-js/faker';
-import {AppPage} from '../support/util';
 import {GlobalHeaderUseCases} from '../support/global-header';
 import {LoginUseCases} from '../support/login';
 import {SearchUseCases} from '../support/search';
 import {StudiesUseCases} from '../support/studies';
+import {AppPage} from '../support/util';
 
 describe('Anonymous User', () => {
   let page: AppPage;

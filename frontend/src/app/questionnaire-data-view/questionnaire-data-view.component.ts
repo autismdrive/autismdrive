@@ -27,7 +27,6 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
     // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
-    // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
 
     window.addEventListener('resize', this._mobileQueryListener);
@@ -46,7 +45,6 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
-    // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
     window.removeEventListener('resize', this._mobileQueryListener);
   }

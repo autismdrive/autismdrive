@@ -18,10 +18,12 @@ export default defineConfig({
     waitForAnimations: true,
     includeShadowDom: false,
     setupNodeEvents(on, config) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('cypress-terminal-report/src/installLogsPrinter')(on, {
         printLogsToConsole: 'always',
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('cypress-fail-fast/plugin')(on, config);
 
       return config;

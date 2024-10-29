@@ -14,11 +14,11 @@ export interface DataTransferDetail {
   id: number;
   date_started: Date;
   last_updated: Date;
-  class_name: String;
+  class_name: string;
   successful: boolean;
   success_count: boolean;
   failure_count: boolean;
-  errors: String;
+  errors: string;
 }
 
 export interface DataTransferPageResults {

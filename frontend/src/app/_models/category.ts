@@ -18,10 +18,6 @@ export interface Category {
   indentedString?: string;
 }
 
-export interface CategoriesById {
-  [key: number]: Category;
-}
+export type CategoriesById = Record<number, Category>;
 
-export interface CategoriesByDisplayOrder {
-  [key: string]: Category;
-}
+export type CategoriesByDisplayOrder = Record<string, Category>;

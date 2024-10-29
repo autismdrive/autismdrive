@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 import {faker} from '@faker-js/faker';
 import {AppPage} from './util';
 

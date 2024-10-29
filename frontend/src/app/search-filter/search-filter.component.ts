@@ -14,7 +14,7 @@ export class SearchFilterComponent {
   @Input() aggregations: Aggregation[];
   @Input() isNotApplicable: boolean;
   @Input() notApplicableMessage: string;
-  @Output() filterSelected = new EventEmitter<String>();
+  @Output() filterSelected = new EventEmitter<string>();
 
   constructor() {}
 
