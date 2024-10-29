@@ -11,7 +11,7 @@
     <div *ngIf="newsItems.length > 0" class="row" fxFlex="87%">
       <app-news-item *ngFor="let item of newsItems; let i = index" [item]="item" [index]="i"></app-news-item>
     </div>
-    <div class="pad-2" *ngIf="!newsItems || newsItems.length == 0">
+    <div class="pad-2" *ngIf="!newsItems || newsItems.length === 0">
       <h4>Please check back for UVA Education content coming soon.</h4>
     </div>
   </div>

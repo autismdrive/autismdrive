@@ -41,7 +41,7 @@ export class ResourceDetailComponent {
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer,
   ) {

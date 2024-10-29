@@ -5,7 +5,6 @@ import installLogsCollector from 'cypress-terminal-report/src/installLogsCollect
 installLogsCollector({xhr: {printHeaderData: true}});
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       saveLocalStorageCache: () => void;

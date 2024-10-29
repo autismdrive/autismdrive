@@ -4,7 +4,7 @@ import {Injectable, NgZone} from '@angular/core';
   providedIn: 'root',
 })
 export class IntervalService {
-  interval: number;
+  interval: number = null;
 
   constructor(private ngZone: NgZone) {}
 

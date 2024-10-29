@@ -34,7 +34,7 @@ export class HomeComponent {
 
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
     if (this.currentStudies && this.currentStudies.length > 0) {
-      return studies.map((s, i) => {
+      return studies.map(s => {
         const n: NewsItem = {
           title: s.short_title || s.title,
           description: s.short_description || s.description,

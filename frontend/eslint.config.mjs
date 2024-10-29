@@ -12,25 +12,57 @@ export default tseslint.config(
     extends: [eslint.configs.recommended],
   },
   {
-    files: ['**/*.ts'],
+    files: ['*.ts'],
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
       ...angular.configs.tsRecommended,
     ],
+    rules: {
+      '@angular-eslint/directive-selector': [
+        'error',
+        {
+          type: 'attribute',
+          prefix: 'app',
+          style: 'camelCase',
+        },
+      ],
+      '@angular-eslint/component-selector': [
+        'error',
+        {
+          type: 'element',
+          prefix: 'app',
+          style: 'kebab-case',
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
     processor: angular.processInlineTemplates,
   },
   {
-    files: ['./cypress/**/*.ts'],
-    extends: [pluginCypress.configs.recommended, pluginChaiFriendly.configs.recommendedFlat],
+    files: ['cypress/support/*.ts', 'cypress/fixtures/*.ts', '*.cy.ts'],
+    extends: [
+      eslint.configs.recommended,
+      ...tseslint.configs.recommended,
+      ...tseslint.configs.stylistic,
+      pluginCypress.configs.recommended,
+      pluginChaiFriendly.configs.recommendedFlat,
+    ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-namespace': 'warn',
+    },
   },
   {
-    files: ['**/*.spec.ts'],
+    files: ['*.spec.ts'],
     extends: [pluginJest.configs['flat/recommended'], pluginChaiFriendly.configs.recommendedFlat],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
   },
   {
-    files: ['**/*.html'],
+    files: ['*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
   },
 );

@@ -1,5 +1,8 @@
-const {pathsToModuleNameMapper} = require('ts-jest');
-const {compilerOptions} = require('./tsconfig');
+import {createRequire} from 'module';
+import {pathsToModuleNameMapper} from 'ts-jest';
+
+const tsconfigJSON = createRequire(import.meta.url)('./tsconfig.json');
+
 const esModules = [
   '@angular',
   '@testing-library',
@@ -47,7 +50,7 @@ class StorageMock {
 global.localStorage = new StorageMock();
 global.sessionStorage = new StorageMock();
 
-module.exports = {
+export default {
   preset: 'jest-preset-angular',
   roots: ['<rootDir>/src/'],
   testMatch: ['**/+(*.)+(spec).+(ts)'],
@@ -56,7 +59,7 @@ module.exports = {
   coverageReporters: ['lcov', 'html'],
   coverageDirectory: 'coverage',
   maxWorkers: 1,
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, {
+  moduleNameMapper: pathsToModuleNameMapper(tsconfigJSON.compilerOptions.paths || {}, {
     prefix: '<rootDir>/',
   }),
   transform: {

@@ -1,5 +1,7 @@
 import {defineConfig} from 'cypress';
 import {faker} from '@faker-js/faker';
+import cypressFailFastPlugin from 'cypress-fail-fast/plugin';
+import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter';
 
 export default defineConfig({
   e2e: {
@@ -18,13 +20,11 @@ export default defineConfig({
     waitForAnimations: true,
     includeShadowDom: false,
     setupNodeEvents(on, config) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('cypress-terminal-report/src/installLogsPrinter')(on, {
+      installLogsPrinter(on, {
         printLogsToConsole: 'always',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('cypress-fail-fast/plugin')(on, config);
+      cypressFailFastPlugin(on, config);
 
       return config;
     },

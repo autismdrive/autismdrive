@@ -17,8 +17,8 @@
   </button>
   <mat-menu #topicMenu>
     <button (click)="selectCategory(child)" *ngFor="let child of categories" mat-menu-item>
-      <span *ngIf="child.hit_count == 1" class="child-label">{{ child.name }} - {{ child.hit_count }} result</span>
-      <span *ngIf="child.hit_count != 1" class="child-label">{{ child.name }} - {{ child.hit_count }} results</span>
+      <span *ngIf="child.hit_count === 1" class="child-label">{{ child.name }} - {{ child.hit_count }} result</span>
+      <span *ngIf="child.hit_count !== 1" class="child-label">{{ child.name }} - {{ child.hit_count }} results</span>
 
       <mat-icon *ngIf="hasChildren(child)" matTooltip="Subtopics">arrow_right </mat-icon>
     </button>

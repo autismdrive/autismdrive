@@ -67,7 +67,11 @@ jobs:
       - name: Install frontend dependencies
         run: |
           cd $FRONTEND_PATH
-          npm install --legacy-peer-deps
+          npm install
+      - name: Run frontend unit tests
+        run: |
+          cd $FRONTEND_PATH
+          ng test frontend
       - name: Export coverage report to XML
         shell: bash
         run: |

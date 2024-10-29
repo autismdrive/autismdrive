@@ -24,6 +24,7 @@
     "module": "es2022",
     "moduleResolution": "node",
     "outDir": "./dist/out-tsc",
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "es2022",

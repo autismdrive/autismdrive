@@ -368,7 +368,7 @@
               [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
               fillOpacity="0.1"
               [clickable]="true"
-              [visible]="isInfoWindowOpen && selectedMapHit.id == hit.id"
+              [visible]="isInfoWindowOpen && selectedMapHit.id === hit.id"
               (circleClick)="showInfoWindow(hit)"
               zIndex="-1"
             >

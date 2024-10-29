@@ -12,7 +12,7 @@
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
             "customWebpackConfig": {
-              "path": "./custom-webpack.config.js"
+              "path": "./custom-webpack.config.mjs"
             },
             "allowedCommonJsDependencies": [
               "geolib",
@@ -137,7 +137,8 @@
           "options": {
             "detectOpenHandles": true,
             "forceExit": true,
-            "tsConfig": "tsconfig.spec.json"
+            "tsConfig": "tsconfig.spec.json",
+            "configPath": "jest.config.mjs"
           }
         },
         "e2e": {
