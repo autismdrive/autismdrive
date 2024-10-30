@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
-        node-version: [14.21.3]
+        python-version: [3.12.1]
+        node-version: [22.3.0]
     steps:
       - uses: actions/checkout@v3
       - name: Configure VM for Elasticsearch
@@ -39,9 +39,13 @@ jobs:
           mkdir -p instance
           cp config/default.py instance/config.py
           cp config/testing.py instance/testing.py
+
           python -m pip install --upgrade pip
-          pip install flake8
-          pip install -r requirements.txt
+          pip install flake8 pytest
+          python -m pip install poetry
+          poetry install
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
           cd ..
       - name: Initialize database and search index
         run: |
