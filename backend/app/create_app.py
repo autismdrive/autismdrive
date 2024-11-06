@@ -138,27 +138,27 @@ def create_app(settings=None):
         data_loader.load_zip_codes()
         data_loader.load_chain_steps()
 
-    @_app.cli.command()
+    @_app.cli.command("upgrade-db")
     def upgrade_db():
         """Run the database migration scripts."""
         from app.database import upgrade_db as _upgrade_db
 
         _upgrade_db()
 
-    @_app.cli.command()
+    @_app.cli.command("migrate-db")
     def migrate_db():
         """Create a new database migration script, if any changes have been made to the database model."""
         from app.database import migrate_db as _migrate_db
 
         _migrate_db()
 
-    @_app.cli.command()
+    @_app.cli.command("init-db")
     def initdb():
         """Initialize the database."""
 
         _load_data()
 
-    @_app.cli.command()
+    @_app.cli.command("clear-db")
     def cleardb():
         """Delete all information from the database."""
         from app.database import clear_db
@@ -166,20 +166,20 @@ def create_app(settings=None):
         click.echo("Clearing out the database")
         clear_db()
 
-    @_app.cli.command()
+    @_app.cli.command("init-index")
     def initindex():
         """Delete all information from the elastic search Index."""
         click.echo("Loading data into Elastic Search")
         _app.elastic_index.clear()
         data_loader.build_index()
 
-    @_app.cli.command()
+    @_app.cli.command("clear-index")
     def clearindex():
         """Delete all information from the elasticsearch index"""
         click.echo("Removing Data from Elastic Search")
         data_loader.clear_index()
 
-    @_app.cli.command()
+    @_app.cli.command("reset")
     def reset():
         """Remove all data and recreate it from the example data files"""
         from app.database import clear_db
@@ -190,7 +190,7 @@ def create_app(settings=None):
         _load_data()
         data_loader.build_index()
 
-    @_app.cli.command()
+    @_app.cli.command("resource-reset")
     def resourcereset():
         """Used for Staging updates where we don't want to do a full reset and wipe away all user data.
         Does not clear and rebuild index because that is a separate step of the prod update.
@@ -206,28 +206,28 @@ def create_app(settings=None):
         data_loader.load_zip_codes()
         data_loader.load_chain_steps()
 
-    @_app.cli.command()
+    @_app.cli.command("load-studies")
     def loadstudies():
         """Used for loading new studies into the database"""
         click.echo("Loading additional studies, not clearing out existing ones")
 
         data_loader.load_studies()
 
-    @_app.cli.command()
+    @_app.cli.command("load-users")
     def loadusers():
         """Used for loading new users into the database"""
         click.echo("Loading users, not clearing out existing ones")
 
         data_loader.load_users()
 
-    @_app.cli.command()
+    @_app.cli.command("load-participants")
     def loadparticipants():
         """Used for loading new participants into the database"""
         click.echo("Loading participants, not clearing out existing ones")
 
         data_loader.load_participants()
 
-    @_app.cli.command()
+    @_app.cli.command("run-full-export")
     def run_full_export():
         """Remove all data and recreate it from the example data files"""
         if settings.MIRRORING:
@@ -239,7 +239,7 @@ def create_app(settings=None):
         else:
             click.echo("This system is not configured to run exports. Ingoring.")
 
-    @_app.cli.command()
+    @_app.cli.command("schedule-tasks")
     def schedule_tasks():
         from app.models import User, Study, EmailLog
         from app.export_service import ExportService

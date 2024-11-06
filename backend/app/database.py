@@ -134,6 +134,20 @@ def upgrade_db():
     current_dir = os.path.dirname(getsourcefile(lambda: 0))
     alembic_cfg = Config(current_dir + "/../migrations/alembic.ini")
     alembic_cfg.set_main_option("script_location", current_dir + "/../migrations")
+
+    # Check if the database is already populated, but has no Alembic version yet.
+    # If so, we need to create the Alembic version table before we can upgrade.
+    if not inspector.has_table("alembic_version"):
+        from alembic.command import stamp
+
+        # Check if the database is already populated
+        num_tables = len(inspector.get_table_names())
+        num_models = len(Base.metadata.tables)
+        if num_tables >= num_models:
+            # The database is already populated, but has no Alembic version yet.
+            # Stamp it with the current revision.
+            stamp(config=alembic_cfg, revision="head")
+
     upgrade(config=alembic_cfg, revision="head")
 
 
