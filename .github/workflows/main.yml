@@ -5,6 +5,7 @@ env:
   BACKEND_PATH: ${{ github.workspace }}/backend
   FLASK_APP: ${{ github.workspace }}/backend/app/main.py
   FLASK_ENV: local
+  PYTHONPATH: ${{ github.workspace }}/backend
 permissions:
   contents: write
 jobs:
@@ -54,8 +55,6 @@ jobs:
           echo "FLASK_APP = $FLASK_APP"
           pwd
           ls -al .
-
-          echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
 
           echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
           flask clear-db
