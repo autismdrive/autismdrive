@@ -34,24 +34,24 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: |
-          sudo apt-get -y install apache2 apache2-utils apache2-dev
-          cd backend
+          sudo apt update
+          sudo apt-get -y install apache2 apache2-utils apache2-dev pipx
+          pipx ensurepath
+          pipx install poetry
+          poetry install --sync
+          python -m pip install --upgrade pip          
+          pip install flake8 pytest
+          
+          cd $BACKEND_PATH
           cp config/template.env .env
           
           mkdir -p instance
           cp config/default.py instance/config.py
           cp config/testing.py instance/testing.py
-
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          python -m pip install poetry
-          poetry install
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-          cd ..
       - name: Initialize database and search index
         run: |
           cd $BACKEND_PATH
+          echo "FLASK_APP = $FLASK_APP"
           pwd
           ls -al .
 
