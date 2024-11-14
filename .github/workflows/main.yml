@@ -3,8 +3,8 @@ on: [push, pull_request, workflow_dispatch]
 env:
   FRONTEND_PATH: ${{ github.workspace }}/frontend
   BACKEND_PATH: ${{ github.workspace }}/backend
-  FLASK_APP: ${{ github.workspace }}/backend/app/__init__.py
-  FLASK_ENV: test
+  FLASK_APP: ${{ github.workspace }}/backend/app/main.py
+  FLASK_ENV: local
 permissions:
   contents: write
 jobs:
@@ -36,6 +36,8 @@ jobs:
         run: |
           sudo apt-get -y install apache2 apache2-utils apache2-dev
           cd backend
+          cp config/template.env .env
+          
           mkdir -p instance
           cp config/default.py instance/config.py
           cp config/testing.py instance/testing.py
@@ -56,10 +58,12 @@ jobs:
           echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
 
           echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
-          flask db upgrade
+          flask clear-db
+          flask upgrade-db
+          flask init-db
 
           echo -e '\n\n*** Updating Elasticsearch index... ***\n\n'
-          flask initindex
+          flask init-index
       - name: Run backend unit tests
         run: |
           cd $BACKEND_PATH
