@@ -15,6 +15,7 @@ jobs:
       matrix:
         python-version: [3.12.1]
         node-version: [22.3.0]
+        poetry-version: [1.8.4]
     steps:
       - uses: actions/checkout@v3
       - name: Configure VM for Elasticsearch
@@ -26,43 +27,60 @@ jobs:
       - name: Start Elasticsearch and PostgreSQL
         run: docker compose up -d db es
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Set up Node
+      - name: Set up Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
+      - name: Install Poetry ${{ matrix.poetry-version }}
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Setup virtual environment
         run: |
-          sudo apt update
-          sudo apt-get -y install apache2 apache2-utils apache2-dev pipx
-          pipx ensurepath
-          pipx install poetry
-          poetry install --sync
-          python -m pip install --upgrade pip          
-          pip install flake8 pytest
-          
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v4
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        id: cache-deps
+        with:
+          path: .venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install and cache dependencies
+        run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - name: Install the project
+        run: poetry install
+
+      - name: Create config files
+        run: |
           cd $BACKEND_PATH
           cp config/template.env .env
           
           mkdir -p instance
           cp config/default.py instance/config.py
           cp config/testing.py instance/testing.py
+
       - name: Initialize database and search index
         run: |
           cd $BACKEND_PATH
+          poetry 
           echo "FLASK_APP = $FLASK_APP"
           pwd
           ls -al .
 
           echo -e '\n\n*** Running Alembic database migrations... ***\n\n'
-          flask clear-db
-          flask upgrade-db
-          flask init-db
+          
+          poetry run flask clear-db
+          poetry run flask upgrade-db
+          poetry run flask init-db
 
           echo -e '\n\n*** Updating Elasticsearch index... ***\n\n'
-          flask init-index
+          poetry run flask init-index
       - name: Run backend unit tests
         run: |
           cd $BACKEND_PATH
@@ -70,7 +88,7 @@ jobs:
           ls -al .
           
           echo -e '\n\n*** Running backend unit tests... ***\n\n'
-          coverage run -m unittest discover -s tests -t tests
+          poetry run coverage run -m unittest discover -s tests -t tests
       - name: Install frontend dependencies
         run: |
           cd $FRONTEND_PATH
