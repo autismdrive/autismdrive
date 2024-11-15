@@ -34,6 +34,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install Apache
+        run: |
+          sudo apt update
+          sudo apt-get -y install apache2 apache2-utils apache2-dev
       - name: Install Poetry ${{ matrix.poetry-version }}
         uses: abatilo/actions-poetry@v2
         with:
