@@ -11,6 +11,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment:
+      name: 'ci'
     strategy:
       matrix:
         python-version: [3.12.1]
@@ -64,6 +66,9 @@ jobs:
         run: |
           cd $BACKEND_PATH
           cp config/template.env .env
+          echo "GOOGLE_MAPS_API_KEY = ${secrets.GOOGLE_MAPS_API_KEY}" >> .env
+          echo "GOOGLE_ANALYTICS_API_KEY = ${secrets.GOOGLE_ANALYTICS_API_KEY}" >> .env
+          echo "GOOGLE_TAG_MANAGER_ID = ${secrets.GOOGLE_TAG_MANAGER_ID}" >> .env
           
           mkdir -p instance
           cp config/ci.py instance/config.py
