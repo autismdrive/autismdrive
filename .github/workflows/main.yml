@@ -11,8 +11,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment:
-      name: 'ci'
     strategy:
       matrix:
         python-version: [3.12.1]
@@ -69,6 +67,8 @@ jobs:
           echo "GOOGLE_MAPS_API_KEY = ${secrets.GOOGLE_MAPS_API_KEY}" >> .env
           echo "GOOGLE_ANALYTICS_API_KEY = ${secrets.GOOGLE_ANALYTICS_API_KEY}" >> .env
           echo "GOOGLE_TAG_MANAGER_ID = ${secrets.GOOGLE_TAG_MANAGER_ID}" >> .env
+          echo "MASTER_EMAIL = ${secrets.MASTER_EMAIL}" >> .env
+          echo "MASTER_PASS = ${secrets.MASTER_PASS}" >> .env
           
           mkdir -p instance
           cp config/ci.py instance/config.py
