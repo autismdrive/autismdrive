@@ -66,7 +66,7 @@ jobs:
           cp config/template.env .env
           
           mkdir -p instance
-          cp config/default.py instance/config.py
+          cp config/ci.py instance/config.py
           cp config/testing.py instance/testing.py
 
       - name: Initialize database and search index

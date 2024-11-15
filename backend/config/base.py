@@ -88,6 +88,6 @@ class Settings(BaseSettings):
     )
 
     DEBUG: bool = False
-    MASTER_EMAIL: str = None
-    MASTER_PASS: str = None
-    MASTER_URL: str = None
+    MASTER_EMAIL: str = "__MASTER_EMAIL__"
+    MASTER_PASS: str = "__MASTER_PASS__"
+    MASTER_URL: str = "http://localhost:5000"
