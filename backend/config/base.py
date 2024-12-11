@@ -1,27 +1,26 @@
-import re
-from os import environ
+from typing import Optional
 
+from pydantic import Field, BaseModel
 from pydantic_settings import BaseSettings
-from typing_extensions import TypedDict
 
 
-class SettingsDictElasticsearch(TypedDict):
-    hosts: list[str]
-    http_auth_pass: str
-    http_auth_user: str
-    index_prefix: str
-    timeout: int
-    use_ssl: bool
-    verify_certs: bool
+class ElasticsearchSettings(BaseModel):
+    hosts: list[str] = Field(default_factory=lambda: ["http://localhost:9200"])
+    http_auth_pass: str = ""
+    http_auth_user: str = ""
+    index_prefix: str = "stardrive"
+    timeout: int = 20
+    use_ssl: bool = False
+    verify_certs: bool = False
 
 
 class Settings(BaseSettings):
     NAME: str = "STAR DRIVE Database"
     VERSION: str = "0.1"
 
-    ENV_NAME: str = environ.get("ENV_NAME", default="local")
+    ENV_NAME: str = "local"
     CORS_ENABLED: bool = True
-    CORS_ALLOW_ORIGINS: list[str] = re.split(r",\s*", environ.get("CORS_ALLOW_ORIGINS", default="localhost:4200"))
+    CORS_ALLOW_ORIGINS: Optional[list[str]] = Field(default_factory=lambda: ["localhost:4200"])
     DEVELOPMENT: bool = True
     TESTING: bool = True
     MIRRORING: bool = False
@@ -33,15 +32,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str = "postgresql+psycopg://ed_user:ed_pass@localhost/stardrive"
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
-    ELASTIC_SEARCH: SettingsDictElasticsearch = {
-        "index_prefix": "stardrive",
-        "hosts": ["http://localhost:9200"],
-        "timeout": 20,
-        "verify_certs": False,
-        "use_ssl": False,
-        "http_auth_user": "",
-        "http_auth_pass": "",
-    }
+    ELASTIC_SEARCH: ElasticsearchSettings = Field(default_factory=ElasticsearchSettings)
 
     API_URL: str = "http://localhost:5000"
     SITE_URL: str = "http://localhost:4200"
@@ -54,12 +45,10 @@ class Settings(BaseSettings):
 
     MAIL_SERVER: str = "smtp.mailtrap.io"
     MAIL_PORT: int = 2525
-    MAIL_USE_SSL: bool = False
     MAIL_USE_TLS: bool = True
     MAIL_USERNAME: str = "__MAIL_USERNAME__"
     MAIL_PASSWORD: str = "__MAIL_PASSWORD__"
-    MAIL_DEFAULT_SENDER: str = "someaddress@fake.com"
-    MAIL_DEFAULT_USER: str = "someaddress@fake.com"
+    MAIL_DEFAULT_SENDER: str = "autismdrive@virginia.edu"
     MAIL_TIMEOUT: int = 10
 
     GOOGLE_MAPS_API_KEY: str = "__GOOGLE_MAPS_API_KEY__"
@@ -87,7 +76,7 @@ class Settings(BaseSettings):
         "lowercase letters, numbers, and punctuation characters."
     )
 
-    DEBUG: bool = False
+    FLASK_DEBUG: bool = False
     MASTER_EMAIL: str = "__MASTER_EMAIL__"
     MASTER_PASS: str = "__MASTER_PASS__"
     MASTER_URL: str = "http://localhost:5000"

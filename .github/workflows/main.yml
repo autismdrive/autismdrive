@@ -71,7 +71,7 @@ jobs:
           echo "MASTER_PASS = ${{secrets.MASTER_PASS}}" >> .env
           
           mkdir -p instance
-          cp config/ci.py instance/config.py
+          cp config/ci.py instance/instance_config.py
           cp config/testing.py instance/testing.py
 
       - name: Initialize database and search index

@@ -1,5 +1,6 @@
 import json
 import logging.config
+import re
 from inspect import getargvalues, currentframe, getouterframes
 
 import click
@@ -22,22 +23,27 @@ from config.logging import logging_config
 
 def create_app(settings=None):
     from config.load import settings as loaded_settings
+    from config.base import Settings
 
-    _settings = loaded_settings if settings is None else settings
+    _settings: Settings = loaded_settings if settings is None else settings
 
     click.secho(f"\n*** create_app > _settings.ENV_NAME = {_settings.ENV_NAME} ***\n")
 
+    logging_config["loggers"][""]["level"] = "DEBUG" if _settings.FLASK_DEBUG else "INFO"
     logging.config.dictConfig(logging_config)
 
     _app = APIApp(__name__, instance_relative_config=True)
 
     _app.config.from_object(_settings)
+    _app.config["FLASK_DEBUG"] = _settings.FLASK_DEBUG
     _app.settings = _settings
 
     # Enable CORS
     if _settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
-        origins_re = [r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS]
+        origins_re = re.compile(r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS]))
+        logging.getLogger('flask_cors').level = logging.DEBUG
+
         CORS(_app, origins=origins_re)
 
     # Database

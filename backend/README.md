@@ -92,7 +92,7 @@ echo 'export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/Cellar/openssl@3/3.1.2/lib/' 
 ## Add a config file
 In the `backend` directory, execute the following command:
 ```BASH
-mkdir instance && cp -r config instance/config && cp instance/config/default.py instance/config.py
+mkdir -p instance && cp config/default.py instance/instance_config.py
 ```
 
 ### Update the Database
@@ -207,7 +207,7 @@ token.
 
 #### Develoment Mode
 The SSO aspect is bypassed in Development mode.  Clicking the log in button will immediately
-log you in as the user specified in your instance/config.py.
+log you in as the user specified in your instance/instance_config.py.
 ```
 SSO_DEVELOPMENT_UID = 'dhf8r'
 ```

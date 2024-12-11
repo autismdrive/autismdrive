@@ -4,7 +4,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY . /app
 
-RUN /bin/bash -c "cd /autismdrive/backend/ && echo $PWD && mkdir instance && cp -r config instance/config && cp instance/config/docker.py instance/config.py"
+RUN /bin/bash -c "cd /autismdrive/backend/ && echo $PWD && mkdir -p instance && cp config/docker.py instance/instance_config.py"
 ENV FLASK_DEBUG=1
 ENV FLASK_APP=/app/__init__.py
 

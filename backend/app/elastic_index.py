@@ -30,6 +30,7 @@ from app.enums import Permission
 from app.utils.category_utils import search_path, calculate_level
 from app.utils.resource_utils import DatabaseObjectDict
 from app.utils.resource_utils import indexable_content, category_names
+from config.base import ElasticsearchSettings
 from config.load import settings
 
 autocomplete = analyzer(
@@ -90,7 +91,7 @@ class ElasticIndex(object):
             cls._instance = cls.__new__(cls)
             cls.logger.debug("Initializing Elastic Index")
             cls.establish_connection(settings.ELASTIC_SEARCH)
-            cls.index_prefix = settings.ELASTIC_SEARCH["index_prefix"]
+            cls.index_prefix = settings.ELASTIC_SEARCH.index_prefix
 
             cls.index_name = "%s_resources" % cls.index_prefix
             cls.index = Index(cls.index_name)
@@ -110,25 +111,23 @@ class ElasticIndex(object):
         return cls._instance
 
     @classmethod
-    def establish_connection(cls, es_settings):
+    def establish_connection(cls, es_settings: ElasticsearchSettings):
         """Establish connection to an ElasticSearch host, and initialize the Submission collection"""
-        if es_settings["http_auth_user"] != "":
+        if es_settings.http_auth_user != "":
             cls.connection = connections.create_connection(
-                hosts=es_settings["hosts"],
-                port=es_settings["port"],
-                request_timeout=es_settings["timeout"],
-                verify_certs=es_settings["verify_certs"],
-                use_ssl=es_settings["use_ssl"],
-                http_auth=(es_settings["http_auth_user"], es_settings["http_auth_pass"]),
+                hosts=es_settings.hosts,
+                port=es_settings.port,
+                request_timeout=es_settings.timeout,
+                verify_certs=es_settings.verify_certs,
+                use_ssl=es_settings.use_ssl,
+                http_auth=(es_settings.http_auth_user, es_settings.http_auth_pass),
             )
         else:
-            # Don't set http_auth at all for connecting to AWS ElasticSearch or you will
-            # get a cryptic message that is darn near ungoogleable.
             cls.connection = connections.create_connection(
-                hosts=es_settings["hosts"],
-                request_timeout=es_settings["timeout"],
-                verify_certs=es_settings["verify_certs"],
-                ssl_show_warn=es_settings["use_ssl"],
+                hosts=es_settings.hosts,
+                request_timeout=es_settings.timeout,
+                verify_certs=es_settings.verify_certs,
+                ssl_show_warn=es_settings.use_ssl,
             )
 
     @classmethod
@@ -275,14 +274,31 @@ class ElasticIndex(object):
             elastic_search = elastic_search.filter("bool", **{"should": cls._default_filter(cls._start_of_day())})
 
         if search.geo_box:
+            top_left = search.geo_box.top_left
+            bottom_right = search.geo_box.bottom_right
+
+            # Does geo_box have an area equal to 0? Make it at least 1km.
+            if top_left.lat == bottom_right.lat or top_left.lon == bottom_right.lon:
+                from app.utils.geo_box import coords_to_geo_box
+
+                geo_box = coords_to_geo_box({
+                    "lat": top_left.lat + bottom_right.lat / 2,
+                    "lon": top_left.lon + bottom_right.lon / 2,
+                })
+
+                top_left.lat = geo_box["top_left"]["lat"]
+                top_left.lon = geo_box["top_left"]["lon"]
+                bottom_right.lat = geo_box["bottom_right"]["lat"]
+                bottom_right.lon = geo_box["bottom_right"]["lon"]
+
             elastic_search = elastic_search.filter(
                 "geo_bounding_box",
                 **{
                     "geo_point": {
-                        "top_left": {"lat": search.geo_box.top_left.lat, "lon": search.geo_box.top_left.lon},
+                        "top_left": {"lat": top_left.lat, "lon": top_left.lon},
                         "bottom_right": {
-                            "lat": search.geo_box.bottom_right.lat,
-                            "lon": search.geo_box.bottom_right.lon,
+                            "lat": bottom_right.lat,
+                            "lon": bottom_right.lon,
                         },
                     }
                 },

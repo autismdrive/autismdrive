@@ -493,9 +493,14 @@ class FrontendConfig:
     googleAnalyticsKey = settings.GOOGLE_ANALYTICS_API_KEY
 
 
+class LatLng(TypedDict):
+    lat: float
+    lng: float
+
+
 class Geocode:
     @staticmethod
-    def get_geocode(address_dict):
+    def get_geocode(address_dict) -> LatLng:
 
         if settings.TESTING:
             z = session.query(ZipCode).order_by(func.random()).first()
@@ -525,7 +530,7 @@ class Geocode:
                         lng = loc["lng"]
                         print(address_dict, loc)
 
-            return {"lat": lat, "lng": lng}
+            return {"lat": float(lat), "lng": float(lng)}
 
 
 class Investigator(Base):

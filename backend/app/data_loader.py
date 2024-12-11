@@ -1,5 +1,8 @@
 import csv
+import datetime
 import os
+import re
+from typing import Optional
 
 import googlemaps
 from sqlalchemy import select, func
@@ -8,6 +11,7 @@ from app.elastic_index import elastic_index
 from app.enums import Status
 from config.load import settings
 from .database import session, engine, get_all_db_objects
+from .models import LatLng
 
 
 class DataLoader:
@@ -69,14 +73,22 @@ class DataLoader:
             next(reader, None)  # skip the headers
             for row in reader:
                 org = row[5] if row[5] else None
+
+                lat = float(row[15]) if row[15] not in ["", None] else None
+                lng = float(row[16]) if row[16] not in ["", None] else None
+
                 geocode = self.get_geocode(
                     address_dict={"street": row[8], "city": row[10], "state": row[11], "zip": row[12]},
-                    lat_long_dict={"lat": row[15], "lng": row[16]},
+                    lat_long_dict={
+                        "lat": lat,
+                        "lng": lng
+                    } if lat and lng else None,
                 )
+
                 event = Event(
                     title=row[0],
                     description=row[1],
-                    date=row[2],
+                    date=datetime.datetime.strptime(row[2], r"%m/%d/%y %H:%M"),
                     time=row[3],
                     ticket_cost=row[4],
                     organization_name=org,
@@ -89,8 +101,8 @@ class DataLoader:
                     zip=row[12],
                     website=row[13],
                     phone=row[14],
-                    latitude=geocode["lat"],
-                    longitude=geocode["lng"],
+                    latitude=geocode["lat"] if geocode else None,
+                    longitude=geocode["lng"] if geocode else None,
                     ages=[],
                     is_draft=False,
                     webinar_link=row[29],
@@ -145,9 +157,15 @@ class DataLoader:
             for row in reader:
                 org = row[5] if row[5] else row[1]
 
+                lat = float(row[17]) if row[17] not in ["", None] else None
+                lng = float(row[18]) if row[18] not in ["", None] else None
+
                 geocode = self.get_geocode(
                     address_dict={"street": row[8], "city": row[10], "state": row[11], "zip": row[12]},
-                    lat_long_dict={"lat": row[17], "lng": row[18]},
+                    lat_long_dict={
+                        "lat": lat,
+                        "lng": lng
+                    } if lat and lng else None,
                 )
 
                 location = Location(
@@ -163,8 +181,8 @@ class DataLoader:
                     website=row[14],
                     email=row[15],
                     phone=row[16],
-                    latitude=geocode["lat"],
-                    longitude=geocode["lng"],
+                    latitude=geocode["lat"] if geocode else None,
+                    longitude=geocode["lng"] if geocode else None,
                     ages=[],
                     is_draft=False,
                 )
@@ -415,9 +433,19 @@ class DataLoader:
         session.close()
         return category
 
-    def get_geocode(self, address_dict, lat_long_dict):
+    def get_geocode(self, address_dict, lat_long_dict: Optional[LatLng]) -> None | LatLng:
         api_key = settings.GOOGLE_MAPS_API_KEY
-        gmaps = googlemaps.Client(key=api_key)
+
+        # Make sure api_key is set and is valid
+        if len(api_key) == 0 or re.fullmatch(r"^__(.*)__$", api_key):
+            return
+
+        try:
+            gmaps = googlemaps.Client(key=api_key)
+        except googlemaps.exceptions.ApiError as e:
+            # Skip execution if API key is invalid.
+            return
+
         lat = None
         lng = None
 
@@ -425,7 +453,7 @@ class DataLoader:
         if address_dict["zip"]:
 
             # Use stored latitude & longitude, if available
-            if "" not in lat_long_dict.values():
+            if lat_long_dict:
                 lat = lat_long_dict["lat"]
                 lng = lat_long_dict["lng"]
 
@@ -437,14 +465,15 @@ class DataLoader:
                 if geocode_result is not None:
                     if geocode_result[0] is not None:
                         loc = geocode_result[0]["geometry"]["location"]
-                        lat = loc["lat"]
-                        lng = loc["lng"]
+                        lat = float(loc["lat"])
+                        lng = float(loc["lng"])
                         print(address_dict, loc)
 
-        return {"lat": lat, "lng": lng}
+        return {"lat": lat, "lng": lng} if lat and lng else None
+
 
     def build_index(self):
-        from .models import Resource, Location, Event, Study, ResourceCategory, StudyCategory, Category
+        from .models import Resource, Location, Event, Study
         from app.utils.resource_utils import to_database_object_dict
         from app.schemas import SchemaRegistry
 

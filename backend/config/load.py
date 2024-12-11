@@ -15,7 +15,7 @@ match ENV_NAME:
     case "docker":
         from config.docker import settings as _settings
     case "local":
-        from instance.config import settings as _settings
+        from instance.instance_config import settings as _settings
     case _:
         from config.default import settings as _settings
 

@@ -7,5 +7,5 @@ flask migrate_db
 sleep 5
 flask upgrade_db
 sleep 5
-psql $(grep -i "SQLALCHEMY_DATABASE_URI" /autismdrive/backend/instance/config.py | awk -F'"' '{print $2}') -lqt | cut -d \| -f 1 | grep stardrive | grep 0 && flask initdb
+psql $(grep -i "SQLALCHEMY_DATABASE_URI" /autismdrive/backend/instance/instance_config.py | awk -F'"' '{print $2}') -lqt | cut -d \| -f 1 | grep stardrive | grep 0 && flask initdb
 flask run --host 0.0.0.0
