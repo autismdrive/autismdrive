@@ -182,7 +182,7 @@ def reset_password():
     db_user = (
         session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id)).unique().scalar_one()
     )
-    return jsonify(SchemaRegistry.UserSchema().dump(user))
+    return jsonify(SchemaRegistry.UserSchema().dump(db_user))
 
 
 @auth.verify_token
