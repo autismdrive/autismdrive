@@ -315,4 +315,8 @@ def create_app(settings=None):
 
         session.remove()
 
+
+    # Schedule Tasks
+    _app.schedule_tasks = schedule_tasks
+
     return _app
