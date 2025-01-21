@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
-from app.resources.UserEndpoint import get_user_by_id
+from app.resources.UserEndpoint import get_user_by_id, get_user_by_email
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from config.load import settings
@@ -32,11 +32,7 @@ def confirm_email(email_token):
     except:
         raise RestException(RestException.EMAIL_TOKEN_INVALID)
 
-    user = (
-        session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
-        .unique()
-        .scalar_one_or_none()
-    )
+    user = get_user_by_email(email=email, with_joins=True)
 
     if user is None:
         raise RestException(RestException.EMAIL_NOT_REGISTERED)
@@ -47,11 +43,7 @@ def confirm_email(email_token):
     session.commit()
     session.close()
 
-    user_to_update = (
-        session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id))
-        .unique()
-        .scalar_one_or_none()
-    )
+    user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
 
     user_to_update.token = User.encode_auth_token(user_id=user_id)
     user_to_update.last_login = datetime.datetime.utcnow()
@@ -59,11 +51,7 @@ def confirm_email(email_token):
     session.commit()
     session.close()
 
-    db_user = (
-        session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
-        .unique()
-        .scalar_one_or_none()
-    )
+    db_user = get_user_by_email(email=email, with_joins=True)
     session.close()
     return db_user
 
@@ -78,11 +66,7 @@ def login_password():
         raise RestException(RestException.INVALID_INPUT)
 
     email = request_data["email"].lower()
-    db_user = (
-        session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
-        .unique()
-        .scalar_one_or_none()
-    )
+    db_user = get_user_by_email(email=email, with_joins=True)
     schema = SchemaRegistry.UserSchema(many=False)
 
     if db_user is None:
@@ -92,22 +76,14 @@ def login_password():
 
         if User.is_correct_password(user_id=user_id, plaintext=request_data["password"]):
             # redirect users back to the front end, include the new auth token.
-            user_to_update = (
-                session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
-                .unique()
-                .scalar_one_or_none()
-            )
+            user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
             user_to_update.token = User.encode_auth_token(user_id=user_id)
             user_to_update.last_login = datetime.datetime.utcnow()
             session.add(user_to_update)
             session.commit()
             session.close()
 
-            updated_user = (
-                session.execute(select(User).options(joinedload(User.participants)).filter_by(email=email))
-                .unique()
-                .scalar_one_or_none()
-            )
+            updated_user = get_user_by_id(user_id=user_id, with_joins=True)
 
             g.user = updated_user
             return jsonify(schema.dump(updated_user))
@@ -129,7 +105,7 @@ def forgot_password():
 
     request_data = request.get_json()
     email = request_data["email"]
-    user = session.query(User).filter(func.lower(User.email) == func.lower(email)).first()
+    user = get_user_by_email(email=email, with_joins=True)
 
     if user:
         tracking_code = email_service.reset_email(user)
@@ -161,7 +137,7 @@ def reset_password():
     except BadSignature:
         raise RestException(RestException.TOKEN_INVALID)
 
-    user = session.execute(select(User).filter_by(email=email)).unique().scalar_one_or_none()
+    user = get_user_by_email(email=email, with_joins=True)
 
     if user is None:
         raise RestException(RestException.EMAIL_NOT_REGISTERED)
@@ -169,7 +145,7 @@ def reset_password():
     user_id = user.id
     session.close()
 
-    user_to_update = session.execute(select(User).filter_by(id=user_id)).unique().scalar_one()
+    user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
     user_to_update.token_url = ""
     user_to_update.email_verified = True
     user_to_update.password = password
@@ -179,9 +155,7 @@ def reset_password():
     session.commit()
     session.close()
 
-    db_user = (
-        session.execute(select(User).options(joinedload(User.participants)).filter_by(id=user_id)).unique().scalar_one()
-    )
+    db_user = get_user_by_id(user_id=user_id, with_joins=True)
     return jsonify(SchemaRegistry.UserSchema().dump(db_user))
 
 

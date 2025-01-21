@@ -36,14 +36,14 @@ export class ForgotPasswordComponent {
     localStorage.removeItem('token_url');
     if (this.form.valid) {
       this.formStatus = 'submitting';
-      this.api.sendResetPasswordEmail(this.model['email']).subscribe(
-        token_url => {
+      this.api.sendResetPasswordEmail(this.model['email']).subscribe({
+        next: token_url => {
           if (token_url) {
             localStorage.setItem('token_url', token_url);
           }
           this.formStatus = 'complete';
         },
-        error1 => {
+        error: error1 => {
           if (error1) {
             this.errorMessage = error1;
           } else {
@@ -52,7 +52,7 @@ export class ForgotPasswordComponent {
           this.formStatus = 'form';
           this.changeDetectorRef.detectChanges();
         },
-      );
+      });
     }
   }
 

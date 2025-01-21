@@ -1,21 +1,24 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {StarError} from '../star-error';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  isSession = new RegExp('.*/api/session');
+  isSession = new RegExp('.*/api/session|.*/logout|.*/timedout');
 
   constructor(
     private router: Router,
     private googleAnalyticsService: GoogleAnalyticsService,
+    private authenticationService: AuthenticationService,
   ) {}
 
   private logError(error: StarError) {
+    console.error(error);
     this.googleAnalyticsService.errorEvent(error);
   }
 
@@ -27,9 +30,11 @@ export class ErrorInterceptor implements HttpInterceptor {
         // which are trying to refresh user accounts - as is the case
         // when they first return after being logged out for a while.
         if (err.status === 401 && !this.isSession.test(request.url)) {
-          console.log('Unauthorized Access!!!', request);
-          // auto logout if 401 response returned from api
-          this.router.navigate(['timedout']);
+          // Skip if they already know they're logged out.
+          if (this.authenticationService.currentUser && localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY)) {
+            console.error('Unauthorized Access', request);
+            this.router.navigate(['timedout']);
+          }
         }
 
         // Log error to google if possible

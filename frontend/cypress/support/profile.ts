@@ -27,7 +27,7 @@ export class ProfileUseCases {
   }
 
   startDependentFlow() {
-    this.page.clickAndExpectRoute('#enroll_dependent', '#/terms/dependent');
+    this.page.clickAndExpectRoute('#enroll_dependent', '/terms/dependent');
   }
 
   checkDependentButtonDisabled() {
@@ -35,12 +35,12 @@ export class ProfileUseCases {
   }
 
   navigateToProfile() {
-    this.page.clickAndExpectRoute('#profile-button', '#/profile');
+    this.page.clickAndExpectRoute('#profile-button', '/profile');
   }
 
   navigateToProfileMeta() {
     const _page = this.page;
-    _page.clickAndExpectRoute('#profile-button', '#/profile');
+    _page.clickAndExpectRoute('#profile-button', '/profile');
     cy.url().then(function (url) {
       _page.navigateToUrl(url + '?meta=true');
       _page.getElements('#meta-form').should('have.length', 1);
@@ -48,7 +48,7 @@ export class ProfileUseCases {
   }
 
   joinRegistry() {
-    this.page.clickAndExpectRoute('#join', '#/terms/self_guardian');
+    this.page.clickAndExpectRoute('#join', '/terms/self_guardian');
   }
 
   displayAvatars() {

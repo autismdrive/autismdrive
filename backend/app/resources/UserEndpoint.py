@@ -33,6 +33,20 @@ def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | Loa
         joinedload(User.user_studies),
     )
 
+def get_user_by_email(email: str, with_joins=False) -> User | None:
+    """
+    Returns a User matching the given email from the database. Optionally include joins to parent and child Categories.
+
+    CAUTION: Make sure to close the session after calling this function!
+    """
+    statement = select(User)
+
+    if with_joins:
+        statement = add_joins_to_statement(statement)
+
+    statement = statement.filter_by(email=email)
+    return session.execute(statement).unique().scalar_one_or_none()
+
 
 def get_user_by_id(user_id: int, with_joins=False) -> User | None:
     """

@@ -1,7 +1,7 @@
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {fadeTransition} from '@animations/animations';
-import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
   selector: 'app-logout',
@@ -9,17 +9,13 @@ import {ApiService} from '@services/api/api.service';
   styleUrls: ['./logout.component.scss'],
   animations: [fadeTransition()],
 })
-export class LogoutComponent {
+export class LogoutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 
-  constructor(
-    private api: ApiService,
-    private router: Router,
-  ) {}
+  constructor(private authenticationService: AuthenticationService) {}
 
-  goHome($event) {
-    $event.preventDefault();
-    this.router.navigate(['home']);
+  ngOnInit() {
+    this.authenticationService.logout();
   }
 }

@@ -65,13 +65,6 @@ export class AppPage {
     const selector = `[href="#${route}"]`;
     this.waitForClickable(selector);
     this.clickElement(selector);
-    this.getRoute().should('eq', route);
-  }
-
-  clickLinkToVariation(route: string) {
-    const selector = `[href="#${route}"]`;
-    this.waitForClickable(selector);
-    this.clickElement(selector);
     this.getRoute().should('equal', route);
   }
 
@@ -79,14 +72,10 @@ export class AppPage {
     return this.getElement(selector).invoke('text');
   }
 
-  getParagraphText() {
-    return this.getElement('app-root h1').invoke('text');
-  }
-
   clickElement(selector: string) {
     this.waitForClickable(selector);
     this.scrollTo(selector);
-    return cy.get(selector).click();
+    return cy.get(selector).first().click();
   }
 
   clickDropdownItem(dropdownSelector: string, nthItem: number) {
@@ -123,7 +112,7 @@ export class AppPage {
   }
 
   getRoute() {
-    return cy.location('hash');
+    return cy.location('hash').invoke('slice', 1);
   }
 
   pressKey(keyCode: string) {
@@ -202,7 +191,7 @@ export class AppPage {
   }
 
   scrollTo(selector: string) {
-    return cy.get(selector).scrollIntoView();
+    return cy.get(selector).first().scrollIntoView();
   }
 
   tabThroughAllFields() {

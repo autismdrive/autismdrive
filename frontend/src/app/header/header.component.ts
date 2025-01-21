@@ -254,12 +254,6 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     this.lgMediaQuery.removeListener(this._lgMediaQueryListener);
   }
 
-  goLogout($event: MouseEvent) {
-    $event.preventDefault();
-    this.authenticationService.logout();
-    this.router.navigate(['logout']);
-  }
-
   goLogin() {
     const onLoginScreen = /^\/login/.test(this.router.url);
     const onLogoutScreen = /^\/logout/.test(this.router.url);

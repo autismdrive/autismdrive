@@ -80,6 +80,8 @@ export class PasswordResetComponent {
     private deviceDetectorService: DeviceDetectorService,
     private googleAnalyticsService: GoogleAnalyticsService,
   ) {
+    this.authenticationService;
+
     this.route.params.subscribe(params => {
       this.token = params['email_token'];
       this.role = params['role'];

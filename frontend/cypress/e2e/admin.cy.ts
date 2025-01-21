@@ -1,4 +1,6 @@
 /// <reference types="cypress" />
+import {faker} from '@faker-js/faker';
+import * as assert from 'node:assert';
 import {AdminUseCases} from '../support/admin';
 import {GlobalHeaderUseCases} from '../support/global-header';
 import {LoginUseCases} from '../support/login';
@@ -13,7 +15,10 @@ describe('Admin', () => {
   let studiesUseCases: StudiesUseCases;
 
   const adminEmail = 'ajlouie@gmail.com';
-  const adminPassword = 'Total Perspective Vortex 56';
+  const adminPassword = faker.internet.password({
+    length: 25,
+    pattern: /[\dA-Za-z,.!@#$%^&*()_+-=;:'"<>?/\\`~|]/,
+  });
 
   before(() => {
     page = new AppPage();
@@ -32,6 +37,53 @@ describe('Admin', () => {
 
   // Login & Register
   it('should display login form', () => loginUseCases.displayLoginForm());
+
+  it('should navigate to login form again', () => {
+    cy.log(`adminEmail = ${adminEmail}`);
+    page.clickAndExpectRoute('#login-button', '/login');
+  });
+
+  it('should click forgot password button', () => {
+    page.clickAndExpectRoute('#forgot_password', '/forgot-password');
+  });
+
+  it('should enter admin email', () => {
+    cy.get('input[type="email"]').as('email-input');
+    cy.get('@email-input').type(adminEmail);
+    cy.get('@email-input').should('have.value', adminEmail);
+    cy.get('#submit').click();
+  });
+
+  it('should get token URL', () => {
+    // Get token URL from local storage
+    cy.log(`localStorage.token_url = ${window.localStorage.getItem('token_url')}`);
+  });
+
+  it('should really get token URL', () => {
+    cy.window()
+      .its('localStorage')
+      .invoke('getItem', 'token_url')
+      .should('not.be.empty')
+      .then(u => {
+        cy.log(`token URL = ${u}`);
+      });
+  });
+
+  it('should go to token URL', () => {
+    // Get token URL from local storage
+    page.getLocalStorageVar('token_url').then(u => {
+      cy.visit(u);
+    });
+  });
+
+  it('should reset admin password', () => {
+    cy.get('input[type="password"]').first().type(adminPassword);
+    cy.get('input[type="password"]').last().type(adminPassword);
+    page.clickAndExpectRoute('#submit', '/profile');
+  });
+
+  it('should log out', () => loginUseCases.logout());
+
   it('should log in with email and password', () => loginUseCases.loginWithCredentials(adminEmail, adminPassword));
 
   // Global Header - Logged In
@@ -79,6 +131,6 @@ describe('Admin', () => {
   it('should delete and be directed to studies');
 
   // Log out
-  it('should log out', () => loginUseCases.logout());
+  it('should log out again', () => loginUseCases.logout());
   it('should display logged-out header state', () => globalHeaderUseCases.displayLoggedOutState());
 });

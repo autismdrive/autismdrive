@@ -44,8 +44,9 @@ import {ErrorInterceptor} from '@routing/error-interceptor';
 import {JwtInterceptor} from '@routing/jwt-interceptor';
 import {RoutingModule} from '@routing/routing.module';
 import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {CategoriesService} from '@services/categories/categories.service';
-import {ConfigService} from '@services/config/config.service';
+import {ConfigService, ConfigServiceProps} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {IntervalService} from '@services/interval/interval.service';
 import {SearchService} from '@services/search/search.service';
@@ -86,7 +87,6 @@ import {FlowComponent} from './flow/flow.component';
 import {FooterComponent} from './footer/footer.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
 import {HeaderComponent} from './header/header.component';
-import {HeroSlidesComponent} from './hero-slides/hero-slides.component';
 import {HomeComponent} from './home/home.component';
 import {InvestigatorFormComponent} from './investigator-form/investigator-form.component';
 import {LastUpdatedDateComponent} from './last-updated-date/last-updated-date.component';
@@ -148,10 +148,10 @@ export const load = (http: HttpClient, config: ConfigService): (() => Promise<bo
     // Check if a file called `config.json` is available in this file's directory.
     // If it is, load the configuration from there.
     try {
-      const localConfig = await lastValueFrom(
-        http.get('./config.json', {responseType: 'json'}).pipe(
+      const localConfig: ConfigServiceProps = await lastValueFrom(
+        http.get<ConfigServiceProps>('./config.json', {responseType: 'json'}).pipe(
           catchError(() => {
-            return of(false);
+            return of(null);
           }),
         ),
       );
@@ -168,10 +168,10 @@ export const load = (http: HttpClient, config: ConfigService): (() => Promise<bo
 
     // Check with the backend to see if there is a configuration override available.
     try {
-      const configFromJsonFile = await lastValueFrom(
-        http.get(url, {responseType: 'json'}).pipe(
+      const configFromJsonFile: ConfigServiceProps = await lastValueFrom(
+        http.get<ConfigServiceProps>(url, {responseType: 'json'}).pipe(
           catchError(() => {
-            return of(false);
+            return of(null);
           }),
         ),
       );
@@ -266,7 +266,6 @@ export class FormlyConfig {
     GroupValidationWrapperComponent,
     HeaderComponent,
     HelpWrapperComponent,
-    HeroSlidesComponent,
     HomeComponent,
     InvestigatorFormComponent,
     LastUpdatedDateComponent,
@@ -342,6 +341,7 @@ export class FormlyConfig {
   ],
   providers: [
     ApiService,
+    AuthenticationService,
     CategoriesService,
     DatePipe,
     DeviceDetectorService,

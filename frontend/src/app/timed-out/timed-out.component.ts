@@ -13,20 +13,9 @@ export class TimedoutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 
-  constructor(
-    private router: Router,
-    private authenticationService: AuthenticationService,
-  ) {}
+  constructor(private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.authenticationService.logout();
-  }
-
-  goHome() {
-    this.router.navigate(['']);
-  }
-
-  goLogin() {
-    this.router.navigate(['/login']);
   }
 }

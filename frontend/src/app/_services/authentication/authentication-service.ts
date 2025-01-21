@@ -1,5 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {load} from '@app/app.module';
+import {AppEnvironment} from '@models/environment';
+import {ApiService} from '@services/api/api.service';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {StarError} from '../../star-error';
@@ -22,17 +25,19 @@ export class AuthenticationService {
     private googleAnalyticsService: GoogleAnalyticsService,
     private configService: ConfigService,
   ) {
-    const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
-    this.login_url = `${configService.apiUrl}/api/login_password`;
-    this.reset_pass_url = `${configService.apiUrl}/api/reset_password`;
-    this.refresh_url = `${configService.apiUrl}/api/session`;
+    this.configService.props.subscribe(p => {
+      const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
+      this.login_url = `${configService.apiUrl}/api/login_password`;
+      this.reset_pass_url = `${configService.apiUrl}/api/reset_password`;
+      this.refresh_url = `${configService.apiUrl}/api/session`;
 
-    this.currentUser = this.currentUserSubject.asObservable();
-    if (token) {
-      this._refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
-    } else {
-      this.currentUserSubject.next(null);
-    }
+      this.currentUser = this.currentUserSubject.asObservable();
+      if (token) {
+        this._refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
+      } else {
+        this.currentUserSubject.next(null);
+      }
+    });
   }
 
   private _handleError(error: StarError) {

@@ -8,8 +8,8 @@
   id="logout-message"
 >
   <div fxFlex.gt-md="50%" fxFlex.lt-lg="80%" class="message">
-    <app-logo variant="dark-lg" (click)="goHome($event)"></app-logo>
+    <app-logo variant="dark-lg" [routerLink]="['/home']"></app-logo>
     <h1>You have been logged out.</h1>
-    <button id="ok-button" mat-flat-button (click)="goHome($event)" color="primary">Ok</button>
+    <button id="ok-button" mat-flat-button [routerLink]="['/home']" color="primary">Ok</button>
   </div>
 </div>

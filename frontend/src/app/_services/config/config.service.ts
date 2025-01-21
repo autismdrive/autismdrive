@@ -1,6 +1,18 @@
+import {User} from '@models/user';
 import {GoogleModuleOptions} from '@ng-maps/google';
 import {Injectable} from '@angular/core';
 import {GoogleMapsScriptProtocol} from '@ng-maps/google/lib/options';
+import {BehaviorSubject, Observable} from 'rxjs';
+
+export interface ConfigServiceProps {
+  apiUrl: string;
+  apiKey: string;
+  development: boolean;
+  testing: boolean;
+  mirroring: boolean;
+  production: boolean;
+  googleAnalyticsKey: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +26,21 @@ export class ConfigService implements GoogleModuleOptions {
   public production: boolean;
   public googleAnalyticsKey: string;
 
-  fromProperties(props) {
+  private propsSubject = new BehaviorSubject<ConfigServiceProps>(null);
+  public props: Observable<ConfigServiceProps>;
+
+  constructor() {
+    this.props = this.propsSubject.asObservable();
+    this.propsSubject.next(null);
+  }
+
+  fromProperties(props: ConfigServiceProps) {
     for (const propName in props) {
       if (props.hasOwnProperty(propName)) {
         this[propName] = props[propName];
       }
     }
+
+    this.propsSubject.next(props);
   }
 }

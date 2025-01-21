@@ -4,7 +4,7 @@ export class StudiesUseCases {
   constructor(private page: AppPage) {}
 
   navigateToStudiesPage() {
-    this.page.clickLinkTo('/studies');
+    this.page.clickLinkTo('/studies/currently_enrolling');
     this.page.getElements('.studies').should('have.length', 1);
     this.page.getElements('app-search-result').should('have.length.gt', 1);
   }

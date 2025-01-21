@@ -40,7 +40,7 @@
           </a>
         </li>
         <li>
-          <a [routerLink]="['/studies']" id="studies-button" mat-button routerLinkActive="selected">
+          <a [routerLink]="['/studies/currently_enrolling']" id="studies-button" mat-button routerLinkActive="selected">
             <span fxHide fxShow.lt-lg>Studies</span>
             <span fxHide fxShow.gt-md>Current Studies</span>
           </a>
@@ -73,7 +73,7 @@
           </a>
         </li>
         <li *ngIf="currentUser">
-          <a (click)="goLogout($event)" id="logout-button" mat-button>
+          <a [routerLink]="['/logout']" id="logout-button" mat-button>
             <mat-icon>exit_to_app</mat-icon>
             Logout
           </a>
@@ -142,7 +142,7 @@
   >
   <a
     (click)="toggleMenu()"
-    [routerLink]="['/studies']"
+    [routerLink]="['/studies/currently_enrolling']"
     id="studies-button-mobile"
     mat-button
     routerLinkActive="selected"
@@ -208,7 +208,7 @@
     <mat-icon>account_circle</mat-icon>
     Visit Profile
   </a>
-  <a (click)="goLogout($event)" (click)="toggleMenu()" *ngIf="currentUser" id="logout-button-mobile" mat-button>
+  <a [routerLink]="['/logout']" (click)="toggleMenu()" *ngIf="currentUser" id="logout-button-mobile" mat-button>
     <mat-icon>exit_to_app</mat-icon>
     Logout
   </a>

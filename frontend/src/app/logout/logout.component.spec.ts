@@ -1,4 +1,5 @@
 import {AppModule} from '@app/app.module';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {LogoutComponent} from './logout.component';
 
@@ -7,7 +8,7 @@ describe('LogoutComponent', () => {
   let fixture: MockedComponentFixture<LogoutComponent>;
 
   beforeEach(() => {
-    return MockBuilder(LogoutComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(LogoutComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS).keep(AuthenticationService);
   });
 
   beforeEach(() => {

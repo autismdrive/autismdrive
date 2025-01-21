@@ -30,7 +30,7 @@ export class GlobalHeaderUseCases {
   }
 
   visitHomePage() {
-    this.page.clickAndExpectRoute('#logo', '#/home');
+    this.page.clickAndExpectRoute('#logo', '/home');
     this.page.waitForVisible('app-news-item');
     this.page.getElements('#hero').should('have.length', 1);
     this.page.getElements('.border-box-tile').should('have.length.gt', 1);
@@ -38,11 +38,13 @@ export class GlobalHeaderUseCases {
   }
 
   displayHomeHero() {
-    const _page = this.page;
-    _page.getElements('.hero-slides .hero-slide').each(function ($el, i) {
-      _page.clickElement(`.hero-slides .dots .dot:nth-of-type(${i + 1})`);
-      _page.getElements(`.hero-slides .hero-slide:nth-of-type(${i + 1}).active`).should('have.length', 1);
-    });
+    cy.get('#hero')
+      .should('be.visible')
+      .and('have.css', 'background-image', `url("http://localhost:4200/assets/home/hero-family.jpg")`)
+      .then($el => {
+        const url = $el.css('background-image').match(/url\("(.*)"\)/)[1];
+        cy.request({url, failOnStatusCode: false}).its('status').should('eq', 200);
+      });
   }
 
   visitAboutPage() {
@@ -53,7 +55,7 @@ export class GlobalHeaderUseCases {
   }
 
   visitStudiesPage() {
-    this.page.clickLinkTo('/studies');
+    this.page.clickLinkTo('/studies/currently_enrolling');
     this.page.getElements('.studies').should('have.length', 1);
     this.page.getElements('app-search-result').should('have.length.gt', 1);
     this.page.clickLinkTo('/home');
@@ -73,7 +75,7 @@ export class GlobalHeaderUseCases {
 
   checkForDoubleNavLabels() {
     this.page.resizeTo(1280, 720);
-    this.page.getElements('#resources-button .mat-button-wrapper span').should('be.visible').should('have.length', 1);
+    this.page.getElements('#resources-button').should('be.visible').should('have.length', 1);
     this.page.maximize();
   }
 

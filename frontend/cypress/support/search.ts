@@ -15,8 +15,8 @@ export class SearchUseCases {
   constructor(private page: AppPage) {}
 
   get searchFieldSelectors(): SearchFieldSelectors {
-    const autocomplete = '.mat-autocomplete-panel';
-    const typeTab = '.type-tabs-container .type-tabs .mat-tab-label';
+    const autocomplete = '.mat-mdc-autocomplete-panel';
+    const typeTab = '.type-tabs-container .type-tabs .mdc-tab';
     const numResultsAttribute = 'data-num-results';
     return {
       searchField: '#search-field input',
@@ -24,9 +24,9 @@ export class SearchUseCases {
       numResultsAttribute,
       numResults: `[${numResultsAttribute}]`,
       autocomplete,
-      suggestion: autocomplete + ' .mat-option',
+      suggestion: autocomplete + ' .mat-mdc-option',
       typeTab,
-      activeFirstTab: typeTab + '.mat-tab-label-active[tabindex="0"]',
+      activeFirstTab: typeTab + '.mdc-tab--active[tabindex="0"]',
     };
   }
 
@@ -48,8 +48,9 @@ export class SearchUseCases {
   enterKeyword(keywordString: string, selectors: SearchFieldSelectors) {
     // Click the search field.
     this.page.clickElement(selectors.searchField);
-    this.page.isVisible(selectors.autocomplete);
-    this.page.getElements(selectors.suggestion).should('have.length.gt', 0).should('be.visible');
+
+    cy.get(selectors.autocomplete).should('be.visible', {timeout: 5000});
+    cy.get(selectors.suggestion).should('have.length.gt', 0).should('be.visible');
 
     // Input keyword
     this.page.inputText(selectors.searchField, keywordString, true);
@@ -57,15 +58,12 @@ export class SearchUseCases {
 
   checkForResults(selectors: SearchFieldSelectors) {
     this.page.waitForVisible(selectors.result);
-    this.page
-      .getElement(selectors.numResults)
-      .should('be.visible')
-      .should('have.attr', selectors.numResultsAttribute)
-      .as('numResultsAfter')
-      .then(function (numResultsAfter) {
-        expect(this.numResultsAfter).to.be.gt(0, 'Keyword search should return results.');
-        expect(this.numResultsAfter).to.be.lt(this.numResultsBefore, 'Keyword search should filter the results.');
-      });
+    this.page.getElement(selectors.numResults).should('be.visible').should('have.attr', selectors.numResultsAttribute);
+
+    cy.get(`${selectors.numResults}["${selectors.numResultsAttribute}"]`).then(function (numResultsAfter) {
+      expect(numResultsAfter).to.be.gt(0, 'Keyword search should return results.');
+      expect(numResultsAfter).to.be.lt(this.numResultsBefore, 'Keyword search should filter the results.');
+    });
 
     // First type tab should be selected.
     this.page.getElements(selectors.typeTab).should('have.length', 4).as('numTypeTabsAfter');
@@ -98,7 +96,7 @@ export class SearchUseCases {
   enterKeywordsInSearchField(keywordString = 'autism') {
     const selectors = this.searchFieldSelectors;
 
-    this.checkTypeTabsAndResults(selectors).as('numResultsBefore');
+    this.checkTypeTabsAndResults(selectors);
     this.enterKeyword(keywordString, selectors);
 
     // Submit the search
@@ -136,7 +134,7 @@ export class SearchUseCases {
   clearSearchBox(keywordString = 'autism') {
     const searchFieldSelector = '#search-field input';
     this.page.getElement(searchFieldSelector).should('contain.value', keywordString, {matchCase: false});
-    this.page.clickAndExpectRoute('#logo', '#/home');
+    this.page.clickAndExpectRoute('#logo', '/home');
     this.page.waitForVisible('app-news-item');
     this.page.clickLinkTo('/search');
     this.page.waitForVisible('app-search-result');
