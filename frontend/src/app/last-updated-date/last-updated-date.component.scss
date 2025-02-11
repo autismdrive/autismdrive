@@ -1,4 +1,4 @@
-@import '../../config';
+@use "config" as config;
 
 .hit-last-updated {
   font-style: italic;

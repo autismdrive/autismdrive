@@ -1,5 +1,28 @@
-@import './styles_curry.scss';
-@import './stardrive_material.scss';
+@use 'material' as custom-theme;
+@use 'overrides' as overrides;
+@use "@angular/material" as mat;
+
+@import 'ehd';
 @import 'assets/css/icofont.css';
 @import 'assets/css/material-icons.css';
-@include stardrive-theme-mixin($stardrive-theme);
+
+html {
+  @include mat.theme(custom-theme.$theme-config);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: $body-font-family, "Helvetica Neue", sans-serif;
+}
+
+:root, :host {
+  @include mat.theme-overrides(overrides.$light-theme-overrides-config);
+}
+
+.dark {
+  @include mat.theme-overrides(overrides.$dark-theme-overrides-config);
+}

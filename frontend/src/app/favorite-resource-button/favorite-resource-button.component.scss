@@ -1,5 +1,5 @@
-@use '@angular/material' as mat;
-@import '../../material';
+@use "@angular/material" as mat;
+@use "material" as material-config;
 
 button.mat-mini-fab.mat-accent {
   background-color: transparent;

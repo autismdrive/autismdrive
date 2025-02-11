@@ -1,4 +1,4 @@
-@import '../../config';
+@use "config" as config;
 @import '../../mixins';
 
 .result-item {

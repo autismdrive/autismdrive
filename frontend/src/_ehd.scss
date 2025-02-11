@@ -1,8 +1,10 @@
-@import './config';
+@use "config" as config;
+
+// Adapted from https://education.virginia.edu/
 
 .border-box {
-  border: 11px solid $brand-primary;
-  border-image: linear-gradient(to bottom, #e57200 0%, $brand-primary 100%);
+  border: 11px solid config.$brand-primary;
+  border-image-source: linear-gradient(to bottom, #e57200 0%, config.$brand-primary 100%);
   border-image-slice: 1;
 }
 
@@ -64,7 +66,6 @@ a:hover {
 
 abbr[title] {
   border-bottom: none;
-  text-decoration: underline;
   text-decoration: underline dotted;
 }
 
@@ -758,7 +759,7 @@ p {
 }
 
 p.intro {
-  color: $brand-primary;
+  color: config.$brand-primary;
   font-style: italic;
   font-size: 1.25rem;
   line-height: 1.875rem;
@@ -770,7 +771,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: $brand-primary;
+  color: config.$brand-primary;
   font-family: 'franklin-gothic-urw', serif;
   font-style: italic;
   font-weight: 800;
@@ -786,8 +787,6 @@ h6 {
 h1 {
   font-size: 2em;
   line-height: 1;
-  margin-bottom: 0.5rem;
-  margin-top: 0;
   margin: 0.67em 0;
 }
 
@@ -915,7 +914,7 @@ hr.full-width-dotted:after {
 
 hr.full-width-dotted:after {
   content: '';
-  background-image: url(/sites/all/themes/curry/_files/css/i/orange-dotted-border-x.png);
+  background-image: url("/assets/theme/orange-dotted-border-x.png");
   background-repeat: repeat-x;
   width: 110vw;
   display: block;
@@ -1164,7 +1163,7 @@ table td {
   outline: 0;
   border: 0;
   background-color: transparent;
-  border-bottom: 1px solid $brand-primary;
+  border-bottom: 1px solid config.$brand-primary;
   padding: 0 1.875rem 0.5rem 0;
   margin: 0;
   height: auto;
@@ -1201,7 +1200,7 @@ table td {
 }
 
 .header-search-submit:hover .icon {
-  color: $brand-primary;
+  color: config.$brand-primary;
 }
 
 .header-search-submit .icon {
@@ -1293,13 +1292,13 @@ table td {
 
 .primary-nav-list-item .primary-nav-link,
 .primary-nav-list-item:hover .primary-nav-link {
-  color: $brand-primary;
+  color: config.$brand-primary;
 }
 
 @media screen and (min-width: 65.625em) {
   .primary-nav-list-item .primary-nav-link,
   .primary-nav-list-item:hover .primary-nav-link {
-    color: $brand-primary;
+    color: config.$brand-primary;
   }
 }
 
@@ -1313,7 +1312,7 @@ table td {
 @media screen and (min-width: 65.625em) {
   .home-page.sticky-header .primary-nav-list-item .primary-nav-link,
   .home-page.sticky-header .primary-nav-list-item:hover .primary-nav-link {
-    color: $brand-primary;
+    color: config.$brand-primary;
   }
 }
 
@@ -1461,7 +1460,7 @@ table td {
 }
 
 .primary-child-nav-trigger [class*='minus'] {
-  color: $brand-primary;
+  color: config.$brand-primary;
   display: none;
 }
 
@@ -1523,7 +1522,7 @@ table td {
 
 @media screen and (min-width: 65.625em) {
   .primary-child-nav-link {
-    color: $brand-primary;
+    color: config.$brand-primary;
     white-space: nowrap;
     font-size: 1.125rem;
     padding: 0.6875rem 1.25rem 0.75rem;
@@ -1686,7 +1685,7 @@ table td {
 
 .sidebar-nav {
   border: 10px solid #dadada;
-  border-image: linear-gradient(to bottom, #dadada 0%, #f1f1ef 100%);
+  border-image-source: linear-gradient(to bottom, #dadada 0%, #f1f1ef 100%);
   border-image-slice: 1;
   margin: 0 0 1.25rem;
 }
@@ -1702,11 +1701,11 @@ table td {
 }
 
 .sidebar-nav h2 a {
-  color: $brand-primary;
+  color: config.$brand-primary;
 }
 
 .sidebar-nav h2 a:hover {
-  color: $brand-primary;
+  color: config.$brand-primary;
 }
 
 .sidebar-nav .chevron-link {
@@ -1741,7 +1740,7 @@ table td {
 }
 
 .social-media-icons a:hover {
-  color: $brand-primary;
+  color: config.$brand-primary;
 }
 
 .ir {
@@ -1821,22 +1820,6 @@ div.more {
 .features {
   display: flex;
   flex-wrap: wrap;
-}
-
-.curry-grid-layout .column:last-child:not(:first-child),
-.curry-grid-layout .columns:last-child:not(:first-child) {
-  float: left;
-}
-
-.curry-grid-layout.whats-going-on .columns {
-  padding-top: 0.625em;
-  padding-bottom: 0.625em;
-}
-
-.morestories li:not(:last-child) {
-  margin: 1rem 0;
-  padding: 0 0 1.5rem 0;
-  border-bottom: solid 1px #eee;
 }
 
 .upper > div,
@@ -2031,10 +2014,9 @@ div.more {
   font-size: 1.125rem;
   line-height: 1;
   display: block;
-  margin: 0.325em 0;
-  color: $brand-primary;
+  color: config.$brand-primary;
   text-decoration: none;
-  margin-bottom: 0;
+  margin: 0.325em 0 0;
   font-family: 'franklin-gothic-urw', sans-serif;
   font-style: italic;
   font-weight: 700;
@@ -2164,8 +2146,8 @@ div.more {
 }
 
 .jumbo-section-header {
-  border: 5px solid $brand-primary;
-  border-image: linear-gradient(to right, #e57200 0%, $brand-primary 100%);
+  border: 5px solid config.$brand-primary;
+  border-image-source: linear-gradient(to right, #e57200 0%, config.$brand-primary 100%);
   border-image-slice: 1;
   z-index: 2;
   min-width: 18.75rem;
@@ -2181,8 +2163,8 @@ div.more {
 
 @media print, screen and (min-width: 48em) {
   .jumbo-section-header {
-    border: 8px solid $brand-primary;
-    border-image: linear-gradient(to right, #e57200 0%, $brand-primary 100%);
+    border: 8px solid config.$brand-primary;
+    border-image-source: linear-gradient(to right, #e57200 0%, config.$brand-primary 100%);
     border-image-slice: 1;
     top: -11.875rem;
     min-width: 43.6875rem;
@@ -2192,8 +2174,8 @@ div.more {
 
 @media print, screen and (min-width: 64em) {
   .jumbo-section-header {
-    border: 11px solid $brand-primary;
-    border-image: linear-gradient(to right, #e57200 0%, $brand-primary 100%);
+    border: 11px solid config.$brand-primary;
+    border-image-source: linear-gradient(to right, #e57200 0%, config.$brand-primary 100%);
     border-image-slice: 1;
     top: -13.4375rem;
     min-width: 59.0625rem;
@@ -2207,7 +2189,6 @@ div.more {
   font-style: italic;
   text-transform: uppercase;
   line-height: 1;
-  font-size: 3.75rem;
   font-size: 18vw;
   white-space: nowrap;
   position: absolute;
@@ -2220,21 +2201,18 @@ div.more {
 
 @media screen and (min-width: 31.25em) {
   .jumbo-section-header .watermark {
-    font-size: 6.25rem;
     font-size: 18vw;
   }
 }
 
 @media print, screen and (min-width: 48em) {
   .jumbo-section-header .watermark {
-    font-size: 9.375rem;
     font-size: 18vw;
   }
 }
 
 @media print, screen and (min-width: 64em) {
   .jumbo-section-header .watermark {
-    font-size: 12.5rem;
     font-size: 18vw;
   }
 }
@@ -2251,7 +2229,7 @@ div.more {
 }
 
 .jumbo-section-header h2 {
-  color: $brand-primary;
+  color: config.$brand-primary;
   text-align: center;
   line-height: 1.125;
   position: relative;

@@ -1,4 +1,4 @@
-@import '../../config';
+@use "config" as config;
 
 #hero {
   background-image: url('/assets/studies/hero.jpg');

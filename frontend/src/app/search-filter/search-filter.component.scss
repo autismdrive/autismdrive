@@ -1,4 +1,4 @@
-@import '../../config';
+@use "config" as config;
 
 ::ng-deep .mat-hint {
   display: block;

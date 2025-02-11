@@ -1,5 +1,6 @@
-@use '@angular/material' as mat;
-@import '../../material';
+@use "@angular/material" as mat;
+@use "material" as material-config;
+@use "config" as config;
 
 #logo {
   display: flex;
@@ -8,7 +9,7 @@
 
   &.dark-lg .variant,
   &.dark .variant {
-    color: $brand-primary;
+    color: config.$brand-primary;
     font-weight: bold;
   }
   &.light-lg .variant,
@@ -18,13 +19,13 @@
   }
 
   a {
-    color: $brand-accent;
+    color: config.$brand-accent;
   }
 
   &.dark-lg,
   &.light-lg {
     a {
-      @include mat.m2-typography-level($stardrive-typography, display-3);
+      @include mat.m2-typography-level(material-config.$typography, display-3);
       font-family: 'franklin-gothic-urw', serif;
       text-transform: uppercase;
       margin-top: 4rem;
@@ -58,7 +59,7 @@
   &.dark,
   &.light {
     a {
-      @include mat.m2-typography-level($stardrive-typography, display-1);
+      @include mat.m2-typography-level(material-config.$typography, display-1);
       font-family: 'franklin-gothic-urw', serif;
       text-transform: uppercase;
       font-weight: lighter;

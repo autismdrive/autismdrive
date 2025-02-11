@@ -1,4 +1,4 @@
-@import '../../config';
+@use "config" as config;
 
 th.mat-header-cell {
   padding-right: 1em;

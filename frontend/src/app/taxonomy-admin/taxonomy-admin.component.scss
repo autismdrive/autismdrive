@@ -1,4 +1,4 @@
-@import '../../config';
+@use "config" as config;
 
 .tree-select-invisible {
   display: none;

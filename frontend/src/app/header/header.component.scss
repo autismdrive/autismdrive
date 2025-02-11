@@ -1,5 +1,5 @@
-@use '@angular/material' as mat;
-@import '../../material';
+@use "@angular/material" as mat;
+@use "material" as material-config;
 
 #header-bg {
   background-color: $brand-gray;
@@ -28,7 +28,10 @@
     color: $brand-primary;
 
     .uva-logo a {
-      @include mat.m2-typography-level($stardrive-typography, button);
+      font-size: var(--mat-sys-label-large-size);
+      font-weight: var(--mat-sys-label-large-weight);
+      font-family: var(--mat-sys-label-large-font);
+      letter-spacing: var(--mat-sys-label-large-tracking);
       color: $brand-primary;
       text-transform: uppercase;
     }

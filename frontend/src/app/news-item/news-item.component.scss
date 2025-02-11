@@ -1,5 +1,5 @@
-@use '@angular/material' as mat;
-@import '../../material';
+@use "@angular/material" as mat;
+@use "material" as material-config;
 
 .news-item {
   display: grid;
@@ -47,7 +47,7 @@
     }
 
     .item-title {
-      @include mat.m2-typography-level($stardrive-typography, headline);
+      @include mat.m2-typography-level(material-config.$typography, headline);
       font-style: italic;
       color: $brand-primary;
       cursor: pointer;

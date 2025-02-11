@@ -1,5 +1,6 @@
-@use '@angular/material' as mat;
-@import '../../material';
+@use "config" as config;
+@use "@angular/material" as mat;
+@use "material" as material-config;
 
 .border-box-tile {
   display: grid;
@@ -11,13 +12,13 @@
   margin: 0;
   background-color: rgba(255, 255, 255, 0.8);
   text-align: center;
-  color: $brand-primary;
+  color: config.$brand-primary;
 
   &.border-box-tile-1x {
-    height: $tile-height-1x;
+    height: config.$tile-height-1x;
   }
   &.border-box-tile-2x {
-    height: $tile-height-2x;
+    height: config.$tile-height-2x;
   }
 
   .border-box-tile-inner {
@@ -48,7 +49,7 @@
 
     &:before {
       border: 11px solid #dadada;
-      border-image: linear-gradient(to bottom, $brand-gray-tint-2 0%, $brand-gray-tint-3 100%);
+      border-image: linear-gradient(to bottom, config.$brand-gray-tint-2 0%, config.$brand-gray-tint-3 100%);
       border-image-slice: 1;
       opacity: 1;
     }
@@ -84,7 +85,7 @@
 
     .border-box-tile-label {
       &.border-box-tile-label-1x {
-        @include mat.m2-typography-level($stardrive-typography, title);
+        @include mat.m2-typography-level(material-config.$typography, title);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;
@@ -93,7 +94,7 @@
       }
 
       &.border-box-tile-label-2x {
-        @include mat.m2-typography-level($stardrive-typography, display-1);
+        @include mat.m2-typography-level(material-config.$typography, display-1);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;
