@@ -1,8 +1,8 @@
-@import url('../../../config');
+@use "config" as config;
 
 mat-card.repeat {
-  background-color: $brand-primary-light;
-  border-left: solid 8px $brand-primary;
+  background-color: config.$brand-primary-light;
+  border-left: solid 8px config.$brand-primary;
 
   &:active,
   &:hover,

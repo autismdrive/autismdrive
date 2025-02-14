@@ -1,16 +1,16 @@
 @use "sass:map";
+@use "sass:color" as color;
 @use "colors" as colors;
 
 // GLOBAL SCSS VARIABLES
 $body-font-family: "franklin-gothic-urw";
 $heading-font-family: "franklin-gothic-urw";
-
-$_primary: map.get(colors.$all-palettes, primary);
-$_secondary: map.get(colors.$all-palettes, secondary);
-$_tertiary: map.get(colors.$all-palettes, tertiary);
-$_neutral: map.get(colors.$all-palettes, neutral);
-$_neutral-variant: map.get(colors.$all-palettes, neutral-variant);
-$_error: map.get(colors.$all-palettes, error);
+$primary-colors: map.get(colors.$all-palettes, primary);
+$secondary-colors: map.get(colors.$all-palettes, secondary);
+$tertiary-colors: map.get(colors.$all-palettes, tertiary);
+$neutral-colors: map.get(colors.$all-palettes, neutral);
+$neutral-variant-colors: map.get(colors.$all-palettes, neutral-variant);
+$error-colors: map.get(colors.$all-palettes, error);
 
 // UVA BRAND COLOR PALETTE
 // https://brand.virginia.edu/design-assets/colors
@@ -18,49 +18,49 @@ $uva-primary-color: #232d4b; // Primary Colors > UVA Blue
 $uva-secondary-color: #e57200; // Primary Colors > UVA Orange
 $uva-tertiary-color: #62BB46; // Secondary Colors > Green
 $uva-neutral-color: #C8CBD2; // Primary Colors > UVA Blue 25%
-$uva-neutral-variant-color: #666666; // Additional Web-Only Colors > Text Gray
+$uva-neutral-variant-color: #666; // Additional Web-Only Colors > Text Gray
 $uva-error-color: #DF1E43; // Additional Web-Only Colors > Emergency Red
 
 // gray
-$brand-gray: map.get($_neutral, 30);
-$brand-gray-tint-1: map.get($_neutral, 40);
-$brand-gray-tint-2: map.get($_neutral, 80);
-$brand-gray-tint-3: map.get($_neutral, 95);
-$brand-gray-tint-4: map.get($_neutral, 98);
+$brand-gray: map.get($neutral-colors, 30);
+$brand-gray-tint-1: map.get($neutral-colors, 40);
+$brand-gray-tint-2: map.get($neutral-colors, 80);
+$brand-gray-tint-3: map.get($neutral-colors, 95);
+$brand-gray-tint-4: map.get($neutral-colors, 98);
 $body-color: $brand-gray;
 $body-color-muted: $brand-gray-tint-1;
 $body-color-light: $brand-gray-tint-4;
 
 // primary (UVA Blue)
 $brand-primary: $uva-primary-color;
-$brand-primary-tint-1: map.get($_primary, 25);
-$brand-primary-tint-2: map.get($_primary, 50);
-$brand-primary-tint-3: map.get($_primary, 70);
-$brand-primary-tint-4: map.get($_primary, 80);
-$brand-primary-shade-1: map.get($_primary, 20);
-$brand-primary-shade-2: map.get($_primary, 10);
+$brand-primary-tint-1: map.get($primary-colors, 25);
+$brand-primary-tint-2: map.get($primary-colors, 50);
+$brand-primary-tint-3: map.get($primary-colors, 70);
+$brand-primary-tint-4: map.get($primary-colors, 80);
+$brand-primary-shade-1: map.get($primary-colors, 20);
+$brand-primary-shade-2: map.get($primary-colors, 10);
 $brand-primary-muted: $brand-primary-tint-1;
 $brand-primary-light: $brand-primary-tint-4;
 
 // accent (UVA Orange)
 $brand-accent: $uva-secondary-color;
-$brand-accent-tint-1: map.get($_primary, 70);
-$brand-accent-tint-2: map.get($_primary, 80);
-$brand-accent-tint-3: map.get($_primary, 90);
-$brand-accent-tint-4: map.get($_primary, 95);
+$brand-accent-tint-1: map.get($primary-colors, 70);
+$brand-accent-tint-2: map.get($primary-colors, 80);
+$brand-accent-tint-3: map.get($primary-colors, 90);
+$brand-accent-tint-4: map.get($primary-colors, 95);
 $brand-accent-muted: $brand-accent-tint-1;
 $brand-accent-light: $brand-accent-tint-4;
 
 // warning (UVA Emergency Red)
 $brand-warning: $uva-error-color;
-$brand-warning-muted: desaturate(map.get($_error, 30), 20%);
-$brand-warning-light: map.get($_error, 80);
+$brand-warning-muted: color.adjust(map.get($error-colors, 30), $saturation: -20%);
+$brand-warning-light: map.get($error-colors, 80);
 
 // OTHER OPTIONS
 
 // Animation
-$easeDuration: 300ms;
-$animationDuration: 500ms;
+$ease-duration: 300ms;
+$animation-duration: 500ms;
 
 // Layout
 $tile-height-1x: 226px;

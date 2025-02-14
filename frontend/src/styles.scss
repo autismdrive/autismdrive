@@ -1,14 +1,14 @@
 @use 'material' as custom-theme;
 @use 'overrides' as overrides;
 @use "@angular/material" as mat;
+@use 'config' as config;
 @use 'ehd' as ehd;
-
 @forward 'assets/css/icofont.css';
 @forward 'assets/css/material-icons.css';
 
 html {
   @include mat.theme(custom-theme.$theme-config);
-  @include ehd.ehd-styles();
+  @include ehd.ehd-styles;
 }
 
 html, body {
@@ -17,7 +17,7 @@ html, body {
 
 body {
   margin: 0;
-  font-family: $body-font-family, "Helvetica Neue", sans-serif;
+  font-family: config.$body-font-family, "Helvetica Neue", sans-serif;
 }
 
 :root, :host {
