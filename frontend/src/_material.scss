@@ -3,13 +3,14 @@
 @use 'colors' as colors;
 @use "@angular/material" as mat;
 
-$typography: mat.define-typography((
+$typography: (
   plain-family: config.$body-font-family,
   brand-family: config.$heading-font-family,
   bold-weight: 800,
   medium-weight: 500,
   regular-weight: 400,
-));
+
+);
 
 $theme-config: (
   color: (

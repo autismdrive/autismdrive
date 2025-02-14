@@ -12,6 +12,7 @@
     color: config.$brand-primary;
     font-weight: bold;
   }
+
   &.light-lg .variant,
   &.light .variant {
     color: white;
@@ -26,20 +27,23 @@
   &.light-lg {
     a {
       @include mat.m2-typography-level(material-config.$typography, display-3);
-      font-family: 'franklin-gothic-urw', serif;
+
+      font-family: franklin-gothic-urw, serif;
       text-transform: uppercase;
       margin-top: 4rem;
       margin-bottom: 4rem;
       font-weight: lighter;
       font-size: 2.5rem;
 
-      @media (min-width: 959px) {
+      @media (width >= 959px) {
         font-size: 3rem;
       }
-      @media (min-width: 960px) {
+
+      @media (width >= 960px) {
         font-size: 3.5rem;
       }
-      @media (min-width: 1280px) {
+
+      @media (width >= 1280px) {
         font-size: 4rem;
       }
     }
@@ -60,7 +64,8 @@
   &.light {
     a {
       @include mat.m2-typography-level(material-config.$typography, display-1);
-      font-family: 'franklin-gothic-urw', serif;
+
+      font-family: franklin-gothic-urw, serif;
       text-transform: uppercase;
       font-weight: lighter;
       font-size: 2rem;

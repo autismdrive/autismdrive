@@ -4,6 +4,7 @@
 button.mat-mini-fab.mat-accent {
   background-color: transparent;
   box-shadow: none;
+
   @include mat.elevation(1);
 
   mat-icon {

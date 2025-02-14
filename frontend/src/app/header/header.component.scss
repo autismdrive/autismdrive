@@ -50,25 +50,23 @@
     #primary-nav {
       .mat-button {
         &.selected {
-          border-bottom-left-radius: 0px;
-          border-bottom-right-radius: 0px;
-          border-bottom-width: 4px;
-          border-bottom-style: solid;
-          border-bottom-color: $brand-primary;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          border-bottom: 4px solid $brand-primary;
         }
       }
     }
 
     #primary-nav .mat-button {
-      margin-top: 0px;
-      margin-bottom: 0px;
+      margin-top: 0;
+      margin-bottom: 0;
     }
   }
 
   mat-toolbar-row#tagline {
     position: fixed;
     z-index: 100;
-    box-shadow: 40px 20px 40px -40px rgba(0, 0, 0, 0.1);
+    box-shadow: 40px 20px 40px -40px rgb(0 0 0 / 10%);
 
     p {
       font-style: italic;
@@ -79,7 +77,8 @@
   mat-toolbar-row#searchtag {
     background-color: $brand-accent;
     z-index: 100;
-    box-shadow: 40px 20px 40px -40px rgba(0, 0, 0, 0.1);
+    box-shadow: 40px 20px 40px -40px rgb(0 0 0 / 10%);
+
     p {
       font-style: italic;
       margin: 0;
@@ -89,23 +88,19 @@
   #primary-nav {
     ul {
       list-style: none;
-      margin: 0px;
+      margin: 0;
       display: flex;
-      align-items: center;
-      justify-items: center;
-      align-content: center;
-      justify-content: center;
+      place-items: center center;
+      place-content: center center;
     }
 
     li {
       border-right: 1px solid $brand-accent;
       height: 2em;
-      padding: 0px 18px 0px 18px;
-      margin: 0px;
-      align-items: center;
-      align-content: center;
-      justify-items: center;
-      justify-content: stretch;
+      padding: 0 18px;
+      margin: 0;
+      place-items: center center;
+      place-content: center stretch;
       display: flex;
 
       &:last-child {
@@ -113,7 +108,7 @@
       }
 
       a {
-        font-family: 'franklin-gothic-urw', sans-serif;
+        font-family: franklin-gothic-urw, sans-serif;
         font-weight: 700;
         font-style: italic;
         font-size: 1rem;
@@ -123,7 +118,7 @@
         display: flex;
         text-decoration: none;
 
-        &:after {
+        &::after {
           transition: all ease-in-out 500ms;
           content: '';
           background-color: transparent;
@@ -131,13 +126,13 @@
           height: 4px;
           position: absolute;
           bottom: 8px;
-          left: 0px;
+          left: 0;
         }
       }
 
-      a.selected:after {
+      a.selected::after {
         background-color: $brand-accent;
-        bottom: 0px;
+        bottom: 0;
       }
 
       &:hover {
@@ -147,9 +142,9 @@
           text-decoration: none;
         }
 
-        a:after {
+        a::after {
           background-color: $brand-accent;
-          bottom: 0px;
+          bottom: 0;
         }
       }
     }

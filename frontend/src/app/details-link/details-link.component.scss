@@ -9,6 +9,7 @@ a {
 
   [class*='details-link-text'] {
     @include mat.m2-typography-level(material-config.$typography, title);
+
     font-style: italic;
     color: $brand-primary;
   }
@@ -55,6 +56,7 @@ a {
 
 .inverted {
   color: white;
+
   [class*='details-link-text'] {
     color: white;
   }

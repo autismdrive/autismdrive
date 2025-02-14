@@ -1,5 +1,6 @@
 @use "config" as config;
-@import '../../mixins';
+
+@import url('../../mixins');
 
 .result-item {
   margin: 2em;
@@ -9,7 +10,7 @@
   @include top-border-dots;
 
   .title {
-    margin: 0px;
+    margin: 0;
     color: $brand-primary;
     font-weight: 800;
     font-style: italic;
@@ -50,15 +51,19 @@
   font-weight: 700;
   line-height: 2;
 }
+
 .status-currently-enrolling {
   color: $brand-accent;
 }
+
 .status-study-in-progress {
   color: $brand-primary-tint-1;
 }
+
 .status-results-being-analyzed {
   color: $brand-primary-tint-2;
 }
+
 .status-study-results-published {
   color: $brand-primary-tint-3;
 }

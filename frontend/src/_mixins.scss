@@ -10,16 +10,18 @@
 }
 
 @mixin bottom-border-dots {
-  &:after {
+  &::after {
     @include border-dots;
+
     content: '';
     bottom: -2em;
   }
 }
 
 @mixin top-border-dots {
-  &:before {
+  &::before {
     @include border-dots;
+
     content: '';
     top: -2em;
   }

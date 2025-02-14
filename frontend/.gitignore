@@ -56,3 +56,8 @@ Thumbs.db
 # Local configuration files
 .env
 config.json
+
+# Rendered SCSS files
+/src/app/**/*.css.map
+/src/app/**/*.scss.map
+/src/app/**/*.css

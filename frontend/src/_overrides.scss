@@ -1,11 +1,13 @@
 /* These tokens are generated using https://themes.angular-material.dev/ */
+
 /* Preview: https://themes.angular-material.dev/?seed-error=%23DF1E43&seed-neutral=%23C8CBD2&seed-neutral-variant=%23666666&seed-primary=%23232D4B&seed-secondary=%23E57200&seed-tertiary=%2362BB46 */
+
 /* Seed Colors: primary: #232D4B, secondary: #E57200, tertiary: #62BB46, error: #DF1E43, neutral: #C8CBD2, neutral-variant: #666666 */
 
 /* Light Theme */
 $light-theme-overrides-config: (
   primary: #535d7e,
-  on-primary: #ffffff,
+  on-primary: #fff,
   primary-container: #dbe1ff,
   on-primary-container: #101a37,
   inverse-primary: #bbc5eb,
@@ -14,7 +16,7 @@ $light-theme-overrides-config: (
   on-primary-fixed: #101a37,
   on-primary-fixed-variant: #3c4665,
   secondary: #964900,
-  on-secondary: #ffffff,
+  on-secondary: #fff,
   secondary-container: #ffdcc7,
   on-secondary-container: #311300,
   secondary-fixed: #ffdcc7,
@@ -22,7 +24,7 @@ $light-theme-overrides-config: (
   on-secondary-fixed: #311300,
   on-secondary-fixed-variant: #733600,
   tertiary: #1a6d00,
-  on-tertiary: #ffffff,
+  on-tertiary: #fff,
   tertiary-container: #9cf97b,
   on-tertiary-container: #042100,
   tertiary-fixed: #9cf97b,
@@ -34,14 +36,14 @@ $light-theme-overrides-config: (
   surface: #fcf8f8,
   surface-dim: #dcd9d9,
   surface-bright: #fcf8f8,
-  surface-container-lowest: #ffffff,
+  surface-container-lowest: #fff,
   surface-container-low: #f6f3f3,
   surface-container: #f0eded,
   surface-container-high: #ebe7e7,
   surface-container-highest: #e5e2e2,
   on-surface: #1c1b1c,
-  shadow: #000000,
-  scrim: #000000,
+  shadow: #000,
+  scrim: #000,
   surface-tint: #5b5f65,
   inverse-surface: #313031,
   inverse-on-surface: #f3f0f0,
@@ -51,7 +53,7 @@ $light-theme-overrides-config: (
   neutral10: #1c1b1c,
   error: #ba1a1a,
   error-container: #ffdad6,
-  on-error: #ffffff,
+  on-error: #fff,
   on-error-container: #410002,
   surface-variant: #e0e3e3,
   on-surface-variant: #444748,
@@ -99,8 +101,8 @@ $dark-theme-overrides-config: (
   surface-container-high: #2a2a2a,
   surface-container-highest: #353435,
   on-surface: #e5e2e2,
-  shadow: #000000,
-  scrim: #000000,
+  shadow: #000,
+  scrim: #000,
   surface-tint: #c3c6cd,
   inverse-surface: #e5e2e2,
   inverse-on-surface: #313031,

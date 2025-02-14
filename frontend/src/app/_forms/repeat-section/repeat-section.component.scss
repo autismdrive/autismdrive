@@ -1,4 +1,4 @@
-@import '../../../config';
+@import url('../../../config');
 
 mat-card.repeat {
   background-color: $brand-primary-light;
@@ -8,7 +8,7 @@ mat-card.repeat {
   &:hover,
   &:focus,
   &:focus-within {
-    background: #eeeeee;
+    background: #eee;
   }
 }
 

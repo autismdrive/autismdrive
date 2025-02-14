@@ -23,7 +23,7 @@
 
 .highlight-node {
   background-color: $brand-primary-light;
-  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
   animation: fade-out 5s forwards;
 }
 
@@ -31,6 +31,7 @@
   0% {
     background-color: $brand-primary-light;
   }
+
   100% {
     background-color: transparent;
   }

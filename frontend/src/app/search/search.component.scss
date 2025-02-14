@@ -45,7 +45,7 @@ form.search-box {
 }
 
 .title {
-  margin: 0px;
+  margin: 0;
   color: $brand-primary;
   font-weight: 800;
   font-style: italic;
@@ -69,7 +69,7 @@ mat-accordion {
   #reset-filters {
     color: $brand-accent;
     font-weight: bold;
-    padding-left: 0px;
+    padding-left: 0;
   }
 
   h3 {
@@ -87,8 +87,8 @@ mat-accordion {
     line-height: 1.5rem;
     margin-top: 1em;
     margin-bottom: 0;
-    padding-left: 0px;
-    padding-bottom: 0px;
+    padding-left: 0;
+    padding-bottom: 0;
 
     &:first-of-type {
       margin-top: 0;
@@ -106,7 +106,7 @@ app-search-filters-breadcrumbs {
   width: 100%;
   padding-right: 0;
   padding-left: 0;
-  margin: 2em 1em 1em 1em;
+  margin: 2em 1em 1em;
 }
 
 .sort-order {
@@ -138,10 +138,10 @@ app-search-filters-breadcrumbs {
     }
 
     .mat-form-field-infix {
-      padding-top: 0px;
-      padding-bottom: 0px;
-      margin-top: 0px;
-      margin-bottom: 0px;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      margin-bottom: 0;
     }
   }
 }
@@ -152,11 +152,13 @@ app-search-filters-breadcrumbs {
     [class*='icofont-'] {
       margin-right: 0.5em;
     }
+
     .mat-icon {
       margin-right: 0.5em;
       margin-top: -0.25em;
     }
   }
+
   .mat-select-value app-type-icon .mat-icon {
     margin-top: 0.25em;
   }
@@ -166,19 +168,23 @@ app-search-filters-breadcrumbs {
 ::ng-deep .gm-style-iw-d {
   max-height: 50vh !important;
 
-  @media (max-width: 575px) {
+  @media (width <= 575px) {
     max-width: 90vw !important;
   }
-  @media (min-width: 576px) {
+
+  @media (width >= 576px) {
     max-width: 80vw !important;
   }
-  @media (min-width: 768px) {
+
+  @media (width >= 768px) {
     max-width: 50vw !important;
   }
-  @media (min-width: 960px) {
+
+  @media (width >= 960px) {
     max-width: 40vw !important;
   }
-  @media (min-width: 1200px) {
+
+  @media (width >= 1200px) {
     max-width: 30vw !important;
   }
 }
@@ -192,6 +198,7 @@ app-search-filters-breadcrumbs {
     color: $brand-primary;
     margin: 5px;
     opacity: 1;
+
     &:focus {
       outline: none;
     }
@@ -252,7 +259,7 @@ app-search-filters-breadcrumbs {
 
   mat-form-field {
     ::placeholder {
-      //color: rgba(255,255,255,0.7);
+      //color: rgb(255 255 255 / 70%);
     }
   }
 }
@@ -308,20 +315,14 @@ app-search-filters-breadcrumbs {
 
     #map {
       position: fixed;
-      top: 64px;
-      left: 60%;
-      right: 0;
-      bottom: 0;
+      inset: 64px 0 0 60%;
     }
   }
 
   &.align-bottom {
     #map {
       position: absolute;
-      top: auto;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      inset: auto 0 0;
 
       map-view {
         position: absolute;
@@ -377,11 +378,8 @@ app-search-filters-breadcrumbs {
 
   .inset-shadow {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    box-shadow: 40px 20px 40px -40px rgba(0, 0, 0, 0.1) inset;
+    inset: 0;
+    box-shadow: 40px 20px 40px -40px rgb(0 0 0 / 10%) inset;
     z-index: 99;
     pointer-events: none;
   }
@@ -389,10 +387,7 @@ app-search-filters-breadcrumbs {
 
 #scroll-spy {
   position: fixed;
-  top: 64px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  inset: 64px 0 0;
   pointer-events: none;
   background: transparent;
 }
@@ -405,10 +400,7 @@ app-search-filters-breadcrumbs {
   &.full-screen {
     display: block;
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
     height: 100vh;
     width: 100vw;
     background-color: white;
@@ -456,11 +448,11 @@ app-search-filters-breadcrumbs {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  background-color: #eeeeee;
-  border-radius: 0px 0px 8px 8px;
+  background-color: #eee;
+  border-radius: 0 0 8px 8px;
 
   h4 {
-    padding: 0.2em 0.5em 0.2em 0.5em;
+    padding: 0.2em 0.5em;
   }
 }
 
@@ -488,64 +480,82 @@ app-search-filters-breadcrumbs {
   }
 
   ::ng-deep .mat-menu-trigger {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgb(0 0 0 / 20%);
   }
 }
+
 .light-gray,
 #filters.light-gray,
 #hero.light-gray {
   background-color: #eee;
 }
+
 .white,
 #filters.white,
 #hero.white {
   background-color: #fff;
 }
+
 .uva-blue,
 #filters.uva-blue,
 #hero.uva-blue {
   @extend %invert-headings;
+
   background-color: #002f6c;
 }
+
 .uva-orange,
 #filters.uva-orange,
 #hero.uva-orange {
   @extend %invert-hint;
+
   background-color: #e57200;
 }
+
 .black,
 #filters.black,
 #hero.black {
   @extend %invert-headings;
+
   background-color: #000;
 }
+
 .gray,
 #filters.gray,
 #hero.gray {
   @extend %invert-headings;
+
   background-color: #636466;
 }
+
 .mountain,
 #filters.mountain,
 #hero.mountain {
   @extend %invert-headings;
+
   background-color: #6f7ea0;
 }
+
 .sky,
 #filters.sky,
 #hero.sky {
   background-color: #e5eef3;
 }
+
 .energy-burst-dark,
 #hero.energy-burst-dark {
   @extend %invert-headings;
+
   background-image: url('/assets/theme/sunrise-burst.jpg');
 }
+
 .energy-burst-light,
 #hero.energy-burst-light {
   @extend %invert-headings;
+
   background-image: url('/assets/theme/sunrise-burst-footer-crop.jpg');
 }
+
 .color-swatch {
   display: inline-block;
   width: 24px;

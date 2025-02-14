@@ -25,7 +25,7 @@ h1 {
 
 h1 small {
   position: absolute;
-  right: 0px;
+  right: 0;
   color: $brand-primary;
 }
 
@@ -60,6 +60,7 @@ h1 small {
 
   .mat-progress-bar-background {
     fill: $brand-gray-tint-2;
+
     pattern {
       fill: $brand-gray-tint-2;
     }

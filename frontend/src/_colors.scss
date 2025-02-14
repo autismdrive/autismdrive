@@ -12,7 +12,7 @@
 
 $all-palettes: (
   primary: (
-    0: #000000,
+    0: #000,
     10: #101a37,
     20: #252f4d,
     25: #303a59,
@@ -27,10 +27,10 @@ $all-palettes: (
     95: #eef0ff,
     98: #faf8ff,
     99: #fefbff,
-    100: #ffffff,
+    100: #fff,
   ),
   secondary: (
-    0: #000000,
+    0: #000,
     10: #311300,
     20: #512400,
     25: #612d00,
@@ -45,10 +45,10 @@ $all-palettes: (
     95: #ffede4,
     98: #fff8f5,
     99: #fffbff,
-    100: #ffffff,
+    100: #fff,
   ),
   tertiary: (
-    0: #000000,
+    0: #000,
     10: #042100,
     20: #093900,
     25: #0d4600,
@@ -63,10 +63,10 @@ $all-palettes: (
     95: #ccffb4,
     98: #edffe0,
     99: #f7ffed,
-    100: #ffffff,
+    100: #fff,
   ),
   neutral: (
-    0: #000000,
+    0: #000,
     10: #181c21,
     20: #2d3136,
     25: #383c41,
@@ -81,7 +81,7 @@ $all-palettes: (
     95: #eef1f8,
     98: #f8f9ff,
     99: #fdfcff,
-    100: #ffffff,
+    100: #fff,
     4: #0b0f13,
     6: #101419,
     12: #1c2025,
@@ -94,7 +94,7 @@ $all-palettes: (
     96: #f1f3fb,
   ),
   neutral-variant: (
-    0: #000000,
+    0: #000,
     10: #1a1b22,
     20: #2f3037,
     25: #3a3b42,
@@ -109,10 +109,10 @@ $all-palettes: (
     95: #f1f0f9,
     98: #faf8ff,
     99: #fefbff,
-    100: #ffffff,
+    100: #fff,
   ),
   error: (
-    0: #000000,
+    0: #000,
     10: #40000b,
     20: #680017,
     25: #7d001e,
@@ -127,7 +127,7 @@ $all-palettes: (
     95: #ffedec,
     98: #fff8f7,
     99: #fffbff,
-    100: #ffffff,
+    100: #fff,
   ),
 );
 

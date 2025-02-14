@@ -5,11 +5,11 @@
   display: grid;
   position: relative;
 
-  @media screen and (max-width: 767px) {
+  @media screen and (width <= 767px) {
     grid-template-columns: 1fr;
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (width >= 768px) {
     grid-template-areas: 'leftCol rightCol';
     grid-template-columns: 1fr 1fr;
   }
@@ -18,16 +18,16 @@
     display: grid;
     align-content: center;
 
-    @media screen and (max-width: 767px) {
+    @media screen and (width <= 767px) {
       text-align: center;
       padding: 2em;
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (width >= 768px) {
       padding: 4em;
     }
 
-    &:after {
+    &::after {
       content: '';
       position: absolute;
       top: 0;
@@ -48,24 +48,25 @@
 
     .item-title {
       @include mat.m2-typography-level(material-config.$typography, headline);
+
       font-style: italic;
       color: $brand-primary;
       cursor: pointer;
       margin-top: 0.75rem;
 
-      &:after {
+      &::after {
         content: '';
         background-color: $brand-accent;
         width: 6.25rem;
         height: 0.125rem;
         display: block;
 
-        @media screen and (max-width: 767px) {
+        @media screen and (width <= 767px) {
           margin-left: auto;
           margin-right: auto;
         }
 
-        @media screen and (min-width: 768px) {
+        @media screen and (width >= 768px) {
           margin: 0.45em 0;
         }
       }
@@ -84,17 +85,17 @@
 
   &.even {
     .image {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: leftCol;
       }
     }
 
     .content {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: rightCol;
       }
 
-      &:before {
+      &::before {
         left: -50%;
       }
     }
@@ -102,17 +103,17 @@
 
   &.odd {
     .image {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: rightCol;
       }
     }
 
     .content {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: leftCol;
       }
 
-      &:before {
+      &::before {
         right: -50%;
       }
     }

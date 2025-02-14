@@ -1,10 +1,10 @@
-@import '../search-filter/search-filter.component';
+@import url('../search-filter/search-filter.component');
 
 div.current-facet-label {
   cursor: pointer;
   font-weight: 700;
   color: $body-color;
-  padding: 5px 0 5px 0;
+  padding: 5px 0;
 }
 
 .show-all {
@@ -19,6 +19,7 @@ button {
 ::ng-deep .mat-menu-panel {
   max-width: 400px !important;
   width: 400px;
+
   .mat-menu-content {
     width: initial;
 

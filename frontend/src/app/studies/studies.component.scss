@@ -14,7 +14,7 @@
   h1 {
     font-size: 2.5rem;
 
-    &:after {
+    &::after {
       content: '';
       background-color: #e57200;
       width: 6.25rem;
@@ -42,10 +42,11 @@
 }
 
 /* mobile display */
-@media only screen and (max-device-width: 480px) {
+@media only screen and (device-width <= 480px) {
   .mobile_device_480px {
     display: block;
   }
+
   .desktop {
     display: none;
   }

@@ -1,13 +1,14 @@
 @use 'material' as custom-theme;
 @use 'overrides' as overrides;
 @use "@angular/material" as mat;
+@use 'ehd' as ehd;
 
-@import 'ehd';
-@import 'assets/css/icofont.css';
-@import 'assets/css/material-icons.css';
+@forward 'assets/css/icofont.css';
+@forward 'assets/css/material-icons.css';
 
 html {
   @include mat.theme(custom-theme.$theme-config);
+  @include ehd.ehd-styles();
 }
 
 html, body {
