@@ -1,5 +1,6 @@
 @use "@angular/material" as mat;
 @use "material" as material-config;
+@use "config" as config;
 
 a {
   transition: all 0.5s;
@@ -8,10 +9,12 @@ a {
   align-items: center;
 
   [class*='details-link-text'] {
-    @include mat.m2-typography-level(material-config.$typography, title);
-
+    font-size: var(--mat-sys-title-large-size);
+    font-weight: var(--mat-sys-title-large-weight);
+    font-family: var(--mat-sys-title-large-font), sans-serif;
+    letter-spacing: var(--mat-sys-title-large-tracking);
     font-style: italic;
-    color: $brand-primary;
+    color: config.$brand-primary;
   }
 
   .details-link-text-1x {
@@ -25,12 +28,10 @@ a {
   }
 
   [class*='icofont-'] {
-    color: $brand-accent;
+    color: config.$brand-accent;
     transition: all 0.5s;
   }
-}
 
-a {
   .details-link-icon {
     transform: rotate(0deg);
   }
@@ -51,7 +52,7 @@ a {
 }
 
 .muted {
-  color: $brand-gray;
+  color: config.$brand-gray;
 }
 
 .inverted {

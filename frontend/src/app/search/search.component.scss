@@ -1,14 +1,14 @@
 @use "config" as config;
 
 #hero {
-  background-color: $brand-gray-tint-4;
-  padding-top: $site-header-height;
-  margin-top: -$site-header-height;
+  background-color: config.$brand-gray-tint-4;
+  padding-top: config.$site-header-height;
+  margin-top: -#{config.$site-header-height};
   padding-left: 16px;
   padding-right: 16px;
 
   h1 {
-    color: $brand-primary;
+    color: config.$brand-primary;
     text-align: start;
     font-size: 2.5rem;
     margin-bottom: 0;
@@ -26,7 +26,7 @@ form.search-box {
   padding-top: 1em;
   padding-bottom: 1em;
   display: flex;
-  transition: $animation-duration ease-in-out padding-top;
+  transition: config.$animation-duration ease-in-out padding-top;
 
   &.hidden-results {
     padding-top: 100px;
@@ -46,7 +46,7 @@ form.search-box {
 
 .title {
   margin: 0;
-  color: $brand-primary;
+  color: config.$brand-primary;
   font-weight: 800;
   font-style: italic;
   text-transform: uppercase;
@@ -67,7 +67,7 @@ mat-accordion {
 
 .filters {
   #reset-filters {
-    color: $brand-accent;
+    color: config.$brand-accent;
     font-weight: bold;
     padding-left: 0;
   }
@@ -120,7 +120,7 @@ app-search-filters-breadcrumbs {
   }
 }
 
-::ng-deep mat-paginator.mat-paginator {
+:root mat-paginator.mat-paginator {
   .mat-paginator-page-size-select.mat-form-field-appearance-outline {
     width: 84px;
 
@@ -146,8 +146,8 @@ app-search-filters-breadcrumbs {
   }
 }
 
-::ng-deep .mat-option,
-::ng-deep .mat-select-trigger {
+:root .mat-option,
+:root .mat-select-trigger {
   app-type-icon {
     [class*='icofont-'] {
       margin-right: 0.5em;
@@ -164,8 +164,8 @@ app-search-filters-breadcrumbs {
   }
 }
 
-::ng-deep .gm-style-iw.gm-style-iw-c,
-::ng-deep .gm-style-iw-d {
+:root .gm-style-iw.gm-style-iw-c,
+:root .gm-style-iw-d {
   max-height: 50vh !important;
 
   @media (width <= 575px) {
@@ -189,13 +189,13 @@ app-search-filters-breadcrumbs {
   }
 }
 
-::ng-deep .mat-form-field-wrapper {
+:root .mat-form-field-wrapper {
   padding-bottom: 0;
 }
 
-::ng-deep .type-tabs {
+:root .type-tabs {
   .mat-tab-label {
-    color: $brand-primary;
+    color: config.$brand-primary;
     margin: 5px;
     opacity: 1;
 
@@ -210,7 +210,7 @@ app-search-filters-breadcrumbs {
   margin: 0.25em 1em;
 
   button {
-    background-color: $brand-accent;
+    background-color: config.$brand-accent;
     margin: 0.5em;
   }
 }
@@ -238,31 +238,7 @@ app-search-filters-breadcrumbs {
 }
 
 .type-tabs-container {
-  //background-color: $brand-gray-tint-4;
   height: 74px;
-
-  //color: white;
-
-  h4 {
-    //color: white;
-  }
-
-  .mat-form-field-appearance-outline,
-  .mat-form-field-outline,
-  .mat-form-field-label {
-    //color: white;
-  }
-
-  .mat-select-value,
-  .mat-select-arrow {
-    //color: white;
-  }
-
-  mat-form-field {
-    ::placeholder {
-      //color: rgb(255 255 255 / 70%);
-    }
-  }
 }
 
 #content {
@@ -351,7 +327,7 @@ app-search-filters-breadcrumbs {
     }
   }
 
-  ::ng-deep mat-expansion-panel#set-location {
+  :root mat-expansion-panel#set-location {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -361,7 +337,7 @@ app-search-filters-breadcrumbs {
     width: 240px;
     transition: top 300ms ease-in-out, margin-top 300ms ease-in-out;
 
-    ::ng-deep mat-expansion-panel-header {
+    :root mat-expansion-panel-header {
       font-size: 1em;
       height: 48px !important;
     }
@@ -415,7 +391,7 @@ app-search-filters-breadcrumbs {
 .filter-container {
   padding-top: 2em;
   padding-bottom: 1em;
-  border-top: 1px solid $brand-gray-tint-4;
+  border-top: 1px solid config.$brand-gray-tint-4;
 }
 
 #type-filter {
@@ -458,7 +434,7 @@ app-search-filters-breadcrumbs {
 }
 
 %invert-hint {
-  ::ng-deep .mat-hint {
+  :root .mat-hint {
     color: white !important;
     font-style: italic;
   }
@@ -467,20 +443,20 @@ app-search-filters-breadcrumbs {
 %invert-headings {
   @extend %invert-hint;
 
-  ::ng-deep h1,
-  ::ng-deep h5,
-  ::ng-deep .mat-select-value-text,
-  ::ng-deep .mat-form-field-label,
-  ::ng-deep .mat-menu-trigger,
-  ::ng-deep .mat-tab-label,
-  ::ng-deep .show-all,
-  ::ng-deep .done-button,
-  ::ng-deep app-search-filters-breadcrumbs h4,
-  ::ng-deep app-search-filters-breadcrumbs .mat-button {
+  :root h1,
+  :root h5,
+  :root .mat-select-value-text,
+  :root .mat-form-field-label,
+  :root .mat-menu-trigger,
+  :root .mat-tab-label,
+  :root .show-all,
+  :root .done-button,
+  :root app-search-filters-breadcrumbs h4,
+  :root app-search-filters-breadcrumbs .mat-button {
     color: white !important;
   }
 
-  ::ng-deep .mat-menu-trigger {
+  :root .mat-menu-trigger {
     background-color: rgb(0 0 0 / 20%);
   }
 }
@@ -572,7 +548,7 @@ app-border-box-tile {
   transition: position 3s;
 }
 
-::ng-deep .mat-tooltip {
+:root .mat-tooltip {
   font-size: 15px !important;
 }
 

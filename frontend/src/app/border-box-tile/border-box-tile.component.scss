@@ -1,6 +1,4 @@
 @use "config" as config;
-@use "@angular/material" as mat;
-@use "material" as material-config;
 
 .border-box-tile {
   display: grid;
@@ -47,14 +45,14 @@
 
     &::before {
       border: 11px solid #dadada;
-      border-image: linear-gradient(to bottom, config.$brand-gray-tint-2 0%, config.$brand-gray-tint-3 100%);
+      border-image-source: linear-gradient(to bottom, config.$brand-gray-tint-2 0%, config.$brand-gray-tint-3 100%);
       border-image-slice: 1;
       opacity: 1;
     }
 
     &::after {
       border: 11px solid #002f6c;
-      border-image: linear-gradient($brand-primary 0%, $brand-accent 100%);
+      border-image-source: linear-gradient(config.$brand-primary 0%, config.$brand-accent 100%);
       border-image-slice: 1;
       opacity: 0;
     }
@@ -77,24 +75,27 @@
 
     p.intro {
       padding: 0 20px;
-      color: $body-color;
+      color: config.$body-color;
       font-weight: bold;
     }
 
     .border-box-tile-label {
       &.border-box-tile-label-1x {
-        @include mat.m2-typography-level(material-config.$typography, title);
-
+        font-size: var(--mat-sys-title-large-size);
+        font-weight: var(--mat-sys-title-large-weight);
+        font-family: var(--mat-sys-title-large-font), sans-serif;
+        letter-spacing: var(--mat-sys-title-large-tracking);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;
         text-transform: uppercase;
-        letter-spacing: 1.8px;
       }
 
       &.border-box-tile-label-2x {
-        @include mat.m2-typography-level(material-config.$typography, display-1);
-
+        font-size: var(--mat-sys-display-large-size);
+        font-weight: var(--mat-sys-display-large-weight);
+        font-family: var(--mat-sys-display-large-font), sans-serif;
+        letter-spacing: var(--mat-sys-display-large-tracking);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;

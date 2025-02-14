@@ -23,7 +23,7 @@
   }
 }
 
-::ng-deep .search-bar {
+:root .search-bar {
   mat-form-field {
     .mat-icon {
       margin-top: 6px;
@@ -76,18 +76,18 @@
 
     mat-form-field {
       ::placeholder {
-        color: $brand-gray-tint-1;
+        color: config.$brand-gray-tint-1;
       }
     }
   }
 }
 
-::ng-deep #search-field .mat-form-field-outline {
+:root #search-field .mat-form-field-outline {
   background-color: white;
   border-radius: 5px;
 }
 
-::ng-deep .mat-option-text {
+:root .mat-option-text {
   font-size: 16px;
   overflow: visible !important;
   text-overflow: unset !important;

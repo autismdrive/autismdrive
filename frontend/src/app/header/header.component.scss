@@ -1,8 +1,9 @@
 @use "@angular/material" as mat;
 @use "material" as material-config;
+@use "config" as config;
 
 #header-bg {
-  background-color: $brand-gray;
+  background-color: config.$brand-gray;
   position: fixed;
   width: 100%;
   z-index: 98;
@@ -11,10 +12,10 @@
 #site-header {
   width: 100%;
   z-index: 100;
-  background-color: $brand-gray;
+  background-color: config.$brand-gray;
 
   mat-toolbar-row {
-    background-color: $brand-primary;
+    background-color: config.$brand-primary;
     color: white;
     position: fixed;
     transition: translate ease-in-out 500ms, height ease-in-out 500ms, top ease-in-out 500ms;
@@ -25,21 +26,21 @@
     background-color: white;
     z-index: 103;
     padding-left: 16px;
-    color: $brand-primary;
+    color: config.$brand-primary;
 
     .uva-logo a {
       font-size: var(--mat-sys-label-large-size);
       font-weight: var(--mat-sys-label-large-weight);
-      font-family: var(--mat-sys-label-large-font);
+      font-family: var(--mat-sys-label-large-font), sans-serif;
       letter-spacing: var(--mat-sys-label-large-tracking);
-      color: $brand-primary;
+      color: config.$brand-primary;
       text-transform: uppercase;
     }
   }
 
   mat-toolbar-row#menu-bar {
     padding-right: 0;
-    background-color: $brand-primary;
+    background-color: config.$brand-primary;
     z-index: 102;
 
     a {
@@ -49,17 +50,15 @@
 
     #primary-nav {
       .mat-button {
+        margin-top: 0;
+        margin-bottom: 0;
+
         &.selected {
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
-          border-bottom: 4px solid $brand-primary;
+          border-bottom: 4px solid config.$brand-primary;
         }
       }
-    }
-
-    #primary-nav .mat-button {
-      margin-top: 0;
-      margin-bottom: 0;
     }
   }
 
@@ -74,8 +73,8 @@
     }
   }
 
-  mat-toolbar-row#searchtag {
-    background-color: $brand-accent;
+    mat-toolbar-row#search-tag {
+    background-color: config.$brand-accent;
     z-index: 100;
     box-shadow: 40px 20px 40px -40px rgb(0 0 0 / 10%);
 
@@ -95,7 +94,7 @@
     }
 
     li {
-      border-right: 1px solid $brand-accent;
+      border-right: 1px solid config.$brand-accent;
       height: 2em;
       padding: 0 18px;
       margin: 0;
@@ -131,19 +130,19 @@
       }
 
       a.selected::after {
-        background-color: $brand-accent;
+        background-color: config.$brand-accent;
         bottom: 0;
       }
 
       &:hover {
-        background-color: $brand-primary;
+        background-color: config.$brand-primary;
 
         a {
           text-decoration: none;
         }
 
         a::after {
-          background-color: $brand-accent;
+          background-color: config.$brand-accent;
           bottom: 0;
         }
       }
@@ -151,14 +150,14 @@
   }
 }
 
-::ng-deep :not(body.is-home) #site-header {
+:root :not(body.is-home) #site-header {
   min-height: unset;
 }
 
 #site-header.mirroring,
 #site-header mat-toolbar.mirroring,
 #mobile-menu.mirroring {
-  background-color: $brand-warning-muted;
+  background-color: config.$brand-warning-muted;
 }
 
 div.mirror-message {
@@ -170,7 +169,7 @@ div.mirror-message {
 #mobile-menu {
   position: fixed;
   width: 100%;
-  background-color: $brand-primary;
+  background-color: config.$brand-primary;
   color: white;
   z-index: 97;
   padding: 1em;

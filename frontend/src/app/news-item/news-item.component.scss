@@ -1,5 +1,4 @@
-@use "@angular/material" as mat;
-@use "material" as material-config;
+@use "config" as config;
 
 .news-item {
   display: grid;
@@ -47,16 +46,19 @@
     }
 
     .item-title {
-      @include mat.m2-typography-level(material-config.$typography, headline);
-
+      font-family: var(--mat-sys-headline-medium-font), sans-serif;
+      font-size: var(--mat-sys-headline-medium-size);
+      font-weight: var(--mat-sys-headline-medium-weight);
+      line-height: var(--mat-sys-headline-medium-line-height);
+      letter-spacing: var(--mat-sys-headline-medium-tracking);
       font-style: italic;
-      color: $brand-primary;
+      color: config.$brand-primary;
       cursor: pointer;
       margin-top: 0.75rem;
 
       &::after {
         content: '';
-        background-color: $brand-accent;
+        background-color: config.$brand-accent;
         width: 6.25rem;
         height: 0.125rem;
         display: block;

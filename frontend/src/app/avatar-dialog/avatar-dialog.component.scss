@@ -1,18 +1,18 @@
-$avatar_image_height: 96px;
-$color_swatch_height: 64px;
-$border_width: 8px;
-$button_padding: 48px;
-$white_1: rgb(255 255 255 / 100%);
-$white_0: rgb(255 255 255 / 0%);
+$avatar-image-height: 96px;
+$color-swatch-height: 64px;
+$border-width: 8px;
+$button-padding: 48px;
+$white-1: rgb(255 255 255 / 100%);
+$white-0: rgb(255 255 255 / 0%);
 
 .avatar {
-  height: ($avatar_image_height * 2);
-  width: ($avatar_image_height * 2);
+  height: ($avatar-image-height * 2);
+  width: ($avatar-image-height * 2);
   border-radius: 50%;
 
   img {
-    height: ($avatar_image_height * 2);
-    width: ($avatar_image_height * 2);
+    height: ($avatar-image-height * 2);
+    width: ($avatar-image-height * 2);
   }
 }
 
@@ -50,14 +50,14 @@ $white_0: rgb(255 255 255 / 0%);
   .scroll-left:hover,
   .scroll-left:active,
   .scroll-left:focus {
-    background-image: linear-gradient(to right, $white_1, $white_1, $white_0);
+    background-image: linear-gradient(to right, $white-1, $white-1, $white-0);
   }
 
   .scroll-right,
   .scroll-right:hover,
   .scroll-right:active,
   .scroll-right:focus {
-    background-image: linear-gradient(to right, $white_0, $white_1, $white_1);
+    background-image: linear-gradient(to right, $white-0, $white-1, $white-1);
   }
 }
 
@@ -69,16 +69,16 @@ $white_0: rgb(255 255 255 / 0%);
 }
 
 .avatar-images {
-  height: ($avatar_image_height + $border_width * 2);
+  height: ($avatar-image-height + $border-width * 2);
 }
 
 .color-swatches {
-  height: ($color_swatch_height + $border_width * 2);
+  height: ($color-swatch-height + $border-width * 2);
 }
 
 .color-swatch,
 .avatar-image {
-  border-width: $border_width;
+  border-width: $border-width;
   border-style: solid;
   border-color: white;
   display: inline-block;
@@ -97,18 +97,18 @@ $white_0: rgb(255 255 255 / 0%);
 }
 
 .color-swatch {
-  width: $color_swatch_height;
-  height: $color_swatch_height;
+  width: $color-swatch-height;
+  height: $color-swatch-height;
 }
 
 .avatar-image {
-  width: ($avatar_image_height + ($border_width * 2));
-  height: ($avatar_image_height + ($border_width * 2));
+  width: ($avatar-image-height + ($border-width * 2));
+  height: ($avatar-image-height + ($border-width * 2));
   background: #eee;
 
   img {
-    width: $avatar_image_height;
-    height: $avatar_image_height;
+    width: $avatar-image-height;
+    height: $avatar-image-height;
   }
 }
 

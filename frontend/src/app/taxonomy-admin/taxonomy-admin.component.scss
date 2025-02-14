@@ -22,14 +22,13 @@
 }
 
 .highlight-node {
-  background-color: $brand-primary-light;
-  animation-name: fade-out;
+  background-color: config.$brand-primary-light;
   animation: fade-out 5s forwards;
 }
 
 @keyframes fade-out {
   0% {
-    background-color: $brand-primary-light;
+    background-color: config.$brand-primary-light;
   }
 
   100% {

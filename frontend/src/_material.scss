@@ -1,7 +1,5 @@
-@use 'sass:map';
-@use 'config' as config;
-@use 'colors' as colors;
-@use "@angular/material" as mat;
+@use "config" as config;
+@use "colors" as colors;
 
 $typography: (
   plain-family: config.$body-font-family,

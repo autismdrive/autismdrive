@@ -1,9 +1,10 @@
-@import '../search-filter/search-filter.component';
+@use 'config' as config;
+@forward '../search-filter/search-filter.component';
 
 div.current-facet-label {
   cursor: pointer;
   font-weight: 700;
-  color: $body-color;
+  color: config.$body-color;
   padding: 5px 0;
 }
 
@@ -16,7 +17,7 @@ button {
   text-align: left;
 }
 
-::ng-deep .mat-menu-panel {
+:root .mat-menu-panel {
   max-width: 400px !important;
   width: 400px;
 
@@ -31,7 +32,7 @@ button {
 
 .placeholder,
 .parent-topics,
-::ng-deep .parent-topics mat-list-item,
+:root .parent-topics mat-list-item,
 .select-topic {
   min-width: 100%;
   min-height: 36px;

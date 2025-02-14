@@ -1,7 +1,13 @@
 @use "config" as config;
-@import '../../mixins';
+@use "mixins" as mixins;
 
-::ng-deep mat-expansion-panel.accordion-link {
+mat-expansion-panel.accordion-link:hover mat-expansion-panel-header .accordion-icon mat-icon {
+  background-color: config.$brand-primary;
+  border-color: config.$brand-primary;
+  border-width: 4px;
+}
+
+:root mat-expansion-panel.accordion-link {
   mat-expansion-panel-header .mat-content {
     display: grid;
     grid-template-areas: 'icon title';
@@ -10,7 +16,7 @@
     position: relative;
 
     &::after {
-      @include border-dots;
+      @include mixins.border-dots;
 
       content: '';
       bottom: 0;
@@ -27,12 +33,12 @@
 
       mat-icon {
         color: white;
-        background-color: $brand-accent;
+        background-color: config.$brand-accent;
         transition: all 0.3s ease-in-out;
         border-width: 0;
         border-radius: 50%;
         border-style: solid;
-        border-color: $brand-accent;
+        border-color: config.$brand-accent;
         align-self: center;
       }
     }
@@ -44,13 +50,7 @@
       place-items: center start;
       padding: 0.5rem;
       margin: 0;
-      color: $brand-primary;
+      color: config.$brand-primary;
     }
   }
-}
-
-mat-expansion-panel.accordion-link:hover mat-expansion-panel-header .accordion-icon mat-icon {
-  background-color: $brand-primary;
-  border-color: $brand-primary;
-  border-width: 4px;
 }

@@ -5,7 +5,7 @@
   margin-left: 0;
   justify-self: start;
 
-  ::ng-deep .mat-chip-list-wrapper {
+  :root .mat-chip-list-wrapper {
     display: flex;
     flex-wrap: wrap;
     overflow-x: auto;
@@ -18,7 +18,7 @@
 
   .applied-filter {
     color: white;
-    background-color: $brand-accent;
+    background-color: config.$brand-accent;
 
     mat-icon {
       margin-left: 0.75rem;

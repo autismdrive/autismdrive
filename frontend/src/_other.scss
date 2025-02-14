@@ -1,8 +1,6 @@
 @use 'sass:map';
 @use 'sass:color';
-
-//@use "@angular/material" as mat;
-@use 'config' as config;
+@use "config" as config;
 @use 'colors' as colors;
 
 body.is-home {
@@ -74,7 +72,7 @@ a.btn {
   }
 }
 
-//  ::ng-deep .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+//  :root .mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
 //    transform: translateY(-1.28125em) scale(0.9) perspective(100px) translateZ(0.001px);
 //  }
 
@@ -156,8 +154,8 @@ formly-field-mat-multicheckbox {
   }
 }
 
-$_dark-primary: map.get(map.get(colors.$all-palettes, primary), 10);
-$_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
+$dark-primary: map.get(map.get(colors.$all-palettes, primary), 10);
+$bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
 
 .gradient-overlay::after {
   content: '';
@@ -171,10 +169,10 @@ $_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
     ),
     linear-gradient(
       90deg,
-      rgba($_dark-primary, 0.8) 0%,
-      rgba($_dark-primary, 0.0) 40%,
-      rgba($_bright-secondary, 0.0) 60%,
-      rgba($_bright-secondary, 0.8) 100%,
+      rgba($dark-primary, 0.8) 0%,
+      rgba($dark-primary, 0.0) 40%,
+      rgba($bright-secondary, 0.0) 60%,
+      rgba($bright-secondary, 0.8) 100%,
     );
   background-blend-mode: saturation;
   z-index: 1;

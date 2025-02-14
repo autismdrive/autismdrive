@@ -1,5 +1,5 @@
 @use "@angular/material" as mat;
-@use "material" as material-config;
+@use "config" as config;
 
 button.mat-mini-fab.mat-accent {
   background-color: transparent;
@@ -8,13 +8,13 @@ button.mat-mini-fab.mat-accent {
   @include mat.elevation(1);
 
   mat-icon {
-    -webkit-text-stroke: 1px $brand-primary;
+    -webkit-text-stroke: 1px config.$brand-primary;
     color: white;
-    text-shadow: -1px -1px 0 $brand-primary, 1px -1px 0 $brand-primary, -1px 1px 0 $brand-primary,
-      1px 1px 0 $brand-primary;
+    text-shadow: -1px -1px 0 config.$brand-primary, 1px -1px 0 config.$brand-primary, -1px 1px 0 config.$brand-primary,
+      1px 1px 0 config.$brand-primary;
 
     &.active {
-      color: $brand-primary;
+      color: config.$brand-primary;
       text-shadow: none;
     }
   }

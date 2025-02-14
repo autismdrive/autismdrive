@@ -1,14 +1,16 @@
 @use 'sass:map';
 
-// Color palettes generated via Angular Material CLI
-// > ng generate @angular/material:m3-theme
-//
-// Seed colors:
-// - primary: #232d4b
-// - secondary: #e57200
-// - tertiary: #62BB46
-// - neutral: #C8CBD2
-// - error: #DF1E43
+/**
+Color palettes generated via Angular Material CLI
+> ng generate @angular/material:m3-theme
+
+Seed colors:
+- primary: #232d4b
+- secondary: #e57200
+- tertiary: #62BB46
+- neutral: #C8CBD2
+- error: #DF1E43
+*/
 
 $all-palettes: (
   primary: (
@@ -130,11 +132,11 @@ $all-palettes: (
     100: #fff,
   ),
 );
-$_rest: (
+$palette-map: (
   secondary: map.get($all-palettes, secondary),
   neutral: map.get($all-palettes, neutral),
   neutral-variant: map.get($all-palettes,  neutral-variant),
   error: map.get($all-palettes, error),
 );
-$primary-palette: map.merge(map.get($all-palettes, primary), $_rest);
-$tertiary-palette: map.merge(map.get($all-palettes, tertiary), $_rest);
+$primary-palette: map.merge(map.get($all-palettes, primary), $palette-map);
+$tertiary-palette: map.merge(map.get($all-palettes, tertiary), $palette-map);

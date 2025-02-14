@@ -19,13 +19,9 @@ $video-padding-width: $video-padding * 2;
 .video-preview {
   position: relative;
   display: block;
-
-  // margin-top: 3.5em;
-  //margin-bottom: 0em;
-  //margin-left: 2em;
   margin: 2em;
   padding: $video-padding;
-  background-color: $brand-primary;
+  background-color: config.$brand-primary;
   color: white;
 
   p {
@@ -112,5 +108,5 @@ $video-padding-width: $video-padding * 2;
 .video-link {
   display: block;
   margin-top: 1em;
-  color: $brand-accent;
+  color: config.$brand-accent;
 }

@@ -5,8 +5,8 @@ map-view {
   width: 100%;
 }
 
-::ng-deep .gm-style-iw.gm-style-iw-c,
-::ng-deep .gm-style-iw-d {
+:root .gm-style-iw.gm-style-iw-c,
+:root .gm-style-iw-d {
   max-height: 50vh !important;
 
   @media (width <= 575px) {
@@ -32,7 +32,7 @@ map-view {
 
 .no-address-message {
   font-weight: 700;
-  color: $brand-accent;
+  color: config.$brand-accent;
 }
 
 .button-overlay {

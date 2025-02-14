@@ -10,7 +10,6 @@
 }
 
 mat-drawer-container {
-  //min-height: 100vh;
   background-color: white;
   min-height: 100vh;
 }
@@ -26,7 +25,7 @@ h1 {
 h1 small {
   position: absolute;
   right: 0;
-  color: $brand-primary;
+  color: config.$brand-primary;
 }
 
 // XS & SM
@@ -50,19 +49,19 @@ h1 small {
   }
 }
 
-::ng-deep mat-progress-bar {
+:root mat-progress-bar {
   height: 16px;
   margin-bottom: 1em;
 
   .mat-progress-bar-buffer {
-    background-color: $brand-gray-tint-2;
+    background-color: config.$brand-gray-tint-2;
   }
 
   .mat-progress-bar-background {
-    fill: $brand-gray-tint-2;
+    fill: config.$brand-gray-tint-2;
 
     pattern {
-      fill: $brand-gray-tint-2;
+      fill: config.$brand-gray-tint-2;
     }
   }
 }

@@ -1,6 +1,6 @@
 @use "config" as config;
 
-.userList {
+.user-list {
   text-align: center;
   margin: 2em;
 }
@@ -22,7 +22,7 @@
 
 mat-row:hover {
   cursor: pointer;
-  background-color: $brand-accent-light;
+  background-color: config.$brand-accent-light;
 }
 
 .mat-column-role {

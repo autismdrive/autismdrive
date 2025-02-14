@@ -1,16 +1,16 @@
 @use "config" as config;
-@import '../../mixins';
+@use "mixins" as mixins;
 
 .result-item {
   margin: 2em;
   padding-bottom: 2em;
   position: relative;
 
-  @include top-border-dots;
+  @include mixins.top-border-dots;
 
   .title {
     margin: 0;
-    color: $brand-primary;
+    color: config.$brand-primary;
     font-weight: 800;
     font-style: italic;
     line-height: 1;
@@ -18,14 +18,14 @@
   }
 }
 
-::ng-deep button.type {
+:root button.type {
   text-transform: uppercase;
   white-space: nowrap;
-  color: $brand-primary-muted;
+  color: config.$brand-primary-muted;
   background-color: transparent;
 
   &:hover {
-    color: $brand-primary;
+    color: config.$brand-primary;
     background-color: transparent;
   }
 
@@ -34,13 +34,13 @@
   }
 }
 
-::ng-deep .highlights em {
+:root .highlights em {
   font-weight: 700;
 }
 
 .highlights .date,
 .description .date {
-  color: $brand-accent;
+  color: config.$brand-accent;
   font-weight: 700;
 }
 
@@ -52,17 +52,17 @@
 }
 
 .status-currently-enrolling {
-  color: $brand-accent;
+  color: config.$brand-accent;
 }
 
 .status-study-in-progress {
-  color: $brand-primary-tint-1;
+  color: config.$brand-primary-tint-1;
 }
 
 .status-results-being-analyzed {
-  color: $brand-primary-tint-2;
+  color: config.$brand-primary-tint-2;
 }
 
 .status-study-results-published {
-  color: $brand-primary-tint-3;
+  color: config.$brand-primary-tint-3;
 }

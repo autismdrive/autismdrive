@@ -1,6 +1,6 @@
 @use "config" as config;
 
-$dot_size: 8px;
+$dot-size: 8px;
 
 .hero-slides {
   position: relative;
@@ -30,18 +30,18 @@ $dot_size: 8px;
     list-style: none;
     z-index: 2;
     position: absolute;
-    bottom: (-4 * $dot_size);
+    bottom: (-4 * $dot-size);
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
     padding: 0;
 
     .dot {
-      padding: $dot_size;
-      height: $dot_size;
-      width: $dot_size;
+      padding: $dot-size;
+      height: $dot-size;
+      width: $dot-size;
       border-radius: 50%;
-      border: 1px solid $brand-primary;
+      border: 1px solid config.$brand-primary;
       background-color: white;
       float: left;
       margin-left: 10px;
@@ -50,7 +50,7 @@ $dot_size: 8px;
 
       &.active,
       &.inactive:hover {
-        background-color: $brand-primary;
+        background-color: config.$brand-primary;
         opacity: 1;
       }
 
