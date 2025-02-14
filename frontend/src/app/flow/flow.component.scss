@@ -30,21 +30,21 @@ h1 small {
 }
 
 // XS & SM
-@media (max-width: 767px) {
+@media (width <= 767px) {
   h1 {
     font-size: 1.25em;
   }
 }
 
 // MD
-@media (min-width: 768px) {
+@media (width >= 768px) {
   h1 {
     font-size: 2em;
   }
 }
 
 // LG - XL
-@media (min-width: 960px) {
+@media (width >= 960px) {
   h1 {
     font-size: 2.5em;
   }

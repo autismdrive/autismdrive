@@ -4,17 +4,14 @@ $lg-factor: 1;
 $md-factor: 0.9;
 $sm-factor: 0.8;
 $xs-factor: 0.7;
-
 $video-width: 560px;
 $video-width-large: ($video-width * 1);
 $video-width-medium: ($video-width * 0.75);
 $video-width-small: ($video-width * 0.5);
-
 $video-height: 315px;
 $video-height-large: ($video-height * 1);
 $video-height-medium: ($video-height * 0.75);
 $video-height-small: ($video-height * 0.5);
-
 $text-height: 48px;
 $video-padding: 24px;
 $video-padding-width: $video-padding * 2;
@@ -22,6 +19,7 @@ $video-padding-width: $video-padding * 2;
 .video-preview {
   position: relative;
   display: block;
+
   // margin-top: 3.5em;
   //margin-bottom: 0em;
   //margin-left: 2em;
@@ -41,17 +39,17 @@ $video-padding-width: $video-padding * 2;
     width: (($video-width-large * $xs-factor) + $video-padding-width);
 
     // SM
-    @media (min-width: 600px) {
+    @media (width >= 600px) {
       width: (($video-width-large * $sm-factor) + $video-padding-width);
     }
 
     // MD
-    @media (min-width: 960px) {
+    @media (width >= 960px) {
       width: (($video-width-large * $md-factor) + $video-padding-width);
     }
 
     // XL
-    @media (min-width: 1280px) {
+    @media (width >= 1280px) {
       width: (($video-width-large * $lg-factor) + $video-padding-width);
     }
   }
@@ -62,23 +60,23 @@ $video-padding-width: $video-padding * 2;
     width: (($video-width-medium * $xs-factor) + $video-padding-width);
 
     // SM
-    @media (min-width: 600px) {
+    @media (width >= 600px) {
       margin: 2em;
       width: (($video-width-medium * $sm-factor) + $video-padding-width);
     }
 
     // MD
-    @media (min-width: 960px) {
+    @media (width >= 960px) {
       margin-top: 3.5em;
-      margin-bottom: 0em;
+      margin-bottom: 0;
       margin-left: 2em;
       width: (($video-width-medium * $md-factor) + $video-padding-width);
     }
 
     // XL
-    @media (min-width: 1280px) {
+    @media (width >= 1280px) {
       margin-top: 3.5em;
-      margin-bottom: 0em;
+      margin-bottom: 0;
       margin-left: 2em;
       width: (($video-width-medium * $lg-factor) + $video-padding-width);
     }
@@ -89,17 +87,17 @@ $video-padding-width: $video-padding * 2;
     width: (($video-width-small * $xs-factor) + $video-padding-width);
 
     // SM
-    @media (min-width: 600px) {
+    @media (width >= 600px) {
       width: (($video-width-small * $sm-factor) + $video-padding-width);
     }
 
     // MD
-    @media (min-width: 960px) {
+    @media (width >= 960px) {
       width: (($video-width-small * $md-factor) + $video-padding-width);
     }
 
     // XL
-    @media (min-width: 1280px) {
+    @media (width >= 1280px) {
       width: (($video-width-small * $lg-factor) + $video-padding-width);
     }
   }

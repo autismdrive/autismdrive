@@ -62,3 +62,4 @@ config.json
 /src/app/**/*.scss.map
 /src/app/**/*.css
 /src/*.css
+

@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use 'sass:color';
+
 //@use "@angular/material" as mat;
 @use 'config' as config;
 @use 'colors' as colors;
@@ -9,17 +10,17 @@ body.is-home {
   padding-top: 0;
 
   // SM
-  @media (min-width: 600px) {
+  @media (width >= 600px) {
     padding-top: 0;
   }
 
   // MD
-  @media (min-width: 960px) {
+  @media (width >= 960px) {
     padding-top: 40px;
   }
 
   // XL
-  @media (min-width: 1280px) {
+  @media (width >= 1280px) {
     padding-top: 80px;
   }
 }
@@ -401,7 +402,7 @@ $_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
 }
 
 // XS
-@media (max-width: 575px) {
+@media (width <= 575px) {
   .cdk-overlay-wrapper .cdk-overlay-pane {
     width: 100%;
     height: 100%;
@@ -413,7 +414,7 @@ $_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
 }
 
 // SM
-@media (min-width: 576px) {
+@media (width >= 576px) {
   .cdk-overlay-wrapper .cdk-overlay-pane {
     width: 90%;
     height: 90%;
@@ -425,7 +426,7 @@ $_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
 }
 
 // MD
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .cdk-overlay-wrapper .cdk-overlay-pane {
     width: 75%;
     height: 75%;
@@ -437,7 +438,7 @@ $_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
 }
 
 // LG
-@media (min-width: 992px) {
+@media (width >= 992px) {
   .cdk-overlay-wrapper .cdk-overlay-pane {
     width: 75%;
     height: 75%;
@@ -449,7 +450,7 @@ $_bright-secondary: map.get(map.get(colors.$all-palettes, secondary), 60);
 }
 
 // XL
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .cdk-overlay-wrapper .cdk-overlay-pane {
     width: 75%;
     height: 75%;

@@ -103,7 +103,7 @@
     }
 
     // XS - MD
-    @media (max-width: 1023px) {
+    @media (width <= 1023px) {
       padding: 1em;
 
       .border-box-tile-label.border-box-tile-label-1x {
@@ -116,7 +116,7 @@
     }
 
     // LG & XL
-    @media (min-width: 1024px) {
+    @media (width >= 1024px) {
       padding: 2.4375rem;
     }
   }

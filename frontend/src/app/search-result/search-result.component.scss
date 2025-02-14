@@ -1,6 +1,5 @@
 @use "config" as config;
-
-@import url('../../mixins');
+@import '../../mixins';
 
 .result-item {
   margin: 2em;

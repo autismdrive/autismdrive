@@ -130,13 +130,11 @@ $all-palettes: (
     100: #fff,
   ),
 );
-
 $_rest: (
   secondary: map.get($all-palettes, secondary),
   neutral: map.get($all-palettes, neutral),
   neutral-variant: map.get($all-palettes,  neutral-variant),
   error: map.get($all-palettes, error),
 );
-
 $primary-palette: map.merge(map.get($all-palettes, primary), $_rest);
 $tertiary-palette: map.merge(map.get($all-palettes, tertiary), $_rest);
