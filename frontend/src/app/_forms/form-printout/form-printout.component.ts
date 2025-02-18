@@ -7,6 +7,7 @@ interface SelectFieldOption {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-form-printout',
   templateUrl: './form-printout.component.html',
   styleUrls: ['./form-printout.component.scss'],

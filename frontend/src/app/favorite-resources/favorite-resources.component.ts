@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {Resource} from '@models/resource';
 
 @Component({
+  standalone: true,
   selector: 'app-favorite-resources',
   templateUrl: './favorite-resources.component.html',
   styleUrls: ['./favorite-resources.component.scss'],

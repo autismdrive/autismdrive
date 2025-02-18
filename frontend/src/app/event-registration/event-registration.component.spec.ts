@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {EventRegistrationComponent} from './event-registration.component';
 
@@ -7,7 +6,7 @@ describe('EventRegistrationComponent', () => {
   let fixture: MockedComponentFixture<EventRegistrationComponent>;
 
   beforeEach(() => {
-    return MockBuilder(EventRegistrationComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(EventRegistrationComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

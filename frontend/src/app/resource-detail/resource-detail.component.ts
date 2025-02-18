@@ -11,6 +11,7 @@ import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-resource-detail',
   templateUrl: './resource-detail.component.html',
   styleUrls: ['./resource-detail.component.scss'],

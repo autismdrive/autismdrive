@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -11,7 +10,7 @@ describe('RepeatSectionDialogComponent', () => {
   let fixture: MockedComponentFixture<RepeatSectionDialogComponent>;
 
   beforeEach(() => {
-    return MockBuilder(RepeatSectionDialogComponent, AppModule)
+    return MockBuilder(RepeatSectionDialogComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(DeviceDetectorService)
       .keep(MaterialModule)

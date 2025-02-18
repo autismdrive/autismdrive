@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {SortMethod, sortMethods} from '@models/sort_method';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import createClone from 'rfdc';
@@ -18,7 +17,7 @@ describe('SearchSortComponent', () => {
   mockSortMethods.DISTANCE.sortQuery.longitude = mockLocation.longitude;
 
   beforeEach(() => {
-    return MockBuilder(SearchSortComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(SearchSortComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

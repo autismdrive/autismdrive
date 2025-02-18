@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -12,7 +11,7 @@ describe('TaxonomyAdminComponent', () => {
   let fixture: MockedComponentFixture<TaxonomyAdminComponent>;
 
   beforeEach(() => {
-    return MockBuilder(TaxonomyAdminComponent, AppModule)
+    return MockBuilder(TaxonomyAdminComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getCategoryTree: jest.fn().mockReturnValue(of([mockCategory])),

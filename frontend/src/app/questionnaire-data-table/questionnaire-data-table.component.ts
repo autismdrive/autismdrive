@@ -5,6 +5,7 @@ import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-questionnaire-data-table',
   templateUrl: './questionnaire-data-table.component.html',
   styleUrls: ['./questionnaire-data-table.component.scss'],

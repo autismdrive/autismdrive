@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {mockQuestionnaireListMeta} from '@util/testing/fixtures/mock-questionnaire-list-meta';
 import {mockExportResponse} from '@util/testing/fixtures/mock-response';
@@ -11,7 +10,7 @@ describe('QuestionnaireDataTableComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(QuestionnaireDataTableComponent, AppModule)
+    return MockBuilder(QuestionnaireDataTableComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getQuestionnaireList: jest.fn().mockReturnValue(of([])),

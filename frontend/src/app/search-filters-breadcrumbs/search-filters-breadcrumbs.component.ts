@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Query} from '@models/query';
 
 @Component({
+  standalone: true,
   selector: 'app-search-filters-breadcrumbs',
   templateUrl: './search-filters-breadcrumbs.component.html',
   styleUrls: ['./search-filters-breadcrumbs.component.scss'],

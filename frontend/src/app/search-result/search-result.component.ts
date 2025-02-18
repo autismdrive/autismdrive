@@ -4,6 +4,7 @@ import {Hit} from '@models/query';
 import {StudyStatus} from '@models/study';
 import {User} from '@models/user';
 @Component({
+  standalone: true,
   selector: 'app-search-result',
   templateUrl: './search-result.component.html',
   styleUrls: ['./search-result.component.scss'],

@@ -9,6 +9,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
+  standalone: true,
   selector: 'app-study-survey-entry',
   templateUrl: './study-survey-entry.component.html',
   styleUrls: ['./study-survey-entry.component.scss'],

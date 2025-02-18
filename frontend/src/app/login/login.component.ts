@@ -9,6 +9,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
+  standalone: true,
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],

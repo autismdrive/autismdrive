@@ -5,6 +5,7 @@ import {Resource} from '@models/resource';
 import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 
 @Component({
+  standalone: true,
   selector: 'app-event-registration',
   templateUrl: './event-registration.component.html',
   styleUrls: ['./event-registration.component.scss'],

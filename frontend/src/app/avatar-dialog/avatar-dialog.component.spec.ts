@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {Participant} from '@models/participant';
 import {ApiService} from '@services/api/api.service';
@@ -14,7 +13,7 @@ describe('AvatarDialogComponent', () => {
   let fixture: MockedComponentFixture<AvatarDialogComponent>;
 
   beforeEach(() => {
-    return MockBuilder(AvatarDialogComponent, AppModule)
+    return MockBuilder(AvatarDialogComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(MaterialModule)
       .mock(ApiService, {

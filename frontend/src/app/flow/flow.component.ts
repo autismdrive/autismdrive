@@ -23,6 +23,7 @@ enum FlowState {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-flow',
   templateUrl: './flow.component.html',
   styleUrls: ['./flow.component.scss'],

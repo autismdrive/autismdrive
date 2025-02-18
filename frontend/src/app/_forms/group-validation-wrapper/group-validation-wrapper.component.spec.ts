@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('GroupValidationWrapperComponent', () => {
@@ -12,9 +11,7 @@ describe('GroupValidationWrapperComponent', () => {
           description: 'Name description',
         },
       },
-      {
-        imports: [AppModule],
-      },
+      {},
     );
 
     expect(query('app-group-validation-wrapper')).not.toBeNull();

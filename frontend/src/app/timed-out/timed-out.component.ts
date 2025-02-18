@@ -4,6 +4,7 @@ import {fadeTransition} from '@animations/animations';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-timedout',
   templateUrl: './timed-out.component.html',
   styleUrls: ['./timed-out.component.scss'],

@@ -14,6 +14,7 @@ interface C19ResourceCategoryObj {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-covid19-resources',
   templateUrl: './covid19-resources.component.html',
   styleUrls: ['./covid19-resources.component.scss'],

@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {TimedoutComponent} from './timed-out.component';
@@ -8,7 +7,7 @@ describe('TimedoutComponent', () => {
   let fixture: MockedComponentFixture<TimedoutComponent>;
 
   beforeEach(() => {
-    return MockBuilder(TimedoutComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS).keep(AuthenticationService);
+    return MockBuilder(TimedoutComponent).keep(NG_MOCKS_ROOT_PROVIDERS).keep(AuthenticationService);
   });
 
   beforeEach(() => {

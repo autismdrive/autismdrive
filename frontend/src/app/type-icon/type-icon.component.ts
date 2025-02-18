@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {HitType} from '@models/hit_type';
 
 @Component({
+  standalone: true,
   selector: 'app-type-icon',
   templateUrl: './type-icon.component.html',
   styleUrls: ['./type-icon.component.scss'],

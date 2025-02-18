@@ -9,6 +9,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
 @Component({
+  standalone: true,
   selector: 'app-study-detail',
   templateUrl: './study-detail.component.html',
   styleUrls: ['./study-detail.component.scss'],

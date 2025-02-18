@@ -10,6 +10,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
 import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
 @Component({
+  standalone: true,
   selector: 'app-register-dialog',
   templateUrl: './register-dialog.component.html',
   styleUrls: ['./register-dialog.component.scss'],

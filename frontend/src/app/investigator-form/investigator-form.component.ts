@@ -4,6 +4,7 @@ import {StudyInvestigator} from '@models/study_investigator';
 import {StudyDetailComponent} from '../study-detail/study-detail.component';
 
 @Component({
+  standalone: true,
   selector: 'app-investigator-form',
   templateUrl: './investigator-form.component.html',
   styleUrls: ['./investigator-form.component.scss'],

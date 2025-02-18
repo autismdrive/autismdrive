@@ -9,6 +9,7 @@ import {ConfigService} from '@services/config/config.service';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({
+  standalone: true,
   selector: 'app-admin-export',
   templateUrl: './admin-export.component.html',
   styleUrls: ['./admin-export.component.scss'],

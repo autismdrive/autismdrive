@@ -19,6 +19,7 @@ interface AgeObj {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-studies',
   templateUrl: './studies.component.html',
   styleUrls: ['./studies.component.scss'],

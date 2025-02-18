@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {DataTransferLog} from '@models/data_transfer_log';
 import {ApiService} from '@services/api/api.service';
@@ -12,7 +11,7 @@ describe('AdminExportComponent', () => {
   let fixture: MockedComponentFixture<AdminExportComponent>;
 
   beforeEach(() => {
-    return MockBuilder(AdminExportComponent, AppModule)
+    return MockBuilder(AdminExportComponent)
       .mock(ApiService, {
         getDataTransferLogs: jest.fn().mockReturnValue(
           of({

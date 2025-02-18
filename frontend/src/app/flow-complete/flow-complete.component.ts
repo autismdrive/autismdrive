@@ -4,6 +4,7 @@ import {Flow} from '@models/flow';
 import {ParticipantRelationship} from '@models/participantRelationship';
 
 @Component({
+  standalone: true,
   selector: 'app-flow-complete',
   templateUrl: './flow-complete.component.html',
   styleUrls: ['./flow-complete.component.scss'],

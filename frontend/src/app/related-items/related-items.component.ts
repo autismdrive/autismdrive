@@ -7,6 +7,7 @@ import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
+  standalone: true,
   selector: 'app-related-items',
   templateUrl: './related-items.component.html',
   styleUrls: ['./related-items.component.scss'],

@@ -39,6 +39,7 @@ enum LocationMode {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],

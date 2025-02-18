@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {CategoriesService} from '@services/categories/categories.service';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
@@ -11,7 +10,7 @@ describe('SearchTopicsComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(SearchTopicsComponent, AppModule)
+    return MockBuilder(SearchTopicsComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .provide({
         provide: CategoriesService,

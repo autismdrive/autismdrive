@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -13,7 +12,7 @@ describe('ResourceDetailComponent', () => {
   let fixture: MockedComponentFixture<ResourceDetailComponent>;
 
   beforeEach(() => {
-    return MockBuilder(ResourceDetailComponent, AppModule)
+    return MockBuilder(ResourceDetailComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {getResourceChangeLog: jest.fn().mockReturnValue(of([]))})
       .keep(ActivatedRoute)

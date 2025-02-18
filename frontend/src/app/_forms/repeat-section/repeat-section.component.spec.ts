@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {createFieldComponent} from '@ngx-formly/core/testing';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {of} from 'rxjs';
@@ -16,9 +15,7 @@ describe('RepeatSectionComponent', () => {
           labelProp: 'name',
         },
       },
-      {
-        imports: [AppModule],
-      },
+      {},
     );
 
     expect(query('app-repeat-section')).not.toBeNull();

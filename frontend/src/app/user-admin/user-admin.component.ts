@@ -8,6 +8,7 @@ import {UserDataSource} from '@models/user_data_source';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-user-admin',
   templateUrl: './user-admin.component.html',
   styleUrls: ['./user-admin.component.scss'],

@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('HelpWrapperComponent', () => {
@@ -12,9 +11,7 @@ describe('HelpWrapperComponent', () => {
           description: 'Name description',
         },
       },
-      {
-        imports: [AppModule],
-      },
+      {},
     );
 
     expect(query('app-help-wrapper')).not.toBeNull();

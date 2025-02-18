@@ -16,6 +16,7 @@ enum PageState {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-study-form',
   templateUrl: './study-form.component.html',
   styleUrls: ['./study-form.component.scss'],

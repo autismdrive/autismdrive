@@ -1,6 +1,5 @@
 import {TestBed} from '@angular/core/testing';
 import {RouterModule} from '@angular/router';
-import {AppModule} from '@app/app.module';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {AppComponent} from './app.component';
@@ -10,7 +9,7 @@ describe('AppComponent', () => {
   let component: AppComponent;
 
   beforeEach(() => {
-    return MockBuilder(AppComponent, AppModule).keep(RouterModule).keep(AuthenticationService);
+    return MockBuilder(AppComponent).keep(RouterModule).keep(AuthenticationService);
   });
 
   beforeEach(() => {

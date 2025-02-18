@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {mockStudyInvestigator} from '@util/testing/fixtures/mock-study-investigator';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -11,7 +10,7 @@ describe('InvestigatorFormComponent', () => {
   let fixture: MockedComponentFixture<InvestigatorFormComponent>;
 
   beforeEach(() => {
-    return MockBuilder(InvestigatorFormComponent, AppModule)
+    return MockBuilder(InvestigatorFormComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(MaterialModule)
       .keep(FormsModule)

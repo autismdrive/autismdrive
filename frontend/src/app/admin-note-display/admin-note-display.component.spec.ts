@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {makeMockAdminNote} from '@util/testing/fixtures/mock-admin-note';
 import {mockResource} from '@util/testing/fixtures/mock-resource';
@@ -18,7 +17,7 @@ describe('AdminNoteDisplayComponent', () => {
   });
 
   beforeEach(() => {
-    return MockBuilder(AdminNoteDisplayComponent, AppModule)
+    return MockBuilder(AdminNoteDisplayComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getResourceAdminNotes: jest.fn().mockReturnValue(of([mockAdminNote])),

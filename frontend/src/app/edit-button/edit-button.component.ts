@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {User} from '@models/user';
 
 @Component({
+  standalone: true,
   selector: 'app-edit-button',
   templateUrl: './edit-button.component.html',
   styleUrls: ['./edit-button.component.scss'],

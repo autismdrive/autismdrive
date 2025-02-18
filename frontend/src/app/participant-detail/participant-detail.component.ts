@@ -5,6 +5,7 @@ import {StepLog} from '@models/step_log';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-participant-detail',
   templateUrl: './participant-detail.component.html',
   styleUrls: ['./participant-detail.component.scss'],

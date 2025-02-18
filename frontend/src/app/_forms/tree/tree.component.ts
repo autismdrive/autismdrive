@@ -8,6 +8,7 @@ import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {of} from 'rxjs';
 
 @Component({
+  standalone: true,
   selector: 'app-tree',
   template: '',
 })

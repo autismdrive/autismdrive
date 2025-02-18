@@ -1,16 +1,18 @@
 import {Component, OnInit} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {FooterComponent} from '@app/footer/footer.component';
+import {HeaderComponent} from '@app/header/header.component';
 import {User} from '@models/user';
-import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
+  standalone: true,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  imports: [HeaderComponent, FooterComponent, RouterOutlet],
 })
 export class AppComponent implements OnInit {
   title = 'Autism DRIVE';
@@ -19,10 +21,8 @@ export class AppComponent implements OnInit {
 
   public constructor(
     private authenticationService: AuthenticationService,
-    private api: ApiService,
     private router: Router,
     private googleAnalyticsService: GoogleAnalyticsService,
-    private configService: ConfigService,
     private meta: Meta,
     private route: ActivatedRoute,
   ) {

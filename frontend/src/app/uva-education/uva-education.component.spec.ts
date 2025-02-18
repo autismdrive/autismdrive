@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockResource} from '@util/testing/fixtures/mock-resource';
 import {mockUser} from '@util/testing/fixtures/mock-user';
@@ -13,7 +12,7 @@ describe('UvaEducationComponent', () => {
   let fixture: MockedComponentFixture<UvaEducationComponent>;
 
   beforeEach(() => {
-    return MockBuilder(UvaEducationComponent, AppModule)
+    return MockBuilder(UvaEducationComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getEducationResources: jest.fn().mockReturnValue(of([mockResource])),

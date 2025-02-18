@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {User} from '@models/user';
 
 @Component({
+  standalone: true,
   selector: 'app-add-button',
   templateUrl: './add-button.component.html',
   styleUrls: ['./add-button.component.scss'],

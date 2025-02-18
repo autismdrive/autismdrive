@@ -27,7 +27,7 @@
     fxLayoutAlign="start center"
     id="menu-bar"
     [ngStyle]="onHomeScreen() ? {} : {top: 0}"
-    [ngStyle.lt-md]="{top: 0, minHeight: '64px'}"
+    ngStyle.lt-md="top: 0, minHeight: '64px'"
   >
     <app-logo variant="light"></app-logo>
     <span fxFlex></span>

@@ -4,6 +4,7 @@ import {FormlyFieldConfig} from '@ngx-formly/core';
 import {FieldType} from '@ngx-formly/material';
 
 @Component({
+  standalone: true,
   selector: 'app-resize-textarea',
   template: `
     <textarea

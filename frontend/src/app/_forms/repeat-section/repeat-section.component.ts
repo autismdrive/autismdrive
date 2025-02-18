@@ -4,6 +4,7 @@ import {FieldArrayType, FormlyFieldConfig} from '@ngx-formly/core';
 import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-section-dialog.component';
 
 @Component({
+  standalone: true,
   selector: 'app-repeat-section',
   templateUrl: './repeat-section.component.html',
   styleUrls: ['./repeat-section.component.scss'],

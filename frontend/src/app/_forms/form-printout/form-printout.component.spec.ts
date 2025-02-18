@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FormPrintoutComponent} from './form-printout.component';
 import {FormlyModule} from '@ngx-formly/core';
@@ -8,7 +7,7 @@ describe('FormPrintoutComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(FormPrintoutComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS).keep(FormlyModule);
+    return MockBuilder(FormPrintoutComponent).keep(NG_MOCKS_ROOT_PROVIDERS).keep(FormlyModule);
   });
 
   beforeEach(() => {

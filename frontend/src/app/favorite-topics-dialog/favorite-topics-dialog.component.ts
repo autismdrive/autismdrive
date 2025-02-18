@@ -11,6 +11,7 @@ import {ApiService} from '@services/api/api.service';
 import {TreeComponent} from '@app/_forms/tree/tree.component';
 
 @Component({
+  standalone: true,
   selector: 'app-favorite-topics-dialog',
   templateUrl: './favorite-topics-dialog.component.html',
   styleUrls: ['./favorite-topics-dialog.component.scss'],

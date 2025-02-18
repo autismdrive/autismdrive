@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockUser} from '@util/testing/fixtures/mock-user';
@@ -11,7 +10,7 @@ describe('EmailLogAdminComponent', () => {
   let fixture: MockedComponentFixture<EmailLogAdminComponent>;
 
   beforeEach(() => {
-    return MockBuilder(EmailLogAdminComponent, AppModule)
+    return MockBuilder(EmailLogAdminComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(AuthenticationService, {currentUser: of(mockUser)})
       .mock(ApiService, {getAllEmailLog: jest.fn().mockReturnValue(of([]))});

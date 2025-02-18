@@ -1,5 +1,4 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AppModule} from '@app/app.module';
 import {mockFlowCompleteRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockFlow} from '@util/testing/fixtures/mock-flow';
 import {MockComponent} from '@util/testing/fixtures/mock.component';
@@ -11,7 +10,7 @@ describe('FlowCompleteComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(FlowCompleteComponent, AppModule)
+    return MockBuilder(FlowCompleteComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(
         RouterModule.forRoot([

@@ -1,6 +1,5 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {CategoriesService} from '@services/categories/categories.service';
@@ -15,7 +14,7 @@ describe('SearchBoxComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(SearchBoxComponent, AppModule)
+    return MockBuilder(SearchBoxComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(MaterialModule)
       .keep(FormsModule)

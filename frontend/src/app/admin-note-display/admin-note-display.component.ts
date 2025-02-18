@@ -7,6 +7,7 @@ import {User} from '@models/user';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-admin-note-display',
   templateUrl: './admin-note-display.component.html',
   styleUrls: ['./admin-note-display.component.scss'],

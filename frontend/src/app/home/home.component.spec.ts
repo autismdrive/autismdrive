@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {ConfigService} from '@services/config/config.service';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
@@ -12,7 +11,7 @@ describe('HomeComponent', () => {
   let fixture: MockedComponentFixture<HomeComponent>;
 
   beforeEach(() => {
-    return MockBuilder(HomeComponent, AppModule)
+    return MockBuilder(HomeComponent)
       .keep(RouterModule)
       .mock(ConfigService)
       .keep(NG_MOCKS_ROOT_PROVIDERS)

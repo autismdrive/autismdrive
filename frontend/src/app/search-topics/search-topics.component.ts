@@ -3,6 +3,7 @@ import {CategoriesById, Category} from '@models/category';
 import {CategoriesService} from '@services/categories/categories.service';
 
 @Component({
+  standalone: true,
   selector: 'app-search-topics',
   templateUrl: './search-topics.component.html',
   styleUrls: ['./search-topics.component.scss'],

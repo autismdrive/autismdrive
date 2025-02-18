@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {StudySurveyEntryComponent} from './study-survey-entry.component';
 
@@ -7,7 +6,7 @@ describe('StudySurveyEntryComponent', () => {
   let fixture: MockedComponentFixture<StudySurveyEntryComponent>;
 
   beforeEach(() => {
-    return MockBuilder(StudySurveyEntryComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(StudySurveyEntryComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

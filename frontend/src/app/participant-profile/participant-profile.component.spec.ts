@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {mockParticipant} from '@util/testing/fixtures/mock-participant';
@@ -14,7 +13,7 @@ describe('ParticipantProfileComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(ParticipantProfileComponent, AppModule)
+    return MockBuilder(ParticipantProfileComponent)
       .keep(MaterialModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {})

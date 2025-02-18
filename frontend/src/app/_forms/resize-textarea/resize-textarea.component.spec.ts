@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {createFieldComponent} from '@ngx-formly/core/testing';
 
 describe('ResizeTextareaComponent', () => {
@@ -14,9 +13,7 @@ describe('ResizeTextareaComponent', () => {
           rows: 20,
         },
       },
-      {
-        imports: [AppModule],
-      },
+      {},
     );
 
     expect(query('app-resize-textarea')).not.toBeNull();

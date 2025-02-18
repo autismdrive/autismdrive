@@ -1,7 +1,6 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
 import {AuthenticationService} from '@app/_services/authentication/authentication-service';
-import {AppModule} from '@app/app.module';
 import {mockStudyUser} from '@src/util/testing/fixtures/mock-study-user';
 import {mockProfileRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockFlow} from '@util/testing/fixtures/mock-flow';
@@ -17,7 +16,7 @@ describe('ProfileComponent', () => {
 
   beforeEach(() => {
     // @ts-ignore
-    return MockBuilder(ProfileComponent, AppModule)
+    return MockBuilder(ProfileComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(RouterModule)
       .mock(AuthenticationService, {currentUser: of(mockUser)})

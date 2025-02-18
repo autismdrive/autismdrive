@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Flow} from '@models/flow';
 
 @Component({
+  standalone: true,
   selector: 'app-flow-intro',
   templateUrl: './flow-intro.component.html',
   styleUrls: ['./flow-intro.component.scss'],

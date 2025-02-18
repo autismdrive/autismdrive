@@ -3,6 +3,7 @@ import {Meta} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 
 @Component({
+  standalone: true,
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss'],

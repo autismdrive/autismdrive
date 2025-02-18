@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
@@ -14,7 +13,7 @@ describe('FavoriteTopicsComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(FavoriteTopicsComponent, AppModule)
+    return MockBuilder(FavoriteTopicsComponent)
       .keep(MaterialModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {

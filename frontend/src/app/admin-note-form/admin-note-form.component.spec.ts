@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {AdminNote} from '@models/admin_note';
 import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
@@ -11,7 +10,7 @@ describe('AdminNoteFormComponent', () => {
   let fixture: MockedComponentFixture<AdminNoteFormComponent>;
 
   beforeEach(() => {
-    return MockBuilder(AdminNoteFormComponent, AppModule)
+    return MockBuilder(AdminNoteFormComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(MaterialModule)
       .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})

@@ -1,13 +1,10 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {load} from '@app/app.module';
-import {AppEnvironment} from '@models/environment';
-import {ApiService} from '@services/api/api.service';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import {StarError} from '../../star-error';
 import {User} from '@models/user';
 import {ConfigService} from '@services/config/config.service';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
+import {StarError} from '@app/star-error';
 import {GoogleAnalyticsService} from '../google-analytics/google-analytics.service';
 
 @Injectable({providedIn: 'root'})

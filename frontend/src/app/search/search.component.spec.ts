@@ -1,7 +1,6 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {faker} from '@faker-js/faker';
 import {GeoLocation} from '@models/geolocation';
@@ -28,7 +27,7 @@ describe('SearchComponent', () => {
   });
 
   beforeEach(() => {
-    return MockBuilder(SearchComponent, AppModule)
+    return MockBuilder(SearchComponent)
       .keep(FormsModule)
       .keep(MaterialModule)
       .keep(ReactiveFormsModule)

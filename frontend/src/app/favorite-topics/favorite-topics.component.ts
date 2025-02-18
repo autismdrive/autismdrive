@@ -8,6 +8,7 @@ import {UserFavorite} from '@models/user_favorite';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-favorite-topics',
   templateUrl: './favorite-topics.component.html',
   styleUrls: ['./favorite-topics.component.scss'],

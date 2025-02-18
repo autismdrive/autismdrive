@@ -7,6 +7,7 @@ import {scrollToFirstInvalidField} from '@util/scrollToTop';
 import {RepeatSectionDialogData} from '@models/repeat_section_dialog_data';
 
 @Component({
+  standalone: true,
   selector: 'app-repeat-section-dialog',
   templateUrl: './repeat-section-dialog.component.html',
   styleUrls: ['./repeat-section-dialog.component.scss'],

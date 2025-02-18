@@ -3,6 +3,7 @@ import {ChainStep} from '@models/chain_step';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-skillstar-admin',
   templateUrl: './skillstar-admin.component.html',
   styleUrls: ['./skillstar-admin.component.scss'],

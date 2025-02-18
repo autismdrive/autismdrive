@@ -4,6 +4,7 @@ import {AdminNote} from '@models/admin_note';
 import {AdminNoteDisplayComponent} from '../admin-note-display/admin-note-display.component';
 
 @Component({
+  standalone: true,
   selector: 'app-admin-note-form',
   templateUrl: './admin-note-form.component.html',
   styleUrls: ['./admin-note-form.component.scss'],

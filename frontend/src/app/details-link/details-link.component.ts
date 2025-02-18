@@ -1,9 +1,13 @@
+import {NgClass, NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {RouterLink} from '@angular/router';
 
 @Component({
+  standalone: true,
   selector: 'app-details-link',
   templateUrl: './details-link.component.html',
   styleUrls: ['./details-link.component.scss'],
+  imports: [NgClass, NgIf, RouterLink],
 })
 export class DetailsLinkComponent {
   @Input() url: string;

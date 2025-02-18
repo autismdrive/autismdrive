@@ -9,6 +9,7 @@ import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-taxonomy-admin',
   templateUrl: './taxonomy-admin.component.html',
   styleUrls: ['./taxonomy-admin.component.scss'],

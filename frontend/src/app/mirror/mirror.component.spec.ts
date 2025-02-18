@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {MirrorComponent} from './mirror.component';
 
@@ -7,7 +6,7 @@ describe('MirrorComponent', () => {
   let fixture: MockedComponentFixture<MirrorComponent>;
 
   beforeEach(() => {
-    return MockBuilder(MirrorComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(MirrorComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

@@ -4,6 +4,7 @@ import {UserFavorite} from '@models/user_favorite';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-favorite-resource-button',
   templateUrl: './favorite-resource-button.component.html',
   styleUrls: ['./favorite-resource-button.component.scss'],

@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FavoriteResourceButtonComponent} from './favorite-resource-button.component';
 
@@ -7,7 +6,7 @@ describe('FavoriteButtonComponent', () => {
   let fixture: MockedComponentFixture<FavoriteResourceButtonComponent>;
 
   beforeEach(() => {
-    return MockBuilder(FavoriteResourceButtonComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(FavoriteResourceButtonComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

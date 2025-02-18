@@ -3,6 +3,7 @@ import {NewsItem} from '@models/news-item';
 import {IntervalService} from '@services/interval/interval.service';
 
 @Component({
+  standalone: true,
   selector: 'app-hero-slides',
   templateUrl: './hero-slides.component.html',
   styleUrls: ['./hero-slides.component.scss'],

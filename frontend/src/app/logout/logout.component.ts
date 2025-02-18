@@ -4,6 +4,7 @@ import {fadeTransition} from '@animations/animations';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-logout',
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.scss'],

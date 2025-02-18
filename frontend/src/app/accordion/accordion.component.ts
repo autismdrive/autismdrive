@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {AccordionItem} from '@models/accordion-item';
 
 @Component({
+  standalone: true,
   selector: 'app-accordion',
   templateUrl: './accordion.component.html',
   styleUrls: ['./accordion.component.scss'],

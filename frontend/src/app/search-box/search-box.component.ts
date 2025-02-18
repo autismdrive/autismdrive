@@ -17,6 +17,7 @@ import {CategoriesService} from '@services/categories/categories.service';
 import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, timer} from 'rxjs';
 
 @Component({
+  standalone: true,
   selector: 'app-search-box',
   templateUrl: './search-box.component.html',
   styleUrls: ['./search-box.component.scss'],

@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {ContactItem} from '@models/contact_item';
 
 @Component({
+  standalone: true,
   selector: 'app-contact-item',
   templateUrl: './contact-item.component.html',
   styleUrls: ['./contact-item.component.scss'],

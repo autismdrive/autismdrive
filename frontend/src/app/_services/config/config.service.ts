@@ -1,7 +1,5 @@
-import {User} from '@models/user';
-import {GoogleModuleOptions} from '@ng-maps/google';
 import {Injectable} from '@angular/core';
-import {GoogleMapsScriptProtocol} from '@ng-maps/google/lib/options';
+import {GoogleModuleOptions} from '@ng-maps/google';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 export interface ConfigServiceProps {

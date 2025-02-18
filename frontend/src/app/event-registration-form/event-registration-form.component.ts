@@ -11,6 +11,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
 import {EventRegistrationComponent} from '../event-registration/event-registration.component';
 
 @Component({
+  standalone: true,
   selector: 'app-event-registration-form',
   templateUrl: './event-registration-form.component.html',
   styleUrls: ['./event-registration-form.component.scss'],

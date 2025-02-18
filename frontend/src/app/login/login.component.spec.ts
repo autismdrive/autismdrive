@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {mockUser} from '@util/testing/fixtures/mock-user';
@@ -15,7 +14,7 @@ describe('LoginComponent', () => {
   let fixture: MockedComponentFixture<LoginComponent>;
 
   beforeEach(() => {
-    return MockBuilder(LoginComponent, AppModule)
+    return MockBuilder(LoginComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(AuthenticationService, {currentUser: of(mockUser)})
       .keep(MaterialModule)

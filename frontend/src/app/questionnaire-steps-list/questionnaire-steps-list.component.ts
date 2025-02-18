@@ -4,6 +4,7 @@ import {Step} from '@models/step';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-questionnaire-steps-list',
   templateUrl: './questionnaire-steps-list.component.html',
   styleUrls: ['./questionnaire-steps-list.component.scss'],

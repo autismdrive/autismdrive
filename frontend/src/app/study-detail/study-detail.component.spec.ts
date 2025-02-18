@@ -1,7 +1,6 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockActivatedRouteWithStudyId} from '@util/testing/fixtures/mock-activated-route';
@@ -18,7 +17,7 @@ describe('StudyDetailComponent', () => {
   let fixture: MockedComponentFixture<StudyDetailComponent>;
 
   beforeEach(() => {
-    return MockBuilder(StudyDetailComponent, AppModule)
+    return MockBuilder(StudyDetailComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(RouterModule)
       .keep(MaterialModule)

@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MaterialModule} from '@app/material/material.module';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -10,7 +9,7 @@ describe('CategoryChipsComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(FilterChipsComponent, AppModule)
+    return MockBuilder(FilterChipsComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(MaterialModule)
       .keep(RouterModule)

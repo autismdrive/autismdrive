@@ -6,6 +6,7 @@ import {ApiService} from '@services/api/api.service';
 import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
 @Component({
+  standalone: true,
   selector: 'app-avatar-dialog',
   templateUrl: './avatar-dialog.component.html',
   styleUrls: ['./avatar-dialog.component.scss'],

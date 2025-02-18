@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {mockInvestigator} from '@util/testing/fixtures/mock-investigator';
@@ -16,7 +15,7 @@ describe('StudyFormComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(StudyFormComponent, AppModule)
+    return MockBuilder(StudyFormComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getInvestigators: jest.fn().mockReturnValue(of([mockInvestigator])),

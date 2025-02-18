@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
@@ -14,7 +13,7 @@ describe('RegisterDialogComponent', () => {
   let fixture: MockedComponentFixture<RegisterDialogComponent>;
 
   beforeEach(() => {
-    return MockBuilder(RegisterDialogComponent, AppModule)
+    return MockBuilder(RegisterDialogComponent)
       .keep(RouterModule)
       .keep(ActivatedRoute)
       .keep(NG_MOCKS_ROOT_PROVIDERS)

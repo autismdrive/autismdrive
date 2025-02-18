@@ -12,6 +12,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
  * In some cases this may be as far as a user can go.
  */
 @Component({
+  standalone: true,
   selector: 'app-profile-meta',
   templateUrl: './profile_meta.component.html',
   styleUrls: ['./profile_meta.component.scss'],

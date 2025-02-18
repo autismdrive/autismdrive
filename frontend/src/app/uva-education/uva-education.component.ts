@@ -8,6 +8,7 @@ import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-uva-education',
   templateUrl: './uva-education.component.html',
   styleUrls: ['./uva-education.component.scss'],

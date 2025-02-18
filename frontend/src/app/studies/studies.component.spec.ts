@@ -1,5 +1,4 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AppModule} from '@app/app.module';
 import {StudyStatus} from '@models/study';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -16,7 +15,7 @@ describe('StudiesComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(StudiesComponent, AppModule)
+    return MockBuilder(StudiesComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(RouterModule)
       .keep(Meta)

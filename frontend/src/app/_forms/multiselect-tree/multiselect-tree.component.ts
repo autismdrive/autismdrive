@@ -5,6 +5,7 @@ import {Category} from '@models/category';
 import {Observable} from 'rxjs';
 
 @Component({
+  standalone: true,
   selector: 'app-multiselect-tree',
   templateUrl: './multiselect-tree.component.html',
   styleUrls: ['./multiselect-tree.component.scss'],

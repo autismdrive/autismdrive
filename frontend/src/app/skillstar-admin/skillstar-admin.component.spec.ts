@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {mockChainStep} from '@util/testing/fixtures/mock-chain-step';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -10,7 +9,7 @@ describe('SkillstarAdminComponent', () => {
   let fixture: MockedComponentFixture<SkillstarAdminComponent>;
 
   beforeEach(() => {
-    return MockBuilder(SkillstarAdminComponent, AppModule)
+    return MockBuilder(SkillstarAdminComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getChainStepsList: jest.fn().mockReturnValue(of([mockChainStep])),

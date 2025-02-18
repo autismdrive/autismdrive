@@ -6,6 +6,7 @@ import {ParticipantAdminList} from '@models/participant_admin_list';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-participant-admin',
   templateUrl: './participant-admin.component.html',
   styleUrls: ['./participant-admin.component.scss'],

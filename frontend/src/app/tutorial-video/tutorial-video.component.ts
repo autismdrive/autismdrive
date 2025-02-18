@@ -3,6 +3,7 @@ import {Component, Input} from '@angular/core';
 import {NavItem} from '@models/nav-item';
 
 @Component({
+  standalone: true,
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
   styleUrls: ['./tutorial-video.component.scss'],

@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {SortMethod} from '@models/sort_method';
 
 @Component({
+  standalone: true,
   selector: 'app-search-sort',
   templateUrl: './search-sort.component.html',
   styleUrls: ['./search-sort.component.scss'],

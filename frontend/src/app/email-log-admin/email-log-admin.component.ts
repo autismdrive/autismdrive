@@ -8,6 +8,7 @@ import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-email-log-admin',
   templateUrl: './email-log-admin.component.html',
   styleUrls: ['./email-log-admin.component.scss'],

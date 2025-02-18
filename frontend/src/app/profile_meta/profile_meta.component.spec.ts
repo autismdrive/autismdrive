@@ -1,4 +1,3 @@
-import {AppModule} from '@app/app.module';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {ProfileMetaComponent} from './profile_meta.component';
 
@@ -7,7 +6,7 @@ describe('MetaComponent', () => {
   let fixture: MockedComponentFixture<ProfileMetaComponent>;
 
   beforeEach(() => {
-    return MockBuilder(ProfileMetaComponent, AppModule).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(ProfileMetaComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

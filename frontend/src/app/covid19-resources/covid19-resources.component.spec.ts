@@ -1,5 +1,4 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AppModule} from '@app/app.module';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockCovidRouteWithCategoryName} from '@util/testing/fixtures/mock-activated-route';
@@ -13,7 +12,7 @@ describe('Covid19ResourcesComponent', () => {
   let fixture: MockedComponentFixture<Covid19ResourcesComponent>;
 
   beforeEach(() => {
-    return MockBuilder(Covid19ResourcesComponent, AppModule)
+    return MockBuilder(Covid19ResourcesComponent)
       .keep(RouterModule.forRoot([{path: 'covid19-resources/:category', component: Covid19ResourcesComponent}]), {
         dependency: false,
       })
