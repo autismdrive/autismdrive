@@ -1,18 +1,33 @@
+import {AsyncPipe} from '@angular/common';
 import {Component, EventEmitter} from '@angular/core';
-import {FormGroup} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {scrollToTop} from '@util/scrollToTop';
-import {DeviceDetectorService} from 'ngx-device-detector';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {LogoComponent} from '@app/logo/logo.component';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {scrollToTop} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({
   standalone: true,
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  imports: [
+    LoadingComponent,
+    FlexModule,
+    LogoComponent,
+    ReactiveFormsModule,
+    FormlyModule,
+    MatButtonModule,
+    RouterModule,
+    AsyncPipe,
+  ],
 })
 export class LoginComponent {
   loading = false;

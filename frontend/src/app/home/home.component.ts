@@ -1,13 +1,14 @@
-import {NgForOf, NgClass} from '@angular/common';
+import {NgForOf} from '@angular/common';
 import {Component} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
-import {Router} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {BorderBoxTileComponent} from '@app/border-box-tile/border-box-tile.component';
 import {DetailsLinkComponent} from '@app/details-link/details-link.component';
 import {NewsItemComponent} from '@app/news-item/news-item.component';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
 import {Study} from '@models/study';
+import {DefaultShowHideDirective, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {ConfigService} from '@services/config/config.service';
 import {lastValueFrom} from 'rxjs';
@@ -17,7 +18,15 @@ import {lastValueFrom} from 'rxjs';
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  imports: [BorderBoxTileComponent, DetailsLinkComponent, NewsItemComponent, NgForOf, NgClass],
+  imports: [
+    BorderBoxTileComponent,
+    DetailsLinkComponent,
+    NewsItemComponent,
+    NgForOf,
+    FlexModule,
+    RouterModule,
+    DefaultShowHideDirective,
+  ],
 })
 export class HomeComponent {
   currentStudies: Study[];

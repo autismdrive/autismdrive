@@ -1,5 +1,12 @@
 import {MediaMatcher} from '@angular/cdk/layout';
+import {NgForOf} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {MatButtonModule, MatFabButton} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
+import {MatDrawerContainer, MatSidenavModule} from '@angular/material/sidenav';
+import {QuestionnaireDataTableComponent} from '@app/questionnaire-data-table/questionnaire-data-table.component';
+import {DefaultLayoutDirective, FlexModule} from '@ngbracket/ngx-layout';
 import {snakeToUpperCase} from '@util/snakeToUpper';
 import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
@@ -9,6 +16,15 @@ import {ApiService} from '@services/api/api.service';
   selector: 'app-questionnaire-data-view',
   templateUrl: './questionnaire-data-view.component.html',
   styleUrls: ['./questionnaire-data-view.component.scss'],
+  imports: [
+    FlexModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    NgForOf,
+    QuestionnaireDataTableComponent,
+  ],
 })
 export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   questionnaire_info: TableInfo[];

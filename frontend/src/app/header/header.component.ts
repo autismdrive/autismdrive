@@ -5,7 +5,7 @@ import {NgIf, NgClass, NgStyle} from '@angular/common';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
-import {Router, RouterLink} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';
 import {User} from '@models/user';
@@ -27,7 +27,7 @@ const easing = '500ms ease-in-out';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [LogoComponent, MatButtonModule, MatIconModule, MatToolbarModule, NgClass, NgIf, NgStyle, RouterLink],
+  imports: [LogoComponent, MatButtonModule, MatIconModule, MatToolbarModule, NgClass, NgIf, NgStyle, RouterModule],
   animations: [
     trigger('toggleMobileMenu', [
       state(stateHiddenCollapsed + '-' + ViewportWidth.Small, style({top: '-100vh'})),

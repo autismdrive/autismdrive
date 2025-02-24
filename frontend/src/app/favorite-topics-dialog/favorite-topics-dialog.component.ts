@@ -1,20 +1,45 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {NestedTreeControl} from '@angular/cdk/tree';
+import {NgForOf} from '@angular/common';
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
+import {MatBadge} from '@angular/material/badge';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
+import {MatOption, MatSelect} from '@angular/material/select';
+import {MatTreeModule} from '@angular/material/tree';
+import {TreeComponent} from '@app/_forms/tree/tree.component';
 import {Category} from '@models/category';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
 import {User} from '@models/user';
 import {ApiService} from '@services/api/api.service';
-import {TreeComponent} from '@app/_forms/tree/tree.component';
+import {Observable} from 'rxjs';
+import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
+
+interface TopicOption {
+  value: string;
+  label: string;
+}
 
 @Component({
   standalone: true,
   selector: 'app-favorite-topics-dialog',
   templateUrl: './favorite-topics-dialog.component.html',
   styleUrls: ['./favorite-topics-dialog.component.scss'],
+  imports: [
+    MatBadge,
+    MatButtonModule,
+    MatCheckbox,
+    MatDialogModule,
+    MatFormField,
+    MatIcon,
+    MatLabel,
+    MatOption,
+    MatSelect,
+    MatTreeModule,
+    NgForOf,
+  ],
 })
 export class FavoriteTopicsDialogComponent extends TreeComponent implements OnInit {
   ageLabels = AgeRange.labels;
@@ -23,8 +48,6 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
   ageOptions = this.getOptions(this.ageLabels);
   languageOptions = this.getOptions(this.languageLabels);
   covid19Options = this.getOptions(this.covid19Labels);
-
-  nodes = {};
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
@@ -51,14 +74,8 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
     });
   }
 
-  getOptions(modelLabels) {
-    const opts = [];
-    for (const key in modelLabels) {
-      if (modelLabels.hasOwnProperty(key)) {
-        opts.push({value: key, label: modelLabels[key]});
-      }
-    }
-    return opts;
+  getOptions(modelLabels: {[key: string]: string}): TopicOption[] {
+    return Object.entries(modelLabels).map(([key, label]) => ({value: key, label: label}));
   }
 
   updateTopicSelection() {
@@ -82,6 +99,10 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
   hasNestedChild = (_: number, node: Category) => {
     return node.children && node.children.length > 0;
   };
+
+  getChildren(node: Category): Category[] | Observable<Category[]> {
+    return node.children;
+  }
 
   numSelectedDescendants(node: Category): number {
     const descendants: Category[] = this.treeControl.getDescendants(node);

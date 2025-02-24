@@ -1,11 +1,5 @@
 import {CommonModule, DatePipe} from '@angular/common';
-import {
-  HTTP_INTERCEPTORS,
-  HttpClient,
-  provideHttpClient,
-  withInterceptors,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import {HttpClient, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {enableProdMode, importProvidersFrom, inject, provideAppInitializer} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
@@ -22,8 +16,8 @@ import {FlexLayoutModule} from '@ngbracket/ngx-layout';
 import {FormlyModule} from '@ngx-formly/core';
 import {FormlyMaterialModule} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
-import {ErrorInterceptor} from '@routing/error-interceptor';
-import {JwtInterceptor} from '@routing/jwt-interceptor';
+import {errorInterceptor} from '@routing/error-interceptor';
+import {jwtInterceptor} from '@routing/jwt-interceptor';
 import {RoutingModule} from '@routing/routing.module';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -80,7 +74,7 @@ bootstrapApplication(AppComponent, {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: {appearance: 'outline'},
     },
-    provideHttpClient(withInterceptors([ErrorInterceptor, JwtInterceptor])),
+    provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor])),
     provideAnimations(),
   ],
 }).catch(err => console.error(err));

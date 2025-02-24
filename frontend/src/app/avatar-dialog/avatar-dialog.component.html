@@ -4,7 +4,9 @@
 
     <div fxLayout="column" fxLayoutAlign="center center">
       <div class="avatar" [ngStyle]="{'background-color': selectedColor || data.participant.avatar_color}">
-        <img src="/assets/avatars/{{ selectedIcon || data.participant.avatar_icon }}.svg" />
+        <img [ngSrc]="'/assets/avatars/' + selectedIcon || data.participant.avatar_icon + '.svg'"
+             alt="{{data.participant.name}}"
+             width="192" height="192" placeholder />
       </div>
     </div>
     <p>Pick an image</p>
@@ -15,12 +17,12 @@
       </button>
       <div class="avatar-images">
         <button
-          *ngFor="let avatarImage of avatarImages"
+          *ngFor="let avatarImage of avatarImages; let i = index"
           class="avatar-image"
           (click)="setImage(avatarImage)"
           [ngClass]="{'avatar-image-active': isSelectedImage(avatarImage)}"
         >
-          <img src="/assets/avatars/{{ avatarImage }}.svg" />
+          <img alt="#{{i}}" ngSrc="/assets/avatars/{{ avatarImage }}.svg" width="96" height="96" placeholder />
         </button>
       </div>
       <button mat-button class="scroll-right" (click)="scroll($event, 'avatar-images', 'right')">

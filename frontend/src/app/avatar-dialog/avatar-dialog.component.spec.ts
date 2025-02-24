@@ -1,12 +1,10 @@
-import {MaterialModule} from '@app/material/material.module';
-import {Participant} from '@models/participant';
-import {ApiService} from '@services/api/api.service';
-import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {AvatarDialogComponent} from './avatar-dialog.component';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MaterialModule} from '@app/material/material.module';
+import {ApiService} from '@services/api/api.service';
+import {mockParticipant} from '@util/testing/fixtures/mock-participant';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
-import {mockParticipant} from '@src/util/testing/fixtures/mock-participant';
+import {AvatarDialogComponent} from './avatar-dialog.component';
 
 describe('AvatarDialogComponent', () => {
   let component: AvatarDialogComponent;

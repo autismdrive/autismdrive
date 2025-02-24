@@ -1,13 +1,17 @@
+import {NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
-import {Router} from '@angular/router';
+import {MatButton} from '@angular/material/button';
+import {Router, RouterModule} from '@angular/router';
 import {Flow} from '@models/flow';
 import {ParticipantRelationship} from '@models/participantRelationship';
+import {FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
   standalone: true,
   selector: 'app-flow-complete',
   templateUrl: './flow-complete.component.html',
   styleUrls: ['./flow-complete.component.scss'],
+  imports: [NgIf, MatButton, FlexModule, RouterModule],
 })
 export class FlowCompleteComponent {
   @Input()

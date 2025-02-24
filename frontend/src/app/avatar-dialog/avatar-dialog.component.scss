@@ -6,6 +6,7 @@ $white-1: rgb(255 255 255 / 100%);
 $white-0: rgb(255 255 255 / 0%);
 
 .avatar {
+  position: relative;
   height: ($avatar-image-height * 2);
   width: ($avatar-image-height * 2);
   border-radius: 50%;

@@ -9,10 +9,8 @@
       "@environments/*": ["src/environments/*"],
       "@forms/*": ["src/app/_forms/*"],
       "@models/*": ["src/app/_models/*"],
-      "@node_modules/*": ["node_modules/*"],
       "@routing/*": ["src/app/_routing/*"],
       "@services/*": ["src/app/_services/*"],
-      "@src/*": ["src/*"],
       "@util/*": ["src/util/*"]
     },
     "declaration": false,

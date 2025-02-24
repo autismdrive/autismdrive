@@ -1,7 +1,10 @@
+import {NgClass, NgForOf, NgIf, NgOptimizedImage, NgStyle} from '@angular/common';
 import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatButtonModule} from '@angular/material/button';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
@@ -10,6 +13,7 @@ import {ParticipantProfileComponent} from '../participant-profile/participant-pr
   selector: 'app-avatar-dialog',
   templateUrl: './avatar-dialog.component.html',
   styleUrls: ['./avatar-dialog.component.scss'],
+  imports: [MatDialogModule, FlexModule, NgStyle, NgIf, MatButtonModule, NgClass, NgForOf, NgOptimizedImage],
 })
 export class AvatarDialogComponent {
   avatarImages: string[] = [];

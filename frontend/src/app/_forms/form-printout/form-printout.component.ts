@@ -1,3 +1,4 @@
+import {NgForOf, NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {FormlyFieldConfig} from '@ngx-formly/core';
 
@@ -11,6 +12,7 @@ interface SelectFieldOption {
   selector: 'app-form-printout',
   templateUrl: './form-printout.component.html',
   styleUrls: ['./form-printout.component.scss'],
+  imports: [NgIf, NgForOf],
 })
 export class FormPrintoutComponent {
   @Input() field: FormlyFieldConfig;

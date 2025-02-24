@@ -1,14 +1,18 @@
+import {NgIf} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {DeviceDetectorService} from 'ngx-device-detector';
-import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {AgeRange, Language} from '@models/hit_type';
 import {Study} from '@models/study';
 import {StudyCategory} from '@models/study_category';
 import {StudyInvestigator} from '@models/study_investigator';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
+import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {
   LOADING = 'loading',
@@ -16,10 +20,11 @@ enum PageState {
 }
 
 @Component({
-  standalone: true,
+  imports: [LoadingComponent, NgIf, FormlyModule, MatButtonModule, FlexModule, ReactiveFormsModule],
   selector: 'app-study-form',
-  templateUrl: './study-form.component.html',
+  standalone: true,
   styleUrls: ['./study-form.component.scss'],
+  templateUrl: './study-form.component.html',
 })
 export class StudyFormComponent implements OnInit {
   study: Study;

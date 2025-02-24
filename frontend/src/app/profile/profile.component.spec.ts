@@ -1,7 +1,7 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
 import {AuthenticationService} from '@app/_services/authentication/authentication-service';
-import {mockStudyUser} from '@src/util/testing/fixtures/mock-study-user';
+import {mockStudyUser} from '@util/testing/fixtures/mock-study-user';
 import {mockProfileRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockFlow} from '@util/testing/fixtures/mock-flow';
 import {mockStudy} from '@util/testing/fixtures/mock-study';

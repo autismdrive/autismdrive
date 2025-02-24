@@ -1,7 +1,17 @@
+import {NgIf} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatLineModule} from '@angular/material/core';
+import {MatListModule} from '@angular/material/list';
+import {MatTabsModule} from '@angular/material/tabs';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
+import {FavoriteResourcesComponent} from '@app/favorite-resources/favorite-resources.component';
+import {FavoriteTopicsComponent} from '@app/favorite-topics/favorite-topics.component';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {ParticipantProfileComponent} from '@app/participant-profile/participant-profile.component';
+import {ProfileMetaComponent} from '@app/profile_meta/profile_meta.component';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {Resource} from '@models/resource';
@@ -9,6 +19,8 @@ import {Study} from '@models/study';
 import {StudyUser} from '@models/study_user';
 import {User} from '@models/user';
 import {UserMeta} from '@models/user_meta';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
@@ -24,6 +36,22 @@ enum ProfileState {
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
+  imports: [
+    FavoriteResourcesComponent,
+    FavoriteTopicsComponent,
+    FlexModule,
+    FormlyModule,
+    LoadingComponent,
+    MatButtonModule,
+    MatCardModule,
+    MatLineModule,
+    MatListModule,
+    MatTabsModule,
+    NgIf,
+    ParticipantProfileComponent,
+    ProfileMetaComponent,
+    ReactiveFormsModule,
+  ],
 })
 export class ProfileComponent implements OnInit {
   user: User;
@@ -45,14 +73,12 @@ export class ProfileComponent implements OnInit {
     {
       validators: {
         fieldMatch: {
-          expression: control => {
+          expression: (control: AbstractControl) => {
             const {self_participant, guardian, professional, interested} = control.value;
 
             // at least one checkbox should be selected.
-            if (!self_participant && !guardian && !professional && !interested) {
-              return false;
-            }
-            return true;
+            return !(!self_participant && !guardian && !professional && !interested);
+
           },
           message: 'Please select at least one option.',
         },

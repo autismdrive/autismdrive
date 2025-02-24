@@ -1,9 +1,14 @@
+import {NgStyle, TitleCasePipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCard, MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
+import {MatProgressBar, MatProgressBarModule} from '@angular/material/progress-bar';
 import {Router} from '@angular/router';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
 
@@ -12,6 +17,7 @@ import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
   selector: 'app-participant-profile',
   templateUrl: './participant-profile.component.html',
   styleUrls: ['./participant-profile.component.scss'],
+  imports: [MatCardModule, NgStyle, MatProgressBarModule, TitleCasePipe, FlexModule, MatButtonModule],
 })
 export class ParticipantProfileComponent {
   @Input() participant: Participant;

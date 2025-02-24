@@ -1,8 +1,11 @@
+import {NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
-import {Router} from '@angular/router';
+import {MatButtonModule} from '@angular/material/button';
+import {Router, RouterModule} from '@angular/router';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {User} from '@models/user';
 import {UserMeta} from '@models/user_meta';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
@@ -16,6 +19,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-profile-meta',
   templateUrl: './profile_meta.component.html',
   styleUrls: ['./profile_meta.component.scss'],
+  imports: [FlexModule, NgIf, MatButtonModule, RouterModule],
 })
 export class ProfileMetaComponent {
   @Input()

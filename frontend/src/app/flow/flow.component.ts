@@ -1,19 +1,28 @@
 import {MediaMatcher} from '@angular/cdk/layout';
+import {NgClass, NgIf} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
-import {AbstractControl, FormGroup} from '@angular/forms';
-import {MatDrawer} from '@angular/material/sidenav';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {scrollToFirstInvalidField, scrollToTop} from '@util/scrollToTop';
-import {keysToCamel} from '@util/snakeToCamel';
-import {DeviceDetectorService} from 'ngx-device-detector';
+import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatDrawer, MatSidenavModule} from '@angular/material/sidenav';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {FlowCompleteComponent} from '@app/flow-complete/flow-complete.component';
+import {FlowIntroComponent} from '@app/flow-intro/flow-intro.component';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {QuestionnaireStepsListComponent} from '@app/questionnaire-steps-list/questionnaire-steps-list.component';
 import {Flow} from '@models/flow';
 import {Participant} from '@models/participant';
 import {Step, StepStatus} from '@models/step';
 import {User} from '@models/user';
+import {DefaultShowHideDirective, FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {scrollToFirstInvalidField, scrollToTop} from '@util/scrollToTop';
+import {keysToCamel} from '@util/snakeToCamel';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum FlowState {
   INTRO = 'intro',
@@ -23,10 +32,27 @@ enum FlowState {
 }
 
 @Component({
-  standalone: true,
+  imports: [
+    DefaultShowHideDirective,
+    FlexModule,
+    FlowCompleteComponent,
+    FlowIntroComponent,
+    FormlyModule,
+    LoadingComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBar,
+    MatSidenavModule,
+    NgClass,
+    NgIf,
+    QuestionnaireStepsListComponent,
+    ReactiveFormsModule,
+    RouterModule,
+  ],
   selector: 'app-flow',
-  templateUrl: './flow.component.html',
+  standalone: true,
   styleUrls: ['./flow.component.scss'],
+  templateUrl: './flow.component.html',
 })
 export class FlowComponent implements OnDestroy {
   mobileQuery: MediaQueryList;

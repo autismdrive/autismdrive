@@ -1,7 +1,10 @@
+import {NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
 import {Resource} from '@models/resource';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 
 @Component({
@@ -9,6 +12,7 @@ import {EventRegistrationFormComponent} from '../event-registration-form/event-r
   selector: 'app-event-registration',
   templateUrl: './event-registration.component.html',
   styleUrls: ['./event-registration.component.scss'],
+  imports: [FlexModule, MatButtonModule, NgIf],
 })
 export class EventRegistrationComponent {
   @Input() resource: Resource;

@@ -1,20 +1,24 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
-import {FormGroup} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {scrollToTop} from '@util/scrollToTop';
-import {DeviceDetectorService} from 'ngx-device-detector';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {LogoComponent} from '@app/logo/logo.component';
 import {PasswordRequirements} from '@models/password_requirements';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {scrollToTop} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({
   standalone: true,
   selector: 'app-password-reset',
   templateUrl: './password-reset.component.html',
   styleUrls: ['./password-reset.component.scss'],
+  imports: [FlexModule, LogoComponent, FormlyModule, MatButtonModule, RouterModule, ReactiveFormsModule],
 })
 export class PasswordResetComponent {
   token: string;

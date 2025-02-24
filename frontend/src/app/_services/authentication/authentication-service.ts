@@ -4,7 +4,7 @@ import {User} from '@models/user';
 import {ConfigService} from '@services/config/config.service';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {StarError} from '@app/star-error';
+import {ApiError} from '@app/api-error';
 import {GoogleAnalyticsService} from '../google-analytics/google-analytics.service';
 
 @Injectable({providedIn: 'root'})
@@ -37,7 +37,7 @@ export class AuthenticationService {
     });
   }
 
-  private _handleError(error: StarError) {
+  private _handleError(error: ApiError) {
     let message = 'Could not complete your request; please try again later.';
     message = error.message;
     // return an observable with a user-facing error message

@@ -1,5 +1,8 @@
+import {NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
-import {Router} from '@angular/router';
+import {MatButtonModule} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
 import {User} from '@models/user';
 
 @Component({
@@ -7,15 +10,12 @@ import {User} from '@models/user';
   selector: 'app-add-button',
   templateUrl: './add-button.component.html',
   styleUrls: ['./add-button.component.scss'],
+  imports: [NgIf, MatButtonModule, MatTooltip, RouterModule],
 })
 export class AddButtonComponent {
   @Input() currentUser: User;
   @Input() addLink: string;
   @Input() addLabel: string;
 
-  constructor(private router: Router) {}
-
-  openAdd() {
-    this.router.navigateByUrl(this.addLink);
-  }
+  constructor() {}
 }

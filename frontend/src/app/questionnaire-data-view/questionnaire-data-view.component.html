@@ -10,9 +10,9 @@
     </div>
     <mat-drawer-container>
       <mat-drawer #sidenav [mode]="'over'" [(opened)]="sidebarOpen">
-        <mat-list class="data-list" *ngFor="let info of questionnaire_info" dense>
+        <mat-list class="data-list" *ngFor="let info of questionnaire_info">
           <mat-list-item>
-            <mat-icon matListIcon>{{ info.getIcon() }}</mat-icon>
+            <mat-icon>{{ info.getIcon() }}</mat-icon>
             ({{ info.size }})
             <button mat-button [disabled]="info.size === 0" (click)="selectQuestionnaire(info)">
               {{ info.display_name }}

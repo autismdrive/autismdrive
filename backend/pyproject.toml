@@ -1,0 +1,102 @@
+[project]
+requires-python = ">=3.12,<3.13"
+authors = [
+    { name = "Rose Nevill", email = "rn4ee@virginia.edu" },
+]
+maintainers = [
+    { name = "Aaron Louie", email = "4656575+ajlouie@users.noreply.github.com" },
+]
+description = "Autism DRIVE backend API"
+name = "autismdrive"
+version = "0.1.0"
+readme = "https://github.com/autismdrive/autismdrive/blob/main/backend/README.md"
+dependencies = [
+    "APScheduler==3.6.3",
+    "Flask==3.0.3",
+    "Flask-Bcrypt==1.0.1",
+    "Flask-Cors==3.0.10",
+    "Flask-HTTPAuth==4.8.0",
+    "Flask-Migrate==4.0.5",
+    "Flask-RESTful==0.3.9",
+    "Flask-SSO==0.4.0",
+    "Flask-Script==2.0.6",
+    "Jinja2==3.1.2",
+    "Mako==1.2.2",
+    "MarkupSafe==2.1.1",
+    "PyJWT==2.4.0",
+    "SQLAlchemy==2.0.22",
+    "SQLAlchemy-Utils==0.41.1",
+    "Werkzeug==3.0.0",
+    "XlsxWriter==3.2.0",
+    "alembic==1.14.0",
+    "aniso8601==9.0.1",
+    "bcrypt==4.2.1",
+    "certifi==2024.8.30",
+    "cffi==1.17.1",
+    "chardet==5.2.0",
+    "click==8.1.7",
+    "elasticsearch==8.16.0",
+    "elasticsearch-dsl==8.16.0",
+    "et-xmlfile==2.0.0",
+    "flask-marshmallow==1.2.1",
+    "googlemaps==4.10.0",
+    "httpretty==1.1.4",
+    "icecream==2.1.3",
+    "idna==3.10",
+    "itsdangerous==2.2.0",
+    "jdcal==1.4.1",
+    "marshmallow==3.23.1",
+    "marshmallow-sqlalchemy==1.1.0",
+    "mod-wsgi-httpd==2.4.62.1",
+    "mod-wsgi==5.0.2",
+    "openpyxl==3.1.5",
+    "psycopg==3.2.3",
+    "pycparser==2.22",
+    "pydantic==2.10.3",
+    "pydantic-settings==2.6.1",
+    "python-dateutil==2.9.0.post0",
+    "python-editor==1.0.4",
+    "pytz==2024.2",
+    "requests==2.32.3",
+    "six==1.17.0",
+    "tzlocal==5.2",
+    "urllib3==2.2.3",
+    "psycopg-c==3.2.3",
+    "psycopg-binary==3.2.3",
+]
+
+[project.urls]
+homepage = "https://autismdrive.virginia.edu"
+source = "https://github.com/autismdrive/autismdrive"
+issues = "https://github.com/autismdrive/autismdrive/issues"
+documentation = "https://github.com/autismdrive/autismdrive/blob/main/backend/README.md"
+icon = "https://autismdrive.virginia.edu/favicon.ico"
+
+[dependency-groups]
+dev = [
+    "autoflake==2.3.1",
+    "black==24.8.0",
+    "coverage==7.6.1",
+    "faker==26.1.0",
+    "faker-biology==0.6.4",
+    "flake8==7.1.1",
+    "flake8-pyproject==1.2.3",
+    "gevent==24.2.1",
+    "isort==5.13.2",
+    "traceback-with-variables==2.1.1",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+include = '\.pyi?$'
+line-length = 120
+target-version = ['py312']
+
+[tool.flake8]
+max-line-length = 120
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+

@@ -1,5 +1,12 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, OnInit} from '@angular/core';
+import {CdkTree} from '@angular/cdk/tree';
+import {NgIf} from '@angular/common';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {MatBadge} from '@angular/material/badge';
+import {MatIconButton} from '@angular/material/button';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {MatIcon} from '@angular/material/icon';
+import {MatNestedTreeNode, MatTree, MatTreeNodeDef, MatTreeNodeOutlet, MatTreeNodeToggle} from '@angular/material/tree';
 import {TreeComponent} from '@app/_forms/tree/tree.component';
 import {Category} from '@models/category';
 import {Observable} from 'rxjs';
@@ -9,8 +16,24 @@ import {Observable} from 'rxjs';
   selector: 'app-multiselect-tree',
   templateUrl: './multiselect-tree.component.html',
   styleUrls: ['./multiselect-tree.component.scss'],
+  imports: [
+    MatBadge,
+    MatCheckbox,
+    MatIcon,
+    MatIconButton,
+    MatTreeNodeDef,
+    MatTreeNodeOutlet,
+    MatTreeNodeToggle,
+    MatTree,
+    MatNestedTreeNode,
+    NgIf,
+  ],
 })
 export class MultiselectTreeComponent extends TreeComponent implements OnInit {
+  @ViewChild(MatTree) tree: MatTree<Category>;
+
+  childrenAccessor = (dataNode: Category) => dataNode.children ?? [];
+
   dataLoaded = false;
 
   /** The selection for checklist */

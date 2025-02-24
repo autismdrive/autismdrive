@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {StarError} from '@app/star-error';
+import {ApiError} from '@app/api-error';
 import {AdminNote} from '@models/admin_note';
 import {Category} from '@models/category';
 import {ChainStep} from '@models/chain_step';
@@ -737,7 +737,7 @@ export class ApiService {
     return this.httpClient.get<PasswordRequirements>(url).pipe(catchError(this._handleError));
   }
 
-  private _handleError(error: StarError) {
+  private _handleError(error: ApiError) {
     let message = 'Could not complete your request; please try again later.';
     message = error.message;
     // return an observable with a user-facing error message

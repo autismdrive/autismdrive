@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Docker Compose - start PostgreSQL and Elasticsearch" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="composeProjectName" value="autismdrive" />
+        <option name="envFilePath" value="" />
+        <option name="services">
+          <list>
+            <option value="db" />
+            <option value="es" />
+          </list>
+        </option>
+        <option name="sourceFilePath" value="$PROJECT_DIR$/../docker-compose.yml" />
+        <option name="upAttachDependencies" value="true" />
+        <option name="upDetach" value="false" />
+      </settings>
+    </deployment>
+    <method v="2">
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Docker" />
+    </method>
+  </configuration>
+</component>

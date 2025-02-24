@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {StarError} from '@app/star-error';
+import {ApiError} from '@app/api-error';
 import {Query} from '@models/query';
 import {Study} from '@models/study';
 import {ConfigService} from '@services/config/config.service';
@@ -23,7 +23,7 @@ export class GoogleAnalyticsService {
     });
   }
 
-  public errorEvent(error: StarError) {
+  public errorEvent(error: ApiError) {
     this.event(error.code, 'error_messages', error.message);
   }
 
