@@ -1,4 +1,4 @@
-import {MaterialModule} from '@app/material/material.module';
+import {FormlyConfig} from '@app/app.config';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -17,8 +17,7 @@ describe('LoginComponent', () => {
     return MockBuilder(LoginComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(AuthenticationService, {currentUser: of(mockUser)})
-      .keep(MaterialModule)
-      .keep(FormlyModule)
+      .keep(FormlyModule.forRoot(FormlyConfig.config))
       .mock(DeviceDetectorService)
       .mock(GoogleAnalyticsService)
       .keep(ActivatedRoute)

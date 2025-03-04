@@ -1,17 +1,23 @@
+import {NgIf} from '@angular/common';
 import {Component} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
+import {LogoComponent} from '@app/logo/logo.component';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 
 @Component({
   standalone: true,
   selector: 'app-terms',
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss'],
+  imports: [PdfJsViewerModule, LogoComponent, FlexModule, NgIf, MatButtonModule],
 })
 export class TermsComponent {
   user: User;

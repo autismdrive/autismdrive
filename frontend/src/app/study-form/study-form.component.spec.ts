@@ -1,14 +1,17 @@
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormlyConfig} from '@app/app.config';
+import {FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
+import {mockStudyEditRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {mockInvestigator} from '@util/testing/fixtures/mock-investigator';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {mockStudyCategory} from '@util/testing/fixtures/mock-study-category';
 import {mockStudyInvestigator} from '@util/testing/fixtures/mock-study-investigator';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {StudyFormComponent} from './study-form.component';
-import {ActivatedRoute, Router} from '@angular/router';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {of} from 'rxjs';
+import {StudyFormComponent} from './study-form.component';
 
 describe('StudyFormComponent', () => {
   let component: StudyFormComponent;
@@ -28,8 +31,9 @@ describe('StudyFormComponent', () => {
         updateStudy: jest.fn().mockReturnValue(of(mockStudy)),
         deleteStudy: jest.fn().mockReturnValue(of(mockStudy)),
       })
-      .keep(ActivatedRoute)
+      .provide({provide: ActivatedRoute, useValue: mockStudyEditRoute})
       .keep(Router)
+      .keep(FormlyModule.forRoot(FormlyConfig.config))
       .mock(DeviceDetectorService);
   });
 

@@ -1,9 +1,8 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
-import {MaterialModule} from '@app/material/material.module';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {mockActivatedRouteWithStudyId} from '@util/testing/fixtures/mock-activated-route';
+import {mockStudyDetailsRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockInvestigator} from '@util/testing/fixtures/mock-investigator';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {mockStudyInvestigator} from '@util/testing/fixtures/mock-study-investigator';
@@ -20,13 +19,12 @@ describe('StudyDetailComponent', () => {
     return MockBuilder(StudyDetailComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(RouterModule)
-      .keep(MaterialModule)
       .mock(ApiService, {
         getStudy: jest.fn().mockReturnValue(of(mockStudy)),
         updateInvestigator: jest.fn().mockReturnValue(of(mockInvestigator)),
       })
       .mock(AuthenticationService, {currentUser: of(mockUser)})
-      .provide({provide: ActivatedRoute, useValue: mockActivatedRouteWithStudyId})
+      .provide({provide: ActivatedRoute, useValue: mockStudyDetailsRoute})
       .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
       .provide({
         provide: MAT_DIALOG_DATA,

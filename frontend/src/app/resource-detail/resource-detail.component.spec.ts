@@ -1,4 +1,9 @@
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {
+  makeMockActivatedRoute,
+  mockResourceDetailsRoute,
+  mockResourceEditRoute,
+} from '@util/testing/fixtures/mock-activated-route';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {ResourceDetailComponent} from './resource-detail.component';
@@ -15,7 +20,7 @@ describe('ResourceDetailComponent', () => {
     return MockBuilder(ResourceDetailComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {getResourceChangeLog: jest.fn().mockReturnValue(of([]))})
-      .keep(ActivatedRoute)
+      .provide({provide: ActivatedRoute, useValue: mockResourceDetailsRoute})
       .keep(RouterModule)
       .mock(AuthenticationService, {currentUser: of(mockUser)})
       .mock(DomSanitizer);

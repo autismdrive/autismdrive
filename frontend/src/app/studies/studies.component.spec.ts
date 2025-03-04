@@ -2,7 +2,7 @@ import {ActivatedRoute, RouterModule} from '@angular/router';
 import {StudyStatus} from '@models/study';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {mockActivatedRouteForStudies} from '@util/testing/fixtures/mock-activated-route';
+import {mockStudiesRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -19,7 +19,7 @@ describe('StudiesComponent', () => {
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(RouterModule)
       .keep(Meta)
-      .provide({provide: ActivatedRoute, useValue: mockActivatedRouteForStudies})
+      .provide({provide: ActivatedRoute, useValue: mockStudiesRoute})
       .mock(ApiService, {
         getStudiesByAge: jest.fn().mockReturnValue(of([mockStudy])),
         getStudiesByStatus: jest.fn().mockReturnValue(of([mockStudy])),

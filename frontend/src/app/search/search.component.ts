@@ -1,12 +1,32 @@
 /// <reference types="google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
-import {Location} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnInit, ViewChild} from '@angular/core';
-import {MatExpansionPanel} from '@angular/material/expansion';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatTabChangeEvent} from '@angular/material/tabs';
+import {Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
+import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnInit, signal, ViewChild} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatCardModule} from '@angular/material/card';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTabChangeEvent, MatTabsModule} from '@angular/material/tabs';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, convertToParamMap, ParamMap, Params, Router} from '@angular/router';
+import {ActivatedRoute, convertToParamMap, ParamMap, Params, Router, RouterModule} from '@angular/router';
+import {AddButtonComponent} from '@app/add-button/add-button.component';
+import {BorderBoxTileComponent} from '@app/border-box-tile/border-box-tile.component';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {SearchBoxComponent} from '@app/search-box/search-box.component';
+import {SearchFilterComponent} from '@app/search-filter/search-filter.component';
+import {SearchFiltersBreadcrumbsComponent} from '@app/search-filters-breadcrumbs/search-filters-breadcrumbs.component';
+import {SearchResultComponent} from '@app/search-result/search-result.component';
+import {SearchSortComponent} from '@app/search-sort/search-sort.component';
+import {SearchTopicsComponent} from '@app/search-topics/search-topics.component';
+import {TutorialVideoComponent} from '@app/tutorial-video/tutorial-video.component';
+import {TypeIconComponent} from '@app/type-icon/type-icon.component';
 import {Algorithm, DefaultRenderer, Renderer, SuperClusterViewportAlgorithm} from '@googlemaps/markerclusterer';
 import {AccordionItem} from '@models/accordion-item';
 import {Category} from '@models/category';
@@ -18,7 +38,10 @@ import {Direction} from '@models/scroll';
 import {SortMethod, sortMethods} from '@models/sort_method';
 import {Study} from '@models/study';
 import {User} from '@models/user';
-import {NgMapsViewComponent} from '@ng-maps/core';
+import {NgMapsCoreModule, NgMapsViewComponent} from '@ng-maps/core';
+import {NgMapsGoogleModule} from '@ng-maps/google';
+import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
+import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
@@ -52,6 +75,41 @@ enum LocationMode {
         ]),
       ]),
     ]),
+  ],
+  imports: [
+    AddButtonComponent,
+    BorderBoxTileComponent,
+    ExtendedModule,
+    FlexModule,
+    LoadingComponent,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatPaginatorModule,
+    MatSelectModule,
+    MatTabsModule,
+    MatTooltipModule,
+    NgForOf,
+    NgIf,
+    NgMapsCoreModule,
+    NgMapsGoogleModule,
+    NgMapsMarkerClustererModule,
+    NgOptimizedImage,
+    ReactiveFormsModule,
+    RouterModule,
+    SearchBoxComponent,
+    SearchFilterComponent,
+    SearchFiltersBreadcrumbsComponent,
+    SearchResultComponent,
+    SearchSortComponent,
+    SearchTopicsComponent,
+    TutorialVideoComponent,
+    TypeIconComponent,
+    FormsModule,
   ],
 })
 export class SearchComponent implements AfterViewInit, OnInit {
@@ -162,6 +220,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   private scrollDirection: Direction;
   clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
   clusterRenderer: Renderer = new DefaultRenderer();
+  readonly panelOpenState = signal(false);
 
   constructor(
     private api: ApiService,
@@ -569,8 +628,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
     return !!(this.query && this.query.hasFilters);
   }
 
-  submitZip($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
-    setLocationExpansionPanel.close();
+  submitZip($event: Event): void {
+    this.panelOpenState.set(false);
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.storedZip);
     this.googleAnalyticsService.searchInteractionEvent('set_zip_code_location');
@@ -584,8 +643,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
     }
   }
 
-  useGPSLocation($event: MouseEvent | KeyboardEvent, setLocationExpansionPanel: MatExpansionPanel): void {
-    setLocationExpansionPanel.close();
+  useGPSLocation($event: Event): void {
+    this.panelOpenState.set(false);
     $event.stopPropagation();
     this.googleAnalyticsService.searchInteractionEvent('set_gps_location');
     this.setGPSLocation(() => {
@@ -946,5 +1005,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.paginatorElement.pageIndex = pageStart / this.pageSize;
     this.expandResults = true;
     this.changeDetectorRef.detectChanges();
+  }
+
+  makePoint(x: number, y: number): google.maps.Point {
+    return new google.maps.Point(x, y);
   }
 }

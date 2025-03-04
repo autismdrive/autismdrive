@@ -1,15 +1,19 @@
+import {NgIf} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormGroup} from '@angular/forms';
+import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig, FormlyFormOptions} from '@ngx-formly/core';
-import {scrollToFirstInvalidField} from '@util/scrollToTop';
-import {DeviceDetectorService} from 'ngx-device-detector';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {AgeRange, Language} from '@models/hit_type';
 import {Resource, ResourceType} from '@models/resource';
 import {ResourceCategory} from '@models/resource_category';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {
   LOADING = 'loading',
@@ -21,6 +25,7 @@ enum PageState {
   selector: 'app-resource-form',
   templateUrl: './resource-form.component.html',
   styleUrls: ['./resource-form.component.scss'],
+  imports: [LoadingComponent, NgIf, FormlyModule, ReactiveFormsModule, FlexModule, MatButtonModule],
 })
 export class ResourceFormComponent implements OnInit {
   resource: Resource;
@@ -29,13 +34,10 @@ export class ResourceFormComponent implements OnInit {
   state = PageState.LOADING;
   showConfirmDelete = false;
   currentUser: User;
-
   model: any = {};
   form: FormGroup;
   fields: FormlyFieldConfig[];
-
   options: FormlyFormOptions;
-
   createNew = false;
 
   constructor(

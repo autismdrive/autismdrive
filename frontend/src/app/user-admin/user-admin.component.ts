@@ -1,17 +1,31 @@
+import {AsyncPipe, DatePipe, PercentPipe} from '@angular/common';
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSort, MatSortModule} from '@angular/material/sort';
+import {MatTableModule} from '@angular/material/table';
 import {Router} from '@angular/router';
-import {fromEvent, merge} from 'rxjs';
-import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
 import {UserDataSource} from '@models/user_data_source';
 import {ApiService} from '@services/api/api.service';
+import {fromEvent, merge} from 'rxjs';
+import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
 
 @Component({
   standalone: true,
   selector: 'app-user-admin',
   templateUrl: './user-admin.component.html',
   styleUrls: ['./user-admin.component.scss'],
+  imports: [
+    AsyncPipe,
+    DatePipe,
+    MatFormFieldModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
+    MatTableModule,
+    PercentPipe,
+  ],
 })
 export class UserAdminComponent implements OnInit, AfterViewInit {
   dataSource: UserDataSource;

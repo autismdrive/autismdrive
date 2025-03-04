@@ -1,4 +1,3 @@
-import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
@@ -14,7 +13,6 @@ describe('FavoriteTopicsComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(FavoriteTopicsComponent)
-      .keep(MaterialModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getFavoritesByUserAndType: jest.fn().mockReturnValue(of([])),

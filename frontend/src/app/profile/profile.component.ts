@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -51,6 +51,7 @@ enum ProfileState {
     ParticipantProfileComponent,
     ProfileMetaComponent,
     ReactiveFormsModule,
+    NgForOf,
   ],
 })
 export class ProfileComponent implements OnInit {
@@ -78,7 +79,6 @@ export class ProfileComponent implements OnInit {
 
             // at least one checkbox should be selected.
             return !(!self_participant && !guardian && !professional && !interested);
-
           },
           message: 'Please select at least one option.',
         },

@@ -1,10 +1,14 @@
+import {NgForOf} from '@angular/common';
 import {Component} from '@angular/core';
+import {MatTabNav, MatTabsModule} from '@angular/material/tabs';
+import {RouterModule} from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-admin-home',
   templateUrl: './admin-home.component.html',
   styleUrls: ['./admin-home.component.scss'],
+  imports: [RouterModule, MatTabsModule, NgForOf],
 })
 export class AdminHomeComponent {
   navLinks = [

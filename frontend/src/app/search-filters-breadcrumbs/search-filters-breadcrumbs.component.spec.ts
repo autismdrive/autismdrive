@@ -1,4 +1,3 @@
-import {MaterialModule} from '@app/material/material.module';
 import {faker} from '@faker-js/faker';
 import {AgeRange} from '@models/hit_type';
 import {Query} from '@models/query';
@@ -10,7 +9,7 @@ describe('SearchFiltersBreadcrumbsComponent', () => {
   let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    return MockBuilder(SearchFiltersBreadcrumbsComponent).keep(NG_MOCKS_ROOT_PROVIDERS).keep(MaterialModule);
+    return MockBuilder(SearchFiltersBreadcrumbsComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   beforeEach(() => {

@@ -1,9 +1,9 @@
-import {MaterialModule} from '@app/material/material.module';
-import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {RepeatSectionDialogComponent} from './repeat-section-dialog.component';
-import {DeviceDetectorService} from 'ngx-device-detector';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {FormlyConfig} from '@app/app.config';
+import {FormlyModule} from '@ngx-formly/core';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {RepeatSectionDialogComponent} from './repeat-section-dialog.component';
 
 describe('RepeatSectionDialogComponent', () => {
   let component: RepeatSectionDialogComponent;
@@ -11,9 +11,9 @@ describe('RepeatSectionDialogComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(RepeatSectionDialogComponent)
+      .keep(FormlyModule.forRoot(FormlyConfig.config))
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(DeviceDetectorService)
-      .keep(MaterialModule)
       .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
       .provide({
         provide: MAT_DIALOG_DATA,

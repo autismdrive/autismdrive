@@ -1,12 +1,11 @@
 import {ChangeDetectorRef, Component, Inject} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {ActivatedRoute} from '@angular/router';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {BehaviorSubject, Observable} from 'rxjs';
 import {User} from '@models/user';
+import {FormlyFieldConfig} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
 @Component({
@@ -69,7 +68,6 @@ export class RegisterDialogComponent {
   constructor(
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute,
     private googleAnalytics: GoogleAnalyticsService,
     public dialogRef: MatDialogRef<StudySurveyEntryComponent>,
     @Inject(MAT_DIALOG_DATA)

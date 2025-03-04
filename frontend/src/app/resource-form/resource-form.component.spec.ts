@@ -1,9 +1,10 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {MaterialModule} from '@app/material/material.module';
+import {FormlyConfig} from '@app/app.config';
 import {FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {mockResourceEditRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockResource} from '@util/testing/fixtures/mock-resource';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -17,9 +18,8 @@ describe('ResourceFormComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(ResourceFormComponent)
-      .keep(FormlyModule.forRoot())
+      .keep(FormlyModule.forRoot(FormlyConfig.config))
       .keep(FormsModule)
-      .keep(MaterialModule)
       .keep(ReactiveFormsModule)
       .mock(ApiService, {
         getCategoryTree: jest.fn().mockReturnValue(of([])),
@@ -27,7 +27,10 @@ describe('ResourceFormComponent', () => {
       })
       .mock(AuthenticationService, {currentUser: of(mockUser)})
       .mock(DeviceDetectorService)
-      .keep(ActivatedRoute)
+      .provide({
+        provide: ActivatedRoute,
+        useValue: mockResourceEditRoute,
+      })
       .keep(RouterModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS);
   });

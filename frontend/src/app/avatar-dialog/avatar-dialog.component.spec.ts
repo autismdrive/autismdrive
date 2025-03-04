@@ -1,5 +1,4 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {mockParticipant} from '@util/testing/fixtures/mock-participant';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -13,7 +12,6 @@ describe('AvatarDialogComponent', () => {
   beforeEach(() => {
     return MockBuilder(AvatarDialogComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .keep(MaterialModule)
       .mock(ApiService, {
         updateParticipant: jest.fn().mockReturnValue(of(mockParticipant)),
       })

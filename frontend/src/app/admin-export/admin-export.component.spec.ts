@@ -1,10 +1,8 @@
-import {MaterialModule} from '@app/material/material.module';
-import {DataTransferLog} from '@models/data_transfer_log';
 import {ApiService} from '@services/api/api.service';
 import {ConfigService} from '@services/config/config.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {AdminExportComponent} from './admin-export.component';
 import {of} from 'rxjs';
+import {AdminExportComponent} from './admin-export.component';
 
 describe('AdminExportComponent', () => {
   let component: AdminExportComponent;
@@ -22,7 +20,6 @@ describe('AdminExportComponent', () => {
         ),
       })
       .mock(ConfigService, {})
-      .keep(MaterialModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 

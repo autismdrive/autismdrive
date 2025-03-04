@@ -17,7 +17,7 @@
     ></app-tutorial-video>
     <div fxLayout="column">
       <app-search-box
-        variant="light-bg"
+        [variant]="'light-bg'"
         (searchUpdated)="querySubject.next(this.query)"
         (categorySelected)="selectCategory($event)"
         [words]="query?.words"
@@ -305,7 +305,8 @@
       [ngClass]="'zipCodeSetButton mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
       [expanded]="showLocationWindow()"
-      #setLocationExpansionPanel
+      (opened)="panelOpenState.set(true)"
+      (closed)="panelOpenState.set(false)"
     >
       <mat-expansion-panel-header>
         <ng-container *ngIf="locationMode === locationModes.default">Set Location</ng-container>
@@ -319,18 +320,18 @@
             matInput
             placeholder="Enter ZIP Code"
             [(ngModel)]="storedZip"
-            (keyup.enter)="submitZip($event, setLocationExpansionPanel)"
+            (keyup.enter)="submitZip($event)"
             #zipCodeInput
           />
         </mat-form-field>
         <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
-          <button mat-flat-button color="accent" (click)="submitZip($event, setLocationExpansionPanel)" id="btn_save">
+          <button mat-flat-button color="accent" (click)="submitZip($event)" id="btn_save">
             Save
           </button>
           <button
             *ngIf="gpsEnabled"
             mat-flat-button
-            (click)="useGPSLocation($event, setLocationExpansionPanel)"
+            (click)="useGPSLocation($event)"
             id="btn_gps"
           >
             Current Location
@@ -358,7 +359,7 @@
             *ngIf="loc"
             [latitude]="loc.lat"
             [longitude]="loc.lng"
-            [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
+            [iconUrl]="{url: '/assets/map/your-location.svg', anchor: makePoint(48, 48)}"
           ></map-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
             <map-circle
@@ -366,17 +367,17 @@
               [longitude]="hit.longitude + mapJitter(hit.id, false)"
               [radius]="circleRadius"
               [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
-              fillOpacity="0.1"
+              [fillOpacity]="0.1"
               [clickable]="true"
               [visible]="isInfoWindowOpen && selectedMapHit.id === hit.id"
               (circleClick)="showInfoWindow(hit)"
-              zIndex="-1"
+              [zIndex]="-1"
             >
             </map-circle>
             <map-marker
               [latitude]="hit.latitude + mapJitter(hit.id, true)"
               [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: {x: 24, y: 24}}"
+              [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: makePoint(24, 24)}"
               (markerClick)="showInfoWindow(hit)"
             >
             </map-marker>
@@ -385,7 +386,7 @@
             <map-marker
               [latitude]="hit.latitude"
               [longitude]="hit.longitude"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
+              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: makePoint(16,16)}"
               (markerClick)="showInfoWindow(hit)"
             ></map-marker>
           </ng-container>
@@ -449,7 +450,7 @@
           [matTooltip]="rg.shortName + ' - ' + rg.description"
           class="resource-gatherer"
         >
-          <img [alt]="rg.shortName" [src]="rg.image" />
+          <img [alt]="rg.shortName" [ngSrc]="rg.image" fill="fill" />
         </a>
       </span>
     </div>

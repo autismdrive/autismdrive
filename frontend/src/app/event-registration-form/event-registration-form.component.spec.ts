@@ -1,6 +1,5 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {RouterModule} from '@angular/router';
-import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
@@ -16,7 +15,6 @@ describe('EventRegistrationFormComponent', () => {
   beforeEach(() => {
     return (
       MockBuilder(EventRegistrationFormComponent)
-        .keep(MaterialModule)
         .keep(NG_MOCKS_ROOT_PROVIDERS)
         .keep(RouterModule.forRoot([{path: '', component: EventRegistrationFormComponent}]))
         .mock(ApiService, {

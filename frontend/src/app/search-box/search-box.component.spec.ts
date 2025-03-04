@@ -1,6 +1,5 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {CategoriesService} from '@services/categories/categories.service';
 import {SearchService} from '@services/search/search.service';
@@ -16,7 +15,6 @@ describe('SearchBoxComponent', () => {
   beforeEach(() => {
     return MockBuilder(SearchBoxComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .keep(MaterialModule)
       .keep(FormsModule)
       .keep(ReactiveFormsModule)
       .keep(RouterModule)

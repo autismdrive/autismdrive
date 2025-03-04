@@ -3,13 +3,15 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="/assets/avatars/{{ participant.avatar_icon || '001' }}.svg"
+        [ngSrc]="'/assets/avatars/' + participant.avatar_icon || '001' + '.svg'"
         alt="{{participant.name}}"
         [ngStyle]="{'background-color': participant.avatar_color || '#CCC'}"
-        (click)="chooseAvatar($event, participant)"
+        (click)="chooseAvatar(participant)"
         id="avatar_{{ participant.id }}"
+        [width]="100"
+        [height]="100"
       />
-      <div class="change-text" (click)="chooseAvatar($event, participant)">change icon</div>
+      <div class="change-text" (click)="chooseAvatar(participant)">change icon</div>
       <mat-card-title>
         {{ participant.name }}
       </mat-card-title>

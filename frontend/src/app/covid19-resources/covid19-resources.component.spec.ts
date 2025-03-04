@@ -1,7 +1,7 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {mockCovidRouteWithCategoryName} from '@util/testing/fixtures/mock-activated-route';
+import {mockCovidRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
@@ -21,7 +21,7 @@ describe('Covid19ResourcesComponent', () => {
         getCovid19ResourcesByCategory: jest.fn().mockReturnValue(of([])),
       })
       .mock(AuthenticationService, {currentUser: of(mockUser)})
-      .provide({provide: ActivatedRoute, useValue: mockCovidRouteWithCategoryName});
+      .provide({provide: ActivatedRoute, useValue: mockCovidRoute});
   });
 
   beforeEach(() => {

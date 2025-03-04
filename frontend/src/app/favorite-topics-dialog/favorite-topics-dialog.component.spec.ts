@@ -1,6 +1,5 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MaterialModule} from '@app/material/material.module';
 import {FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
@@ -9,6 +8,7 @@ import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS
 import {of} from 'rxjs';
 import {FavoriteTopicsDialogComponent} from './favorite-topics-dialog.component';
 import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {FormlyConfig} from '@app/app.config';
 
 describe('FavoriteTopicsDialogComponent', () => {
   let component: FavoriteTopicsDialogComponent;
@@ -16,9 +16,7 @@ describe('FavoriteTopicsDialogComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(FavoriteTopicsDialogComponent)
-      .keep(FormlyModule)
-      .keep(FormsModule)
-      .keep(MaterialModule)
+      .keep(FormlyModule.forRoot(FormlyConfig.config))
       .keep(ReactiveFormsModule)
       .keep(NoopAnimationsModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)

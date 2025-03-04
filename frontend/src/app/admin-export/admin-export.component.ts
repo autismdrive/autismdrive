@@ -1,11 +1,14 @@
+import {DatePipe, NgIf} from '@angular/common';
 import {Component, OnInit, ViewChild, ViewChildren, ViewContainerRef} from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {merge} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {MatRippleModule} from '@angular/material/core';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatTableModule} from '@angular/material/table';
 import {DataTransferDataSource} from '@models/data_transfer_data_source';
 import {DataTransferLog} from '@models/data_transfer_log';
 import {ApiService} from '@services/api/api.service';
 import {ConfigService} from '@services/config/config.service';
+import {merge} from 'rxjs';
+import {tap} from 'rxjs/operators';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({
@@ -13,6 +16,7 @@ import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-
   selector: 'app-admin-export',
   templateUrl: './admin-export.component.html',
   styleUrls: ['./admin-export.component.scss'],
+  imports: [MatPaginatorModule, MatTableModule, NgIf, DatePipe, MatRippleModule],
 })
 export class AdminExportComponent implements OnInit {
   dataTransferDataSource: DataTransferDataSource;

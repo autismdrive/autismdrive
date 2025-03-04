@@ -1,12 +1,12 @@
-import {AuthenticationService} from '@services/authentication/authentication-service';
-import {mockActivatedRouteWithUserId} from '@util/testing/fixtures/mock-activated-route';
-import {makeMockEmailLog, mockEmailLog} from '@util/testing/fixtures/mock-email-log';
-import {mockUser} from '@util/testing/fixtures/mock-user';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {UserAdminDetailsComponent} from './user-admin-details.component';
-import {of} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {mockUserDetailsRoute} from '@util/testing/fixtures/mock-activated-route';
+import {makeMockEmailLog} from '@util/testing/fixtures/mock-email-log';
+import {mockUser} from '@util/testing/fixtures/mock-user';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {UserAdminDetailsComponent} from './user-admin-details.component';
 
 describe('UserAdminDetailsComponent', () => {
   let component: UserAdminDetailsComponent;
@@ -25,7 +25,7 @@ describe('UserAdminDetailsComponent', () => {
         updateUser: jest.fn().mockReturnValue(of()),
       })
       .mock(AuthenticationService, {currentUser: of(mockUser)})
-      .provide({provide: ActivatedRoute, useValue: mockActivatedRouteWithUserId});
+      .provide({provide: ActivatedRoute, useValue: mockUserDetailsRoute});
   });
 
   beforeEach(() => {

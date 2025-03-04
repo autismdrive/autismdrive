@@ -1,12 +1,15 @@
 import {Component} from '@angular/core';
+import {MatButton, MatButtonModule} from '@angular/material/button';
 import {Meta} from '@angular/platform-browser';
 import {Router} from '@angular/router';
+import {DefaultLayoutDirective, DefaultShowHideDirective, ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
   standalone: true,
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss'],
+  imports: [FlexModule, ExtendedModule, MatButtonModule],
 })
 export class AboutComponent {
   constructor(

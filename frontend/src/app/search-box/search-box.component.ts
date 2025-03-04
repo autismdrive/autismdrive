@@ -1,3 +1,4 @@
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -8,11 +9,21 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
-import {MatInput} from '@angular/material/input';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {
+  MatAutocomplete,
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInput, MatInputModule} from '@angular/material/input';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Category} from '@models/category';
+import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {CategoriesService} from '@services/categories/categories.service';
 import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, timer} from 'rxjs';
 
@@ -21,6 +32,20 @@ import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith
   selector: 'app-search-box',
   templateUrl: './search-box.component.html',
   styleUrls: ['./search-box.component.scss'],
+  imports: [
+    ExtendedModule,
+    FlexModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatTooltipModule,
+    NgIf,
+    ReactiveFormsModule,
+    NgForOf,
+    AsyncPipe,
+  ],
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {
   @Input() variant: 'dark-bg' | 'light-bg' = 'light-bg';

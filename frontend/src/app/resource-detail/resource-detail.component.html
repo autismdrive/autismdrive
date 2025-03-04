@@ -19,7 +19,7 @@
         This resource is being edited and is under review. Please check back for more up-to-date information soon.
       </p>
       <p *ngIf="resource.type === 'event' && resource.image_url">
-        <a [href]="resource.website" target="_blank"><img src="{{ resource.image_url }}" /></a>
+        <a [href]="resource.website" target="_blank"><img [alt]="resource.title" [ngSrc]="resource.image_url" fill="fill" /></a>
       </p>
 
       <ng-container *ngIf="resource.type !== 'event'">
@@ -59,7 +59,7 @@
           <h2>Interested in watching this video?</h2>
           <div class="video-image-box">
             <div class="gradient-overlay image">
-              <img [src]="'https://img.youtube.com/vi/' + resource.video_code + '/hqdefault.jpg'" />
+              <img [ngSrc]="safeVideoImgUrl" fill="fill" [alt]="resource.title" />
             </div>
             <div fxLayout="column" fxLayoutGap="20px" class="button-overlay">
               <button

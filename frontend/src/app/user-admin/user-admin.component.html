@@ -13,7 +13,7 @@
     matSort
     matSortActive="email"
     matSortDirection="asc"
-    matSortDisableClear
+    [matSortDisableClear]="true"
   >
     <ng-container matColumnDef="id">
       <mat-header-cell *matHeaderCellDef mat-sort-header>ID</mat-header-cell>

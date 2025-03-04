@@ -1,20 +1,40 @@
 /// <reference types="google.maps" />
-import {formatDate} from '@angular/common';
+import {DatePipe, formatDate, NgIf, NgOptimizedImage} from '@angular/common';
 import {Component} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {EditButtonComponent} from '@app/edit-button/edit-button.component';
+import {EventRegistrationComponent} from '@app/event-registration/event-registration.component';
+import {FavoriteResourceButtonComponent} from '@app/favorite-resource-button/favorite-resource-button.component';
+import {TypeIconComponent} from '@app/type-icon/type-icon.component';
 import {ContactItem} from '@models/contact_item';
 import {Resource} from '@models/resource';
 import {ResourceChangeLog} from '@models/resource_change_log';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {MarkdownComponent} from 'ngx-markdown';
 
 @Component({
   standalone: true,
   selector: 'app-resource-detail',
   templateUrl: './resource-detail.component.html',
   styleUrls: ['./resource-detail.component.scss'],
+  imports: [
+    NgOptimizedImage,
+    MarkdownComponent,
+    FlexModule,
+    TypeIconComponent,
+    EditButtonComponent,
+    FavoriteResourceButtonComponent,
+    NgIf,
+    EventRegistrationComponent,
+    MatButtonModule,
+    DatePipe,
+    RouterModule,
+  ],
 })
 export class ResourceDetailComponent {
   resource: Resource;
@@ -26,6 +46,8 @@ export class ResourceDetailComponent {
   typeName: string;
   showInfoWindow = false;
   safeVideoLink: SafeResourceUrl;
+  safeVideoImgUrl: SafeResourceUrl;
+
   get isPastEvent(): boolean {
     const eventDate = new Date(this.resource.date);
     const now = new Date();
@@ -50,6 +72,8 @@ export class ResourceDetailComponent {
     this.route.params.subscribe(params => {
       this.loading = true;
       this.safeVideoLink = null;
+      this.safeVideoImgUrl = null;
+
       const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
@@ -66,6 +90,9 @@ export class ResourceDetailComponent {
           if (this.resource.video_code) {
             this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(
               'https://www.youtube.com/embed/' + this.resource.video_code,
+            );
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(
+              'https://img.youtube.com/vi/' + resource.video_code + '/hqdefault.jpg',
             );
           }
           if (this.currentUser && this.currentUser.permissions.includes('edit_resource')) {

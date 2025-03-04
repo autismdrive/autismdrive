@@ -1,18 +1,23 @@
+import {NgIf} from '@angular/common';
 import {ChangeDetectorRef, Component} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
+  imports: [FlexModule, ReactiveFormsModule, FormlyModule, MatButtonModule, LoadingComponent, NgIf],
 })
 export class RegisterComponent {
   private _stateSubject: BehaviorSubject<string>;

@@ -1,4 +1,3 @@
-import {MaterialModule} from '@app/material/material.module';
 import {ApiService} from '@services/api/api.service';
 import {mockParticipantAdminList} from '@util/testing/fixtures/mock-participant-admin-list';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -11,7 +10,6 @@ describe('ParticipantAdminComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(ParticipantAdminComponent)
-      .keep(MaterialModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {getParticipantAdminList: jest.fn().mockReturnValue(of(mockParticipantAdminList))});
   });

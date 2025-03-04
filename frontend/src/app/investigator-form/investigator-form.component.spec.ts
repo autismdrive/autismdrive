@@ -1,4 +1,3 @@
-import {MaterialModule} from '@app/material/material.module';
 import {mockStudyInvestigator} from '@util/testing/fixtures/mock-study-investigator';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {InvestigatorFormComponent} from './investigator-form.component';
@@ -12,10 +11,8 @@ describe('InvestigatorFormComponent', () => {
   beforeEach(() => {
     return MockBuilder(InvestigatorFormComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .keep(MaterialModule)
       .keep(FormsModule)
       .keep(ReactiveFormsModule)
-      .keep(MaterialModule)
       .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
       .provide({
         provide: MAT_DIALOG_DATA,

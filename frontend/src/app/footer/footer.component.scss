@@ -29,18 +29,6 @@ footer {
   }
 }
 
-.footer-logo {
-  // SM
-  @media (width <= 959px) {
-    width: 320px;
-  }
-
-  // MD - XL
-  @media (width >= 960px) {
-    width: 457px;
-  }
-}
-
 .footer-contact {
   margin: 0 auto 1.25rem;
   max-width: 15.625rem;

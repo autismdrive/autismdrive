@@ -40,7 +40,7 @@
   </p>
   <app-details-link
     [url]="'/' + hit.type.toLowerCase() + '/' + hit.id"
-    size="1"
+    [size]="1"
     label="View {{ hit.type }} Details"
     subtitle="{{ mapLoc && hit.hasCoords() ? '(' + hit.milesFrom(mapLoc) + 'mi)' : '' }}"
     (mouseover)="hover = true"

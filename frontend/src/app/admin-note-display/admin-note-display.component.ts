@@ -1,16 +1,32 @@
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatLineModule} from '@angular/material/core';
 import {MatDialog} from '@angular/material/dialog';
-import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {AdminNote} from '@models/admin_note';
 import {Resource} from '@models/resource';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
+import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.component';
 
 @Component({
   standalone: true,
   selector: 'app-admin-note-display',
   templateUrl: './admin-note-display.component.html',
   styleUrls: ['./admin-note-display.component.scss'],
+  imports: [
+    DatePipe,
+    FlexModule,
+    MatButtonModule,
+    MatCardModule,
+    MatLineModule,
+    MatTooltipModule,
+    NgForOf,
+    NgIf,
+  ],
 })
 export class AdminNoteDisplayComponent implements OnInit {
   @Input() currentUser: User;

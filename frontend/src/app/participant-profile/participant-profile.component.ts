@@ -1,9 +1,9 @@
-import {NgStyle, TitleCasePipe} from '@angular/common';
+import {NgOptimizedImage, NgStyle, TitleCasePipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatCard, MatCardModule} from '@angular/material/card';
+import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
-import {MatProgressBar, MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {Router} from '@angular/router';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
@@ -17,7 +17,7 @@ import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
   selector: 'app-participant-profile',
   templateUrl: './participant-profile.component.html',
   styleUrls: ['./participant-profile.component.scss'],
-  imports: [MatCardModule, NgStyle, MatProgressBarModule, TitleCasePipe, FlexModule, MatButtonModule],
+  imports: [MatCardModule, NgStyle, MatProgressBarModule, TitleCasePipe, FlexModule, MatButtonModule, NgOptimizedImage],
 })
 export class ParticipantProfileComponent {
   @Input() participant: Participant;
@@ -53,7 +53,7 @@ export class ParticipantProfileComponent {
     this.router.navigate(['terms', this.participant.relationship, {preview: true}]);
   }
 
-  chooseAvatar($event, participant): void {
+  chooseAvatar(participant: Participant): void {
     const dialogRef = this.dialog.open(AvatarDialogComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',

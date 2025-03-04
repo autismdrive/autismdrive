@@ -1,6 +1,8 @@
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {NgIf, NgOptimizedImage} from '@angular/common';
 import {Component} from '@angular/core';
-import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
+import {ImageDimensions} from '@models/image-dimensions';
 import {ConfigService} from '@services/config/config.service';
 
 @Component({
@@ -8,11 +10,20 @@ import {ConfigService} from '@services/config/config.service';
   selector: 'app-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
-  imports: [NgIf],
+  imports: [NgIf, NgOptimizedImage],
 })
 export class FooterComponent {
+  logoURL = '/assets/logo/UVA_STAR-logo.svg';
+  logoDimensions: ImageDimensions;
+
   constructor(
     public config: ConfigService,
     public router: Router,
-  ) {}
+    private breakpointObserver: BreakpointObserver,
+  ) {
+    this.breakpointObserver.observe('(max-width: 959px)').subscribe(result => {
+      const ratio = result ? 0.51 : 0.72;
+      this.logoDimensions = {width: ratio * 627, height: ratio * 627};
+    });
+  }
 }
