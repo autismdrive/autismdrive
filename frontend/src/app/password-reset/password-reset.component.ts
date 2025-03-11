@@ -1,12 +1,18 @@
+import {NgIf} from '@angular/common';
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {MatButtonModule} from '@angular/material/button';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {MatAnchor, MatButton, MatButtonModule} from '@angular/material/button';
+import {ActivatedRoute, Router, RouterLink, RouterModule} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
 import {PasswordRequirements} from '@models/password_requirements';
 import {User} from '@models/user';
-import {FlexModule} from '@ngbracket/ngx-layout';
-import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
+import {
+  DefaultFlexDirective,
+  DefaultLayoutAlignDirective,
+  DefaultLayoutDirective,
+  DefaultLayoutGapDirective, FlexModule,
+} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyForm, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
@@ -18,7 +24,15 @@ import {DeviceDetectorService} from 'ngx-device-detector';
   selector: 'app-password-reset',
   templateUrl: './password-reset.component.html',
   styleUrls: ['./password-reset.component.scss'],
-  imports: [FlexModule, LogoComponent, FormlyModule, MatButtonModule, RouterModule, ReactiveFormsModule],
+  imports: [
+    FlexModule,
+    FormlyForm,
+    LogoComponent,
+    MatButtonModule,
+    NgIf,
+    ReactiveFormsModule,
+    RouterModule,
+  ],
 })
 export class PasswordResetComponent {
   token: string;

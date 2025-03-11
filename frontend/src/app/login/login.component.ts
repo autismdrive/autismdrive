@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {Component, EventEmitter} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -8,6 +8,7 @@ import {LogoComponent} from '@app/logo/logo.component';
 import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
+import {FormlyMatInputModule} from '@ngx-formly/material/input';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {scrollToTop} from '@util/scrollToTop';
@@ -24,9 +25,11 @@ import {DeviceDetectorService} from 'ngx-device-detector';
     LogoComponent,
     ReactiveFormsModule,
     FormlyModule,
+    FormlyMatInputModule,
     MatButtonModule,
     RouterModule,
     AsyncPipe,
+    NgIf,
   ],
 })
 export class LoginComponent {

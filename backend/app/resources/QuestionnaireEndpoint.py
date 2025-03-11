@@ -35,7 +35,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         Parameters:
             name (str):
                 Snake-cased name of the questionnaire class (should also match the table name),
-                found in app.model.questionnaires.
+                found in app.models.
                 E.g., clinical_diagnoses_questionnaire -> ClinicalDiagnosesQuestionnaire
 
             questionnaire_id (int): ID of the questionnaire record to retrieve

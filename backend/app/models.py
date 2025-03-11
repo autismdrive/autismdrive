@@ -566,7 +566,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
             "RELATIONSHIP_REQUIRED": ["dependent"],
             "display_order": 1.1,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "required": False,
                 "label": "",
                 "options": [
@@ -584,13 +584,13 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
             "RELATIONSHIP_REQUIRED": ["dependent"],
             "display_order": 1.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter your relationship",
                 "required": True,
             },
             "hide_expression": relationship_to_participant_other_hide_expression,
             "expression_properties": {
-                "template_options.required": "!" + relationship_to_participant_other_hide_expression
+                "props.required": "!" + relationship_to_participant_other_hide_expression
             },
         },
     )
@@ -598,16 +598,16 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "input",
-            "template_options": {"label": "First name", "required": True},
+            "props": {"label": "First name", "required": True},
         },
     )
     middle_name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "input",
-            "template_options": {"label": "Middle name"},
+            "props": {"label": "Middle name"},
             "hide_expression": "model.no_middle_name",
-            "expression_properties": {"template_options.required": "!model.no_middle_name"},
+            "expression_properties": {"props.required": "!model.no_middle_name"},
         },
     )
     no_middle_name: Mapped[Optional[bool]] = mapped_column(
@@ -615,7 +615,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
             "display_order": 3.5,
             "type": "checkbox",
             "defaultValue": False,
-            "template_options": {
+            "props": {
                 "label": "If NO Middle Name click here",
                 "required": False,
             },
@@ -625,14 +625,14 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "input",
-            "template_options": {"label": "Last name", "required": True},
+            "props": {"label": "Last name", "required": True},
         },
     )
     is_first_name_preferred: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 5,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "required": False,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
@@ -654,7 +654,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 6,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Nickname",
                 "required": False,
             },
@@ -666,7 +666,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 7,
             "type": "datepicker",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
@@ -684,7 +684,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 8,
             "type": "input",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
@@ -702,7 +702,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 9,
             "type": "input",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
@@ -720,7 +720,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 10,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "required": False,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
@@ -755,7 +755,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
                 ],
                 "display_order": 0,
                 "wrappers": ["card"],
-                "template_options": {
+                "props": {
                     "label": "Your relationship to your child or the person with autism on whom you are providing information:"
                 },
             },
@@ -763,7 +763,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
                 "fields": [],
                 "display_order": 1,
                 "wrappers": ["help"],
-                "template_options": {
+                "props": {
                     "description": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": "Please answer the following questions about yourself (* indicates required response):",
@@ -796,7 +796,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.1,
             "type": "input",
-            "template_options": {
+            "props": {
                 "required": True,
                 "type": "tel",
                 "label": "Preferred number",
@@ -810,7 +810,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Type",
                 "placeholder": "",
                 "description": "",
@@ -826,7 +826,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.3,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Leave voicemail?",
                 "description": "Is it okay to leave a voicemail message at this number?",
                 "required": False,
@@ -841,7 +841,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.4,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Best times to call",
                 "description": "Some research studies might involve a phone call. "
                 "If that’s the case, when would be the best times "
@@ -854,7 +854,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Email",
                 "type": "email",
                 "required": True,
@@ -866,28 +866,28 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.1,
             "type": "input",
-            "template_options": {"label": "Street Address", "required": True},
+            "props": {"label": "Street Address", "required": True},
         },
     )
     city: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {"label": "Town/City", "required": False},
+            "props": {"label": "Town/City", "required": False},
         },
     )
     state: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.3,
             "type": "input",
-            "template_options": {"label": "State", "required": False},
+            "props": {"label": "State", "required": False},
         },
     )
     zip: Mapped[Optional[int]] = mapped_column(
         info={
             "display_order": 3.4,
             "type": "input",
-            "template_options": {
+            "props": {
                 "type": "number",
                 "label": "Zip",
                 "max": 99999,
@@ -901,7 +901,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4.1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "label": "",
                 "placeholder": "Please select how you heard about us",
                 "description": "",
@@ -923,12 +923,12 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Please specify how you heard about us",
                 "required": True,
             },
             "hide_expression": marketing_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + marketing_other_hide_expression},
+            "expression_properties": {"props.required": "!" + marketing_other_hide_expression},
         },
     )
 
@@ -943,25 +943,25 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
                 ],
                 "display_order": 1,
                 "wrappers": ["card"],
-                "template_options": {"label": "Phone"},
+                "props": {"label": "Phone"},
             },
             "address": {
                 "fields": ["street_address", "city", "state", "zip"],
                 "display_order": 3,
                 "wrappers": ["card"],
-                "template_options": {"label": "Address"},
+                "props": {"label": "Address"},
             },
             "email": {
                 "fields": ["email"],
                 "display_order": 4,
                 "wrappers": ["card"],
-                "template_options": {"label": "Email"},
+                "props": {"label": "Email"},
             },
             "marketing": {
                 "fields": ["marketing_channel", "marketing_other"],
                 "display_order": 5,
                 "wrappers": ["card"],
-                "template_options": {"label": "How did you hear about us?"},
+                "props": {"label": "How did you hear about us?"},
             },
         }
 
@@ -1488,7 +1488,7 @@ class AlternativeAugmentative(Base, QuestionnaireMixin):
             "type": "radio",
             "default": "self",
             "class_name": "vertical-radio-group",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Select device",
                 "placeholder": "Please select",
@@ -1517,19 +1517,19 @@ class AlternativeAugmentative(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Enter alternative and augmentative communication system",
                 "required": True,
             },
             "hide_expression": type_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
+            "expression_properties": {"props.required": "!" + type_other_hide_expression},
         },
     )
     timeframe: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -1544,7 +1544,7 @@ class AlternativeAugmentative(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Notes on use and/or issues with alternative and augmentative communication system",
                 "required": False,
             },
@@ -1557,7 +1557,7 @@ class AlternativeAugmentative(Base, QuestionnaireMixin):
                 "fields": ["type", "type_other"],
                 "display_order": 1,
                 "wrappers": ["card"],
-                "template_options": {"label": "Type of alternative and augmentative communication system"},
+                "props": {"label": "Type of alternative and augmentative communication system"},
             }
         }
 
@@ -1577,7 +1577,7 @@ class AssistiveDevice(Base, QuestionnaireMixin):
         info={
             "display_order": 1.1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Select category of device",
                 "placeholder": "Please select",
@@ -1610,7 +1610,7 @@ class AssistiveDevice(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "select",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Select device",
                 "placeholder": "Please select",
@@ -1713,7 +1713,7 @@ class AssistiveDevice(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.options": 'field.props.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
+                "props.options": 'field.props.allOptions.filter(t => t.groupValue === "other" || t.groupValue === model.type_group)',
                 "model.type": 'model.type_group === "other" ? "other" : (field.props.options.find(o => o.value === model.type) ? model.type : null)',
             },
         },
@@ -1722,19 +1722,19 @@ class AssistiveDevice(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Enter assistive device",
                 "required": True,
             },
             "hide_expression": type_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
+            "expression_properties": {"props.required": "!" + type_other_hide_expression},
         },
     )
     timeframe: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -1749,7 +1749,7 @@ class AssistiveDevice(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Notes on use and/or issues with assistive device",
                 "required": False,
             },
@@ -1762,7 +1762,7 @@ class AssistiveDevice(Base, QuestionnaireMixin):
                 "fields": ["type_group", "type", "type_other"],
                 "display_order": 1,
                 "wrappers": ["card"],
-                "template_options": {"label": "Type of assistive device"},
+                "props": {"label": "Type of assistive device"},
             }
         }
 
@@ -1811,7 +1811,7 @@ class ChainSession(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "datepicker",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Session Date",
             },
@@ -1822,7 +1822,7 @@ class ChainSession(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Session Complete?",
                 "options": [
@@ -1837,7 +1837,7 @@ class ChainSession(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Session Type",
                 "options": [
@@ -1863,7 +1863,7 @@ class ChallengingBehavior(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "datepicker",
-            "template_options": {
+            "props": {
                 "label": "Time challenging behavior occurred",
             },
         },
@@ -1891,7 +1891,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Task",
                 "options": [],
@@ -1916,7 +1916,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
     #         info={
     #             "display_order": 1,
     #             "type": "select",
-    #             "template_options": {
+    #             "props": {
     #                 "required": True,
     #                 "label": "Task",
     #                 "options": options,
@@ -1929,7 +1929,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "datepicker",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": "Step Date",
             },
@@ -1940,7 +1940,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 3,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "Focus Step",
                 "required": True,
@@ -1950,7 +1950,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
                 ],
             },
             "hide_expression": training_session_hide_expression,
-            "expression_properties": {"template_options.required": "!" + training_session_hide_expression},
+            "expression_properties": {"props.required": "!" + training_session_hide_expression},
         },
     )
 
@@ -1958,7 +1958,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "What prompt level was targeted for the focus step?",
                 "required": True,
@@ -1970,7 +1970,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
                 ],
             },
             "hide_expression": focus_step_hide_expression,
-            "expression_properties": {"template_options.required": "!" + focus_step_hide_expression},
+            "expression_properties": {"props.required": "!" + focus_step_hide_expression},
         },
     )
 
@@ -1978,7 +1978,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 5,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "Step Status",
                 "required": True,
@@ -1998,7 +1998,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 6,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "Task Complete?",
                 "required": True,
@@ -2014,7 +2014,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 7,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "Was Prompted?",
                 "required": True,
@@ -2030,7 +2030,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 8,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "What prompt did you use to complete the step?",
                 "required": True,
@@ -2048,7 +2048,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 9,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "Challenging Behavior?",
                 "required": True,
@@ -2064,7 +2064,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
         info={
             "display_order": 10,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "What was the primary reason for failing to complete the task?",
                 "required": True,
@@ -2099,7 +2099,7 @@ def _get_chain_session_field_groups(_self):
             "display_order": 3,
             "wrappers": ["card"],
             "repeat_class": ChainSessionStep,
-            "template_options": {
+            "props": {
                 "label": "Which tasks were attempted?",
                 "description": "Add a step",
             },
@@ -2118,7 +2118,7 @@ def _get_chain_session_step_field_groups(_self):
             "display_order": 11,
             "wrappers": ["card"],
             "repeat_class": ChallengingBehavior,
-            "template_options": {
+            "props": {
                 "label": "",
                 "description": "Add a challenging behavior",
             },
@@ -2136,7 +2136,7 @@ def _get_chain_questionnaire_field_groups(_self):
             "display_order": 3,
             "wrappers": ["card"],
             "repeat_class": ChainSession,
-            "template_options": {
+            "props": {
                 "label": "Chain Session",
                 "description": "Add a session",
             },
@@ -2169,7 +2169,7 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -2191,12 +2191,12 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter developmental condition",
                 "required": True,
             },
             "hide_expression": developmental_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + developmental_other_hide_expression},
+            "expression_properties": {"props.required": "!" + developmental_other_hide_expression},
         },
     )
     mental_health: Mapped[Optional[list[str]]] = mapped_column(
@@ -2204,7 +2204,7 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -2227,12 +2227,12 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter mental health condition",
                 "required": True,
             },
             "hide_expression": mental_health_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + mental_health_other_hide_expression},
+            "expression_properties": {"props.required": "!" + mental_health_other_hide_expression},
         },
     )
     medical: Mapped[Optional[list[str]]] = mapped_column(
@@ -2240,7 +2240,7 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -2260,12 +2260,12 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter medical condition",
                 "required": True,
             },
             "hide_expression": medical_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + medical_other_hide_expression},
+            "expression_properties": {"props.required": "!" + medical_other_hide_expression},
         },
     )
     genetic: Mapped[Optional[list[str]]] = mapped_column(
@@ -2273,7 +2273,7 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -2294,12 +2294,12 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter genetic condition",
                 "required": True,
             },
             "hide_expression": genetic_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + genetic_other_hide_expression},
+            "expression_properties": {"props.required": "!" + genetic_other_hide_expression},
         },
     )
 
@@ -2309,19 +2309,19 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
                 "fields": [],
                 "display_order": 0,
                 "wrappers": ["help"],
-                "template_options": {
+                "props": {
                     "label": "",
                     "description": "",
                 },
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
                             "self_guardian": '"Do you CURRENTLY have any of the following diagnoses? (please check all that apply)"',
                             "dependent": '"Does " + (formState.preferredName || "your child") + " CURRENTLY have any of the following diagnoses? (please check all that apply)"',
                         }
                     },
-                    "template_options.description": {
+                    "props.description": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies."',
                             "self_guardian": '"You may choose not to disclose confidential health information, however, this may cause to you to be excluded from some studies."',
@@ -2334,25 +2334,25 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
                 "fields": ["developmental", "developmental_other"],
                 "display_order": 1,
                 "wrappers": ["card"],
-                "template_options": {"label": "Developmental"},
+                "props": {"label": "Developmental"},
             },
             "mental_health_group": {
                 "fields": ["mental_health", "mental_health_other"],
                 "display_order": 2,
                 "wrappers": ["card"],
-                "template_options": {"label": "Mental health"},
+                "props": {"label": "Mental health"},
             },
             "medical_group": {
                 "fields": ["medical", "medical_other"],
                 "display_order": 3,
                 "wrappers": ["card"],
-                "template_options": {"label": "Medical"},
+                "props": {"label": "Medical"},
             },
             "genetic_group": {
                 "fields": ["genetic", "genetic_other"],
                 "display_order": 4,
                 "wrappers": ["card"],
-                "template_options": {"label": "Genetic Conditions"},
+                "props": {"label": "Genetic Conditions"},
             },
         }
 
@@ -2382,7 +2382,7 @@ class CurrentBehaviorsMixin(object):
             info={
                 "display_order": 3,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "label": "Academic Difficulties",
                     "required": False,
                     "options": [
@@ -2391,7 +2391,7 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": self.has_academic_difficulties_desc,
+                    "props.description": self.has_academic_difficulties_desc,
                 },
             },
         )
@@ -2403,7 +2403,7 @@ class CurrentBehaviorsMixin(object):
             info={
                 "display_order": 4,
                 "type": "multicheckbox",
-                "template_options": {
+                "props": {
                     "type": "array",
                     "label": "Area of difficulty",
                     "required": True,
@@ -2415,8 +2415,8 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": self.academic_difficulty_areas_desc,
-                    "template_options.required": "model.has_academic_difficulties",
+                    "props.description": self.academic_difficulty_areas_desc,
+                    "props.required": "model.has_academic_difficulties",
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
                 "validators": {"required": "multicheckbox"},
@@ -2427,9 +2427,9 @@ class CurrentBehaviorsMixin(object):
         info={
             "display_order": 4.2,
             "type": "input",
-            "template_options": {"label": "Enter area of academic difficulty", "required": True},
+            "props": {"label": "Enter area of academic difficulty", "required": True},
             "hide_expression": academic_difficulty_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + academic_difficulty_other_hide_expression},
+            "expression_properties": {"props.required": "!" + academic_difficulty_other_hide_expression},
         },
     )
 
@@ -2457,7 +2457,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBe
         info={
             "display_order": 1,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -2469,7 +2469,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBe
                 ],
             },
             "expression_properties": {
-                "template_options.label": '(formState.preferredName || "Your child") + "\'s current ' 'verbal ability:"'
+                "props.label": '(formState.preferredName || "Your child") + "\'s current ' 'verbal ability:"'
             },
         },
     )
@@ -2478,7 +2478,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBe
         info={
             "display_order": 2,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "",
                 "required": False,
@@ -2506,7 +2506,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBe
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"Does " + (formState.preferredName || "your child") + '
+                "props.label": '"Does " + (formState.preferredName || "your child") + '
                 '" currently engage in the following behaviors of concern?"'
             },
         },
@@ -2515,12 +2515,12 @@ class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBe
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter concerning behavior",
                 "required": True,
             },
             "hide_expression": concerning_behaviors_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + concerning_behaviors_other_hide_expression},
+            "expression_properties": {"props.required": "!" + concerning_behaviors_other_hide_expression},
         },
     )
 
@@ -2542,7 +2542,7 @@ class CurrentBehaviorsSelfQuestionnaire(Base, QuestionnaireMixin, CurrentBehavio
         info={
             "display_order": 1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "How do you best communicate?",
                 "required": False,
@@ -2584,7 +2584,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "required": True,
                 "label": {
                     "RELATIONSHIP_SPECIFIC": {
@@ -2600,7 +2600,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": {
+                "props.label": {
                     "RELATIONSHIP_SPECIFIC": {
                         "dependent": '(formState.preferredName || "your child") + "\'s" ' '+ " sex at birth"',
                     }
@@ -2612,7 +2612,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2.1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "required": True,
                 "options": [
                     {"value": "male", "label": "Male"},
@@ -2625,12 +2625,12 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
                 "label": "Your current gender identity:",
             },
             "expression_properties": {
-                "template_options.label": {
+                "props.label": {
                     "RELATIONSHIP_SPECIFIC": {
                         "dependent": '(formState.preferredName || "Your child") + "\'s current gender identity"',
                     }
                 },
-                "template_options.placeholder": {
+                "props.placeholder": {
                     "RELATIONSHIP_SPECIFIC": {
                         "dependent": '"Please select " + (formState.preferredName || "your child") + "\'s gender"',
                     }
@@ -2642,12 +2642,12 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter gender identity",
                 "required": True,
             },
             "hide_expression": gender_identity_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + gender_identity_other_hide_expression},
+            "expression_properties": {"props.required": "!" + gender_identity_other_hide_expression},
         },
     )
     race_ethnicity: Mapped[Optional[list[str]]] = mapped_column(
@@ -2655,7 +2655,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "label": "Race/Ethnicity",
                 "type": "array",
                 "required": True,
@@ -2678,12 +2678,12 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter race/ethnicity",
                 "required": True,
             },
             "hide_expression": race_ethnicity_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + race_ethnicity_other_hide_expression},
+            "expression_properties": {"props.required": "!" + race_ethnicity_other_hide_expression},
         },
     )
 
@@ -2693,13 +2693,13 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
                 "fields": ["birth_sex", "gender_identity", "gender_identity_other"],
                 "display_order": 2,
                 "wrappers": ["card"],
-                "template_options": {"label": "Gender"},
+                "props": {"label": "Gender"},
             },
             "race": {
                 "fields": ["race_ethnicity", "race_ethnicity_other"],
                 "display_order": 3,
                 "wrappers": ["card"],
-                "template_options": {
+                "props": {
                     "label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": "What is your race/ethnicity?",
@@ -2709,7 +2709,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
                     }
                 },
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "dependent": '"What is " + (formState.preferredName || "your child") + "\'s" + '
                             '" race/ethnicity?"',
@@ -2736,7 +2736,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Were there any complications during the pregnancy or delivery?",
                 "required": False,
                 "options": [
@@ -2750,7 +2750,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Please describe:",
                 "required": False,
             },
@@ -2761,7 +2761,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -2772,7 +2772,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"When did " + '
+                "props.label": '"When did " + '
                 '(formState.preferredName || "Your child") + '
                 '" reach their motor developmental milestones '
                 '(e.g., walking, crawling, etc.)?"'
@@ -2783,7 +2783,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -2794,7 +2794,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"When did " + '
+                "props.label": '"When did " + '
                 '(formState.preferredName || "Your child") + '
                 '" reach their speech/language developmental milestones '
                 '(e.g., babbling, using first words and phrases)?"'
@@ -2805,7 +2805,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -2816,7 +2816,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"When did " + '
+                "props.label": '"When did " + '
                 '(formState.preferredName || "Your child") + '
                 '" reach their toileting milestones (e.g., potty training)?"'
             },
@@ -2849,7 +2849,7 @@ class EducationMixin(object):
             info={
                 "display_order": 1,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "label": "Attend a school or program?",
                     "required": False,
                     "options": [
@@ -2858,7 +2858,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": self.attends_school_desc,
+                    "props.label": self.attends_school_desc,
                 },
             },
         )
@@ -2867,7 +2867,7 @@ class EducationMixin(object):
         info={
             "display_order": 2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Name of the school or program",
                 "required": False,
             },
@@ -2882,7 +2882,7 @@ class EducationMixin(object):
             info={
                 "display_order": 3,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "label": "Type of School",
                     "required": False,
                     "options": [
@@ -2892,7 +2892,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.school_type_desc,
+                    "props.label": cls.school_type_desc,
                 },
                 "hide_expression": "!(model.attends_school)",
             },
@@ -2905,12 +2905,12 @@ class EducationMixin(object):
             info={
                 "display_order": 4.3,
                 "type": "input",
-                "template_options": {
+                "props": {
                     "label": "Enter school placement",
                     "required": True,
                 },
                 "hide_expression": cls.placement_other_hide_expression,
-                "expression_properties": {"template_options.required": "!" + cls.placement_other_hide_expression},
+                "expression_properties": {"props.required": "!" + cls.placement_other_hide_expression},
             },
         )
 
@@ -2921,12 +2921,12 @@ class EducationMixin(object):
             info={
                 "display_order": 5,
                 "type": "input",
-                "template_options": {
+                "props": {
                     "label": "School grade level",
                     "required": True,
                 },
                 "hide_expression": cls.current_grade_hide_expression,
-                "expression_properties": {"template_options.required": "!" + cls.current_grade_hide_expression},
+                "expression_properties": {"props.required": "!" + cls.current_grade_hide_expression},
             },
         )
 
@@ -2937,7 +2937,7 @@ class EducationMixin(object):
             info={
                 "display_order": 6.1,
                 "type": "multicheckbox",
-                "template_options": {
+                "props": {
                     "type": "array",
                     "required": False,
                     "options": [
@@ -2965,7 +2965,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.label": cls.school_services_desc,
+                    "props.label": cls.school_services_desc,
                 },
                 "hide_expression": "!(model.attends_school)",
             },
@@ -2975,12 +2975,12 @@ class EducationMixin(object):
         info={
             "display_order": 6.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Describe additional services",
                 "required": True,
             },
             "hide_expression": school_services_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + school_services_other_hide_expression},
+            "expression_properties": {"props.required": "!" + school_services_other_hide_expression},
         },
     )
 
@@ -2989,14 +2989,14 @@ class EducationMixin(object):
             "placement_group": {
                 "display_order": 4,
                 "wrappers": ["card"],
-                "template_options": {"label": "Placement"},
+                "props": {"label": "Placement"},
                 "hide_expression": "!(model.attends_school)",
             },
             "school_services_group": {
                 "fields": ["school_services", "school_services_other"],
                 "display_order": 6,
                 "wrappers": ["card"],
-                "template_options": {"label": "School Services"},
+                "props": {"label": "School Services"},
                 "hide_expression": "!(model.attends_school)",
             },
         }
@@ -3016,7 +3016,7 @@ class EducationDependentQuestionnaire(Base, QuestionnaireMixin, EducationMixin):
         info={
             "display_order": 4.2,
             "type": "select",
-            "template_options": {
+            "props": {
                 "label": "",
                 "placeholder": "Please select placement",
                 "required": False,
@@ -3032,7 +3032,7 @@ class EducationDependentQuestionnaire(Base, QuestionnaireMixin, EducationMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": '"What is " + (formState.preferredName || "your child") + "\'s '
+                "props.label": '"What is " + (formState.preferredName || "your child") + "\'s '
                 'current grade/school placement?"',
             },
             "hide_expression": "!(model.attends_school)",
@@ -3059,7 +3059,7 @@ class EducationSelfQuestionnaire(Base, QuestionnaireMixin, EducationMixin):
         info={
             "display_order": 4.1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "label": "Program Type",
                 "placeholder": "Please select program type",
                 "required": False,
@@ -3097,7 +3097,7 @@ class EmploymentQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.1,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Are you currently employed?",
                 "required": False,
                 "options": [{"value": True, "label": "Yes"}, {"value": False, "label": "No"}],
@@ -3109,7 +3109,7 @@ class EmploymentQuestionnaire(Base, QuestionnaireMixin):
             "display_order": 1.2,
             "type": "radio",
             "default_value": "n/a",
-            "template_options": {
+            "props": {
                 "label": "In what capacity?",
                 "required": False,
                 "options": [
@@ -3124,7 +3124,7 @@ class EmploymentQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Receiving Support?",
                 "description": "Do you currently receive supports to help you work successfully, such as job coaching "
                 "or vocational training?",
@@ -3161,7 +3161,7 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 1,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "required": True,
                     "label": "Formal Diagnosis?",
                     "options": [
@@ -3169,7 +3169,7 @@ class EvaluationHistoryMixin(object):
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {"template_options.description": cls.has_autism_diagnosis_label},
+                "expression_properties": {"props.description": cls.has_autism_diagnosis_label},
             },
         )
 
@@ -3180,14 +3180,14 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 2,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "required": False,
                     "options": [
                         {"value": True, "label": "Yes"},
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {"template_options.label": cls.self_identifies_autistic_label},
+                "expression_properties": {"props.label": cls.self_identifies_autistic_label},
             },
         )
 
@@ -3198,14 +3198,14 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 3,
                 "type": "input",
-                "template_options": {
+                "props": {
                     "label": "Age at Diagnosis",
                     "type": "number",
                     "max": 130,
                 },
                 "expression_properties": {
-                    "template_options.description": cls.years_old_at_first_diagnosis_label,
-                    "template_options.required": "model.has_autism_diagnosis",
+                    "props.description": cls.years_old_at_first_diagnosis_label,
+                    "props.required": "model.has_autism_diagnosis",
                 },
                 "hide_expression": "!(model.has_autism_diagnosis)",
                 "validation": {
@@ -3223,7 +3223,7 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 4,
                 "type": "select",
-                "template_options": {
+                "props": {
                     "label": "First Diagnosed by:",
                     "placeholder": "Please select from these options",
                     "options": [
@@ -3242,8 +3242,8 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.who_diagnosed_label,
-                    "template_options.required": "model.has_autism_diagnosis",
+                    "props.description": cls.who_diagnosed_label,
+                    "props.required": "model.has_autism_diagnosis",
                 },
                 "hide_expression": "!(model.has_autism_diagnosis)",
             },
@@ -3253,13 +3253,13 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 5,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Diagnosed by other?",
                 "placeholder": "Please Describe",
                 "required": True,
             },
             "hide_expression": who_diagnosed_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + who_diagnosed_other_hide_expression},
+            "expression_properties": {"props.required": "!" + who_diagnosed_other_hide_expression},
         },
     )
 
@@ -3271,7 +3271,7 @@ class EvaluationHistoryMixin(object):
                 "display_order": 6,
                 "type": "radio",
                 "className": "vertical-radio-group",
-                "template_options": {
+                "props": {
                     "label": "Diagnosed At",
                     "placeholder": "Please select from these options",
                     "options": [
@@ -3310,8 +3310,8 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.where_diagnosed_label,
-                    "template_options.required": "model.has_autism_diagnosis",
+                    "props.description": cls.where_diagnosed_label,
+                    "props.required": "model.has_autism_diagnosis",
                 },
                 "hide_expression": "!(model.has_autism_diagnosis)",
             },
@@ -3321,12 +3321,12 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 7,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Where was this diagnosis made?",
                 "required": True,
             },
             "hide_expression": where_diagnosed_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + where_diagnosed_other_hide_expression},
+            "expression_properties": {"props.required": "!" + where_diagnosed_other_hide_expression},
         },
     )
 
@@ -3335,7 +3335,7 @@ class EvaluationHistoryMixin(object):
         info={
             "display_order": 8.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -3361,7 +3361,7 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 9,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "label": "Permission to Link Data",
                     "required": False,
                     "options": [
@@ -3370,7 +3370,7 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.gives_permission_to_link_evaluation_data_desc,
+                    "props.description": cls.gives_permission_to_link_evaluation_data_desc,
                 },
                 "hide_expression": '!(model.partner_centers_evaluation && (model.partner_centers_evaluation.length > 0) && !model.partner_centers_evaluation.includes("none"))',
             },
@@ -3383,7 +3383,7 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 10,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "required": False,
                     "label": "Taken an IQ Test?",
                     "options": [
@@ -3392,7 +3392,7 @@ class EvaluationHistoryMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "template_options.description": cls.has_iq_test_desc,
+                    "props.description": cls.has_iq_test_desc,
                 },
             },
         )
@@ -3404,7 +3404,7 @@ class EvaluationHistoryMixin(object):
             info={
                 "display_order": 11,
                 "type": "input",
-                "template_options": {
+                "props": {
                     "label": "IQ Score",
                     "placeholder": "Please enter the number of the most recent score, if known. Otherwise, leave this field blank.",
                     "type": "number",
@@ -3421,7 +3421,7 @@ class EvaluationHistoryMixin(object):
                 "fields": ["partner_centers_evaluation", "gives_permission_to_link_evaluation_data"],
                 "display_order": 8,
                 "wrappers": ["card"],
-                "template_options": {"label": ""},
+                "props": {"label": ""},
                 "expression_properties": {},
             }
         }
@@ -3445,7 +3445,7 @@ class EvaluationHistoryDependentQuestionnaire(Base, QuestionnaireMixin, Evaluati
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
-        field_groups["partner_centers"]["expression_properties"]["template_options.label"] = (
+        field_groups["partner_centers"]["expression_properties"]["props.label"] = (
             '"Has " + (formState.preferredName || "your child") + '
             '" ever been evaluated at any of the following centers?"'
         )
@@ -3468,7 +3468,7 @@ class EvaluationHistorySelfQuestionnaire(Base, QuestionnaireMixin, EvaluationHis
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
-        field_groups["partner_centers"]["template_options"][
+        field_groups["partner_centers"]["props"][
             "label"
         ] = "Have you ever been evaluated at any of the following centers?"
         return field_groups
@@ -3500,7 +3500,7 @@ class HomeMixin(object):
             info={
                 "display_order": 4,
                 "type": "radio",
-                "template_options": {
+                "props": {
                     "required": False,
                     "label": "Financial Struggles",
                     "options": [
@@ -3508,7 +3508,7 @@ class HomeMixin(object):
                         {"value": False, "label": "No"},
                     ],
                 },
-                "expression_properties": {"template_options.description": cls.struggle_to_afford_desc},
+                "expression_properties": {"props.description": cls.struggle_to_afford_desc},
             },
         )
 
@@ -3519,7 +3519,7 @@ class HomeMixin(object):
                 "display_order": 3,
                 "wrappers": ["card"],
                 "repeat_class": Housemate,
-                "template_options": {
+                "props": {
                     "label": "Who else lives there?",
                     "description": "Add a housemate",
                 },
@@ -3546,7 +3546,7 @@ class HomeDependentQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": True,
                 "label": "Current Living Situation",
@@ -3566,14 +3566,14 @@ class HomeDependentQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": True,
             },
             "hide_expression": dependent_living_other_hide_expression,
             "expression_properties": {
-                "template_options.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"',
-                "template_options.required": "!" + dependent_living_other_hide_expression,
+                "props.label": '"Please describe "+ (formState.preferredName || "your child") + "\'s current living situation"',
+                "props.required": "!" + dependent_living_other_hide_expression,
             },
         },
     )
@@ -3584,9 +3584,9 @@ class HomeDependentQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
             "fields": ["dependent_living_situation", "dependent_living_other"],
             "display_order": 2,
             "wrappers": ["card"],
-            "template_options": {"label": "Current Living Situation"},
+            "props": {"label": "Current Living Situation"},
             "expression_properties": {
-                "template_options.label": '"Where does " + (formState.preferredName || "your child") + " currently '
+                "props.label": '"Where does " + (formState.preferredName || "your child") + " currently '
                 'live (select all that apply)?"'
             },
         }
@@ -3595,7 +3595,7 @@ class HomeDependentQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
         ] = '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
 
         field_groups["housemates"]["expression_properties"] = {
-            "template_options.label": '"Who else lives with " + (formState.preferredName || "your child") + "?"'
+            "props.label": '"Who else lives with " + (formState.preferredName || "your child") + "?"'
         }
 
         return field_groups
@@ -3619,14 +3619,14 @@ class Housemate(Base, QuestionnaireMixin):
         info={
             "display_order": 3.1,
             "type": "input",
-            "template_options": {"label": "Name", "required": True},
+            "props": {"label": "Name", "required": True},
         },
     )
     relationship: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3.2,
             "type": "select",
-            "template_options": {
+            "props": {
                 "required": False,
                 "label": "Relationship",
                 "placeholder": "Please select",
@@ -3649,7 +3649,7 @@ class Housemate(Base, QuestionnaireMixin):
                 ],
             },
             "expression_properties": {
-                "template_options.label": {
+                "props.label": {
                     "RELATIONSHIP_SPECIFIC": {
                         "self_participant": '"Relationship to you"',
                         "self_guardian": '"Relationship to you"',
@@ -3664,19 +3664,19 @@ class Housemate(Base, QuestionnaireMixin):
         info={
             "display_order": 3.3,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Please enter their relationship",
                 "required": True,
             },
             "hide_expression": relationship_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + relationship_other_hide_expression},
+            "expression_properties": {"props.required": "!" + relationship_other_hide_expression},
         },
     )
     age: Mapped[int] = mapped_column(
         info={
             "display_order": 3.4,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Age",
                 "type": "number",
                 "max": 130,
@@ -3693,7 +3693,7 @@ class Housemate(Base, QuestionnaireMixin):
         info={
             "display_order": 3.5,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Does this relation have autism?",
                 "required": False,
                 "options": [
@@ -3724,7 +3724,7 @@ class HomeSelfQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
         info={
             "display_order": 1.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "label": "Current Living Situation",
                 "required": True,
@@ -3745,23 +3745,23 @@ class HomeSelfQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
         info={
             "display_order": 1.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Describe your current living situation",
                 "required": True,
             },
             "hide_expression": self_living_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + self_living_other_hide_expression},
+            "expression_properties": {"props.required": "!" + self_living_other_hide_expression},
         },
     )
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
-        field_groups["housemates"]["template_options"]["label"] = "Who else lives with you?"
+        field_groups["housemates"]["props"]["label"] = "Who else lives with you?"
         field_groups["self_living"] = {
             "fields": ["self_living_situation", "self_living_other"],
             "display_order": 1,
             "wrappers": ["card"],
-            "template_options": {"label": "Where do you currently live?"},
+            "props": {"label": "Where do you currently live?"},
         }
         return field_groups
 
@@ -3779,7 +3779,7 @@ class Medication(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "label": "Select symptom",
                 "placeholder": "Please select",
                 "required": True,
@@ -3797,19 +3797,19 @@ class Medication(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Enter symptom",
                 "required": True,
             },
             "hide_expression": symptom_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + symptom_other_hide_expression},
+            "expression_properties": {"props.required": "!" + symptom_other_hide_expression},
         },
     )
     name: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Name of Medication (if known)",
             },
         },
@@ -3818,7 +3818,7 @@ class Medication(Base, QuestionnaireMixin):
         info={
             "display_order": 3,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Notes on use and/or issues with medication",
                 "required": False,
             },
@@ -3831,9 +3831,9 @@ class Medication(Base, QuestionnaireMixin):
                 "fields": ["symptom", "symptom_other"],
                 "display_order": 1,
                 "wrappers": ["card"],
-                "template_options": {"label": ""},
+                "props": {"label": ""},
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Symptom for which you are taking medication"',
                             "self_guardian": '"Symptom for which you are taking medication"',
@@ -3869,7 +3869,7 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "select",
-            "template_options": {
+            "props": {
                 "label": "For what purposes are you interested in accessing the Autism DRIVE?",
                 "placeholder": "Please select",
                 "options": [
@@ -3885,7 +3885,7 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -3936,12 +3936,12 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 2.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Describe professional identity",
                 "required": True,
             },
             "hide_expression": professional_identity_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + professional_identity_other_hide_expression},
+            "expression_properties": {"props.required": "!" + professional_identity_other_hide_expression},
         },
     )
     learning_interests: Mapped[Optional[list[str]]] = mapped_column(
@@ -3949,7 +3949,7 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "required": False,
                 "options": [
@@ -3988,19 +3988,19 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.2,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "Enter other interests",
                 "required": True,
             },
             "hide_expression": learning_interests_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + learning_interests_other_hide_expression},
+            "expression_properties": {"props.required": "!" + learning_interests_other_hide_expression},
         },
     )
     currently_work_with_autistic: Mapped[Optional[bool]] = mapped_column(
         info={
             "display_order": 4,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Do you currently work with a person or people who have autism?",
                 "required": False,
                 "options": [
@@ -4014,7 +4014,7 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "Did you previously work with someone/people who had autism? ",
                 "required": False,
                 "options": [
@@ -4028,7 +4028,7 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 5,
             "type": "input",
-            "template_options": {
+            "props": {
                 "label": "In total, how long have you worked with someone/people who have autism? ",
                 "required": False,
             },
@@ -4041,13 +4041,13 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
                 "fields": ["professional_identity", "professional_identity_other"],
                 "display_order": 2,
                 "wrappers": ["card"],
-                "template_options": {"label": "I am a(n):"},
+                "props": {"label": "I am a(n):"},
             },
             "learning_interests": {
                 "fields": ["learning_interests", "learning_interests_other"],
                 "display_order": 3,
                 "wrappers": ["card"],
-                "template_options": {"label": "What topics or areas are you interested in learning about? "},
+                "props": {"label": "What topics or areas are you interested in learning about? "},
             },
         }
 
@@ -4102,7 +4102,7 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1,
             "type": "multicheckbox",
-            "template_options": {
+            "props": {
                 "type": "array",
                 "options": [
                     {"value": "altMedChiropractics", "label": "Chiropractics"},
@@ -4121,12 +4121,12 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Enter other alternative treatment",
                 "required": True,
             },
             "hide_expression": alternative_med_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + alternative_med_other_hide_expression},
+            "expression_properties": {"props.required": "!" + alternative_med_other_hide_expression},
         },
     )
     therapies = relationship(
@@ -4155,12 +4155,12 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
                 "display_order": 1,
                 "wrappers": ["card"],
                 "repeat_class": Medication,
-                "template_options": {
+                "props": {
                     "label": "",
                     "description": "Add a medication",
                 },
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Do you take any medications and/or vitamins?"',
                             "self_guardian": '"Do you take any medications and/or vitamins?"',
@@ -4173,9 +4173,9 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
                 "fields": ["alternative_med", "alternative_med_other"],
                 "display_order": 2,
                 "wrappers": ["card"],
-                "template_options": {"label": ""},
+                "props": {"label": ""},
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Are you receiving any complementary or alternative treatments?"',
                             "self_guardian": '"Are you receiving any complementary or alternative treatments?"',
@@ -4190,12 +4190,12 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
                 "display_order": 3,
                 "wrappers": ["card"],
                 "repeat_class": Therapy,
-                "template_options": {
+                "props": {
                     "label": "",
                     "description": "Add a therapy or service",
                 },
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"What kinds of therapies and services do you currently receive?"',
                             "self_guardian": '"What kinds of therapies and services do you currently receive?"',
@@ -4209,12 +4209,12 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
                 "display_order": 4,
                 "wrappers": ["card"],
                 "repeat_class": AssistiveDevice,
-                "template_options": {
+                "props": {
                     "label": "",
                     "description": "Add an assistive device",
                 },
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Do you use an assistive device?"',
                             "self_guardian": '"Do you use an assistive device?"',
@@ -4228,12 +4228,12 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
                 "display_order": 5,
                 "wrappers": ["card"],
                 "repeat_class": AlternativeAugmentative,
-                "template_options": {
+                "props": {
                     "label": "",
                     "description": "Add AAC",
                 },
                 "expression_properties": {
-                    "template_options.label": {
+                    "props.label": {
                         "RELATIONSHIP_SPECIFIC": {
                             "self_participant": '"Do you use an AAC (alternative & augmentative communication) system?"',
                             "self_guardian": '"Do you use an AAC (alternative & augmentative communication) system?"',
@@ -4259,7 +4259,7 @@ class Therapy(Base, QuestionnaireMixin):
             "display_order": 1,
             "type": "radio",
             "className": "vertical-radio-group",
-            "template_options": {
+            "props": {
                 "label": "Select type",
                 "placeholder": "Please select",
                 "required": True,
@@ -4319,19 +4319,19 @@ class Therapy(Base, QuestionnaireMixin):
         info={
             "display_order": 1.2,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Enter therapy or service",
                 "required": True,
             },
             "hide_expression": type_other_hide_expression,
-            "expression_properties": {"template_options.required": "!" + type_other_hide_expression},
+            "expression_properties": {"props.required": "!" + type_other_hide_expression},
         },
     )
     timeframe: Mapped[Optional[str]] = mapped_column(
         info={
             "display_order": 3,
             "type": "radio",
-            "template_options": {
+            "props": {
                 "label": "",
                 "required": False,
                 "options": [
@@ -4346,7 +4346,7 @@ class Therapy(Base, QuestionnaireMixin):
         info={
             "display_order": 4,
             "type": "textarea",
-            "template_options": {
+            "props": {
                 "label": "Notes on use and/or issues with therapy or service",
                 "required": False,
             },
@@ -4359,7 +4359,7 @@ class Therapy(Base, QuestionnaireMixin):
                 "fields": ["type", "type_other"],
                 "display_order": 1,
                 "wrappers": ["card"],
-                "template_options": {"label": "Type of therapy or service"},
+                "props": {"label": "Type of therapy or service"},
             }
         }
         return info

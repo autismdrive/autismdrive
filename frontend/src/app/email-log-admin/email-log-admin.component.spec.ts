@@ -1,5 +1,7 @@
+import {ActivatedRoute} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {EmailLogAdminComponent} from './email-log-admin.component';
@@ -12,6 +14,7 @@ describe('EmailLogAdminComponent', () => {
   beforeEach(() => {
     return MockBuilder(EmailLogAdminComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, '/email-log')})
       .mock(AuthenticationService, {currentUser: of(mockUser)})
       .mock(ApiService, {getAllEmailLog: jest.fn().mockReturnValue(of([]))});
   });

@@ -13,6 +13,8 @@ import {Participant} from '@models/participant';
 import {ParticipantAdminList} from '@models/participant_admin_list';
 import {PasswordRequirements} from '@models/password_requirements';
 import {Query} from '@models/query';
+import {Questionnaire} from '@models/questionnaire';
+import {QuestionnaireMeta} from '@models/questionnaire_meta';
 import {RelatedOptions, RelatedResults} from '@models/related_results';
 import {Resource} from '@models/resource';
 import {ResourceCategory} from '@models/resource_category';
@@ -653,9 +655,9 @@ export class ApiService {
   }
 
   /** getQuestionnaireListMeta */
-  getQuestionnaireListMeta(name: string) {
+  getQuestionnaireListMeta(name: string): Observable<QuestionnaireMeta> {
     const url = this._endpointUrl('questionnaireListMeta').replace('<name>', name);
-    return this.httpClient.get<object>(url).pipe(catchError(this._handleError));
+    return this.httpClient.get<QuestionnaireMeta>(url).pipe(catchError(this._handleError));
   }
 
   /** exportQuestionnaire */
@@ -671,24 +673,35 @@ export class ApiService {
     return this.httpClient.get(url, {observe: 'response', responseType: 'blob' as 'json'});
   }
 
-  /** getQuestionnaire */
-  getQuestionnaire(name: string, id: number) {
+  /**
+   * Returns a single questionnaire record, representing the user's response to the given questionnaire name.
+   *
+   * @param name = Questionnaire name
+   * @param id = User ID
+   */
+  getQuestionnaire(name: string, id: number): Observable<Questionnaire> {
     const url = this._endpointUrl('questionnaire').replace('<name>', name).replace('<id>', id.toString());
     return this.httpClient.get<object>(url).pipe(catchError(this._handleError));
   }
 
-  /** updateQuestionnaire */
+  /**
+   * Updates a single questionnaire record with the user's given answers to the given questionnaire name.
+   *
+   * @param name = Questionnaire name
+   * @param id = User ID
+   * @param options = Updated questionnaire answers
+   */
   updateQuestionnaire(name: string, id: number, options: object) {
     const url = this._endpointUrl('questionnaire').replace('<name>', name).replace('<id>', id.toString());
     return this.httpClient.put<object>(url, options).pipe(catchError(this._handleError));
   }
 
   /** getQuestionnaireMeta */
-  getQuestionnaireMeta(flow: string, questionnaire_name: string) {
+  getQuestionnaireMeta(flow: string, questionnaire_name: string): Observable<QuestionnaireMeta> {
     const url = this._endpointUrl('questionnairemeta')
       .replace('<flow>', flow)
       .replace('<questionnaire_name>', questionnaire_name);
-    return this.httpClient.get<any>(url).pipe(catchError(this._handleError));
+    return this.httpClient.get<QuestionnaireMeta>(url).pipe(catchError(this._handleError));
   }
 
   /** submitQuestionnaire */

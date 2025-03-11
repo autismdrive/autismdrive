@@ -1,6 +1,6 @@
-import {QuestionnaireListMeta} from '@models/questionnaire_list_meta';
+import {QuestionnaireMeta} from '@models/questionnaire_meta';
 
-export const mockQuestionnaireListMeta: QuestionnaireListMeta = {
+export const mockQuestionnaireMeta: QuestionnaireMeta = {
   table: {
     question_type: 'sensitive',
     label: 'Clinical Diagnosis',
@@ -10,6 +10,7 @@ export const mockQuestionnaireListMeta: QuestionnaireListMeta = {
       name: 'id',
       key: 'id',
       display_order: 0,
+      type: 'string',
     },
   ],
 };

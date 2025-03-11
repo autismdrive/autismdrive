@@ -16,7 +16,6 @@ class ExportService:
 
     logger = logging.getLogger("ExportService")
 
-    QUESTION_PACKAGE = "app.model.questionnaires"
     SCHEMA_PACKAGE = "app.schemas"
     EXPORT_SCHEMA_CLASS = "ExportSchemas"
 

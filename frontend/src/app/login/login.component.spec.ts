@@ -1,5 +1,8 @@
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyConfig} from '@app/app.config';
+import {FormlyMatInputModule} from '@ngx-formly/material/input';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {LoginComponent} from './login.component';
@@ -11,22 +14,34 @@ import {FormlyModule} from '@ngx-formly/core';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
-  let fixture: MockedComponentFixture<LoginComponent>;
+  let fixture: MockedComponentFixture<any>;
+  let windowSpy: jest.SpyInstance;
 
   beforeEach(() => {
     return MockBuilder(LoginComponent)
-      .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
       .keep(FormlyModule.forRoot(FormlyConfig.config))
+      .keep(FormlyMatInputModule)
+      .keep(RouterModule)
+      .keep(NoopAnimationsModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({returnUrl: 'http://some.url'},{email_token: 'some_token'},'login')})
+      .mock(AuthenticationService, {currentUser: of(mockUser)})
       .mock(DeviceDetectorService)
       .mock(GoogleAnalyticsService)
-      .keep(ActivatedRoute)
-      .keep(RouterModule);
   });
 
   beforeEach(() => {
-    fixture = MockRender(LoginComponent, null, {detectChanges: true});
+    windowSpy = jest.spyOn(globalThis, "window", "get");
+    windowSpy.mockImplementation(() => ({
+      scroll: jest.fn(),
+    }));
+
+    fixture = MockRender(LoginComponent, {animations: {'@transitionMessages': {}}}, {detectChanges: true});
     component = fixture.point.componentInstance;
+  });
+
+  afterEach(() => {
+    windowSpy.mockRestore();
   });
 
   it('should create', () => {

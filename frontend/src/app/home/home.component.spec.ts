@@ -1,9 +1,10 @@
 import {ApiService} from '@services/api/api.service';
 import {ConfigService} from '@services/config/config.service';
+import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {HomeComponent} from './home.component';
-import {RouterModule} from '@angular/router';
+import {ActivatedRoute, RouterModule} from '@angular/router';
 import {of} from 'rxjs';
 
 describe('HomeComponent', () => {
@@ -15,6 +16,7 @@ describe('HomeComponent', () => {
       .keep(RouterModule)
       .mock(ConfigService)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, '/home')})
       .mock(ApiService, {
         getStudiesByStatus: jest.fn().mockReturnValue(of([mockStudy])),
       });

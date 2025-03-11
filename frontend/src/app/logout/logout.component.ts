@@ -1,6 +1,8 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import {RouterModule} from '@angular/router';
 import {fadeTransition} from '@animations/animations';
+import {LogoComponent} from '@app/logo/logo.component';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
@@ -9,6 +11,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.scss'],
   animations: [fadeTransition()],
+  imports: [FlexModule, LogoComponent, RouterModule],
 })
 export class LogoutComponent implements OnInit {
   @HostBinding('@fadeTransition')

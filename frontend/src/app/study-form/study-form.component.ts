@@ -84,11 +84,12 @@ export class StudyFormComponent implements OnInit {
       },
       {
         key: 'description',
-        type: 'textarea-auto-resize',
+        type: 'textarea',
         props: {
           label: 'Description',
           placeholder: 'Please enter the description of your study',
           required: true,
+          autosize: true,
         },
       },
       {
@@ -103,10 +104,11 @@ export class StudyFormComponent implements OnInit {
       },
       {
         key: 'participant_description',
-        type: 'textarea-auto-resize',
+        type: 'textarea',
         props: {
           label: 'Participant Description',
           placeholder: 'Who are you looking for to participate in your study?',
+          autosize: true,
         },
         expressionProperties: {
           'props.required': 'model.status === "currently_enrolling"',

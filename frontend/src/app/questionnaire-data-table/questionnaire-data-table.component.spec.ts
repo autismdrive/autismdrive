@@ -1,5 +1,5 @@
 import {ApiService} from '@services/api/api.service';
-import {mockQuestionnaireListMeta} from '@util/testing/fixtures/mock-questionnaire-list-meta';
+import {mockQuestionnaireMeta} from '@util/testing/fixtures/mock-questionnaire-meta';
 import {mockExportResponse} from '@util/testing/fixtures/mock-response';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {QuestionnaireDataTableComponent} from './questionnaire-data-table.component';
@@ -14,7 +14,7 @@ describe('QuestionnaireDataTableComponent', () => {
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {
         getQuestionnaireList: jest.fn().mockReturnValue(of([])),
-        getQuestionnaireListMeta: jest.fn().mockReturnValue(of(mockQuestionnaireListMeta)),
+        getQuestionnaireListMeta: jest.fn().mockReturnValue(of(mockQuestionnaireMeta)),
         exportQuestionnaire: jest.fn().mockReturnValue(of(mockExportResponse)),
       });
   });

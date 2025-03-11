@@ -1493,6 +1493,16 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "struggle_to_afford": False,
             "participant_id": p.id,
         }
+
+        rv_meta = self.client.get(
+            "api/flow/self_intake/home_self_questionnaire/meta",
+            content_type="application/json",
+            follow_redirects=True,
+            headers=headers,
+        )
+        self.assert_success(rv_meta)
+
+
         rv = self.client.post(
             "api/flow/self_intake/home_self_questionnaire",
             data=self.jsonify(home_self_questionnaire),
@@ -1509,6 +1519,14 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_identification_questionnaire_basics(self):
         self.construct_identification_questionnaire()
+
+        rv_meta = self.client.get(
+            "/api/flow/self_intake/identification_questionnaire/meta",
+            follow_redirects=True,
+            content_type="application/json",
+            headers=self.logged_in_headers(),
+        )
+        self.assert_success(rv_meta)
 
         iq = self.session.query(IdentificationQuestionnaire).first()
         self.assertIsNotNone(iq)
@@ -2019,17 +2037,17 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assert_success(rv)
         response = rv.json
         intro = self._get_field("intro", response)
-        self.assertIsNotNone(intro["template_options"]["description"])
+        self.assertIsNotNone(intro["props"]["description"])
         self.assertEqual(
-            intro["template_options"]["description"],
+            intro["props"]["description"],
             "Please answer the following questions about yourself (* indicates required response):",
         )
 
         birth_city = self._get_field("birth_city", response)
         self.assertIsNotNone(birth_city)
-        self.assertIsNotNone(birth_city["template_options"])
-        self.assertIsNotNone(birth_city["template_options"]["label"])
-        self.assertEqual(birth_city["template_options"]["label"], "Your city/municipality of birth")
+        self.assertIsNotNone(birth_city["props"])
+        self.assertIsNotNone(birth_city["props"]["label"])
+        self.assertEqual(birth_city["props"]["label"], "Your city/municipality of birth")
 
         rv = self.client.get(
             "/api/flow/dependent_intake/identification_questionnaire/meta",
@@ -2040,8 +2058,8 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assert_success(rv)
         response = rv.json
         birth_city = self._get_field("birth_city", response)
-        self.assertIsNotNone(birth_city["template_options"]["label"])
-        self.assertEqual(birth_city["template_options"]["label"], "Your child's city/municipality of birth")
+        self.assertIsNotNone(birth_city["props"]["label"])
+        self.assertEqual(birth_city["props"]["label"], "Your child's city/municipality of birth")
 
     def test_questionnaire_meta_has_relation_required_fields(self):
         rv = self.client.get(

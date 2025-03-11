@@ -6,7 +6,6 @@ import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/g
 import {HelpWrapperComponent} from '@forms/help-wrapper/help-wrapper.component';
 import {MultiselectTreeComponent} from '@forms/multiselect-tree/multiselect-tree.component';
 import {RepeatSectionComponent} from '@forms/repeat-section/repeat-section.component';
-import {ResizeTextareaComponent} from '@forms/resize-textarea/resize-textarea.component';
 import {
   EmailMatchValidator,
   EmailMatchValidatorMessage,
@@ -90,11 +89,6 @@ export class FormlyConfig {
         name: 'multiselecttree',
         component: MultiselectTreeComponent,
         wrappers: ['card'],
-      },
-      {
-        name: 'textarea-auto-resize',
-        component: ResizeTextareaComponent,
-        wrappers: ['form-field'],
       },
     ],
     validators: [
