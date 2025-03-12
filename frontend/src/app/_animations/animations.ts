@@ -10,6 +10,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import {HeaderState, MenuState, ViewportWidth} from '@models/scroll';
 
 const easing = '0.5s ease-in-out';
 const hide = style({opacity: 0});
@@ -23,6 +24,11 @@ const zoomedIn = style({opacity: 0, transform: 'translateX(0%) scale(10)'});
 const offScreenLeft = style({opacity: 0, transform: 'translateX(-100%) scale(1)'});
 const offScreenRight = style({opacity: 0, transform: 'translateX(100%) scale(1)'});
 const fadedOut = style({opacity: 0, transform: 'translateX(0%) scale(1)'});
+const stateHiddenCollapsed = MenuState.Hidden + '-' + HeaderState.Collapsed;
+const stateHiddenExpanded = MenuState.Hidden + '-' + HeaderState.Expanded;
+const stateVisibleCollapsed = MenuState.Visible + '-' + HeaderState.Collapsed;
+const stateVisibleExpanded = MenuState.Visible + '-' + HeaderState.Expanded;
+const boxShadow = '0px 5px 5px 0px rgba(0, 0, 0, 0.3)';
 
 export function fadeTransition(): AnimationTriggerMetadata {
   return trigger('fadeTransition', [
@@ -87,3 +93,330 @@ export function zoomTransition(): AnimationTriggerMetadata {
     transition('* => slide-right-exit', [normal, animate(easing, offScreenRight), animate(easing, offScreenRight)]),
   ]);
 }
+
+export const commonAnimations = [
+  trigger('toggleMobileMenu', [
+    state(stateHiddenCollapsed + '-' + ViewportWidth.Small, style({top: '-100vh'})),
+    state(stateHiddenExpanded + '-' + ViewportWidth.Small, style({top: '-100vh'})),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Small,
+      style({
+        top: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    transition('* => *', animate(easing)),
+  ]),
+  trigger('toggleUvaHeader', [
+    state(
+      HeaderState.Collapsed,
+      style({
+        top: '-40px',
+        height: '40px',
+      }),
+    ),
+    state(HeaderState.Expanded, style({top: '0px', height: '40px'})),
+    transition('* => *', animate(easing)),
+  ]),
+  trigger('toggleMenuBar', [
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Medium,
+      style({
+        top: '40px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Medium,
+      style({
+        top: '40px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Large,
+      style({
+        top: '40px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Large,
+      style({
+        top: '40px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    transition('* => *', animate(easing)),
+  ]),
+  trigger('toggleTaglineToolbar', [
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Small,
+      style({
+        top: '104px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Medium,
+      style({
+        top: '104px',
+        height: '40px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Large,
+      style({
+        top: '104px',
+        height: '40px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Small,
+      style({
+        top: '104px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Medium,
+      style({
+        top: '104px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleCollapsed + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateVisibleExpanded + '-' + ViewportWidth.Large,
+      style({
+        top: '104px',
+        height: '40px',
+        'box-shadow': 'none',
+      }),
+    ),
+    transition('* => *', animate(easing)),
+  ]),
+  trigger('toggleBackground', [
+    state(
+      HeaderState.Collapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+      }),
+    ),
+    state(
+      HeaderState.Expanded + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+      }),
+    ),
+    state(
+      HeaderState.Collapsed + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '64px',
+      }),
+    ),
+    state(
+      HeaderState.Expanded + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '144px',
+      }),
+    ),
+    state(
+      HeaderState.Collapsed + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '64px',
+      }),
+    ),
+    state(
+      HeaderState.Expanded + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '144px',
+      }),
+    ),
+    transition('* => *', animate(easing)),
+  ]),
+  trigger('toggleResourceBar', [
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Small,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Medium,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Medium,
+      style({
+        top: '40px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    state(
+      stateHiddenCollapsed + '-' + ViewportWidth.Large,
+      style({
+        top: '0px',
+        height: '64px',
+        'box-shadow': boxShadow,
+      }),
+    ),
+    state(
+      stateHiddenExpanded + '-' + ViewportWidth.Large,
+      style({
+        top: '40px',
+        height: '64px',
+        'box-shadow': 'none',
+      }),
+    ),
+    transition('* => *', animate(easing)),
+  ]),
+];

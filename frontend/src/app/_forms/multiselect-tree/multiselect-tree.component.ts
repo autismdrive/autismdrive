@@ -1,12 +1,11 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {CdkTree} from '@angular/cdk/tree';
 import {NgIf} from '@angular/common';
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatBadge} from '@angular/material/badge';
-import {MatIconButton} from '@angular/material/button';
-import {MatCheckbox} from '@angular/material/checkbox';
-import {MatIcon} from '@angular/material/icon';
-import {MatNestedTreeNode, MatTree, MatTreeNodeDef, MatTreeNodeOutlet, MatTreeNodeToggle} from '@angular/material/tree';
+import {MatBadgeModule} from '@angular/material/badge';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTree, MatTreeModule} from '@angular/material/tree';
 import {TreeComponent} from '@app/_forms/tree/tree.component';
 import {Category} from '@models/category';
 import {Observable} from 'rxjs';
@@ -16,18 +15,7 @@ import {Observable} from 'rxjs';
   selector: 'app-multiselect-tree',
   templateUrl: './multiselect-tree.component.html',
   styleUrls: ['./multiselect-tree.component.scss'],
-  imports: [
-    MatBadge,
-    MatCheckbox,
-    MatIcon,
-    MatIconButton,
-    MatTreeNodeDef,
-    MatTreeNodeOutlet,
-    MatTreeNodeToggle,
-    MatTree,
-    MatNestedTreeNode,
-    NgIf,
-  ],
+  imports: [MatBadgeModule, MatCheckboxModule, MatIconModule, MatButtonModule, MatTreeModule, NgIf],
 })
 export class MultiselectTreeComponent extends TreeComponent implements OnInit {
   @ViewChild(MatTree) tree: MatTree<Category>;

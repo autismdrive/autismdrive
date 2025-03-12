@@ -25,7 +25,7 @@ import {StudyDetailComponent} from '../study-detail/study-detail.component';
 import {StudyFormComponent} from '../study-form/study-form.component';
 import {TaxonomyAdminComponent} from '../taxonomy-admin/taxonomy-admin.component';
 import {TermsComponent} from '../terms/terms.component';
-import {TimedoutComponent} from '../timed-out/timed-out.component';
+import {TimedOutComponent} from '../timed-out/timed-out.component';
 import {UserAdminDetailsComponent} from '../user-admin-details/user-admin-details.component';
 import {UserAdminComponent} from '../user-admin/user-admin.component';
 import {UvaEducationComponent} from '../uva-education/uva-education.component';
@@ -121,7 +121,7 @@ const routes: Routes = [
     data: {title: 'Agree to Terms and Conditions for an Autism DRIVE Account', hideHeader: true},
   },
   {path: 'logout', component: LogoutComponent, data: {title: 'You have been logged out.', hideHeader: true}},
-  {path: 'timedout', component: TimedoutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
+  {path: 'timedout', component: TimedOutComponent, data: {title: 'Your session has timed out.', hideHeader: true}},
   {path: 'search', component: SearchComponent, data: {title: 'Search Autism DRIVE'}},
   {path: 'search/:query', component: SearchComponent, data: {title: 'Search Autism DRIVE Resources'}},
   {

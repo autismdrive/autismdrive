@@ -1,9 +1,14 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
+import {MatBadgeModule} from '@angular/material/badge';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTreeModule} from '@angular/material/tree';
+import {FieldConfigCamelCase} from '@models/questionnaire_meta';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
-import {createFieldComponent} from '@ngx-formly/core/testing';
-import {FormlyMatFormFieldModule} from '@ngx-formly/material/form-field';
-import {keysToCamel} from '@util/snakeToCamel';
-import {mockHousematesQuestionnaireMeta} from '@util/testing/fixtures/mock-housemates-questionnaire-meta';
+import {FormlyMaterialModule} from '@ngx-formly/material';
+import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
 
 /**
  * Custom components that inherit from FormlyField are only rendered in the context of a form.
@@ -44,14 +49,25 @@ import {mockHousematesQuestionnaireMeta} from '@util/testing/fixtures/mock-house
  * });
  *
  */
+
 @Component({
   standalone: true,
   selector: 'app-mock-formly-form-component',
   template: '<formly-form [fields]="fields"></formly-form>',
-  imports: [FormlyModule],
+  imports: [
+    FormlyMatDatepickerModule,
+    FormlyMaterialModule,
+    FormlyModule,
+    MatBadgeModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatIconModule,
+    MatTreeModule,
+  ],
 })
 export class MockFormlyFormComponent {
-  fields = [keysToCamel(mockHousematesQuestionnaireMeta)];
+  @Input() fields: FormlyFieldConfig[] | FieldConfigCamelCase[];
 
   constructor() {}
 }

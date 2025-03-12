@@ -1,13 +1,11 @@
 import {NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
-import {Router, RouterModule} from '@angular/router';
+import {RouterModule} from '@angular/router';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {User} from '@models/user';
 import {UserMeta} from '@models/user_meta';
 import {FlexModule} from '@ngbracket/ngx-layout';
-import {ApiService} from '@services/api/api.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
 
 /**
  * Provides some messaging based on the profile meta information, this should be displayed
@@ -22,21 +20,11 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   imports: [FlexModule, NgIf, MatButtonModule, RouterModule],
 })
 export class ProfileMetaComponent {
-  @Input()
-  user: User;
-  @Input()
-  meta: UserMeta;
+  @Input() user: User;
+  @Input() meta: UserMeta;
 
   relationships = ParticipantRelationship;
 
-  constructor(
-    private authenticationService: AuthenticationService,
-    private api: ApiService,
-    private router: Router,
-  ) {}
+  constructor() {}
 
-  goFlow($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms', this.meta.self_relationship]);
-  }
 }

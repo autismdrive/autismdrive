@@ -24,6 +24,80 @@ import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/co
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
+export const profileFormFields = [
+  {
+    validators: {
+      fieldMatch: {
+        expression: (control: AbstractControl) => {
+          const {self_participant, guardian, professional, interested} = control.value;
+
+          // at least one checkbox should be selected.
+          return !(!self_participant && !guardian && !professional && !interested);
+        },
+        message: 'Please select at least one option.',
+      },
+    },
+    wrappers: ['group-validation'],
+    fieldGroup: [
+      {
+        key: 'self_participant',
+        type: 'checkbox',
+        props: {label: 'I am autistic/I have autism', indeterminate: false, class: 'self_participant'},
+      },
+      {
+        key: 'self_has_guardian',
+        type: 'radio',
+        props: {
+          label: 'Do you have a legal guardian?',
+          options: [
+            {value: true, label: 'Yes', id: '1'},
+            {value: false, label: 'No', id: '2'},
+          ],
+        },
+        expressionProperties: {
+          'props.required': 'model.self_participant',
+        },
+        hideExpression: '!model.self_participant',
+      },
+      {
+        key: 'guardian',
+        type: 'checkbox',
+        className: 'guardian',
+        props: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
+      },
+      {
+        key: 'guardian_has_dependent',
+        type: 'radio',
+        className: 'guardian_has_dependent',
+        props: {
+          label: 'Are you their legal guardian?',
+          options: [
+            {value: true, label: 'Yes', id: '3'},
+            {value: false, label: 'No', id: '4'},
+          ],
+        },
+        expressionProperties: {
+          'props.required': 'model.guardian',
+        },
+        hideExpression: '!model.guardian',
+      },
+      {
+        key: 'professional',
+        type: 'checkbox',
+        props: {label: 'I am a professional who works with the autism community', indeterminate: false},
+      },
+      {
+        key: 'interested',
+        type: 'checkbox',
+        props: {
+          label: 'None of the above, but I am interested in autism research and resources',
+          indeterminate: false,
+        },
+      },
+    ],
+  },
+];
+
 enum ProfileState {
   NEEDS_USER = 'NEEDS_USER',
   NEEDS_META = 'NEEDS_META',
@@ -70,79 +144,7 @@ export class ProfileComponent implements OnInit {
   form = new FormGroup({});
   model = new UserMeta({});
   options: FormlyFormOptions = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      validators: {
-        fieldMatch: {
-          expression: (control: AbstractControl) => {
-            const {self_participant, guardian, professional, interested} = control.value;
-
-            // at least one checkbox should be selected.
-            return !(!self_participant && !guardian && !professional && !interested);
-          },
-          message: 'Please select at least one option.',
-        },
-      },
-      wrappers: ['group-validation'],
-      fieldGroup: [
-        {
-          key: 'self_participant',
-          type: 'checkbox',
-          props: {label: 'I am autistic/I have autism', indeterminate: false, class: 'self_participant'},
-        },
-        {
-          key: 'self_has_guardian',
-          type: 'radio',
-          props: {
-            label: 'Do you have a legal guardian?',
-            options: [
-              {value: true, label: 'Yes', id: '1'},
-              {value: false, label: 'No', id: '2'},
-            ],
-          },
-          expressionProperties: {
-            'props.required': 'model.self_participant',
-          },
-          hideExpression: '!model.self_participant',
-        },
-        {
-          key: 'guardian',
-          type: 'checkbox',
-          className: 'guardian',
-          props: {label: 'I am the parent/legal guardian of someone with autism', indeterminate: false},
-        },
-        {
-          key: 'guardian_has_dependent',
-          type: 'radio',
-          className: 'guardian_has_dependent',
-          props: {
-            label: 'Are you their legal guardian?',
-            options: [
-              {value: true, label: 'Yes', id: '3'},
-              {value: false, label: 'No', id: '4'},
-            ],
-          },
-          expressionProperties: {
-            'props.required': 'model.guardian',
-          },
-          hideExpression: '!model.guardian',
-        },
-        {
-          key: 'professional',
-          type: 'checkbox',
-          props: {label: 'I am a professional who works with the autism community', indeterminate: false},
-        },
-        {
-          key: 'interested',
-          type: 'checkbox',
-          props: {
-            label: 'None of the above, but I am interested in autism research and resources',
-            indeterminate: false,
-          },
-        },
-      ],
-    },
-  ];
+  fields: FormlyFieldConfig[] = profileFormFields;
 
   constructor(
     private authenticationService: AuthenticationService,

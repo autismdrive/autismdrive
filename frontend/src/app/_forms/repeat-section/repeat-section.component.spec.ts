@@ -2,7 +2,9 @@ import {By} from '@angular/platform-browser';
 import {FormlyConfig} from '@app/app.config';
 import {RepeatSectionComponent} from '@forms/repeat-section/repeat-section.component';
 import {FormlyModule} from '@ngx-formly/core';
+import {keysToCamel} from '@util/snakeToCamel';
 import {MockFormlyFormComponent} from '@util/testing/fixtures/mock-form.component';
+import {mockHousematesQuestionnaireMeta} from '@util/testing/fixtures/mock-housemates-questionnaire-meta';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 
 describe('RepeatSectionComponent', () => {
@@ -17,7 +19,11 @@ describe('RepeatSectionComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = MockRender(MockFormlyFormComponent, null, {detectChanges: true});
+    fixture = MockRender(
+      MockFormlyFormComponent,
+      {fields: [keysToCamel(mockHousematesQuestionnaireMeta)]},
+      {detectChanges: true},
+    );
     component = fixture.point.componentInstance;
   });
 

@@ -1,4 +1,12 @@
+import {Router, RouterModule} from '@angular/router';
+import {Resource} from '@models/resource';
+import {Study} from '@models/study';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {mockResource} from '@util/testing/fixtures/mock-resource';
+import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
 import {RelatedItemsComponent} from './related-items.component';
 
 describe('RelatedItemsComponent', () => {
@@ -6,7 +14,20 @@ describe('RelatedItemsComponent', () => {
   let fixture: MockedComponentFixture<RelatedItemsComponent>;
 
   beforeEach(() => {
-    return MockBuilder(RelatedItemsComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(RelatedItemsComponent)
+      .keep(RouterModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(ApiService, {
+        getRelatedResults: jest.fn().mockReturnValue(
+          of([
+            {
+              resources: [mockResource],
+              studies: [mockStudy],
+            },
+          ]),
+        ),
+      })
+      .mock(GoogleAnalyticsService, {});
   });
 
   beforeEach(() => {

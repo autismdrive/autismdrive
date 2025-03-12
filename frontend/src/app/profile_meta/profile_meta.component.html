@@ -43,7 +43,7 @@
     </p>
   </div>
 
-  <div id="self_profressional" *ngIf="meta.self_relationship === relationships.SELF_PROFESSIONAL">
+  <div id="self_professional" *ngIf="meta.self_relationship === relationships.SELF_PROFESSIONAL">
     <h1>Join the Registry as a Professional!</h1>
     <p>
       Your account set up is complete! You may now sign up for webinars, search for resources, and join our research
@@ -81,7 +81,7 @@
       id="join"
       type="button"
       color="accent"
-      (click)="goFlow($event)"
+      [routerLink]="['terms', meta.self_relationship]"
     >
       Join the Registry
     </button>

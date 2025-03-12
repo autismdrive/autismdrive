@@ -269,7 +269,7 @@ export class StudyFormComponent implements OnInit {
         props: {
           label: 'Age Ranges',
           type: 'array',
-          options: this.getOptions(AgeRange.labels),
+          options: AgeRange.options,
         },
       },
       {
@@ -278,7 +278,7 @@ export class StudyFormComponent implements OnInit {
         props: {
           label: 'Languages',
           type: 'array',
-          options: this.getOptions(Language.labels),
+          options: Language.options,
         },
       },
     ];
@@ -287,16 +287,6 @@ export class StudyFormComponent implements OnInit {
   ngOnInit() {
     this.model.createNew = false;
     this.loadData();
-  }
-
-  getOptions(modelLabels) {
-    const opts = [];
-    for (const key in modelLabels) {
-      if (modelLabels.hasOwnProperty(key)) {
-        opts.push({value: key, label: modelLabels[key]});
-      }
-    }
-    return opts;
   }
 
   loadData() {

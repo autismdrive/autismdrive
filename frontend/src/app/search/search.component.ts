@@ -81,6 +81,7 @@ enum LocationMode {
     BorderBoxTileComponent,
     ExtendedModule,
     FlexModule,
+    FormsModule,
     LoadingComponent,
     MatButtonModule,
     MatButtonToggleModule,
@@ -109,7 +110,6 @@ enum LocationMode {
     SearchTopicsComponent,
     TutorialVideoComponent,
     TypeIconComponent,
-    FormsModule,
   ],
 })
 export class SearchComponent implements AfterViewInit, OnInit {
@@ -238,8 +238,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.sortMethods.DISTANCE.sortQuery.longitude = this.loc.lng;
     this.selectedSort = this.sortMethods.DISTANCE;
     this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.languageOptions = this.getOptions(Language.labels);
-    this.ageOptions = this.getOptions(AgeRange.labels);
+    this.languageOptions = Language.options;
+    this.ageOptions = AgeRange.options;
 
     this.meta.updateTag(
       {property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
@@ -469,16 +469,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit() {
     this.watchScrollEvents();
-  }
-
-  getOptions(modelLabels: Record<string, string>) {
-    const opts = [];
-    for (const key in modelLabels) {
-      if (modelLabels.hasOwnProperty(key)) {
-        opts.push({value: key, label: modelLabels[key]});
-      }
-    }
-    return opts;
   }
 
   removeCategory(skipUpdate = false) {

@@ -614,7 +614,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         info={
             "display_order": 3.5,
             "type": "checkbox",
-            "defaultValue": False,
+            "default_value": False,
             "props": {
                 "label": "If NO Middle Name click here",
                 "required": False,
@@ -760,7 +760,6 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
                 },
             },
             "intro": {
-                "fields": [],
                 "display_order": 1,
                 "wrappers": ["help"],
                 "props": {
@@ -2306,7 +2305,6 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
     def get_field_groups(self):
         return {
             "intro": {
-                "fields": [],
                 "display_order": 0,
                 "wrappers": ["help"],
                 "props": {

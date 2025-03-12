@@ -1,3 +1,5 @@
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -10,8 +12,10 @@ describe('HeaderComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(HeaderComponent)
+      .keep(NoopAnimationsModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .mock(AuthenticationService, {currentUser: of(mockUser)});
+      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(ApiService, {});
   });
 
   beforeEach(() => {

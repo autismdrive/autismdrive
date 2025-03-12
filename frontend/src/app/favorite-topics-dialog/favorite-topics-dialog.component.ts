@@ -42,12 +42,9 @@ interface TopicOption {
   ],
 })
 export class FavoriteTopicsDialogComponent extends TreeComponent implements OnInit {
-  ageLabels = AgeRange.labels;
-  languageLabels = Language.labels;
-  covid19Labels = Covid19Categories.labels;
-  ageOptions = this.getOptions(this.ageLabels);
-  languageOptions = this.getOptions(this.languageLabels);
-  covid19Options = this.getOptions(this.covid19Labels);
+  ageOptions = AgeRange.options;
+  languageOptions = Language.options;
+  covid19Options = Covid19Categories.options;
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
@@ -72,10 +69,6 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
       this.dataSource.data = categories;
       this.updateTopicSelection();
     });
-  }
-
-  getOptions(modelLabels: {[key: string]: string}): TopicOption[] {
-    return Object.entries(modelLabels).map(([key, label]) => ({value: key, label: label}));
   }
 
   updateTopicSelection() {

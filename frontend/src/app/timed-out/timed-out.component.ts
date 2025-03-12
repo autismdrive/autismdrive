@@ -1,6 +1,9 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import {MatButtonModule} from '@angular/material/button';
+import {RouterModule} from '@angular/router';
 import {fadeTransition} from '@animations/animations';
+import {LogoComponent} from '@app/logo/logo.component';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
@@ -9,8 +12,9 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   templateUrl: './timed-out.component.html',
   styleUrls: ['./timed-out.component.scss'],
   animations: [fadeTransition()],
+  imports: [FlexModule, LogoComponent, RouterModule, MatButtonModule],
 })
-export class TimedoutComponent implements OnInit {
+export class TimedOutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 

@@ -1,4 +1,12 @@
-export class HitType {
+class LabelsOptions {
+  static labels: {[key: string]: string};
+
+  static get options(): {value: string; label: string}[] {
+    return Object.entries(this.labels).map(([k, v]) => ({value: k, label: v}));
+  }
+}
+
+export class HitType extends LabelsOptions {
   static labels = {
     location: 'Local Services',
     resource: 'Online Information',
@@ -18,7 +26,9 @@ export class HitType {
   constructor(
     public name: string,
     public label: string,
-  ) {}
+  ) {
+    super()
+  }
 
   static all(): HitType[] {
     return [this.LOCATION, this.RESOURCE, this.EVENT, this.STUDY];
@@ -29,7 +39,7 @@ export class HitType {
   }
 }
 
-export class AgeRange {
+export class AgeRange extends LabelsOptions {
   static labels = {
     'pre-k': 'Pre-K (0 - 5 years)',
     school: 'School Age (6 - 13 years)',
@@ -39,7 +49,7 @@ export class AgeRange {
   };
 }
 
-export class Language {
+export class Language extends LabelsOptions {
   static labels = {
     english: 'English',
     spanish: 'Spanish',
@@ -51,7 +61,7 @@ export class Language {
   };
 }
 
-export class Covid19Categories {
+export class Covid19Categories extends LabelsOptions {
   static labels = {
     'COVID-19_for_Autism':
       'COVID-19 Information: Information explaining COVID-19 for people with ASD, families and professionals',
