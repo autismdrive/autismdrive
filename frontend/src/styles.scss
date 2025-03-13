@@ -3,12 +3,14 @@
 @use "@angular/material" as mat;
 @use "config" as config;
 @use "ehd" as ehd;
+@use "other" as other;
 @forward "assets/css/icofont.css";
 @forward "assets/css/material-icons.css";
 
 html {
   @include mat.theme(custom-theme.$theme-config);
   @include ehd.ehd-styles;
+  @include other.other-styles;
 }
 
 html, body {
