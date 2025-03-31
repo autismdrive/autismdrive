@@ -1,5 +1,7 @@
+import {signal} from '@angular/core';
 import {ApiService} from '@services/api/api.service';
 import {ConfigService} from '@services/config/config.service';
+import {mockConfigServiceProps} from '@util/testing/fixtures/mock-config-service-props';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {AdminExportComponent} from './admin-export.component';
@@ -19,7 +21,7 @@ describe('AdminExportComponent', () => {
           }),
         ),
       })
-      .mock(ConfigService, {})
+      .mock(ConfigService, {props: signal(mockConfigServiceProps)})
       .keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 

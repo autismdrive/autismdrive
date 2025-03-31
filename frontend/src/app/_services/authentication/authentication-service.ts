@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {User} from '@models/user';
 import {ConfigService} from '@services/config/config.service';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
@@ -10,8 +10,7 @@ import {GoogleAnalyticsService} from '../google-analytics/google-analytics.servi
 @Injectable({providedIn: 'root'})
 export class AuthenticationService {
   public static LOCAL_TOKEN_KEY = 'star_token';
-  private currentUserSubject = new BehaviorSubject<User>(null);
-  public currentUser: Observable<User>;
+  public currentUser: WritableSignal<User | undefined> = signal(undefined);
 
   private login_url: string;
   private reset_pass_url: string;
@@ -22,17 +21,18 @@ export class AuthenticationService {
     private googleAnalyticsService: GoogleAnalyticsService,
     private configService: ConfigService,
   ) {
-    this.configService.props.subscribe(p => {
-      const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
-      this.login_url = `${configService.apiUrl}/api/login_password`;
-      this.reset_pass_url = `${configService.apiUrl}/api/reset_password`;
-      this.refresh_url = `${configService.apiUrl}/api/session`;
+    effect(() => {
+      if (this.configService.props()) {
+        const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
+        this.login_url = `${this.configService?.apiUrl}/api/login_password`;
+        this.reset_pass_url = `${this.configService?.apiUrl}/api/reset_password`;
+        this.refresh_url = `${this.configService?.apiUrl}/api/session`;
 
-      this.currentUser = this.currentUserSubject.asObservable();
-      if (token) {
-        this._refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
-      } else {
-        this.currentUserSubject.next(null);
+        if (token) {
+          this._refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
+        } else {
+          this.currentUser.set(undefined);
+        }
       }
     });
   }
@@ -50,8 +50,7 @@ export class AuthenticationService {
       localStorage.setItem(AuthenticationService.LOCAL_TOKEN_KEY, userDict.token);
     }
     const user = new User(userDict);
-    this.currentUserSubject.next(user);
-    console.log('The current user subject is now set.', user);
+    this.currentUser.set(user);
     this.googleAnalyticsService.set_user(user.id);
     return user;
   }
@@ -72,7 +71,7 @@ export class AuthenticationService {
           return this.loadUser(userDict);
         },
         error => {
-          this.currentUserSubject.next(null);
+          this.currentUser.set(undefined);
         },
       ),
     );
@@ -94,7 +93,7 @@ export class AuthenticationService {
   logout() {
     // remove user from local storage to log user out
     localStorage.removeItem(AuthenticationService.LOCAL_TOKEN_KEY);
-    this.currentUserSubject.next(null);
+    this.currentUser.set(undefined);
     this.googleAnalyticsService.set_user(null);
   }
 }

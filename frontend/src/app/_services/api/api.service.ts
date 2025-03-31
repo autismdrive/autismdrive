@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {effect, Injectable} from '@angular/core';
 import {ApiError} from '@app/api-error';
 import {AdminNote} from '@models/admin_note';
 import {Category} from '@models/category';
@@ -132,7 +132,11 @@ export class ApiService {
     private httpClient: HttpClient,
     private configService: ConfigService,
   ) {
-    this.apiRoot = configService.apiUrl;
+    effect(() => {
+      if (this.configService.props()) {
+        this.apiRoot = configService.apiUrl;
+      }
+    });
   }
 
   /** sendResetPasswordEmail

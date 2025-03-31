@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
 import {AuthenticationService} from '@app/_services/authentication/authentication-service';
@@ -22,7 +23,7 @@ describe('ProfileComponent', () => {
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(FormlyModule.forRoot(FormlyConfig.config))
       .keep(RouterModule)
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         getUserMeta: jest.fn().mockReturnValue(of(mockUserMeta)),
         getUserStudyInquiries: jest.fn().mockReturnValue(of([mockStudyUser])),

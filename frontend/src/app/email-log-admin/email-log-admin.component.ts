@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
@@ -12,6 +12,8 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-email-log-admin',
   templateUrl: './email-log-admin.component.html',
   styleUrls: ['./email-log-admin.component.scss'],
+  providers: [ApiService, AuthenticationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailLogAdminComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -25,7 +27,9 @@ export class EmailLogAdminComponent implements OnInit {
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
   }
 
   ngOnInit() {

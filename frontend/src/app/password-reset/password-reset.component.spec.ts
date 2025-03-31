@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -29,7 +30,7 @@ describe('PasswordResetComponent', () => {
         ),
       })
       .keep(RouterModule)
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         getPasswordRequirements: jest.fn().mockReturnValue(
           of({

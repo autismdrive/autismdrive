@@ -1,11 +1,13 @@
+import {signal} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {ActivatedRoute, RouterModule} from '@angular/router';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
+import {mockConfigServiceProps} from '@util/testing/fixtures/mock-config-service-props';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
-import {of} from 'rxjs';
 import {AppComponent} from './app.component';
 
 describe('AppComponent', () => {
@@ -15,9 +17,10 @@ describe('AppComponent', () => {
   beforeEach(() => {
     return MockBuilder(AppComponent)
       .keep(RouterModule)
-      .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({},{},'/home')})
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
-      .mock(GoogleAnalyticsService);
+      .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, '/home')})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
+      .mock(GoogleAnalyticsService)
+      .mock(ConfigService, {props: signal(mockConfigServiceProps)});
   });
 
   beforeEach(() => {

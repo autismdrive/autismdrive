@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {effect, Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
 import {ConfigService} from '@services/config/config.service';
 
@@ -13,7 +13,7 @@ export class NotMirroredGuard {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (this.configService && this.configService.mirroring) {
+    if (this.configService.props() && this.configService.mirroring) {
       this.router.navigate(['/mirrored']);
       return false;
     } else {

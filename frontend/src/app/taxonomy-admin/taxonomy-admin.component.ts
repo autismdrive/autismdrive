@@ -1,18 +1,19 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
-import {Component} from '@angular/core';
+import {Component, effect} from '@angular/core';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {Observable, of} from 'rxjs';
 import {Category} from '@models/category';
 import {User} from '@models/user';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {Observable, of} from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-taxonomy-admin',
   templateUrl: './taxonomy-admin.component.html',
   styleUrls: ['./taxonomy-admin.component.scss'],
+  providers: [ApiService, AuthenticationService],
 })
 export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;
@@ -32,10 +33,12 @@ export class TaxonomyAdminComponent {
     private api: ApiService,
     private authenticationService: AuthenticationService,
   ) {
-    this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
-    this.dataSource = new MatTreeNestedDataSource();
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.getCategoryTree(true);
+    effect(() => {
+      this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
+      this.dataSource = new MatTreeNestedDataSource();
+      this.currentUser = this.authenticationService.currentUser();
+      this.getCategoryTree(true);
+    });
   }
 
   getCategoryTree(updateDisplayOrder = false, done?: () => void) {

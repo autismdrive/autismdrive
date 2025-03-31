@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {FormlyConfig} from '@app/app.config';
 import {FormlyModule} from '@ngx-formly/core';
@@ -34,7 +35,7 @@ describe('EnrollmentFlowComponent', () => {
           ),
         ),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         getFlow: jest.fn().mockReturnValue(of(mockFlow)),
         getParticipant: jest.fn().mockReturnValue(of(mockParticipant)),

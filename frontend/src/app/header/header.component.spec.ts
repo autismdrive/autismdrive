@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -14,7 +15,7 @@ describe('HeaderComponent', () => {
     return MockBuilder(HeaderComponent)
       .keep(NoopAnimationsModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {});
   });
 

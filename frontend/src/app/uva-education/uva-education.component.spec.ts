@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockResource} from '@util/testing/fixtures/mock-resource';
 import {mockUser} from '@util/testing/fixtures/mock-user';
@@ -17,7 +18,7 @@ describe('UvaEducationComponent', () => {
       .mock(ApiService, {
         getEducationResources: jest.fn().mockReturnValue(of([mockResource])),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .keep(Meta);
   });
 

@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, RouterModule} from '@angular/router';
@@ -40,7 +41,7 @@ describe('SearchComponent', () => {
         getStudy: jest.fn().mockReturnValue(of(mockStudy)),
         getStudiesByStatus: jest.fn().mockReturnValue(of([mockStudy])),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(GoogleAnalyticsService, {})
       .mock(SearchService, {})
       .provide({

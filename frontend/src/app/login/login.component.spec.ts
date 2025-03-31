@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {FormlyConfig} from '@app/app.config';
 import {FormlyMatInputModule} from '@ngx-formly/material/input';
@@ -25,7 +26,7 @@ describe('LoginComponent', () => {
       .keep(NoopAnimationsModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({returnUrl: 'http://some.url'},{email_token: 'some_token'},'login')})
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(DeviceDetectorService)
       .mock(GoogleAnalyticsService)
   });

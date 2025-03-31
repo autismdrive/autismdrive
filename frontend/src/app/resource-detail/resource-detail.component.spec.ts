@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {
   makeMockActivatedRoute,
@@ -22,7 +23,7 @@ describe('ResourceDetailComponent', () => {
       .mock(ApiService, {getResourceChangeLog: jest.fn().mockReturnValue(of([]))})
       .provide({provide: ActivatedRoute, useValue: mockResourceDetailsRoute})
       .keep(RouterModule)
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(DomSanitizer);
   });
 

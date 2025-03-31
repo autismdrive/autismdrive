@@ -1,23 +1,27 @@
-import {Component, OnInit} from '@angular/core';
+import {AsyncPipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {FooterComponent} from '@app/footer/footer.component';
 import {HeaderComponent} from '@app/header/header.component';
 import {User} from '@models/user';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {Observable} from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [HeaderComponent, FooterComponent, RouterOutlet],
+  imports: [HeaderComponent, FooterComponent, RouterOutlet, AsyncPipe],
+  providers: [ConfigService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   title = 'Autism DRIVE';
   hideHeader = false;
-  currentUser: User;
 
   public constructor(
     private authenticationService: AuthenticationService,
@@ -25,23 +29,27 @@ export class AppComponent implements OnInit {
     private googleAnalyticsService: GoogleAnalyticsService,
     private meta: Meta,
     private route: ActivatedRoute,
+    private configService: ConfigService,
   ) {
-    this.googleAnalyticsService.init();
-    this.router.events.subscribe(e => {
-      if (e instanceof ActivationStart || e instanceof ActivationEnd) {
-        if (e.snapshot && e.snapshot.data) {
-          const data = e.snapshot.data;
-          this.hideHeader = !!data.hideHeader;
-        }
+    effect(() => {
+      if (this.configService.props()) {
+        this.googleAnalyticsService.init();
+        this.router.events.subscribe(e => {
+          if (e instanceof ActivationStart || e instanceof ActivationEnd) {
+            if (e.snapshot && e.snapshot.data) {
+              const data = e.snapshot.data;
+              this.hideHeader = !!data.hideHeader;
+            }
+          }
+        });
+        this.meta.addTags([
+          {property: 'og:url', content: location.origin},
+          {property: 'og:image', content: location.origin + '/assets/home/hero-family.jpg'},
+          {property: 'og:image:secure_url', content: location.origin + '/assets/home/hero-family.jpg'},
+          {name: 'twitter:image', content: location.origin + '/assets/home/hero-family.jpg'},
+        ]);
       }
     });
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.meta.addTags([
-      {property: 'og:url', content: location.origin},
-      {property: 'og:image', content: location.origin + '/assets/home/hero-family.jpg'},
-      {property: 'og:image:secure_url', content: location.origin + '/assets/home/hero-family.jpg'},
-      {name: 'twitter:image', content: location.origin + '/assets/home/hero-family.jpg'},
-    ]);
   }
 
   ngOnInit() {
@@ -57,5 +65,9 @@ export class AppComponent implements OnInit {
         this.meta.updateTag({property: 'og:url', content: location.href}, `property='og:url'`);
       }
     });
+  }
+
+  get currentUser(): User {
+    return this.authenticationService.currentUser();
   }
 }

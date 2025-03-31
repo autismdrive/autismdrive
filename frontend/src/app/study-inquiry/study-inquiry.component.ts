@@ -1,8 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {NgForOf, NgIf} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
+import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatCard, MatCardModule} from '@angular/material/card';
+import {MatProgressBar, MatProgressBarModule} from '@angular/material/progress-bar';
 import {Router} from '@angular/router';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {Study} from '@models/study';
 import {User} from '@models/user';
+import {DefaultLayoutDirective, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
@@ -12,6 +17,16 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
   selector: 'app-study-inquiry',
   templateUrl: './study-inquiry.component.html',
   styleUrls: ['./study-inquiry.component.scss'],
+  imports: [
+    FlexModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressBarModule,
+    NgForOf,
+    NgIf,
+  ],
+  providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudyInquiryComponent implements OnInit {
   currentUser: User;
@@ -26,7 +41,9 @@ export class StudyInquiryComponent implements OnInit {
     private router: Router,
     private googleAnalytics: GoogleAnalyticsService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
   }
 
   ngOnInit() {

@@ -1,7 +1,17 @@
 /// <reference types="google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, OnInit, signal, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  HostBinding,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
@@ -111,6 +121,8 @@ enum LocationMode {
     TutorialVideoComponent,
     TypeIconComponent,
   ],
+  providers: [ApiService, AuthenticationService, GoogleAnalyticsService, SearchService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements AfterViewInit, OnInit {
   @HostBinding('@pageAnimations')
@@ -233,11 +245,14 @@ export class SearchComponent implements AfterViewInit, OnInit {
     private router: Router,
     private searchService: SearchService,
   ) {
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
+
     this.sortMethods = createClone()(sortMethods);
     this.sortMethods.DISTANCE.sortQuery.latitude = this.loc.lat;
     this.sortMethods.DISTANCE.sortQuery.longitude = this.loc.lng;
     this.selectedSort = this.sortMethods.DISTANCE;
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
     this.languageOptions = Language.options;
     this.ageOptions = AgeRange.options;
 

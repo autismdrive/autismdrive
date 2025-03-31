@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {FormlyConfig} from '@app/app.config';
@@ -25,7 +26,7 @@ describe('ResourceFormComponent', () => {
         getCategoryTree: jest.fn().mockReturnValue(of([])),
         deleteResource: jest.fn().mockReturnValue(of(mockResource)),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(DeviceDetectorService)
       .provide({
         provide: ActivatedRoute,

@@ -1,6 +1,6 @@
 import {MediaMatcher} from '@angular/cdk/layout';
 import {NgClass, NgIf} from '@angular/common';
-import {ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnDestroy, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -53,6 +53,8 @@ enum FlowState {
   standalone: true,
   styleUrls: ['./flow.component.scss'],
   templateUrl: './flow.component.html',
+  providers: [ApiService, AuthenticationService, DeviceDetectorService, GoogleAnalyticsService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlowComponent implements OnDestroy {
   mobileQuery: MediaQueryList;
@@ -91,9 +93,9 @@ export class FlowComponent implements OnDestroy {
     this._mobileQueryListener = () => this._updateSidenavState();
     window.addEventListener('resize', this._mobileQueryListener);
 
-    this.authenticationService.currentUser.subscribe(user => {
-      this.user = user;
-      this.route.params.subscribe(params => {
+    effect(() => {
+      this.user = this.authenticationService.currentUser();
+      this.route?.params?.subscribe(params => {
         this.participant = this.user.getParticipantById(parseInt(params.participantId, 10));
         this.loadFlow(params.flowName);
       });

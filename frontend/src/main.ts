@@ -1,6 +1,6 @@
 import {CommonModule, DatePipe} from '@angular/common';
-import {HttpClient, provideHttpClient, withInterceptors} from '@angular/common/http';
-import {enableProdMode, importProvidersFrom, inject, provideAppInitializer} from '@angular/core';
+import {provideHttpClient, withInterceptors} from '@angular/common/http';
+import {enableProdMode, importProvidersFrom, provideAppInitializer} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {bootstrapApplication, BrowserModule} from '@angular/platform-browser';
@@ -22,7 +22,6 @@ import {RoutingModule} from '@routing/routing.module';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {CategoriesService} from '@services/categories/categories.service';
-import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {IntervalService} from '@services/interval/interval.service';
 import {SearchService} from '@services/search/search.service';
@@ -64,7 +63,7 @@ bootstrapApplication(AppComponent, {
     IntervalService,
     SearchService,
     provideAppInitializer(() => {
-      load(inject(HttpClient), inject(ConfigService));
+      load();
     }),
     {
       provide: GOOGLE_MAPS_API_CONFIG,

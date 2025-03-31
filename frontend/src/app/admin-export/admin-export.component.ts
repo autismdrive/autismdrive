@@ -1,5 +1,13 @@
 import {DatePipe, NgIf} from '@angular/common';
-import {Component, OnInit, ViewChild, ViewChildren, ViewContainerRef} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  OnInit,
+  ViewChild,
+  ViewChildren,
+  ViewContainerRef,
+} from '@angular/core';
 import {MatRippleModule} from '@angular/material/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableModule} from '@angular/material/table';
@@ -17,6 +25,8 @@ import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-
   templateUrl: './admin-export.component.html',
   styleUrls: ['./admin-export.component.scss'],
   imports: [MatPaginatorModule, MatTableModule, NgIf, DatePipe, MatRippleModule],
+  providers: [ApiService, ConfigService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminExportComponent implements OnInit {
   dataTransferDataSource: DataTransferDataSource;
@@ -33,12 +43,17 @@ export class AdminExportComponent implements OnInit {
   constructor(
     private api: ApiService,
     private configService: ConfigService,
-  ) {}
+  ) {
+    effect(() => {
+      if (this.configService.props()) {
+        this.mirroring = this.configService.mirroring;
+        this.loadData();
+        this.loadLatestLog();
+      }
+    });
+  }
 
   ngOnInit(): void {
-    this.mirroring = this.configService.mirroring;
-    this.loadData();
-    this.loadLatestLog();
     merge(this.paginator.page)
       .pipe(tap(() => this.loadData()))
       .subscribe();

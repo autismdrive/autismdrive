@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
@@ -23,7 +24,7 @@ describe('StudyDetailComponent', () => {
         getStudy: jest.fn().mockReturnValue(of(mockStudy)),
         updateInvestigator: jest.fn().mockReturnValue(of(mockInvestigator)),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .provide({provide: ActivatedRoute, useValue: mockStudyDetailsRoute})
       .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
       .provide({

@@ -1,5 +1,5 @@
 import {NgForOf} from '@angular/common';
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {Router, RouterModule} from '@angular/router';
 import {BorderBoxTileComponent} from '@app/border-box-tile/border-box-tile.component';
@@ -27,10 +27,12 @@ import {lastValueFrom} from 'rxjs';
     RouterModule,
     DefaultShowHideDirective,
   ],
+  providers: [ConfigService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  currentStudies: Study[];
-  newsItems: NewsItem[];
+  currentStudies: WritableSignal<Study[]> = signal(undefined);
+  newsItems: WritableSignal<NewsItem[]> = signal(undefined);
 
   constructor(
     private api: ApiService,
@@ -38,13 +40,17 @@ export class HomeComponent {
     private configService: ConfigService,
     private meta: Meta,
   ) {
-    this.loadStudies();
+    effect(() => {
+      if (this.configService.props()) {
+        this.loadStudies();
 
-    if (this.configService.mirroring) {
-      this.router.navigate(['mirrored']);
-    }
+        if (this.configService.mirroring) {
+          this.router.navigate(['mirrored']);
+        }
 
-    this.updateTags();
+        this.updateTags();
+      }
+    })
   }
 
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
@@ -65,8 +71,9 @@ export class HomeComponent {
   }
 
   private async loadStudies() {
-    this.currentStudies = await lastValueFrom(this.api.getStudiesByStatus('currently_enrolling'));
-    this.newsItems = this._studiesToNewsItems(this.currentStudies);
+    const studies = await lastValueFrom(this.api.getStudiesByStatus('currently_enrolling'));
+    this.currentStudies.set(studies);
+    this.newsItems.set(this._studiesToNewsItems(studies));
   }
 
   private updateTags() {

@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {StudyStatus} from '@models/study';
 import {ApiService} from '@services/api/api.service';
@@ -24,7 +25,7 @@ describe('StudiesComponent', () => {
         getStudiesByAge: jest.fn().mockReturnValue(of([mockStudy])),
         getStudiesByStatus: jest.fn().mockReturnValue(of([mockStudy])),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)});
+      .mock(AuthenticationService, {currentUser: signal(mockUser)});
   });
 
   beforeEach(() => {

@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockStudyUser} from '@util/testing/fixtures/mock-study-user';
@@ -13,7 +14,7 @@ describe('StudyInquiryComponent', () => {
   beforeEach(() => {
     return MockBuilder(StudyInquiryComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         getUserStudyInquiries: jest.fn().mockReturnValue(of([mockStudyUser])),
         getUser: jest.fn().mockReturnValue(of(mockUser)),

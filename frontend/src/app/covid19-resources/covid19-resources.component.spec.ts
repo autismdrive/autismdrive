@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -20,7 +21,7 @@ describe('Covid19ResourcesComponent', () => {
       .mock(ApiService, {
         getCovid19ResourcesByCategory: jest.fn().mockReturnValue(of([])),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .provide({provide: ActivatedRoute, useValue: mockCovidRoute});
   });
 

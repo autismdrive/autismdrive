@@ -1,5 +1,5 @@
 import {NgIf} from '@angular/common';
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
@@ -18,6 +18,8 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss'],
   imports: [PdfJsViewerModule, LogoComponent, FlexModule, NgIf, MatButtonModule],
+  providers: [AuthenticationService, ApiService, GoogleAnalyticsService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsComponent {
   user: User;
@@ -38,15 +40,9 @@ export class TermsComponent {
       }
     });
 
-    this.authenticationService.currentUser.subscribe(
-      user => {
-        this.user = user;
-      },
-      error1 => {
-        console.error(error1);
-        this.user = null;
-      },
-    );
+    effect(() => {
+      this.user = this.authenticationService.currentUser();
+    });
   }
 
   goProfile($event) {

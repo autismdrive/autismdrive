@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {effect, Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
 import {User} from '@models/user';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -11,7 +11,9 @@ export class RoleGuard {
     private router: Router,
     private authenticationService: AuthenticationService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser()
+    });
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {

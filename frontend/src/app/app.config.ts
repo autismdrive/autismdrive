@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {environment} from '@environments/environment';
 import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
 import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
@@ -22,59 +22,47 @@ import {
   UrlValidatorMessage,
 } from '@forms/validators/formly.validator';
 import {ConfigService, ConfigServiceProps} from '@services/config/config.service';
-import {lastValueFrom, of} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {lastValueFrom} from 'rxjs';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists. Otherwise, assume we are connecting to port
 // 5000 on the local server.
-export const load = (http: HttpClient, config: ConfigService): (() => Promise<boolean>) => {
-  return async (): Promise<boolean> => {
-    let url = './api/config';
-    if ('override_config_url' in environment) {
-      url = environment['override_config_url'];
-    }
+export const load = async (): Promise<ConfigServiceProps> => {
+  const httpClient = inject(HttpClient);
+  const configService = inject(ConfigService);
 
-    let hasLocalConfig = false;
+  let url = './api/config';
+  if ('override_config_url' in environment) {
+    url = environment['override_config_url'];
+  }
 
-    // Check if a file called `config.json` is available in this file's directory.
-    // If it is, load the configuration from there.
-    try {
-      const localConfig: ConfigServiceProps = await lastValueFrom(
-        http.get<ConfigServiceProps>('./config.json', {responseType: 'json'}).pipe(
-          catchError(() => {
-            return of(null);
-          }),
-        ),
-      );
+  let localConfig: ConfigServiceProps;
 
-      if (localConfig) {
-        config.fromProperties(localConfig);
-        hasLocalConfig = true;
-      }
-    } catch {
-      hasLocalConfig = false;
-    }
+  // Check if a file called `config.json` is available in this file's directory.
+  // If it is, load the configuration from there.
+  try {
+    localConfig = await lastValueFrom(httpClient.get<ConfigServiceProps>('./config.json', {responseType: 'json'}));
+  } catch {
+    localConfig = undefined;
+  }
 
-    if (hasLocalConfig) return hasLocalConfig;
+  if (localConfig) {
+    configService.fromProperties(localConfig);
+    return localConfig;
+  }
 
-    // Check with the backend to see if there is a configuration override available.
-    try {
-      const configFromJsonFile: ConfigServiceProps = await lastValueFrom(
-        http.get<ConfigServiceProps>(url, {responseType: 'json'}).pipe(
-          catchError(() => {
-            return of(null);
-          }),
-        ),
-      );
-      if (configFromJsonFile) {
-        config.fromProperties(configFromJsonFile);
-      }
-      return !!configFromJsonFile;
-    } catch {
-      return false;
-    }
-  };
+  // Check with the backend to see if there is a configuration override available.
+  let configFromJsonFile: ConfigServiceProps;
+  try {
+    configFromJsonFile = await lastValueFrom(httpClient.get<ConfigServiceProps>(url, {responseType: 'json'}));
+  } catch {
+    configFromJsonFile = undefined;
+  }
+
+  if (configFromJsonFile) {
+    configService.fromProperties(configFromJsonFile);
+    return configFromJsonFile;
+  }
 };
 
 @Injectable()

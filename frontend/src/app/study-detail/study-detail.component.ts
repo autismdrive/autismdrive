@@ -1,11 +1,11 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
-import {snakeToUpperCase} from '@util/snakeToUpper';
 import {Study} from '@models/study';
 import {User} from '@models/user';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {snakeToUpperCase} from '@util/snakeToUpper';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
 @Component({
@@ -13,6 +13,8 @@ import {InvestigatorFormComponent} from '../investigator-form/investigator-form.
   selector: 'app-study-detail',
   templateUrl: './study-detail.component.html',
   styleUrls: ['./study-detail.component.scss'],
+  providers: [ApiService, AuthenticationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudyDetailComponent {
   study: Study;
@@ -26,17 +28,19 @@ export class StudyDetailComponent {
     private authenticationService: AuthenticationService,
     public dialog: MatDialog,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.route.params.subscribe(params => {
-      this.loading = true;
-      const studyId = params.studyId ? parseInt(params.studyId, 10) : null;
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.route.params.subscribe(params => {
+        this.loading = true;
+        const studyId = params.studyId ? parseInt(params.studyId, 10) : null;
 
-      if (isFinite(studyId)) {
-        this.api.getStudy(studyId).subscribe(study => {
-          this.study = study;
-          this.loading = false;
-        });
-      }
+        if (isFinite(studyId)) {
+          this.api.getStudy(studyId).subscribe(study => {
+            this.study = study;
+            this.loading = false;
+          });
+        }
+      });
     });
   }
 

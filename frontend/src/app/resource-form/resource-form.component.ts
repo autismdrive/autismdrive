@@ -1,5 +1,5 @@
 import {NgIf} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -26,6 +26,8 @@ enum PageState {
   templateUrl: './resource-form.component.html',
   styleUrls: ['./resource-form.component.scss'],
   imports: [LoadingComponent, NgIf, FormlyModule, ReactiveFormsModule, FlexModule, MatButtonModule],
+  providers: [ApiService, AuthenticationService, DeviceDetectorService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceFormComponent implements OnInit {
   resource: Resource;
@@ -47,8 +49,10 @@ export class ResourceFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.fields = getResourceFormFields(this.api.getCategoryTree());
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.fields = getResourceFormFields(this.api.getCategoryTree());
+    });
   }
 
   ngOnInit() {

@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import {DatePipe, formatDate, NgIf, NgOptimizedImage} from '@angular/common';
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
@@ -35,6 +35,8 @@ import {MarkdownComponent} from 'ngx-markdown';
     DatePipe,
     RouterModule,
   ],
+  providers: [ApiService, AuthenticationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceDetailComponent {
   resource: Resource;
@@ -68,7 +70,9 @@ export class ResourceDetailComponent {
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
     this.route.params.subscribe(params => {
       this.loading = true;
       this.safeVideoLink = null;

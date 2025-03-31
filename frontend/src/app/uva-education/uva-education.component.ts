@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
@@ -12,6 +12,8 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-uva-education',
   templateUrl: './uva-education.component.html',
   styleUrls: ['./uva-education.component.scss'],
+  providers: [AuthenticationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UvaEducationComponent {
   edResources: Resource[];
@@ -24,20 +26,22 @@ export class UvaEducationComponent {
     private authenticationService: AuthenticationService,
     private meta: Meta,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.meta.updateTag(
-      {property: 'og:image', content: location.origin + '/assets/education/uva_education.jpg'},
-      `property='og:image'`,
-    );
-    this.meta.updateTag(
-      {property: 'og:image:secure_url', content: location.origin + '/assets/education/uva_education.jpg'},
-      `property='og:image:secure_url'`,
-    );
-    this.meta.updateTag(
-      {name: 'twitter:image', content: location.origin + '/assets/education/uva_education.jpg'},
-      `name='twitter:image'`,
-    );
-    this.loadResources();
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.meta.updateTag(
+        {property: 'og:image', content: location.origin + '/assets/education/uva_education.jpg'},
+        `property='og:image'`,
+      );
+      this.meta.updateTag(
+        {property: 'og:image:secure_url', content: location.origin + '/assets/education/uva_education.jpg'},
+        `property='og:image:secure_url'`,
+      );
+      this.meta.updateTag(
+        {name: 'twitter:image', content: location.origin + '/assets/education/uva_education.jpg'},
+        `name='twitter:image'`,
+      );
+      this.loadResources();
+    });
   }
 
   loadResources() {

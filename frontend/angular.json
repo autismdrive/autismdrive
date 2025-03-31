@@ -16,7 +16,8 @@
             },
             "allowedCommonJsDependencies": [
               "geolib",
-              "rfdc"
+              "rfdc",
+              "fast-deep-equal"
             ],
             "budgets": [
               {

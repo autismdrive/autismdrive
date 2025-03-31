@@ -1,4 +1,5 @@
 import {HttpEvent, HttpHandlerFn, HttpRequest} from '@angular/common/http';
+import {error} from '@angular/compiler-cli/src/transformers/util';
 import {inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -27,11 +28,14 @@ export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
         }
       }
 
-      const apiError: ApiError = err.error || {code: err.status, message: err.statusText};
+      const apiError: ApiError = err?.error || {code: err.status, message: err.statusText};
 
-      console.error(err.error);
-      googleAnalyticsService.errorEvent(err.error);
-      return throwError(() => apiError);
+      // Ignore config.json errors
+      if (req.url !== './config.json') {
+        console.error(err?.error);
+        googleAnalyticsService.errorEvent(err?.error);
+        return throwError(() => apiError);
+      }
     }),
   );
 }

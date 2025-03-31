@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {ApiService} from '@app/_services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -24,7 +25,7 @@ describe('UserAdminDetailsComponent', () => {
         exportUserQuestionnaire: jest.fn().mockReturnValue(of()),
         updateUser: jest.fn().mockReturnValue(of()),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .provide({provide: ActivatedRoute, useValue: mockUserDetailsRoute});
   });
 

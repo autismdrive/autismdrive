@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -30,7 +31,7 @@ describe('TermsComponent', () => {
           'terms/:relationship',
         ),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)})
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         addParticipant: jest.fn().mockReturnValue(of(mockParticipant))
       })

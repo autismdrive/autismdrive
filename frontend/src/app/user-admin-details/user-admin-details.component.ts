@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
 import {AdminNote} from '@models/admin_note';
@@ -13,6 +13,8 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-user-admin-details',
   templateUrl: './user-admin-details.component.html',
   styleUrls: ['./user-admin-details.component.scss'],
+  providers: [ApiService, AuthenticationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserAdminDetailsComponent {
   user: User;
@@ -28,35 +30,37 @@ export class UserAdminDetailsComponent {
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.route.params.subscribe(params => {
-      const userId = params.userId ? parseInt(params.userId, 10) : null;
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.route.params.subscribe(params => {
+        const userId = params.userId ? parseInt(params.userId, 10) : null;
 
-      if (isFinite(userId)) {
-        this.api.getUser(userId).subscribe(user => {
-          this.user = user;
-          this.roleSelected = user.role;
+        if (isFinite(userId)) {
+          this.api.getUser(userId).subscribe(user => {
+            this.user = user;
+            this.roleSelected = user.role;
 
-          this.api.getUserEmailLog(this.user).subscribe(log => {
-            this.user.email_log = log;
-            this.dataSource = new MatTableDataSource<EmailLog>(log);
-          });
+            this.api.getUserEmailLog(this.user).subscribe(log => {
+              this.user.email_log = log;
+              this.dataSource = new MatTableDataSource<EmailLog>(log);
+            });
 
-          this.api.getUserAdminNotes(this.user.id).subscribe(notes => {
-            this.adminNotes = notes;
-          });
+            this.api.getUserAdminNotes(this.user.id).subscribe(notes => {
+              this.adminNotes = notes;
+            });
 
-          this.api.getUserResourceChangeLog(this.user.id).subscribe(log => {
-            this.resourceChangeLog = log;
-          });
+            this.api.getUserResourceChangeLog(this.user.id).subscribe(log => {
+              this.resourceChangeLog = log;
+            });
 
-          this.user.participants.forEach(pi => {
-            this.api.getParticipantStepLog(pi).subscribe(log => {
-              pi.step_log = log;
+            this.user.participants.forEach(pi => {
+              this.api.getParticipantStepLog(pi).subscribe(log => {
+                pi.step_log = log;
+              });
             });
           });
-        });
-      }
+        }
+      });
     });
   }
 

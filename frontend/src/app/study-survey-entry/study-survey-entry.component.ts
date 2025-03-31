@@ -1,5 +1,5 @@
 import {NgIf} from '@angular/common';
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
@@ -17,6 +17,8 @@ import {RegisterDialogComponent} from '../register-dialog/register-dialog.compon
   templateUrl: './study-survey-entry.component.html',
   styleUrls: ['./study-survey-entry.component.scss'],
   imports: [FlexModule, NgIf, MatButtonModule],
+  providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudySurveyEntryComponent implements OnInit {
   @Input() study: Study;
@@ -30,7 +32,9 @@ export class StudySurveyEntryComponent implements OnInit {
     private authenticationService: AuthenticationService,
     public dialog: MatDialog,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser;
+    });
   }
 
   ngOnInit() {

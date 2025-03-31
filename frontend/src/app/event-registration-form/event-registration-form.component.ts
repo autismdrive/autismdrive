@@ -1,13 +1,16 @@
-import {ChangeDetectorRef, Component, Inject} from '@angular/core';
-import {FormGroup} from '@angular/forms';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, Inject} from '@angular/core';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute} from '@angular/router';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {EventRegistrationComponent} from '../event-registration/event-registration.component';
 
 @Component({
@@ -15,6 +18,9 @@ import {EventRegistrationComponent} from '../event-registration/event-registrati
   selector: 'app-event-registration-form',
   templateUrl: './event-registration-form.component.html',
   styleUrls: ['./event-registration-form.component.scss'],
+  imports: [MatDialogModule, ReactiveFormsModule, FormlyModule, FlexModule, MatButtonModule, LoadingComponent],
+  providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventRegistrationFormComponent {
   private _stateSubject: BehaviorSubject<string>;
@@ -159,13 +165,18 @@ export class EventRegistrationFormComponent {
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
-    this.authenticationService.currentUser.subscribe(user => {
+
+    effect(() => {
+      const user = this.authenticationService.currentUser();
+
       if (user) {
         this.user = user;
         this.model['email'] = user.email;
-        this.model['first_name'] = user.getSelf().identification['first_name'];
-        this.model['last_name'] = user.getSelf().identification['last_name'];
-        this.model['zip_code'] = user.getSelf().contact['zip'];
+
+        const selfParticipant = user.getSelf();
+        this.model['first_name'] = selfParticipant?.identification['first_name'];
+        this.model['last_name'] = selfParticipant?.identification['last_name'];
+        this.model['zip_code'] = selfParticipant?.contact['zip'];
       } else {
         this.user = new User({
           id: null,

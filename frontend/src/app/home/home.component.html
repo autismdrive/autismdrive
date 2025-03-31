@@ -61,7 +61,7 @@
 
 <div class="container">
   <div class="row">
-    <app-news-item *ngFor="let item of newsItems; let i = index" [item]="item" [index]="i"></app-news-item>
+    <app-news-item *ngFor="let item of newsItems(); let i = index" [item]="item" [index]="i"></app-news-item>
     <div class="more-studies">
       <app-details-link [url]="'/studies'" label="View more studies" [size]="2"></app-details-link>
     </div>

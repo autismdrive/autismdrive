@@ -1,5 +1,5 @@
 import {NgForOf, NgIf} from '@angular/common';
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
 import {Meta} from '@angular/platform-browser';
@@ -31,16 +31,18 @@ interface AgeObj {
   templateUrl: './studies.component.html',
   styleUrls: ['./studies.component.scss'],
   imports: [
-    FlexModule,
+    AddButtonComponent,
     ExtendedModule,
+    FlexModule,
     MatFormFieldModule,
     MatSelectModule,
-    TypeIconComponent,
     NgForOf,
-    AddButtonComponent,
-    SearchResultComponent,
     NgIf,
+    SearchResultComponent,
+    TypeIconComponent,
   ],
+  providers: [AuthenticationService, ApiService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudiesComponent {
   query: Query;
@@ -58,41 +60,43 @@ export class StudiesComponent {
     private router: Router,
     private meta: Meta,
   ) {
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
-    this.meta.updateTag(
-      {property: 'og:image', content: location.origin + '/assets/studies/hero.jpg'},
-      `property='og:image'`,
-    );
-    this.meta.updateTag(
-      {property: 'og:image:secure_url', content: location.origin + '/assets/studies/hero.jpg'},
-      `property='og:image:secure_url'`,
-    );
-    this.meta.updateTag(
-      {name: 'twitter:image', content: location.origin + '/assets/studies/hero.jpg'},
-      `name='twitter:image'`,
-    );
-    this.studyStatuses = Object.keys(StudyStatus).map(k => {
-      return {name: k, label: StudyStatus[k]};
-    });
-    this.Ages = Object.keys(AgeRange.labels).map(k => {
-      return {name: k, label: AgeRange.labels[k]};
-    });
-    this.route.params.subscribe(params => {
-      if ('studyStatus' in params) {
-        this.selectedStatus = this.studyStatuses.find(x => x.name === params['studyStatus']);
-        if ('age' in params) {
-          this.selectedAge = this.Ages.find(x => x.name === params['age']);
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.meta.updateTag(
+        {property: 'og:image', content: location.origin + '/assets/studies/hero.jpg'},
+        `property='og:image'`,
+      );
+      this.meta.updateTag(
+        {property: 'og:image:secure_url', content: location.origin + '/assets/studies/hero.jpg'},
+        `property='og:image:secure_url'`,
+      );
+      this.meta.updateTag(
+        {name: 'twitter:image', content: location.origin + '/assets/studies/hero.jpg'},
+        `name='twitter:image'`,
+      );
+      this.studyStatuses = Object.keys(StudyStatus).map(k => {
+        return {name: k, label: StudyStatus[k]};
+      });
+      this.Ages = Object.keys(AgeRange.labels).map(k => {
+        return {name: k, label: AgeRange.labels[k]};
+      });
+      this.route.params.subscribe(params => {
+        if ('studyStatus' in params) {
+          this.selectedStatus = this.studyStatuses.find(x => x.name === params['studyStatus']);
+          if ('age' in params) {
+            this.selectedAge = this.Ages.find(x => x.name === params['age']);
+          } else {
+            this.selectedAge = undefined;
+          }
         } else {
+          this.selectedStatus = this.studyStatuses[0];
+          this.route.params['studyStatus'] = this.studyStatuses[0].name;
           this.selectedAge = undefined;
+          this.router.navigate(['/studies/' + this.studyStatuses[0].name]);
         }
-      } else {
-        this.selectedStatus = this.studyStatuses[0];
-        this.route.params['studyStatus'] = this.studyStatuses[0].name;
-        this.selectedAge = undefined;
-        this.router.navigate(['/studies/' + this.studyStatuses[0].name]);
-      }
+      });
+      this.loadStudies();
     });
-    this.loadStudies();
   }
 
   loadStudies() {

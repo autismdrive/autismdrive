@@ -1,5 +1,5 @@
 import {NgForOf, NgIf} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -127,6 +127,8 @@ enum ProfileState {
     ReactiveFormsModule,
     NgForOf,
   ],
+  providers: [AuthenticationService, ApiService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit {
   user: User;
@@ -159,43 +161,42 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-    this.authenticationService.currentUser.subscribe(
-      user => {
-        this.user = user;
-        console.log(user);
-        this.self = user.getSelf();
-        this.dependents = user.getDependents();
+    effect(() => {
+      this.user = this.authenticationService.currentUser();
 
-        this.api.getUserMeta(user.id).subscribe(
-          meta => {
-            console.log('UserMeta', meta);
-            this.userMeta = meta;
-            this.loading = false;
-          },
-          error1 => {
-            console.error(error1);
-            this.loading = false;
-          },
-        );
-      },
-      error1 => {
-        console.error(error1);
+      if (!this.user) {
         this.user = null;
         this.loading = false;
-      },
-    );
+        return;
+      }
+
+      this.self = this.user.getSelf();
+      this.dependents = this.user.getDependents();
+
+      this.api.getUserMeta(this.user.id).subscribe(
+        meta => {
+          console.log('UserMeta', meta);
+          this.userMeta = meta;
+          this.loading = false;
+        },
+        error1 => {
+          console.error(error1);
+          this.loading = false;
+        },
+      );
+      this.refreshParticipants();
+      this.api.getUserStudyInquiries(this.user.id).subscribe(x => (this.studyInquiries = x));
+      this.api.getStudies().subscribe(all => {
+        this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
+      });
+      this.favoriteResources = this.user.user_favorites
+        .filter(f => f.type === 'resource')
+        .map(f => f.resource)
+        .sort(a => a.id);
+    });
   }
 
   ngOnInit() {
-    this.refreshParticipants();
-    this.api.getUserStudyInquiries(this.user.id).subscribe(x => (this.studyInquiries = x));
-    this.api.getStudies().subscribe(all => {
-      this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
-    });
-    this.favoriteResources = this.user.user_favorites
-      .filter(f => f.type === 'resource')
-      .map(f => f.resource)
-      .sort(a => a.id);
   }
 
   refreshParticipants() {

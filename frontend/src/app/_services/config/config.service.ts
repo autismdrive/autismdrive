@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {effect, Injectable, signal, Signal, WritableSignal} from '@angular/core';
 import {GoogleModuleOptions} from '@ng-maps/google';
 import {BehaviorSubject, Observable} from 'rxjs';
 
@@ -24,21 +24,22 @@ export class ConfigService implements GoogleModuleOptions {
   public production: boolean;
   public googleAnalyticsKey: string;
 
-  private propsSubject = new BehaviorSubject<ConfigServiceProps>(null);
-  public props: Observable<ConfigServiceProps>;
+  public readonly props: WritableSignal<ConfigServiceProps | undefined> = signal(undefined);
 
   constructor() {
-    this.props = this.propsSubject.asObservable();
-    this.propsSubject.next(null);
+    effect(() => {
+      const value = this.props();
+
+      console.log('ConfigService > constructor > effect > value', value);
+    });
   }
 
   fromProperties(props: ConfigServiceProps) {
-    for (const propName in props) {
-      if (props.hasOwnProperty(propName)) {
-        this[propName] = props[propName];
-      }
-    }
+    const instance = this;
+    Object.entries(props).forEach(([key, value]) => {
+      instance[key] = value;
+    });
 
-    this.propsSubject.next(props);
+    this.props.set(props);
   }
 }

@@ -1,6 +1,5 @@
-def main():
-    print("Hello from backend!")
-
+# TODO: Delete this file?
+print("Loading backend/main.py")
 
 if __name__ == "__main__":
-    main()
+    print("Running backend/main.py")

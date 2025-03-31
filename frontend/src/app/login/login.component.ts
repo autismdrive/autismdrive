@@ -1,5 +1,5 @@
 import {AsyncPipe, NgIf} from '@angular/common';
-import {Component, EventEmitter} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, EventEmitter} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
@@ -31,6 +31,8 @@ import {DeviceDetectorService} from 'ngx-device-detector';
     AsyncPipe,
     NgIf,
   ],
+  providers: [AuthenticationService, DeviceDetectorService, GoogleAnalyticsService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   loading = false;
@@ -71,7 +73,6 @@ export class LoginComponent {
     this.route.queryParams.subscribe(qParams => {
       if (qParams.hasOwnProperty('returnUrl')) {
         this.returnUrl = qParams.returnUrl;
-        this.authenticationService.currentUser.subscribe(u => this._goToReturnUrl(u));
       }
     });
 
@@ -80,7 +81,10 @@ export class LoginComponent {
         this.emailToken = params.email_token;
       }
     });
-    this.authenticationService.currentUser.subscribe(user => {
+
+    effect(() => {
+      const user = this.authenticationService.currentUser();
+
       // If the login form discovers there is a user, send folks to the return url.
       if (user) {
         this._goToReturnUrl(user);

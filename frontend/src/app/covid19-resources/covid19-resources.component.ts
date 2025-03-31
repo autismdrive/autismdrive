@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Covid19Categories} from '@models/hit_type';
 import {Hit, Query} from '@models/query';
@@ -18,6 +18,8 @@ interface C19ResourceCategoryObj {
   selector: 'app-covid19-resources',
   templateUrl: './covid19-resources.component.html',
   styleUrls: ['./covid19-resources.component.scss'],
+  providers: [ApiService, AuthenticationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Covid19ResourcesComponent {
   query: Query;
@@ -49,7 +51,10 @@ export class Covid19ResourcesComponent {
       }
     });
     this.loadResources();
-    this.authenticationService.currentUser.subscribe(x => (this.currentUser = x));
+
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
   }
 
   loadResources() {

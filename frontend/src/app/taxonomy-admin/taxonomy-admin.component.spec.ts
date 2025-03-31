@@ -1,3 +1,4 @@
+import {signal} from '@angular/core';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
@@ -18,7 +19,7 @@ describe('TaxonomyAdminComponent', () => {
         addCategory: jest.fn().mockReturnValue(of(mockCategory)),
         deleteCategory: jest.fn().mockReturnValue(of(mockCategory)),
       })
-      .mock(AuthenticationService, {currentUser: of(mockUser)});
+      .mock(AuthenticationService, {currentUser: signal(mockUser)});
   });
 
   beforeEach(() => {
