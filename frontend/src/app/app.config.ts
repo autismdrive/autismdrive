@@ -28,6 +28,7 @@ import {lastValueFrom} from 'rxjs';
 // this index page, it if exists. Otherwise, assume we are connecting to port
 // 5000 on the local server.
 export const load = async (): Promise<ConfigServiceProps> => {
+  console.log(`app.config.ts > load`);
   const httpClient = inject(HttpClient);
   const configService = inject(ConfigService);
 
@@ -47,21 +48,23 @@ export const load = async (): Promise<ConfigServiceProps> => {
   }
 
   if (localConfig) {
+    console.log(`app.config.ts > load > localConfig: ${JSON.stringify(localConfig)}`);
     configService.fromProperties(localConfig);
     return localConfig;
   }
 
   // Check with the backend to see if there is a configuration override available.
-  let configFromJsonFile: ConfigServiceProps;
+  let configFromBackend: ConfigServiceProps;
   try {
-    configFromJsonFile = await lastValueFrom(httpClient.get<ConfigServiceProps>(url, {responseType: 'json'}));
+    configFromBackend = await lastValueFrom(httpClient.get<ConfigServiceProps>(url, {responseType: 'json'}));
   } catch {
-    configFromJsonFile = undefined;
+    configFromBackend = undefined;
   }
 
-  if (configFromJsonFile) {
-    configService.fromProperties(configFromJsonFile);
-    return configFromJsonFile;
+  if (configFromBackend) {
+    console.log(`app.config.ts > load > configFromBackend: ${JSON.stringify(configFromBackend)}`);
+    configService.fromProperties(configFromBackend);
+    return configFromBackend;
   }
 };
 

@@ -25,7 +25,7 @@
                 "maximumWarning": "64kb"
               }
             ],
-            "outputPath": "dist",
+            "outputPath": "dist/frontend/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
@@ -182,6 +182,89 @@
             "watch": true,
             "headless": false
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/frontend/server",
+            "main": "src/server.ts",
+            "tsConfig": "src/tsconfig.server.json",
+            "buildOptimizer": false,
+            "optimization": true,
+            "sourceMap": true,
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            },
+            "preserveSymlinks": true,
+            "extractLicenses": false
+          },
+          "configurations": {
+            "production": {
+              "buildOptimizer": true,
+              "outputHashing": "media",
+              "optimization": true,
+              "sourceMap": true,
+              "extractLicenses": true
+            },
+            "staging": {
+              "outputHashing": "media",
+              "optimization": true,
+              "extractLicenses": true
+            },
+            "dev": {
+              "outputHashing": "media",
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": true
+            },
+            "ci": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false
+            },
+            "docker": {
+              "outputHashing": "media",
+              "optimization": true,
+              "extractLicenses": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@angular-devkit/build-angular:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "frontend:build:development",
+              "serverTarget": "frontend:server:development"
+            },
+            "production": {
+              "browserTarget": "frontend:build:production",
+              "serverTarget": "frontend:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@angular-devkit/build-angular:prerender",
+          "options": {
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "frontend:build:production",
+              "serverTarget": "frontend:server:production"
+            },
+            "development": {
+              "browserTarget": "frontend:build:development",
+              "serverTarget": "frontend:server:development"
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     }

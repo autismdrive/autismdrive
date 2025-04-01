@@ -2,6 +2,7 @@
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import {
+  afterNextRender,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -256,18 +257,20 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.languageOptions = Language.options;
     this.ageOptions = AgeRange.options;
 
-    this.meta.updateTag(
-      {property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
-      `property='og:image'`,
-    );
-    this.meta.updateTag(
-      {property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
-      `property='og:image:secure_url'`,
-    );
-    this.meta.updateTag(
-      {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
-      `name='twitter:image'`,
-    );
+    afterNextRender(() => {
+      this.meta.updateTag(
+        {property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+        `property='og:image'`,
+      );
+      this.meta.updateTag(
+        {property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+        `property='og:image:secure_url'`,
+      );
+      this.meta.updateTag(
+        {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+        `name='twitter:image'`,
+      );
+    });
   }
 
   @ViewChild('paginator')
@@ -456,30 +459,32 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   setGPSLocation(callback?: () => void) {
-    if (navigator.geolocation) {
-      this.gpsEnabled = true;
-      navigator.geolocation.getCurrentPosition(
-        p => {
-          this.setLocation(LocationMode.gps, {lat: p.coords.latitude, lng: p.coords.longitude});
-          this.mapZoomLevel = 10;
-          if (callback) {
-            callback();
-          }
-        },
-        error => {
-          console.error(error);
-          this.gpsEnabled = false;
-          if (callback) {
-            callback();
-          }
-        },
-      );
-    } else {
-      this.gpsEnabled = false;
-      if (callback) {
-        callback();
+    afterNextRender(() => {
+      if (navigator.geolocation) {
+        this.gpsEnabled = true;
+        navigator.geolocation.getCurrentPosition(
+          p => {
+            this.setLocation(LocationMode.gps, {lat: p.coords.latitude, lng: p.coords.longitude});
+            this.mapZoomLevel = 10;
+            if (callback) {
+              callback();
+            }
+          },
+          error => {
+            console.error(error);
+            this.gpsEnabled = false;
+            if (callback) {
+              callback();
+            }
+          },
+        );
+      } else {
+        this.gpsEnabled = false;
+        if (callback) {
+          callback();
+        }
       }
-    }
+    });
   }
 
   ngAfterViewInit() {
@@ -497,7 +502,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   scrollToTopOfSearch() {
-    document.getElementById('TopOfSearch').scrollIntoView();
+    afterNextRender(() => {
+      document.getElementById('TopOfSearch').scrollIntoView();
+    });
   }
 
   setDefaultMapLocation(callback?: () => void) {
@@ -823,53 +830,55 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   protected mapLoad(m: google.maps.Map) {
-    const controlDiv: MapControlDiv = document.createElement('div');
+    afterNextRender(() => {
+      const controlDiv: MapControlDiv = document.createElement('div');
 
-    // Set CSS for the control border.
-    const controlUI = document.createElement('div');
-    controlUI.style.backgroundColor = '#fff';
-    controlUI.style.border = '2px solid #fff';
-    controlUI.style.borderRadius = '3px';
-    controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-    controlUI.style.cursor = 'pointer';
-    controlUI.style.marginBottom = '6px';
-    controlUI.style.marginRight = '12px';
-    controlUI.style.textAlign = 'center';
-    controlUI.title = 'Your Location';
-    controlDiv.appendChild(controlUI);
+      // Set CSS for the control border.
+      const controlUI = document.createElement('div');
+      controlUI.style.backgroundColor = '#fff';
+      controlUI.style.border = '2px solid #fff';
+      controlUI.style.borderRadius = '3px';
+      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+      controlUI.style.cursor = 'pointer';
+      controlUI.style.marginBottom = '6px';
+      controlUI.style.marginRight = '12px';
+      controlUI.style.textAlign = 'center';
+      controlUI.title = 'Your Location';
+      controlDiv.appendChild(controlUI);
 
-    // Set CSS for the control interior.
-    const controlText = document.createElement('div');
-    controlText.style.fontSize = '16px';
-    controlText.style.lineHeight = '38px';
-    controlText.style.paddingLeft = '5px';
-    controlText.style.paddingRight = '5px';
-    controlText.innerHTML = '<img src="/assets/map/my-location.svg" alt="Your Location">';
-    controlUI.appendChild(controlText);
+      // Set CSS for the control interior.
+      const controlText = document.createElement('div');
+      controlText.style.fontSize = '16px';
+      controlText.style.lineHeight = '38px';
+      controlText.style.paddingLeft = '5px';
+      controlText.style.paddingRight = '5px';
+      controlText.innerHTML = '<img src="/assets/map/my-location.svg" alt="Your Location">';
+      controlUI.appendChild(controlText);
 
-    // Set the center to the user's location on click
-    controlUI.addEventListener('click', () => {
-      // fixme: maybe we should requery when clicking.
-      console.log('map clicked.');
-      this.mapQuerySubject.next(this.query);
-    });
-
-    controlDiv.index = 1;
-    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
-
-    m.addListener('dragend', () => {
-      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
-      this.setLocation(LocationMode.map, {
-        lat: latLngBounds.getCenter().lat(),
-        lng: latLngBounds.getCenter().lng(),
+      // Set the center to the user's location on click
+      controlUI.addEventListener('click', () => {
+        // fixme: maybe we should requery when clicking.
+        console.log('map clicked.');
+        this.mapQuerySubject.next(this.query);
       });
-      this.mapQuerySubject.next(this.query);
-      console.log('Map Dragged');
-      if (this.isDistanceSort) {
-        console.log('Map Dragged, re-sorting');
-        this._updateDistanceSort();
-        this.querySubject.next(this.query);
-      }
+
+      controlDiv.index = 1;
+      m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+
+      m.addListener('dragend', () => {
+        const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
+        this.setLocation(LocationMode.map, {
+          lat: latLngBounds.getCenter().lat(),
+          lng: latLngBounds.getCenter().lng(),
+        });
+        this.mapQuerySubject.next(this.query);
+        console.log('Map Dragged');
+        if (this.isDistanceSort) {
+          console.log('Map Dragged, re-sorting');
+          this._updateDistanceSort();
+          this.querySubject.next(this.query);
+        }
+      });
     });
   }
 

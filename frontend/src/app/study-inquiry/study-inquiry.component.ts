@@ -1,5 +1,5 @@
 import {NgForOf, NgIf} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
+import {afterNextRender, ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatCard, MatCardModule} from '@angular/material/card';
 import {MatProgressBar, MatProgressBarModule} from '@angular/material/progress-bar';
@@ -99,7 +99,9 @@ export class StudyInquiryComponent implements OnInit {
 
   goEligibility() {
     if (this.study && this.study.eligibility_url) {
-      window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
+      afterNextRender(() => {
+        window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
+      });
       this.sendInquiry();
     }
   }

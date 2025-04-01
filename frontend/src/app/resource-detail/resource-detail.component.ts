@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import {DatePipe, formatDate, NgIf, NgOptimizedImage} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {afterNextRender, ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
@@ -118,28 +118,34 @@ export class ResourceDetailComponent {
   }
 
   loadMapLocation() {
-    if (this.resource && this.resource.hasCoords() && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(p => {
-        this.mapLoc = {
-          lat: p.coords.latitude,
-          lng: p.coords.longitude,
-        };
-      });
-    }
+    afterNextRender(() => {
+      if (this.resource && this.resource.hasCoords() && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(p => {
+          this.mapLoc = {
+            lat: p.coords.latitude,
+            lng: p.coords.longitude,
+          };
+        });
+      }
+    });
   }
 
   goPhone($event: MouseEvent) {
-    $event.preventDefault();
-    if (this.resource && this.resource.phone) {
-      location.href = `tel://${this.resource.phone}`;
-    }
+    afterNextRender(() => {
+      $event.preventDefault();
+      if (this.resource && this.resource.phone) {
+        location.href = `tel://${this.resource.phone}`;
+      }
+    });
   }
 
   goWebsite($event: MouseEvent) {
-    $event.preventDefault();
-    if (this.resource && this.resource.website) {
-      window.open(this.resource.website, '_blank');
-    }
+    afterNextRender(() => {
+      $event.preventDefault();
+      if (this.resource && this.resource.website) {
+        window.open(this.resource.website, '_blank');
+      }
+    });
   }
 
   getGoogleMapsUrl(): string {

@@ -1,6 +1,6 @@
 import {MediaMatcher} from '@angular/cdk/layout';
 import {NgClass, NgIf, NgStyle} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
+import {afterNextRender, AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -142,21 +142,23 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   watchScrollEvents() {
-    const scroll$ = fromEvent(window, 'scroll').pipe(
-      throttleTime(10),
-      map((e: Event) => window.pageYOffset),
-      pairwise(),
-      map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
-      share(),
-    );
+    afterNextRender(() => {
+      const scroll$ = fromEvent(window, 'scroll').pipe(
+        throttleTime(10),
+        map((e: Event) => window.pageYOffset),
+        pairwise(),
+        map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
+        share(),
+      );
 
-    scroll$.pipe(filter(direction => direction === Direction.Up)).subscribe(() => {
-      this.headerExpanded = true;
-    });
+      scroll$.pipe(filter(direction => direction === Direction.Up)).subscribe(() => {
+        this.headerExpanded = true;
+      });
 
-    scroll$.pipe(filter(direction => direction === Direction.Down)).subscribe(() => {
-      this.menuVisible = false;
-      this.headerExpanded = false;
+      scroll$.pipe(filter(direction => direction === Direction.Down)).subscribe(() => {
+        this.menuVisible = false;
+        this.headerExpanded = false;
+      });
     });
   }
 }

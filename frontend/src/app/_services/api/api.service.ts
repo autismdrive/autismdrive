@@ -133,8 +133,9 @@ export class ApiService {
     private configService: ConfigService,
   ) {
     effect(() => {
+      console.log(`ApiService > constructor > effect > configService.props():`, configService.props());
       if (this.configService.props()) {
-        this.apiRoot = configService.apiUrl;
+        this.apiRoot = this.configService.apiUrl;
       }
     });
   }
@@ -163,6 +164,7 @@ export class ApiService {
       catchError(this._handleError),
     );
   }
+
   /** getUserMeta */
   getUserMeta(user_id: number): Observable<UserMeta> {
     return this.httpClient
@@ -213,6 +215,7 @@ export class ApiService {
       catchError(this._handleError),
     );
   }
+
   // Add Study
   addStudy(study: Study): Observable<Study> {
     return this.httpClient.post<Study>(this._endpointUrl('studylist'), study).pipe(catchError(this._handleError));

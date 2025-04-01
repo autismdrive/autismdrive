@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {afterNextRender, Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {ApiError} from '@app/api-error';
 import {Query} from '@models/query';
@@ -95,22 +95,25 @@ export class GoogleAnalyticsService {
     try {
       const apiKey = this.configService.googleAnalyticsKey;
 
-      const script1 = document.createElement('script');
-      script1.async = true;
-      script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + apiKey;
-      document.head.appendChild(script1);
+      afterNextRender(() => {
+        const script1 = document.createElement('script');
+        script1.async = true;
+        script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + apiKey;
+        document.head.appendChild(script1);
 
-      const script2 = document.createElement('script');
-      script2.innerHTML =
-        `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '` +
-        apiKey +
-        `', {'send_page_view': false});
-      `;
-      document.head.appendChild(script2);
+        const script2 = document.createElement('script');
+        script2.innerHTML =
+          `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '` +
+          apiKey +
+          `', {'send_page_view': false});
+        `;
+        document.head.appendChild(script2);
+      });
+
     } catch (ex) {
       console.error('Error appending google analytics');
       console.error(ex);

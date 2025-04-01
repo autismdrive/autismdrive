@@ -12,11 +12,11 @@ export class SearchService {
 
   constructor(
     private _http: HttpClient,
-    private config: ConfigService,
+    private configService: ConfigService,
   ) {}
 
   search(query: Query): Observable<Query> {
-    const url = this.config.apiUrl + this.query_url;
+    const url = this.configService.apiUrl + this.query_url;
     return this._http.post<any>(url, query).pipe(
       map(queryDict => {
         return this._loadQuery(queryDict);

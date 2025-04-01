@@ -1,5 +1,4 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
+import {afterNextRender, ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {FooterComponent} from '@app/footer/footer.component';
@@ -8,14 +7,13 @@ import {User} from '@models/user';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {Observable} from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [HeaderComponent, FooterComponent, RouterOutlet, AsyncPipe],
+  imports: [HeaderComponent, FooterComponent, RouterOutlet],
   providers: [ConfigService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -53,17 +51,19 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        const title = this.route.snapshot.firstChild.data.title;
-        const bodyElement = document.querySelector('body');
-        bodyElement.classList.toggle('is-home', this.router.url === '/home');
-        if (title) {
-          this.meta.updateTag({property: 'og:title', content: title}, `property='og:title'`);
-          this.meta.updateTag({name: 'twitter:text:title', content: title}, `name='twitter:text:title'`);
+    afterNextRender(() => {
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          const title = this.route.snapshot.firstChild.data.title;
+          const bodyElement = document.querySelector('body');
+          bodyElement.classList.toggle('is-home', this.router.url === '/home');
+          if (title) {
+            this.meta.updateTag({property: 'og:title', content: title}, `property='og:title'`);
+            this.meta.updateTag({name: 'twitter:text:title', content: title}, `name='twitter:text:title'`);
+          }
+          this.meta.updateTag({property: 'og:url', content: location.href}, `property='og:url'`);
         }
-        this.meta.updateTag({property: 'og:url', content: location.href}, `property='og:url'`);
-      }
+      });
     });
   }
 

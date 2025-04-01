@@ -50,7 +50,6 @@ export class StudyDetailComponent {
 
   openDialog(si): void {
     const dialogRef = this.dialog.open(InvestigatorFormComponent, {
-      width: `${window.innerWidth}px`,
       data: {
         si: si,
       },

@@ -1,6 +1,7 @@
+import {afterNextRender} from '@angular/core';
 import {AppEnvironment} from '@models/environment';
 
-export const SERVICE_HOST = navigator.platform.includes('Win') ? '10.0.2.2' : 'localhost';
+export const SERVICE_HOST = 'localhost';
 export const API_URL = `http://${SERVICE_HOST}:5000`;
 
 const defaultValues: AppEnvironment = {

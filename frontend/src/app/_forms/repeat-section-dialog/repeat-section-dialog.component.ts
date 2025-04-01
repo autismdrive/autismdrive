@@ -2,7 +2,6 @@ import {NgClass} from '@angular/common';
 import {AfterContentInit, Component, Inject} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
-import {FormlyConfig} from '@app/app.config';
 import {RepeatSectionDialogData} from '@models/repeat_section_dialog_data';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';

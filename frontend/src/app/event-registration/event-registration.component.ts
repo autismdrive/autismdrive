@@ -29,7 +29,6 @@ export class EventRegistrationComponent {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(EventRegistrationFormComponent, {
-      width: `${window.innerWidth}px`,
       data: {
         registered: false,
         title: 'Register for ' + this.resource.title,
