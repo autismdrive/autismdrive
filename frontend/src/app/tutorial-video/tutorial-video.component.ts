@@ -1,12 +1,18 @@
 /// <reference types="@types/youtube" />
+import {NgForOf} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {YouTubePlayerModule} from '@angular/youtube-player';
+import {DetailsLinkComponent} from '@app/details-link/details-link.component';
 import {NavItem} from '@models/nav-item';
+import {MarkdownModule} from 'ngx-markdown';
 
 @Component({
   standalone: true,
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
   styleUrls: ['./tutorial-video.component.scss'],
+  imports: [MatButtonModule, YouTubePlayerModule, MarkdownModule, DetailsLinkComponent, NgForOf],
 })
 export class TutorialVideoComponent {
   @Input() videoSize: string;
