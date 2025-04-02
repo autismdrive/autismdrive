@@ -1,14 +1,6 @@
 import {MediaMatcher} from '@angular/cdk/layout';
 import {NgClass, NgIf} from '@angular/common';
-import {
-  afterNextRender,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  effect,
-  OnDestroy,
-  ViewChild,
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnDestroy, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -99,10 +91,7 @@ export class FlowComponent implements OnDestroy {
     // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
     this.mobileQuery.addListener(this._mobileQueryListener);
     this._mobileQueryListener = () => this._updateSidenavState();
-
-    afterNextRender(() => {
-      window.addEventListener('resize', this._mobileQueryListener);
-    });
+    window.addEventListener('resize', this._mobileQueryListener);
 
     effect(() => {
       this.user = this.authenticationService.currentUser();
@@ -123,10 +112,7 @@ export class FlowComponent implements OnDestroy {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
     this.mobileQuery.removeListener(this._mobileQueryListener);
-
-    afterNextRender(() => {
-      window.removeEventListener('resize', this._mobileQueryListener);
-    });
+    window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   loadFlow(flowName: string) {

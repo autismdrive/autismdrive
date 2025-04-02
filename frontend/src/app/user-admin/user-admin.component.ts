@@ -1,5 +1,5 @@
 import {AsyncPipe, DatePipe, PercentPipe} from '@angular/common';
-import {afterNextRender, AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -63,40 +63,33 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    // server-side search
+    fromEvent(this.input.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(150),
+        distinctUntilChanged(),
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.loadUsers();
+        }),
+      )
+      .subscribe();
 
-    afterNextRender(() => {
-      // server-side search
-      fromEvent(this.input.nativeElement, 'keyup')
-        .pipe(
-          debounceTime(150),
-          distinctUntilChanged(),
-          tap(() => {
-            this.paginator.pageIndex = 0;
-            this.loadUsers();
-          }),
-        )
-        .subscribe();
+    // reset the paginator after sorting
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-      // reset the paginator after sorting
-      this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-      merge(this.sort.sortChange, this.paginator.page)
-        .pipe(tap(() => this.loadUsers()))
-        .subscribe();
-    });
-
-
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(tap(() => this.loadUsers()))
+      .subscribe();
   }
 
   loadUsers() {
-    afterNextRender(() => {
-      this.dataSource.loadUsers(
-        this.input.nativeElement.value,
-        this.sort.active,
-        this.sort.direction,
-        this.paginator.pageIndex,
-        this.paginator.pageSize,
-      );
-    });
+    this.dataSource.loadUsers(
+      this.input.nativeElement.value,
+      this.sort.active,
+      this.sort.direction,
+      this.paginator.pageIndex,
+      this.paginator.pageSize,
+    );
   }
 }

@@ -50,6 +50,7 @@ export class AdminNoteDisplayComponent implements OnInit {
 
   openDialog(adminNote?: AdminNote): void {
     const dialogRef = this.dialog.open(AdminNoteFormComponent, {
+      width: `${window.innerWidth}px`,
       data: {
         adminNote: adminNote || {
           user_id: this.currentUser.id,

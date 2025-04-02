@@ -1,5 +1,5 @@
 import {NgClass, NgForOf, NgIf, NgOptimizedImage, NgStyle} from '@angular/common';
-import {afterNextRender, Component, Inject} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {Participant} from '@models/participant';
@@ -37,22 +37,19 @@ export class AvatarDialogComponent {
     this.selectedIcon = this.data.participant.avatar_icon || '001';
     this.selectedColor = this.data.participant.avatar_color || `hsl(0, 100%, 80%)`;
 
-    afterNextRender(() => {
-      this.dialogRef.afterOpened().subscribe(() => {
-        const imageEl = document.getElementsByClassName('avatar-image-active')[0] as HTMLElement;
-        const colorEl = document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
+    this.dialogRef.afterOpened().subscribe(() => {
+      const imageEl = document.getElementsByClassName('avatar-image-active')[0] as HTMLElement;
+      const colorEl = document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
 
-        if (imageEl) {
-          const x = imageEl.offsetLeft - imageEl.clientWidth * 1.25 - imageEl.parentElement.clientWidth;
-          imageEl.parentElement.scrollTo({left: x});
-        }
-        if (colorEl) {
-          const x = colorEl.offsetLeft - colorEl.clientWidth * 3 - colorEl.parentElement.clientWidth;
-          colorEl.parentElement.scrollTo({left: x});
-        }
-      });
+      if (imageEl) {
+        const x = imageEl.offsetLeft - imageEl.clientWidth * 1.25 - imageEl.parentElement.clientWidth;
+        imageEl.parentElement.scrollTo({left: x});
+      }
+      if (colorEl) {
+        const x = colorEl.offsetLeft - colorEl.clientWidth * 3 - colorEl.parentElement.clientWidth;
+        colorEl.parentElement.scrollTo({left: x});
+      }
     });
-
   }
 
   onNoClick(): void {
@@ -90,13 +87,11 @@ export class AvatarDialogComponent {
   }
 
   scroll($event: MouseEvent, className: string, direction: string) {
-    afterNextRender(() => {
-      const el = document.getElementsByClassName(className)[0];
-      const row = document.getElementsByClassName(className + '-row')[0];
-      const dir = direction === 'left' ? -1 : 1;
-      const x = row.clientWidth * dir;
-      el.scrollBy(x, 0);
-    });
+    const el = document.getElementsByClassName(className)[0];
+    const row = document.getElementsByClassName(className + '-row')[0];
+    const dir = direction === 'left' ? -1 : 1;
+    const x = row.clientWidth * dir;
+    el.scrollBy(x, 0);
   }
 
   onSubmit() {

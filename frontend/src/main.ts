@@ -3,7 +3,7 @@ import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {enableProdMode, importProvidersFrom, provideAppInitializer} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
-import {bootstrapApplication, BrowserModule, provideClientHydration, withEventReplay} from '@angular/platform-browser';
+import {bootstrapApplication, BrowserModule} from '@angular/platform-browser';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {YouTubePlayerModule} from '@angular/youtube-player';
 import {AppComponent} from '@app/app.component';
@@ -74,6 +74,6 @@ bootstrapApplication(AppComponent, {
       useValue: {appearance: 'outline'},
     },
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor])),
-    provideAnimations(), provideClientHydration(withEventReplay()),
+    provideAnimations(),
   ],
 }).catch(err => console.error(err));

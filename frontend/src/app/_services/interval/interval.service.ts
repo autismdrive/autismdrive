@@ -1,4 +1,4 @@
-import {afterNextRender, Injectable, NgZone} from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
@@ -10,17 +10,13 @@ export class IntervalService {
 
   setInterval(callback: () => void, time: number) {
     this.ngZone.runOutsideAngular(() => {
-      afterNextRender(() => {
-        this.interval = window.setInterval(() => {
-          this.ngZone.run(callback);
-        }, time);
-      });
+      this.interval = window.setInterval(() => {
+        this.ngZone.run(callback);
+      }, time);
     });
   }
 
   clearInterval() {
-    afterNextRender(() => {
-      window.clearInterval(this.interval);
-    });
+    window.clearInterval(this.interval);
   }
 }

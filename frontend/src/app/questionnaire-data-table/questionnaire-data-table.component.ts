@@ -1,4 +1,4 @@
-import {afterNextRender, Component, Input, OnChanges} from '@angular/core';
+import {Component, Input, OnChanges} from '@angular/core';
 import {snakeToUpperCase} from '@util/snakeToUpper';
 import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
 import {TableInfo} from '@models/table_info';
@@ -60,25 +60,22 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   }
 
   exportQ(info) {
-
-    afterNextRender(() => {
-      this.api.exportQuestionnaire(info.table_name).subscribe(response => {
-        console.log('data', response);
-        const filename = response.headers.get('x-filename');
-        const blob = new Blob([response.body], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        });
-
-        const url = URL.createObjectURL(blob);
-        const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
-
-        a.href = url;
-        a.download = filename;
-        window.document.body.appendChild(a);
-        a.click();
-        window.document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    this.api.exportQuestionnaire(info.table_name).subscribe(response => {
+      console.log('data', response);
+      const filename = response.headers.get('x-filename');
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
+
+      const url = URL.createObjectURL(blob);
+      const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
+
+      a.href = url;
+      a.download = filename;
+      window.document.body.appendChild(a);
+      a.click();
+      window.document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
   }
 }

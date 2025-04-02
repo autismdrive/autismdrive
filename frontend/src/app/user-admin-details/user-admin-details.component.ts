@@ -1,4 +1,4 @@
-import {afterNextRender, ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
 import {AdminNote} from '@models/admin_note';
@@ -65,25 +65,23 @@ export class UserAdminDetailsComponent {
   }
 
   exportUserData() {
-    afterNextRender(() => {
-      console.log('clicking the button for export user data');
-      this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe(response => {
-        console.log('data', response);
-        const filename = response.headers.get('x-filename');
-        const blob = new Blob([response.body], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        });
-
-        const url = URL.createObjectURL(blob);
-        const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
-
-        a.href = url;
-        a.download = filename;
-        window.document.body.appendChild(a);
-        a.click();
-        window.document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    console.log('clicking the button for export user data');
+    this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe(response => {
+      console.log('data', response);
+      const filename = response.headers.get('x-filename');
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
+
+      const url = URL.createObjectURL(blob);
+      const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
+
+      a.href = url;
+      a.download = filename;
+      window.document.body.appendChild(a);
+      a.click();
+      window.document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
   }
 

@@ -1,5 +1,5 @@
 import {NgIf} from '@angular/common';
-import {afterNextRender, ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
@@ -53,9 +53,7 @@ export class StudySurveyEntryComponent implements OnInit {
     if (this.surveyLink) {
       this.sendInquiry();
       this.googleAnalytics.studySurveyEvent(this.study);
-      afterNextRender(() => {
-        window.open(this.surveyLink, '_blank');
-      });
+      window.open(this.surveyLink, '_blank');
     }
   }
 
@@ -66,6 +64,7 @@ export class StudySurveyEntryComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(RegisterDialogComponent, {
+      width: `${window.innerWidth}px`,
       data: {
         displaySurvey: false,
       },

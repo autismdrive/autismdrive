@@ -1,18 +1,12 @@
 /// <reference types="@types/youtube" />
-import {NgForOf} from '@angular/common';
 import {Component, Input} from '@angular/core';
-import {MatMiniFabButton} from '@angular/material/button';
-import {YouTubePlayer} from '@angular/youtube-player';
-import {DetailsLinkComponent} from '@app/details-link/details-link.component';
 import {NavItem} from '@models/nav-item';
-import {MarkdownComponent} from 'ngx-markdown';
 
 @Component({
   standalone: true,
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
   styleUrls: ['./tutorial-video.component.scss'],
-  imports: [MatMiniFabButton, YouTubePlayer, MarkdownComponent, DetailsLinkComponent, NgForOf],
 })
 export class TutorialVideoComponent {
   @Input() videoSize: string;
