@@ -127,7 +127,7 @@ enum ProfileState {
     ReactiveFormsModule,
     NgForOf,
   ],
-  providers: [AuthenticationService, ApiService],
+  // providers: [AuthenticationService, ApiService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit {

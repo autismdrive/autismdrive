@@ -11,7 +11,7 @@ from app.models import Category, Resource
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
 from app.resources.StudyEndpoint import get_study_by_id
-from fixtures.fixure_utils import fake
+from fixtures.fixture_utils import fake
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy
 from tests.base_test import BaseTest
@@ -692,7 +692,7 @@ class TestSearch(BaseTest):
         self.assertFalse("highlights" in search_results["hits"][0])
 
     def test_study_search_record_updates(self):
-        from fixtures.fixure_utils import fake
+        from fixtures.fixture_utils import fake
 
         keyword = fake.word()
         kw_query = {"words": keyword}

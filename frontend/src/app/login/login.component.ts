@@ -31,7 +31,7 @@ import {DeviceDetectorService} from 'ngx-device-detector';
     AsyncPipe,
     NgIf,
   ],
-  providers: [AuthenticationService, DeviceDetectorService, GoogleAnalyticsService],
+  // providers: [AuthenticationService, DeviceDetectorService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {

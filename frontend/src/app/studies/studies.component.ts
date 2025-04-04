@@ -41,7 +41,7 @@ interface AgeObj {
     SearchResultComponent,
     TypeIconComponent,
   ],
-  providers: [AuthenticationService, ApiService],
+  // providers: [AuthenticationService, ApiService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudiesComponent {

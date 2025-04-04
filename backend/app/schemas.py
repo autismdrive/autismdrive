@@ -894,6 +894,9 @@ class InvestigatorStudiesSchema(ModelSchema):
 
 
 class HitSchema(Schema):
+    class Meta(Schema.Meta):
+        unknown = EXCLUDE
+
     id = Integer()
     content = Str(missing=None)
     description = Str(missing=None)
@@ -965,14 +968,14 @@ class SearchSchema(Schema):
     ordered = True
     date = DateTime(allow_none=True)
     map_data_only = Boolean()
-    age_counts = List(Nested("AggCountSchema"), dump_only=True)
-    category = Nested("CategoryInSearchSchema")
-    geo_box = Nested("GeoboxSchema", allow_none=True, default=None)
-    hits = List(Nested("HitSchema", dump_only=True))
-    language_counts = List(Nested("AggCountSchema"), dump_only=True)
-    sort = Nested("SortSchema", allow_none=True, default=None)
-    total = Nested("TotalSchema", allow_none=True, default=None)
-    type_counts = List(Nested("AggCountSchema"), dump_only=True)
+    age_counts = List(Nested(lambda: AggCountSchema()), dump_only=True)
+    category = Nested(lambda: CategoryInSearchSchema())
+    geo_box = Nested(lambda: GeoboxSchema(), allow_none=True, default=None)
+    hits = List(Nested(lambda: HitSchema()), dump_only=True)
+    language_counts = List(Nested(lambda: AggCountSchema), dump_only=True)
+    sort = Nested(lambda: SortSchema, allow_none=True, default=None)
+    total = Nested(lambda: TotalSchema, allow_none=True, default=None)
+    type_counts = List(Nested(lambda: AggCountSchema), dump_only=True)
 
     @post_load
     def make_search(self, data, **kwargs):

@@ -13,7 +13,7 @@ from app.import_service import ImportService
 from app.models import DataTransferLog, Participant, User, IdentificationQuestionnaire
 from app.resources.UserEndpoint import get_user_by_id
 from app.schemas import SchemaRegistry, ParticipantSchema
-from fixtures.fixure_utils import fake, fake_password
+from fixtures.fixture_utils import fake, fake_password
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 os.environ["ENV_NAME"] = "testing"

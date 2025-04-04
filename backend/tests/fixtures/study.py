@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from app.enums import Status
-from .fixure_utils import fake
+from .fixture_utils import fake
 
 
 @dataclass

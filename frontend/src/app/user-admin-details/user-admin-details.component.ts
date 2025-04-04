@@ -13,7 +13,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-user-admin-details',
   templateUrl: './user-admin-details.component.html',
   styleUrls: ['./user-admin-details.component.scss'],
-  providers: [ApiService, AuthenticationService],
+  // providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserAdminDetailsComponent {

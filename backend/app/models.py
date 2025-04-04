@@ -500,37 +500,44 @@ class LatLng(TypedDict):
 
 class Geocode:
     @staticmethod
-    def get_geocode(address_dict) -> LatLng:
+    def get_geocode(address_dict) -> LatLng | None:
 
-        if settings.TESTING:
-            z = session.query(ZipCode).order_by(func.random()).first()
-            print("TEST:  Pretending to get the geocode and setting lat/lng to  %s - %s" % (z.latitude, z.longitude))
-            return {"lat": z.latitude, "lng": z.longitude}
+        # If we're testing, just use fake coordinates to avoid exceeding the Google Maps API quota
+        if not settings.PRODUCTION:
+            from tests.utils import fake
+            fake_coords = fake.latlng()
+            print(f"TEST:  Pretending to get the geocode and setting lat/lng to {fake_coords[0]} - {fake_coords[1]}")
+            return LatLng(lat=float(fake_coords[0]), lng=float(fake_coords[1]))
 
-        else:
-            api_key = settings.GOOGLE_MAPS_API_KEY
-            gmaps = googlemaps.Client(key=api_key)
-            lat = None
-            lng = None
+        api_key = settings.GOOGLE_MAPS_API_KEY
 
-            # Check that location has at least a zip code
-            if address_dict["zip"]:
+        # Make sure api_key is set and is valid
+        if len(api_key) == 0 or re.fullmatch(r"^__(.*)__$", api_key):
+            return None
 
-                # Look up the latitude and longitude using Google Maps API
-                address = ""
-                for value in address_dict:
-                    if address_dict[value] is not None:
-                        address = address + " " + address_dict[value]
-                geocode_result = gmaps.geocode(address)
+        gmaps = googlemaps.Client(key=api_key)
 
-                if geocode_result is not None:
-                    if geocode_result[0] is not None:
-                        loc = geocode_result[0]["geometry"]["location"]
-                        lat = loc["lat"]
-                        lng = loc["lng"]
-                        print(address_dict, loc)
+        # Check that location has at least a zip code
+        if not address_dict["zip"]:
+            return None
 
-            return {"lat": float(lat), "lng": float(lng)}
+        # Look up the latitude and longitude using Google Maps API
+        address = ""
+        for value in address_dict:
+            if address_dict[value] is not None:
+                address = address + " " + address_dict[value]
+
+        geocode_result = gmaps.geocode(address)
+
+        if geocode_result is not None and geocode_result[0] is not None:
+            loc = geocode_result[0]["geometry"]["location"]
+            lat = loc["lat"]
+            lng = loc["lng"]
+
+            return LatLng(lat=float(lat), lng=float(lng))
+
+        return None
+
 
 
 class Investigator(Base):

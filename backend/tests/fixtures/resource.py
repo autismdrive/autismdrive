@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from random import choice
 
-from .fixure_utils import fake
+from .fixture_utils import fake
 
 
 @dataclass()

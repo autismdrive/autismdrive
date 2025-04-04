@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from app.models import User
 from fixtures.location import MockLocation, MockLocationWithLatLong
-from .fixure_utils import fake
+from .fixture_utils import fake
 
 
 @dataclass

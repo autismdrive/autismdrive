@@ -37,7 +37,7 @@ from app.models import (
 )
 from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.UserEndpoint import get_user_by_id
-from fixtures.fixure_utils import fake
+from fixtures.fixture_utils import fake
 
 
 class BaseTestQuestionnaire(BaseTest):

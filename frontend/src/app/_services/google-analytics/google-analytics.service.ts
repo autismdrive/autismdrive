@@ -1,9 +1,11 @@
-import {Injectable} from '@angular/core';
+import {effect, Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {ApiError} from '@app/api-error';
 import {Query} from '@models/query';
 import {Study} from '@models/study';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
 import {ConfigService} from '@services/config/config.service';
+import {GoogleTagManagerService} from 'angular-google-tag-manager';
 
 declare let gtag: Function;
 
@@ -14,7 +16,14 @@ export class GoogleAnalyticsService {
   constructor(
     private router: Router,
     private configService: ConfigService,
-  ) {}
+    private authenticationStateService: AuthenticationStateService,
+    private gtmService: GoogleTagManagerService,
+  ) {
+    effect(() => {
+      const user = this.authenticationStateService.currentUser();
+      this.set_user(user || null);
+    });
+  }
 
   private event(action: string, category: string, label: string) {
     gtag('event', action, {
@@ -119,6 +128,7 @@ export class GoogleAnalyticsService {
 
   private listenForRouteChanges() {
     const analyticsKey = this.configService.googleAnalyticsKey;
+
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         gtag('config', analyticsKey, {
@@ -127,4 +137,5 @@ export class GoogleAnalyticsService {
       }
     });
   }
+
 }

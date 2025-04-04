@@ -79,10 +79,7 @@ class DataLoader:
 
                 geocode = self.get_geocode(
                     address_dict={"street": row[8], "city": row[10], "state": row[11], "zip": row[12]},
-                    lat_long_dict={
-                        "lat": lat,
-                        "lng": lng
-                    } if lat and lng else None,
+                    lat_long_dict=LatLng(lat=lat, lng=lng) if lat and lng else None,
                 )
 
                 event = Event(
@@ -162,10 +159,7 @@ class DataLoader:
 
                 geocode = self.get_geocode(
                     address_dict={"street": row[8], "city": row[10], "state": row[11], "zip": row[12]},
-                    lat_long_dict={
-                        "lat": lat,
-                        "lng": lng
-                    } if lat and lng else None,
+                    lat_long_dict=LatLng(lat=lat, lng=lng) if lat and lng else None,
                 )
 
                 location = Location(
@@ -433,43 +427,15 @@ class DataLoader:
         session.close()
         return category
 
-    def get_geocode(self, address_dict, lat_long_dict: Optional[LatLng]) -> None | LatLng:
-        api_key = settings.GOOGLE_MAPS_API_KEY
+    def get_geocode(self, address_dict: dict, lat_long_dict: Optional[LatLng]=None) -> None | LatLng:
+        # Avoid hitting the Google Maps API unnecessarily.
+        if not lat_long_dict:
 
-        # Make sure api_key is set and is valid
-        if len(api_key) == 0 or re.fullmatch(r"^__(.*)__$", api_key):
-            return
+            from app.models import Geocode
 
-        try:
-            gmaps = googlemaps.Client(key=api_key)
-        except googlemaps.exceptions.ApiError as e:
-            # Skip execution if API key is invalid.
-            return
+            return Geocode.get_geocode(address_dict)
 
-        lat = None
-        lng = None
-
-        # Check that location has at least a zip code
-        if address_dict["zip"]:
-
-            # Use stored latitude & longitude, if available
-            if lat_long_dict:
-                lat = lat_long_dict["lat"]
-                lng = lat_long_dict["lng"]
-
-            # Otherwise, look it up using Google Maps API
-            else:
-                address = " ".join(address_dict.values())
-                geocode_result = gmaps.geocode(address)
-
-                if geocode_result is not None:
-                    if geocode_result[0] is not None:
-                        loc = geocode_result[0]["geometry"]["location"]
-                        lat = float(loc["lat"])
-                        lng = float(loc["lng"])
-                        print(address_dict, loc)
-
-        return {"lat": lat, "lng": lng} if lat and lng else None
+        return lat_long_dict
 
 
     def build_index(self):

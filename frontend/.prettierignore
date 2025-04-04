@@ -9,7 +9,7 @@
 
 # dependencies
 /node_modules
-/src/assets/js
+/src/public/js
 
 # IDEs and editors
 /.idea

@@ -1,11 +1,12 @@
+import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MediaMatcher} from '@angular/cdk/layout';
-import {NgClass, NgIf, NgStyle} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import {provideAnimations} from '@angular/platform-browser/animations';
 import {Router, RouterModule} from '@angular/router';
-import {commonAnimations} from '@animations/animations';
 import {LogoComponent} from '@app/logo/logo.component';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';
 import {User} from '@models/user';
@@ -20,18 +21,343 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   imports: [
+    CommonModule,
     ExtendedModule,
     FlexModule,
     LogoComponent,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
-    NgClass,
-    NgIf,
-    NgStyle,
     RouterModule,
   ],
-  animations: commonAnimations,
+  providers: [provideAnimations()],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('toggleMobileMenu', [
+      state('hidden-collapsed-sm', style({top: '-100vh'})),
+      state('hidden-expanded-sm', style({top: '-100vh'})),
+      state(
+        'visible-collapsed-sm',
+        style({
+          top: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'visible-expanded-sm',
+        style({
+          top: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      transition('* => *', animate('0.5s ease-in-out')),
+    ]),
+    trigger('toggleUvaHeader', [
+      state(
+        'collapsed',
+        style({
+          top: '-40px',
+          height: '40px',
+        }),
+      ),
+      state('expanded', style({top: '0px', height: '40px'})),
+      transition('* => *', animate('0.5s ease-in-out')),
+    ]),
+    trigger('toggleMenuBar', [
+      state(
+        'hidden-collapsed-sm',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-expanded-sm',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-collapsed-sm',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-expanded-sm',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-collapsed-md',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-expanded-md',
+        style({
+          top: '40px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-collapsed-md',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-expanded-md',
+        style({
+          top: '40px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-collapsed-lg',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-expanded-lg',
+        style({
+          top: '40px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-collapsed-lg',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-expanded-lg',
+        style({
+          top: '40px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      transition('* => *', animate('0.5s ease-in-out')),
+    ]),
+    trigger('toggleTaglineToolbar', [
+      state(
+        'hidden-collapsed-sm',
+        style({
+          top: '0px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-expanded-sm',
+        style({
+          top: '104px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-collapsed-md',
+        style({
+          top: '0px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-expanded-md',
+        style({
+          top: '104px',
+          height: '40px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-collapsed-lg',
+        style({
+          top: '0px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-expanded-lg',
+        style({
+          top: '104px',
+          height: '40px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'visible-collapsed-sm',
+        style({
+          top: '0px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-expanded-sm',
+        style({
+          top: '104px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-collapsed-md',
+        style({
+          top: '0px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-expanded-md',
+        style({
+          top: '104px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-collapsed-lg',
+        style({
+          top: '0px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'visible-expanded-lg',
+        style({
+          top: '104px',
+          height: '40px',
+          'box-shadow': 'none',
+        }),
+      ),
+      transition('* => *', animate('0.5s ease-in-out')),
+    ]),
+    trigger('toggleBackground', [
+      state(
+        'collapsed-sm',
+        style({
+          top: '0px',
+          height: '64px',
+        }),
+      ),
+      state(
+        'expanded-sm',
+        style({
+          top: '0px',
+          height: '64px',
+        }),
+      ),
+      state(
+        'collapsed-md',
+        style({
+          top: '0px',
+          height: '64px',
+        }),
+      ),
+      state(
+        'expanded-md',
+        style({
+          top: '0px',
+          height: '144px',
+        }),
+      ),
+      state(
+        'collapsed-lg',
+        style({
+          top: '0px',
+          height: '64px',
+        }),
+      ),
+      state(
+        'expanded-lg',
+        style({
+          top: '0px',
+          height: '144px',
+        }),
+      ),
+      transition('* => *', animate('0.5s ease-in-out')),
+    ]),
+    trigger('toggleResourceBar', [
+      state(
+        'hidden-collapsed-sm',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-expanded-sm',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-collapsed-md',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-expanded-md',
+        style({
+          top: '40px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      state(
+        'hidden-collapsed-lg',
+        style({
+          top: '0px',
+          height: '64px',
+          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+        }),
+      ),
+      state(
+        'hidden-expanded-lg',
+        style({
+          top: '40px',
+          height: '64px',
+          'box-shadow': 'none',
+        }),
+      ),
+      transition('* => *', animate('0.5s ease-in-out')),
+    ]),
+  ],
 })
 export class HeaderComponent implements AfterViewInit, OnDestroy {
   private headerExpanded = true;

@@ -4,8 +4,10 @@
 @use "config" as config;
 @use "ehd" as ehd;
 @use "other" as other;
-@forward "assets/css/icofont.css";
-@forward "assets/css/material-icons.css";
+@forward "../public/assets/css/bodoni-urw.css";
+@forward "../public/assets/css/franklin-gothic-urw.css";
+@forward "../public/assets/css/icofont.css";
+@forward "../public/assets/css/material-icons.css";
 
 html {
   @include mat.theme(custom-theme.$theme-config);

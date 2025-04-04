@@ -1,6 +1,5 @@
 import {HttpClient} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
-import {environment} from '@environments/environment';
 import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
 import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
 import {HelpWrapperComponent} from '@forms/help-wrapper/help-wrapper.component';
@@ -21,48 +20,20 @@ import {
   UrlValidator,
   UrlValidatorMessage,
 } from '@forms/validators/formly.validator';
-import {ConfigService, ConfigServiceProps} from '@services/config/config.service';
-import {lastValueFrom} from 'rxjs';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {ConfigService} from '@services/config/config.service';
+import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists. Otherwise, assume we are connecting to port
 // 5000 on the local server.
-export const load = async (): Promise<ConfigServiceProps> => {
-  const httpClient = inject(HttpClient);
-  const configService = inject(ConfigService);
-
-  let url = './api/config';
-  if ('override_config_url' in environment) {
-    url = environment['override_config_url'];
-  }
-
-  let localConfig: ConfigServiceProps;
-
-  // Check if a file called `config.json` is available in this file's directory.
-  // If it is, load the configuration from there.
-  try {
-    localConfig = await lastValueFrom(httpClient.get<ConfigServiceProps>('./config.json', {responseType: 'json'}));
-  } catch {
-    localConfig = undefined;
-  }
-
-  if (localConfig) {
-    configService.fromProperties(localConfig);
-    return localConfig;
-  }
-
-  // Check with the backend to see if there is a configuration override available.
-  let configFromJsonFile: ConfigServiceProps;
-  try {
-    configFromJsonFile = await lastValueFrom(httpClient.get<ConfigServiceProps>(url, {responseType: 'json'}));
-  } catch {
-    configFromJsonFile = undefined;
-  }
-
-  if (configFromJsonFile) {
-    configService.fromProperties(configFromJsonFile);
-    return configFromJsonFile;
-  }
+export const load = () => {
+  inject(HttpClient);
+  inject(ConfigService);
+  inject(GoogleMapsLibraryService);
+  inject(AuthenticationService)
+  inject(ApiService)
 };
 
 @Injectable()

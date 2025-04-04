@@ -1,4 +1,3 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
@@ -8,15 +7,13 @@ import {User} from '@models/user';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {ConfigService} from '@services/config/config.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {Observable} from 'rxjs';
 
 @Component({
   standalone: true,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [HeaderComponent, FooterComponent, RouterOutlet, AsyncPipe],
-  providers: [ConfigService],
+  imports: [HeaderComponent, FooterComponent, RouterOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {

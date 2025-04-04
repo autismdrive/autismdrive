@@ -25,7 +25,7 @@ import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-
   templateUrl: './admin-export.component.html',
   styleUrls: ['./admin-export.component.scss'],
   imports: [MatPaginatorModule, MatTableModule, NgIf, DatePipe, MatRippleModule],
-  providers: [ApiService, ConfigService],
+  // providers: [ApiService, ConfigService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminExportComponent implements OnInit {

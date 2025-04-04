@@ -1,8 +1,6 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {ApiService} from '@services/api/api.service';
 import {CategoriesService} from '@services/categories/categories.service';
-import {SearchService} from '@services/search/search.service';
 import {mockCategory} from '@util/testing/fixtures/mock-category';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';

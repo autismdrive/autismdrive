@@ -1,4 +1,4 @@
-import {ConfigServiceProps} from '@services/config/config.service';
+import {ConfigServiceProps} from '@models/config-service-props';
 
 export const mockConfigServiceProps: ConfigServiceProps = {
   apiUrl: 'http://localhost:5000',

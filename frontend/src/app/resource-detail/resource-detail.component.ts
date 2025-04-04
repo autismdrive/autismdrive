@@ -1,20 +1,30 @@
-/// <reference types="google.maps" />
-import {DatePipe, formatDate, NgIf, NgOptimizedImage} from '@angular/common';
+/// <reference types="@types/google.maps" />
+import {CommonModule, DatePipe, formatDate, NgIf, NgOptimizedImage, UpperCasePipe} from '@angular/common';
+import {core} from '@angular/compiler';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
+import {MatCard, MatCardModule, MatCardTitle} from '@angular/material/card';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {AdminNoteDisplayComponent} from '@app/admin-note-display/admin-note-display.component';
+import {ContactItemComponent} from '@app/contact-item/contact-item.component';
 import {EditButtonComponent} from '@app/edit-button/edit-button.component';
 import {EventRegistrationComponent} from '@app/event-registration/event-registration.component';
 import {FavoriteResourceButtonComponent} from '@app/favorite-resource-button/favorite-resource-button.component';
+import {FilterChipsComponent} from '@app/filter-chips/filter-chips.component';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {RelatedItemsComponent} from '@app/related-items/related-items.component';
 import {TypeIconComponent} from '@app/type-icon/type-icon.component';
 import {ContactItem} from '@models/contact_item';
 import {Resource} from '@models/resource';
 import {ResourceChangeLog} from '@models/resource_change_log';
 import {User} from '@models/user';
+import {NgMapsCoreModule} from '@ng-maps/core';
+import {NgMapsGoogleModule} from '@ng-maps/google';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {MarkdownComponent} from 'ngx-markdown';
 
 @Component({
@@ -23,19 +33,27 @@ import {MarkdownComponent} from 'ngx-markdown';
   templateUrl: './resource-detail.component.html',
   styleUrls: ['./resource-detail.component.scss'],
   imports: [
-    NgOptimizedImage,
-    MarkdownComponent,
-    FlexModule,
-    TypeIconComponent,
-    EditButtonComponent,
-    FavoriteResourceButtonComponent,
-    NgIf,
-    EventRegistrationComponent,
-    MatButtonModule,
+    AdminNoteDisplayComponent,
+    CommonModule,
+    ContactItemComponent,
     DatePipe,
+    EditButtonComponent,
+    EventRegistrationComponent,
+    FavoriteResourceButtonComponent,
+    FilterChipsComponent,
+    FlexModule,
+    LoadingComponent,
+    MarkdownComponent,
+    MatButtonModule,
+    MatCardModule,
+    NgMapsCoreModule,
+    NgMapsGoogleModule,
+    NgOptimizedImage,
+    RelatedItemsComponent,
     RouterModule,
+    TypeIconComponent,
+    UpperCasePipe,
   ],
-  providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceDetailComponent {
@@ -49,6 +67,7 @@ export class ResourceDetailComponent {
   showInfoWindow = false;
   safeVideoLink: SafeResourceUrl;
   safeVideoImgUrl: SafeResourceUrl;
+  googleMapsCoreLibrary: google.maps.CoreLibrary;
 
   get isPastEvent(): boolean {
     const eventDate = new Date(this.resource.date);
@@ -69,9 +88,17 @@ export class ResourceDetailComponent {
     public router: Router,
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer,
+    private googleMapsLibrary: GoogleMapsLibraryService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
+    });
+    effect(() => {
+      const core = this.googleMapsLibrary.core();
+
+      if (core) {
+        this.googleMapsCoreLibrary = core;
+      }
     });
     this.route.params.subscribe(params => {
       this.loading = true;
@@ -213,5 +240,9 @@ export class ResourceDetailComponent {
 
   toggleInfoWindow($event) {
     this.showInfoWindow = !this.showInfoWindow;
+  }
+
+  makePoint(x: number, y: number): google.maps.Point {
+    return new this.googleMapsCoreLibrary.Point(x, y);
   }
 }

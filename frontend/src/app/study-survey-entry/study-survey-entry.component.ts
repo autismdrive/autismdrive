@@ -17,7 +17,7 @@ import {RegisterDialogComponent} from '../register-dialog/register-dialog.compon
   templateUrl: './study-survey-entry.component.html',
   styleUrls: ['./study-survey-entry.component.scss'],
   imports: [FlexModule, NgIf, MatButtonModule],
-  providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
+  // providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudySurveyEntryComponent implements OnInit {

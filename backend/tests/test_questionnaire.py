@@ -33,7 +33,7 @@ from app.models import (
     SupportsQuestionnaire,
 )
 from fixtures.endpoints_map import endpoints_map
-from fixtures.fixure_utils import fake, fake_user_id
+from fixtures.fixture_utils import fake, fake_user_id
 
 
 class TestQuestionnaire(BaseTestQuestionnaire):

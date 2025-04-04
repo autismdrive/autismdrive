@@ -124,7 +124,7 @@ class SearchEndpoint(flask_restful.Resource):
             while c and c.parent:
                 c = c.parent
 
-            if c:
+            if c and c is not topic_category:
                 # Add the Topics bucket to the top of the category tree.
                 c.parent = topic_category
 

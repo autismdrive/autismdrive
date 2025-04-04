@@ -1,4 +1,4 @@
-/// <reference types="google.maps" />
+/// <reference types="@types/google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
 import {Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import {
@@ -55,6 +55,7 @@ import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {SearchService} from '@services/search/search.service';
 import createClone from 'rfdc';
 import {fromEvent, Subject} from 'rxjs';
@@ -121,7 +122,7 @@ enum LocationMode {
     TutorialVideoComponent,
     TypeIconComponent,
   ],
-  providers: [ApiService, AuthenticationService, GoogleAnalyticsService, SearchService],
+  // providers: [ApiService, AuthenticationService, GoogleAnalyticsService, SearchService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements AfterViewInit, OnInit {
@@ -233,6 +234,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
   clusterRenderer: Renderer = new DefaultRenderer();
   readonly panelOpenState = signal(false);
+  private googleMapsCoreLibrary: google.maps.CoreLibrary;
 
   constructor(
     private api: ApiService,
@@ -244,10 +246,19 @@ export class SearchComponent implements AfterViewInit, OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private searchService: SearchService,
+    private googleMapsLibrary: GoogleMapsLibraryService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
     });
+
+    effect(() => {
+      const core = this.googleMapsLibrary.core();
+
+      if (core) {
+        this.googleMapsCoreLibrary = core;
+      }
+    })
 
     this.sortMethods = createClone()(sortMethods);
     this.sortMethods.DISTANCE.sortQuery.latitude = this.loc.lat;
@@ -740,7 +751,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     const footerPos = searchFooter.getBoundingClientRect();
     const scrollDirection = this.scrollDirection ? this.scrollDirection.toLowerCase() : '';
 
-    let alignClass;
+    let alignClass: string;
 
     if (this._overlaps(scrollSpyPos, headerPos)) {
       alignClass = 'align-top';
@@ -760,7 +771,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   watchScrollEvents() {
     const scroll$ = fromEvent(window, 'scroll').pipe(
       throttleTime(10),
-      map(e => window.scrollY),
+      map(_ => window.scrollY),
       pairwise(),
       map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
       share(),
@@ -1013,6 +1024,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   makePoint(x: number, y: number): google.maps.Point {
-    return new google.maps.Point(x, y);
+    return new this.googleMapsCoreLibrary.Point(x, y);
   }
 }

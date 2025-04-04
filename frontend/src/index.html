@@ -13,46 +13,9 @@
       property="og:description"
       content="Transform Outcomes. Together. A centralized system for autism research & resources for individuals, families & professionals. "
     />
-    <link
-      href="assets/css/icofont.css"
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-      crossorigin="anonymous"
-    />
-    <noscript>
-      <link rel="stylesheet" href="assets/css/icofont.css" />
-    </noscript>
-    <link
-      href="assets/css/material-icons.css"
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-      crossorigin="anonymous"
-    />
-    <noscript>
-      <link rel="stylesheet" href="assets/css/material-icons.css" />
-    </noscript>
-    <link
-      href="assets/css/franklin-gothic-urw.css"
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-      crossorigin="anonymous"
-    />
-    <noscript>
-      <link rel="stylesheet" href="assets/css/bodoni-urw.css" />
-    </noscript>
-    <link
-      href="assets/css/bodoni-urw.css"
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-      crossorigin="anonymous"
-    />
-    <noscript>
-      <link rel="stylesheet" href="assets/css/bodoni-urw.css" />
-    </noscript>
+    <link rel="preload" href="/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/assets/fonts/bodoni-urw/bodoni-urw-700.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
 
     <!-- Google Tag Manager -->
     <script>
@@ -66,13 +29,22 @@
       }
     </script>
     <!-- End Google Tag Manager -->
+    <!-- Google tag (gtag.js) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '__GOOGLE_ANALYTICS_API_KEY__');
+    </script>
+
 
     <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
-    <link rel="icon" href="assets/icon.svg" sizes="all" type="image/svg+xml" />
-    <link rel="icon" href="assets/icons/icon-16.png" sizes="16x16" type="image/png" />
-    <link rel="icon" href="assets/icons/icon-32.png" sizes="32x32" type="image/png" />
-    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
-    <link rel="manifest" href="assets/manifest.webmanifest" />
+    <link rel="icon" href="/assets/icon.svg" sizes="all" type="image/svg+xml" />
+    <link rel="icon" href="/assets/icons/icon-16.png" sizes="16x16" type="image/png" />
+    <link rel="icon" href="/assets/icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/assets/manifest.webmanifest" />
     <meta content="#ffffff" name="theme-color" />
   </head>
 
@@ -98,7 +70,10 @@
         console.log('No Google Maps API key set. Skipping Google Maps script load.');
       } else {
         // prettier-ignore
-        (g=>{let h,a,k,p='The Google Maps JavaScript API',c='google',l='importLibrary',q='__ib__',m=document,b=window;b=b[c]||(b[c]={});let d=b.maps||(b.maps={}),r=new Set(),e=new URLSearchParams(),u=()=>h||(h=new Promise(async(f,n)=>{await(a=m.createElement('script'));e.set('libraries',[...r]+'');for(k in g) e.set(k.replace(/[A-Z]/g,t=>'_'+t[0].toLowerCase()),g[k],);e.set('callback',c+'.maps.'+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>(h=n(Error(p+' could not load.')));a.nonce=m.querySelector('script[nonce]')?.nonce||'';m.head.append(a);}));d[l]?console.warn(p+' only loads once. Ignoring:',g):(d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n)));})({v:'weekly',key:mapsKey});
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+          v: "weekly",
+          key: mapsKey
+        });
       }
     </script>
     <!-- End Google Maps -->

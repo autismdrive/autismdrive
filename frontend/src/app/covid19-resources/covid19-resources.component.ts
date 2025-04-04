@@ -18,7 +18,7 @@ interface C19ResourceCategoryObj {
   selector: 'app-covid19-resources',
   templateUrl: './covid19-resources.component.html',
   styleUrls: ['./covid19-resources.component.scss'],
-  providers: [ApiService, AuthenticationService],
+  // providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Covid19ResourcesComponent {

@@ -1,17 +1,14 @@
 import {HttpEvent, HttpHandlerFn, HttpRequest} from '@angular/common/http';
-import {error} from '@angular/compiler-cli/src/transformers/util';
-import {inject} from '@angular/core';
+import {forwardRef, inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {AuthenticationService} from '@services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {ApiError} from '../api-error';
 
 export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
-  const router = inject(Router);
-  const googleAnalyticsService = inject(GoogleAnalyticsService);
-  const authenticationService = inject(AuthenticationService);
+  const router = inject(forwardRef(() => Router));
+  const authenticationStateService = inject(forwardRef(() => AuthenticationStateService));
   const isSession = new RegExp('.*/api/session|.*/logout|.*/timedout');
 
   return next(req).pipe(
@@ -22,7 +19,7 @@ export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
       // when they first return after being logged out for a while.
       if (err.status === 401 && !isSession.test(req.url)) {
         // Skip if they already know they're logged out.
-        if (authenticationService.currentUser && localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY)) {
+        if (authenticationStateService.currentUser() && authenticationStateService.authToken) {
           console.error('Unauthorized Access', req);
           router.navigate(['timedout']);
         }
@@ -33,7 +30,6 @@ export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn)
       // Ignore config.json errors
       if (req.url !== './config.json') {
         console.error(err?.error);
-        googleAnalyticsService.errorEvent(err?.error);
         return throwError(() => apiError);
       }
     }),

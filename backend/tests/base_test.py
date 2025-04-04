@@ -49,7 +49,7 @@ from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.ResourceEndpoint import get_resource_by_id
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
-from fixtures.fixure_utils import fake, fake_password
+from fixtures.fixture_utils import fake, fake_password
 from fixtures.location import MockLocationWithLatLong
 from fixtures.resource import MockResource
 from fixtures.study import MockStudy

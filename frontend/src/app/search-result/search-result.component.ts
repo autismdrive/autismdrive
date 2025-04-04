@@ -1,4 +1,4 @@
-/// <reference types="google.maps" />
+/// <reference types="@types/google.maps" />
 import {NgClass, NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';

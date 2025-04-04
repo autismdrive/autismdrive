@@ -1,6 +1,6 @@
 import uuid
 
-from fixtures.fixure_utils import fake
+from tests.fixtures.fixture_utils import fake
 
 
 def get_new_uuid():

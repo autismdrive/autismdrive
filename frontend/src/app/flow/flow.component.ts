@@ -53,7 +53,7 @@ enum FlowState {
   standalone: true,
   styleUrls: ['./flow.component.scss'],
   templateUrl: './flow.component.html',
-  providers: [ApiService, AuthenticationService, DeviceDetectorService, GoogleAnalyticsService],
+  // providers: [ApiService, AuthenticationService, DeviceDetectorService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlowComponent implements OnDestroy {

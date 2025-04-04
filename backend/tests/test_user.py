@@ -10,7 +10,7 @@ from app.enums import Relationship, Permission, Role, StudyUserStatus
 from app.models import EmailLog, User, UserFavorite
 from app.models import StudyUser
 from app.rest_exception import RestException
-from fixtures.fixure_utils import fake, fake_password, fake_user_id
+from fixtures.fixture_utils import fake, fake_password, fake_user_id
 from tests.base_test import BaseTest
 
 

@@ -4,46 +4,76 @@
   "newProjectRoot": "projects",
   "projects": {
     "frontend": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "changeDetection": "OnPush",
+          "standalone": true,
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
+      "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser-esbuild",
           "options": {
-            "customWebpackConfig": {
-              "path": "./custom-webpack.config.mjs"
-            },
-            "allowedCommonJsDependencies": [
-              "geolib",
-              "rfdc",
-              "fast-deep-equal"
-            ],
-            "budgets": [
-              {
-                "type": "anyComponentStyle",
-                "maximumWarning": "64kb"
-              }
-            ],
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
-            "preserveSymlinks": true,
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
+            "inlineStyleLanguage": "scss",
             "assets": [
-              "src/assets",
-              "src/assets/icon.svg"
+              {
+                "glob": "**/*",
+                "input": "public/assets/",
+                "output": "/assets/"
+              }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "public/assets/css/icofont.css",
+              "public/assets/css/material-icons.css",
+              "public/assets/css/franklin-gothic-urw.css",
+              "public/assets/css/bodoni-urw.css"
             ],
             "scripts": [
               {
-                "input": "src/assets/js/gtag.js",
+                "input": "public/assets/js/gtag.js",
                 "inject": false,
                 "bundleName": "google-module"
               }
+            ],
+            "allowedCommonJsDependencies": [
+              "geolib",
+              "rfdc",
+              "fast-deep-equal"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -54,21 +84,25 @@
             "extractLicenses": false,
             "buildOptimizer": false,
             "sourceMap": true,
-            "optimization": {
-              "scripts": false,
-              "styles": false,
-              "fonts": false
-            },
+            "optimization": false,
             "namedChunks": true
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
               "aot": true,
-              "optimization": {
-                "scripts": true,
-                "styles": true,
-                "fonts": true
-              },
+              "optimization": true,
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
@@ -81,7 +115,7 @@
               "namedChunks": false,
               "extractLicenses": true
             },
-            "dev": {
+            "development": {
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
@@ -102,36 +136,22 @@
               "extractLicenses": true
             }
           },
-          "defaultConfiguration": ""
+          "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
-          "options": {
-            "buildTarget": "frontend:build"
-          },
+          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"
             },
-            "staging": {
-              "buildTarget": "frontend:build:staging"
-            },
-            "dev": {
-              "buildTarget": "frontend:build:dev"
-            },
-            "ci": {
-              "buildTarget": "frontend:build:ci"
-            },
-            "docker": {
-              "buildTarget": "frontend:build:docker"
+            "development": {
+              "buildTarget": "frontend:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular/build:extract-i18n",
-          "options": {
-            "buildTarget": "frontend:build"
-          }
+          "builder": "@angular-devkit/build-angular:extract-i18n"
         },
         "test": {
           "builder": "@angular-builders/jest:run",
@@ -139,7 +159,27 @@
             "detectOpenHandles": true,
             "forceExit": true,
             "tsConfig": "tsconfig.spec.json",
-            "configPath": "jest.config.mjs"
+            "configPath": "jest.config.mjs",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public/assets/",
+                "output": "/assets/"
+              }
+            ],
+            "styles": [
+              "src/styles.scss",
+              "public/assets/css/icofont.css",
+              "public/assets/css/material-icons.css",
+              "public/assets/css/franklin-gothic-urw.css",
+              "public/assets/css/bodoni-urw.css"
+            ],
+            "scripts": []
           }
         },
         "e2e": {
@@ -184,15 +224,6 @@
           }
         }
       }
-    }
-  },
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "style": "scss"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
     }
   },
   "cli": {

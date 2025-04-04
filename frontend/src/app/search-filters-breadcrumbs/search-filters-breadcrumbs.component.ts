@@ -1,11 +1,17 @@
+import {NgForOf, NgIf} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatIconModule} from '@angular/material/icon';
 import {Query} from '@models/query';
+import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
   standalone: true,
   selector: 'app-search-filters-breadcrumbs',
   templateUrl: './search-filters-breadcrumbs.component.html',
   styleUrls: ['./search-filters-breadcrumbs.component.scss'],
+  imports: [ExtendedModule, FlexModule, MatChipsModule, MatIconModule, NgForOf, NgIf, MatButtonModule],
 })
 export class SearchFiltersBreadcrumbsComponent {
   @Input() query: Query;

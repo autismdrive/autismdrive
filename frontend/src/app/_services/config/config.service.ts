@@ -1,16 +1,9 @@
-import {effect, Injectable, signal, Signal, WritableSignal} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Injectable, signal, WritableSignal} from '@angular/core';
+import {environment} from '@environments/environment';
+import {ConfigServiceProps} from '@models/config-service-props';
 import {GoogleModuleOptions} from '@ng-maps/google';
-import {BehaviorSubject, Observable} from 'rxjs';
-
-export interface ConfigServiceProps {
-  apiUrl: string;
-  apiKey: string;
-  development: boolean;
-  testing: boolean;
-  mirroring: boolean;
-  production: boolean;
-  googleAnalyticsKey: string;
-}
+import {lastValueFrom} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -26,12 +19,43 @@ export class ConfigService implements GoogleModuleOptions {
 
   public readonly props: WritableSignal<ConfigServiceProps | undefined> = signal(undefined);
 
-  constructor() {
-    effect(() => {
-      const value = this.props();
+  constructor(private httpClient: HttpClient) {
+    this.load();
+  }
 
-      console.log('ConfigService > constructor > effect > value', value);
-    });
+  async load() {
+    let configFromJsonFile: ConfigServiceProps;
+
+    // Check if a file called `config.json` is available in this file's directory.
+    // If it is, load the configuration from there.
+    try {
+      configFromJsonFile = await lastValueFrom(
+        this.httpClient.get<ConfigServiceProps>('/assets/config.json', {responseType: 'json'}),
+      );
+    } catch {
+      configFromJsonFile = undefined;
+    }
+
+    if (configFromJsonFile) {
+      this.fromProperties(configFromJsonFile);
+      return;
+    }
+
+    // Check with the backend to see if there is a configuration override available.
+    const backendConfigEndpoint = `${environment.api}/api/config`;
+    let configFromBackend: ConfigServiceProps;
+    try {
+      configFromBackend = await lastValueFrom(
+        this.httpClient.get<ConfigServiceProps>(backendConfigEndpoint, {responseType: 'json'}),
+      );
+    } catch {
+      configFromBackend = undefined;
+    }
+
+    if (configFromBackend) {
+      this.fromProperties(configFromBackend);
+      return;
+    }
   }
 
   fromProperties(props: ConfigServiceProps) {

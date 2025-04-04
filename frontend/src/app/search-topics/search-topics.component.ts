@@ -1,5 +1,12 @@
+import {NgForOf, NgIf} from '@angular/common';
 import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {CategoriesById, Category} from '@models/category';
+import {ExtendedModule} from '@ngbracket/ngx-layout';
 import {CategoriesService} from '@services/categories/categories.service';
 
 @Component({
@@ -7,6 +14,16 @@ import {CategoriesService} from '@services/categories/categories.service';
   selector: 'app-search-topics',
   templateUrl: './search-topics.component.html',
   styleUrls: ['./search-topics.component.scss'],
+  imports: [
+    ExtendedModule,
+    MatButtonModule,
+    MatIconModule,
+    MatListModule,
+    MatMenuModule,
+    MatTooltipModule,
+    NgForOf,
+    NgIf,
+  ],
 })
 export class SearchTopicsComponent {
   @Input() category: Category;

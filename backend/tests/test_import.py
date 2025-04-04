@@ -11,7 +11,7 @@ from app.import_service import ImportService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo, User
 from app.schemas import SchemaRegistry
 from config.load import settings
-from fixtures.fixure_utils import fake, fake_password, fake_user_id
+from fixtures.fixture_utils import fake, fake_password, fake_user_id
 from mocks.mock_response import MockRequestsResponse
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 

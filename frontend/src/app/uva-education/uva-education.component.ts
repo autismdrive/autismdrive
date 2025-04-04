@@ -12,7 +12,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-uva-education',
   templateUrl: './uva-education.component.html',
   styleUrls: ['./uva-education.component.scss'],
-  providers: [AuthenticationService],
+  // providers: [AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UvaEducationComponent {

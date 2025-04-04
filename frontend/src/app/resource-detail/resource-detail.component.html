@@ -137,17 +137,17 @@
             (circleClick)="toggleInfoWindow($event)"
           >
           </map-circle>
-          <agm-marker
+          <map-marker
             *ngIf="resource.hasCoords()"
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
             [iconUrl]="{
               url: '/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg',
-              anchor: {x: 24, y: 24}
+              anchor: makePoint(24, 24)
             }"
             (markerClick)="toggleInfoWindow($event)"
           >
-            <map-info-window [isOpen]="showInfoWindow" [latitude]="resource.latitude" [latitude]="resource.longitude">
+            <map-info-window [isOpen]="showInfoWindow" [latitude]="resource.latitude" [longitude]="resource.longitude">
               <h5>{{ resource.title }}</h5>
               <ng-container *ngIf="resource.street_address1">
                 <p>About {{ resource.milesFrom(mapLoc) }} miles away</p>
@@ -172,7 +172,7 @@
                 </a>
               </ng-container>
             </map-info-window>
-          </agm-marker>
+          </map-marker>
         </map-view>
       </div>
       <div id="resource-categories">

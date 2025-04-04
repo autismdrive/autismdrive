@@ -1,6 +1,11 @@
+import {NgClass, NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {MatButtonModule, MatMiniFabButton} from '@angular/material/button';
+import {MatIcon, MatIconModule} from '@angular/material/icon';
+import {MatTooltip, MatTooltipModule} from '@angular/material/tooltip';
 import {User} from '@models/user';
 import {UserFavorite} from '@models/user_favorite';
+import {DefaultLayoutDirective, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 
 @Component({
@@ -8,6 +13,7 @@ import {ApiService} from '@services/api/api.service';
   selector: 'app-favorite-resource-button',
   templateUrl: './favorite-resource-button.component.html',
   styleUrls: ['./favorite-resource-button.component.scss'],
+  imports: [NgIf, FlexModule, MatIconModule, MatButtonModule, MatTooltipModule, NgClass],
 })
 export class FavoriteResourceButtonComponent {
   @Input() resource_id: number;

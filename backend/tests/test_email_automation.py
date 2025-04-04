@@ -9,7 +9,7 @@ from app.email_service import EmailService
 from app.models import EmailLog, Study, User
 from app.enums import Relationship
 from app.resources.UserEndpoint import get_user_by_id
-from fixtures.fixure_utils import fake
+from fixtures.fixture_utils import fake
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 

@@ -2,6 +2,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatHint} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {Aggregation} from '@models/query';
@@ -11,7 +12,7 @@ import {Aggregation} from '@models/query';
   selector: 'app-search-filter',
   templateUrl: './search-filter.component.html',
   styleUrls: ['./search-filter.component.scss'],
-  imports: [MatButtonModule, MatMenuModule, MatHint, NgIf, LoadingComponent, NgForOf],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatHint, NgIf, LoadingComponent, NgForOf],
 })
 export class SearchFilterComponent {
   @Input() label_title: string;

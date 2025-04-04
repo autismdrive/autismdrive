@@ -30,6 +30,7 @@ import {UserFavorite} from '@models/user_favorite';
 import {UserMeta} from '@models/user_meta';
 import {UserSearchResults} from '@models/user_search_results';
 import {ConfigService} from '@services/config/config.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
@@ -131,6 +132,7 @@ export class ApiService {
   constructor(
     private httpClient: HttpClient,
     private configService: ConfigService,
+    private googleAnalyticsService: GoogleAnalyticsService,
   ) {
     effect(() => {
       if (this.configService.props()) {
@@ -757,8 +759,11 @@ export class ApiService {
   private _handleError(error: ApiError) {
     let message = 'Could not complete your request; please try again later.';
     message = error.message;
+
+    this.googleAnalyticsService.errorEvent(error);
+
     // return an observable with a user-facing error message
-    return throwError(message);
+    return throwError(() => message);
   }
 
   /** getChainStepsList */

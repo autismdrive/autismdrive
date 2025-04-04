@@ -13,7 +13,7 @@ import {Observable, of} from 'rxjs';
   selector: 'app-taxonomy-admin',
   templateUrl: './taxonomy-admin.component.html',
   styleUrls: ['./taxonomy-admin.component.scss'],
-  providers: [ApiService, AuthenticationService],
+  // providers: [ApiService, AuthenticationService],
 })
 export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;

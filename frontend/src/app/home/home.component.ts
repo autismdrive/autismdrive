@@ -27,7 +27,7 @@ import {lastValueFrom} from 'rxjs';
     RouterModule,
     DefaultShowHideDirective,
   ],
-  providers: [ConfigService],
+  // providers: [ConfigService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {

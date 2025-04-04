@@ -18,7 +18,7 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss'],
   imports: [PdfJsViewerModule, LogoComponent, FlexModule, NgIf, MatButtonModule],
-  providers: [AuthenticationService, ApiService, GoogleAnalyticsService],
+  // providers: [AuthenticationService, ApiService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsComponent {

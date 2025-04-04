@@ -12,7 +12,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-email-log-admin',
   templateUrl: './email-log-admin.component.html',
   styleUrls: ['./email-log-admin.component.scss'],
-  providers: [ApiService, AuthenticationService],
+  // providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailLogAdminComponent implements OnInit {

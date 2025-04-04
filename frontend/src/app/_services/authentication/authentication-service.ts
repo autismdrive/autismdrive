@@ -1,15 +1,15 @@
 import {HttpClient} from '@angular/common/http';
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
-import {User} from '@models/user';
-import {ConfigService} from '@services/config/config.service';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
 import {ApiError} from '@app/api-error';
+import {User} from '@models/user';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
+import {ConfigService} from '@services/config/config.service';
+import {Observable, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 import {GoogleAnalyticsService} from '../google-analytics/google-analytics.service';
 
 @Injectable({providedIn: 'root'})
 export class AuthenticationService {
-  public static LOCAL_TOKEN_KEY = 'star_token';
   public currentUser: WritableSignal<User | undefined> = signal(undefined);
 
   private login_url: string;
@@ -18,12 +18,16 @@ export class AuthenticationService {
 
   constructor(
     private http: HttpClient,
-    private googleAnalyticsService: GoogleAnalyticsService,
     private configService: ConfigService,
+    private authStateService: AuthenticationStateService,
+    private googleAnalyticsService: GoogleAnalyticsService,
   ) {
+    console.log('AuthenticationService > constructor > configService.props()', this.configService.props());
+
     effect(() => {
+      console.log('AuthenticationService > constructor > effect > configService.props()', this.configService.props());
       if (this.configService.props()) {
-        const token = localStorage.getItem(AuthenticationService.LOCAL_TOKEN_KEY);
+        const token = this.authStateService.authToken;
         this.login_url = `${this.configService?.apiUrl}/api/login_password`;
         this.reset_pass_url = `${this.configService?.apiUrl}/api/reset_password`;
         this.refresh_url = `${this.configService?.apiUrl}/api/session`;
@@ -40,18 +44,18 @@ export class AuthenticationService {
   private _handleError(error: ApiError) {
     let message = 'Could not complete your request; please try again later.';
     message = error.message;
+
+    this.googleAnalyticsService.errorEvent(error);
+
     // return an observable with a user-facing error message
-    return throwError(message);
+    return throwError(() => message);
   }
 
   private loadUser(userDict): User {
     // login successful if there's a jwt token in the response
-    if (userDict.token) {
-      localStorage.setItem(AuthenticationService.LOCAL_TOKEN_KEY, userDict.token);
-    }
     const user = new User(userDict);
     this.currentUser.set(user);
-    this.googleAnalyticsService.set_user(user.id);
+    this.authStateService.setUser(user);
     return user;
   }
 
@@ -72,6 +76,7 @@ export class AuthenticationService {
         },
         error => {
           this.currentUser.set(undefined);
+          this.authStateService.currentUser.set(undefined);
         },
       ),
     );
@@ -92,8 +97,7 @@ export class AuthenticationService {
 
   logout() {
     // remove user from local storage to log user out
-    localStorage.removeItem(AuthenticationService.LOCAL_TOKEN_KEY);
+    this.authStateService.removeUser();
     this.currentUser.set(undefined);
-    this.googleAnalyticsService.set_user(null);
   }
 }

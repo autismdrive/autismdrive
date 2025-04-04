@@ -19,7 +19,7 @@ import {EventRegistrationComponent} from '../event-registration/event-registrati
   templateUrl: './event-registration-form.component.html',
   styleUrls: ['./event-registration-form.component.scss'],
   imports: [MatDialogModule, ReactiveFormsModule, FormlyModule, FlexModule, MatButtonModule, LoadingComponent],
-  providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
+  // providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventRegistrationFormComponent {

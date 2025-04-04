@@ -23,7 +23,7 @@ export class FooterComponent {
   ) {
     this.breakpointObserver.observe('(max-width: 959px)').subscribe(result => {
       const ratio = result ? 0.51 : 0.72;
-      this.logoDimensions = {width: ratio * 627, height: ratio * 627};
+      this.logoDimensions = {width: ratio * 300, height: ratio * 74};
     });
   }
 }
