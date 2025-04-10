@@ -11,7 +11,7 @@ import {LogoComponent} from '@app/logo/logo.component';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';
 import {User} from '@models/user';
 import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 
@@ -30,7 +30,6 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
     MatToolbarModule,
     RouterModule,
   ],
-  providers: [provideAnimations()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('toggleMobileMenu', [
@@ -410,10 +409,14 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     return `${menuState}-${headerState}-${this.viewportWidth}`;
   }
 
+  get mirroring(): boolean {
+    return this.appEnvironmentService.mirroring;
+  }
+
   constructor(
     changeDetectorRef: ChangeDetectorRef,
     private router: Router,
-    public config: ConfigService,
+    private appEnvironmentService: AppEnvironmentService,
     media: MediaMatcher,
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');

@@ -4,9 +4,8 @@ import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, R
 import {FooterComponent} from '@app/footer/footer.component';
 import {HeaderComponent} from '@app/header/header.component';
 import {User} from '@models/user';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {ConfigService} from '@services/config/config.service';
-import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
   standalone: true,
@@ -23,14 +22,12 @@ export class AppComponent implements OnInit {
   public constructor(
     private authenticationService: AuthenticationService,
     private router: Router,
-    private googleAnalyticsService: GoogleAnalyticsService,
     private meta: Meta,
     private route: ActivatedRoute,
-    private configService: ConfigService,
+    private appEnvironmentService: AppEnvironmentService,
   ) {
     effect(() => {
-      if (this.configService.props()) {
-        this.googleAnalyticsService.init();
+      if (this.appEnvironmentService.props()) {
         this.router.events.subscribe(e => {
           if (e instanceof ActivationStart || e instanceof ActivationEnd) {
             if (e.snapshot && e.snapshot.data) {

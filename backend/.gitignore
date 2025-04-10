@@ -8,3 +8,7 @@ python-env
 _trial_temp.lock
 pylintrc
 star_drive.log
+*.egg-info
+dist/
+.venv/
+

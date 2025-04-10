@@ -76,7 +76,7 @@ export class TermsComponent {
     const flow = this.getFlow(this.relationship);
 
     this.api.addParticipant(newParticipant).subscribe(participant => {
-      this.googleAnalyticsService.flowStartEvent(flow);
+      this.googleAnalyticsService?.flowStartEvent(flow);
       this.user.participants.push(participant);
       console.log('Navigating to flow/', flow, '/', participant.id);
       this.router.navigate(['flow', flow, participant.id]);

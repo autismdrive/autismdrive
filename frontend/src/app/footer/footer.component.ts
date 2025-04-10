@@ -3,7 +3,7 @@ import {NgIf, NgOptimizedImage} from '@angular/common';
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {ImageDimensions} from '@models/image-dimensions';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 
 @Component({
   standalone: true,
@@ -17,7 +17,7 @@ export class FooterComponent {
   logoDimensions: ImageDimensions;
 
   constructor(
-    public config: ConfigService,
+    public config: AppEnvironmentService,
     public router: Router,
     private breakpointObserver: BreakpointObserver,
   ) {

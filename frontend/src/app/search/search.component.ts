@@ -356,6 +356,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   get shouldShowMap() {
+    if (!this.googleMapsCoreLibrary) return false;
+
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
     return isLocation || this.isDistanceSort;
   }
@@ -389,7 +391,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
       this.searchService.search(q).subscribe(queryWithResults => {
         this.prevQuery = createClone()(this.query);
         this.query = queryWithResults;
-        this.googleAnalyticsService.searchEvent(this.query);
+        this.googleAnalyticsService?.searchEvent(this.query);
         this.updateUrl();
         this.loading = false;
         this.changeDetectorRef.detectChanges();
@@ -648,7 +650,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.panelOpenState.set(false);
     $event.stopPropagation();
     localStorage.setItem('zipCode', this.storedZip);
-    this.googleAnalyticsService.searchInteractionEvent('set_zip_code_location');
+    this.googleAnalyticsService?.searchInteractionEvent('set_zip_code_location');
     if (this.isZipCode(this.storedZip)) {
       this.mapZoomLevel = 10;
       this.setZipLocation(this.storedZip, () => {
@@ -662,7 +664,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   useGPSLocation($event: Event): void {
     this.panelOpenState.set(false);
     $event.stopPropagation();
-    this.googleAnalyticsService.searchInteractionEvent('set_gps_location');
+    this.googleAnalyticsService?.searchInteractionEvent('set_gps_location');
     this.setGPSLocation(() => {
       if (this.gpsEnabled) {
         this.reSort('Distance', true);
@@ -678,7 +680,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.api.getResource(hit.id).subscribe(r => {
       this.selectedMapResource = r;
       this.selectedMapHit = hit;
-      this.googleAnalyticsService.mapEvent(hit.id.toString());
+      this.googleAnalyticsService?.mapEvent(hit.id.toString());
     });
   }
 
@@ -716,7 +718,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   geoBox(): GeoBox {
     if (this.mapBounds) {
-      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
+      const latLngBounds = new this.googleMapsCoreLibrary.LatLngBounds(this.mapBounds);
       return {
         top_left: {
           lat: latLngBounds.getNorthEast().lat(),
@@ -734,7 +736,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     console.log('Restricting to mapped results', shouldRestrict);
     this.restrictToMappedResults = shouldRestrict;
     if (shouldRestrict) {
-      this.googleAnalyticsService.searchInteractionEvent('search_as_map_moves');
+      this.googleAnalyticsService?.searchInteractionEvent('search_as_map_moves');
       this.query.geo_box = this.geoBox();
     } else {
       this.query.geo_box = null;
@@ -807,7 +809,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   goSelectedMapResource(selectedMapResource: Resource) {
-    this.googleAnalyticsService.mapResourceEvent(selectedMapResource.id.toString());
+    this.googleAnalyticsService?.mapResourceEvent(selectedMapResource.id.toString());
     this.router.navigate(['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]);
   }
 
@@ -866,10 +868,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
     });
 
     controlDiv.index = 1;
-    m.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+    m.controls[this.googleMapsCoreLibrary.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 
     m.addListener('dragend', () => {
-      const latLngBounds = new google.maps.LatLngBounds(this.mapBounds);
+      const latLngBounds = new this.googleMapsCoreLibrary.LatLngBounds(this.mapBounds);
       this.setLocation(LocationMode.map, {
         lat: latLngBounds.getCenter().lat(),
         lng: latLngBounds.getCenter().lng(),
@@ -1023,7 +1025,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  makePoint(x: number, y: number): google.maps.Point {
+  makePoint(x: number, y: number): google.maps.Point | undefined {
+    if (!this.googleMapsCoreLibrary) return;
+
     return new this.googleMapsCoreLibrary.Point(x, y);
   }
 }

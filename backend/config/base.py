@@ -52,8 +52,7 @@ class Settings(BaseSettings):
     MAIL_TIMEOUT: int = 10
 
     GOOGLE_MAPS_API_KEY: str = "__GOOGLE_MAPS_API_KEY__"
-    GOOGLE_ANALYTICS_API_KEY: str = "__GOOGLE_ANALYTICS_API_KEY__"
-    GOOGLE_TAG_MANAGER_ID: str = "__GOOGLE_TAG_MANAGER_ID__"
+    GOOGLE_ANALYTICS_TAG_ID: str = "__GOOGLE_ANALYTICS_TAG_ID__"
 
     ADMIN_EMAIL: str = "admin@tester.com"
     PRINCIPAL_INVESTIGATOR_EMAIL: str = "pi@tester.com"  # Receives some high level alerts per agreement with InfoSec.

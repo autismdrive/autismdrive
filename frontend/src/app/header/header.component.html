@@ -1,5 +1,5 @@
 <div [@toggleBackground]="onHomeScreen() && headerViewportState" id="header-bg" *ngIf="onHomeScreen()"></div>
-<mat-toolbar [ngClass]="{mirroring: config.mirroring}" ngStyle.lt-md="min-height: unset;" id="site-header">
+<mat-toolbar [ngClass]="{mirroring: mirroring}" ngStyle.lt-md="min-height: unset;" id="site-header">
   <mat-toolbar-row
     *ngIf="onHomeScreen()"
     [@toggleUvaHeader]="headerExpandedState"
@@ -19,7 +19,7 @@
       </a>
     </div>
     <span fxFlex></span>
-    <div *ngIf="config.mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
+    <div *ngIf="mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
   </mat-toolbar-row>
   <mat-toolbar-row
 
@@ -131,7 +131,7 @@
 </mat-toolbar>
 <div
   [@toggleMobileMenu]="menuState"
-  [ngClass]="{mirroring: config.mirroring}"
+  [ngClass]="{mirroring: mirroring}"
   class="mat-typography"
   fxHide
   fxShow.lt-md

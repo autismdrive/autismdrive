@@ -1,11 +1,11 @@
+/// <reference types="@types/google.analytics" />
 import {effect, Injectable} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {ApiError} from '@app/api-error';
 import {Query} from '@models/query';
 import {Study} from '@models/study';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
-import {ConfigService} from '@services/config/config.service';
-import {GoogleTagManagerService} from 'angular-google-tag-manager';
 
 declare let gtag: Function;
 
@@ -15,10 +15,21 @@ declare let gtag: Function;
 export class GoogleAnalyticsService {
   constructor(
     private router: Router,
-    private configService: ConfigService,
+    private appEnvironmentService: AppEnvironmentService,
     private authenticationStateService: AuthenticationStateService,
-    private gtmService: GoogleTagManagerService,
   ) {
+    effect(() => {
+      if (!this.appEnvironmentService.props()) return;
+
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          gtag('config', appEnvironmentService.googleAnalyticsTagId, {
+            page_path: event.urlAfterRedirects,
+          });
+        }
+      });
+    });
+
     effect(() => {
       const user = this.authenticationStateService.currentUser();
       this.set_user(user || null);
@@ -97,45 +108,4 @@ export class GoogleAnalyticsService {
   public set_user(user_id) {
     gtag('set', {user_id: user_id}); // Set the user ID using signed-in user_id.
   }
-
-  public init() {
-    this.listenForRouteChanges();
-
-    try {
-      const apiKey = this.configService.googleAnalyticsKey;
-
-      const script1 = document.createElement('script');
-      script1.async = true;
-      script1.src = 'https://www.googletagmanager.com/gtag/js?id=' + apiKey;
-      document.head.appendChild(script1);
-
-      const script2 = document.createElement('script');
-      script2.innerHTML =
-        `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '` +
-        apiKey +
-        `', {'send_page_view': false});
-      `;
-      document.head.appendChild(script2);
-    } catch (ex) {
-      console.error('Error appending google analytics');
-      console.error(ex);
-    }
-  }
-
-  private listenForRouteChanges() {
-    const analyticsKey = this.configService.googleAnalyticsKey;
-
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        gtag('config', analyticsKey, {
-          page_path: event.urlAfterRedirects,
-        });
-      }
-    });
-  }
-
 }

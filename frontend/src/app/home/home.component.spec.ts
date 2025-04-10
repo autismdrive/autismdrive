@@ -1,9 +1,9 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockConfigServiceProps} from '@util/testing/fixtures/mock-config-service-props';
+import {mockAppEnvironment} from '@util/testing/fixtures/mock-app-environment';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
@@ -16,7 +16,7 @@ describe('HomeComponent', () => {
   beforeEach(() => {
     return MockBuilder(HomeComponent)
       .keep(RouterModule)
-      .mock(ConfigService, {props: signal(mockConfigServiceProps)})
+      .mock(AppEnvironmentService, {props: signal(mockAppEnvironment)})
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, '/home')})
       .mock(ApiService, {

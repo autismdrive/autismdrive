@@ -14,7 +14,7 @@ import {MatTableModule} from '@angular/material/table';
 import {DataTransferDataSource} from '@models/data_transfer_data_source';
 import {DataTransferLog} from '@models/data_transfer_log';
 import {ApiService} from '@services/api/api.service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
@@ -42,11 +42,11 @@ export class AdminExportComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    private configService: ConfigService,
+    private appEnvironmentService: AppEnvironmentService,
   ) {
     effect(() => {
-      if (this.configService.props()) {
-        this.mirroring = this.configService.mirroring;
+      if (this.appEnvironmentService.props()) {
+        this.mirroring = this.appEnvironmentService.mirroring;
         this.loadData();
         this.loadLatestLog();
       }

@@ -124,7 +124,7 @@ export class PasswordResetComponent {
       this.authenticationService.resetPassword(this.model['password']['password'], this.token).subscribe(
         data => {
           this._goToReturnUrl(data);
-          this.googleAnalyticsService.accountEvent('reset_password');
+          this.googleAnalyticsService?.accountEvent('reset_password');
         },
         error1 => {
           if (error1.code === 'token_expired') {

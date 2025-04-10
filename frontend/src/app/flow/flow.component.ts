@@ -159,7 +159,7 @@ export class FlowComponent implements OnDestroy {
       this.loadActiveStep();
     } else {
       this.state = FlowState.COMPLETE;
-      this.googleAnalyticsService.flowCompleteEvent(this.flow.name);
+      this.googleAnalyticsService?.flowCompleteEvent(this.flow.name);
       scrollToTop(this.deviceDetectorService);
     }
   }
@@ -228,13 +228,13 @@ export class FlowComponent implements OnDestroy {
       this.api
         .updateQuestionnaire(this.currentStep().name, this.currentStep().questionnaire_id, this.model)
         .subscribe(() => {
-          this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
+          this.googleAnalyticsService?.stepCompleteEvent(this.currentStep().name);
           this.loadFlow(this.flow.name);
           scrollToTop(this.deviceDetectorService);
         });
     } else {
       this.api.submitQuestionnaire(this.flow.name, this.currentStep().name, this.model).subscribe(() => {
-        this.googleAnalyticsService.stepCompleteEvent(this.currentStep().name);
+        this.googleAnalyticsService?.stepCompleteEvent(this.currentStep().name);
         this.loadFlow(this.flow.name);
         scrollToTop(this.deviceDetectorService);
       });

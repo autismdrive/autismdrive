@@ -67,6 +67,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     private categoryService: CategoriesService,
     private changeDetectorRef: ChangeDetectorRef,
   ) {
+    console.log('SearchBoxComponent constructor');
     this.route.queryParams.pipe(debounce(() => timer(1000))).subscribe(qp => (this.queryParams = qp));
 
     this.searchUpdate.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => this.updateSearch(false));

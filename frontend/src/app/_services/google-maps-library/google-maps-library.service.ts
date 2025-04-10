@@ -1,35 +1,39 @@
+/// <reference types="@types/google.maps" />
 import {effect, Injectable, signal, WritableSignal} from '@angular/core';
-import {ConfigService} from '@services/config/config.service';
+import {GoogleMapsAPIWrapper} from '@ng-maps/google';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
+
+declare let google;
 
 @Injectable({
   providedIn: 'root',
 })
 export class GoogleMapsLibraryService {
   public readonly core: WritableSignal<google.maps.CoreLibrary> = signal(undefined);
-  public readonly maps: WritableSignal<google.maps.MapsLibrary> = signal(undefined);
-  public readonly geocoding: WritableSignal<google.maps.GeocodingLibrary> = signal(undefined);
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private appEnvironmentService: AppEnvironmentService,
+    private googleMapsAPIWrapper: GoogleMapsAPIWrapper,
+  ) {
     console.log('GoogleMapsLibraryService > constructor');
 
     effect(() => {
-      console.log('GoogleMapsLibraryService > constructor > configService.apiKey:', this.configService.apiKey);
+      console.log(
+        'GoogleMapsLibraryService > constructor > appEnvironmentService.googleMapsApiKey:',
+        this.appEnvironmentService.googleMapsApiKey,
+      );
 
-      if (!configService.props()) return;
+      if (!appEnvironmentService.props()) return;
 
-      google.maps.importLibrary('core').then(result => {
-        console.log('GoogleMapsLibraryService > constructor > CoreLibrary imported.')
+      this.googleMapsAPIWrapper['_loader'].configure({
+        apiKey: appEnvironmentService.googleMapsApiKey,
+        libraries: ['core', 'maps', 'geocoding']
+      });
+
+      google?.maps?.importLibrary('core').then(result => {
+        console.log('GoogleMapsLibraryService > constructor > CoreLibrary imported.');
         this.core.set(result as google.maps.CoreLibrary);
       });
-      google.maps.importLibrary('maps').then(m => {
-        console.log('GoogleMapsLibraryService > constructor > MapsLibrary imported.')
-        this.maps.set(m as google.maps.MapsLibrary);
-      });
-      google.maps.importLibrary('geocoding').then(g => {
-        console.log('GoogleMapsLibraryService > constructor > GeocodingLibrary imported.')
-        this.geocoding.set(g as google.maps.GeocodingLibrary);
-      });
-
     });
   }
 }

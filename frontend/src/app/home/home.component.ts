@@ -10,7 +10,7 @@ import {NewsItem} from '@models/news-item';
 import {Study} from '@models/study';
 import {DefaultShowHideDirective, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {lastValueFrom} from 'rxjs';
 
 @Component({
@@ -37,14 +37,14 @@ export class HomeComponent {
   constructor(
     private api: ApiService,
     private router: Router,
-    private configService: ConfigService,
+    private appEnvironmentService: AppEnvironmentService,
     private meta: Meta,
   ) {
     effect(() => {
-      if (this.configService.props()) {
+      if (this.appEnvironmentService.props()) {
         this.loadStudies();
 
-        if (this.configService.mirroring) {
+        if (this.appEnvironmentService.mirroring) {
           this.router.navigate(['mirrored']);
         }
 

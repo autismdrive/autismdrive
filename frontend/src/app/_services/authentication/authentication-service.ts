@@ -3,7 +3,7 @@ import {effect, Injectable, signal, WritableSignal} from '@angular/core';
 import {ApiError} from '@app/api-error';
 import {User} from '@models/user';
 import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {GoogleAnalyticsService} from '../google-analytics/google-analytics.service';
@@ -18,19 +18,19 @@ export class AuthenticationService {
 
   constructor(
     private http: HttpClient,
-    private configService: ConfigService,
+    private appEnvironmentService: AppEnvironmentService,
     private authStateService: AuthenticationStateService,
     private googleAnalyticsService: GoogleAnalyticsService,
   ) {
-    console.log('AuthenticationService > constructor > configService.props()', this.configService.props());
+    console.log('AuthenticationService > constructor > appEnvironmentService.props()', this.appEnvironmentService.props());
 
     effect(() => {
-      console.log('AuthenticationService > constructor > effect > configService.props()', this.configService.props());
-      if (this.configService.props()) {
+      console.log('AuthenticationService > constructor > effect > appEnvironmentService.props()', this.appEnvironmentService.props());
+      if (this.appEnvironmentService.props()) {
         const token = this.authStateService.authToken;
-        this.login_url = `${this.configService?.apiUrl}/api/login_password`;
-        this.reset_pass_url = `${this.configService?.apiUrl}/api/reset_password`;
-        this.refresh_url = `${this.configService?.apiUrl}/api/session`;
+        this.login_url = `${this.appEnvironmentService?.apiUrl}/api/login_password`;
+        this.reset_pass_url = `${this.appEnvironmentService?.apiUrl}/api/reset_password`;
+        this.refresh_url = `${this.appEnvironmentService?.apiUrl}/api/session`;
 
         if (token) {
           this._refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
@@ -45,7 +45,9 @@ export class AuthenticationService {
     let message = 'Could not complete your request; please try again later.';
     message = error.message;
 
-    this.googleAnalyticsService.errorEvent(error);
+    if (this.googleAnalyticsService) {
+      this.googleAnalyticsService.errorEvent(error);
+    }
 
     // return an observable with a user-facing error message
     return throwError(() => message);

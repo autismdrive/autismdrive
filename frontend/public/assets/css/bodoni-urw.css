@@ -15,7 +15,7 @@
 /*{"last_published":"2019-04-01 21:00:54 UTC"}*/
 @font-face {
     font-family: "bodoni-urw";
-    src: url(/assets/fonts/bodoni-urw/bodoni-urw-700.woff2) format("woff2");
+    src: url("/assets/fonts/bodoni-urw/bodoni-urw-700.woff2") format("woff2");
     font-display: auto;
     font-style: italic;
     font-weight: 700;

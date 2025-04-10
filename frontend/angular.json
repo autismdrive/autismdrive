@@ -63,13 +63,7 @@
               "public/assets/css/franklin-gothic-urw.css",
               "public/assets/css/bodoni-urw.css"
             ],
-            "scripts": [
-              {
-                "input": "public/assets/js/gtag.js",
-                "inject": false,
-                "bundleName": "google-module"
-              }
-            ],
+            "scripts": [],
             "allowedCommonJsDependencies": [
               "geolib",
               "rfdc",
@@ -164,14 +158,8 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public/assets/",
-                "output": "/assets/"
-              }
-            ],
+            "inlineStyleLanguage": ["scss"],
+            "assets": ["public/assets"],
             "styles": [
               "src/styles.scss",
               "public/assets/css/icofont.css",

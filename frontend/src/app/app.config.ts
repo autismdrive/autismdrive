@@ -22,18 +22,16 @@ import {
 } from '@forms/validators/formly.validator';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 
 // Attempt to load the configuration from a file called config.json right next to
 // this index page, it if exists. Otherwise, assume we are connecting to port
 // 5000 on the local server.
 export const load = () => {
-  inject(HttpClient);
-  inject(ConfigService);
-  inject(GoogleMapsLibraryService);
-  inject(AuthenticationService)
-  inject(ApiService)
+  const httpClient = inject(HttpClient);
+  const appEnvironmentService = inject(AppEnvironmentService);
+  return appEnvironmentService.load();
 };
 
 @Injectable()

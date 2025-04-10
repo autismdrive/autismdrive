@@ -1,7 +1,9 @@
 export interface AppEnvironment {
-  envName: string;
+  development: boolean;
+  testing: boolean;
+  mirroring: boolean;
   production: boolean;
-  api: string;
-  googleTagManagerId: string;
+  apiUrl: string;
+  googleAnalyticsTagId: string;
   googleMapsApiKey: string;
 }

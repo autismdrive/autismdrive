@@ -3,6 +3,7 @@ import enum
 import typing
 
 import click
+from psycopg import OperationalError
 from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
@@ -26,9 +27,8 @@ def _create_db(engine_: Engine):
         create_database(engine_.url)
         click.secho(f"\n*** Database {engine_.url.database} created. ***\n")
 
-    except Exception as e:
-        click.secho(f"Error creating database: {e}")
-        raise e
+    except OperationalError as e:
+        click.secho(f"Error creating database: {e}. Make sure the database server is running.", fg="red")
 
 
 def _create_tables(base_metadata: MetaData, engine_: Engine):

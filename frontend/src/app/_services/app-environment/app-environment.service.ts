@@ -1,36 +1,35 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable, signal, WritableSignal} from '@angular/core';
 import {environment} from '@environments/environment';
-import {ConfigServiceProps} from '@models/config-service-props';
-import {GoogleModuleOptions} from '@ng-maps/google';
+import {AppEnvironment} from '@models/environment';
 import {lastValueFrom} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ConfigService implements GoogleModuleOptions {
-  public apiUrl: string;
-  public apiKey: string; // The Google Maps api key, to implement GoogleModuleOptions
-  public development: boolean;
-  public testing: boolean;
-  public mirroring: boolean;
-  public production: boolean;
-  public googleAnalyticsKey: string;
+export class AppEnvironmentService implements AppEnvironment {
+  development: boolean;
+  testing: boolean;
+  mirroring: boolean;
+  production: boolean;
+  apiUrl: string;
+  googleAnalyticsTagId: string;
+  googleTagManagerId: string;
+  googleMapsApiKey: string;
 
-  public readonly props: WritableSignal<ConfigServiceProps | undefined> = signal(undefined);
+  public readonly props: WritableSignal<AppEnvironment | undefined> = signal(undefined);
 
   constructor(private httpClient: HttpClient) {
-    this.load();
   }
 
   async load() {
-    let configFromJsonFile: ConfigServiceProps;
+    let configFromJsonFile: AppEnvironment;
 
     // Check if a file called `config.json` is available in this file's directory.
     // If it is, load the configuration from there.
     try {
       configFromJsonFile = await lastValueFrom(
-        this.httpClient.get<ConfigServiceProps>('/assets/config.json', {responseType: 'json'}),
+        this.httpClient.get<AppEnvironment>('/assets/config.json', {responseType: 'json'}),
       );
     } catch {
       configFromJsonFile = undefined;
@@ -42,11 +41,11 @@ export class ConfigService implements GoogleModuleOptions {
     }
 
     // Check with the backend to see if there is a configuration override available.
-    const backendConfigEndpoint = `${environment.api}/api/config`;
-    let configFromBackend: ConfigServiceProps;
+    const backendConfigEndpoint = `${environment.apiUrl}/api/config`;
+    let configFromBackend: AppEnvironment;
     try {
       configFromBackend = await lastValueFrom(
-        this.httpClient.get<ConfigServiceProps>(backendConfigEndpoint, {responseType: 'json'}),
+        this.httpClient.get<AppEnvironment>(backendConfigEndpoint, {responseType: 'json'}),
       );
     } catch {
       configFromBackend = undefined;
@@ -58,7 +57,7 @@ export class ConfigService implements GoogleModuleOptions {
     }
   }
 
-  fromProperties(props: ConfigServiceProps) {
+  fromProperties(props: AppEnvironment) {
     const instance = this;
     Object.entries(props).forEach(([key, value]) => {
       instance[key] = value;

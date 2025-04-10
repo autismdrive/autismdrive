@@ -9,7 +9,7 @@ maintainers = [
 description = "Autism DRIVE backend API"
 name = "autismdrive"
 version = "0.1.0"
-readme = "https://github.com/autismdrive/autismdrive/blob/main/backend/README.md"
+readme = "README.md"
 dependencies = [
     "APScheduler==3.6.3",
     "Flask==3.0.3",
@@ -47,8 +47,6 @@ dependencies = [
     "jdcal==1.4.1",
     "marshmallow==3.23.1",
     "marshmallow-sqlalchemy==1.1.0",
-    "mod-wsgi-httpd==2.4.62.1",
-    "mod-wsgi==5.0.2",
     "openpyxl==3.1.5",
     "psycopg==3.2.3",
     "pycparser==2.22",
@@ -63,6 +61,7 @@ dependencies = [
     "urllib3==2.2.3",
     "psycopg-c==3.2.3",
     "psycopg-binary==3.2.3",
+    "uwsgi==2.0.28",
 ]
 
 [project.urls]
@@ -100,3 +99,14 @@ max-line-length = 120
 [tool.coverage.run]
 concurrency = ["gevent"]
 
+[tool.setuptools.packages.find]
+where = ["app"]
+include = ["app"]
+exclude = [
+    "config",
+    "example_data",
+    "instance",
+    "migrations",
+    "tests",
+]
+namespaces = false

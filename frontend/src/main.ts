@@ -4,14 +4,14 @@ import {enableProdMode, importProvidersFrom, provideAppInitializer} from '@angul
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {bootstrapApplication, BrowserModule} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule, provideAnimations} from '@angular/platform-browser/animations';
 import {provideRouter, withHashLocation, withInMemoryScrolling, withRouterConfig} from '@angular/router';
 import {YouTubePlayerModule} from '@angular/youtube-player';
 import {AppComponent} from '@app/app.component';
 import {FormlyConfig, load} from '@app/app.config';
 import {environment} from '@environments/environment';
 import {NgMapsCoreModule} from '@ng-maps/core';
-import {GOOGLE_MAPS_API_CONFIG, NgMapsGoogleModule} from '@ng-maps/google';
+import {GOOGLE_MAPS_API_CONFIG, GoogleMapsAPIWrapper, NgMapsGoogleModule} from '@ng-maps/google';
 import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {FlexLayoutModule} from '@ngbracket/ngx-layout';
 import {FormlyModule} from '@ngx-formly/core';
@@ -23,7 +23,7 @@ import {routes} from '@routing/routes';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {CategoriesService} from '@services/categories/categories.service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {IntervalService} from '@services/interval/interval.service';
@@ -49,10 +49,6 @@ bootstrapApplication(AppComponent, {
       },
     },
     {
-      provide: 'googleTagManagerId',
-      useValue: environment.googleTagManagerId,
-    },
-    {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: {appearance: 'outline'},
     },
@@ -62,6 +58,7 @@ bootstrapApplication(AppComponent, {
       withRouterConfig({urlUpdateStrategy: 'eager'}),
       withInMemoryScrolling({scrollPositionRestoration: 'enabled'}),
     ),
+    provideAnimations(),
     importProvidersFrom(
       BrowserAnimationsModule,
       BrowserModule,
@@ -83,11 +80,12 @@ bootstrapApplication(AppComponent, {
     ApiService,
     AuthenticationService,
     CategoriesService,
-    ConfigService,
+    AppEnvironmentService,
     DatePipe,
     DeviceDetectorService,
     GoogleAnalyticsService,
     GoogleMapsLibraryService,
+    GoogleMapsAPIWrapper,
     IntervalService,
     SearchService,
   ],

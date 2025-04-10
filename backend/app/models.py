@@ -489,8 +489,8 @@ class FrontendConfig:
     mirroring = settings.MIRRORING
     production = settings.PRODUCTION
     apiUrl = settings.API_URL
-    apiKey = settings.GOOGLE_MAPS_API_KEY
-    googleAnalyticsKey = settings.GOOGLE_ANALYTICS_API_KEY
+    googleMapsApiKey = settings.GOOGLE_MAPS_API_KEY
+    googleAnalyticsTagId = settings.GOOGLE_ANALYTICS_TAG_ID
 
 
 class LatLng(TypedDict):

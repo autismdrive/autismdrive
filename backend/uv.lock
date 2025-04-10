@@ -94,8 +94,6 @@ dependencies = [
     { name = "markupsafe" },
     { name = "marshmallow" },
     { name = "marshmallow-sqlalchemy" },
-    { name = "mod-wsgi" },
-    { name = "mod-wsgi-httpd" },
     { name = "openpyxl" },
     { name = "psycopg" },
     { name = "psycopg-binary" },
@@ -113,6 +111,7 @@ dependencies = [
     { name = "sqlalchemy-utils" },
     { name = "tzlocal" },
     { name = "urllib3" },
+    { name = "uwsgi" },
     { name = "werkzeug" },
     { name = "xlsxwriter" },
 ]
@@ -164,8 +163,6 @@ requires-dist = [
     { name = "markupsafe", specifier = "==2.1.1" },
     { name = "marshmallow", specifier = "==3.23.1" },
     { name = "marshmallow-sqlalchemy", specifier = "==1.1.0" },
-    { name = "mod-wsgi", specifier = "==5.0.2" },
-    { name = "mod-wsgi-httpd", specifier = "==2.4.62.1" },
     { name = "openpyxl", specifier = "==3.1.5" },
     { name = "psycopg", specifier = "==3.2.3" },
     { name = "psycopg-binary", specifier = "==3.2.3" },
@@ -183,6 +180,7 @@ requires-dist = [
     { name = "sqlalchemy-utils", specifier = "==0.41.1" },
     { name = "tzlocal", specifier = "==5.2" },
     { name = "urllib3", specifier = "==2.2.3" },
+    { name = "uwsgi", specifier = "==2.0.28" },
     { name = "werkzeug", specifier = "==3.0.0" },
     { name = "xlsxwriter", specifier = "==3.2.0" },
 ]
@@ -790,18 +788,6 @@ wheels = [
 ]
 
 [[package]]
-name = "mod-wsgi"
-version = "5.0.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ca/4d/275853efa4d2a4efe1614aa0df06295e71f2082cebccc4d40d0f0a551c24/mod_wsgi-5.0.2.tar.gz", hash = "sha256:6fe5557c3ef25c184c2c994905fe52be1c06ae5c46235ecafe558e84789e2159", size = 498627 }
-
-[[package]]
-name = "mod-wsgi-httpd"
-version = "2.4.62.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/61/f4/942f066aba1cd52276b4af24dc31d35b5fa2888802fe181dd2ba4c52d736/mod_wsgi_httpd-2.4.62.1.tar.gz", hash = "sha256:259fb1af4700bcfaf0b0213313a9ff1a6e13a5b754cc29ee37747276be4b0e0d", size = 2100729 }
-
-[[package]]
 name = "mypy-extensions"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1135,6 +1121,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/ed/63/22ba4ebfe7430b763
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ce/d9/5f4c13cecde62396b0d3fe530a50ccea91e7dfc1ccf0e09c228841bb5ba8/urllib3-2.2.3-py3-none-any.whl", hash = "sha256:ca899ca043dcb1bafa3e262d73aa25c465bfb49e0bd9dd5d59f1d0acba2f8fac", size = 126338 },
 ]
+
+[[package]]
+name = "uwsgi"
+version = "2.0.28"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/24/c2/d58480aadc9a1f420dd96fc43cf0dcd8cb5ededb95cab53743529c23b6cd/uwsgi-2.0.28.tar.gz", hash = "sha256:79ca1891ef2df14508ab0471ee8c0eb94bd2d51d03f32f90c4bbe557ab1e99d0", size = 816212 }
 
 [[package]]
 name = "werkzeug"

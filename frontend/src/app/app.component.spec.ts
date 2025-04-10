@@ -2,10 +2,10 @@ import {signal} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {ConfigService} from '@services/config/config.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockConfigServiceProps} from '@util/testing/fixtures/mock-config-service-props';
+import {mockAppEnvironment} from '@util/testing/fixtures/mock-app-environment';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {AppComponent} from './app.component';
@@ -20,7 +20,7 @@ describe('AppComponent', () => {
       .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, '/home')})
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(GoogleAnalyticsService)
-      .mock(ConfigService, {props: signal(mockConfigServiceProps)});
+      .mock(AppEnvironmentService, {props: signal(mockAppEnvironment)});
   });
 
   beforeEach(() => {
