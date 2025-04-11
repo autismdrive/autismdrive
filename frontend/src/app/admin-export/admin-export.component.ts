@@ -1,4 +1,4 @@
-import {DatePipe, NgIf} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -24,7 +24,7 @@ import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-
   selector: 'app-admin-export',
   templateUrl: './admin-export.component.html',
   styleUrls: ['./admin-export.component.scss'],
-  imports: [MatPaginatorModule, MatTableModule, NgIf, DatePipe, MatRippleModule],
+  imports: [MatPaginatorModule, MatTableModule, CommonModule, DatePipe, MatRippleModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminExportComponent implements OnInit {

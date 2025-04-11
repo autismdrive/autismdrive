@@ -1,4 +1,4 @@
-import {NgIf, NgStyle} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {HitType} from '@models/hit_type';
@@ -8,7 +8,7 @@ import {HitType} from '@models/hit_type';
   selector: 'app-type-icon',
   templateUrl: './type-icon.component.html',
   styleUrls: ['./type-icon.component.scss'],
-  imports: [NgIf, MatIconModule, NgStyle],
+  imports: [CommonModule, MatIconModule],
 })
 export class TypeIconComponent {
   @Input() iconType: string;

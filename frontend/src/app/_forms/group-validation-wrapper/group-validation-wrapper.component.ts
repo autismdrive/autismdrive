@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component} from '@angular/core';
 import {FieldWrapper, FormlyModule} from '@ngx-formly/core';
 
@@ -7,6 +7,6 @@ import {FieldWrapper, FormlyModule} from '@ngx-formly/core';
   selector: 'app-group-validation-wrapper',
   templateUrl: './group-validation-wrapper.component.html',
   styleUrls: ['./group-validation-wrapper.component.scss'],
-  imports: [FormlyModule, NgIf],
+  imports: [FormlyModule, CommonModule],
 })
 export class GroupValidationWrapperComponent extends FieldWrapper {}

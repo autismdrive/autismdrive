@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatHint} from '@angular/material/form-field';
@@ -12,7 +12,7 @@ import {Aggregation} from '@models/query';
   selector: 'app-search-filter',
   templateUrl: './search-filter.component.html',
   styleUrls: ['./search-filter.component.scss'],
-  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatHint, NgIf, LoadingComponent, NgForOf],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatHint, LoadingComponent, CommonModule],
 })
 export class SearchFilterComponent {
   @Input() label_title: string;

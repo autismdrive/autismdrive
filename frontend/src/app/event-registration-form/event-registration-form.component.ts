@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, Inject} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -19,7 +19,15 @@ import {EventRegistrationComponent} from '../event-registration/event-registrati
   selector: 'app-event-registration-form',
   templateUrl: './event-registration-form.component.html',
   styleUrls: ['./event-registration-form.component.scss'],
-  imports: [MatDialogModule, ReactiveFormsModule, FormlyModule, FlexModule, MatButtonModule, LoadingComponent, NgIf],
+  imports: [
+    CommonModule,
+    FlexModule,
+    FormlyModule,
+    LoadingComponent,
+    MatButtonModule,
+    MatDialogModule,
+    ReactiveFormsModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventRegistrationFormComponent {

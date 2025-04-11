@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -14,7 +14,15 @@ import {ApiService} from '@services/api/api.service';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
-  imports: [FlexModule, LogoComponent, ReactiveFormsModule, FormlyModule, MatButtonModule, LoadingComponent, NgIf],
+  imports: [
+    CommonModule,
+    FlexModule,
+    FormlyModule,
+    LoadingComponent,
+    LogoComponent,
+    MatButtonModule,
+    ReactiveFormsModule,
+  ],
 })
 export class ForgotPasswordComponent {
   errorMessage: string;

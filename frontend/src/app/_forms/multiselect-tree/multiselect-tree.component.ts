@@ -1,5 +1,5 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
@@ -15,7 +15,7 @@ import {Observable} from 'rxjs';
   selector: 'app-multiselect-tree',
   templateUrl: './multiselect-tree.component.html',
   styleUrls: ['./multiselect-tree.component.scss'],
-  imports: [MatBadgeModule, MatCheckboxModule, MatIconModule, MatButtonModule, MatTreeModule, NgIf],
+  imports: [MatBadgeModule, MatCheckboxModule, MatIconModule, MatButtonModule, MatTreeModule, CommonModule],
 })
 export class MultiselectTreeComponent extends TreeComponent implements OnInit {
   @ViewChild(MatTree) tree: MatTree<Category>;

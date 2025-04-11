@@ -1,4 +1,4 @@
-@use "/src/config" as config;
+ @use "config" as config;
 
 :root :not(body.is-home) .content {
   padding-top: config.$site-header-height;

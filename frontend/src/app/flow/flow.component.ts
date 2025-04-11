@@ -1,5 +1,5 @@
 import {MediaMatcher} from '@angular/cdk/layout';
-import {NgClass, NgIf} from '@angular/common';
+import {CommonModule, NgClass, NgIf} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnDestroy, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -15,7 +15,7 @@ import {Flow} from '@models/flow';
 import {Participant} from '@models/participant';
 import {Step, StepStatus} from '@models/step';
 import {User} from '@models/user';
-import {DefaultShowHideDirective, FlexModule} from '@ngbracket/ngx-layout';
+import {DefaultShowHideDirective, ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -33,7 +33,8 @@ enum FlowState {
 
 @Component({
   imports: [
-    DefaultShowHideDirective,
+    CommonModule,
+    ExtendedModule,
     FlexModule,
     FlowCompleteComponent,
     FlowIntroComponent,
@@ -43,8 +44,6 @@ enum FlowState {
     MatIconModule,
     MatProgressBar,
     MatSidenavModule,
-    NgClass,
-    NgIf,
     QuestionnaireStepsListComponent,
     ReactiveFormsModule,
     RouterModule,

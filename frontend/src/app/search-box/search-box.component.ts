@@ -1,4 +1,4 @@
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, CommonModule} from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -33,6 +33,8 @@ import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith
   templateUrl: './search-box.component.html',
   styleUrls: ['./search-box.component.scss'],
   imports: [
+    AsyncPipe,
+    CommonModule,
     ExtendedModule,
     FlexModule,
     MatAutocompleteModule,
@@ -41,10 +43,7 @@ import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith
     MatIconModule,
     MatInputModule,
     MatTooltipModule,
-    NgIf,
     ReactiveFormsModule,
-    NgForOf,
-    AsyncPipe,
   ],
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {

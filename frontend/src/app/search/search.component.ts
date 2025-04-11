@@ -1,6 +1,6 @@
 /// <reference types="@types/google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
-import {Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
+import {CommonModule, Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -90,6 +90,7 @@ enum LocationMode {
   imports: [
     AddButtonComponent,
     BorderBoxTileComponent,
+    CommonModule,
     ExtendedModule,
     FlexModule,
     FormsModule,
@@ -105,8 +106,6 @@ enum LocationMode {
     MatSelectModule,
     MatTabsModule,
     MatTooltipModule,
-    NgForOf,
-    NgIf,
     NgMapsCoreModule,
     NgMapsGoogleModule,
     NgMapsMarkerClustererModule,

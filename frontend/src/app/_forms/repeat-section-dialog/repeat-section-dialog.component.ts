@@ -1,8 +1,7 @@
-import {NgClass} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {AfterContentInit, Component, Inject} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
-import {FormlyConfig} from '@app/app.config';
 import {RepeatSectionDialogData} from '@models/repeat_section_dialog_data';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
@@ -15,7 +14,7 @@ import {DeviceDetectorService} from 'ngx-device-detector';
   selector: 'app-repeat-section-dialog',
   templateUrl: './repeat-section-dialog.component.html',
   styleUrls: ['./repeat-section-dialog.component.scss'],
-  imports: [FlexModule, MatButtonModule, FormlyModule, MatDialogModule, NgClass],
+  imports: [FlexModule, MatButtonModule, FormlyModule, MatDialogModule, CommonModule],
 })
 export class RepeatSectionDialogComponent implements AfterContentInit {
   disableSave: boolean;

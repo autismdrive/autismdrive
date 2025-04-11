@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -111,6 +111,7 @@ enum ProfileState {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
   imports: [
+    CommonModule,
     FavoriteResourcesComponent,
     FavoriteTopicsComponent,
     FlexModule,
@@ -121,11 +122,9 @@ enum ProfileState {
     MatLineModule,
     MatListModule,
     MatTabsModule,
-    NgIf,
     ParticipantProfileComponent,
     ProfileMetaComponent,
     ReactiveFormsModule,
-    NgForOf,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

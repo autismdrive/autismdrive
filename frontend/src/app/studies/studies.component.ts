@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -36,8 +36,7 @@ interface AgeObj {
     FlexModule,
     MatFormFieldModule,
     MatSelectModule,
-    NgForOf,
-    NgIf,
+    CommonModule,
     SearchResultComponent,
     TypeIconComponent,
   ],

@@ -1,9 +1,9 @@
-import {NgIf, PercentPipe} from '@angular/common';
+import {CommonModule, PercentPipe} from '@angular/common';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
-import {MatDivider, MatDividerModule} from '@angular/material/divider';
+import {MatDividerModule} from '@angular/material/divider';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInput, MatInputModule} from '@angular/material/input';
+import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -18,15 +18,15 @@ import {ApiService} from '@services/api/api.service';
   templateUrl: './participant-admin.component.html',
   styleUrls: ['./participant-admin.component.scss'],
   imports: [
+    CommonModule,
     FlexModule,
-    MatProgressSpinnerModule,
     MatCardModule,
     MatDividerModule,
     MatFormFieldModule,
-    MatTableModule,
-    MatSortModule,
     MatInputModule,
-    NgIf,
+    MatProgressSpinnerModule,
+    MatSortModule,
+    MatTableModule,
     PercentPipe,
   ],
 })

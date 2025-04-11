@@ -1,4 +1,4 @@
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe, CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, EventEmitter} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -20,16 +20,16 @@ import {DeviceDetectorService} from 'ngx-device-detector';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   imports: [
-    LoadingComponent,
-    FlexModule,
-    LogoComponent,
-    ReactiveFormsModule,
-    FormlyModule,
-    FormlyMatInputModule,
-    MatButtonModule,
-    RouterModule,
     AsyncPipe,
-    NgIf,
+    CommonModule,
+    FlexModule,
+    FormlyMatInputModule,
+    FormlyModule,
+    LoadingComponent,
+    LogoComponent,
+    MatButtonModule,
+    ReactiveFormsModule,
+    RouterModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

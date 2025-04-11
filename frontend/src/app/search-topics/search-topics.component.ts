@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -15,14 +15,13 @@ import {CategoriesService} from '@services/categories/categories.service';
   templateUrl: './search-topics.component.html',
   styleUrls: ['./search-topics.component.scss'],
   imports: [
+    CommonModule,
     ExtendedModule,
     MatButtonModule,
     MatIconModule,
     MatListModule,
     MatMenuModule,
     MatTooltipModule,
-    NgForOf,
-    NgIf,
   ],
 })
 export class SearchTopicsComponent {

@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -25,7 +25,7 @@ enum PageState {
   selector: 'app-resource-form',
   templateUrl: './resource-form.component.html',
   styleUrls: ['./resource-form.component.scss'],
-  imports: [LoadingComponent, NgIf, FormlyModule, ReactiveFormsModule, FlexModule, MatButtonModule],
+  imports: [LoadingComponent, CommonModule, FormlyModule, ReactiveFormsModule, FlexModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceFormComponent implements OnInit {

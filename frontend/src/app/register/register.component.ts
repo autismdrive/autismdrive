@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -17,7 +17,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
-  imports: [FlexModule, ReactiveFormsModule, FormlyModule, MatButtonModule, LoadingComponent, NgIf],
+  imports: [FlexModule, ReactiveFormsModule, FormlyModule, MatButtonModule, LoadingComponent, CommonModule],
 })
 export class RegisterComponent {
   private _stateSubject: BehaviorSubject<string>;
@@ -42,6 +42,7 @@ export class RegisterComponent {
       },
     },
   ];
+
   constructor(
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,

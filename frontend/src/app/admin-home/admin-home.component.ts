@@ -1,6 +1,6 @@
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component} from '@angular/core';
-import {MatTabNav, MatTabsModule} from '@angular/material/tabs';
+import {MatTabsModule} from '@angular/material/tabs';
 import {RouterModule} from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import {RouterModule} from '@angular/router';
   selector: 'app-admin-home',
   templateUrl: './admin-home.component.html',
   styleUrls: ['./admin-home.component.scss'],
-  imports: [RouterModule, MatTabsModule, NgForOf],
+  imports: [RouterModule, MatTabsModule, CommonModule],
 })
 export class AdminHomeComponent {
   navLinks = [

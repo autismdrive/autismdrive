@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -17,7 +17,7 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
   selector: 'app-terms',
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss'],
-  imports: [PdfJsViewerModule, LogoComponent, FlexModule, NgIf, MatButtonModule],
+  imports: [PdfJsViewerModule, LogoComponent, FlexModule, CommonModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsComponent {

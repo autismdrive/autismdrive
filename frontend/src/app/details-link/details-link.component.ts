@@ -1,4 +1,4 @@
-import {NgClass, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
@@ -7,7 +7,7 @@ import {RouterModule} from '@angular/router';
   selector: 'app-details-link',
   templateUrl: './details-link.component.html',
   styleUrls: ['./details-link.component.scss'],
-  imports: [NgClass, NgIf, RouterModule],
+  imports: [CommonModule, RouterModule],
 })
 export class DetailsLinkComponent {
   @Input() url: string;

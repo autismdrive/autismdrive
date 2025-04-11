@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
@@ -12,7 +12,7 @@ import {EventRegistrationFormComponent} from '../event-registration-form/event-r
   selector: 'app-event-registration',
   templateUrl: './event-registration.component.html',
   styleUrls: ['./event-registration.component.scss'],
-  imports: [FlexModule, MatButtonModule, NgIf],
+  imports: [FlexModule, MatButtonModule, CommonModule],
 })
 export class EventRegistrationComponent {
   @Input() resource: Resource;

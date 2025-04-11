@@ -1,10 +1,10 @@
-import {DatePipe, NgIf} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, OnInit, ViewChild} from '@angular/core';
-import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
-import {MatInput, MatInputModule} from '@angular/material/input';
-import {MatProgressSpinner, MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSort, MatSortModule} from '@angular/material/sort';
-import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
 import {EmailLog} from '@models/email_log';
 import {User} from '@models/user';
@@ -18,13 +18,13 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   styleUrls: ['./email-log-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    NgIf,
-    MatProgressSpinnerModule,
-    MatFormFieldModule,
-    MatTableModule,
-    MatSortModule,
-    MatInputModule,
+    CommonModule,
     DatePipe,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
+    MatTableModule,
   ],
 })
 export class EmailLogAdminComponent implements OnInit {

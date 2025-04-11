@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -20,7 +20,7 @@ enum PageState {
 }
 
 @Component({
-  imports: [LoadingComponent, NgIf, FormlyModule, MatButtonModule, FlexModule, ReactiveFormsModule],
+  imports: [LoadingComponent, CommonModule, FormlyModule, MatButtonModule, FlexModule, ReactiveFormsModule],
   selector: 'app-study-form',
   standalone: true,
   styleUrls: ['./study-form.component.scss'],

@@ -1,23 +1,23 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
-import {MatButton, MatButtonModule} from '@angular/material/button';
-import {MatCardModule, MatCardTitle} from '@angular/material/card';
-import {MatChipListbox, MatChipsModule} from '@angular/material/chips';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
 import {MatDialog} from '@angular/material/dialog';
-import {RouterLink, RouterModule} from '@angular/router';
-import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
+import {RouterModule} from '@angular/router';
 import {Category} from '@models/category';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
 import {User} from '@models/user';
 import {UserFavorite} from '@models/user_favorite';
 import {ApiService} from '@services/api/api.service';
+import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
 
 @Component({
   standalone: true,
   selector: 'app-favorite-topics',
   templateUrl: './favorite-topics.component.html',
   styleUrls: ['./favorite-topics.component.scss'],
-  imports: [NgIf, MatCardModule, MatChipsModule, RouterModule, NgForOf, MatButtonModule],
+  imports: [CommonModule, MatCardModule, MatChipsModule, RouterModule, MatButtonModule],
 })
 export class FavoriteTopicsComponent implements OnInit {
   @Input() currentUser: User;

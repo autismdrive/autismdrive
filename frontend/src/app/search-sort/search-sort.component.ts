@@ -1,4 +1,4 @@
-import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -9,7 +9,7 @@ import {SortMethod} from '@models/sort_method';
   selector: 'app-search-sort',
   templateUrl: './search-sort.component.html',
   styleUrls: ['./search-sort.component.scss'],
-  imports: [MatFormFieldModule, MatSelectModule, NgForOf, NgClass, NgIf],
+  imports: [MatFormFieldModule, MatSelectModule, CommonModule],
 })
 export class SearchSortComponent {
   @Input() selectedSort: SortMethod;

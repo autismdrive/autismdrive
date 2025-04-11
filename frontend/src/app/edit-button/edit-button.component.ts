@@ -1,8 +1,8 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
-import {MatButtonModule, MatMiniFabButton} from '@angular/material/button';
-import {MatTooltip, MatTooltipModule} from '@angular/material/tooltip';
-import {Router, RouterLink, RouterModule} from '@angular/router';
+import {MatButtonModule} from '@angular/material/button';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
 import {User} from '@models/user';
 
 @Component({
@@ -10,7 +10,7 @@ import {User} from '@models/user';
   selector: 'app-edit-button',
   templateUrl: './edit-button.component.html',
   styleUrls: ['./edit-button.component.scss'],
-  imports: [NgIf, MatButtonModule, MatTooltipModule, RouterModule],
+  imports: [CommonModule, MatButtonModule, MatTooltipModule, RouterModule],
 })
 export class EditButtonComponent {
   @Input() currentUser: User;

@@ -1,4 +1,4 @@
-@use "/src/config" as config;
+ @use "config" as config;
 
 // Adapted from https://education.virginia.edu/
 
@@ -8,33 +8,7 @@
     border-image-source: linear-gradient(to bottom, config.$brand-accent 0%, config.$brand-primary 100%);
     border-image-slice: 1;
   }
-
-  html {
-    font-family: sans-serif;
-    line-height: 1.15;
-    text-size-adjust: 100%;
-    box-sizing: border-box;
-    font-size: 100%;
-  }
-
-  article,
-  aside,
-  footer,
-  header,
-  nav,
-  section {
-    display: block;
-  }
-
-  figcaption,
-  figure {
-    display: block;
-  }
-
-  main {
-    display: block;
-  }
-
+  
   a:active,
   a:hover {
     outline-width: 0;
@@ -249,29 +223,6 @@
     display: none !important;
   }
 
-  div,
-  dl,
-  dt,
-  dd,
-  ul,
-  ol,
-  li,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  pre,
-  form,
-  p,
-  blockquote,
-  th,
-  td {
-    margin: 0;
-    padding: 0;
-  }
-
   p {
     margin-bottom: 1rem;
     font-size: inherit;
@@ -417,7 +368,7 @@
   }
 
   .stat {
-    font-size: 2.5rem;
+    font-size: var(--mat-sys-title-large-size);
     line-height: 1;
   }
 
@@ -716,120 +667,11 @@
   h5,
   h6 {
     color: config.$brand-primary;
-    font-family: franklin-gothic-urw, serif;
     font-style: italic;
-    font-weight: 800;
-    line-height: 1;
-    text-rendering: optimizelegibility;
 
     & small {
       line-height: 0;
       color: config.$brand-gray-tint-2;
-    }
-  }
-
-  h1 {
-    font-size: 2em;
-    line-height: 1;
-    margin: 0.67em 0;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-    line-height: 1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  h3 {
-    font-size: 1.1875rem;
-    line-height: 1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  h4 {
-    font-size: 1.125rem;
-    line-height: 1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  h5 {
-    font-size: 1.0625rem;
-    line-height: 1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  h6 {
-    font-size: 1rem;
-    line-height: 1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  @media print, screen and (width >= 48em) {
-    h1,
-    .h1 {
-      font-size: 3rem;
-    }
-
-    h2,
-    .h2 {
-      font-size: 2.5rem;
-    }
-
-    h3,
-    .h3 {
-      font-size: 1.9375rem;
-    }
-
-    h4,
-    .h4 {
-      font-size: 1.5625rem;
-    }
-
-    h5,
-    .h5 {
-      font-size: 1.25rem;
-    }
-
-    h6,
-    .h6 {
-      font-size: 1rem;
-    }
-  }
-
-  @media screen and (width >= 37.5em) {
-    h1,
-    .h1 {
-      font-size: 2.5rem;
-    }
-
-    h2,
-    .h2 {
-      font-size: 2rem;
-    }
-
-    h3,
-    .h3 {
-      font-size: 1.875rem;
-    }
-
-    h4,
-    .h4 {
-      font-size: 1.625rem;
-    }
-
-    h5,
-    .h5 {
-      font-size: 1.375rem;
-    }
-
-    h6,
-    .h6 {
-      font-size: 1.25rem;
     }
   }
 

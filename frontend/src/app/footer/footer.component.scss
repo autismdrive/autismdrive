@@ -1,4 +1,4 @@
-@use "/src/config" as config;
+ @use "config" as config;
 @use 'mixins' as mixins;
 
 footer {
@@ -16,17 +16,8 @@ footer {
 
 .funded-by {
   text-align: left;
-  margin: 1em auto -1em;
-
-  // SM
-  @media (width <= 959px) {
-    width: 290px;
-  }
-
-  // MD - XL
-  @media (width >= 960px) {
-    width: 417px;
-  }
+  margin: 1em auto -0.5em auto;
+  width: 300px;
 }
 
 .footer-contact {

@@ -1,4 +1,4 @@
-@use "/src/config" as config;
+ @use "config" as config;
 
 mat-card.repeat {
   background-color: config.$brand-primary-light;

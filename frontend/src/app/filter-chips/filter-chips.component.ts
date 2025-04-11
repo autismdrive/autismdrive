@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
@@ -13,7 +13,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
   selector: 'app-filter-chips',
   templateUrl: './filter-chips.component.html',
   styleUrls: ['./filter-chips.component.scss'],
-  imports: [MatCardModule, MatChipsModule, NgIf, NgForOf],
+  imports: [MatCardModule, MatChipsModule, CommonModule],
 })
 export class FilterChipsComponent {
   @Input() categories: StudyCategory[] | ResourceCategory[] = [];

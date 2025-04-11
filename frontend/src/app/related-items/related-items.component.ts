@@ -1,4 +1,4 @@
-import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatLineModule} from '@angular/material/core';
@@ -18,17 +18,7 @@ import {TruncateModule} from '@yellowspot/ng-truncate';
   selector: 'app-related-items',
   templateUrl: './related-items.component.html',
   styleUrls: ['./related-items.component.scss'],
-  imports: [
-    FlexModule,
-    MatCardModule,
-    MatLineModule,
-    MatListModule,
-    NgClass,
-    NgForOf,
-    NgIf,
-    TruncateModule,
-    TypeIconComponent,
-  ],
+  imports: [FlexModule, MatCardModule, MatLineModule, MatListModule, CommonModule, TruncateModule, TypeIconComponent],
 })
 export class RelatedItemsComponent implements OnInit {
   @Input() resource: Resource;

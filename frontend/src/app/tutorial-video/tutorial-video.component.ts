@@ -1,5 +1,5 @@
 /// <reference types="@types/youtube" />
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {YouTubePlayerModule} from '@angular/youtube-player';
@@ -12,7 +12,7 @@ import {MarkdownModule} from 'ngx-markdown';
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
   styleUrls: ['./tutorial-video.component.scss'],
-  imports: [MatButtonModule, YouTubePlayerModule, MarkdownModule, DetailsLinkComponent, NgForOf],
+  imports: [MatButtonModule, YouTubePlayerModule, MarkdownModule, DetailsLinkComponent, CommonModule],
 })
 export class TutorialVideoComponent {
   @Input() videoSize: string;

@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {RouterModule} from '@angular/router';
@@ -9,7 +9,7 @@ import {Flow} from '@models/flow';
   selector: 'app-flow-intro',
   templateUrl: './flow-intro.component.html',
   styleUrls: ['./flow-intro.component.scss'],
-  imports: [NgIf, MatButtonModule, RouterModule],
+  imports: [CommonModule, MatButtonModule, RouterModule],
 })
 export class FlowIntroComponent {
   @Input() flow: Flow;

@@ -1,4 +1,4 @@
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {Router, RouterModule} from '@angular/router';
@@ -8,7 +8,7 @@ import {NewsItemComponent} from '@app/news-item/news-item.component';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
 import {Study} from '@models/study';
-import {DefaultShowHideDirective, FlexModule} from '@ngbracket/ngx-layout';
+import {DefaultShowHideDirective, ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {lastValueFrom} from 'rxjs';
@@ -22,10 +22,10 @@ import {lastValueFrom} from 'rxjs';
     BorderBoxTileComponent,
     DetailsLinkComponent,
     NewsItemComponent,
-    NgForOf,
+    CommonModule,
     FlexModule,
     RouterModule,
-    DefaultShowHideDirective,
+    ExtendedModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -49,7 +49,7 @@ export class HomeComponent {
 
         this.updateTags();
       }
-    })
+    });
   }
 
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {

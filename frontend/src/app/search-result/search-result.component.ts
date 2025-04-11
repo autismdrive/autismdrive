@@ -1,5 +1,5 @@
 /// <reference types="@types/google.maps" />
-import {NgClass, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -31,8 +31,7 @@ import {MarkdownModule} from 'ngx-markdown';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    NgClass,
-    NgIf,
+    CommonModule,
     RouterModule,
     TypeIconComponent,
   ],

@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatChipsModule} from '@angular/material/chips';
@@ -11,7 +11,7 @@ import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
   selector: 'app-search-filters-breadcrumbs',
   templateUrl: './search-filters-breadcrumbs.component.html',
   styleUrls: ['./search-filters-breadcrumbs.component.scss'],
-  imports: [ExtendedModule, FlexModule, MatChipsModule, MatIconModule, NgForOf, NgIf, MatButtonModule],
+  imports: [ExtendedModule, FlexModule, MatChipsModule, MatIconModule, CommonModule, MatButtonModule],
 })
 export class SearchFiltersBreadcrumbsComponent {
   @Input() query: Query;

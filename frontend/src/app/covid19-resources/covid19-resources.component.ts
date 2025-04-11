@@ -1,13 +1,13 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
-import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SearchResultComponent} from '@app/search-result/search-result.component';
 import {Covid19Categories} from '@models/hit_type';
 import {Hit, Query} from '@models/query';
 import {Resource} from '@models/resource';
 import {User} from '@models/user';
-import {DefaultLayoutDirective, FlexModule} from '@ngbracket/ngx-layout';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
@@ -23,7 +23,7 @@ interface C19ResourceCategoryObj {
   templateUrl: './covid19-resources.component.html',
   styleUrls: ['./covid19-resources.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FlexModule, MatButtonModule, SearchResultComponent, NgForOf, NgIf],
+  imports: [FlexModule, MatButtonModule, SearchResultComponent, CommonModule],
 })
 export class Covid19ResourcesComponent {
   query: Query;

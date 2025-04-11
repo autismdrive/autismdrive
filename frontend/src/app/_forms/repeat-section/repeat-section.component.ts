@@ -1,4 +1,4 @@
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component} from '@angular/core';
 import {MatButtonModule, MatIconButton} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -13,7 +13,15 @@ import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-sect
   selector: 'app-repeat-section',
   templateUrl: './repeat-section.component.html',
   styleUrls: ['./repeat-section.component.scss'],
-  imports: [FlexModule, FormPrintoutComponent, FormlyModule, MatButtonModule, MatCardModule, MatIconButton, NgForOf],
+  imports: [
+    CommonModule,
+    FlexModule,
+    FormPrintoutComponent,
+    FormlyModule,
+    MatButtonModule,
+    MatCardModule,
+    MatIconButton,
+  ],
 })
 export class RepeatSectionComponent extends FieldArrayType {
   constructor(public dialog: MatDialog) {

@@ -1,4 +1,4 @@
-import {DatePipe, NgForOf, NgIf} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -18,14 +18,13 @@ import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.compone
   templateUrl: './admin-note-display.component.html',
   styleUrls: ['./admin-note-display.component.scss'],
   imports: [
+    CommonModule,
     DatePipe,
     FlexModule,
     MatButtonModule,
     MatCardModule,
     MatLineModule,
     MatTooltipModule,
-    NgForOf,
-    NgIf,
   ],
 })
 export class AdminNoteDisplayComponent implements OnInit {

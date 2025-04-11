@@ -10,7 +10,7 @@ import {AccordionItem} from '@models/accordion-item';
   selector: 'app-accordion',
   templateUrl: './accordion.component.html',
   styleUrls: ['./accordion.component.scss'],
-  imports: [MatExpansionModule, NgIf, NgClass, MatIcon, RouterModule],
+  imports: [MatExpansionModule, CommonModule, CommonModule, MatIcon, RouterModule],
 })
 export class AccordionComponent {
   @Input() item: AccordionItem;

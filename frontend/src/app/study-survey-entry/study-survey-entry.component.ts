@@ -1,4 +1,4 @@
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
@@ -16,7 +16,7 @@ import {RegisterDialogComponent} from '../register-dialog/register-dialog.compon
   selector: 'app-study-survey-entry',
   templateUrl: './study-survey-entry.component.html',
   styleUrls: ['./study-survey-entry.component.scss'],
-  imports: [FlexModule, NgIf, MatButtonModule],
+  imports: [FlexModule, CommonModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudySurveyEntryComponent implements OnInit {
