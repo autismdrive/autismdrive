@@ -1,8 +1,8 @@
 import {Component, Input, OnChanges} from '@angular/core';
-import {snakeToUpperCase} from '@util/snakeToUpper';
 import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
 import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
+import {snakeToUpperCase} from '@util/snakeToUpper';
 
 @Component({
   standalone: true,
@@ -61,7 +61,6 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
   exportQ(info) {
     this.api.exportQuestionnaire(info.table_name).subscribe(response => {
-      console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

@@ -157,7 +157,9 @@ export class ApiService {
    * StudyInquiry */
   sendStudyInquiryEmail(user: User, study: Study): Observable<any> {
     const email_data = {user_id: user.id, study_id: study.id};
-    return this.httpClient.post<any>(this._endpointUrl('studyinquiry'), email_data).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<any>(this._endpointUrl('studyinquiry'), email_data)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** addUserMeta */
@@ -168,6 +170,7 @@ export class ApiService {
       catchError(this._handleError.bind(this)),
     );
   }
+
   /** getUserMeta */
   getUserMeta(user_id: number): Observable<UserMeta> {
     return this.httpClient
@@ -218,9 +221,12 @@ export class ApiService {
       catchError(this._handleError.bind(this)),
     );
   }
+
   // Add Study
   addStudy(study: Study): Observable<Study> {
-    return this.httpClient.post<Study>(this._endpointUrl('studylist'), study).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<Study>(this._endpointUrl('studylist'), study)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Update Study */
@@ -293,7 +299,9 @@ export class ApiService {
 
   /** Get AdminNotes */
   getAdminNotes(): Observable<AdminNote[]> {
-    return this.httpClient.get<AdminNote[]>(this._endpointUrl('adminNoteList')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<AdminNote[]>(this._endpointUrl('adminNoteList'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Get AdminNotes by Resource */
@@ -312,7 +320,9 @@ export class ApiService {
 
   /** Add Event */
   addEvent(event: Resource): Observable<Resource> {
-    return this.httpClient.post<Resource>(this._endpointUrl('eventlist'), event).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<Resource>(this._endpointUrl('eventlist'), event)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Update Event */
@@ -338,7 +348,9 @@ export class ApiService {
 
   /** Get Events */
   getEvents(): Observable<Resource[]> {
-    return this.httpClient.get<Resource[]>(this._endpointUrl('eventlist')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<Resource[]>(this._endpointUrl('eventlist'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Add Location */
@@ -371,7 +383,9 @@ export class ApiService {
 
   /** Get Locations */
   getLocations(): Observable<Resource[]> {
-    return this.httpClient.get<Resource[]>(this._endpointUrl('locationlist')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<Resource[]>(this._endpointUrl('locationlist'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Add Resource */
@@ -404,7 +418,9 @@ export class ApiService {
 
   /** Get Resources */
   getResources(): Observable<Resource[]> {
-    return this.httpClient.get<Resource[]>(this._endpointUrl('resourcelist')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<Resource[]>(this._endpointUrl('resourcelist'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Get Education Resources */
@@ -443,19 +459,25 @@ export class ApiService {
   /** Update ResourceCategory */
   updateResourceCategories(resource_id: number, selectedCategories: ResourceCategory[]) {
     const url = this._endpointUrl('categorybyresource').replace('<resource_id>', resource_id.toString());
-    return this.httpClient.post<ResourceCategory>(url, selectedCategories).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Update LocationCategory */
   updateLocationCategories(location_id: number, selectedCategories: ResourceCategory[]) {
     const url = this._endpointUrl('categorybylocation').replace('<location_id>', location_id.toString());
-    return this.httpClient.post<ResourceCategory>(url, selectedCategories).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Update EventCategory */
   updateEventCategories(event_id: number, selectedCategories: ResourceCategory[]) {
     const url = this._endpointUrl('categorybyevent').replace('<event_id>', event_id.toString());
-    return this.httpClient.post<ResourceCategory>(url, selectedCategories).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<ResourceCategory>(url, selectedCategories)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Delete ResourceCategory */
@@ -487,12 +509,16 @@ export class ApiService {
 
   /** getCategoryNamesList */
   getCategoryNamesList(): Observable<any> {
-    return this.httpClient.get<any>(this._endpointUrl('categorynameslist')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<any>(this._endpointUrl('categorynameslist'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** getCategoryTree */
   getCategoryTree(): Observable<Category[]> {
-    return this.httpClient.get<Category[]>(this._endpointUrl('categorytree')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<Category[]>(this._endpointUrl('categorytree'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Add Category */
@@ -533,7 +559,9 @@ export class ApiService {
   /** Update StudyInvestigators */
   updateStudyInvestigators(study_id: number, selectedInvestigators: StudyInvestigator[]) {
     const url = this._endpointUrl('investigatorbystudy').replace('<study_id>', study_id.toString());
-    return this.httpClient.post<StudyInvestigator>(url, selectedInvestigators).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .post<StudyInvestigator>(url, selectedInvestigators)
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Get User */
@@ -594,7 +622,9 @@ export class ApiService {
 
   /** Get All Email Log */
   getAllEmailLog(): Observable<EmailLog[]> {
-    return this.httpClient.get<EmailLog[]>(this._endpointUrl('emailloglist')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<EmailLog[]>(this._endpointUrl('emailloglist'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** Get Resource Change Log */
@@ -773,7 +803,9 @@ export class ApiService {
 
   /** getChainStepsList */
   getChainStepsList(): Observable<ChainStep[]> {
-    return this.httpClient.get<ChainStep[]>(this._endpointUrl('chainStepsList')).pipe(catchError(this._handleError.bind(this)));
+    return this.httpClient
+      .get<ChainStep[]>(this._endpointUrl('chainStepsList'))
+      .pipe(catchError(this._handleError.bind(this)));
   }
 
   /** EditChainStep */
@@ -794,7 +826,7 @@ export class ApiService {
     if (path) {
       return this.apiRoot + path;
     } else {
-      console.log(`endpoint '${endpointName}' does not exist`);
+      console.error(`endpoint '${endpointName}' does not exist`);
     }
   }
 

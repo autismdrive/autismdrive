@@ -13,7 +13,6 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-user-admin-details',
   templateUrl: './user-admin-details.component.html',
   styleUrls: ['./user-admin-details.component.scss'],
-  // providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserAdminDetailsComponent {
@@ -65,9 +64,7 @@ export class UserAdminDetailsComponent {
   }
 
   exportUserData() {
-    console.log('clicking the button for export user data');
     this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe(response => {
-      console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

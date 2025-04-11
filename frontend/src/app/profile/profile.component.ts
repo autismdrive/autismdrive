@@ -127,7 +127,6 @@ enum ProfileState {
     ReactiveFormsModule,
     NgForOf,
   ],
-  // providers: [AuthenticationService, ApiService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit {
@@ -155,7 +154,6 @@ export class ProfileComponent implements OnInit {
     private route: ActivatedRoute,
   ) {
     this.route.queryParams.subscribe(params => {
-      console.log('Params', params);
       if (params.hasOwnProperty('meta')) {
         this.forceMetaFormState = true;
       }
@@ -175,7 +173,6 @@ export class ProfileComponent implements OnInit {
 
       this.api.getUserMeta(this.user.id).subscribe(
         meta => {
-          console.log('UserMeta', meta);
           this.userMeta = meta;
           this.loading = false;
         },
@@ -196,8 +193,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   refreshParticipants() {
     if (this.user) {
@@ -208,7 +204,6 @@ export class ProfileComponent implements OnInit {
         if (newU.getSelf()) {
           this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(f => {
             this.selfPercentComplete = f.percentComplete();
-            console.log('selfPercentComplete', this.selfPercentComplete);
           });
         }
       });

@@ -156,7 +156,9 @@
       color="accent"
     >
       <mat-tab>
-        <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
+        <ng-template mat-tab-label>
+          <div class="type-buttons all">All Resources</div>
+        </ng-template>
       </mat-tab>
       <mat-tab *ngFor="let type of resourceTypesFiltered">
         <ng-template mat-tab-label>
@@ -402,7 +404,7 @@
               class="title mat-h2"
               href="/#/{{ selectedMapResource.type.toLowerCase() }}/{{ selectedMapResource.id }}"
               (click)="goSelectedMapResource(selectedMapResource)"
-              >{{ selectedMapResource.title }}</a
+            >{{ selectedMapResource.title }}</a
             >
             <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
               {{ selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type }} Details</a

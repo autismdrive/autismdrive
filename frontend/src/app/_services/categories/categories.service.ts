@@ -13,9 +13,7 @@ export class CategoriesService {
   @Output() updated = new EventEmitter<boolean>();
 
   constructor(private api: ApiService) {
-    console.log('CategoriesService constructor');
     this.api.getCategoryTree().subscribe(categoryTree => {
-      console.log('CategoriesService > getCategoryTree.subscribe callback');
       this.categoryTree = categoryTree;
       this._populateCategoryIndices(this.categoryTree);
 

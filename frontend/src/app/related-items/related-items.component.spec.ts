@@ -1,6 +1,4 @@
-import {Router, RouterModule} from '@angular/router';
-import {Resource} from '@models/resource';
-import {Study} from '@models/study';
+import {RouterModule} from '@angular/router';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {mockResource} from '@util/testing/fixtures/mock-resource';

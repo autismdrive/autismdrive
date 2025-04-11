@@ -1,8 +1,8 @@
 import {TestBed} from '@angular/core/testing';
 import {ApiService} from '@services/api/api.service';
-import {CategoriesService} from './categories.service';
 import {MockProvider} from 'ng-mocks';
 import {of} from 'rxjs';
+import {CategoriesService} from './categories.service';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;

@@ -18,7 +18,6 @@ export class AuthGuard {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (!this.currentUser) {
-      console.log('On AuthGuard, and there is no user, sending to login!');
       this.router.navigate(['/login'], {queryParams: {returnUrl: state.url}});
       return false;
     } else {

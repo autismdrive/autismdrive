@@ -60,8 +60,6 @@ export class ParticipantProfileComponent {
       data: {participant: participant},
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+    dialogRef.afterClosed().subscribe(_ => {});
   }
 }

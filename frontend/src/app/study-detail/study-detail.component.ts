@@ -13,7 +13,6 @@ import {InvestigatorFormComponent} from '../investigator-form/investigator-form.
   selector: 'app-study-detail',
   templateUrl: './study-detail.component.html',
   styleUrls: ['./study-detail.component.scss'],
-  // providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudyDetailComponent {

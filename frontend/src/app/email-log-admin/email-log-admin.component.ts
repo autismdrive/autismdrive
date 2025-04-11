@@ -1,6 +1,10 @@
+import {DatePipe, NgIf} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, OnInit, ViewChild} from '@angular/core';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
+import {MatInput, MatInputModule} from '@angular/material/input';
+import {MatProgressSpinner, MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSort, MatSortModule} from '@angular/material/sort';
+import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
 import {EmailLog} from '@models/email_log';
 import {User} from '@models/user';
@@ -12,8 +16,16 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   selector: 'app-email-log-admin',
   templateUrl: './email-log-admin.component.html',
   styleUrls: ['./email-log-admin.component.scss'],
-  // providers: [ApiService, AuthenticationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    NgIf,
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatTableModule,
+    MatSortModule,
+    MatInputModule,
+    DatePipe,
+  ],
 })
 export class EmailLogAdminComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;

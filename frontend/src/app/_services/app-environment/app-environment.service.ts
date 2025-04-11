@@ -18,8 +18,7 @@ export class AppEnvironmentService implements AppEnvironment {
 
   public readonly props: WritableSignal<AppEnvironment | undefined> = signal(undefined);
 
-  constructor(private httpClient: HttpClient) {
-  }
+  constructor(private httpClient: HttpClient) {}
 
   async load() {
     let configFromJsonFile: AppEnvironment;

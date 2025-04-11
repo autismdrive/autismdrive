@@ -5,12 +5,11 @@ import {MockProvider} from 'ng-mocks';
 import {GoogleAnalyticsService} from './google-analytics.service';
 
 describe('GoogleAnalyticsService', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      MockProvider(AppEnvironmentService),
-      MockProvider(AuthenticationStateService),
-    ]
-  }));
+  beforeEach(() =>
+    TestBed.configureTestingModule({
+      providers: [MockProvider(AppEnvironmentService), MockProvider(AuthenticationStateService)],
+    }),
+  );
 
   it('should be created', () => {
     const service: GoogleAnalyticsService = TestBed.get(GoogleAnalyticsService);

@@ -19,7 +19,8 @@
         This resource is being edited and is under review. Please check back for more up-to-date information soon.
       </p>
       <p *ngIf="resource.type === 'event' && resource.image_url">
-        <a [href]="resource.website" target="_blank"><img [alt]="resource.title" [ngSrc]="resource.image_url" fill="fill" /></a>
+        <a [href]="resource.website" target="_blank"><img [alt]="resource.title" [ngSrc]="resource.image_url"
+                                                          fill="fill" /></a>
       </p>
 
       <ng-container *ngIf="resource.type !== 'event'">
@@ -46,14 +47,13 @@
             'mailto:' + resource.contact_email + '?subject=Registration+for+' + resource.title
           "
           target="_blank"
-          >Register Now</a
-        >
+        >Register Now</a>
       </div>
       <p *ngIf="resource.insurance">Insurance accepted: {{ resource.insurance }}</p>
 
       <div *ngIf="safeVideoLink">
         <div *ngIf="currentUser">
-          <iframe fxFlex="100%" height="500px" [src]="safeVideoLink" frameborder="0" allowfullscreen></iframe>
+          <iframe fxFlex="100%" height="500px" [src]="safeVideoLink" allowfullscreen></iframe>
         </div>
         <div *ngIf="!currentUser">
           <h2>Interested in watching this video?</h2>
@@ -132,7 +132,7 @@
             [longitude]="resource.longitude"
             [radius]="32186.9"
             [fillColor]="resource.type.toLowerCase() === 'location' ? '#6c799c' : '#E57200'"
-            fillOpacity="0.1"
+            [fillOpacity]="0.1"
             [clickable]="true"
             (circleClick)="toggleInfoWindow($event)"
           >
@@ -160,7 +160,7 @@
                   {{ resource.type === 'location' ? 'service area' : 'location' }}.
                 </p>
                 <a *ngIf="resource.phone" class="chevron-link" target="_blank" href="tel://{{ resource.phone }}"
-                  >Call {{ resource.phone }}</a
+                >Call {{ resource.phone }}</a
                 >
                 <a
                   *ngIf="!resource.phone && resource.website"

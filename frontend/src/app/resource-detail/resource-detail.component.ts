@@ -1,9 +1,9 @@
 /// <reference types="@types/google.maps" />
-import {CommonModule, DatePipe, formatDate, NgIf, NgOptimizedImage, UpperCasePipe} from '@angular/common';
-import {core} from '@angular/compiler';
+import {CommonModule, DatePipe, formatDate, NgOptimizedImage, UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatCard, MatCardModule, MatCardTitle} from '@angular/material/card';
+import {MatCardModule} from '@angular/material/card';
+import {MatLine} from '@angular/material/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {AdminNoteDisplayComponent} from '@app/admin-note-display/admin-note-display.component';
@@ -53,6 +53,7 @@ import {MarkdownComponent} from 'ngx-markdown';
     RouterModule,
     TypeIconComponent,
     UpperCasePipe,
+    MatLine,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -72,8 +73,6 @@ export class ResourceDetailComponent {
   get isPastEvent(): boolean {
     const eventDate = new Date(this.resource.date);
     const now = new Date();
-
-    console.log('eventDate', eventDate);
     return !!(
       this.resource &&
       this.resource.type === 'event' &&
@@ -112,9 +111,6 @@ export class ResourceDetailComponent {
         const resourceType = path.charAt(0).toUpperCase() + path.slice(1);
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
           this.resource = new Resource(resource);
-
-          console.log('resource = ', this.resource);
-
           this.initializeContactItems();
           this.loadMapLocation();
           this.loading = false;

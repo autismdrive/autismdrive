@@ -17,7 +17,7 @@ describe('StudySurveyEntryComponent', () => {
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         getUser: jest.fn().mockReturnValue(of(mockUser)),
-        sendStudyInquiryEmail: jest.fn().mockReturnValue(of("")),
+        sendStudyInquiryEmail: jest.fn().mockReturnValue(of('')),
       })
       .mock(GoogleAnalyticsService, {});
   });

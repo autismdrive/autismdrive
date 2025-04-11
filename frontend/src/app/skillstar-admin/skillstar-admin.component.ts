@@ -23,7 +23,6 @@ export class SkillstarAdminComponent {
   }
 
   save(formField: HTMLTextAreaElement) {
-    console.log('formField', formField.value);
     const stepInstructions = formField.value.split('\n').map((instruction, id) => {
       const chainStep: ChainStep = {id, instruction};
       return chainStep;
@@ -32,9 +31,7 @@ export class SkillstarAdminComponent {
     stepInstructions.forEach(step => {
       if (step.instruction === '') {
         this.api.deleteChainStep(step).subscribe(
-          result => {
-            console.log('Delete blank step ID', step.id);
-          },
+          _ => {},
           error => {
             console.error(`Cannot delete step ID ${step.id}`, error);
           },

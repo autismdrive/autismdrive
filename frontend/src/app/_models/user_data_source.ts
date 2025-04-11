@@ -27,7 +27,6 @@ export class UserDataSource implements DataSource<User> {
     this.loadingSubject.next(true);
     this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize).subscribe(
       results => {
-        console.log('UserDataSource loadUsers results', results);
         this.userSubject.next(results.items);
         this.countSubject.next(results.total);
         this.loadingSubject.next(false);

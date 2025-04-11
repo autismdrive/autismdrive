@@ -6,7 +6,6 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
 import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockParticipant} from '@util/testing/fixtures/mock-participant';
 import {mockIdentificationQuestionnaire} from '@util/testing/fixtures/mock-questionnaire';
-import {mockQuestionnaireMeta} from '@util/testing/fixtures/mock-questionnaire-meta';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
@@ -33,7 +32,7 @@ describe('TermsComponent', () => {
       })
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
-        addParticipant: jest.fn().mockReturnValue(of(mockParticipant))
+        addParticipant: jest.fn().mockReturnValue(of(mockParticipant)),
       })
       .keep(PdfJsViewerModule)
       .mock(GoogleAnalyticsService, {});

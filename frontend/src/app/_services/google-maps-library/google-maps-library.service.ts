@@ -15,14 +15,7 @@ export class GoogleMapsLibraryService {
     private appEnvironmentService: AppEnvironmentService,
     private googleMapsAPIWrapper: GoogleMapsAPIWrapper,
   ) {
-    console.log('GoogleMapsLibraryService > constructor');
-
     effect(() => {
-      console.log(
-        'GoogleMapsLibraryService > constructor > appEnvironmentService.googleMapsApiKey:',
-        this.appEnvironmentService.googleMapsApiKey,
-      );
-
       if (!appEnvironmentService.props()) return;
 
       this.googleMapsAPIWrapper['_loader'].configure({
@@ -31,7 +24,6 @@ export class GoogleMapsLibraryService {
       });
 
       google?.maps?.importLibrary('core').then(result => {
-        console.log('GoogleMapsLibraryService > constructor > CoreLibrary imported.');
         this.core.set(result as google.maps.CoreLibrary);
       });
     });

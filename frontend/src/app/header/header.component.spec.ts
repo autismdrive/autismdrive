@@ -1,11 +1,8 @@
-import {signal} from '@angular/core';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ApiService} from '@services/api/api.service';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockUser} from '@util/testing/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {of} from 'rxjs';
 import {HeaderComponent} from './header.component';
 
 describe('HeaderComponent', () => {
@@ -17,7 +14,7 @@ describe('HeaderComponent', () => {
       .keep(NoopAnimationsModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .mock(ApiService, {})
-      .mock(AppEnvironmentService, {mirroring: false})
+      .mock(AppEnvironmentService, {mirroring: false});
   });
 
   beforeEach(() => {

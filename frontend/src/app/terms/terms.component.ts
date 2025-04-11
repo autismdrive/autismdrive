@@ -18,7 +18,6 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss'],
   imports: [PdfJsViewerModule, LogoComponent, FlexModule, NgIf, MatButtonModule],
-  // providers: [AuthenticationService, ApiService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsComponent {
@@ -78,7 +77,6 @@ export class TermsComponent {
     this.api.addParticipant(newParticipant).subscribe(participant => {
       this.googleAnalyticsService?.flowStartEvent(flow);
       this.user.participants.push(participant);
-      console.log('Navigating to flow/', flow, '/', participant.id);
       this.router.navigate(['flow', flow, participant.id]);
     });
   }

@@ -26,7 +26,6 @@ enum PageState {
   templateUrl: './resource-form.component.html',
   styleUrls: ['./resource-form.component.scss'],
   imports: [LoadingComponent, NgIf, FormlyModule, ReactiveFormsModule, FlexModule, MatButtonModule],
-  // providers: [ApiService, AuthenticationService, DeviceDetectorService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceFormComponent implements OnInit {

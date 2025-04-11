@@ -25,7 +25,6 @@ import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-
   templateUrl: './admin-export.component.html',
   styleUrls: ['./admin-export.component.scss'],
   imports: [MatPaginatorModule, MatTableModule, NgIf, DatePipe, MatRippleModule],
-  // providers: [ApiService, ConfigService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminExportComponent implements OnInit {
@@ -87,7 +86,6 @@ export class AdminExportComponent implements OnInit {
   }
 
   selectRow(index: number) {
-    console.log('Row ' + index + ' Selected');
     if (this.expandedRow != null) {
       // clear old content
       this.rowContainers.toArray()[this.expandedRow].clear();

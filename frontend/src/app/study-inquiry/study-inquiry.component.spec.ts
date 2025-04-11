@@ -19,7 +19,7 @@ describe('StudyInquiryComponent', () => {
       .mock(ApiService, {
         getUserStudyInquiries: jest.fn().mockReturnValue(of([mockStudyUser])),
         getUser: jest.fn().mockReturnValue(of(mockUser)),
-        sendStudyInquiryEmail: jest.fn().mockReturnValue(of("")),
+        sendStudyInquiryEmail: jest.fn().mockReturnValue(of('')),
       })
       .mock(GoogleAnalyticsService, {});
   });

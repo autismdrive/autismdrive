@@ -25,7 +25,6 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
     NgForOf,
     NgIf,
   ],
-  // providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudyInquiryComponent implements OnInit {

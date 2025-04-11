@@ -22,10 +22,7 @@ export class AuthenticationService {
     private authStateService: AuthenticationStateService,
     private googleAnalyticsService: GoogleAnalyticsService,
   ) {
-    console.log('AuthenticationService > constructor > appEnvironmentService.props()', this.appEnvironmentService.props());
-
     effect(() => {
-      console.log('AuthenticationService > constructor > effect > appEnvironmentService.props()', this.appEnvironmentService.props());
       if (this.appEnvironmentService.props()) {
         const token = this.authStateService.authToken;
         this.login_url = `${this.appEnvironmentService?.apiUrl}/api/login_password`;

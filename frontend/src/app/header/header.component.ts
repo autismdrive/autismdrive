@@ -5,7 +5,6 @@ import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, In
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {Router, RouterModule} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';

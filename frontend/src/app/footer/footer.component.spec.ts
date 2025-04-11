@@ -8,9 +8,7 @@ describe('FooterComponent', () => {
   let fixture: MockedComponentFixture<FooterComponent>;
 
   beforeEach(() => {
-    return MockBuilder(FooterComponent)
-      .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .mock(AppEnvironmentService, mockAppEnvironment);
+    return MockBuilder(FooterComponent).keep(NG_MOCKS_ROOT_PROVIDERS).mock(AppEnvironmentService, mockAppEnvironment);
   });
 
   beforeEach(() => {

@@ -1,15 +1,15 @@
 import {MediaMatcher} from '@angular/cdk/layout';
 import {NgForOf} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {MatButtonModule, MatFabButton} from '@angular/material/button';
+import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
-import {MatDrawerContainer, MatSidenavModule} from '@angular/material/sidenav';
+import {MatSidenavModule} from '@angular/material/sidenav';
 import {QuestionnaireDataTableComponent} from '@app/questionnaire-data-table/questionnaire-data-table.component';
-import {DefaultLayoutDirective, FlexModule} from '@ngbracket/ngx-layout';
-import {snakeToUpperCase} from '@util/snakeToUpper';
 import {TableInfo} from '@models/table_info';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
+import {snakeToUpperCase} from '@util/snakeToUpper';
 
 @Component({
   standalone: true,
@@ -73,9 +73,7 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   }
 
   exportAll() {
-    console.log('clicking the button for export all');
     this.api.exportQuestionnaire('all').subscribe(response => {
-      console.log('data', response);
       const filename = response.headers.get('x-filename');
       const blob = new Blob([response.body], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

@@ -1,3 +1,4 @@
+import {NgIf} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, Inject} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -18,8 +19,7 @@ import {EventRegistrationComponent} from '../event-registration/event-registrati
   selector: 'app-event-registration-form',
   templateUrl: './event-registration-form.component.html',
   styleUrls: ['./event-registration-form.component.scss'],
-  imports: [MatDialogModule, ReactiveFormsModule, FormlyModule, FlexModule, MatButtonModule, LoadingComponent],
-  // providers: [ApiService, AuthenticationService, GoogleAnalyticsService],
+  imports: [MatDialogModule, ReactiveFormsModule, FormlyModule, FlexModule, MatButtonModule, LoadingComponent, NgIf],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventRegistrationFormComponent {
@@ -223,7 +223,6 @@ export class EventRegistrationFormComponent {
         this.model['participant_id'] = this.user.getSelf().id;
         this.api.submitQuestionnaire('registration', 'registration_questionnaire', this.model).subscribe(() => {
           this.googleAnalytics.stepCompleteEvent('registration_questionnaire');
-          console.log('submitting questionnaire', this.model);
           this.dialogRef.close();
         });
       }

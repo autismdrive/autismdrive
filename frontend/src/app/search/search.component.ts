@@ -122,7 +122,6 @@ enum LocationMode {
     TutorialVideoComponent,
     TypeIconComponent,
   ],
-  // providers: [ApiService, AuthenticationService, GoogleAnalyticsService, SearchService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements AfterViewInit, OnInit {
@@ -258,7 +257,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
       if (core) {
         this.googleMapsCoreLibrary = core;
       }
-    })
+    });
 
     this.sortMethods = createClone()(sortMethods);
     this.sortMethods.DISTANCE.sortQuery.latitude = this.loc.lat;
@@ -733,7 +732,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   listMapResultsOnly(shouldRestrict: boolean, skipUpdate = false) {
-    console.log('Restricting to mapped results', shouldRestrict);
     this.restrictToMappedResults = shouldRestrict;
     if (shouldRestrict) {
       this.googleAnalyticsService?.searchInteractionEvent('search_as_map_moves');
@@ -863,7 +861,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
     // Set the center to the user's location on click
     controlUI.addEventListener('click', () => {
       // fixme: maybe we should requery when clicking.
-      console.log('map clicked.');
       this.mapQuerySubject.next(this.query);
     });
 
@@ -877,9 +874,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
         lng: latLngBounds.getCenter().lng(),
       });
       this.mapQuerySubject.next(this.query);
-      console.log('Map Dragged');
       if (this.isDistanceSort) {
-        console.log('Map Dragged, re-sorting');
         this._updateDistanceSort();
         this.querySubject.next(this.query);
       }

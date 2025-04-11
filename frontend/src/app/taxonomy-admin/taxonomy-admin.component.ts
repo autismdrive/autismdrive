@@ -1,7 +1,12 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
+import {NgClass, NgIf} from '@angular/common';
 import {Component, effect} from '@angular/core';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatTreeModule, MatTreeNestedDataSource} from '@angular/material/tree';
+import {RouterModule} from '@angular/router';
 import {Category} from '@models/category';
 import {User} from '@models/user';
 import {ApiService} from '@services/api/api.service';
@@ -13,7 +18,7 @@ import {Observable, of} from 'rxjs';
   selector: 'app-taxonomy-admin',
   templateUrl: './taxonomy-admin.component.html',
   styleUrls: ['./taxonomy-admin.component.scss'],
-  // providers: [ApiService, AuthenticationService],
+  imports: [MatTreeModule, NgIf, MatButtonModule, RouterModule, MatTooltipModule, MatIconModule, NgClass],
 })
 export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;
@@ -75,12 +80,7 @@ export class TaxonomyAdminComponent {
   };
 
   hasNoContent = (_: number, _nodeData: Category) => {
-    const noContent = _nodeData.name === '' && _nodeData.id === undefined;
-    if (_nodeData.name === '') {
-      console.log({_nodeData});
-    }
-
-    return noContent;
+    return _nodeData.name === '' && _nodeData.id === undefined;
   };
 
   /** Select the category so we can insert the new item. */
