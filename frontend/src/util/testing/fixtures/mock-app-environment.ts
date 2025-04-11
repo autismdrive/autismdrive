@@ -6,6 +6,6 @@ export const mockAppEnvironment: AppEnvironment = {
   testing: false,
   mirroring: false,
   production: false,
-  googleTagManagerId: 'some_string',
+  googleAnalyticsTagId: 'some_string',
   googleMapsApiKey: 'some_string',
 };

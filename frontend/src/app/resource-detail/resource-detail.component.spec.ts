@@ -1,5 +1,6 @@
 import {signal} from '@angular/core';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {
   makeMockActivatedRoute,
   mockResourceDetailsRoute,
@@ -24,6 +25,7 @@ describe('ResourceDetailComponent', () => {
       .provide({provide: ActivatedRoute, useValue: mockResourceDetailsRoute})
       .keep(RouterModule)
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
+      .mock(GoogleMapsLibraryService, {core: signal(undefined)})
       .mock(DomSanitizer);
   });
 

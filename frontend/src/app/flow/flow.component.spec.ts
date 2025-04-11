@@ -4,6 +4,7 @@ import {FormlyConfig} from '@app/app.config';
 import {FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
 import {mockFlow} from '@util/testing/fixtures/mock-flow';
 import {mockParticipant} from '@util/testing/fixtures/mock-participant';
@@ -35,6 +36,7 @@ describe('EnrollmentFlowComponent', () => {
           ),
         ),
       })
+      .mock(GoogleAnalyticsService)
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {
         getFlow: jest.fn().mockReturnValue(of(mockFlow)),

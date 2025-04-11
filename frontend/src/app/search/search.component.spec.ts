@@ -9,6 +9,7 @@ import {NgMapsGoogleModule} from '@ng-maps/google';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {SearchService} from '@services/search/search.service';
 import {mockResource} from '@util/testing/fixtures/mock-resource';
 import {mockStudy} from '@util/testing/fixtures/mock-study';
@@ -43,6 +44,7 @@ describe('SearchComponent', () => {
       })
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(GoogleAnalyticsService, {})
+      .mock(GoogleMapsLibraryService, {core: signal(undefined)})
       .mock(SearchService, {})
       .provide({
         provide: ActivatedRoute,

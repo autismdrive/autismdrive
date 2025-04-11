@@ -36,7 +36,7 @@ describe('TermsComponent', () => {
         addParticipant: jest.fn().mockReturnValue(of(mockParticipant))
       })
       .keep(PdfJsViewerModule)
-      .keep(GoogleAnalyticsService);
+      .mock(GoogleAnalyticsService, {});
   });
 
   beforeEach(() => {

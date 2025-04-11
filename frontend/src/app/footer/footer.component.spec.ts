@@ -1,3 +1,5 @@
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
+import {mockAppEnvironment} from '@util/testing/fixtures/mock-app-environment';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FooterComponent} from './footer.component';
 
@@ -6,7 +8,9 @@ describe('FooterComponent', () => {
   let fixture: MockedComponentFixture<FooterComponent>;
 
   beforeEach(() => {
-    return MockBuilder(FooterComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
+    return MockBuilder(FooterComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(AppEnvironmentService, mockAppEnvironment);
   });
 
   beforeEach(() => {

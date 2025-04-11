@@ -14,7 +14,6 @@ export class AppEnvironmentService implements AppEnvironment {
   production: boolean;
   apiUrl: string;
   googleAnalyticsTagId: string;
-  googleTagManagerId: string;
   googleMapsApiKey: string;
 
   public readonly props: WritableSignal<AppEnvironment | undefined> = signal(undefined);
