@@ -1,4 +1,7 @@
+import {NgForOf, NgIf} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
 import {Router} from '@angular/router';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
 import {ResourceCategory} from '@models/resource_category';
@@ -10,6 +13,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
   selector: 'app-filter-chips',
   templateUrl: './filter-chips.component.html',
   styleUrls: ['./filter-chips.component.scss'],
+  imports: [MatCardModule, MatChipsModule, NgIf, NgForOf],
 })
 export class FilterChipsComponent {
   @Input() categories: StudyCategory[] | ResourceCategory[] = [];

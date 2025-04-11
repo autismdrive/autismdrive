@@ -1,4 +1,7 @@
+import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
 import {NewsItem} from '@models/news-item';
 import {IntervalService} from '@services/interval/interval.service';
 
@@ -7,6 +10,7 @@ import {IntervalService} from '@services/interval/interval.service';
   selector: 'app-hero-slides',
   templateUrl: './hero-slides.component.html',
   styleUrls: ['./hero-slides.component.scss'],
+  imports: [CommonModule, MatTooltipModule, RouterModule],
 })
 export class HeroSlidesComponent {
   @Input() slides: NewsItem[];

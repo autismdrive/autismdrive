@@ -1,5 +1,5 @@
 import {MediaMatcher} from '@angular/cdk/layout';
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -22,7 +22,7 @@ import {snakeToUpperCase} from '@util/snakeToUpper';
     MatSidenavModule,
     MatListModule,
     MatIconModule,
-    NgForOf,
+    CommonModule,
     QuestionnaireDataTableComponent,
   ],
 })

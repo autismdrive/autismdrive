@@ -1,13 +1,13 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {NgForOf} from '@angular/common';
+import {CommonModule, NgForOf, NgIf} from '@angular/common';
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatBadge} from '@angular/material/badge';
+import {MatBadge, MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
-import {MatCheckbox} from '@angular/material/checkbox';
+import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatIcon} from '@angular/material/icon';
-import {MatOption, MatSelect} from '@angular/material/select';
+import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form-field';
+import {MatIcon, MatIconModule} from '@angular/material/icon';
+import {MatOption, MatSelect, MatSelectModule} from '@angular/material/select';
 import {MatTreeModule} from '@angular/material/tree';
 import {TreeComponent} from '@app/_forms/tree/tree.component';
 import {Category} from '@models/category';
@@ -28,17 +28,15 @@ interface TopicOption {
   templateUrl: './favorite-topics-dialog.component.html',
   styleUrls: ['./favorite-topics-dialog.component.scss'],
   imports: [
-    MatBadge,
+    MatBadgeModule,
     MatButtonModule,
-    MatCheckbox,
+    MatCheckboxModule,
     MatDialogModule,
-    MatFormField,
-    MatIcon,
-    MatLabel,
-    MatOption,
-    MatSelect,
+    MatFormFieldModule,
+    MatIconModule,
+    MatSelectModule,
     MatTreeModule,
-    NgForOf,
+    CommonModule,
   ],
 })
 export class FavoriteTopicsDialogComponent extends TreeComponent implements OnInit {

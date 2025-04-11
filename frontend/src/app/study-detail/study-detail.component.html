@@ -35,7 +35,7 @@
           </p>
         </div>
         <button
-          *ngIf="currentUser && currentUser.permissions.includes('edit_resource' || 'edit_study')"
+          *ngIf="userCanEdit()"
           mat-mini-fab
           type="button"
           color="primary"

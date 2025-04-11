@@ -1,6 +1,7 @@
-import {AsyncPipe, DatePipe, PercentPipe} from '@angular/common';
+import {AsyncPipe, CommonModule, DatePipe, NgIf, PercentPipe} from '@angular/common';
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInput, MatInputModule} from '@angular/material/input';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSort, MatSortModule} from '@angular/material/sort';
@@ -25,6 +26,8 @@ import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
     MatSortModule,
     MatTableModule,
     PercentPipe,
+    MatInputModule,
+    CommonModule,
   ],
 })
 export class UserAdminComponent implements OnInit, AfterViewInit {

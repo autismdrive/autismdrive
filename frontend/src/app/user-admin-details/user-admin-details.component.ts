@@ -1,10 +1,18 @@
+import {CommonModule, DatePipe, UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatLineModule} from '@angular/material/core';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
+import {ParticipantDetailComponent} from '@app/participant-detail/participant-detail.component';
 import {AdminNote} from '@models/admin_note';
 import {EmailLog} from '@models/email_log';
 import {ResourceChangeLog} from '@models/resource_change_log';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
@@ -14,6 +22,19 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   templateUrl: './user-admin-details.component.html',
   styleUrls: ['./user-admin-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    DatePipe,
+    FlexModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatLineModule,
+    MatSelectModule,
+    MatTableModule,
+    ParticipantDetailComponent,
+    UpperCasePipe,
+  ],
 })
 export class UserAdminDetailsComponent {
   user: User;

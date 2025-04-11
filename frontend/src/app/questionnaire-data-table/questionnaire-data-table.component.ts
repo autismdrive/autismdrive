@@ -1,4 +1,7 @@
+import {CommonModule} from '@angular/common';
 import {Component, Input, OnChanges} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
 import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
 import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
@@ -9,6 +12,7 @@ import {snakeToUpperCase} from '@util/snakeToUpper';
   selector: 'app-questionnaire-data-table',
   templateUrl: './questionnaire-data-table.component.html',
   styleUrls: ['./questionnaire-data-table.component.scss'],
+  imports: [MatButtonModule, MatTableModule, CommonModule],
 })
 export class QuestionnaireDataTableComponent implements OnChanges {
   @Input() questionnaire_info: TableInfo;

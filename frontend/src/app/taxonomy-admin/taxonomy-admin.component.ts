@@ -1,14 +1,18 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
-import {NgClass, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, effect} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule, MatTreeNestedDataSource} from '@angular/material/tree';
 import {RouterModule} from '@angular/router';
 import {Category} from '@models/category';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {Observable, of} from 'rxjs';
@@ -18,7 +22,18 @@ import {Observable, of} from 'rxjs';
   selector: 'app-taxonomy-admin',
   templateUrl: './taxonomy-admin.component.html',
   styleUrls: ['./taxonomy-admin.component.scss'],
-  imports: [MatTreeModule, NgIf, MatButtonModule, RouterModule, MatTooltipModule, MatIconModule, NgClass],
+  imports: [
+    CommonModule,
+    FlexModule,
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatTooltipModule,
+    MatTreeModule,
+    RouterModule,
+  ],
 })
 export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;

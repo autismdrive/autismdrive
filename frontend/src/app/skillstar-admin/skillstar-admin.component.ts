@@ -1,4 +1,7 @@
 import {Component} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 import {ChainStep} from '@models/chain_step';
 import {ApiService} from '@services/api/api.service';
 
@@ -7,6 +10,7 @@ import {ApiService} from '@services/api/api.service';
   selector: 'app-skillstar-admin',
   templateUrl: './skillstar-admin.component.html',
   styleUrls: ['./skillstar-admin.component.scss'],
+  imports: [MatFormFieldModule, MatButtonModule, MatInputModule],
 })
 export class SkillstarAdminComponent {
   chainSteps: ChainStep[] = [];

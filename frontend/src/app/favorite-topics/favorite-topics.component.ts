@@ -1,5 +1,10 @@
+import {NgForOf, NgIf} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
+import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatCardModule, MatCardTitle} from '@angular/material/card';
+import {MatChipListbox, MatChipsModule} from '@angular/material/chips';
 import {MatDialog} from '@angular/material/dialog';
+import {RouterLink, RouterModule} from '@angular/router';
 import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
 import {Category} from '@models/category';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
@@ -12,6 +17,7 @@ import {ApiService} from '@services/api/api.service';
   selector: 'app-favorite-topics',
   templateUrl: './favorite-topics.component.html',
   styleUrls: ['./favorite-topics.component.scss'],
+  imports: [NgIf, MatCardModule, MatChipsModule, RouterModule, NgForOf, MatButtonModule],
 })
 export class FavoriteTopicsComponent implements OnInit {
   @Input() currentUser: User;

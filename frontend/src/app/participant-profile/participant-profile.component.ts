@@ -1,4 +1,4 @@
-import {NgOptimizedImage, NgStyle, TitleCasePipe} from '@angular/common';
+import {CommonModule, NgOptimizedImage, TitleCasePipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -17,7 +17,15 @@ import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
   selector: 'app-participant-profile',
   templateUrl: './participant-profile.component.html',
   styleUrls: ['./participant-profile.component.scss'],
-  imports: [MatCardModule, NgStyle, MatProgressBarModule, TitleCasePipe, FlexModule, MatButtonModule, NgOptimizedImage],
+  imports: [
+    MatCardModule,
+    CommonModule,
+    MatProgressBarModule,
+    TitleCasePipe,
+    FlexModule,
+    MatButtonModule,
+    NgOptimizedImage,
+  ],
 })
 export class ParticipantProfileComponent {
   @Input() participant: Participant;

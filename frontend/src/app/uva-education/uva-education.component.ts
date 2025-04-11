@@ -1,9 +1,13 @@
+import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {Meta} from '@angular/platform-browser';
+import {NewsItemComponent} from '@app/news-item/news-item.component';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
 import {Resource} from '@models/resource';
 import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 
@@ -13,6 +17,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   templateUrl: './uva-education.component.html',
   styleUrls: ['./uva-education.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FlexModule, MatProgressSpinnerModule, CommonModule, NewsItemComponent],
 })
 export class UvaEducationComponent {
   edResources: Resource[];

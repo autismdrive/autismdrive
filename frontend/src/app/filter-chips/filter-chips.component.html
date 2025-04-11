@@ -6,7 +6,6 @@
         *ngFor="let c of categories"
         (click)="goFilter(['/search'], 'related_topic', {queryParams: {category: c.category.id}})"
         color="primary"
-        selected
         >{{ c.category.name }}</mat-chip
       >
     </mat-chip-list>
@@ -19,7 +18,6 @@
         *ngFor="let age of ages"
         (click)="goFilter(['/search'], 'related_age', {queryParams: {ages: age}})"
         color="primary"
-        selected
         >{{ ageLabels[age] }}</mat-chip
       >
     </mat-chip-list>
@@ -32,7 +30,6 @@
         *ngFor="let language of languages"
         (click)="goFilter(['/search'], 'related_language', {queryParams: {languages: language}})"
         color="primary"
-        selected
         >{{ languageLabels[language] }}</mat-chip
       >
     </mat-chip-list>
@@ -49,7 +46,6 @@
           })
         "
         color="accent"
-        selected
         >{{ covid19Labels[cat].split(': ')[0] }}</mat-chip
       >
     </mat-chip-list>

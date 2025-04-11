@@ -1,8 +1,12 @@
+import {CommonModule} from '@angular/common';
 import {ChangeDetectorRef, Component, Inject} from '@angular/core';
-import {FormGroup} from '@angular/forms';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {User} from '@models/user';
-import {FormlyFieldConfig} from '@ngx-formly/core';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -13,6 +17,15 @@ import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entr
   selector: 'app-register-dialog',
   templateUrl: './register-dialog.component.html',
   styleUrls: ['./register-dialog.component.scss'],
+  imports: [
+    ReactiveFormsModule,
+    FormlyModule,
+    FlexModule,
+    MatButtonModule,
+    MatDialogModule,
+    LoadingComponent,
+    CommonModule,
+  ],
 })
 export class RegisterDialogComponent {
   private _stateSubject: BehaviorSubject<string>;

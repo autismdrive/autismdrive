@@ -1,4 +1,4 @@
-import {DatePipe, PercentPipe} from '@angular/common';
+import {CommonModule, DatePipe, PercentPipe} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {Participant} from '@models/participant';
@@ -10,7 +10,7 @@ import {ApiService} from '@services/api/api.service';
   selector: 'app-participant-detail',
   templateUrl: './participant-detail.component.html',
   styleUrls: ['./participant-detail.component.scss'],
-  imports: [DatePipe, PercentPipe, MatTableModule],
+  imports: [DatePipe, PercentPipe, MatTableModule, CommonModule],
 })
 export class ParticipantDetailComponent implements OnInit {
   @Input() participant: Participant;

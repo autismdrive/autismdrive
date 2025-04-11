@@ -66,7 +66,7 @@
     </div>
   </div>
   <h2 *ngIf="user.participants.length > 0">Related Participants:</h2>
-  <div id="participants" *ngFor="let p of user.participants" id="participant-detail" fxFlex="40%" fxLayoutGap="2em">
+  <div *ngFor="let p of user.participants" id="participant-detail" fxFlex="40%" fxLayoutGap="2em">
     <mat-card>
       <app-participant-detail [participant]="p"></app-participant-detail>
     </mat-card>

@@ -1,13 +1,17 @@
+import {CommonModule} from '@angular/common';
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
 import {Flow} from '@models/flow';
 import {Step} from '@models/step';
-import {ApiService} from '@services/api/api.service';
+import {FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
   standalone: true,
   selector: 'app-questionnaire-steps-list',
   templateUrl: './questionnaire-steps-list.component.html',
   styleUrls: ['./questionnaire-steps-list.component.scss'],
+  imports: [CommonModule, MatListModule, MatIconModule, FlexModule],
 })
 export class QuestionnaireStepsListComponent implements OnInit, OnChanges {
   @Input() flow: Flow;

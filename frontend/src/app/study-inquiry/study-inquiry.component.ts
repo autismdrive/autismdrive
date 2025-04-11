@@ -1,4 +1,4 @@
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, TitleCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatCard, MatCardModule} from '@angular/material/card';
@@ -17,14 +17,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
   selector: 'app-study-inquiry',
   templateUrl: './study-inquiry.component.html',
   styleUrls: ['./study-inquiry.component.scss'],
-  imports: [
-    FlexModule,
-    MatButtonModule,
-    MatCardModule,
-    MatProgressBarModule,
-    NgForOf,
-    NgIf,
-  ],
+  imports: [FlexModule, MatButtonModule, MatCardModule, MatProgressBarModule, NgForOf, NgIf, TitleCasePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudyInquiryComponent implements OnInit {
