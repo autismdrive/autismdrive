@@ -4,6 +4,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatLineModule} from '@angular/material/core';
 import {MatDialog} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {AdminNote} from '@models/admin_note';
 import {Resource} from '@models/resource';
@@ -23,6 +24,7 @@ import {AdminNoteFormComponent} from '../admin-note-form/admin-note-form.compone
     FlexModule,
     MatButtonModule,
     MatCardModule,
+    MatIconModule,
     MatLineModule,
     MatTooltipModule,
   ],

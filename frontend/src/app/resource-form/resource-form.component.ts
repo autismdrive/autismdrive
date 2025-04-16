@@ -48,8 +48,12 @@ export class ResourceFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
+    console.log('ResourceFormComponent > constructor');
+
     effect(() => {
+      console.log('ResourceFormComponent > constructor > effect');
       this.currentUser = this.authenticationService.currentUser();
+      console.log('ResourceFormComponent > constructor > effect > currentUser', this.currentUser);
       this.fields = getResourceFormFields(this.api.getCategoryTree());
     });
   }

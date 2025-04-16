@@ -1,33 +1,65 @@
-// Base class for MultiSelectTreeComponent and FavoriteTopicsDialogComponent
-import {Component} from '@angular/core';
-import {FieldType} from '@ngx-formly/material';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {NestedTreeControl} from '@angular/cdk/tree';
+/**
+ * Base class for MultiSelectTreeComponent and FavoriteTopicsDialogComponent
+ */
+import {CdkTreeNode} from '@angular/cdk/tree';
+import {AfterContentChecked, ChangeDetectionStrategy, Component} from '@angular/core';
+import {MatNestedTreeNode, MatTreeModule, MatTreeNestedDataSource} from '@angular/material/tree';
 import {Category} from '@models/category';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {of} from 'rxjs';
+import {FormlyFieldConfig} from '@ngx-formly/core';
+import {FieldType} from '@ngx-formly/material';
+import {lastValueFrom, Observable, of} from 'rxjs';
+
+type CatTreeNode = CdkTreeNode<Category, Category>;
+type CatTreeNodeList = CatTreeNode[] | Observable<CatTreeNode[]>;
 
 @Component({
   standalone: true,
   selector: 'app-tree',
   template: '',
+  imports: [MatTreeModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TreeComponent extends FieldType<FormlyFieldConfig> {
+export class TreeComponent extends FieldType<FormlyFieldConfig> implements AfterContentChecked {
   dataSource: MatTreeNestedDataSource<Category>;
-  treeControl: NestedTreeControl<Category>;
+  treeControl: MatNestedTreeNode<Category>;
+  catMap: Map<number, CatTreeNode> = new Map();
 
   constructor() {
+    console.log('TreeComponent > constructor')
     super();
-    this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
+    this.treeControl = new MatNestedTreeNode<Category>((node: Category) => of(node.children));
     this.dataSource = new MatTreeNestedDataSource();
   }
 
-  findNode(cat_id: number): Category {
-    return this.dataSource.data
-      .reduce(
-        (accumulator: Category[], dataCat: Category) => accumulator.concat(this.treeControl.getDescendants(dataCat)),
-        [] as Category[],
-      )
-      .find(i => i.id === cat_id);
+  ngAfterContentChecked() {
+    this.getDescendants(this.treeControl).then(descendants => {
+      descendants.forEach(d => this.catMap.set(d.data.id, d));
+    });
   }
+
+  /** Returns a flattened array of all descendant nodes for the given node. */
+  async getDescendants(node: CatTreeNode) {
+    const _collectDescendants = async (_node: CatTreeNode, _accumulator: CatTreeNode[]) => {
+      _accumulator.push(_node);
+      const _obs: CatTreeNodeList = _node.getChildren();
+      const catTreeNodes: CatTreeNode[] = _obs instanceof Observable ? await lastValueFrom(_obs) : _obs;
+
+      for (const c of catTreeNodes) {
+        await _collectDescendants(c, _accumulator);
+      }
+
+      return _accumulator;
+    };
+
+    return _collectDescendants(node, []);
+  }
+
+  /** Returns the Category from the tree that matches the given Category ID. */
+  findNode(catId: number): CatTreeNode {
+    return this.catMap.get(catId);
+  }
+
+  childrenAccessor = (dataNode: Category) => dataNode.children ?? [];
+
+  hasNestedChild = (_: number, node: Category) => node?.children?.length > 0;
 }

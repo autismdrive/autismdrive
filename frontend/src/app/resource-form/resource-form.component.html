@@ -1,7 +1,5 @@
 <div class="resource-detail mat-typography">
-  <app-loading *ngIf="state === pageState.LOADING" message="Loading..."></app-loading>
-
-  <form *ngIf="state === pageState.SHOW_FORM" [formGroup]="form" class="pad-2">
+  <form *ngIf="state === pageState.SHOW_FORM; else loadingMessage" [formGroup]="form" class="pad-2">
     <h1>Resource Details</h1>
 
     <formly-form [form]="form" [model]="model" [fields]="fields" [options]="options" />
@@ -50,3 +48,6 @@
     </div>
   </form>
 </div>
+<ng-template #loadingMessage>
+  <app-loading message="Loading..."></app-loading>
+</ng-template>

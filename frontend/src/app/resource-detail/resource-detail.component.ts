@@ -70,17 +70,6 @@ export class ResourceDetailComponent {
   safeVideoImgUrl: SafeResourceUrl;
   googleMapsCoreLibrary: google.maps.CoreLibrary;
 
-  get isPastEvent(): boolean {
-    const eventDate = new Date(this.resource.date);
-    const now = new Date();
-    return !!(
-      this.resource &&
-      this.resource.type === 'event' &&
-      eventDate < now &&
-      this.resource.post_event_description
-    );
-  }
-
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
@@ -130,6 +119,17 @@ export class ResourceDetailComponent {
         });
       }
     });
+  }
+
+  get isPastEvent(): boolean {
+    const eventDate = new Date(this.resource.date);
+    const now = new Date();
+    return !!(
+      this.resource &&
+      this.resource.type === 'event' &&
+      eventDate < now &&
+      this.resource.post_event_description
+    );
   }
 
   get userCanEdit(): boolean {

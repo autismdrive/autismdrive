@@ -17,25 +17,24 @@
     <div class="mat-tree-node">
       <button mat-icon-button [attr.aria-label]="'toggle ' + node.name" class="toggle-node-button" matTreeNodeToggle>
         <mat-icon class="mat-icon-rtl-mirror">
-          {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+          {{ findNode(node.id).isExpanded ? 'expand_more' : 'chevron_right' }}
         </mat-icon>
       </button>
 
       <mat-checkbox disabled="true" [checked]="checklistSelection.isSelected(node)">
-          <span
-            *ngIf="numSelectedDescendants(node)"
-            matBadge="{{ numSelectedDescendants(node) }}"
-            matBadgeColor="accent"
-            matBadgeOverlap="false"
-          >{{ node.name }}</span
-          >
-        <span *ngIf="!numSelectedDescendants(node)">{{ node.name }}</span>
+        <span
+          *ngIf="numSelectedDescendants(node) | async as numDescendants; else noSelectedDescendants"
+          matBadge="{{ numDescendants }}"
+          matBadgeColor="accent"
+          matBadgeOverlap="false"
+        >{{ node.name }}</span>
+        <ng-template #noSelectedDescendants>{{ node.name }}</ng-template>
       </mat-checkbox>
     </div>
 
     <!-- There is inline padding applied to this div using styles.
         This padding value depends on the mat-icon-button width.  -->
-    <div [class.example-tree-invisible]="!tree.isExpanded(node)"
+    <div [class.tree-select-invisible]="!tree.isExpanded(node)"
          role="group">
       <ng-container matTreeNodeOutlet></ng-container>
     </div>

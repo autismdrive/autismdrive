@@ -4,6 +4,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatDialog} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
 import {RouterModule} from '@angular/router';
 import {Category} from '@models/category';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
@@ -17,7 +18,7 @@ import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-
   selector: 'app-favorite-topics',
   templateUrl: './favorite-topics.component.html',
   styleUrls: ['./favorite-topics.component.scss'],
-  imports: [CommonModule, MatCardModule, MatChipsModule, RouterModule, MatButtonModule],
+  imports: [CommonModule, MatCardModule, MatChipsModule, RouterModule, MatButtonModule, MatIconModule],
 })
 export class FavoriteTopicsComponent implements OnInit {
   @Input() currentUser: User;

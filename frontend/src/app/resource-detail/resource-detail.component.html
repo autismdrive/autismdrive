@@ -1,4 +1,4 @@
-<div *ngIf="!loading && resource" class="container" id="resource">
+<div *ngIf="resource; else loadingMessage" class="container" id="resource">
   <div class="row" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="40px">
     <div id="resource-details" fxFlex.gt-md="60%" fxLayout="column" fxLayoutGap="40px">
       <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="1em">
@@ -195,4 +195,5 @@
   </div>
 </div>
 
-<app-loading *ngIf="!resource" message="Loading..."></app-loading>
+<ng-template #loadingMessage><app-loading message="Loading..."></app-loading></ng-template>
+

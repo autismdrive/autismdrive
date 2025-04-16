@@ -20,15 +20,15 @@ import {Observable} from 'rxjs';
 export class MultiselectTreeComponent extends TreeComponent implements OnInit {
   @ViewChild(MatTree) tree: MatTree<Category>;
 
-  childrenAccessor = (dataNode: Category) => dataNode.children ?? [];
-
   dataLoaded = false;
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
 
   ngOnInit() {
+    console.log('MultiselectTreeComponent > ngOnInit');
     (this.props.options as Observable<any>).subscribe((categories: Category[]) => {
+      console.log('MultiselectTreeComponent > ngOnInit > this.props.options.subscribe', categories);
       this.dataSource.data = categories;
       this.updateSelection();
     });
@@ -49,38 +49,36 @@ export class MultiselectTreeComponent extends TreeComponent implements OnInit {
     }
   }
 
-  hasNestedChild = (_: number, node: Category) => {
-    return node.children && node.children.length > 0;
-  };
-
-  numSelectedDescendants(node: Category): number {
-    const descendants: Category[] = this.treeControl.getDescendants(node);
+  async numSelectedDescendants(category: Category): Promise<number> {
+    const catNode = this.findNode(category.id);
+    const descendants = await this.getDescendants(catNode);
     const selectedDescendants = descendants.filter(d => this.checklistSelection.isSelected(d));
     return selectedDescendants.length;
   }
 
   /** Toggle the category item selection. Select/deselect all the parent/grandparent nodes */
-  toggleNode(node: Category): void {
-    this.checklistSelection.toggle(node);
+  async toggleNode(category: Category): Promise<void> {
+    this.checklistSelection.toggle(category);
     const ancestors = [];
-    let parent = this.findNode(node.parent_id);
-    while (parent != null) {
-      ancestors.push(parent);
-      parent = this.findNode(parent.parent_id);
+    let parentNode = this.findNode(category.parent_id);
+    while (parentNode != null) {
+      ancestors.push(parentNode);
+      parentNode = this.findNode(parentNode.data.parent_id);
     }
 
-    if (this.checklistSelection.isSelected(node)) {
+    if (this.checklistSelection.isSelected(category)) {
       ancestors.forEach(anc => {
         const parentNode = this.findNode(anc.id);
         this.checklistSelection.select(parentNode);
       });
     } else {
-      ancestors.forEach(anc => {
+      for (const anc of ancestors) {
         const parentNode = this.findNode(anc.id);
-        if (this.numSelectedDescendants(parentNode) < 1) {
+        const numSelected = await this.numSelectedDescendants(parentNode);
+        if (numSelected < 1) {
           this.checklistSelection.deselect(parentNode);
         }
-      });
+      }
     }
 
     this._updateModelCategories();

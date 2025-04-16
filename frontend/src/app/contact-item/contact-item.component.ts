@@ -1,6 +1,6 @@
 import {CommonModule} from '@angular/common';
 import {Component, Input} from '@angular/core';
-import {MatIcon} from '@angular/material/icon';
+import {MatIconModule} from '@angular/material/icon';
 import {ContactItem} from '@models/contact_item';
 import {FlexModule} from '@ngbracket/ngx-layout';
 
@@ -9,7 +9,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
   selector: 'app-contact-item',
   templateUrl: './contact-item.component.html',
   styleUrls: ['./contact-item.component.scss'],
-  imports: [CommonModule, FlexModule, MatIcon],
+  imports: [CommonModule, FlexModule, MatIconModule],
 })
 export class ContactItemComponent {
   @Input() contactItem: ContactItem;

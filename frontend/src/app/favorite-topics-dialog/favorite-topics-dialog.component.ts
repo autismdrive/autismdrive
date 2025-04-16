@@ -87,16 +87,9 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
     this._updateModelCategories();
   }
 
-  hasNestedChild = (_: number, node: Category) => {
-    return node.children && node.children.length > 0;
-  };
-
-  getChildren(node: Category): Category[] | Observable<Category[]> {
-    return node.children;
-  }
-
-  numSelectedDescendants(node: Category): number {
-    const descendants: Category[] = this.treeControl.getDescendants(node);
+  async numSelectedDescendants(category: Category): Promise<number> {
+    const node = this.findNode(category.id);
+    const descendants: Category[] = await this.getDescendants(node);
     const selectedDescendants = descendants.filter(d => this.checklistSelection.isSelected(d));
     return selectedDescendants.length;
   }

@@ -3,6 +3,7 @@ import {Component} from '@angular/core';
 import {MatButtonModule, MatIconButton} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
 import {FormPrintoutComponent} from '@forms/form-printout/form-printout.component';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FieldArrayType, FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
@@ -20,7 +21,7 @@ import {RepeatSectionDialogComponent} from '../repeat-section-dialog/repeat-sect
     FormlyModule,
     MatButtonModule,
     MatCardModule,
-    MatIconButton,
+    MatIconModule,
   ],
 })
 export class RepeatSectionComponent extends FieldArrayType {

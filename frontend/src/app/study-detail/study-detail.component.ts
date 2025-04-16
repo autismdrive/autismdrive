@@ -2,6 +2,7 @@ import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {ActivatedRoute, Router} from '@angular/router';
 import {EditButtonComponent} from '@app/edit-button/edit-button.component';
@@ -29,6 +30,7 @@ import {InvestigatorFormComponent} from '../investigator-form/investigator-form.
     MarkdownModule,
     FlexModule,
     MatButtonModule,
+    MatIconModule,
     MatTooltipModule,
     StudySurveyEntryComponent,
     StudyInquiryComponent,
