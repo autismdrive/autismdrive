@@ -1,5 +1,4 @@
-import {HttpClient} from '@angular/common/http';
-import {inject, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
 import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
 import {HelpWrapperComponent} from '@forms/help-wrapper/help-wrapper.component';
@@ -20,19 +19,6 @@ import {
   UrlValidator,
   UrlValidatorMessage,
 } from '@forms/validators/formly.validator';
-import {ApiService} from '@services/api/api.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
-import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
-import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
-
-// Attempt to load the configuration from a file called config.json right next to
-// this index page, it if exists. Otherwise, assume we are connecting to port
-// 5000 on the local server.
-export const load = () => {
-  const httpClient = inject(HttpClient);
-  const appEnvironmentService = inject(AppEnvironmentService);
-  return appEnvironmentService.load();
-};
 
 @Injectable()
 export class FormlyConfig {

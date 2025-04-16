@@ -16,11 +16,13 @@ export class GoogleMapsLibraryService {
     private googleMapsAPIWrapper: GoogleMapsAPIWrapper,
   ) {
     effect(() => {
-      if (!appEnvironmentService.props()) return;
+      if (!this.appEnvironmentService.props()) return;
+
+      console.log('this.appEnvironmentService.googleMapsApiKey:', this.appEnvironmentService.googleMapsApiKey)
 
       this.googleMapsAPIWrapper['_loader'].configure({
-        apiKey: appEnvironmentService.googleMapsApiKey,
-        libraries: ['core', 'maps', 'geocoding']
+        apiKey: this.appEnvironmentService.googleMapsApiKey,
+        libraries: ['core', 'maps', 'places', 'geocoding']
       });
 
       google?.maps?.importLibrary('core').then(result => {

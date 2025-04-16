@@ -97,7 +97,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
 class InvestigatorSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Investigator
-        fields = ("id", "last_updated", "name", "title", "organization_name", "bio_link", "_links")
+        fields = ["id", "last_updated", "name", "title", "organization_name", "bio_link", "_links"]
 
     _links = Hyperlinks(
         {
@@ -112,7 +112,7 @@ class ParentCategorySchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ("id", "name", "parent", "level", "_links", "display_order")
+        fields = ["id", "name", "parent", "level", "_links", "display_order"]
 
     parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
     level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0)
@@ -129,7 +129,7 @@ class ChildCategoryInSearchSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ("id", "name", "_links", "hit_count", "display_order")
+        fields = ["id", "name", "_links", "hit_count", "display_order"]
 
     _links = Hyperlinks(
         {
@@ -144,7 +144,7 @@ class CategoryInSearchSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ("id", "name", "children", "parent_id", "parent", "level", "display_order")
+        fields = ["id", "name", "children", "parent_id", "parent", "level", "display_order"]
 
     parent_id = Integer(required=False, allow_none=True)
     level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0, dump_only=True)
@@ -158,7 +158,7 @@ class CategorySchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = (
+        fields = [
             "id",
             "name",
             "children",
@@ -174,7 +174,7 @@ class CategorySchema(ModelSchema):
             "_links",
             "last_updated",
             "display_order",
-        )
+        ]
 
     id = Integer(required=False, allow_none=True)
     parent_id = Integer(required=False, allow_none=True)
@@ -249,7 +249,7 @@ class CategorySchema(ModelSchema):
 class CategoryUpdateSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Category
-        fields = ("id", "name", "parent_id", "display_order", "hit_count")
+        fields = ["id", "name", "parent_id", "display_order", "hit_count"]
 
     # id = Integer(required=True, allow_none=False)
     # parent_id = Integer(required=False, allow_none=True)
@@ -261,7 +261,7 @@ class CategoryUpdateSchema(ModelSchema):
 class CategoriesOnEventSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "category", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "category", "type"]
 
     category = Nested("ParentCategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -276,7 +276,7 @@ class CategoriesOnEventSchema(ModelSchema):
 class CategoriesOnLocationSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "category", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "category", "type"]
 
     category = Nested("ParentCategorySchema", dump_only=True)
     resource_categories = List(Nested("CategoriesOnLocationSchema", dump_only=True))
@@ -292,7 +292,7 @@ class CategoriesOnLocationSchema(ModelSchema):
 class CategoriesOnResourceSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "category", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "category", "type"]
 
     category = Nested("ParentCategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -307,7 +307,7 @@ class CategoriesOnResourceSchema(ModelSchema):
 class CategoriesOnStudySchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyCategory
-        fields = ("id", "_links", "study_id", "category_id", "category")
+        fields = ["id", "_links", "study_id", "category_id", "category"]
 
     category = Nested("ParentCategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -322,7 +322,7 @@ class CategoriesOnStudySchema(ModelSchema):
 class StudyInvestigatorSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyInvestigator
-        fields = ("id", "_links", "study_id", "investigator_id", "investigator")
+        fields = ["id", "_links", "study_id", "investigator_id", "investigator"]
 
     investigator = Nested("InvestigatorSchema", dump_only=True)
     _links = Hyperlinks(
@@ -374,7 +374,7 @@ class ResourceSchema(ModelSchema):
 class ResourceCategoriesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "category", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "category", "type"]
 
     category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -389,7 +389,7 @@ class ResourceCategoriesSchema(ModelSchema):
 class CategoryResourcesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "resource", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "resource", "type"]
 
     resource = Nested("ResourceSchema", dump_only=True)
     _links = Hyperlinks(
@@ -404,7 +404,7 @@ class CategoryResourcesSchema(ModelSchema):
 class ResourceCategorySchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "type"]
 
     _links = Hyperlinks(
         {
@@ -418,7 +418,7 @@ class ResourceCategorySchema(ModelSchema):
 class EventUserSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = EventUser
-        fields = ("id", "last_updated", "event_id", "event", "user_id", "user")
+        fields = ["id", "last_updated", "event_id", "event", "user_id", "user"]
 
     event_id = Integer(required=False, allow_none=True)
     user_id = Integer(required=False, allow_none=True)
@@ -487,7 +487,7 @@ class EventSchema(ModelSchema):
 class EventCategoriesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "category", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "category", "type"]
 
     category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -502,7 +502,7 @@ class EventCategoriesSchema(ModelSchema):
 class CategoryEventsSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "resource", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "resource", "type"]
 
     resource = Nested("EventSchema", dump_only=True)
     _links = Hyperlinks(
@@ -517,7 +517,7 @@ class CategoryEventsSchema(ModelSchema):
 class EventCategorySchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "type"]
 
     _links = Hyperlinks(
         {
@@ -576,7 +576,7 @@ class LocationSchema(ModelSchema):
 class LocationCategoriesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "category", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "category", "type"]
 
     category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -591,7 +591,7 @@ class LocationCategoriesSchema(ModelSchema):
 class CategoryLocationsSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "resource", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "resource", "type"]
 
     resource = Nested("LocationSchema", dump_only=True)
     _links = Hyperlinks(
@@ -606,7 +606,7 @@ class CategoryLocationsSchema(ModelSchema):
 class LocationCategorySchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ResourceCategory
-        fields = ("id", "_links", "resource_id", "category_id", "type")
+        fields = ["id", "_links", "resource_id", "category_id", "type"]
 
     _links = Hyperlinks(
         {
@@ -620,7 +620,7 @@ class LocationCategorySchema(ModelSchema):
 class ParticipantSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Participant
-        fields = (
+        fields = [
             "id",
             "_links",
             "last_updated",
@@ -633,7 +633,7 @@ class ParticipantSchema(ModelSchema):
             "contact",
             "identification",
             "percent_complete",
-        )
+        ]
 
     id = Integer(required=False, allow_none=True)
     name = Function(lambda obj: missing if obj is None else obj.get_name())
@@ -680,7 +680,7 @@ class UserMetaSchema(ModelSchema):
         model = UserMeta
         # load_instance = True
         # sqla_session = session
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "self_participant",
@@ -690,7 +690,7 @@ class UserMetaSchema(ModelSchema):
             "guardian",
             "guardian_has_dependent",
             "self_relationship",
-        )
+        ]
 
     self_participant = Boolean(required=False, allow_none=True)
     self_has_guardian = Boolean(required=False, allow_none=True)
@@ -703,7 +703,7 @@ class UserMetaSchema(ModelSchema):
 class UserSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = User
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "registration_date",
@@ -722,7 +722,7 @@ class UserSchema(ModelSchema):
             "identity",
             "percent_self_registration_complete",
             "email_verified",
-        )
+        ]
 
     password = String(load_only=True)
     participant_count = Integer(required=False, allow_none=True)
@@ -750,7 +750,7 @@ class UserSchema(ModelSchema):
 class StudyUsersSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyUser
-        fields = ("id", "_links", "status", "study_id", "user_id", "user")
+        fields = ["id", "_links", "status", "study_id", "user_id", "user"]
 
     user = Nested("UserSchema", dump_only=True)
     status = Enum(StudyUserStatus, allow_none=True)
@@ -766,7 +766,7 @@ class StudyUsersSchema(ModelSchema):
 class StudyUserSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyUser
-        fields = ("id", "_links", "status", "study_id", "user_id")
+        fields = ["id", "_links", "status", "study_id", "user_id"]
 
     status = Enum(StudyUserStatus, allow_none=True)
     _links = Hyperlinks(
@@ -781,7 +781,7 @@ class StudyUserSchema(ModelSchema):
 class StudySchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Study
-        fields = (
+        fields = [
             "id",
             "title",
             "short_title",
@@ -804,7 +804,7 @@ class StudySchema(ModelSchema):
             "languages",
             "num_visits",
             "_links",
-        )
+        ]
 
     study_categories = List(Nested("CategoriesOnStudySchema", dump_only=True))
     study_investigators = List(Nested("StudyInvestigatorSchema", dump_only=True))
@@ -821,7 +821,7 @@ class StudySchema(ModelSchema):
 class UserStudiesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyUser
-        fields = ("id", "_links", "status", "study_id", "user_id", "study")
+        fields = ["id", "_links", "status", "study_id", "user_id", "study"]
 
     status = Enum(StudyUserStatus, allow_none=True)
     study = Nested("StudySchema", dump_only=True)
@@ -837,7 +837,7 @@ class UserStudiesSchema(ModelSchema):
 class StudyCategoriesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyCategory
-        fields = ("id", "_links", "study_id", "category_id", "category")
+        fields = ["id", "_links", "study_id", "category_id", "category"]
 
     category = Nested("CategorySchema", dump_only=True)
     _links = Hyperlinks(
@@ -852,7 +852,7 @@ class StudyCategoriesSchema(ModelSchema):
 class CategoryStudiesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyCategory
-        fields = ("id", "_links", "study_id", "category_id", "study")
+        fields = ["id", "_links", "study_id", "category_id", "study"]
 
     study = Nested("StudySchema", dump_only=True)
     _links = Hyperlinks(
@@ -867,7 +867,7 @@ class CategoryStudiesSchema(ModelSchema):
 class StudyCategorySchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyCategory
-        fields = ("id", "_links", "study_id", "category_id")
+        fields = ["id", "_links", "study_id", "category_id"]
 
     _links = Hyperlinks(
         {
@@ -881,7 +881,7 @@ class StudyCategorySchema(ModelSchema):
 class InvestigatorStudiesSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = StudyInvestigator
-        fields = ("id", "_links", "study_id", "investigator_id", "study")
+        fields = ["id", "_links", "study_id", "investigator_id", "study"]
 
     study = Nested("StudySchema", dump_only=True)
     _links = Hyperlinks(
@@ -1015,7 +1015,7 @@ class StudyChangeLogSchema(ModelSchema):
 class AdminNoteSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = AdminNote
-        fields = ("id", "resource_id", "user_id", "resource", "user", "last_updated", "note")
+        fields = ["id", "resource_id", "user_id", "resource", "user", "last_updated", "note"]
 
     resource = Nested("ResourceSchema", dump_only=True)
     user = Nested("UserSchema", dump_only=True)
@@ -1053,7 +1053,7 @@ class ExportSchemas:
 
         class Meta(ModelSchema.Meta):
             model = User
-            fields = ("id", "last_updated", "role", "email_verified", "email", "_links")
+            fields = ["id", "last_updated", "role", "email_verified", "email", "_links"]
 
         role = Enum(Role)
         email = Function(lambda obj: missing if obj is None else str(obj.id))
@@ -1069,7 +1069,7 @@ class ExportSchemas:
 
         class Meta(ModelSchema.Meta):
             model = User
-            fields = ("id", "last_updated", "email", "_password", "role", "participants", "token", "email_verified")
+            fields = ["id", "last_updated", "email", "_password", "role", "participants", "token", "email_verified"]
 
         role = Enum(Role)
 
@@ -1078,7 +1078,7 @@ class ExportSchemas:
 
         class Meta(ModelSchema.Meta):
             model = Participant
-            fields = ("id", "last_updated", "user_id", "relationship", "avatar_icon", "avatar_color", "_links")
+            fields = ["id", "last_updated", "user_id", "relationship", "avatar_icon", "avatar_color", "_links"]
 
         relationship = Enum(Relationship)
         _links = Hyperlinks(
@@ -1113,7 +1113,15 @@ class ExportInfoSchema(Schema):
 class FrontendConfigSchema(Schema):
     class Meta:
         ordered = True
-        fields = ["development", "testing", "mirroring", "production", "apiUrl", "apiKey", "googleAnalyticsKey"]
+        fields = [
+            "development",
+            "testing",
+            "mirroring",
+            "production",
+            "apiUrl",
+            "googleMapsApiKey",
+            "googleAnalyticsTagId"
+        ]
 
 
 class SupportsBaseSchema(ModelSchema):
@@ -1134,7 +1142,7 @@ class SupportsBaseSchema(ModelSchema):
 class AlternativeAugmentativeSchema(SupportsBaseSchema):
     class Meta(ModelSchema.Meta):
         model = AlternativeAugmentative
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "supports_questionnaire_id",
@@ -1144,13 +1152,13 @@ class AlternativeAugmentativeSchema(SupportsBaseSchema):
             "notes",
             "participant_id",
             "user_id",
-        )
+        ]
 
 
 class AssistiveDeviceSchema(SupportsBaseSchema):
     class Meta(ModelSchema.Meta):
         model = AssistiveDevice
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "supports_questionnaire_id",
@@ -1161,7 +1169,7 @@ class AssistiveDeviceSchema(SupportsBaseSchema):
             "notes",
             "participant_id",
             "user_id",
-        )
+        ]
 
 
 class ChainSessionSchema(ModelSchema):
@@ -1172,7 +1180,7 @@ class ChainSessionSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = ChainSession
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1184,7 +1192,7 @@ class ChainSessionSchema(ModelSchema):
             "session_number",
             "chain_questionnaire_id",
             "step_attempts",
-        )
+        ]
 
     participant_id = Method("get_participant_id", dump_only=True)
     user_id = Method("get_user_id", dump_only=True)
@@ -1222,13 +1230,13 @@ class ChainSessionSchema(ModelSchema):
 class ChallengingBehaviorSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ChallengingBehavior
-        fields = ("id", "last_updated", "chain_session_step_id", "time")
+        fields = ["id", "last_updated", "chain_session_step_id", "time"]
 
 
 class ChainSessionStepSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = ChainSessionStep
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1249,7 +1257,7 @@ class ChainSessionStepSchema(ModelSchema):
             "num_stars",
             "challenging_behaviors",
             "chain_step",
-        )
+        ]
 
     participant_id = Method("get_participant_id", dump_only=True)
     user_id = Method("get_user_id", dump_only=True)
@@ -1307,14 +1315,14 @@ class ChainQuestionnaireSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = ChainQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
             "user_id",
             "time_on_task_ms",
             "sessions",
-        )
+        ]
 
     sessions = List(Nested("ChainSessionSchema"))
 
@@ -1338,7 +1346,7 @@ class ContactQuestionnaireSchema(ModelSchema):
 class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = CurrentBehaviorsDependentQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1351,7 +1359,7 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
             "academic_difficulty_areas",
             "academic_difficulty_other",
             "_links",
-        )
+        ]
 
     _links = Hyperlinks(
         {
@@ -1363,7 +1371,7 @@ class CurrentBehaviorsDependentQuestionnaireSchema(ModelSchema):
 class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = CurrentBehaviorsSelfQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1374,7 +1382,7 @@ class CurrentBehaviorsSelfQuestionnaireSchema(ModelSchema):
             "academic_difficulty_areas",
             "academic_difficulty_other",
             "_links",
-        )
+        ]
 
     _links = Hyperlinks(
         {
@@ -1404,7 +1412,7 @@ class DevelopmentalQuestionnaireSchema(ModelSchema):
 class EducationDependentQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = EducationDependentQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1418,13 +1426,13 @@ class EducationDependentQuestionnaireSchema(ModelSchema):
             "current_grade",
             "school_services",
             "school_services_other",
-        )
+        ]
 
 
 class EducationSelfQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = EducationSelfQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1438,7 +1446,7 @@ class EducationSelfQuestionnaireSchema(ModelSchema):
             "current_grade",
             "school_services",
             "school_services_other",
-        )
+        ]
 
 
 class EmploymentQuestionnaireSchema(ModelSchema):
@@ -1455,7 +1463,7 @@ class EmploymentQuestionnaireSchema(ModelSchema):
 class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = EvaluationHistoryDependentQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1473,7 +1481,7 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
             "has_iq_test",
             "recent_iq_score",
             "_links",
-        )
+        ]
 
     _links = Hyperlinks(
         {
@@ -1485,7 +1493,7 @@ class EvaluationHistoryDependentQuestionnaireSchema(ModelSchema):
 class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = EvaluationHistorySelfQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1503,7 +1511,7 @@ class EvaluationHistorySelfQuestionnaireSchema(ModelSchema):
             "has_iq_test",
             "recent_iq_score",
             "_links",
-        )
+        ]
 
     _links = Hyperlinks(
         {
@@ -1520,7 +1528,7 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = HomeSelfQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1530,7 +1538,7 @@ class HomeSelfQuestionnaireSchema(ModelSchema):
             "self_living_other",
             "housemates",
             "struggle_to_afford",
-        )
+        ]
 
     housemates = List(Nested("HousemateSchema"))
 
@@ -1543,7 +1551,7 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = HomeDependentQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "participant_id",
@@ -1553,7 +1561,7 @@ class HomeDependentQuestionnaireSchema(ModelSchema):
             "dependent_living_other",
             "housemates",
             "struggle_to_afford",
-        )
+        ]
 
     housemates = List(Nested("HousemateSchema"))
 
@@ -1600,7 +1608,7 @@ class SupportsQuestionnaireSchema(ModelSchema):
 
     class Meta(ModelSchema.Meta):
         model = SupportsQuestionnaire
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "time_on_task_ms",
@@ -1611,7 +1619,7 @@ class SupportsQuestionnaireSchema(ModelSchema):
             "assistive_devices",
             "alternative_augmentative",
             "_links",
-        )
+        ]
 
     alternative_augmentative = List(Nested("AlternativeAugmentativeSchema"))
     assistive_devices = List(Nested("AssistiveDeviceSchema"))
@@ -1632,7 +1640,7 @@ class TherapySchema(AlternativeAugmentativeSchema):
 class HousemateSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = Housemate
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "home_dependent_questionnaire_id",
@@ -1644,7 +1652,7 @@ class HousemateSchema(ModelSchema):
             "has_autism",
             "participant_id",
             "user_id",
-        )
+        ]
 
     participant_id = Method("get_participant_id")
     user_id = Method("get_user_id")
@@ -1673,7 +1681,7 @@ class HousemateSchema(ModelSchema):
 class MedicationSchema(SupportsBaseSchema):
     class Meta(ModelSchema.Meta):
         model = Medication
-        fields = (
+        fields = [
             "id",
             "last_updated",
             "supports_questionnaire_id",
@@ -1683,7 +1691,7 @@ class MedicationSchema(SupportsBaseSchema):
             "notes",
             "participant_id",
             "user_id",
-        )
+        ]
 
 
 class DataTransferLogDetailSchema(ModelSchema):
@@ -1694,7 +1702,7 @@ class DataTransferLogDetailSchema(ModelSchema):
 class DataTransferLogSchema(ModelSchema):
     class Meta(ModelSchema.Meta):
         model = DataTransferLog
-        fields = ("id", "type", "date_started", "last_updated", "total_records", "alerts_sent", "details", "_links")
+        fields = ["id", "type", "date_started", "last_updated", "total_records", "alerts_sent", "details", "_links"]
 
     details = List(Nested("DataTransferLogDetailSchema", dump_only=True))
     _links = Hyperlinks({"self": url_for.DataTransferLog("id")})
