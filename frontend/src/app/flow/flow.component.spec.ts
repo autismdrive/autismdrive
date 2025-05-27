@@ -1,16 +1,16 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {FormlyConfig} from '@app/app.config';
+import {customFormlyConfig} from '@app/app.config';
 import {FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockFlow} from '@util/testing/fixtures/mock-flow';
-import {mockParticipant} from '@util/testing/fixtures/mock-participant';
-import {mockIdentificationQuestionnaire} from '@util/testing/fixtures/mock-questionnaire';
-import {mockQuestionnaireMeta} from '@util/testing/fixtures/mock-questionnaire-meta';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockFlow} from '@app/shared/fixtures/mock-flow';
+import {mockParticipant} from '@app/shared/fixtures/mock-participant';
+import {mockIdentificationQuestionnaire} from '@app/shared/fixtures/mock-questionnaire';
+import {mockQuestionnaireMeta} from '@app/shared/fixtures/mock-questionnaire-meta';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {FlowComponent} from './flow.component';
@@ -21,7 +21,7 @@ describe('EnrollmentFlowComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(FlowComponent)
-      .keep(FormlyModule.forRoot(FormlyConfig.config))
+      .keep(FormlyModule.forRoot(customFormlyConfig))
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .provide({
         provide: ActivatedRoute,

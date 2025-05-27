@@ -1,4 +1,4 @@
-<div *ngIf="resource; else loadingMessage" class="container" id="resource">
+<div *ngIf="!loading(); else loadingMessage" class="container" id="resource">
   <div class="row" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="40px">
     <div id="resource-details" fxFlex.gt-md="60%" fxLayout="column" fxLayoutGap="40px">
       <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="1em">
@@ -19,8 +19,9 @@
         This resource is being edited and is under review. Please check back for more up-to-date information soon.
       </p>
       <p *ngIf="resource.type === 'event' && resource.image_url">
-        <a [href]="resource.website" target="_blank"><img [alt]="resource.title" [ngSrc]="resource.image_url"
-                                                          fill="fill" /></a>
+        <a [href]="resource.website" target="_blank"
+          ><img [alt]="resource.title" [ngSrc]="resource.image_url" fill="fill"
+        /></a>
       </p>
 
       <ng-container *ngIf="resource.type !== 'event'">
@@ -47,7 +48,8 @@
             'mailto:' + resource.contact_email + '?subject=Registration+for+' + resource.title
           "
           target="_blank"
-        >Register Now</a>
+          >Register Now</a
+        >
       </div>
       <p *ngIf="resource.insurance">Insurance accepted: {{ resource.insurance }}</p>
 
@@ -143,7 +145,7 @@
             [longitude]="resource.longitude"
             [iconUrl]="{
               url: '/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg',
-              anchor: makePoint(24, 24)
+              anchor: makePoint(24, 24),
             }"
             (markerClick)="toggleInfoWindow($event)"
           >
@@ -160,7 +162,7 @@
                   {{ resource.type === 'location' ? 'service area' : 'location' }}.
                 </p>
                 <a *ngIf="resource.phone" class="chevron-link" target="_blank" href="tel://{{ resource.phone }}"
-                >Call {{ resource.phone }}</a
+                  >Call {{ resource.phone }}</a
                 >
                 <a
                   *ngIf="!resource.phone && resource.website"
@@ -196,4 +198,3 @@
 </div>
 
 <ng-template #loadingMessage><app-loading message="Loading..."></app-loading></ng-template>
-

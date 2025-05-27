@@ -14,7 +14,7 @@ import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {snakeToUpperCase} from '@util/snakeToUpper';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 import {MarkdownModule} from 'ngx-markdown';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 

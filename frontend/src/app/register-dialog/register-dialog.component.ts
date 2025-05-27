@@ -9,6 +9,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {StorageService} from '@services/storage/storage.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
@@ -83,6 +84,7 @@ export class RegisterDialogComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private googleAnalytics: GoogleAnalyticsService,
     public dialogRef: MatDialogRef<StudySurveyEntryComponent>,
+    private storageService: StorageService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       displaySurvey: boolean;
@@ -100,7 +102,7 @@ export class RegisterDialogComponent {
   }
 
   submit() {
-    localStorage.removeItem('token_url');
+    this.storageService.remove('token_url');
     if (this.form.valid) {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();
@@ -114,7 +116,7 @@ export class RegisterDialogComponent {
         u => {
           this.user = u;
           if (u.hasOwnProperty('token_url')) {
-            localStorage.setItem('token_url', u.token_url);
+            this.storageService.set('token_url', u.token_url);
           }
           this.googleAnalytics.accountEvent('register');
           this._stateSubject.next('wait_for_email');

@@ -1,0 +1,14 @@
+<div
+  class="container mat-typography"
+  fxLayout="row wrap"
+  fxLayout.xs="column"
+  fxLayoutGap="10px"
+  fxLayoutAlign="center center"
+>
+  <div fxFlex="50%" class="message">
+    <app-logo variant="dark-lg" [routerLink]="['/home']"></app-logo>
+    <h1>Oops!</h1>
+    <p>We couldn't find that page. Maybe try searching for it?</p>
+    <button id="ok-button" mat-flat-button color="accent" [routerLink]="['/search']">Search for Resources</button>
+  </div>
+</div>

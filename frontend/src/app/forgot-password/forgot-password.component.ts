@@ -8,6 +8,8 @@ import {LogoComponent} from '@app/logo/logo.component';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
+import {StorageService} from '@services/storage/storage.service';
 
 @Component({
   standalone: true,
@@ -46,16 +48,17 @@ export class ForgotPasswordComponent {
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
+    private storageService: StorageService,
   ) {}
 
   submit() {
-    localStorage.removeItem('token_url');
+    this.storageService.remove(AuthenticationStateService.LOCAL_TOKEN_URL_KEY);
     if (this.form.valid) {
       this.formStatus = 'submitting';
       this.api.sendResetPasswordEmail(this.model['email']).subscribe({
         next: token_url => {
           if (token_url) {
-            localStorage.setItem('token_url', token_url);
+            this.storageService.set(AuthenticationStateService.LOCAL_TOKEN_URL_KEY, token_url);
           }
           this.formStatus = 'complete';
         },

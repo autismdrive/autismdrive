@@ -472,7 +472,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   watchScrollEvents() {
     const scroll$ = fromEvent(window, 'scroll').pipe(
       throttleTime(10),
-      map((e: Event) => window.pageYOffset),
+      map((_: Event) => window.pageYOffset),
       pairwise(),
       map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
       share(),

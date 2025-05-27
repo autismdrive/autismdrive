@@ -34,12 +34,14 @@ Make sure you have the database, backend, and frontend all running.
 ### From PyCharm
 
 Open the Edit Configurations menu (Run > Edit Configurations...) and add a Cypress configuration with the following settings:
-* Configuration File: `[path-to-your-files]/autismdrive/frontend/cypress.config.ts`
-* Cypress Options: `--dev-server-target=`
+
+- Configuration File: `[path-to-your-files]/autismdrive/frontend/cypress.config.ts`
+- Cypress Options: `--dev-server-target=`
 
 Save the configuration. Now you can run end-to-end tests with the play button.
 
 ### From command line
+
 Execute the following at the top level of the repository, which will clear and re-seed the database, then run all e2e tests:
 
 ```BASH

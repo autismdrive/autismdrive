@@ -9,7 +9,7 @@ import {QuestionnaireDataTableComponent} from '@app/questionnaire-data-table/que
 import {TableInfo} from '@models/table_info';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
-import {snakeToUpperCase} from '@util/snakeToUpper';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 
 @Component({
   standalone: true,

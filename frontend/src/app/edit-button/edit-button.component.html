@@ -1,5 +1,4 @@
-<div
-  *ngIf="shouldDisplayButton()">
+<div *ngIf="shouldDisplayButton()">
   <button mat-mini-fab color="accent" matTooltip="{{ editLabel }}" [routerLink]="this.editLink" aria-label="Edit">
     <mat-icon>edit</mat-icon>
   </button>

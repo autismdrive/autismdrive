@@ -25,6 +25,7 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Category} from '@models/category';
 import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {CategoriesService} from '@services/categories/categories.service';
+import {StorageService} from '@services/storage/storage.service';
 import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, timer} from 'rxjs';
 
 @Component({
@@ -65,6 +66,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     private router: Router,
     private categoryService: CategoriesService,
     private changeDetectorRef: ChangeDetectorRef,
+    private storageService: StorageService,
   ) {
     this.route.queryParams.pipe(debounce(() => timer(1000))).subscribe(qp => (this.queryParams = qp));
 
@@ -72,7 +74,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   }
 
   get videoIsVisible(): boolean {
-    return localStorage.getItem('shouldHideTutorialVideo') === 'true';
+    return this.storageService.get('shouldHideTutorialVideo') === 'true';
   }
 
   @ViewChild('searchInput', {read: MatInput})
@@ -180,7 +182,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   }
 
   showVideo() {
-    localStorage.removeItem('shouldHideTutorialVideo');
+    this.storageService.remove('shouldHideTutorialVideo');
   }
 
   private _filter(value: string): Category[] {

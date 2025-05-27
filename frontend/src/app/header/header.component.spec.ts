@@ -1,7 +1,7 @@
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ApiService} from '@services/api/api.service';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {HeaderComponent} from './header.component';
 

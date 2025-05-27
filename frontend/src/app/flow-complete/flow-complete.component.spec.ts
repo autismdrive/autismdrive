@@ -1,7 +1,7 @@
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {mockFlowCompleteRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockFlow} from '@util/testing/fixtures/mock-flow';
-import {MockComponent} from '@util/testing/fixtures/mock.component';
+import {mockFlowCompleteRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockFlow} from '@app/shared/fixtures/mock-flow';
+import {MockComponent} from '@app/shared/fixtures/mock.component';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FlowCompleteComponent} from './flow-complete.component';
 

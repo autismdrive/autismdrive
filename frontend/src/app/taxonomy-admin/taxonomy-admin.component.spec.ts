@@ -1,10 +1,10 @@
 import {signal} from '@angular/core';
-import {mockCategory} from '@util/testing/fixtures/mock-category';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockCategory} from '@app/shared/fixtures/mock-category';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {TaxonomyAdminComponent} from './taxonomy-admin.component';
-import {AuthenticationService} from '@app/_services/authentication/authentication-service';
-import {ApiService} from '@app/_services/api/api.service';
+import {AuthenticationService} from '@app/shared/services/authentication/authentication-service';
+import {ApiService} from '@app/shared/services/api/api.service';
 import {of} from 'rxjs';
 
 describe('TaxonomyAdminComponent', () => {

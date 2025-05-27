@@ -11,7 +11,7 @@ import {StudyInvestigator} from '@models/study_investigator';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
-import {scrollToFirstInvalidField} from '@util/scrollToTop';
+import {scrollToFirstInvalidField} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {

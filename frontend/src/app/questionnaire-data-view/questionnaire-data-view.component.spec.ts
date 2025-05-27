@@ -1,6 +1,6 @@
 import {ApiService} from '@services/api/api.service';
-import {mockQuestionnaireInfoList} from '@util/testing/fixtures/mock-questionnaire-info-list';
-import {mockExportResponse} from '@util/testing/fixtures/mock-response';
+import {mockQuestionnaireInfoList} from '@app/shared/fixtures/mock-questionnaire-info-list';
+import {mockExportResponse} from '@app/shared/fixtures/mock-response';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {QuestionnaireDataViewComponent} from './questionnaire-data-view.component';
 import {of} from 'rxjs';

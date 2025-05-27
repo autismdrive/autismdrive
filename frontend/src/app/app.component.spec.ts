@@ -4,9 +4,9 @@ import {ActivatedRoute, RouterModule} from '@angular/router';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {makeMockActivatedRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockAppEnvironment} from '@util/testing/fixtures/mock-app-environment';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockAppEnvironment} from '@app/shared/fixtures/mock-app-environment';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {AppComponent} from './app.component';
 

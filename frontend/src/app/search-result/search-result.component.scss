@@ -1,5 +1,5 @@
- @use "config" as config;
-@use "mixins" as mixins;
+@use '../../styles/config' as config;
+@use '../../styles/mixins' as mixins;
 
 .result-item {
   margin: 2em;

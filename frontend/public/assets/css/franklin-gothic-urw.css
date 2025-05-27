@@ -19,59 +19,59 @@
  */
 /*{"last_published":"2019-04-01 21:00:54 UTC"}*/
 @font-face {
-    font-family: "franklin-gothic-urw";
-    src: url("/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-400.woff2") format("woff2");
-    font-display: auto;
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
+  font-family: 'franklin-gothic-urw';
+  src: url('/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-400.woff2') format('woff2');
+  font-display: auto;
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: normal;
 }
 
 @font-face {
-    font-family: "franklin-gothic-urw";
-    src: url("/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-500.woff2") format("woff2");
-    font-display: auto;
-    font-style: normal;
-    font-weight: 500;
-    font-stretch: normal;
+  font-family: 'franklin-gothic-urw';
+  src: url('/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-500.woff2') format('woff2');
+  font-display: auto;
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: normal;
 }
 
 @font-face {
-    font-family: "franklin-gothic-urw";
-    src: url("/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-700.woff2") format("woff2");
-    font-display: auto;
-    font-style: normal;
-    font-weight: 700;
-    font-stretch: normal;
+  font-family: 'franklin-gothic-urw';
+  src: url('/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-700.woff2') format('woff2');
+  font-display: auto;
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: normal;
 }
 
 @font-face {
-    font-family: "franklin-gothic-urw";
-    src: url("/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-italic-400.woff2") format("woff2");
-    font-display: auto;
-    font-style: italic;
-    font-weight: 400;
-    font-stretch: normal;
+  font-family: 'franklin-gothic-urw';
+  src: url('/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-italic-400.woff2') format('woff2');
+  font-display: auto;
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
 }
 
 @font-face {
-    font-family: "franklin-gothic-urw";
-    src: url("/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-italic-500.woff2") format("woff2");
-    font-display: auto;
-    font-style: italic;
-    font-weight: 500;
-    font-stretch: normal;
+  font-family: 'franklin-gothic-urw';
+  src: url('/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-italic-500.woff2') format('woff2');
+  font-display: auto;
+  font-style: italic;
+  font-weight: 500;
+  font-stretch: normal;
 }
 
 @font-face {
-    font-family: "franklin-gothic-urw";
-    src: url("/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-italic-700.woff2") format("woff2");
-    font-display: auto;
-    font-style: italic;
-    font-weight: 700;
-    font-stretch: normal;
+  font-family: 'franklin-gothic-urw';
+  src: url('/assets/fonts/franklin-gothic-urw/franklin-gothic-urw-italic-700.woff2') format('woff2');
+  font-display: auto;
+  font-style: italic;
+  font-weight: 700;
+  font-stretch: normal;
 }
 
 .tk-franklin-gothic-urw {
-    font-family: "franklin-gothic-urw",sans-serif;
+  font-family: 'franklin-gothic-urw', sans-serif;
 }

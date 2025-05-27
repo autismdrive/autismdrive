@@ -2,8 +2,8 @@ import {Category} from '@models/category';
 import {AgeRange, Language} from '@models/hit_type';
 import {Observable} from 'rxjs';
 
-export const getResourceFormFields = (categoryTree: Observable<Category[]>|Category[]) => {
-  console.log('getResourceFormFields')
+export const getResourceFormFields = (categoryTree: Observable<Category[]> | Category[]) => {
+  console.log('getResourceFormFields');
   return [
     {
       key: 'type',

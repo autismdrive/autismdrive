@@ -1,13 +1,13 @@
 import {signal} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {FormlyConfig} from '@app/app.config';
+import {customFormlyConfig} from '@app/app.config';
 import {FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {mockResourceEditRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockResource} from '@util/testing/fixtures/mock-resource';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockResourceEditRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockResource} from '@app/shared/fixtures/mock-resource';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {of} from 'rxjs';
@@ -19,7 +19,7 @@ describe('ResourceFormComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(ResourceFormComponent)
-      .keep(FormlyModule.forRoot(FormlyConfig.config))
+      .keep(FormlyModule.forRoot(customFormlyConfig))
       .keep(FormsModule)
       .keep(ReactiveFormsModule)
       .mock(ApiService, {

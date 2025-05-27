@@ -39,15 +39,14 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser-esbuild",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "prerender": {"discoverRoutes": true},
             "outputPath": "dist",
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "polyfills": ["zone.js"],
             "inlineStyleLanguage": "scss",
             "assets": [
               {
@@ -64,19 +63,17 @@
               "public/assets/css/bodoni-urw.css"
             ],
             "scripts": [],
-            "allowedCommonJsDependencies": [
-              "geolib",
-              "rfdc",
-              "fast-deep-equal"
-            ],
+            "allowedCommonJsDependencies": ["geolib", "rfdc", "fast-deep-equal"],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "src"
-              ]
+              "includePaths": ["src"]
+            },
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "src/server.ts"
             },
             "aot": false,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true
@@ -96,12 +93,16 @@
                 }
               ],
               "aot": true,
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": true
+              },
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "buildOptimizer": true,
-              "extractLicenses": true
+              "extractLicenses": true,
+              "buildOptimizer": true
             },
             "staging": {
               "optimization": true,
@@ -154,10 +155,7 @@
             "forceExit": true,
             "tsConfig": "tsconfig.spec.json",
             "configPath": "jest.config.mjs",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "inlineStyleLanguage": ["scss"],
             "assets": ["public/assets"],
             "styles": [
@@ -186,11 +184,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html",
-              "cypress/**/*.ts"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html", "cypress/**/*.ts"]
           }
         },
         "cypress-run": {
@@ -215,9 +209,7 @@
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ],
+    "schematicCollections": ["@angular-eslint/schematics"],
     "cache": {
       "enabled": false
     },

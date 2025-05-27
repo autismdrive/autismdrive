@@ -11,7 +11,7 @@ import {FavoriteResourcesComponent} from '@app/favorite-resources/favorite-resou
 import {FavoriteTopicsComponent} from '@app/favorite-topics/favorite-topics.component';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {ParticipantProfileComponent} from '@app/participant-profile/participant-profile.component';
-import {ProfileMetaComponent} from '@app/profile_meta/profile_meta.component';
+import {ProfileMetaComponent} from '@app/profile-meta/profile-meta.component';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {Resource} from '@models/resource';

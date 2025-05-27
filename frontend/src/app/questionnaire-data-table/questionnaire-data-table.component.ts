@@ -5,7 +5,7 @@ import {MatTableModule} from '@angular/material/table';
 import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
 import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
-import {snakeToUpperCase} from '@util/snakeToUpper';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 
 @Component({
   standalone: true,

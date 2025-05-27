@@ -1,4 +1,4 @@
-import {mockStudyInvestigator} from '@util/testing/fixtures/mock-study-investigator';
+import {mockStudyInvestigator} from '@app/shared/fixtures/mock-study-investigator';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {InvestigatorFormComponent} from './investigator-form.component';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';

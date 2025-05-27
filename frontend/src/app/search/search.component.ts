@@ -1,6 +1,6 @@
 /// <reference types="@types/google.maps" />
 import {animate, query, stagger, style, transition, trigger} from '@angular/animations';
-import {CommonModule, Location, NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
+import {CommonModule, Location} from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -11,6 +11,7 @@ import {
   OnInit,
   signal,
   ViewChild,
+  WritableSignal,
 } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -57,6 +58,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {SearchService} from '@services/search/search.service';
+import {StorageService} from '@services/storage/storage.service';
 import createClone from 'rfdc';
 import {fromEvent, Subject} from 'rxjs';
 import {debounceTime, filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
@@ -109,7 +111,6 @@ enum LocationMode {
     NgMapsCoreModule,
     NgMapsGoogleModule,
     NgMapsMarkerClustererModule,
-    NgOptimizedImage,
     ReactiveFormsModule,
     RouterModule,
     SearchBoxComponent,
@@ -144,7 +145,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
   typeLabels = HitType.labels;
   ageOptions = [];
   languageOptions = [];
-  loading = true;
+  shouldShowMap: WritableSignal<boolean> = signal(false);
+  loading: WritableSignal<boolean> = signal(true);
   pageSizeOptions = [20, 60, 100];
   pageSize = this.pageSizeOptions[0];
 
@@ -232,7 +234,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
   clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
   clusterRenderer: Renderer = new DefaultRenderer();
   readonly panelOpenState = signal(false);
-  private googleMapsCoreLibrary: google.maps.CoreLibrary;
 
   constructor(
     private api: ApiService,
@@ -245,17 +246,14 @@ export class SearchComponent implements AfterViewInit, OnInit {
     private router: Router,
     private searchService: SearchService,
     private googleMapsLibrary: GoogleMapsLibraryService,
+    private storageService: StorageService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
     });
-
     effect(() => {
-      const core = this.googleMapsLibrary.core();
-
-      if (core) {
-        this.googleMapsCoreLibrary = core;
-      }
+      this.googleMapsLibrary.core();
+      this.updateShouldShowMap();
     });
 
     this.sortMethods = createClone()(sortMethods);
@@ -277,6 +275,16 @@ export class SearchComponent implements AfterViewInit, OnInit {
       {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
       `name='twitter:image'`,
     );
+  }
+
+  get mapsCoreLibrary() {
+    const core = this.googleMapsLibrary.core();
+
+    if (!core) {
+      console.error('Google Maps Library is not loaded yet.');
+    }
+
+    return core;
   }
 
   @ViewChild('paginator')
@@ -350,14 +358,12 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   get shouldHideVideo() {
-    return !!localStorage.getItem('shouldHideTutorialVideo');
+    return !!this.storageService.get('shouldHideTutorialVideo');
   }
 
-  get shouldShowMap() {
-    if (!this.googleMapsCoreLibrary) return false;
-
+  updateShouldShowMap() {
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    return isLocation || this.isDistanceSort;
+    this.shouldShowMap.set(this.mapsCoreLibrary && (isLocation || this.isDistanceSort));
   }
 
   get selectedCategory() {
@@ -371,13 +377,13 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit() {
-    if (localStorage.noFirstVisit === 'true') {
+    if (this.storageService.get('noFirstVisit') === 'true') {
       this.hideVideo();
     }
-    localStorage.noFirstVisit = true;
+    this.storageService.set('noFirstVisit', 'true');
 
     /**
-     * On initialization, set up two subjects that will watch for, debouce, and depulicate all queries sent to
+     * On initialization, set up two subjects that will watch for, debounce, and deduplicate all queries sent to
      * the backend.  Then attempt to run a sensible search, either based on query params or using defaults.
      * In the even we can fall back to the users current location, we may need to run the query again, but
      * we don't want to wait for them to grant us access, so in the worst case, we just run the query using a
@@ -385,13 +391,13 @@ export class SearchComponent implements AfterViewInit, OnInit {
      */
 
     this.querySubject.pipe(debounceTime(1000)).subscribe(q => {
-      this.loading = true;
+      this.loading.set(true);
       this.searchService.search(q).subscribe(queryWithResults => {
         this.prevQuery = createClone()(this.query);
         this.query = queryWithResults;
         this.googleAnalyticsService?.searchEvent(this.query);
         this.updateUrl();
-        this.loading = false;
+        this.loading.set(false);
         this.changeDetectorRef.detectChanges();
         this._loadRelatedStudies();
         this._updatePaginator();
@@ -429,7 +435,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
       });
     });
     this.mapQuerySubject.pipe(debounceTime(1000)).subscribe(q => {
-      this.loading = true;
+      this.loading.set(true);
       const geoBox = this.geoBox();
       this.searchService.mapSearch(q, geoBox).subscribe(mapQueryWithResults => {
         this.mapQuery = mapQueryWithResults;
@@ -440,7 +446,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
           this.hitsWithAddress = [];
           this.hitsWithNoAddress = [];
         }
-        this.loading = false;
+        this.loading.set(false);
         this.changeDetectorRef.detectChanges();
         if (this.restrictToMappedResults) {
           this.query.geo_box = geoBox;
@@ -525,7 +531,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
      * 3) Finally, calls the given callback.
      *
      */
-    this.storedZip = localStorage.getItem('zipCode');
+    this.storedZip = this.storageService.get('zipCode');
     if (this.isZipCode(this.storedZip)) {
       this.setZipLocation(this.storedZip, callback);
     } else {
@@ -647,7 +653,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   submitZip($event: Event): void {
     this.panelOpenState.set(false);
     $event.stopPropagation();
-    localStorage.setItem('zipCode', this.storedZip);
+    this.storageService.set('zipCode', this.storedZip);
     this.googleAnalyticsService?.searchInteractionEvent('set_zip_code_location');
     if (this.isZipCode(this.storedZip)) {
       this.mapZoomLevel = 10;
@@ -714,9 +720,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.mapBounds = $event;
   }
 
-  geoBox(): GeoBox {
-    if (this.mapBounds) {
-      const latLngBounds = new this.googleMapsCoreLibrary.LatLngBounds(this.mapBounds);
+  geoBox(): GeoBox | undefined {
+    if (this.mapBounds && this.mapsCoreLibrary) {
+      const latLngBounds = new this.mapsCoreLibrary.LatLngBounds(this.mapBounds);
       return {
         top_left: {
           lat: latLngBounds.getNorthEast().lat(),
@@ -800,7 +806,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   toggleShowFilters() {
     this.showFilters = !this.showFilters;
 
-    if (!this.shouldShowMap) {
+    if (!this.shouldShowMap()) {
       this.expandResults = true;
     }
   }
@@ -812,9 +818,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   hideVideo(shouldHide = true) {
     if (shouldHide) {
-      localStorage.setItem('shouldHideTutorialVideo', `${shouldHide}`);
+      this.storageService.set('shouldHideTutorialVideo', `${shouldHide}`);
     } else {
-      localStorage.removeItem('shouldHideTutorialVideo');
+      this.storageService.remove('shouldHideTutorialVideo');
     }
   }
 
@@ -833,6 +839,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   protected mapLoad(m: google.maps.Map) {
+    if (!this.mapsCoreLibrary) return;
+
     const controlDiv: MapControlDiv = document.createElement('div');
 
     // Set CSS for the control border.
@@ -864,10 +872,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
     });
 
     controlDiv.index = 1;
-    m.controls[this.googleMapsCoreLibrary.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+    m.controls[this.mapsCoreLibrary.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 
     m.addListener('dragend', () => {
-      const latLngBounds = new this.googleMapsCoreLibrary.LatLngBounds(this.mapBounds);
+      const latLngBounds = new this.mapsCoreLibrary.LatLngBounds(this.mapBounds);
       this.setLocation(LocationMode.map, {
         lat: latLngBounds.getCenter().lat(),
         lng: latLngBounds.getCenter().lng(),
@@ -1020,8 +1028,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   makePoint(x: number, y: number): google.maps.Point | undefined {
-    if (!this.googleMapsCoreLibrary) return;
-
-    return new this.googleMapsCoreLibrary.Point(x, y);
+    if (!this.mapsCoreLibrary) return;
+    return new this.mapsCoreLibrary.Point(x, y);
   }
 }

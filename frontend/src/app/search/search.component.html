@@ -94,7 +94,7 @@
                     [label_icon]="'cake'"
                     (filterSelected)="selectAgeRange($event)"
                     [ngClass]="'filter-by-age'"
-                    [isNotApplicable]="!loading && !query.hasAgeCounts"
+                    [isNotApplicable]="!loading() && !query.hasAgeCounts"
                     [notApplicableMessage]="'No age restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -110,7 +110,7 @@
                     [label_icon]="'language'"
                     (filterSelected)="selectLanguage($event)"
                     [ngClass]="'filter-by-language'"
-                    [isNotApplicable]="!loading && !query.hasLanguageCounts"
+                    [isNotApplicable]="!loading() && !query.hasLanguageCounts"
                     [notApplicableMessage]="'No language restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -177,7 +177,7 @@
       <ng-container *ngIf="!restrictToMappedResults">{{ numTotalResults }} results</ng-container>
       <ng-container *ngIf="restrictToMappedResults">{{ hits.length }} mapped results</ng-container>
     </mat-button-toggle>
-    <mat-button-toggle [value]="false" [disabled]="!shouldShowMap">Map</mat-button-toggle>
+    <mat-button-toggle [value]="false" [disabled]="!shouldShowMap()">Map</mat-button-toggle>
   </mat-button-toggle-group>
 </div>
 <div id="content" fxLayout="row" fxLayoutAlign="start start">
@@ -192,7 +192,7 @@
     fxHide.lt-md
     [fxShow.lt-md]="!!expandResults"
   >
-    <ng-container *ngIf="!loading; else loadingMessage">
+    <ng-container *ngIf="!loading(); else loadingMessage">
       <div
         *ngIf="query?.hits.length === 0"
         fxLayout="column"
@@ -295,14 +295,14 @@
       [ngClass]="'mat-elevation-z1'"
       [ngClass.gt-sm]="'gt-sm'"
       [ngClass.lt-md]="'lt-md'"
-      [fxHide]="!shouldShowMap"
+      [fxHide]="!shouldShowMap()"
     >
       <mat-icon *ngIf="!restrictToMappedResults">check_box_outline_blank</mat-icon>
       <mat-icon *ngIf="restrictToMappedResults">check_box</mat-icon>
       Limit results to map
     </button>
     <mat-expansion-panel
-      *ngIf="shouldShowMap"
+      *ngIf="shouldShowMap()"
       id="set-location"
       [ngClass]="'zipCodeSetButton mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
@@ -327,15 +327,8 @@
           />
         </mat-form-field>
         <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
-          <button mat-flat-button color="accent" (click)="submitZip($event)" id="btn_save">
-            Save
-          </button>
-          <button
-            *ngIf="gpsEnabled"
-            mat-flat-button
-            (click)="useGPSLocation($event)"
-            id="btn_gps"
-          >
+          <button mat-flat-button color="accent" (click)="submitZip($event)" id="btn_save">Save</button>
+          <button *ngIf="gpsEnabled" mat-flat-button (click)="useGPSLocation($event)" id="btn_gps">
             Current Location
           </button>
         </div>
@@ -343,7 +336,7 @@
     </mat-expansion-panel>
     <div id="map" fxLayout="column" fxLayoutGap="2em">
       <map-view
-        *ngIf="shouldShowMap"
+        *ngIf="shouldShowMap()"
         #mapTemplate
         [latitude]="loc.lat"
         [longitude]="loc.lng"
@@ -388,7 +381,7 @@
             <map-marker
               [latitude]="hit.latitude"
               [longitude]="hit.longitude"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: makePoint(16,16)}"
+              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: makePoint(16, 16)}"
               (markerClick)="showInfoWindow(hit)"
             ></map-marker>
           </ng-container>
@@ -404,7 +397,7 @@
               class="title mat-h2"
               href="/#/{{ selectedMapResource.type.toLowerCase() }}/{{ selectedMapResource.id }}"
               (click)="goSelectedMapResource(selectedMapResource)"
-            >{{ selectedMapResource.title }}</a
+              >{{ selectedMapResource.title }}</a
             >
             <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
               {{ selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type }} Details</a
@@ -452,13 +445,13 @@
           [matTooltip]="rg.shortName + ' - ' + rg.description"
           class="resource-gatherer"
         >
-          <img [alt]="rg.shortName" src="{{rg.image}}" fill="fill" />
+          <img [alt]="rg.shortName" src="{{ rg.image }}" fill="fill" />
         </a>
       </span>
     </div>
   </div>
   <app-border-box-tile
-    *ngIf="!loading"
+    *ngIf="!loading()"
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"

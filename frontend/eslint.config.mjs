@@ -5,6 +5,7 @@ import angular from 'angular-eslint';
 import pluginCypress from 'eslint-plugin-cypress/flat';
 import pluginJest from 'eslint-plugin-jest';
 import pluginChaiFriendly from 'eslint-plugin-chai-friendly';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
@@ -65,4 +66,5 @@ export default tseslint.config(
     files: ['*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
   },
+  eslintConfigPrettier,
 );

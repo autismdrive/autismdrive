@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
+import {DOCUMENT} from '@angular/common';
+import {HttpClient} from '@angular/common/http';
+import {ChangeDetectionStrategy, Component, effect, Inject, OnInit, Renderer2} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {FooterComponent} from '@app/footer/footer.component';
@@ -47,6 +49,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('AppComponent > ngOnInit');
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const title = this.route.snapshot.firstChild.data.title;

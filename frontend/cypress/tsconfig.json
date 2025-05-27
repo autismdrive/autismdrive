@@ -10,13 +10,7 @@
   ],
   "compilerOptions": {
     "sourceMap": false,
-    "types": [
-      "cypress",
-      "node",
-      "./support"
-    ]
+    "types": ["cypress", "node", "./support"]
   },
-  "exclude": [
-    "../node_modules"
-  ]
+  "exclude": ["../node_modules"]
 }

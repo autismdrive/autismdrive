@@ -16,7 +16,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
   imports: [MatCardModule, MatChipsModule, CommonModule],
 })
 export class FilterChipsComponent {
-  @Input() categories: StudyCategory[] | ResourceCategory[] = [];
+  @Input() categories: StudyCategory[] | ResourceCategory[];
   @Input() ages: string[] = [];
   @Input() languages: string[] = [];
   @Input() covid19_categories: string[] = [];

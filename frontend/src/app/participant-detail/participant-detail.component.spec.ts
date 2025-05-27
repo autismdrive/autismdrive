@@ -1,5 +1,5 @@
 import {ApiService} from '@services/api/api.service';
-import {mockParticipant} from '@util/testing/fixtures/mock-participant';
+import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {ParticipantDetailComponent} from './participant-detail.component';
 import {of} from 'rxjs';

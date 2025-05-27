@@ -1,5 +1,5 @@
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
-import {mockAppEnvironment} from '@util/testing/fixtures/mock-app-environment';
+import {mockAppEnvironment} from '@app/shared/fixtures/mock-app-environment';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FooterComponent} from './footer.component';
 

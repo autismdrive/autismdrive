@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {ChangeDetectorRef, Component} from '@angular/core';
+import {afterNextRender, ChangeDetectorRef, Component} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
@@ -11,7 +11,8 @@ import {FormlyFieldConfig, FormlyForm} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {scrollToTop} from '@util/scrollToTop';
+import {StorageService} from '@services/storage/storage.service';
+import {scrollToTop} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({
@@ -58,7 +59,7 @@ export class PasswordResetComponent {
           validators: {
             password: {
               expression: c => !c.value || this.passwordRegex.test(c.value),
-              message: (error, field: FormlyFieldConfig) => this.passwordRequirements.instructions,
+              message: (_error, _field: FormlyFieldConfig) => this.passwordRequirements.instructions,
             },
           },
         },
@@ -85,9 +86,8 @@ export class PasswordResetComponent {
     private apiService: ApiService,
     private deviceDetectorService: DeviceDetectorService,
     private googleAnalyticsService: GoogleAnalyticsService,
+    private storageService: StorageService,
   ) {
-    this.authenticationService;
-
     this.route.params.subscribe(params => {
       this.token = params['email_token'];
       this.role = params['role'];
@@ -133,10 +133,12 @@ export class PasswordResetComponent {
   }
 
   private _goToReturnUrl(user: User) {
-    const storedUrl = localStorage.getItem('returnUrl');
-    const returnUrl = storedUrl && storedUrl !== 'undefined' ? storedUrl : '/profile';
-    if (user) {
-      this.router.navigateByUrl(returnUrl).then(_ => scrollToTop(this.deviceDetectorService));
-    }
+    afterNextRender(() => {
+      const storedUrl = this.storageService.get('returnUrl');
+      const returnUrl = storedUrl && storedUrl !== 'undefined' ? storedUrl : '/profile';
+      if (user) {
+        this.router.navigateByUrl(returnUrl).then(_ => scrollToTop(this.deviceDetectorService));
+      }
+    });
   }
 }

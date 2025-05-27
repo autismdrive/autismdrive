@@ -9,7 +9,9 @@ import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {StorageService} from '@services/storage/storage.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
@@ -50,6 +52,7 @@ export class RegisterComponent {
     private route: ActivatedRoute,
     private googleAnalytics: GoogleAnalyticsService,
     private meta: Meta,
+    private storageService: StorageService,
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
@@ -73,8 +76,8 @@ export class RegisterComponent {
   }
 
   submit() {
-    localStorage.removeItem('token_url');
-    localStorage.setItem('returnUrl', this.route.snapshot.queryParams['returnUrl']);
+    this.storageService.remove('token_url');
+    this.storageService.set('returnUrl', this.route.snapshot.queryParams['returnUrl']);
     if (this.form.valid) {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();
@@ -85,7 +88,7 @@ export class RegisterComponent {
         u => {
           this.user = u;
           if (u.hasOwnProperty('token_url')) {
-            localStorage.setItem('token_url', u.token_url);
+            this.storageService.set(AuthenticationStateService.LOCAL_TOKEN_URL_KEY, u.token_url);
           }
           this.googleAnalytics.accountEvent('register');
           this._stateSubject.next('wait_for_email');

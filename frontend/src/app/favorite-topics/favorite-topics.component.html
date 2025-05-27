@@ -14,13 +14,9 @@
 <div id="ages" class="margin-top" *ngIf="favoriteAges && favoriteAges.length > 0">
   <mat-card-title>Favorite Age Ranges</mat-card-title>
   <mat-chip-listbox>
-    <mat-chip
-      *ngFor="let age of favoriteAges"
-      [routerLink]="['/search']"
-      [queryParams]="{ages: age}"
-      color="primary"
-      >{{ ageLabels[age] }}</mat-chip
-    >
+    <mat-chip *ngFor="let age of favoriteAges" [routerLink]="['/search']" [queryParams]="{ages: age}" color="primary">{{
+      ageLabels[age]
+    }}</mat-chip>
   </mat-chip-listbox>
 </div>
 

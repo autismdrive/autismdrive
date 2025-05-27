@@ -1,14 +1,14 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {ApiService} from '@app/_services/api/api.service';
-import {AuthenticationService} from '@app/_services/authentication/authentication-service';
-import {FormlyConfig} from '@app/app.config';
+import {ApiService} from '@app/shared/services/api/api.service';
+import {AuthenticationService} from '@app/shared/services/authentication/authentication-service';
+import {customFormlyConfig} from '@app/app.config';
 import {FormlyModule} from '@ngx-formly/core';
-import {mockProfileRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockFlow} from '@util/testing/fixtures/mock-flow';
-import {mockStudy} from '@util/testing/fixtures/mock-study';
-import {mockStudyUser} from '@util/testing/fixtures/mock-study-user';
-import {mockUser, mockUserMeta} from '@util/testing/fixtures/mock-user';
+import {mockProfileRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockFlow} from '@app/shared/fixtures/mock-flow';
+import {mockStudy} from '@app/shared/fixtures/mock-study';
+import {mockStudyUser} from '@app/shared/fixtures/mock-study-user';
+import {mockUser, mockUserMeta} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {ProfileComponent} from './profile.component';
@@ -21,7 +21,7 @@ describe('ProfileComponent', () => {
     // @ts-ignore
     return MockBuilder(ProfileComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
-      .keep(FormlyModule.forRoot(FormlyConfig.config))
+      .keep(FormlyModule.forRoot(customFormlyConfig))
       .keep(RouterModule)
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(ApiService, {

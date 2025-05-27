@@ -1,4 +1,4 @@
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {AddButtonComponent} from './add-button.component';
 
@@ -11,11 +11,15 @@ describe('AddButtonComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = MockRender(AddButtonComponent, {
-      currentUser: mockUser,
-      addLink: 'https://some.link',
-      addLabel: 'Some Label',
-    }, {detectChanges: true});
+    fixture = MockRender(
+      AddButtonComponent,
+      {
+        currentUser: mockUser,
+        addLink: 'https://some.link',
+        addLabel: 'Some Label',
+      },
+      {detectChanges: true},
+    );
     component = fixture.point.componentInstance;
   });
 

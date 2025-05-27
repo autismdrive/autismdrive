@@ -1,7 +1,7 @@
 import {ApiService} from '@services/api/api.service';
-import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
-import {mockCategory} from '@util/testing/fixtures/mock-category';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockAdminNote} from '@app/shared/fixtures/mock-admin-note';
+import {mockCategory} from '@app/shared/fixtures/mock-category';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FavoriteTopicsComponent} from './favorite-topics.component';
 import {of} from 'rxjs';

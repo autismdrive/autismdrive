@@ -1,0 +1,25 @@
+import {TestBed} from '@angular/core/testing';
+import {ApiService} from '@app/shared/services/api/api.service';
+import {MockProvider} from 'ng-mocks';
+import {of} from 'rxjs';
+import {CategoriesService} from './categories.service';
+
+describe('CategoriesService', () => {
+  let service: CategoriesService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        CategoriesService,
+        MockProvider(ApiService, {
+          getCategoryTree: jest.fn().mockReturnValue(of([])),
+        }),
+      ],
+    });
+    service = TestBed.inject(CategoriesService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});

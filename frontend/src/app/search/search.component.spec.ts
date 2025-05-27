@@ -11,9 +11,9 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {SearchService} from '@services/search/search.service';
-import {mockResource} from '@util/testing/fixtures/mock-resource';
-import {mockStudy} from '@util/testing/fixtures/mock-study';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockResource} from '@app/shared/fixtures/mock-resource';
+import {mockStudy} from '@app/shared/fixtures/mock-study';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {SearchComponent} from './search.component';

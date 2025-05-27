@@ -1,5 +1,5 @@
 import {ApiService} from '@services/api/api.service';
-import {mockUserFavorite} from '@util/testing/fixtures/mock-user-favorite';
+import {mockUserFavorite} from '@app/shared/fixtures/mock-user-favorite';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {FavoriteResourceButtonComponent} from './favorite-resource-button.component';

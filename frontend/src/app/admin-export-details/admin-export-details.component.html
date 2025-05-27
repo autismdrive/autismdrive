@@ -3,28 +3,28 @@
 
   <table mat-table [dataSource]="exportDetails" class="mat-elevation-z8">
     <ng-container matColumnDef="class_name">
-      <th mat-header-cell *matHeaderCellDef style="flex: 2"> Table Name </th>
-      <td mat-cell style="flex: 2" *matCellDef="let element"> {{ element.class_name }} </td>
+      <th mat-header-cell *matHeaderCellDef style="flex: 2">Table Name</th>
+      <td mat-cell style="flex: 2" *matCellDef="let element">{{ element.class_name }}</td>
     </ng-container>
 
     <ng-container matColumnDef="successful">
-      <th mat-header-cell *matHeaderCellDef> Successful </th>
-      <td mat-cell *matCellDef="let element"> {{ element.successful }} </td>
+      <th mat-header-cell *matHeaderCellDef>Successful</th>
+      <td mat-cell *matCellDef="let element">{{ element.successful }}</td>
     </ng-container>
 
     <ng-container matColumnDef="success_count">
-      <th mat-header-cell *matHeaderCellDef> Records Processed </th>
-      <td mat-cell *matCellDef="let element"> {{ element.success_count }} </td>
+      <th mat-header-cell *matHeaderCellDef>Records Processed</th>
+      <td mat-cell *matCellDef="let element">{{ element.success_count }}</td>
     </ng-container>
 
     <ng-container matColumnDef="failure_count">
-      <th mat-header-cell *matHeaderCellDef> Failures </th>
-      <td mat-cell *matCellDef="let element"> {{ element.failure_count }} </td>
+      <th mat-header-cell *matHeaderCellDef>Failures</th>
+      <td mat-cell *matCellDef="let element">{{ element.failure_count }}</td>
     </ng-container>
 
     <ng-container matColumnDef="errors">
-      <th mat-header-cell *matHeaderCellDef> Error Messages</th>
-      <td mat-cell *matCellDef="let element"> {{ element.errors }} </td>
+      <th mat-header-cell *matHeaderCellDef>Error Messages</th>
+      <td mat-cell *matCellDef="let element">{{ element.errors }}</td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

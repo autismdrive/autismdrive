@@ -1,6 +1,6 @@
-@use "@angular/material" as mat;
-@use "material" as material-config;
- @use "config" as config;
+@use '@angular/material' as mat;
+@use '../../styles/material' as material-config;
+@use '../../styles/config' as config;
 
 #header-bg {
   background-color: config.$brand-gray;
@@ -18,7 +18,10 @@
     background-color: config.$brand-primary;
     color: white;
     position: fixed;
-    transition: translate ease-in-out 500ms, height ease-in-out 500ms, top ease-in-out 500ms;
+    transition:
+      translate ease-in-out 500ms,
+      height ease-in-out 500ms,
+      top ease-in-out 500ms;
   }
 
   mat-toolbar-row#uva-header {
@@ -73,7 +76,7 @@
     }
   }
 
-    mat-toolbar-row#search-tag {
+  mat-toolbar-row#search-tag {
     background-color: config.$brand-accent;
     z-index: 100;
     box-shadow: 40px 20px 40px -40px rgb(0 0 0 / 10%);

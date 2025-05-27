@@ -1,4 +1,4 @@
-import {mockFlow} from '@util/testing/fixtures/mock-flow';
+import {mockFlow} from '@app/shared/fixtures/mock-flow';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {QuestionnaireStepsListComponent} from './questionnaire-steps-list.component';
 

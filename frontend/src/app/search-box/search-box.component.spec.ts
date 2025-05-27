@@ -1,7 +1,7 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {CategoriesService} from '@services/categories/categories.service';
-import {mockCategory} from '@util/testing/fixtures/mock-category';
+import {mockCategory} from '@app/shared/fixtures/mock-category';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {SearchBoxComponent} from './search-box.component';

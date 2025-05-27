@@ -113,7 +113,7 @@
     </ng-container>
     <p *ngIf="!studyHits || studyHits.length === 0" class="no-results" [attr.data-study-status]="selectedStatus.name">
       We don't have any Autism DRIVE studies
-      {{getEnrollmentStatusMessage(selectedStatus)}}
+      {{ getEnrollmentStatusMessage(selectedStatus) }}
       at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!
     </p>
   </div>

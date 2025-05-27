@@ -20,8 +20,8 @@ import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/co
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {scrollToFirstInvalidField, scrollToTop} from '@util/scrollToTop';
-import {keysToCamel} from '@util/snakeToCamel';
+import {scrollToFirstInvalidField, scrollToTop} from '@app/shared/utilities/scrollToTop';
+import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum FlowState {

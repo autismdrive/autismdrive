@@ -1,5 +1,5 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {mockAdminNote} from '@util/testing/fixtures/mock-admin-note';
+import {mockAdminNote} from '@app/shared/fixtures/mock-admin-note';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {AdminNoteFormComponent} from './admin-note-form.component';
 

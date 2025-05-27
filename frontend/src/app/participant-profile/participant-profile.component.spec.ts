@@ -1,6 +1,6 @@
 import {ApiService} from '@services/api/api.service';
-import {mockParticipant} from '@util/testing/fixtures/mock-participant';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockParticipant} from '@app/shared/fixtures/mock-participant';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {ParticipantProfileComponent} from './participant-profile.component';
 import {RouterModule} from '@angular/router';

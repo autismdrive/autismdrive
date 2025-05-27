@@ -1,13 +1,13 @@
-@use "material" as custom-theme;
-@use "overrides" as overrides;
-@use "@angular/material" as mat;
- @use "config" as config;
-@use "ehd" as ehd;
-@use "other" as other;
-@forward "../public/assets/css/bodoni-urw.css";
-@forward "../public/assets/css/franklin-gothic-urw.css";
-@forward "../public/assets/css/icofont.css";
-@forward "../public/assets/css/material-icons.css";
+@use 'styles/material' as custom-theme;
+@use 'styles/overrides' as overrides;
+@use '@angular/material' as mat;
+@use 'styles/config' as config;
+@use 'styles/ehd' as ehd;
+@use 'styles/other' as other;
+@forward '../public/assets/css/bodoni-urw.css';
+@forward '../public/assets/css/franklin-gothic-urw.css';
+@forward '../public/assets/css/icofont.css';
+@forward '../public/assets/css/material-icons.css';
 
 html {
   @include mat.theme(custom-theme.$theme-config);
@@ -15,16 +15,18 @@ html {
   @include other.other-styles;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: config.$body-font-family, "Helvetica Neue", sans-serif;
+  font-family: config.$body-font-family, 'Helvetica Neue', sans-serif;
 }
 
-:root, :host {
+:root,
+:host {
   @include mat.theme-overrides(overrides.$light-theme-overrides-config);
 }
 

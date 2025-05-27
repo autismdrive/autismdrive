@@ -10,7 +10,9 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {StorageService} from '@services/storage/storage.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {EventRegistrationComponent} from '../event-registration/event-registration.component';
 
@@ -164,6 +166,7 @@ export class EventRegistrationFormComponent {
     private googleAnalytics: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     public dialogRef: MatDialogRef<EventRegistrationComponent>,
+    private storageService: StorageService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       registered: boolean;
@@ -196,7 +199,7 @@ export class EventRegistrationFormComponent {
   }
 
   submit() {
-    localStorage.removeItem('token_url');
+    this.storageService.remove(AuthenticationStateService.LOCAL_TOKEN_URL_KEY);
     if (this.form.valid) {
       this.model['event_id'] = this.data.event_id;
       if (this.user.id === null) {
@@ -210,7 +213,7 @@ export class EventRegistrationFormComponent {
             this.model['user_id'] = this.user.id;
             this.api.submitRegistration(this.model).subscribe();
             if (u.hasOwnProperty('token_url')) {
-              localStorage.setItem('token_url', u.token_url);
+              this.storageService.set(AuthenticationStateService.LOCAL_TOKEN_URL_KEY, u.token_url);
             }
             this.googleAnalytics.accountEvent('register');
             this._stateSubject.next('wait_for_email');

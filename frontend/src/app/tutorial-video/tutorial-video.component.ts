@@ -6,6 +6,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {YouTubePlayerModule} from '@angular/youtube-player';
 import {DetailsLinkComponent} from '@app/details-link/details-link.component';
 import {NavItem} from '@models/nav-item';
+import {StorageService} from '@services/storage/storage.service';
 import {MarkdownModule} from 'ngx-markdown';
 
 @Component({
@@ -13,7 +14,7 @@ import {MarkdownModule} from 'ngx-markdown';
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
   styleUrls: ['./tutorial-video.component.scss'],
-  imports: [MatButtonModule, MatIconModule, MarkdownModule, DetailsLinkComponent, CommonModule],
+  imports: [MatButtonModule, MatIconModule, MarkdownModule, DetailsLinkComponent, CommonModule, YouTubePlayerModule],
 })
 export class TutorialVideoComponent {
   @Input() videoSize: string;
@@ -27,7 +28,7 @@ export class TutorialVideoComponent {
     showinfo: 0, // YT.ShowInfo.Hide
   };
 
-  constructor() {}
+  constructor(private storageService: StorageService) {}
 
   get windowWidthFactor(): number {
     const windowWidthPx = window.innerWidth;
@@ -65,6 +66,6 @@ export class TutorialVideoComponent {
   }
 
   hideVideo() {
-    localStorage.setItem('shouldHideTutorialVideo', 'true');
+    this.storageService.set('shouldHideTutorialVideo', 'true');
   }
 }

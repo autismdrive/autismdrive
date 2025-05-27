@@ -1,10 +1,10 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ApiService} from '@app/_services/api/api.service';
+import {ApiService} from '@app/shared/services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {mockUserDetailsRoute} from '@util/testing/fixtures/mock-activated-route';
-import {makeMockEmailLog} from '@util/testing/fixtures/mock-email-log';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockUserDetailsRoute} from '@app/shared/fixtures/mock-activated-route';
+import {makeMockEmailLog} from '@app/shared/fixtures/mock-email-log';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {UserAdminDetailsComponent} from './user-admin-details.component';

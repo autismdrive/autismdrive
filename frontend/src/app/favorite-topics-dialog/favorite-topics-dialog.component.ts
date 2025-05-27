@@ -9,7 +9,7 @@ import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form
 import {MatIcon, MatIconModule} from '@angular/material/icon';
 import {MatOption, MatSelect, MatSelectModule} from '@angular/material/select';
 import {MatTreeModule} from '@angular/material/tree';
-import {TreeComponent} from '@app/_forms/tree/tree.component';
+import {TreeComponent} from '@app/shared/forms/tree/tree.component';
 import {Category} from '@models/category';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
 import {User} from '@models/user';

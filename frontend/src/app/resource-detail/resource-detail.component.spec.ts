@@ -1,11 +1,11 @@
 import {signal} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {ApiService} from '@app/_services/api/api.service';
+import {ApiService} from '@app/shared/services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
-import {mockResourceDetailsRoute} from '@util/testing/fixtures/mock-activated-route';
-import {mockUser} from '@util/testing/fixtures/mock-user';
+import {mockResourceDetailsRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {ResourceDetailComponent} from './resource-detail.component';

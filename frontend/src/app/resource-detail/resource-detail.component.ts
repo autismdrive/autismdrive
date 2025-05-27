@@ -1,6 +1,6 @@
 /// <reference types="@types/google.maps" />
 import {CommonModule, DatePipe, formatDate, NgOptimizedImage, UpperCasePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatLine} from '@angular/material/core';
@@ -62,9 +62,8 @@ export class ResourceDetailComponent {
   mapLoc: google.maps.LatLngLiteral;
   currentUser: User;
   changeLog: ResourceChangeLog[];
-  loading = true;
+  loading: WritableSignal<boolean> = signal(true);
   contactItems: ContactItem[];
-  typeName: string;
   showInfoWindow = false;
   safeVideoLink: SafeResourceUrl;
   safeVideoImgUrl: SafeResourceUrl;
@@ -89,7 +88,7 @@ export class ResourceDetailComponent {
       }
     });
     this.route.params.subscribe(params => {
-      this.loading = true;
+      this.loading.set(true);
       this.safeVideoLink = null;
       this.safeVideoImgUrl = null;
 
@@ -102,7 +101,7 @@ export class ResourceDetailComponent {
           this.resource = new Resource(resource);
           this.initializeContactItems();
           this.loadMapLocation();
-          this.loading = false;
+          this.loading.set(false);
           if (this.resource.video_code) {
             this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(
               'https://www.youtube.com/embed/' + this.resource.video_code,

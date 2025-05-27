@@ -11,7 +11,7 @@ import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {FormlyMatInputModule} from '@ngx-formly/material/input';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {scrollToTop} from '@util/scrollToTop';
+import {scrollToTop} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({

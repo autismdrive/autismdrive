@@ -1,6 +1,6 @@
 import {ApiService} from '@services/api/api.service';
 import {CategoriesService} from '@services/categories/categories.service';
-import {mockCategory} from '@util/testing/fixtures/mock-category';
+import {mockCategory} from '@app/shared/fixtures/mock-category';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {SearchTopicsComponent} from './search-topics.component';
 import {of} from 'rxjs';

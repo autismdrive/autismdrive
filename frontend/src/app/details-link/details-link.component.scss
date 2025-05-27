@@ -1,6 +1,6 @@
-@use "@angular/material" as mat;
-@use "material" as material-config;
- @use "config" as config;
+@use '@angular/material' as mat;
+@use '../../styles/material' as material-config;
+@use '../../styles/config' as config;
 
 a {
   transition: all 0.5s;
