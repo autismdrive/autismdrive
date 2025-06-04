@@ -309,7 +309,7 @@ export const getResourceFormFields = (categoryTree: Observable<Category[]> | Cat
     },
     {
       key: 'categories',
-      type: 'multiselecttree',
+      type: 'categorytree',
       props: {
         label: 'Topics',
         description: 'This field is required',

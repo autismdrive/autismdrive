@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {Crypto} from '@peculiar/webcrypto';
 import {ngMocks} from 'ng-mocks';
@@ -9,5 +10,7 @@ import {ngMocks} from 'ng-mocks';
     return '';
   },
 });
+// @ts-expect-error Zone.js patches MutationObserver in a way that is not compatible with happy-dom
+(window as any).MutationObserver = window[Zone.__symbol__('MutationObserver')];
 
 ngMocks.globalReplace(BrowserAnimationsModule, NoopAnimationsModule);

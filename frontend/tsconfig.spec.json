@@ -4,7 +4,8 @@
     "outDir": "./out-tsc/spec",
     "module": "CommonJs",
     "allowJs": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "types": ["jest"],
   },
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

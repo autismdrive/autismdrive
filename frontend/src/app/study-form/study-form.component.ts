@@ -255,7 +255,7 @@ export class StudyFormComponent implements OnInit {
       },
       {
         key: 'categories',
-        type: 'multiselecttree',
+        type: 'categorytree',
         props: {
           label: 'Topics',
           options: this.api.getCategoryTree(),

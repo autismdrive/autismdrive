@@ -1,6 +1,9 @@
+import {OverlayRef} from '@angular/cdk/overlay';
+import {MatSelect, MatSelectModule} from '@angular/material/select';
 import {ActivatedRoute, Router} from '@angular/router';
 import {customFormlyConfig} from '@app/app.config';
-import {FormlyModule} from '@ngx-formly/core';
+import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
+import {withFormlyMaterial} from '@ngx-formly/material';
 import {ApiService} from '@services/api/api.service';
 import {mockStudyEditRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockCategory} from '@app/shared/fixtures/mock-category';
@@ -19,7 +22,9 @@ describe('StudyFormComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(StudyFormComponent)
+      .keep(FormlyModule.forRoot(customFormlyConfig))
       .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide(provideFormlyCore([...withFormlyMaterial(), customFormlyConfig]))
       .mock(ApiService, {
         getInvestigators: jest.fn().mockReturnValue(of([mockInvestigator])),
         getCategoryTree: jest.fn().mockReturnValue(of([mockCategory])),
@@ -33,8 +38,8 @@ describe('StudyFormComponent', () => {
       })
       .provide({provide: ActivatedRoute, useValue: mockStudyEditRoute})
       .keep(Router)
-      .keep(FormlyModule.forRoot(customFormlyConfig))
-      .mock(DeviceDetectorService);
+      .mock(DeviceDetectorService)
+      .keep(MatSelectModule);
   });
 
   beforeEach(() => {

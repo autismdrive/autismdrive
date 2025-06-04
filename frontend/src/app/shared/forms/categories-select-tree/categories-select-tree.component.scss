@@ -18,14 +18,14 @@
  * This padding sets alignment of the nested nodes.
  */
 .tree-select .mat-nested-tree-node div[role='group'] {
-  padding-left: 40px;
+  padding-left: 2rem;
+
+  .mat-nested-tree-node {
+    padding-left: 0;
+  }
 }
 
-/*
- * Padding for leaf nodes.
- * Leaf nodes need to have padding so as to align with other non-leaf nodes
- * under the same parent.
- */
-.tree-select div[role='group'] > .mat-nested-tree-node {
-  padding-left: 40px;
+.leaf-tree-node {
+  display: flex;
+  align-items: center;
 }

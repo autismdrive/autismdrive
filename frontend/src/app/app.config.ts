@@ -21,7 +21,7 @@ import {YouTubePlayerModule} from '@angular/youtube-player';
 import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
 import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
 import {HelpWrapperComponent} from '@forms/help-wrapper/help-wrapper.component';
-import {MultiselectTreeComponent} from '@forms/multiselect-tree/multiselect-tree.component';
+import {CategoriesSelectTreeComponent} from '@forms/categories-select-tree/categories-select-tree.component';
 import {RepeatSectionComponent} from '@forms/repeat-section/repeat-section.component';
 import {
   EmailMatchValidator,
@@ -70,8 +70,8 @@ export const customFormlyConfig = {
   types: [
     {name: 'repeat', component: RepeatSectionComponent},
     {
-      name: 'multiselecttree',
-      component: MultiselectTreeComponent,
+      name: 'categorytree',
+      component: CategoriesSelectTreeComponent,
       wrappers: ['card'],
     },
   ],

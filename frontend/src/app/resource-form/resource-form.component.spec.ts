@@ -1,8 +1,10 @@
 import {signal} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatSelectModule} from '@angular/material/select';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {customFormlyConfig} from '@app/app.config';
-import {FormlyModule} from '@ngx-formly/core';
+import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
+import {withFormlyMaterial} from '@ngx-formly/material';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockResourceEditRoute} from '@app/shared/fixtures/mock-activated-route';
@@ -20,6 +22,8 @@ describe('ResourceFormComponent', () => {
   beforeEach(() => {
     return MockBuilder(ResourceFormComponent)
       .keep(FormlyModule.forRoot(customFormlyConfig))
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide(provideFormlyCore([...withFormlyMaterial(), customFormlyConfig]))
       .keep(FormsModule)
       .keep(ReactiveFormsModule)
       .mock(ApiService, {
@@ -33,12 +37,13 @@ describe('ResourceFormComponent', () => {
         useValue: mockResourceEditRoute,
       })
       .keep(RouterModule)
-      .keep(NG_MOCKS_ROOT_PROVIDERS);
+      .keep(MatSelectModule);
   });
 
   beforeEach(() => {
     fixture = MockRender(ResourceFormComponent, null, {detectChanges: true});
     component = fixture.point.componentInstance;
+    window.scrollTo = jest.fn();
   });
 
   it('should create', () => {

@@ -1,38 +1,44 @@
 import {SelectionModel} from '@angular/cdk/collections';
+import {CdkTreeNode} from '@angular/cdk/tree';
 import {CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
+import {MatError, MatLabel} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTree, MatTreeModule, MatTreeNestedDataSource} from '@angular/material/tree';
-import {Category, CatTreeNode} from '@app/shared/models/category';
+import {Category} from '@models/category';
 import {FieldTypeConfig, FormlyModule} from '@ngx-formly/core';
 import {FieldType} from '@ngx-formly/material';
 import {lastValueFrom, Observable} from 'rxjs';
 
+export type CatTreeNode = CdkTreeNode<Category, Category>;
+
 @Component({
   standalone: true,
-  selector: 'app-multiselect-tree',
-  templateUrl: './multiselect-tree.component.html',
-  styleUrls: ['./multiselect-tree.component.scss'],
+  selector: 'app-categories-select-tree',
+  templateUrl: './categories-select-tree.component.html',
+  styleUrl: './categories-select-tree.component.scss',
   imports: [
+    CommonModule,
+    FormlyModule,
     MatBadgeModule,
+    MatButtonModule,
     MatCheckboxModule,
     MatIconModule,
-    MatButtonModule,
     MatTreeModule,
-    CommonModule,
     ReactiveFormsModule,
-    FormlyModule,
+    MatLabel,
+    MatError,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MultiselectTreeComponent extends FieldType<FieldTypeConfig> implements OnInit {
+export class CategoriesSelectTreeComponent extends FieldType<FieldTypeConfig> implements OnInit {
   dataSource: MatTreeNestedDataSource<Category>;
-  @ViewChild(MatTree) tree: MatTree<Category, string>;
-  @ViewChild('categoryCheckbox') checkboxes: MatCheckbox[];
+  @ViewChild(MatTree) tree: MatTree<Category, number>;
+  @ViewChildren('categoryCheckbox') checkboxes: MatCheckbox[];
 
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
@@ -46,7 +52,6 @@ export class MultiselectTreeComponent extends FieldType<FieldTypeConfig> impleme
   expansionKey = (node: Category) => node.id;
   childrenAccessor = (dataNode: Category) => dataNode.children ?? [];
   hasNestedChild = (_: number, node: Category) => node?.children?.length > 0;
-  descendantsMap = new Map<number, Category[]>();
 
   ngOnInit() {
     this.setOptions();
@@ -70,7 +75,6 @@ export class MultiselectTreeComponent extends FieldType<FieldTypeConfig> impleme
   async setOptions() {
     const options: Category[] | Observable<Category[]> = this.props.options;
     this.dataSource.data = options instanceof Observable ? await lastValueFrom(options) : options;
-    this.initializeDescendantsMap();
     this.updateSelection();
     this.form.updateValueAndValidity();
   }
@@ -87,27 +91,6 @@ export class MultiselectTreeComponent extends FieldType<FieldTypeConfig> impleme
         }
       }
     }
-  }
-
-  numSelectedDescendants(category: Category): number {
-    const descendants = this.descendantsMap.get(category.id);
-    const selectedDescendants = descendants.filter(d => this.checklistSelection.isSelected(d));
-    return selectedDescendants.length;
-  }
-
-  /** Returns a flat list of Categories that have the given category as an ancestor. */
-  getDescendants(category: Category, descendants: Category[]) {
-    if (!descendants) {
-      descendants = [];
-    }
-
-    // Recurse through all children and populate the descendants list.
-    for (const child of category.children) {
-      descendants.push(child);
-      this.getDescendants(child, descendants);
-    }
-
-    return descendants;
   }
 
   /** Toggle the category item selection. */
@@ -128,31 +111,5 @@ export class MultiselectTreeComponent extends FieldType<FieldTypeConfig> impleme
     this.checkboxes.forEach(c => {
       this.renderer2.setAttribute(c._inputElement.nativeElement, 'name', this.field.key.toString());
     });
-  }
-
-  /**
-   * Recurse through entire tree, building a map of ids and a list of descendant categories.
-   * Do this just once when the tree initializes, so we don't have to update it every time
-   * the tree updates.
-   **/
-  initializeDescendantsMap() {
-    const _recurseThroughDescendants = (ancestorCat: Category) => {
-      const descendants = [];
-
-      // Recurse through all children of this category and populate its descendants list.
-      for (const child of ancestorCat.children) {
-        descendants.push(child);
-        descendants.concat(_recurseThroughDescendants(child));
-      }
-
-      // Through the magic of recursion, the descendants list should now contain just the descendants of the given category.
-      this.descendantsMap.set(ancestorCat.id, descendants);
-      return descendants;
-    };
-
-    // Loop through root-level categories
-    for (const cat of this.dataSource.data) {
-      _recurseThroughDescendants(cat);
-    }
   }
 }

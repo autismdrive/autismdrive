@@ -1,7 +1,8 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {customFormlyConfig} from '@app/app.config';
-import {FormlyModule} from '@ngx-formly/core';
+import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
+import {withFormlyMaterial} from '@ngx-formly/material';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
@@ -23,6 +24,7 @@ describe('EnrollmentFlowComponent', () => {
     return MockBuilder(FlowComponent)
       .keep(FormlyModule.forRoot(customFormlyConfig))
       .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide(provideFormlyCore([...withFormlyMaterial(), customFormlyConfig]))
       .provide({
         provide: ActivatedRoute,
         useValue: of(

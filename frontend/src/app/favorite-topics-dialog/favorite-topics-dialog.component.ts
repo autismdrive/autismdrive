@@ -1,26 +1,21 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {CommonModule, NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatBadge, MatBadgeModule} from '@angular/material/badge';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatBadgeModule} from '@angular/material/badge';
 import {MatButtonModule} from '@angular/material/button';
-import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
-import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form-field';
-import {MatIcon, MatIconModule} from '@angular/material/icon';
-import {MatOption, MatSelect, MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
 import {MatTreeModule} from '@angular/material/tree';
-import {TreeComponent} from '@app/shared/forms/tree/tree.component';
 import {Category} from '@models/category';
 import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
 import {User} from '@models/user';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
-import {Observable} from 'rxjs';
 import {ResourceDetailComponent} from '../resource-detail/resource-detail.component';
-
-interface TopicOption {
-  value: string;
-  label: string;
-}
 
 @Component({
   standalone: true,
@@ -37,15 +32,15 @@ interface TopicOption {
     MatSelectModule,
     MatTreeModule,
     CommonModule,
+    FormlyModule,
+    ReactiveFormsModule,
   ],
 })
-export class FavoriteTopicsDialogComponent extends TreeComponent implements OnInit {
-  ageOptions = AgeRange.options;
-  languageOptions = Language.options;
-  covid19Options = Covid19Categories.options;
-
+export class FavoriteTopicsDialogComponent implements OnInit {
   /** The selection for checklist */
   checklistSelection = new SelectionModel<Category>(true /* multiple */);
+  form = new FormGroup({});
+  fields: FormlyFieldConfig[];
 
   constructor(
     private api: ApiService,
@@ -58,45 +53,45 @@ export class FavoriteTopicsDialogComponent extends TreeComponent implements OnIn
       languages: string[];
       covid19_categories: string[];
     },
-  ) {
-    super();
-  }
+  ) {}
 
   ngOnInit() {
-    this.api.getCategoryTree().subscribe((categories: Category[]) => {
-      this.dataSource.data = categories;
-      this.updateTopicSelection();
-    });
-  }
-
-  updateTopicSelection() {
-    if (this.data.topics) {
-      this.data.topics.forEach(cat => {
-        const node = this.findNode(cat.id);
-        if (node) {
-          this.toggleNode(node);
-        }
-        this._updateModelCategories();
-      });
-    }
-  }
-
-  /** Toggle the category item selection. */
-  toggleNode(node: Category): void {
-    this.checklistSelection.toggle(node);
-    this._updateModelCategories();
-  }
-
-  async numSelectedDescendants(category: Category): Promise<number> {
-    const node = this.findNode(category.id);
-    const descendants: Category[] = await this.getDescendants(node);
-    const selectedDescendants = descendants.filter(d => this.checklistSelection.isSelected(d));
-    return selectedDescendants.length;
-  }
-
-  private _updateModelCategories() {
-    this.data.topics = [];
-    this.checklistSelection.selected.forEach(c => this.data.topics.push(c));
+    this.fields = [
+      {
+        key: 'topics',
+        type: 'categorytree',
+        props: {
+          label: 'Topics',
+          options: this.api.getCategoryTree(),
+          valueProp: 'id',
+          labelProp: 'name',
+        },
+      },
+      {
+        key: 'ages',
+        type: 'multicheckbox',
+        props: {
+          label: 'Ages',
+          options: AgeRange.options,
+        },
+      },
+      {
+        key: 'languages',
+        type: 'multicheckbox',
+        props: {
+          label: 'Languages',
+          options: Language.options,
+        },
+      },
+      {
+        key: 'covid19_categories',
+        type: 'multicheckbox',
+        props: {
+          label: 'COVID-19 Categories',
+          options: Covid19Categories.options,
+        },
+      },
+    ];
   }
 
   onNoClick(): void {

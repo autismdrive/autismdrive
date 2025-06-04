@@ -5,16 +5,22 @@ const tsconfigJSON = createRequire(import.meta.url)('./tsconfig.json');
 
 const esModules = [
   '@angular',
-  '@testing-library',
-  'ngx-markdown',
-  '@ngx-formly',
-  'ngx-device-detector',
   '@ng-maps',
   '@ngbracket',
+  '@ngx-formly',
+  '@testing-library',
   '@types/google.maps',
   '@yellowspot/ng-truncate',
+  'data-uri-to-buffer',
+  'fetch-blob',
+  'formdata-polyfill',
+  'jsdom-worker',
+  'lodash-es',
   'ng2-pdfjs-viewer',
+  'ngx-device-detector',
+  'ngx-markdown',
   'ngx-progressbar',
+  'node-fetch',
 ];
 
 class StorageMock {
@@ -54,6 +60,7 @@ export default {
   preset: 'jest-preset-angular',
   roots: ['<rootDir>/src/'],
   testMatch: ['**/+(*.)+(spec).+(ts)'],
+  setupFiles: ['jsdom-worker'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   collectCoverage: true,
   coverageReporters: ['lcov', 'html'],
@@ -62,9 +69,11 @@ export default {
   moduleNameMapper: pathsToModuleNameMapper(tsconfigJSON.compilerOptions.paths || {}, {
     prefix: '<rootDir>/',
   }),
+  testEnvironment: '@happy-dom/jest-environment',
   transform: {
     '.js': 'jest-esm-transformer-2',
   },
+
   transformIgnorePatterns: [`node_modules/(?!(${esModules.join('|')})/)`],
   globals: {
     addeventatc: {

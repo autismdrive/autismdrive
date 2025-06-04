@@ -1,6 +1,7 @@
 import {ActivatedRoute} from '@angular/router';
 import {customFormlyConfig} from '@app/app.config';
-import {FormlyModule} from '@ngx-formly/core';
+import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
+import {withFormlyMaterial} from '@ngx-formly/material';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
@@ -17,6 +18,7 @@ describe('RegisterComponent', () => {
     return MockBuilder(RegisterComponent)
       .keep(FormlyModule.forRoot(customFormlyConfig))
       .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide(provideFormlyCore([...withFormlyMaterial(), customFormlyConfig]))
       .mock(ApiService, {addUser: jest.fn().mockReturnValue(of(mockUser))})
       .mock(GoogleAnalyticsService, {})
       .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, 'register')});
