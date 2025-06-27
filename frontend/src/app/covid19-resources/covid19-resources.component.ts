@@ -82,7 +82,7 @@ export class Covid19ResourcesComponent {
         title: r.title,
         content: r.description,
         description: r.description,
-        last_updated: r.last_updated,
+        last_updated: new Date(Date.parse(r.last_updated)),
         highlights: null,
         url: `/resource/${r.id}`,
         label: 'Research Studies',

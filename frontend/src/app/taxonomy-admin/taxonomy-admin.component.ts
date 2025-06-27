@@ -15,7 +15,7 @@ import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {Observable, of} from 'rxjs';
+import {lastValueFrom, Observable, of} from 'rxjs';
 
 @Component({
   standalone: true,
@@ -202,6 +202,9 @@ export class TaxonomyAdminComponent {
           return cat;
         });
       }
+    } else {
+      // Category list is empty, so just return it.
+      return cats;
     }
   }
 
@@ -213,22 +216,24 @@ export class TaxonomyAdminComponent {
 
   /** Recursively visits every node in the given tree and executes the given callback on each node */
   private async walkTree(cats: Category[], callback: (c: Category, i: number) => Observable<any>) {
-    return cats.map(async (c, i) => {
+    const results = [];
+
+    for (let i = 0; i < cats.length; i++) {
+      const c = cats[i];
+
       // Store node in an index for faster retrieval by id later.
       this.nodes[c.id] = c;
 
-      // Execute the callback.
-      const result = callback(c, i);
+      // Execute the callback and store the result in results.
+      results.push(await lastValueFrom(callback(c, i)));
 
       // If this node has children, recursively walk them.
       if (c.children && c.children.length > 0) {
-        // The callback must return an observable. Wait for the
-        // observable to resolve before going through the next level.
-        return result.subscribe(async () => {
-          return await this.walkTree(c.children, callback);
-        });
+        return await this.walkTree(c.children, callback);
       }
-    });
+    }
+
+    return results;
   }
 
   /** Returns true if any category in the given category tree is missing the display_order property. */

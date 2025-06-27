@@ -27,5 +27,7 @@ export class GeoLocation {
       const dist = getDistance(here, there);
       return convertDistance(dist, 'mi').toFixed(1);
     }
+
+    return '';
   }
 }

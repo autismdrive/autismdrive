@@ -1,14 +1,5 @@
 import {AsyncPipe, CommonModule} from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, Output, signal, ViewChild} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {
   MatAutocomplete,
@@ -26,7 +17,7 @@ import {Category} from '@models/category';
 import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {CategoriesService} from '@services/categories/categories.service';
 import {StorageService} from '@services/storage/storage.service';
-import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, timer} from 'rxjs';
+import {debounce, map, Observable, startWith, timer} from 'rxjs';
 
 @Component({
   standalone: true,
@@ -50,15 +41,14 @@ import {debounce, debounceTime, distinctUntilChanged, map, Observable, startWith
 export class SearchBoxComponent implements OnInit, AfterViewInit {
   @Input() variant: 'dark-bg' | 'light-bg' = 'light-bg';
   @Input() words: string;
-  @Output() categorySelected = new EventEmitter<Category>();
-  @Output() searchUpdated = new EventEmitter<Params>();
+  @Output() categorySelected = signal<Category>(null);
+  @Output() searchUpdated = signal<Params>(null);
   autocompletePanelElement: MatAutocomplete;
   autocompletePanelTriggerElement: MatAutocompleteTrigger;
   filteredOptions: Observable<Category[]>;
   queryParams: Params;
   searchBoxControl = new FormControl();
   searchInputElement: MatInput;
-  searchUpdate = new Subject<string>();
   skipUpdate = false;
 
   constructor(
@@ -69,8 +59,6 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     private storageService: StorageService,
   ) {
     this.route.queryParams.pipe(debounce(() => timer(1000))).subscribe(qp => (this.queryParams = qp));
-
-    this.searchUpdate.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => this.updateSearch(false));
   }
 
   get videoIsVisible(): boolean {
@@ -111,12 +99,12 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     return option?.indentedString;
   }
 
-  updateSearch(removeWords: boolean): Promise<boolean> {
+  async updateSearch(removeWords: boolean): Promise<boolean> {
     if (this.skipUpdate) {
       // Stupid hack to prevent submitting a keyword search when the user is selecting
       // a topic from the autocomplete panel.
       this.skipUpdate = false;
-      return;
+      return false;
     }
 
     if (removeWords) {
@@ -142,11 +130,11 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
           queryParams: newParams,
         })
         .finally(() => {
-          this.searchUpdated.emit(newParams);
+          this.searchUpdated.set(newParams);
           this.changeDetectorRef.detectChanges();
         });
     } else {
-      return this.router.navigateByUrl('/search').finally(() => this.searchUpdated.emit(newParams));
+      return this.router.navigateByUrl('/search').finally(() => this.searchUpdated.set(newParams));
     }
   }
 
@@ -178,7 +166,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     this.skipUpdate = true;
 
     // Emit the selected category.
-    this.categorySelected.emit($event.option.value as Category);
+    this.categorySelected.set($event.option.value as Category);
   }
 
   showVideo() {

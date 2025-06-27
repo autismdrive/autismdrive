@@ -71,13 +71,13 @@ export class LoginComponent {
   ) {
     this.route.queryParams.subscribe(qParams => {
       if (qParams.hasOwnProperty('returnUrl')) {
-        this.returnUrl = qParams.returnUrl;
+        this.returnUrl = qParams['returnUrl'];
       }
     });
 
     this.route.params.subscribe(params => {
       if (params.hasOwnProperty('email_token')) {
-        this.emailToken = params.email_token;
+        this.emailToken = params['email_token'];
       }
     });
 

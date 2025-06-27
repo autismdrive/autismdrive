@@ -18,7 +18,7 @@
     <div fxLayout="column">
       <app-search-box
         [variant]="'light-bg'"
-        (searchUpdated)="querySubject.next(this.query)"
+        (searchUpdated)="updateQueryParams($event)"
         (categorySelected)="selectCategory($event)"
         [words]="query?.words"
       ></app-search-box>

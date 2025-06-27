@@ -7,7 +7,7 @@ class LabelsOptions {
 }
 
 export class HitType extends LabelsOptions {
-  static labels = {
+  static override labels = {
     location: 'Local Services',
     resource: 'Online Information',
     event: 'Events and Training',
@@ -40,7 +40,7 @@ export class HitType extends LabelsOptions {
 }
 
 export class AgeRange extends LabelsOptions {
-  static labels = {
+  static override labels = {
     'pre-k': 'Pre-K (0 - 5 years)',
     school: 'School Age (6 - 13 years)',
     transition: 'Transition Age (14 - 22 years)',
@@ -50,7 +50,7 @@ export class AgeRange extends LabelsOptions {
 }
 
 export class Language extends LabelsOptions {
-  static labels = {
+  static override labels = {
     english: 'English',
     spanish: 'Spanish',
     chinese: 'Chinese',
@@ -62,7 +62,7 @@ export class Language extends LabelsOptions {
 }
 
 export class Covid19Categories extends LabelsOptions {
-  static labels = {
+  static override labels = {
     'COVID-19_for_Autism':
       'COVID-19 Information: Information explaining COVID-19 for people with ASD, families and professionals',
     Health_and_Telehealth:

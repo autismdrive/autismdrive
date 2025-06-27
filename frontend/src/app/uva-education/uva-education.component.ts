@@ -83,5 +83,7 @@ export class UvaEducationComponent {
         return n;
       });
     }
+
+    return [];
   }
 }

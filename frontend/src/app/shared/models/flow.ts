@@ -1,7 +1,17 @@
 import {Step} from './step';
 
+export enum FlowName {
+  SELF_INTAKE = 'self_intake',
+  DEPENDENT_INTAKE = 'dependent_intake',
+  GUARDIAN_INTAKE = 'guardian_intake',
+  PROFESSIONAL_INTAKE = 'professional_intake',
+  INTERESTED_INTAKE = 'interested_intake',
+  REGISTRATION = 'registration',
+  SKILLSTAR = 'skillstar',
+}
+
 export class Flow {
-  name: string;
+  name: FlowName;
   steps: Step[];
 
   constructor(private _props) {

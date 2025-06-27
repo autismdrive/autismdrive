@@ -143,7 +143,7 @@ export class StudiesComponent {
     });
   }
 
-  getEnrollmentStatusMessage(selectedStatus: StudyStatusObj) {
+  getEnrollmentStatusMessage(selectedStatus: StudyStatusObj): string {
     switch (StudyStatus[selectedStatus.name]) {
       case StudyStatus.currently_enrolling:
         return 'that are enrolling';
@@ -153,6 +153,8 @@ export class StudiesComponent {
         return 'that are in progress';
       case StudyStatus.study_results_published:
         return 'where results have been published';
+      default:
+        return '';
     }
   }
 }

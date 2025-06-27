@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
           if (e instanceof ActivationStart || e instanceof ActivationEnd) {
             if (e.snapshot && e.snapshot.data) {
               const data = e.snapshot.data;
-              this.hideHeader = !!data.hideHeader;
+              this.hideHeader = !!data['hideHeader'];
             }
           }
         });
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
     console.log('AppComponent > ngOnInit');
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        const title = this.route.snapshot.firstChild.data.title;
+        const title = this.route.snapshot.firstChild.data['title'];
         const bodyElement = document.querySelector('body');
         bodyElement.classList.toggle('is-home', this.router.url === '/home');
         if (title) {

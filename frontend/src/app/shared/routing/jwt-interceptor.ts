@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 
 export function jwtInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const authStateService = inject(forwardRef(() => AuthenticationStateService));
-  const isS3 = new RegExp('^https?://s3.amazonaws.com.*');
+  const isS3 = new RegExp('^https?:\/\/s3\.amazonaws\.com\/(.*)');
 
   // add authorization header with jwt token if available
   const token = authStateService.authToken;

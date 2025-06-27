@@ -63,5 +63,7 @@ export class SearchResultComponent {
         }
       }
     }
+
+    return '';
   }
 }

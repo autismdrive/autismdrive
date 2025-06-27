@@ -379,6 +379,8 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     if (this.lgMediaQuery.matches) {
       return ViewportWidth.Large;
     }
+
+    return ViewportWidth.Medium;
   }
 
   get headerViewportState(): string {

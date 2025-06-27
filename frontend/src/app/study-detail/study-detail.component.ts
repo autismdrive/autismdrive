@@ -53,7 +53,7 @@ export class StudyDetailComponent {
       this.currentUser = this.authenticationService.currentUser();
       this.route.params.subscribe(params => {
         this.loading = true;
-        const studyId = params.studyId ? parseInt(params.studyId, 10) : null;
+        const studyId = params['studyId'] ? parseInt(params['studyId'], 10) : null;
 
         if (isFinite(studyId)) {
           this.api.getStudy(studyId).subscribe(study => {

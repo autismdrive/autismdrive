@@ -92,7 +92,7 @@ export class ResourceDetailComponent {
       this.safeVideoLink = null;
       this.safeVideoImgUrl = null;
 
-      const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
+      const resourceId = params['resourceId'] ? parseInt(params['resourceId'], 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
         const path = this.route.snapshot.url[0].path;
@@ -176,6 +176,8 @@ export class ResourceDetailComponent {
 
       return `https://www.google.com/maps/dir/${this.mapLoc.lat},${this.mapLoc.lng}/${encodeURIComponent(address)}`;
     }
+
+    return '';
   }
 
   initializeContactItems() {

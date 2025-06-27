@@ -12,25 +12,7 @@ export interface GeoBox {
   bottom_right: GeoPoint;
 }
 
-export interface QueryProps {
-  words?: string;
-  total?: number;
-  start?: number;
-  size?: number;
-  types?: string[];
-  ages?: string[];
-  languages?: string[];
-  sort?: Sort;
-  hits?: Hit[];
-  category?: Category;
-  type_counts?: Aggregation[];
-  age_counts?: Aggregation[];
-  language_counts?: Aggregation[];
-  date?: Date;
-  status?: string;
-  map_data_only?: boolean;
-  geo_box: GeoBox;
-}
+export type QueryProps = Partial<Query>;
 
 export class Query {
   words = '';
@@ -62,37 +44,37 @@ export class Query {
       }
     }
 
-    if (this.hits && this.hits.length > 0) {
+    if (this.hits?.length > 0) {
       this.hits = this.hits.map(h => new Hit(h));
     }
   }
 
   public get hasHits(): boolean {
-    return !!(this.hits && this.hits.length > 0);
+    return this.hits?.length > 0;
   }
 
   public get hasWords(): boolean {
-    return !!(this.words && this.words.length > 0);
+    return this.words?.length > 0;
   }
 
   public get hasTypes(): boolean {
-    return !!(this.types && (this.types.length === 1 || this.types.length === 2));
+    return [1, 2].includes(this.types?.length);
   }
 
   public get hasAges(): boolean {
-    return !!(this.ages && this.ages.length > 0);
+    return this.ages?.length > 0;
   }
 
   public get hasLanguages(): boolean {
-    return !!(this.languages && this.languages.length > 0);
+    return this.languages?.length > 0;
   }
 
   public get hasCategory(): boolean {
-    return !!(this.category && this.category.id);
+    return !!this.category?.id;
   }
 
   public get hasFilters(): boolean {
-    return !!(this.hasWords || this.hasTypes || this.hasLanguages || this.hasAges || this.hasCategory);
+    return this.hasWords || this.hasTypes || this.hasLanguages || this.hasAges || this.hasCategory;
   }
 
   public get hitTypes(): HitType[] {
@@ -126,6 +108,8 @@ export class Aggregation {
   is_selected: boolean;
 }
 
+export type HitProps = Partial<Hit>;
+
 export class Hit extends GeoLocation {
   type: string;
   ages: string[];
@@ -142,7 +126,7 @@ export class Hit extends GeoLocation {
   status?: string;
   is_draft?: boolean;
 
-  constructor(private _props) {
+  constructor(private _props: HitProps) {
     super(_props);
 
     for (const propName in this._props) {

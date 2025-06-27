@@ -53,7 +53,7 @@ export class UserAdminDetailsComponent {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
       this.route.params.subscribe(params => {
-        const userId = params.userId ? parseInt(params.userId, 10) : null;
+        const userId = params['userId'] ? parseInt(params['userId'], 10) : null;
 
         if (isFinite(userId)) {
           this.api.getUser(userId).subscribe(user => {

@@ -41,6 +41,8 @@ export class TutorialVideoComponent {
       return 0.9;
     } else if (windowWidthPx >= 1280) {
       return 1.0;
+    } else {
+      return 1.0;
     }
   }
 
@@ -49,6 +51,7 @@ export class TutorialVideoComponent {
       case 'large':
         return 1.0;
       case 'medium':
+      default:
         return 0.75;
       case 'small':
         return 0.5;

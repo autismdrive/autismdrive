@@ -1,9 +1,12 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {HitType} from '@models/hit_type';
+import {sortMethods} from '@models/sort_method';
+import {cloneDeep} from 'lodash-es';
 import createClone from 'rfdc';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {GeoBox, Query} from '@app/shared/models/query';
+import {GeoBox, Query, QueryProps} from '@app/shared/models/query';
 import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
 
 @Injectable({providedIn: 'root'})
@@ -19,7 +22,7 @@ export class SearchService {
     const url = this.config.apiUrl + this.query_url;
     return this._http.post<any>(url, query).pipe(
       map(queryDict => {
-        return this._loadQuery(queryDict);
+        return this.loadQuery(queryDict);
       }),
     );
   }
@@ -32,10 +35,19 @@ export class SearchService {
     return this.search(mapQuery);
   }
 
-  private _loadQuery(queryDict): Query {
-    if (queryDict && queryDict.hits) {
-      const query = new Query(queryDict);
-      return query;
+  loadQuery(queryDict: QueryProps): Query {
+    if (queryDict?.hits) {
+      return new Query(queryDict);
     }
+
+    return new Query({
+      geo_box: undefined,
+      words: '',
+      ages: [],
+      languages: [],
+      sort: cloneDeep(sortMethods.DISTANCE.sortQuery),
+      start: 0,
+      types: HitType.all_resources().map(type => type.name),
+    });
   }
 }

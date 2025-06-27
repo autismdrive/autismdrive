@@ -1,4 +1,5 @@
 import {SortMethod, sortMethods} from '@models/sort_method';
+import {cloneDeep} from 'lodash-es';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import createClone from 'rfdc';
 import {SearchSortComponent} from './search-sort.component';
@@ -11,7 +12,7 @@ interface SearchSortParams {
 describe('SearchSortComponent', () => {
   let component: SearchSortComponent;
   let fixture: MockedComponentFixture<SearchSortComponent, SearchSortParams>;
-  const mockSortMethods = createClone()(sortMethods);
+  const mockSortMethods = cloneDeep(sortMethods);
   const mockLocation = {latitude: 0, longitude: 0};
   mockSortMethods.DISTANCE.sortQuery.latitude = mockLocation.latitude;
   mockSortMethods.DISTANCE.sortQuery.longitude = mockLocation.longitude;

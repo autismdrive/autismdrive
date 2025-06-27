@@ -94,8 +94,8 @@ export class FlowComponent implements OnDestroy {
     effect(() => {
       this.user = this.authenticationService.currentUser();
       this.route?.params?.subscribe(params => {
-        this.participant = this.user.getParticipantById(parseInt(params.participantId, 10));
-        this.loadFlow(params.flowName);
+        this.participant = this.user.getParticipantById(parseInt(params['participantId'], 10));
+        this.loadFlow(params['flowName']);
       });
     });
   }

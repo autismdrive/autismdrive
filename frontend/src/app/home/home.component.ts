@@ -53,7 +53,7 @@ export class HomeComponent {
   }
 
   private _studiesToNewsItems(studies: Study[]): NewsItem[] {
-    if (this.currentStudies && this.currentStudies.length > 0) {
+    if (this.currentStudies()?.length > 0) {
       return studies.map(s => {
         const n: NewsItem = {
           title: s.short_title || s.title,
@@ -67,6 +67,8 @@ export class HomeComponent {
         return n;
       });
     }
+
+    return [];
   }
 
   private async loadStudies() {

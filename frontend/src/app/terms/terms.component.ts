@@ -3,6 +3,7 @@ import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
+import {FlowName} from '@models/flow';
 import {Participant} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {User} from '@models/user';
@@ -33,7 +34,7 @@ export class TermsComponent {
     private googleAnalyticsService: GoogleAnalyticsService,
   ) {
     this.route.params.subscribe(params => {
-      this.relationship = params.relationship;
+      this.relationship = params['relationship'];
       if ('preview' in params) {
         this.preview = params['preview'];
       }
@@ -49,17 +50,19 @@ export class TermsComponent {
     this.router.navigate(['profile']);
   }
 
-  getFlow(relationship: ParticipantRelationship) {
+  getFlow(relationship: ParticipantRelationship): FlowName {
     if (relationship === ParticipantRelationship.SELF_PARTICIPANT) {
-      return 'self_intake';
+      return FlowName.SELF_INTAKE;
     } else if (relationship === ParticipantRelationship.SELF_GUARDIAN) {
-      return 'guardian_intake';
+      return FlowName.GUARDIAN_INTAKE;
     } else if (relationship === ParticipantRelationship.DEPENDENT) {
-      return 'dependent_intake';
+      return FlowName.DEPENDENT_INTAKE;
     } else if (relationship === ParticipantRelationship.SELF_PROFESSIONAL) {
-      return 'professional_intake';
+      return FlowName.PROFESSIONAL_INTAKE;
     } else if (relationship === ParticipantRelationship.SELF_INTERESTED) {
-      return 'interested_intake';
+      return FlowName.PROFESSIONAL_INTAKE;
+    } else {
+      throw new Error(`Invalid participant relationship type: ${relationship}`);
     }
   }
 
