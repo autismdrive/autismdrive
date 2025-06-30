@@ -51,16 +51,16 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public/assets/",
-                "output": "/assets/"
+                "input": "public/",
+                "output": "/public/"
               }
             ],
             "styles": [
               "src/styles.scss",
-              "public/assets/css/icofont.css",
-              "public/assets/css/material-icons.css",
-              "public/assets/css/franklin-gothic-urw.css",
-              "public/assets/css/bodoni-urw.css"
+              "public/css/icofont.css",
+              "public/css/material-icons.css",
+              "public/css/franklin-gothic-urw.css",
+              "public/css/bodoni-urw.css"
             ],
             "scripts": [],
             "allowedCommonJsDependencies": ["geolib", "rfdc", "fast-deep-equal"],
@@ -157,13 +157,13 @@
             "configPath": "jest.config.mjs",
             "polyfills": ["zone.js", "zone.js/testing"],
             "inlineStyleLanguage": ["scss"],
-            "assets": ["public/assets"],
+            "assets": ["public"],
             "styles": [
               "src/styles.scss",
-              "public/assets/css/icofont.css",
-              "public/assets/css/material-icons.css",
-              "public/assets/css/franklin-gothic-urw.css",
-              "public/assets/css/bodoni-urw.css"
+              "public/css/icofont.css",
+              "public/css/material-icons.css",
+              "public/css/franklin-gothic-urw.css",
+              "public/css/bodoni-urw.css"
             ],
             "scripts": []
           }

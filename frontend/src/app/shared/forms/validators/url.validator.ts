@@ -28,4 +28,6 @@ export function ValidateUrl(control: AbstractControl): ValidationErrors {
     const error: ValidationErrors = {url: true};
     return error;
   }
+
+  return null;
 }

@@ -33,15 +33,15 @@ export class UvaEducationComponent {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
       this.meta.updateTag(
-        {property: 'og:image', content: location.origin + '/assets/education/uva_education.jpg'},
+        {property: 'og:image', content: location.origin + '/public/education/uva_education.jpg'},
         `property='og:image'`,
       );
       this.meta.updateTag(
-        {property: 'og:image:secure_url', content: location.origin + '/assets/education/uva_education.jpg'},
+        {property: 'og:image:secure_url', content: location.origin + '/public/education/uva_education.jpg'},
         `property='og:image:secure_url'`,
       );
       this.meta.updateTag(
-        {name: 'twitter:image', content: location.origin + '/assets/education/uva_education.jpg'},
+        {name: 'twitter:image', content: location.origin + '/public/education/uva_education.jpg'},
         `name='twitter:image'`,
       );
       this.loadResources();
@@ -60,7 +60,7 @@ export class UvaEducationComponent {
     if (resource.video_code) {
       return 'https://img.youtube.com/vi/' + resource.video_code + '/hqdefault.jpg';
     } else {
-      return '/assets/about/feature.jpg';
+      return '/public/about/feature.jpg';
     }
   }
 

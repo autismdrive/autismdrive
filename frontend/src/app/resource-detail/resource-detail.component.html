@@ -144,7 +144,7 @@
             [latitude]="resource.latitude"
             [longitude]="resource.longitude"
             [iconUrl]="{
-              url: '/assets/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg',
+              url: '/public/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg',
               anchor: makePoint(24, 24),
             }"
             (markerClick)="toggleInfoWindow($event)"

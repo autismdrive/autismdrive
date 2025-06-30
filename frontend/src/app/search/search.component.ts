@@ -182,14 +182,14 @@ export class SearchComponent implements AfterViewInit, OnInit {
         initiated by Commonwealth Autism. Established in 2010, it serves Charlottesville, Albemarle, Greene,
         Fluvanna, Louisa, and Nelson counties.
       `,
-      image: '/assets/partners/craag.png',
+      image: '/public/partners/craag.png',
       url: 'https://www.cahumanservices.org/craag/',
     },
     {
       name: 'The Faison Center',
       shortName: 'Faison Center',
       description: 'The Faison School provides full-time day school programs for students ages 5 to 22 years.',
-      image: '/assets/partners/faison_center.png',
+      image: '/public/partners/faison_center.png',
       url: 'https://www.faisoncenter.org',
     },
     {
@@ -199,7 +199,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
         A public regional organization designed to meet the needs of special education students. Provides special
         education programming and related services to nine school districts under an umbrella of a regional program.
       `,
-      image: '/assets/partners/prep.png',
+      image: '/public/partners/prep.png',
       url: 'https://www.prepivycreek.com/',
     },
     {
@@ -209,7 +209,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
         The Virginia Institute of Autism is dedicated to helping people overcome the challenges of autism through innovative,
         evidence-based programs in education, outreach and adult services.
       `,
-      image: '/assets/partners/via.png',
+      image: '/public/partners/via.png',
       url: 'https://www.viaschool.org/',
     },
   ];
@@ -358,15 +358,15 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.ageOptions = AgeRange.options;
 
     this.meta.updateTag(
-      {property: 'og:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+      {property: 'og:image', content: window.location.origin + '/public/home/hero-parent-child.jpg'},
       `property='og:image'`,
     );
     this.meta.updateTag(
-      {property: 'og:image:secure_url', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+      {property: 'og:image:secure_url', content: window.location.origin + '/public/home/hero-parent-child.jpg'},
       `property='og:image:secure_url'`,
     );
     this.meta.updateTag(
-      {name: 'twitter:image', content: window.location.origin + '/assets/home/hero-parent-child.jpg'},
+      {name: 'twitter:image', content: window.location.origin + '/public/home/hero-parent-child.jpg'},
       `name='twitter:image'`,
     );
   }
@@ -920,7 +920,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     controlText.style.lineHeight = '38px';
     controlText.style.paddingLeft = '5px';
     controlText.style.paddingRight = '5px';
-    controlText.innerHTML = '<img src="/assets/map/my-location.svg" alt="Your Location">';
+    controlText.innerHTML = '<img src="/public/map/my-location.svg" alt="Your Location">';
     controlUI.appendChild(controlText);
 
     // Set the center to the user's location on click

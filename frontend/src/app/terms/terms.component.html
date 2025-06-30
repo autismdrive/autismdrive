@@ -6,7 +6,7 @@
     </h3>
     <h1>Terms and Conditions</h1>
     <div *ngIf="relationship === 'self_guardian'" id="guardian-terms">
-      <ng2-pdfjs-viewer pdfSrc="/assets/terms/guardian_information_sheet.pdf"></ng2-pdfjs-viewer>
+      <ng2-pdfjs-viewer pdfSrc="/public/terms/guardian_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
     <div
       *ngIf="
@@ -16,10 +16,10 @@
       "
       id="self-terms"
     >
-      <ng2-pdfjs-viewer pdfSrc="/assets/terms/adult_information_sheet.pdf"></ng2-pdfjs-viewer>
+      <ng2-pdfjs-viewer pdfSrc="/public/terms/adult_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
     <div *ngIf="relationship === 'dependent'" id="dependent-terms">
-      <ng2-pdfjs-viewer pdfSrc="/assets/terms/child_information_sheet.pdf"></ng2-pdfjs-viewer>
+      <ng2-pdfjs-viewer pdfSrc="/public/terms/child_information_sheet.pdf"></ng2-pdfjs-viewer>
     </div>
     <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="2%" fxLayoutAlign="center center">
       <button

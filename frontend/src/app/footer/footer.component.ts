@@ -12,7 +12,7 @@ import {AppEnvironmentService} from '@services/app-environment/app-environment.s
   imports: [CommonModule, NgOptimizedImage],
 })
 export class FooterComponent {
-  logoURL = '/assets/logo/UVA_STAR-logo.svg';
+  logoURL = '/public/logo/UVA_STAR-logo.svg';
   logoDimensions: ImageDimensions;
 
   constructor(

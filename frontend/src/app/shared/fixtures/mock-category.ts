@@ -12,7 +12,6 @@ export const mockCategory: Category = {
   event_count: 0,
   location_count: 0,
   study_count: 0,
-  training_count: 0,
   hit_count: 0,
   display_order: 0,
   indentedString: 'string',

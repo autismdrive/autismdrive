@@ -715,7 +715,7 @@
 
   hr.full-width-dotted::after {
     content: '';
-    background-image: url('/assets/theme/orange-dotted-border-x.png');
+    background-image: url('/public/theme/orange-dotted-border-x.png');
     background-repeat: repeat-x;
     width: 110vw;
     display: block;
@@ -1795,7 +1795,7 @@
       content: '';
       width: 22px;
       height: 22px;
-      background-image: url('/assets/theme/chevron-circle-right.svg');
+      background-image: url('/public/theme/chevron-circle-right.svg');
       display: inline-block;
       background-repeat: no-repeat;
       margin-right: 0.5rem;

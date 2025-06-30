@@ -20,7 +20,7 @@
         [variant]="'light-bg'"
         (searchUpdated)="updateQueryParams($event)"
         (categorySelected)="selectCategory($event)"
-        [words]="query?.words"
+        [words]="query()?.words"
       ></app-search-box>
       <app-add-button
         *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
@@ -87,14 +87,14 @@
               <div id="age-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
                 <div *ngIf="query">
                   <app-search-filter
-                    [aggregations]="query.age_counts"
+                    [aggregations]="query().age_counts"
                     [label_title]="'Filter by Age'"
                     [label_any]="'Any age'"
                     [label_map]="ageLabels"
                     [label_icon]="'cake'"
                     (filterSelected)="selectAgeRange($event)"
                     [ngClass]="'filter-by-age'"
-                    [isNotApplicable]="!loading() && !query.hasAgeCounts"
+                    [isNotApplicable]="!loading() && !query().hasAgeCounts"
                     [notApplicableMessage]="'No age restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -103,14 +103,14 @@
               <div id="language-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
                 <div *ngIf="query">
                   <app-search-filter
-                    [aggregations]="query.language_counts"
+                    [aggregations]="query().language_counts"
                     [label_title]="'Filter by Language'"
                     [label_any]="'Any language'"
                     [label_map]="languageLabels"
                     [label_icon]="'language'"
                     (filterSelected)="selectLanguage($event)"
                     [ngClass]="'filter-by-language'"
-                    [isNotApplicable]="!loading() && !query.hasLanguageCounts"
+                    [isNotApplicable]="!loading() && !query().hasLanguageCounts"
                     [notApplicableMessage]="'No language restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -194,7 +194,7 @@
   >
     <ng-container *ngIf="!loading(); else loadingMessage">
       <div
-        *ngIf="query?.hits.length === 0"
+        *ngIf="query()?.hits.length === 0"
         fxLayout="column"
         fxLayoutGap="20px"
         fxLayoutAlign="center center"
@@ -208,7 +208,7 @@
         <h3>Check back soon for more updates!</h3>
       </div>
       <div
-        *ngIf="query?.total !== 0"
+        *ngIf="query()?.total !== 0"
         id="sort-and-status"
         fxLayout="row"
         fxLayout.lt-md="column"
@@ -238,7 +238,7 @@
       </div>
       <div class="sort-order" fxShow fxHide.lt-md>
         <app-search-filters-breadcrumbs
-          *ngIf="query"
+          *ngIf="query()"
           (ageRangeChipClicked)="selectAgeRange()"
           (categoryChipClicked)="removeCategory()"
           (clearAllClicked)="clearAllFilters()"
@@ -250,7 +250,7 @@
           [fxHide]="!showBreadcrumbs()"
           [fxShow]="showBreadcrumbs()"
           [languageLabels]="languageLabels"
-          [query]="query"
+          [query]="query()"
           [restrictToMappedResults]="restrictToMappedResults"
           [typeLabels]="typeLabels"
         ></app-search-filters-breadcrumbs>
@@ -354,7 +354,7 @@
             *ngIf="loc"
             [latitude]="loc.lat"
             [longitude]="loc.lng"
-            [iconUrl]="{url: '/assets/map/your-location.svg', anchor: makePoint(48, 48)}"
+            [iconUrl]="{url: '/public/map/your-location.svg', anchor: makePoint(48, 48)}"
           ></map-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
             <map-circle
@@ -372,7 +372,7 @@
             <map-marker
               [latitude]="hit.latitude + mapJitter(hit.id, true)"
               [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: makePoint(24, 24)}"
+              [iconUrl]="{url: '/public/map/' + hit.type + '-no-address.svg', anchor: makePoint(24, 24)}"
               (markerClick)="showInfoWindow(hit)"
             >
             </map-marker>
@@ -381,7 +381,7 @@
             <map-marker
               [latitude]="hit.latitude"
               [longitude]="hit.longitude"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: makePoint(16, 16)}"
+              [iconUrl]="{url: '/public/map/' + hit.type + '.svg', anchor: makePoint(16, 16)}"
               (markerClick)="showInfoWindow(hit)"
             ></map-marker>
           </ng-container>

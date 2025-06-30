@@ -40,9 +40,9 @@ export class AppComponent implements OnInit {
         });
         this.meta.addTags([
           {property: 'og:url', content: location.origin},
-          {property: 'og:image', content: location.origin + '/assets/home/hero-family.jpg'},
-          {property: 'og:image:secure_url', content: location.origin + '/assets/home/hero-family.jpg'},
-          {name: 'twitter:image', content: location.origin + '/assets/home/hero-family.jpg'},
+          {property: 'og:image', content: location.origin + '/public/home/hero-family.jpg'},
+          {property: 'og:image:secure_url', content: location.origin + '/public/home/hero-family.jpg'},
+          {name: 'twitter:image', content: location.origin + '/public/home/hero-family.jpg'},
         ]);
       }
     });

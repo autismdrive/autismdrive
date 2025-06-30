@@ -3,7 +3,7 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        [ngSrc]="'/assets/avatars/' + participant.avatar_icon || '001' + '.svg'"
+        [ngSrc]="'/public/avatars/' + participant.avatar_icon || '001' + '.svg'"
         alt="{{ participant.name }}"
         [ngStyle]="{'background-color': participant.avatar_color || '#CCC'}"
         (click)="chooseAvatar(participant)"

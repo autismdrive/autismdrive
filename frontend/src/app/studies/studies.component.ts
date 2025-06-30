@@ -61,15 +61,15 @@ export class StudiesComponent {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
       this.meta.updateTag(
-        {property: 'og:image', content: location.origin + '/assets/studies/hero.jpg'},
+        {property: 'og:image', content: location.origin + '/public/studies/hero.jpg'},
         `property='og:image'`,
       );
       this.meta.updateTag(
-        {property: 'og:image:secure_url', content: location.origin + '/assets/studies/hero.jpg'},
+        {property: 'og:image:secure_url', content: location.origin + '/public/studies/hero.jpg'},
         `property='og:image:secure_url'`,
       );
       this.meta.updateTag(
-        {name: 'twitter:image', content: location.origin + '/assets/studies/hero.jpg'},
+        {name: 'twitter:image', content: location.origin + '/public/studies/hero.jpg'},
         `name='twitter:image'`,
       );
       this.studyStatuses = Object.keys(StudyStatus).map(k => {

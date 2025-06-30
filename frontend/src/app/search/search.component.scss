@@ -527,14 +527,14 @@ app-search-filters-breadcrumbs {
 #hero.energy-burst-dark {
   @extend %invert-headings;
 
-  background-image: url('/public/assets/theme/sunrise-burst.jpg');
+  background-image: url('/public/theme/sunrise-burst.jpg');
 }
 
 .energy-burst-light,
 #hero.energy-burst-light {
   @extend %invert-headings;
 
-  background-image: url('public/assets/theme/sunrise-burst-footer-crop.jpg');
+  background-image: url('public/theme/sunrise-burst-footer-crop.jpg');
 }
 
 .color-swatch {
