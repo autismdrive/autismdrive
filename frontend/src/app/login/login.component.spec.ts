@@ -1,14 +1,14 @@
 import {signal} from '@angular/core';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AuthenticationService} from '@app/shared/services/authentication/authentication-service';
 import {customFormlyConfig} from '@app/app.config';
+import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {AuthenticationService} from '@app/shared/services/authentication/authentication-service';
 import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
 import {withFormlyMaterial} from '@ngx-formly/material';
 import {FormlyMatInputModule} from '@ngx-formly/material/input';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
-import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {LoginComponent} from './login.component';

@@ -1,12 +1,12 @@
 import {signal} from '@angular/core';
-import {AuthenticationService} from '@services/authentication/authentication-service';
+import {Meta} from '@angular/platform-browser';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
 import {mockUser} from '@app/shared/fixtures/mock-user';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {UvaEducationComponent} from './uva-education.component';
-import {Meta} from '@angular/platform-browser';
 import {ApiService} from '@app/shared/services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
+import {UvaEducationComponent} from './uva-education.component';
 
 describe('UvaEducationComponent', () => {
   let component: UvaEducationComponent;

@@ -1,8 +1,8 @@
 import {RouterModule} from '@angular/router';
-import {ApiService} from '@services/api/api.service';
-import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
 import {mockStudy} from '@app/shared/fixtures/mock-study';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {RelatedItemsComponent} from './related-items.component';

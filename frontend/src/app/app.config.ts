@@ -1,6 +1,12 @@
-import {CommonModule, DatePipe} from '@angular/common';
+import {CommonModule, DatePipe, isPlatformServer} from '@angular/common';
 import {provideHttpClient, withFetch, withInterceptors, withInterceptorsFromDi} from '@angular/common/http';
-import {importProvidersFrom, LOCALE_ID, provideAppInitializer, provideZoneChangeDetection} from '@angular/core';
+import {
+  importProvidersFrom,
+  LOCALE_ID,
+  PLATFORM_ID,
+  provideAppInitializer,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {
@@ -18,10 +24,11 @@ import {
   withRouterConfig,
 } from '@angular/router';
 import {YouTubePlayerModule} from '@angular/youtube-player';
+import {googleMapsApiConfigFactory} from '@app/shared/services/google-maps-library/google-maps-api-config';
 import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
+import {CategoriesSelectTreeComponent} from '@forms/categories-select-tree/categories-select-tree.component';
 import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
 import {HelpWrapperComponent} from '@forms/help-wrapper/help-wrapper.component';
-import {CategoriesSelectTreeComponent} from '@forms/categories-select-tree/categories-select-tree.component';
 import {RepeatSectionComponent} from '@forms/repeat-section/repeat-section.component';
 import {
   EmailMatchValidator,
@@ -47,6 +54,7 @@ import {FormlyMaterialModule, withFormlyMaterial} from '@ngx-formly/material';
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker';
 import {errorInterceptor} from '@routing/error-interceptor';
 import {jwtInterceptor} from '@routing/jwt-interceptor';
+import {clientRoutes} from '@routing/routes.client';
 import {ApiService} from '@services/api/api.service';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -60,8 +68,7 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
 import {appInitializer} from '../app-initializer';
-import {clientRoutes} from '@routing/routes.client';
-import {googleMapsApiConfigFactory} from '@app/shared/services/google-maps-library/google-maps-api-config';
+import {LOCAL_STORAGE} from './tokens';
 
 export const customFormlyConfig = {
   extras: {
@@ -119,6 +126,16 @@ export const customFormlyConfig = {
 
 export const appConfig = {
   providers: [
+    {
+      provide: LOCAL_STORAGE,
+      useFactory: (platformId: object) => {
+        if (isPlatformServer(platformId)) {
+          return {}; // Return an empty object on the server
+        }
+        return localStorage; // Use the browser's localStorage
+      },
+      deps: [PLATFORM_ID],
+    },
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(clientRoutes, withComponentInputBinding()),
     provideAnimations(),

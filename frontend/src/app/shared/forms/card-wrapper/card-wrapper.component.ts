@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {MatCard, MatCardContent, MatCardHeader, MatCardModule} from '@angular/material/card';
+import {MatCardModule} from '@angular/material/card';
 import {FieldWrapper} from '@ngx-formly/core';
 
 @Component({

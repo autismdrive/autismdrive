@@ -1,7 +1,7 @@
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {faker} from '@faker-js/faker';
 import {Participant, ParticipantProps} from '@models/participant';
 import {ParticipantRelationship} from '@models/participantRelationship';
-import {mockUser} from '@app/shared/fixtures/mock-user';
 
 export const makeMockParticipant = (overrideProps?: Partial<ParticipantProps>): Participant => {
   const defaultProps: Partial<ParticipantProps> = {

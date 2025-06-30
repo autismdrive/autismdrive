@@ -1,11 +1,11 @@
 // @ts-check
 import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
 import angular from 'angular-eslint';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import pluginChaiFriendly from 'eslint-plugin-chai-friendly';
 import pluginCypress from 'eslint-plugin-cypress/flat';
 import pluginJest from 'eslint-plugin-jest';
-import pluginChaiFriendly from 'eslint-plugin-chai-friendly';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {

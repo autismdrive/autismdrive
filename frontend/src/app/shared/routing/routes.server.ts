@@ -34,17 +34,17 @@ export const serverRoutes: ServerRoute[] = [
 
   // Logged-in routes containing user-specific data
   {path: 'admin', renderMode: RenderMode.Server},
-  {path: 'data-admin', renderMode: RenderMode.Server},
-  {path: 'email-log', renderMode: RenderMode.Server},
+  {path: 'admin/data-admin', renderMode: RenderMode.Server},
+  {path: 'admin/email-log', renderMode: RenderMode.Server},
+  {path: 'admin/import-export-status', renderMode: RenderMode.Server},
+  {path: 'admin/participant-admin', renderMode: RenderMode.Server},
+  {path: 'admin/taxonomy-admin', renderMode: RenderMode.Server},
+  {path: 'admin/user-admin', renderMode: RenderMode.Server},
   {path: 'flow/complete', renderMode: RenderMode.Server},
-  {path: 'import-export-status', renderMode: RenderMode.Server},
   {path: 'mirrored', renderMode: RenderMode.Server},
-  {path: 'participant-admin', renderMode: RenderMode.Server},
   {path: 'profile', renderMode: RenderMode.Server},
   {path: 'resources/add', renderMode: RenderMode.Server},
   {path: 'studies/add', renderMode: RenderMode.Server},
-  {path: 'taxonomy-admin', renderMode: RenderMode.Server},
-  {path: 'user-admin', renderMode: RenderMode.Server},
 
   /*****************************
    *    2. Empty path route    *

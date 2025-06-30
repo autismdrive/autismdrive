@@ -1,6 +1,6 @@
+import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 import {faker} from '@faker-js/faker';
 import {ParticipantAdminList} from '@models/participant_admin_list';
-import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 
 export const mockParticipantAdminList: ParticipantAdminList = {
   num_self_participants: faker.number.int(),

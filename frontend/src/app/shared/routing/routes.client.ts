@@ -1,8 +1,9 @@
 import {Routes} from '@angular/router';
-import {AuthGuard} from './auth-guard';
-import {NotMirroredGuard} from './not-mirrored-guard';
+import {LoginComponent} from '@app/login/login.component';
 import {NotFoundComponent} from '@app/not-found/not-found.component';
-import {RoleGuard} from './role-guard';
+import {authGuard} from './auth-guard';
+import {notMirroredGuard} from './not-mirrored-guard';
+import {roleGuard} from './role-guard';
 
 /**
  * Client-side routes for the Autism DRIVE application.
@@ -27,7 +28,7 @@ export const clientRoutes: Routes = [
     path: 'about',
     loadComponent: () => import('../../about/about.component').then(c => c.AboutComponent),
     data: {title: 'About Autism DRIVE'},
-    canActivate: [NotMirroredGuard],
+    canActivate: [notMirroredGuard],
   },
   {
     path: 'forgot-password',
@@ -67,13 +68,13 @@ export const clientRoutes: Routes = [
     path: 'home',
     loadComponent: () => import('../../home/home.component').then(c => c.HomeComponent),
     data: {title: 'Welcome to Autism DRIVE'},
-    canActivate: [NotMirroredGuard],
+    canActivate: [notMirroredGuard],
   },
   {
     path: 'uva-education',
     loadComponent: () => import('../../uva-education/uva-education.component').then(c => c.UvaEducationComponent),
     data: {title: 'Autism DRIVE UVA Education'},
-    canActivate: [NotMirroredGuard],
+    canActivate: [notMirroredGuard],
   },
 
   {
@@ -92,7 +93,7 @@ export const clientRoutes: Routes = [
     path: 'admin',
     loadComponent: () => import('../../admin-home/admin-home.component').then(c => c.AdminHomeComponent),
     data: {title: 'Autism DRIVE Admin Home', roles: ['admin']},
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     children: [
       {path: '', redirectTo: 'data-admin', pathMatch: 'full'},
       {
@@ -102,40 +103,40 @@ export const clientRoutes: Routes = [
             c => c.QuestionnaireDataViewComponent,
           ),
         data: {title: 'Autism DRIVE Data Admin', roles: ['admin']},
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
       },
       {
         path: 'user-admin',
         loadComponent: () => import('../../user-admin/user-admin.component').then(c => c.UserAdminComponent),
         data: {title: 'Autism DRIVE User Admin', roles: ['admin']},
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
       },
       {
         path: 'participant-admin',
         loadComponent: () =>
           import('../../participant-admin/participant-admin.component').then(c => c.ParticipantAdminComponent),
         data: {title: 'Autism DRIVE Participant Admin', roles: ['admin']},
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
       },
       {
         path: 'taxonomy-admin',
         loadComponent: () =>
           import('../../taxonomy-admin/taxonomy-admin.component').then(c => c.TaxonomyAdminComponent),
         data: {title: 'Autism DRIVE Taxonomy Admin', roles: ['admin']},
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
       },
       {
         path: 'import-export-status',
         loadComponent: () => import('../../admin-export/admin-export.component').then(c => c.AdminExportComponent),
         data: {title: 'Autism DRIVE Import/Export Admin', roles: ['admin']},
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
       },
       {
         path: 'email-log',
         loadComponent: () =>
           import('../../email-log-admin/email-log-admin.component').then(c => c.EmailLogAdminComponent),
         data: {title: 'Autism DRIVE Email Log Admin', roles: ['admin']},
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
       },
     ],
   },
@@ -143,7 +144,7 @@ export const clientRoutes: Routes = [
     path: 'flow/complete',
     loadComponent: () => import('../../flow-complete/flow-complete.component').then(c => c.FlowCompleteComponent),
     data: {title: 'Enrollment complete'},
-    canActivate: [AuthGuard, NotMirroredGuard],
+    canActivate: [authGuard, notMirroredGuard],
   },
   {
     path: 'mirrored',
@@ -154,19 +155,19 @@ export const clientRoutes: Routes = [
     path: 'profile',
     loadComponent: () => import('../../profile/profile.component').then(c => c.ProfileComponent),
     data: {title: 'Your Autism DRIVE Account'},
-    canActivate: [AuthGuard, NotMirroredGuard],
+    canActivate: [authGuard, notMirroredGuard],
   },
   {
     path: 'resources/add',
     loadComponent: () => import('../../resource-form/resource-form.component').then(c => c.ResourceFormComponent),
     data: {title: 'Add Resource', roles: ['admin', 'editor']},
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
   },
   {
     path: 'studies/add',
     loadComponent: () => import('../../study-form/study-form.component').then(c => c.StudyFormComponent),
     data: {title: 'Create an Autism DRIVE Study', roles: ['admin']},
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
   },
 
   /*****************************
@@ -245,20 +246,20 @@ export const clientRoutes: Routes = [
     path: ':resourceType/:resourceId/edit',
     loadComponent: () => import('../../resource-form/resource-form.component').then(c => c.ResourceFormComponent),
     data: {title: 'Edit Resource', roles: ['admin', 'editor']},
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
   },
   {
     path: 'admin/user/:userId',
     loadComponent: () =>
       import('../../user-admin-details/user-admin-details.component').then(c => c.UserAdminDetailsComponent),
     data: {title: 'User Admin Details', roles: ['admin', 'researcher']},
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
   },
   {
     path: 'study/edit/:studyId',
     loadComponent: () => import('../../study-form/study-form.component').then(c => c.StudyFormComponent),
     data: {title: 'Edit Study', roles: ['admin']},
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
   },
 
   // Logged-in user routes
@@ -266,12 +267,14 @@ export const clientRoutes: Routes = [
     path: 'flow/:flowName/:participantId',
     loadComponent: () => import('../../flow/flow.component').then(c => c.FlowComponent),
     data: {title: 'Your Autism DRIVE Account'},
-    canActivate: [AuthGuard, NotMirroredGuard],
+    canActivate: [authGuard, notMirroredGuard],
   },
 
   /*****************************
    * 4. Routes with wildcards *
    *****************************/
+  // Gets the session token in the URL and saves it in localStorage
+  {path: 'session/*', component: LoginComponent},
 
   // Catch-all route for 404 errors
   {path: '**', component: NotFoundComponent},

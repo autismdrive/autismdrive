@@ -1,9 +1,9 @@
-import {faker} from '@faker-js/faker';
-import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
-import {UserFavorite} from '@models/user_favorite';
 import {mockCategory} from '@app/shared/fixtures/mock-category';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {faker} from '@faker-js/faker';
+import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
+import {UserFavorite} from '@models/user_favorite';
 
 export const mockUserFavorite: UserFavorite = new UserFavorite({
   id: faker.number.int(),

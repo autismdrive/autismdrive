@@ -1,9 +1,8 @@
-import {ApiService} from '@services/api/api.service';
-import {CategoriesService} from '@services/categories/categories.service';
 import {mockCategory} from '@app/shared/fixtures/mock-category';
+import {CategoriesService} from '@services/categories/categories.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {SearchTopicsComponent} from './search-topics.component';
 import {of} from 'rxjs';
+import {SearchTopicsComponent} from './search-topics.component';
 
 describe('SearchTopicsComponent', () => {
   let component: SearchTopicsComponent;

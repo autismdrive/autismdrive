@@ -1,8 +1,8 @@
 import {signal} from '@angular/core';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {StudySurveyEntryComponent} from './study-survey-entry.component';

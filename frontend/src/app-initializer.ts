@@ -2,11 +2,8 @@
  * Loads the configuration from the middleware, which should be running on localhost port 5000.
  */
 import {HttpBackend, HttpEvent, HttpEventType, HttpRequest} from '@angular/common/http';
-import {inject, InjectionToken, runInInjectionContext} from '@angular/core';
-import {GoogleModuleOptions} from '@ng-maps/google';
+import {inject} from '@angular/core';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
-import {googleMapsApiConfigFactory} from '@services/google-maps-library/google-maps-api-config';
-import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {StorageService} from '@services/storage/storage.service';
 import {catchError, map} from 'rxjs';
 

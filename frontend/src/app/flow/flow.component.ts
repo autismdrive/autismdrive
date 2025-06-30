@@ -11,6 +11,8 @@ import {FlowCompleteComponent} from '@app/flow-complete/flow-complete.component'
 import {FlowIntroComponent} from '@app/flow-intro/flow-intro.component';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {QuestionnaireStepsListComponent} from '@app/questionnaire-steps-list/questionnaire-steps-list.component';
+import {scrollToFirstInvalidField, scrollToTop} from '@app/shared/utilities/scrollToTop';
+import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
 import {Flow} from '@models/flow';
 import {Participant} from '@models/participant';
 import {Step, StepStatus} from '@models/step';
@@ -20,8 +22,6 @@ import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/co
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {scrollToFirstInvalidField, scrollToTop} from '@app/shared/utilities/scrollToTop';
-import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum FlowState {

@@ -1,8 +1,8 @@
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {mockStudyInvestigator} from '@app/shared/fixtures/mock-study-investigator';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {InvestigatorFormComponent} from './investigator-form.component';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 describe('InvestigatorFormComponent', () => {
   let component: InvestigatorFormComponent;

@@ -1,6 +1,6 @@
 import {inject} from '@angular/core';
-import {GoogleModuleOptions} from '@ng-maps/google';
 import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
+import {GoogleModuleOptions} from '@ng-maps/google';
 
 export const googleMapsApiConfigFactory = (): GoogleModuleOptions => {
   const appEnvironment = inject(AppEnvironmentService);

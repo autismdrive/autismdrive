@@ -1,9 +1,5 @@
-import {inject, Injectable, InjectionToken} from '@angular/core';
-
-const LOCAL_STORAGE = new InjectionToken<Storage>('Browser Storage', {
-  providedIn: 'root',
-  factory: () => localStorage,
-});
+import {inject, Injectable} from '@angular/core';
+import {LOCAL_STORAGE} from '@app/tokens';
 
 @Injectable({
   providedIn: 'root',

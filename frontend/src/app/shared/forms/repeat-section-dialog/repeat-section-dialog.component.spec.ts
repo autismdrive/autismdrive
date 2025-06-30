@@ -1,8 +1,8 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {customFormlyConfig} from '@app/app.config';
-import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
-import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
 import {mockHousematesQuestionnaireMeta} from '@app/shared/fixtures/mock-housemates-questionnaire-meta';
+import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
+import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
 import {withFormlyMaterial} from '@ngx-formly/material';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {DeviceDetectorService} from 'ngx-device-detector';

@@ -5,7 +5,7 @@
     "module": "CommonJs",
     "allowJs": true,
     "emitDecoratorMetadata": true,
-    "types": ["jest"],
+    "types": ["jest"]
   },
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

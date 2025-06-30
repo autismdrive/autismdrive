@@ -1,8 +1,8 @@
-import {ApiService} from '@services/api/api.service';
 import {mockParticipantAdminList} from '@app/shared/fixtures/mock-participant-admin-list';
+import {ApiService} from '@services/api/api.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {ParticipantAdminComponent} from './participant-admin.component';
 import {of} from 'rxjs';
+import {ParticipantAdminComponent} from './participant-admin.component';
 
 describe('ParticipantAdminComponent', () => {
   let component: ParticipantAdminComponent;

@@ -8,7 +8,7 @@ import {NewsItemComponent} from '@app/news-item/news-item.component';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
 import {Study} from '@models/study';
-import {DefaultShowHideDirective, ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
+import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {lastValueFrom} from 'rxjs';

@@ -1,6 +1,5 @@
-import {DOCUMENT} from '@angular/common';
-import {HttpClient} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, effect, Inject, OnInit, Renderer2} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {FooterComponent} from '@app/footer/footer.component';
@@ -27,6 +26,7 @@ export class AppComponent implements OnInit {
     private meta: Meta,
     private route: ActivatedRoute,
     private appEnvironmentService: AppEnvironmentService,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     effect(() => {
       if (this.appEnvironmentService.props()) {
@@ -39,10 +39,10 @@ export class AppComponent implements OnInit {
           }
         });
         this.meta.addTags([
-          {property: 'og:url', content: location.origin},
-          {property: 'og:image', content: location.origin + '/public/home/hero-family.jpg'},
-          {property: 'og:image:secure_url', content: location.origin + '/public/home/hero-family.jpg'},
-          {name: 'twitter:image', content: location.origin + '/public/home/hero-family.jpg'},
+          {property: 'og:url', content: this.location.origin},
+          {property: 'og:image', content: this.location.origin + '/public/home/hero-family.jpg'},
+          {property: 'og:image:secure_url', content: this.location.origin + '/public/home/hero-family.jpg'},
+          {name: 'twitter:image', content: this.location.origin + '/public/home/hero-family.jpg'},
         ]);
       }
     });
@@ -59,9 +59,19 @@ export class AppComponent implements OnInit {
           this.meta.updateTag({property: 'og:title', content: title}, `property='og:title'`);
           this.meta.updateTag({name: 'twitter:text:title', content: title}, `name='twitter:text:title'`);
         }
-        this.meta.updateTag({property: 'og:url', content: location.href}, `property='og:url'`);
+        this.meta.updateTag({property: 'og:url', content: this.location.href}, `property='og:url'`);
       }
     });
+  }
+
+  get location() {
+    if (isPlatformBrowser(this.platformId)) return location;
+
+    // Fallback for server-side rendering
+    return {
+      origin: 'http://localhost:4200', // Default origin for SSR
+      href: 'http://localhost:4200', // Default href for SSR
+    };
   }
 
   get currentUser(): User {

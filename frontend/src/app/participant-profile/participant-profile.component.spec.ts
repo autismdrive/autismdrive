@@ -1,11 +1,11 @@
-import {ApiService} from '@services/api/api.service';
+import {MatDialogRef} from '@angular/material/dialog';
+import {RouterModule} from '@angular/router';
 import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {ParticipantProfileComponent} from './participant-profile.component';
-import {RouterModule} from '@angular/router';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {of} from 'rxjs';
+import {ParticipantProfileComponent} from './participant-profile.component';
 
 describe('ParticipantProfileComponent', () => {
   let component: ParticipantProfileComponent;

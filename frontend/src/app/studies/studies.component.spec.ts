@@ -1,15 +1,14 @@
 import {signal} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {StudyStatus} from '@models/study';
-import {ApiService} from '@services/api/api.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockStudiesRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockStudy} from '@app/shared/fixtures/mock-study';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {StudiesComponent} from './studies.component';
-import {Meta} from '@angular/platform-browser';
 import {of} from 'rxjs';
+import {StudiesComponent} from './studies.component';
 
 describe('StudiesComponent', () => {
   let component: StudiesComponent;

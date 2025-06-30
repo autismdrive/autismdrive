@@ -1,4 +1,3 @@
-import {Optional} from '@angular/core';
 import {ParticipantRelationship} from '@app/shared/models/participantRelationship';
 
 export interface Questionnaire {}

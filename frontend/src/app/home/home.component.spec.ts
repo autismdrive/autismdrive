@@ -1,10 +1,10 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {ApiService} from '@services/api/api.service';
-import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockAppEnvironment} from '@app/shared/fixtures/mock-app-environment';
 import {mockStudy} from '@app/shared/fixtures/mock-study';
+import {ApiService} from '@services/api/api.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {HomeComponent} from './home.component';

@@ -1,11 +1,11 @@
 /// <reference types="cypress" />
 import {faker} from '@faker-js/faker';
-import {AppPage} from '../support/util';
 import {EnrollUseCases} from '../support/enroll';
 import {GlobalHeaderUseCases} from '../support/global-header';
 import {LoginUseCases} from '../support/login';
 import {ProfileUseCases} from '../support/profile';
 import {SearchUseCases} from '../support/search';
+import {AppPage} from '../support/util';
 
 describe('Participant (Guardian - Self)', () => {
   let page: AppPage;

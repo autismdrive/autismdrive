@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 import {faker} from '@faker-js/faker';
-import * as assert from 'node:assert';
 import {AdminUseCases} from '../support/admin';
 import {GlobalHeaderUseCases} from '../support/global-header';
 import {LoginUseCases} from '../support/login';

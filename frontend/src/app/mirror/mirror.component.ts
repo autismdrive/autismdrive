@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {DefaultLayoutDirective, FlexModule} from '@ngbracket/ngx-layout';
+import {FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
   standalone: true,

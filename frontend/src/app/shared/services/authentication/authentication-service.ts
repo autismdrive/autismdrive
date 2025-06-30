@@ -5,7 +5,7 @@ import {User} from '@app/shared/models/user';
 import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
 import {AuthenticationStateService} from '@app/shared/services/authentication/authentication-state-service';
 import {Observable, throwError} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, finalize, map} from 'rxjs/operators';
 import {GoogleAnalyticsService} from '../google-analytics/google-analytics.service';
 
 @Injectable({providedIn: 'root'})
@@ -16,6 +16,7 @@ export class AuthenticationService {
     resetPassword: null,
     refresh: null,
   };
+  public status: WritableSignal<'loading' | 'loaded' | 'error' | 'idle'> = signal('idle');
 
   constructor(
     private http: HttpClient,
@@ -23,6 +24,7 @@ export class AuthenticationService {
     private authStateService: AuthenticationStateService,
     private googleAnalyticsService: GoogleAnalyticsService,
   ) {
+    this.status.set('loading');
     effect(() => {
       if (this.appEnvironmentService.props()) {
         const token = this.authStateService.authToken;
@@ -37,10 +39,15 @@ export class AuthenticationService {
         if (token) {
           this.refresh().subscribe(); // Make sure the api still considers the in-memory user as valid.
         } else {
+          this.status.set('loaded');
           this.currentUser.set(undefined);
         }
       }
     });
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.authStateService.authToken && !!this.currentUser();
   }
 
   private _handleError(error: ApiError) {
@@ -83,6 +90,9 @@ export class AuthenticationService {
 
         // return an observable with a user-facing error message
         return throwError(() => 'Could not refresh session; please log in again.');
+      }),
+      finalize(() => {
+        this.status.set('loaded');
       }),
     );
   }

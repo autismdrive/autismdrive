@@ -1,11 +1,11 @@
 import {ActivatedRoute} from '@angular/router';
 import {customFormlyConfig} from '@app/app.config';
+import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
+import {mockUser} from '@app/shared/fixtures/mock-user';
 import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
 import {withFormlyMaterial} from '@ngx-formly/material';
 import {ApiService} from '@services/api/api.service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
-import {mockUser} from '@app/shared/fixtures/mock-user';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {RegisterComponent} from './register.component';

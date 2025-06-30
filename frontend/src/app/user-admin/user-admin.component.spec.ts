@@ -1,9 +1,9 @@
-import {ApiService} from '@services/api/api.service';
-import {mockUser} from '@app/shared/fixtures/mock-user';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {UserAdminComponent} from './user-admin.component';
 import {RouterModule} from '@angular/router';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
+import {UserAdminComponent} from './user-admin.component';
 
 describe('UserAdminComponent', () => {
   let component: UserAdminComponent;

@@ -1,7 +1,7 @@
-import {ApiService} from '@services/api/api.service';
 import {makeMockAdminNote} from '@app/shared/fixtures/mock-admin-note';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {AdminNoteDisplayComponent} from './admin-note-display.component';

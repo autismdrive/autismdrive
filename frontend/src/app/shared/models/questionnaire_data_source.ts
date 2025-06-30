@@ -1,7 +1,7 @@
 import {CollectionViewer} from '@angular/cdk/collections';
 import {DataSource} from '@angular/cdk/table';
-import {BehaviorSubject, Observable} from 'rxjs';
 import {ApiService} from '@app/shared/services/api/api.service';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {Step} from './step';
 
 export class QuestionnaireDataSource implements DataSource<Step> {

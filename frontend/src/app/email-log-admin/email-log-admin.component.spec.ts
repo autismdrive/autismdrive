@@ -1,12 +1,12 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ApiService} from '@services/api/api.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
 import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {EmailLogAdminComponent} from './email-log-admin.component';
 import {of} from 'rxjs';
+import {EmailLogAdminComponent} from './email-log-admin.component';
 
 describe('EmailLogAdminComponent', () => {
   let component: EmailLogAdminComponent;

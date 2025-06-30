@@ -1,8 +1,7 @@
 /// <reference types="@types/google.maps" />
-import {DOCUMENT} from '@angular/common';
-import {effect, Inject, Injectable, Renderer2, signal, WritableSignal} from '@angular/core';
-import {GoogleMapsAPIWrapper, GoogleModuleOptions} from '@ng-maps/google';
+import {Injectable, signal, WritableSignal} from '@angular/core';
 import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
+import {GoogleMapsAPIWrapper, GoogleModuleOptions} from '@ng-maps/google';
 
 declare let google;
 

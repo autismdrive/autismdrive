@@ -2,7 +2,6 @@ import {faker} from '@faker-js/faker';
 import {ParticipantRelationship} from '@models/participantRelationship';
 import {User} from '@models/user';
 import {UserMeta} from '@models/user_meta';
-import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 
 export const mockUserMeta: UserMeta = {
   id: faker.number.int(),

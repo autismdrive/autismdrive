@@ -1,7 +1,6 @@
 import {SortMethod, sortMethods} from '@models/sort_method';
 import {cloneDeep} from 'lodash-es';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import createClone from 'rfdc';
 import {SearchSortComponent} from './search-sort.component';
 
 interface SearchSortParams {

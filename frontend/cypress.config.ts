@@ -1,5 +1,5 @@
-import {defineConfig} from 'cypress';
 import {faker} from '@faker-js/faker';
+import {defineConfig} from 'cypress';
 import cypressFailFastPlugin from 'cypress-fail-fast/plugin';
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter';
 

@@ -4,6 +4,7 @@ import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
+import {scrollToTop} from '@app/shared/utilities/scrollToTop';
 import {PasswordRequirements} from '@models/password_requirements';
 import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
@@ -12,7 +13,6 @@ import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {StorageService} from '@services/storage/storage.service';
-import {scrollToTop} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({

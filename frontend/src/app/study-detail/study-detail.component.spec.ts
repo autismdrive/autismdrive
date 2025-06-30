@@ -1,13 +1,13 @@
 import {signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {ApiService} from '@app/shared/services/api/api.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
 import {mockStudyDetailsRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockInvestigator} from '@app/shared/fixtures/mock-investigator';
 import {mockStudy} from '@app/shared/fixtures/mock-study';
 import {mockStudyInvestigator} from '@app/shared/fixtures/mock-study-investigator';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@app/shared/services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {StudyDetailComponent} from './study-detail.component';

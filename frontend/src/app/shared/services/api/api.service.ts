@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {effect, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ApiError} from '@app/api-error';
 import {AdminNote} from '@app/shared/models/admin_note';
 import {Category} from '@app/shared/models/category';

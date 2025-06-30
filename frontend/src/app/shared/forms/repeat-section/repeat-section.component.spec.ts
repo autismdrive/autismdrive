@@ -1,10 +1,10 @@
 import {By} from '@angular/platform-browser';
 import {customFormlyConfig} from '@app/app.config';
-import {RepeatSectionComponent} from '@app/shared/forms/repeat-section/repeat-section.component';
-import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
-import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
 import {MockFormlyFormComponent} from '@app/shared/fixtures/mock-form.component';
 import {mockHousematesQuestionnaireMeta} from '@app/shared/fixtures/mock-housemates-questionnaire-meta';
+import {RepeatSectionComponent} from '@app/shared/forms/repeat-section/repeat-section.component';
+import {keysToCamel} from '@app/shared/utilities/snakeToCamel';
+import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
 import {withFormlyMaterial} from '@ngx-formly/material';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 

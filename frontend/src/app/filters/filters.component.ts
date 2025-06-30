@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @Component({
   standalone: true,

@@ -1,6 +1,6 @@
-import {AdminNote} from '@models/admin_note';
-import {faker} from '@faker-js/faker';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
+import {faker} from '@faker-js/faker';
+import {AdminNote} from '@models/admin_note';
 import {mockUser} from './mock-user';
 
 export const makeMockAdminNote = (overrideProps?: Partial<AdminNote>): AdminNote => {

@@ -1,32 +1,43 @@
-import {effect, Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
-import {User} from '@app/shared/models/user';
+import {isPlatformServer} from '@angular/common';
+import {inject, Injector, PLATFORM_ID} from '@angular/core';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {ActivatedRouteSnapshot, CanActivateFn, createUrlTreeFromSnapshot, RouterStateSnapshot} from '@angular/router';
 import {AuthenticationService} from '@app/shared/services/authentication/authentication-service';
+import {EMPTY, skipWhile, timeout} from 'rxjs';
+import {first, map} from 'rxjs/operators';
 
-@Injectable({providedIn: 'root'})
-export class RoleGuard {
-  private currentUser: User;
+export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+  const roles = route.data['roles'] as string[];
+  // Checks to see if the server we are connected to is running in a mirroring mode.  If so
+  // prevent users from taking actions that might cause data issues later on.
+  const authService = inject(AuthenticationService);
+  const injector = inject(Injector);
+  const platformId = inject(PLATFORM_ID);
 
-  constructor(
-    private router: Router,
-    private authenticationService: AuthenticationService,
-  ) {
-    effect(() => {
-      this.currentUser = this.authenticationService.currentUser();
-    });
-  }
+  return toObservable(authService.status, {injector}).pipe(
+    skipWhile(status => status === 'loading'),
+    timeout({
+      each: 5000,
+      with: () => {
+        console.error('roleGuard stuck: status did not change from "loading" after 5 seconds.');
+        return EMPTY;
+      },
+    }),
+    map(() => {
+      if (isPlatformServer(platformId)) {
+        return false;
+      }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const roles = route.data['roles'] as string[];
+      if (!authService.isLoggedIn()) {
+        return createUrlTreeFromSnapshot(route, ['/', 'login'], {returnUrl: state.url});
+      }
 
-    if (!this.currentUser) {
-      this.router.navigate(['/login'], {queryParams: {returnUrl: state.url}});
-      return false;
-    } else if (!roles.includes(this.currentUser.role)) {
-      this.router.navigate(['/profile']);
-      return false;
-    } else {
+      if (!roles.includes(authService.currentUser()?.role)) {
+        return createUrlTreeFromSnapshot(route, ['/', 'profile']);
+      }
+
       return true;
-    }
-  }
-}
+    }),
+    first(),
+  );
+};

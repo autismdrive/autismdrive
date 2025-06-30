@@ -5,13 +5,13 @@ import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {LogoComponent} from '@app/logo/logo.component';
+import {scrollToTop} from '@app/shared/utilities/scrollToTop';
 import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {FormlyMatInputModule} from '@ngx-formly/material/input';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
-import {scrollToTop} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({

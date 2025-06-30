@@ -1,12 +1,12 @@
 import {signal} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {AuthenticationService} from '@services/authentication/authentication-service';
-import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
-import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockAppEnvironment} from '@app/shared/fixtures/mock-app-environment';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {AppComponent} from './app.component';
 

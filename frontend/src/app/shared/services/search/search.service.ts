@@ -1,13 +1,13 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {GeoBox, Query, QueryProps} from '@app/shared/models/query';
+import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
 import {HitType} from '@models/hit_type';
 import {sortMethods} from '@models/sort_method';
 import {cloneDeep} from 'lodash-es';
 import createClone from 'rfdc';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {GeoBox, Query, QueryProps} from '@app/shared/models/query';
-import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
 
 @Injectable({providedIn: 'root'})
 export class SearchService {

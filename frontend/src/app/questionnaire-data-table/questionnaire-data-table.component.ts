@@ -2,10 +2,10 @@ import {CommonModule} from '@angular/common';
 import {Component, Input, OnChanges} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTableModule} from '@angular/material/table';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
 import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
-import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 
 @Component({
   standalone: true,

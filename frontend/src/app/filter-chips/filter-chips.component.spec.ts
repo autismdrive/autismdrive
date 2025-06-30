@@ -1,7 +1,7 @@
+import {RouterModule} from '@angular/router';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {FilterChipsComponent} from './filter-chips.component';
-import {RouterModule} from '@angular/router';
 
 describe('CategoryChipsComponent', () => {
   let component: FilterChipsComponent;

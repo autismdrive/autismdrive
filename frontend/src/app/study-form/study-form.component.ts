@@ -4,6 +4,7 @@ import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LoadingComponent} from '@app/loading/loading.component';
+import {scrollToFirstInvalidField} from '@app/shared/utilities/scrollToTop';
 import {AgeRange, Language} from '@models/hit_type';
 import {Study} from '@models/study';
 import {StudyCategory} from '@models/study_category';
@@ -11,7 +12,6 @@ import {StudyInvestigator} from '@models/study_investigator';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
-import {scrollToFirstInvalidField} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {

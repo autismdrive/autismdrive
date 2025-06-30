@@ -1,10 +1,10 @@
-import {HttpEvent, HttpHandlerFn, HttpRequest, HttpResponse, HttpStatusCode, HttpUserEvent} from '@angular/common/http';
+import {HttpEvent, HttpHandlerFn, HttpRequest, HttpResponse, HttpStatusCode} from '@angular/common/http';
 import {forwardRef, inject} from '@angular/core';
 import {Router} from '@angular/router';
+import {ApiError} from '@app/api-error';
 import {AuthenticationStateService} from '@app/shared/services/authentication/authentication-state-service';
 import {Observable, of, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
-import {ApiError} from '@app/api-error';
 
 export function errorInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const router: Router = inject(forwardRef(() => Router));

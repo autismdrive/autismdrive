@@ -1,6 +1,6 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {ApiService} from '@services/api/api.service';
 import {mockParticipant} from '@app/shared/fixtures/mock-participant';
+import {ApiService} from '@services/api/api.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
 import {AvatarDialogComponent} from './avatar-dialog.component';

@@ -1,12 +1,12 @@
 import {signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {ApiService} from '@services/api/api.service';
-import {AuthenticationService} from '@services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 import {mockIdentificationQuestionnaire} from '@app/shared/fixtures/mock-questionnaire';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {MockBuilder, MockedComponentFixture, MockRender} from 'ng-mocks';
 import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {of} from 'rxjs';

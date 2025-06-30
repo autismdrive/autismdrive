@@ -5,6 +5,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {getResourceFormFields} from '@app/resource-form/resource-form.fields';
+import {scrollToFirstInvalidField} from '@app/shared/utilities/scrollToTop';
 import {Resource, ResourceType} from '@models/resource';
 import {ResourceCategory} from '@models/resource_category';
 import {User} from '@models/user';
@@ -12,7 +13,6 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-import {scrollToFirstInvalidField} from '@app/shared/utilities/scrollToTop';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {

@@ -1,9 +1,9 @@
 import {By} from '@angular/platform-browser';
 import {customFormlyConfig} from '@app/app.config';
 import {profileFormFields} from '@app/profile/profile.component';
+import {MockFormlyFormComponent} from '@app/shared/fixtures/mock-form.component';
 import {GroupValidationWrapperComponent} from '@app/shared/forms/group-validation-wrapper/group-validation-wrapper.component';
 import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
-import {MockFormlyFormComponent} from '@app/shared/fixtures/mock-form.component';
 import {withFormlyMaterial} from '@ngx-formly/material';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 

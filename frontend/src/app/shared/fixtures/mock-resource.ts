@@ -1,5 +1,5 @@
-import {Resource, ResourceProps, ResourceType} from '@models/resource';
 import {faker} from '@faker-js/faker';
+import {Resource, ResourceProps, ResourceType} from '@models/resource';
 
 export const makeMockResource = (overrideProps?: Partial<ResourceProps>): Resource => {
   const defaultProps: ResourceProps = {

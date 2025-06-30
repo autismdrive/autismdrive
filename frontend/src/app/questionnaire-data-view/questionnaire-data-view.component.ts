@@ -6,10 +6,10 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {QuestionnaireDataTableComponent} from '@app/questionnaire-data-table/questionnaire-data-table.component';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 import {TableInfo} from '@models/table_info';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
-import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 
 @Component({
   standalone: true,

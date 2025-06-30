@@ -1,5 +1,5 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
-import {MatButton, MatButtonModule} from '@angular/material/button';
+import {MatButtonModule} from '@angular/material/button';
 import {RouterModule} from '@angular/router';
 import {fadeTransition} from '@animations/animations';
 import {LogoComponent} from '@app/logo/logo.component';

@@ -1,11 +1,9 @@
-import {ApiService} from '@services/api/api.service';
-import {mockAdminNote} from '@app/shared/fixtures/mock-admin-note';
-import {mockCategory} from '@app/shared/fixtures/mock-category';
-import {mockUser} from '@app/shared/fixtures/mock-user';
-import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
-import {FavoriteTopicsComponent} from './favorite-topics.component';
-import {of} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {FavoriteTopicsComponent} from './favorite-topics.component';
 
 describe('FavoriteTopicsComponent', () => {
   let component: FavoriteTopicsComponent;
