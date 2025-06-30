@@ -40,7 +40,7 @@ export class GlobalHeaderUseCases {
   displayHomeHero() {
     cy.get('#hero')
       .should('be.visible')
-      .and('have.css', 'background-image', `url("http://localhost:4200/assets/home/hero-family.jpg")`)
+      .and('have.css', 'background-image', `url("http://localhost:4200/public/home/hero-family.jpg")`)
       .then($el => {
         const url = $el.css('background-image').match(/url\("(.*)"\)/)[1];
         cy.request({url, failOnStatusCode: false}).its('status').should('eq', 200);
