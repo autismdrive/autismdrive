@@ -250,7 +250,7 @@ export class StudyFormComponent implements OnInit {
         props: {
           label: 'Image Url',
           placeholder: 'This is the link to the image used for current study display',
-          description: 'Something like: /assets/home/study7.jpg',
+          description: 'Something like: /public/home/study7.jpg',
         },
       },
       {
