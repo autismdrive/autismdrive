@@ -12,6 +12,7 @@ import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {FormlyMatInputModule} from '@ngx-formly/material/input';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({
@@ -68,6 +69,7 @@ export class LoginComponent {
     private googleAnalytics: GoogleAnalyticsService,
     private route: ActivatedRoute,
     private router: Router,
+    private windowService: WindowService,
   ) {
     this.route.queryParams.subscribe(qParams => {
       if (qParams.hasOwnProperty('returnUrl')) {
@@ -117,7 +119,9 @@ export class LoginComponent {
 
   private _goToReturnUrl(user: User) {
     if (user) {
-      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop(this.deviceDetectorService));
+      this.router
+        .navigateByUrl(this.returnUrl || '/profile')
+        .then(_ => scrollToTop(this.deviceDetectorService, this.windowService));
     }
   }
 }

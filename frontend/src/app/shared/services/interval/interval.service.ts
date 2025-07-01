@@ -1,4 +1,5 @@
 import {Injectable, NgZone} from '@angular/core';
+import {WindowService} from '@services/window/window.service';
 
 @Injectable({
   providedIn: 'root',
@@ -6,17 +7,20 @@ import {Injectable, NgZone} from '@angular/core';
 export class IntervalService {
   interval: number = null;
 
-  constructor(private ngZone: NgZone) {}
+  constructor(
+    private ngZone: NgZone,
+    private windowService: WindowService,
+  ) {}
 
   setInterval(callback: () => void, time: number) {
     this.ngZone.runOutsideAngular(() => {
-      this.interval = window.setInterval(() => {
+      this.interval = this.windowService.window.setInterval(() => {
         this.ngZone.run(callback);
       }, time);
     });
   }
 
   clearInterval() {
-    window.clearInterval(this.interval);
+    this.windowService.window.clearInterval(this.interval);
   }
 }

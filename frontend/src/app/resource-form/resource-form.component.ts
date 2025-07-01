@@ -13,6 +13,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {
@@ -47,6 +48,7 @@ export class ResourceFormComponent implements OnInit {
     private deviceDetectorService: DeviceDetectorService,
     private route: ActivatedRoute,
     private router: Router,
+    private windowService: WindowService,
   ) {
     console.log('ResourceFormComponent > constructor');
 
@@ -196,6 +198,6 @@ export class ResourceFormComponent implements OnInit {
       field.markAsDirty();
     }
 
-    scrollToFirstInvalidField(this.deviceDetectorService);
+    scrollToFirstInvalidField(this.deviceDetectorService, this.windowService);
   }
 }

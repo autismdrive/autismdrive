@@ -15,6 +15,7 @@ import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
   standalone: true,
@@ -49,6 +50,7 @@ export class UserAdminDetailsComponent {
     private api: ApiService,
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
+    private windowService: WindowService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
@@ -96,9 +98,9 @@ export class UserAdminDetailsComponent {
 
       a.href = url;
       a.download = filename;
-      window.document.body.appendChild(a);
+      this.windowService.window.document.body.appendChild(a);
       a.click();
-      window.document.body.removeChild(a);
+      this.windowService.window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
   }

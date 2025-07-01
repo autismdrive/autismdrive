@@ -25,8 +25,7 @@ export function ValidateUrl(control: AbstractControl): ValidationErrors {
   );
 
   if (!urlRegEx.test(control.value) && control.value && control.value !== '') {
-    const error: ValidationErrors = {url: true};
-    return error;
+    return {url: true};
   }
 
   return null;

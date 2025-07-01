@@ -13,6 +13,7 @@ import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {StorageService} from '@services/storage/storage.service';
+import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({
@@ -87,6 +88,7 @@ export class PasswordResetComponent {
     private deviceDetectorService: DeviceDetectorService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private storageService: StorageService,
+    private windowService: WindowService,
   ) {
     this.route.params.subscribe(params => {
       this.token = params['email_token'];
@@ -137,7 +139,7 @@ export class PasswordResetComponent {
       const storedUrl = this.storageService.get('returnUrl');
       const returnUrl = storedUrl && storedUrl !== 'undefined' ? storedUrl : '/profile';
       if (user) {
-        this.router.navigateByUrl(returnUrl).then(_ => scrollToTop(this.deviceDetectorService));
+        this.router.navigateByUrl(returnUrl).then(_ => scrollToTop(this.deviceDetectorService, this.windowService));
       }
     });
   }

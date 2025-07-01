@@ -9,6 +9,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {WindowService} from '@services/window/window.service';
 import {RegisterDialogComponent} from '../register-dialog/register-dialog.component';
 
 @Component({
@@ -30,6 +31,7 @@ export class StudySurveyEntryComponent implements OnInit {
     private googleAnalytics: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
     public dialog: MatDialog,
+    private windowService: WindowService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser;
@@ -52,7 +54,7 @@ export class StudySurveyEntryComponent implements OnInit {
     if (this.surveyLink) {
       this.sendInquiry();
       this.googleAnalytics.studySurveyEvent(this.study);
-      window.open(this.surveyLink, '_blank');
+      this.windowService.window.open(this.surveyLink, '_blank');
     }
   }
 
@@ -63,7 +65,7 @@ export class StudySurveyEntryComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(RegisterDialogComponent, {
-      width: `${window.innerWidth}px`,
+      width: `${this.windowService.window.innerWidth}px`,
       data: {
         displaySurvey: false,
       },

@@ -12,8 +12,7 @@ export function ValidatePasswordsMatch(control: AbstractControl): ValidationErro
 
   if (password !== passwordRepeated) {
     /* for newPasswordRepeat from current field "newPassword" */
-    const error: ValidationErrors = {MatchPassword: true};
-    return error;
+    return {MatchPassword: true};
   } else {
     return null;
   }

@@ -60,6 +60,7 @@ import {GoogleAnalyticsService} from '@services/google-analytics/google-analytic
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
 import {SearchService} from '@services/search/search.service';
 import {StorageService} from '@services/storage/storage.service';
+import {WindowService} from '@services/window/window.service';
 import createClone from 'rfdc';
 import {firstValueFrom, fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
@@ -250,6 +251,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
     private searchService: SearchService,
     private googleMapsLibrary: GoogleMapsLibraryService,
     private storageService: StorageService,
+    private windowService: WindowService,
   ) {
     // Watch for changes to the query param map, and update the query signal when it changes.
     effect(() => {
@@ -358,15 +360,21 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.ageOptions = AgeRange.options;
 
     this.meta.updateTag(
-      {property: 'og:image', content: window.location.origin + '/public/home/hero-parent-child.jpg'},
+      {property: 'og:image', content: this.windowService.window.location.origin + '/public/home/hero-parent-child.jpg'},
       `property='og:image'`,
     );
     this.meta.updateTag(
-      {property: 'og:image:secure_url', content: window.location.origin + '/public/home/hero-parent-child.jpg'},
+      {
+        property: 'og:image:secure_url',
+        content: this.windowService.window.location.origin + '/public/home/hero-parent-child.jpg',
+      },
       `property='og:image:secure_url'`,
     );
     this.meta.updateTag(
-      {name: 'twitter:image', content: window.location.origin + '/public/home/hero-parent-child.jpg'},
+      {
+        name: 'twitter:image',
+        content: this.windowService.window.location.origin + '/public/home/hero-parent-child.jpg',
+      },
       `name='twitter:image'`,
     );
   }
@@ -682,7 +690,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   submitResource() {
-    const popUp = window.open('https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP', '_blank');
+    const popUp = this.windowService.window.open(
+      'https://virginia.az1.qualtrics.com/jfe/form/SV_0JQAQjutv54EwnP',
+      '_blank',
+    );
     if (popUp == null || typeof popUp === 'undefined') {
       alert(
         'Please disable your pop-up blocker and try again. \nYou can also use following link to submit your resource: ' +
@@ -834,9 +845,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   watchScrollEvents() {
-    const scroll$ = fromEvent(window, 'scroll').pipe(
+    const scroll$ = fromEvent(this.windowService.window, 'scroll').pipe(
       throttleTime(10),
-      map(_ => window.scrollY),
+      map(_ => this.windowService.window.scrollY),
       pairwise(),
       map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
       share(),

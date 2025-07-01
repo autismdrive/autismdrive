@@ -25,6 +25,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
+import {WindowService} from '@services/window/window.service';
 import {MarkdownComponent} from 'ngx-markdown';
 
 @Component({
@@ -76,6 +77,7 @@ export class ResourceDetailComponent {
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer,
     private googleMapsLibrary: GoogleMapsLibraryService,
+    private windowService: WindowService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
@@ -160,7 +162,7 @@ export class ResourceDetailComponent {
   goWebsite($event: MouseEvent) {
     $event.preventDefault();
     if (this.resource && this.resource.website) {
-      window.open(this.resource.website, '_blank');
+      this.windowService.window.open(this.resource.website, '_blank');
     }
   }
 

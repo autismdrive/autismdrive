@@ -189,7 +189,7 @@
       <div id="resource-related" *ngIf="!resource.should_hide_related_resources">
         <app-related-items
           [resource]="resource"
-          [loading]="loading"
+          [loading]="loading()"
           [parentComponent]="'resource-detail'"
         ></app-related-items>
       </div>

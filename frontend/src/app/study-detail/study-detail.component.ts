@@ -15,6 +15,7 @@ import {User} from '@models/user';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {WindowService} from '@services/window/window.service';
 import {MarkdownModule} from 'ngx-markdown';
 import {InvestigatorFormComponent} from '../investigator-form/investigator-form.component';
 
@@ -48,6 +49,7 @@ export class StudyDetailComponent {
     private router: Router,
     private authenticationService: AuthenticationService,
     public dialog: MatDialog,
+    private windowService: WindowService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
@@ -71,7 +73,7 @@ export class StudyDetailComponent {
 
   openDialog(si): void {
     const dialogRef = this.dialog.open(InvestigatorFormComponent, {
-      width: `${window.innerWidth}px`,
+      width: `${this.windowService.window.innerWidth}px`,
       data: {
         si: si,
       },

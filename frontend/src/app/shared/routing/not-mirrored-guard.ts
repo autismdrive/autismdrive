@@ -29,7 +29,7 @@ export const notMirroredGuard: CanActivateFn = (route: ActivatedRouteSnapshot, s
         return false;
       }
 
-      if (appEnvironmentService.props() && !appEnvironmentService.mirroring) {
+      if (appEnvironmentService.props() && appEnvironmentService.mirroring) {
         return createUrlTreeFromSnapshot(route, ['/', 'mirrored']);
       }
 

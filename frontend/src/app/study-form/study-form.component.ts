@@ -12,6 +12,7 @@ import {StudyInvestigator} from '@models/study_investigator';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
+import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 enum PageState {
@@ -46,6 +47,7 @@ export class StudyFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private deviceDetectorService: DeviceDetectorService,
+    private windowService: WindowService,
   ) {
     this.fields = [
       {
@@ -446,6 +448,6 @@ export class StudyFormComponent implements OnInit {
       field.markAsDirty();
     }
 
-    scrollToFirstInvalidField(this.deviceDetectorService);
+    scrollToFirstInvalidField(this.deviceDetectorService, this.windowService);
   }
 }

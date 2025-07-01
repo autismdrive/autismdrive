@@ -11,6 +11,7 @@ import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';
 import {User} from '@models/user';
 import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
+import {WindowService} from '@services/window/window.service';
 import {fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 
@@ -419,6 +420,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     private router: Router,
     private appEnvironmentService: AppEnvironmentService,
     media: MediaMatcher,
+    private windowService: WindowService,
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 959px)');
     this.mdMediaQuery = media.matchMedia('(min-width: 960px) and (max-width: 1279px)');
@@ -472,9 +474,9 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   watchScrollEvents() {
-    const scroll$ = fromEvent(window, 'scroll').pipe(
+    const scroll$ = fromEvent(this.windowService.window, 'scroll').pipe(
       throttleTime(10),
-      map((_: Event) => window.pageYOffset),
+      map((_: Event) => this.windowService.window.pageYOffset),
       pairwise(),
       map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
       share(),

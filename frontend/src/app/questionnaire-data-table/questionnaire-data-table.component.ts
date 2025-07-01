@@ -6,6 +6,7 @@ import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
 import {TableInfo} from '@models/table_info';
 import {ApiService} from '@services/api/api.service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
   standalone: true,
@@ -22,7 +23,10 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   displayedColumns = [];
   columnNames = [];
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private windowService: WindowService,
+  ) {}
 
   get snakeToUpperCase() {
     return snakeToUpperCase;
@@ -75,9 +79,9 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
       a.href = url;
       a.download = filename;
-      window.document.body.appendChild(a);
+      this.windowService.window.document.body.appendChild(a);
       a.click();
-      window.document.body.removeChild(a);
+      this.windowService.window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
   }

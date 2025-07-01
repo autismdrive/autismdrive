@@ -134,7 +134,8 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
           this.changeDetectorRef.detectChanges();
         });
     } else {
-      return this.router.navigateByUrl('/search').finally(() => this.searchUpdated.set(newParams));
+      this.searchUpdated.set(newParams);
+      return this.router.navigateByUrl('/search');
     }
   }
 

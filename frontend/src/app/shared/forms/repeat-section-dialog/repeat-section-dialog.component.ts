@@ -7,6 +7,7 @@ import {clone} from '@app/shared/utilities/clone';
 import {scrollToFirstInvalidField} from '@app/shared/utilities/scrollToTop';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
+import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 @Component({
@@ -24,6 +25,7 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
     @Inject(MAT_DIALOG_DATA) public data: RepeatSectionDialogData,
     private deviceDetectorService: DeviceDetectorService,
     public dialogRef: MatDialogRef<RepeatSectionDialogComponent>,
+    private windowService: WindowService,
   ) {}
 
   ngAfterContentInit(): void {
@@ -66,7 +68,7 @@ export class RepeatSectionDialogComponent implements AfterContentInit {
 
   onInvalidFields(): void {
     this.highlightRequiredFields(this.data.fields);
-    scrollToFirstInvalidField(this.deviceDetectorService);
+    scrollToFirstInvalidField(this.deviceDetectorService, this.windowService);
   }
 
   onSubmit(): void {

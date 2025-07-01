@@ -10,6 +10,7 @@ import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
 import {TableInfo} from '@models/table_info';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
   standalone: true,
@@ -38,6 +39,7 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
     private api: ApiService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher,
+    private windowService: WindowService,
   ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -46,7 +48,7 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
     // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
     this.mobileQuery.addListener(this._mobileQueryListener);
 
-    window.addEventListener('resize', this._mobileQueryListener);
+    this.windowService.window.addEventListener('resize', this._mobileQueryListener);
   }
 
   get snakeToUpperCase() {
@@ -63,7 +65,7 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
     this.mobileQuery.removeListener(this._mobileQueryListener);
-    window.removeEventListener('resize', this._mobileQueryListener);
+    this.windowService.window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   selectQuestionnaire(info: TableInfo) {
@@ -84,9 +86,9 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
 
       a.href = url;
       a.download = filename;
-      window.document.body.appendChild(a);
+      this.windowService.window.document.body.appendChild(a);
       a.click();
-      window.document.body.removeChild(a);
+      this.windowService.window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
   }

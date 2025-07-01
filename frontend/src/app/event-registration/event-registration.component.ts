@@ -5,6 +5,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {Router} from '@angular/router';
 import {Resource} from '@models/resource';
 import {FlexModule} from '@ngbracket/ngx-layout';
+import {WindowService} from '@services/window/window.service';
 import {EventRegistrationFormComponent} from '../event-registration-form/event-registration-form.component';
 
 @Component({
@@ -21,6 +22,7 @@ export class EventRegistrationComponent {
   constructor(
     private router: Router,
     public dialog: MatDialog,
+    private windowService: WindowService,
   ) {}
 
   goLogin() {
@@ -29,7 +31,7 @@ export class EventRegistrationComponent {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(EventRegistrationFormComponent, {
-      width: `${window.innerWidth}px`,
+      width: `${this.windowService.window.innerWidth}px`,
       data: {
         registered: false,
         title: 'Register for ' + this.resource.title,

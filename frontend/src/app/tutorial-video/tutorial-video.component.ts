@@ -7,6 +7,7 @@ import {YouTubePlayerModule} from '@angular/youtube-player';
 import {DetailsLinkComponent} from '@app/details-link/details-link.component';
 import {NavItem} from '@models/nav-item';
 import {StorageService} from '@services/storage/storage.service';
+import {WindowService} from '@services/window/window.service';
 import {MarkdownModule} from 'ngx-markdown';
 
 @Component({
@@ -28,10 +29,13 @@ export class TutorialVideoComponent {
     showinfo: 0, // YT.ShowInfo.Hide
   };
 
-  constructor(private storageService: StorageService) {}
+  constructor(
+    private storageService: StorageService,
+    private windowService: WindowService,
+  ) {}
 
   get windowWidthFactor(): number {
-    const windowWidthPx = window.innerWidth;
+    const windowWidthPx = this.windowService.window.innerWidth;
 
     if (windowWidthPx < 600) {
       return 0.7;

@@ -11,6 +11,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
   standalone: true,
@@ -32,6 +33,7 @@ export class StudyInquiryComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private router: Router,
     private googleAnalytics: GoogleAnalyticsService,
+    private windowService: WindowService,
   ) {
     effect(() => {
       this.currentUser = this.authenticationService.currentUser();
@@ -91,7 +93,7 @@ export class StudyInquiryComponent implements OnInit {
 
   goEligibility() {
     if (this.study && this.study.eligibility_url) {
-      window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
+      this.windowService.window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
       this.sendInquiry();
     }
   }
