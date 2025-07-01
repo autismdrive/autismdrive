@@ -5,6 +5,7 @@ import {ActivatedRoute, RouterModule} from '@angular/router';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
 import {mockStudy} from '@app/shared/fixtures/mock-study';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {LOCAL_STORAGE} from '@app/tokens';
 import {faker} from '@faker-js/faker';
 import {GeoLocation} from '@models/geolocation';
 import {NgMapsCoreModule} from '@ng-maps/core';
@@ -46,6 +47,7 @@ describe('SearchComponent', () => {
       .mock(GoogleAnalyticsService, {})
       .mock(GoogleMapsLibraryService, {core: signal(undefined)})
       .mock(SearchService, {})
+      .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
       .provide({
         provide: ActivatedRoute,
         useValue: {

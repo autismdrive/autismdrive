@@ -2,6 +2,7 @@ import {ActivatedRoute} from '@angular/router';
 import {customFormlyConfig} from '@app/app.config';
 import {makeMockActivatedRoute} from '@app/shared/fixtures/mock-activated-route';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {LOCAL_STORAGE} from '@app/tokens';
 import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
 import {withFormlyMaterial} from '@ngx-formly/material';
 import {ApiService} from '@services/api/api.service';
@@ -21,6 +22,7 @@ describe('RegisterComponent', () => {
       .provide(provideFormlyCore([...withFormlyMaterial(), customFormlyConfig]))
       .mock(ApiService, {addUser: jest.fn().mockReturnValue(of(mockUser))})
       .mock(GoogleAnalyticsService, {})
+      .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
       .provide({provide: ActivatedRoute, useValue: makeMockActivatedRoute({}, {}, 'register')});
   });
 

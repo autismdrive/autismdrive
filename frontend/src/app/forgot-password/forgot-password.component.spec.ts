@@ -1,4 +1,5 @@
 import {RouterModule} from '@angular/router';
+import {LOCAL_STORAGE} from '@app/tokens';
 import {ApiService} from '@services/api/api.service';
 import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
 import {of} from 'rxjs';
@@ -12,6 +13,7 @@ describe('ForgotPasswordComponent', () => {
     return MockBuilder(ForgotPasswordComponent)
       .keep(RouterModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
       .mock(ApiService, {
         sendResetPasswordEmail: jest.fn().mockReturnValue(of('')),
       });

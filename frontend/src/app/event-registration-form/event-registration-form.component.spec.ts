@@ -3,6 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {RouterModule} from '@angular/router';
 import {mockParticipant} from '@app/shared/fixtures/mock-participant';
 import {mockUser} from '@app/shared/fixtures/mock-user';
+import {LOCAL_STORAGE} from '@app/tokens';
 import {User} from '@models/user';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -19,27 +20,25 @@ describe('EventRegistrationFormComponent', () => {
   const mockUserWithSelfParticipant = new User({...mockUser, participants: [mockParticipant]});
 
   beforeEach(() => {
-    return (
-      MockBuilder(EventRegistrationFormComponent)
-        .keep(NG_MOCKS_ROOT_PROVIDERS)
-        .keep(RouterModule.forRoot([{path: '', component: EventRegistrationFormComponent}]))
-        .mock(ApiService, {
-          addUser: jest.fn().mockReturnValue(of(mockUser)),
-          submitRegistration: jest.fn().mockReturnValue(of()),
-          submitQuestionnaire: jest.fn().mockReturnValue(of()),
-        })
-        // .provide({provide: ActivatedRoute, useValue: mockActivatedRouteWithEventId})
-        .mock(GoogleAnalyticsService)
-        .mock(AuthenticationService, {currentUser: signal(mockUserWithSelfParticipant)})
-        .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
-        .provide({
-          provide: MAT_DIALOG_DATA,
-          useValue: {
-            title: 'some title',
-            event_id: 0,
-          },
-        })
-    );
+    return MockBuilder(EventRegistrationFormComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(RouterModule.forRoot([{path: '', component: EventRegistrationFormComponent}]))
+      .mock(ApiService, {
+        addUser: jest.fn().mockReturnValue(of(mockUser)),
+        submitRegistration: jest.fn().mockReturnValue(of()),
+        submitQuestionnaire: jest.fn().mockReturnValue(of()),
+      })
+      .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
+      .mock(GoogleAnalyticsService)
+      .mock(AuthenticationService, {currentUser: signal(mockUserWithSelfParticipant)})
+      .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
+      .provide({
+        provide: MAT_DIALOG_DATA,
+        useValue: {
+          title: 'some title',
+          event_id: 0,
+        },
+      });
   });
 
   beforeEach(() => {

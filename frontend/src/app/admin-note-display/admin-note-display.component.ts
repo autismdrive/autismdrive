@@ -43,9 +43,7 @@ export class AdminNoteDisplayComponent implements OnInit {
     private api: ApiService,
     public dialog: MatDialog,
     private windowService: WindowService,
-  ) {}
-
-  ngOnInit() {
+  ) {
     // Update the resource when the given currentResource changes
     effect(async () => {
       if (this.currentResource?.id !== this.resource()?.id) this.resource.set(this.currentResource);
@@ -56,6 +54,8 @@ export class AdminNoteDisplayComponent implements OnInit {
       if (this.resource()) await this.loadNotes();
     });
   }
+
+  ngOnInit() {}
 
   async loadNotes() {
     const newNotes = await firstValueFrom(this.api.getResourceAdminNotes(this.currentResource.id));
