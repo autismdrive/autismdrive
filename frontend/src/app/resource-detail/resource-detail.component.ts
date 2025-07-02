@@ -1,6 +1,7 @@
 /// <reference types="@types/google.maps" />
 import {CommonModule, DatePipe, formatDate, NgOptimizedImage, UpperCasePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, signal, WritableSignal} from '@angular/core';
+import {GoogleMapsModule} from '@angular/google-maps';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatLine} from '@angular/material/core';
@@ -14,13 +15,12 @@ import {FavoriteResourceButtonComponent} from '@app/favorite-resource-button/fav
 import {FilterChipsComponent} from '@app/filter-chips/filter-chips.component';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {RelatedItemsComponent} from '@app/related-items/related-items.component';
+import {GOOGLE_MAPS_MAP_IDS} from '@app/tokens';
 import {TypeIconComponent} from '@app/type-icon/type-icon.component';
 import {ContactItem} from '@models/contact_item';
 import {Resource} from '@models/resource';
 import {ResourceChangeLog} from '@models/resource_change_log';
 import {User} from '@models/user';
-import {NgMapsCoreModule} from '@ng-maps/core';
-import {NgMapsGoogleModule} from '@ng-maps/google';
 import {FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -47,8 +47,7 @@ import {MarkdownComponent} from 'ngx-markdown';
     MarkdownComponent,
     MatButtonModule,
     MatCardModule,
-    NgMapsCoreModule,
-    NgMapsGoogleModule,
+    GoogleMapsModule,
     NgOptimizedImage,
     RelatedItemsComponent,
     RouterModule,
@@ -69,6 +68,8 @@ export class ResourceDetailComponent {
   safeVideoLink: SafeResourceUrl;
   safeVideoImgUrl: SafeResourceUrl;
   googleMapsCoreLibrary: google.maps.CoreLibrary;
+  googleMapsMapIds = inject(GOOGLE_MAPS_MAP_IDS);
+  mapOptions: WritableSignal<google.maps.MapOptions> = signal(undefined);
 
   constructor(
     private api: ApiService,
@@ -85,8 +86,12 @@ export class ResourceDetailComponent {
     effect(() => {
       const core = this.googleMapsLibrary.core();
 
-      if (core) {
+      if (core && this.resource?.hasCoords()) {
         this.googleMapsCoreLibrary = core;
+        this.mapOptions.set({
+          mapId: this.googleMapsMapIds.resourceDetailsPage,
+          center: {lat: this.resource?.latitude, lng: this.resource?.longitude},
+        });
       }
     });
     this.route.params.subscribe(params => {

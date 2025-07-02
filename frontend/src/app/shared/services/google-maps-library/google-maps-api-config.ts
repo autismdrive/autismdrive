@@ -1,17 +1,25 @@
 import {inject} from '@angular/core';
-import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
-import {GoogleModuleOptions} from '@ng-maps/google';
+import {GoogleMapsApiConfig, GoogleMapsMapIds} from '@models/google-maps-api-config';
+import {StorageService} from '@services/storage/storage.service';
 
-export const googleMapsApiConfigFactory = (): GoogleModuleOptions => {
-  const appEnvironment = inject(AppEnvironmentService);
-  console.log('googleMapsApiConfigFactory > appEnvironment', appEnvironment);
-  const googleMapsApiKey = appEnvironment.googleMapsApiKey;
+export const googleMapsApiConfigFactory = (): GoogleMapsApiConfig => {
+  const storageService = inject(StorageService);
+  const googleMapsApiConfig = storageService.get('googleMapsApiConfig');
 
-  if (googleMapsApiKey) {
-    return {
-      apiKey: googleMapsApiKey,
-      libraries: ['maps', 'marker', 'places', 'geocoding'],
-    };
+  if (googleMapsApiConfig?.length > 0) {
+    return JSON.parse(googleMapsApiConfig) as GoogleMapsApiConfig;
   }
-  throw new Error('API URL not found in configuration');
+
+  throw new Error('Google Maps API configuration not found in local storage. Please ensure it is set up correctly.');
+};
+
+export const googleMapsMapIdsFactory = (): GoogleMapsMapIds => {
+  const storageService = inject(StorageService);
+  const googleMapsMapIds = storageService.get('googleMapsMapIds');
+
+  if (googleMapsMapIds?.length > 0) {
+    return JSON.parse(googleMapsMapIds) as GoogleMapsMapIds;
+  }
+
+  throw new Error('Google Maps Map IDs not found in local storage. Please ensure it is set up correctly.');
 };

@@ -1,5 +1,6 @@
 import {signal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
+import {GoogleMapsModule} from '@angular/google-maps';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
@@ -8,8 +9,6 @@ import {mockUser} from '@app/shared/fixtures/mock-user';
 import {LOCAL_STORAGE} from '@app/tokens';
 import {faker} from '@faker-js/faker';
 import {GeoLocation} from '@models/geolocation';
-import {NgMapsCoreModule} from '@ng-maps/core';
-import {NgMapsGoogleModule} from '@ng-maps/google';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
@@ -32,8 +31,7 @@ describe('SearchComponent', () => {
 
   beforeEach(() => {
     return MockBuilder(SearchComponent)
-      .keep(NgMapsCoreModule)
-      .keep(NgMapsGoogleModule)
+      .keep(GoogleMapsModule)
       .keep(ReactiveFormsModule)
       .keep(RouterModule)
       .mock(ApiService, {

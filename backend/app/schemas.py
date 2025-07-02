@@ -1120,7 +1120,8 @@ class FrontendConfigSchema(Schema):
             "production",
             "apiUrl",
             "googleMapsApiKey",
-            "googleAnalyticsTagId"
+            "googleMapsMapIds",
+            "googleAnalyticsTagId",
         ]
 
 

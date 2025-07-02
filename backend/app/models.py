@@ -491,6 +491,10 @@ class FrontendConfig:
     apiUrl = settings.API_URL
     googleMapsApiKey = settings.GOOGLE_MAPS_API_KEY
     googleAnalyticsTagId = settings.GOOGLE_ANALYTICS_TAG_ID
+    googleMapsMapIds = {
+        "resourceDetailsPage": settings.GOOGLE_MAPS_MAP_IDS.resource_details_page,
+        "searchPage": settings.GOOGLE_MAPS_MAP_IDS.search_page,
+    }
 
 
 class LatLng(TypedDict):

@@ -25,12 +25,13 @@ export const appInitializer = () => {
         storageService.set('appEnvironment', JSON.stringify(appEnvironment));
         appEnvironmentService.fromProperties(appEnvironment);
         storageService.set(
-          'googleModuleOptions',
+          'googleMapsApiConfig',
           JSON.stringify({
             apiKey: appEnvironment.googleMapsApiKey,
             libraries: ['maps', 'marker', 'places', 'geocoding'],
           }),
         );
+        storageService.set('googleMapsMapIds', JSON.stringify(appEnvironment.googleMapsMapIds));
       }
     }),
     catchError((error: any) => {

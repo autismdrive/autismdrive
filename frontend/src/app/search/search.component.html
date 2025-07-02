@@ -335,63 +335,52 @@
       </div>
     </mat-expansion-panel>
     <div id="map" fxLayout="column" fxLayoutGap="2em">
-      <map-view
+      <google-map
         *ngIf="shouldShowMap()"
         #mapTemplate
-        [latitude]="loc.lat"
-        [longitude]="loc.lng"
-        [streetViewControl]="false"
-        mapTypeId="roadmap"
-        [zoom]="mapZoomLevel ? mapZoomLevel : defaultZoom"
-        (mapReady)="mapLoad($event)"
-        [scrollwheel]="null"
+        [options]="mapOptions()"
+        (mapInitialized)="mapLoad($event)"
         (mapClick)="closeInfoWindow()"
-        (zoomChange)="updateZoom($event)"
-        (boundsChange)="updateResultsList($event)"
+        (mapDragend)="handleMapDragEnd()"
+        (zoomChanged)="updateZoom(mapTemplate.getZoom())"
+        (boundsChanged)="updateResultsList(mapTemplate.getBounds())"
       >
-        <map-marker-cluster [renderer]="clusterRenderer" [algorithm]="clusterAlgorithm">
-          <map-marker
-            *ngIf="loc"
-            [latitude]="loc.lat"
-            [longitude]="loc.lng"
-            [iconUrl]="{url: '/public/map/your-location.svg', anchor: makePoint(48, 48)}"
-          ></map-marker>
+        <map-marker-clusterer>
+          <map-advanced-marker *ngIf="loc" [options]="markerOptions(loc, 'user')"></map-advanced-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
             <map-circle
-              [latitude]="hit.latitude + mapJitter(hit.id, true)"
-              [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [radius]="circleRadius"
-              [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
-              [fillOpacity]="0.1"
-              [clickable]="true"
-              [visible]="isInfoWindowOpen && selectedMapHit.id === hit.id"
+              [options]="mapCircleOptions(hit)"
               (circleClick)="showInfoWindow(hit)"
-              [zIndex]="-1"
             >
             </map-circle>
-            <map-marker
-              [latitude]="hit.latitude + mapJitter(hit.id, true)"
-              [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [iconUrl]="{url: '/public/map/' + hit.type + '-no-address.svg', anchor: makePoint(24, 24)}"
-              (markerClick)="showInfoWindow(hit)"
+            <map-advanced-marker
+              [options]="markerOptions({
+                lat: hit.latitude + mapJitter(hit.id, true),
+                lng: hit.longitude + mapJitter(hit.id, false),
+              }, hit.type + '-no-address')"
+              (mapClick)="showInfoWindow(hit)"
             >
-            </map-marker>
+            </map-advanced-marker>
           </ng-container>
           <ng-container *ngFor="let hit of hitsWithAddress">
             <map-marker
-              [latitude]="hit.latitude"
-              [longitude]="hit.longitude"
-              [iconUrl]="{url: '/public/map/' + hit.type + '.svg', anchor: makePoint(16, 16)}"
-              (markerClick)="showInfoWindow(hit)"
+              [options]="markerOptions({
+                lat: hit.latitude,
+                lng: hit.longitude,
+              }, hit.type)"
+              (mapClick)="showInfoWindow(hit)"
             ></map-marker>
           </ng-container>
-        </map-marker-cluster>
+        </map-marker-clusterer>
         <ng-container *ngIf="selectedMapResource">
           <map-info-window
-            [isOpen]="isInfoWindowOpen"
-            [latitude]="selectedMapHit.latitude"
-            [longitude]="selectedMapHit.longitude"
-            (infoWindowClose)="closeInfoWindow()"
+            [options]="{
+              position: {
+                lat: selectedMapHit.latitude,
+                lng: selectedMapHit.longitude,
+              },
+            }"
+            (close)="closeInfoWindow()"
           >
             <a
               class="title mat-h2"
@@ -404,7 +393,7 @@
             >
           </map-info-window>
         </ng-container>
-      </map-view>
+      </google-map>
 
       <div *ngIf="highlightedStudy" id="studies-highlight">
         <mat-card>

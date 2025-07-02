@@ -8,12 +8,14 @@ import {
   Component,
   effect,
   HostBinding,
+  inject,
   OnInit,
   signal,
   ViewChild,
   WritableSignal,
 } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {GoogleMap, GoogleMapsModule} from '@angular/google-maps';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -37,9 +39,9 @@ import {SearchResultComponent} from '@app/search-result/search-result.component'
 import {SearchSortComponent} from '@app/search-sort/search-sort.component';
 import {SearchTopicsComponent} from '@app/search-topics/search-topics.component';
 import {paramMapsAreEqual} from '@app/shared/utilities/map-equals';
+import {GOOGLE_MAPS_MAP_IDS} from '@app/tokens';
 import {TutorialVideoComponent} from '@app/tutorial-video/tutorial-video.component';
 import {TypeIconComponent} from '@app/type-icon/type-icon.component';
-import {Algorithm, DefaultRenderer, Renderer, SuperClusterViewportAlgorithm} from '@googlemaps/markerclusterer';
 import {AccordionItem} from '@models/accordion-item';
 import {Category} from '@models/category';
 import {AgeRange, HitType, Language} from '@models/hit_type';
@@ -50,9 +52,6 @@ import {Direction} from '@models/scroll';
 import {SortMethod, sortMethods} from '@models/sort_method';
 import {Study} from '@models/study';
 import {User} from '@models/user';
-import {NgMapsCoreModule, NgMapsViewComponent} from '@ng-maps/core';
-import {NgMapsGoogleModule} from '@ng-maps/google';
-import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -64,6 +63,14 @@ import {WindowService} from '@services/window/window.service';
 import createClone from 'rfdc';
 import {firstValueFrom, fromEvent} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
+
+export const markerIconUrls = {
+  location: 'public/map/location.svg',
+  event: 'public/map/event.svg',
+  'location-no-address': 'public/map/location-no-address.svg',
+  'event-no-address': 'public/map/event-no-address.svg',
+  user: 'public/map/your-location.svg',
+};
 
 class MapControlDiv extends HTMLDivElement {
   index?: number;
@@ -110,9 +117,7 @@ enum LocationMode {
     MatSelectModule,
     MatTabsModule,
     MatTooltipModule,
-    NgMapsCoreModule,
-    NgMapsGoogleModule,
-    NgMapsMarkerClustererModule,
+    GoogleMapsModule,
     ReactiveFormsModule,
     RouterModule,
     SearchBoxComponent,
@@ -135,6 +140,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
   shouldShowMap: WritableSignal<boolean> = signal(false);
   loading: WritableSignal<boolean> = signal(true);
   queryParamMap: WritableSignal<ParamMap> = signal(convertToParamMap({}));
+  googleMapsMapIds = inject(GOOGLE_MAPS_MAP_IDS);
+  mapOptions: WritableSignal<google.maps.MapOptions> = signal(undefined);
 
   prevQueryParamMap: ParamMap = convertToParamMap({});
   prevQuery: Query = null;
@@ -171,7 +178,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   sortMethods: Record<string, SortMethod>;
   selectedSort: SortMethod;
   paginatorElement: MatPaginator;
-  mapTemplateElement: NgMapsViewComponent<any>;
+  mapTemplateElement: GoogleMap;
   currentUser: User;
   highlightedStudy: Study;
   resourceGatherers: AccordionItem[] = [
@@ -232,10 +239,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
       url: 'https://www.nationalautismcenter.org/resources/for-families/',
     },
   ];
-  mapBounds: google.maps.LatLngBoundsLiteral;
+  mapBounds: google.maps.LatLngBounds;
   scrollDirection: Direction;
-  clusterAlgorithm: Algorithm = new SuperClusterViewportAlgorithm({maxZoom: 8});
-  clusterRenderer: Renderer = new DefaultRenderer();
   readonly panelOpenState = signal(false);
   skipUpdate = false;
 
@@ -324,6 +329,11 @@ export class SearchComponent implements AfterViewInit, OnInit {
     // Watch for changes to the map library loading status.
     effect(() => {
       this.googleMapsLibrary.core();
+      this.mapOptions.set({
+        mapId: this.googleMapsMapIds.searchPage,
+        center: this.loc || this.defaultLoc,
+        zoom: this.mapZoomLevel || this.defaultZoom,
+      });
       this.updateShouldShowMap();
     });
 
@@ -395,7 +405,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   @ViewChild('mapTemplate')
-  set mapTemplate(value: NgMapsViewComponent<google.maps.Map>) {
+  set mapTemplate(value: GoogleMap) {
     this.mapTemplateElement = value;
   }
 
@@ -421,10 +431,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   get isDistanceSort(): boolean {
     return this.selectedSort && this.selectedSort.name === 'Distance';
-  }
-
-  get isInfoWindowOpen(): boolean {
-    return this.selectedMapResource != null;
   }
 
   get isLastPage(): boolean {
@@ -514,18 +520,24 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.loc = loc;
     this.locationMode = mode;
 
-    this.query.update(
-      q =>
-        new Query({
-          ...q,
-          sort: {
-            ...q.sort,
-            latitude: this.loc.lat,
-            longitude: this.loc.lng,
-          },
-          geo_box: this.geoBox(),
-        }),
-    );
+    this.query.update(q => {
+      const defaultSort = {
+        field: 'geo_point',
+        latitude: null,
+        longitude: null,
+        order: 'asc',
+        unit: 'mi',
+      };
+      return new Query({
+        ...(q || {}),
+        sort: {
+          ...(q?.sort || defaultSort),
+          latitude: this.loc.lat,
+          longitude: this.loc.lng,
+        },
+        geo_box: this.geoBox(),
+      });
+    });
     this.mapQuery.set(this.query());
   }
 
@@ -754,12 +766,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
     return zipCode && zipCode !== '' && /^\d{5}$/.test(zipCode);
   }
 
-  showInfoWindow(hit: Hit) {
-    this.api.getResource(hit.id).subscribe(r => {
-      this.selectedMapResource = r;
-      this.selectedMapHit = hit;
-      this.googleAnalyticsService?.mapEvent(hit.id.toString());
-    });
+  async showInfoWindow(hit: Hit) {
+    this.selectedMapResource = await firstValueFrom(this.api.getResource(hit.id));
+    this.selectedMapHit = hit;
+    this.googleAnalyticsService?.mapEvent(hit.id.toString());
   }
 
   closeInfoWindow() {
@@ -780,8 +790,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
     return ((x - Math.floor(x)) / 100) * m;
   }
 
-  updateZoom(zoomLevel: number) {
-    this.mapZoomLevel = zoomLevel;
+  updateZoom(zoom: number) {
+    this.mapZoomLevel = zoom;
     this.mapQuery.set(this.query());
   }
 
@@ -790,8 +800,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.selectType(resourceType.name);
   }
 
-  updateResultsList($event: google.maps.LatLngBoundsLiteral) {
-    this.mapBounds = $event;
+  updateResultsList(bounds: google.maps.LatLngBounds) {
+    this.mapBounds = bounds;
   }
 
   geoBox(): GeoBox | undefined {
@@ -942,18 +952,20 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
     controlDiv.index = 1;
     m.controls[this.mapsCoreLibrary.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+  }
 
-    m.addListener('dragend', () => {
-      const latLngBounds = new this.mapsCoreLibrary.LatLngBounds(this.mapBounds);
-      this.setLocation(LocationMode.map, {
-        lat: latLngBounds.getCenter().lat(),
-        lng: latLngBounds.getCenter().lng(),
-      });
+  handleMapDragEnd() {
+    if (!(this.mapBounds && this.mapsCoreLibrary)) return;
 
-      if (this.isDistanceSort) {
-        this.updateDistanceSort();
-      }
+    const latLngBounds = new this.mapsCoreLibrary.LatLngBounds(this.mapBounds);
+    this.setLocation(LocationMode.map, {
+      lat: latLngBounds.getCenter().lat(),
+      lng: latLngBounds.getCenter().lng(),
     });
+
+    if (this.isDistanceSort) {
+      this.updateDistanceSort();
+    }
   }
 
   updateDistanceSort() {
@@ -1057,8 +1069,15 @@ export class SearchComponent implements AfterViewInit, OnInit {
     return !prevMap || paramMapsAreEqual(prevMap, newMap);
   }
 
+  /**
+   * Returns true if the previous query and the new query are different, or if either is not initialized.
+   */
   queryHasChanged(prevQuery: Query, newQuery: Query): boolean {
-    return !prevQuery || !prevQuery.equals(newQuery);
+    if (!prevQuery || !newQuery) return true; // Query is not initialized yet.
+
+    const prevQ = new Query(prevQuery);
+    const newQ = new Query(newQuery);
+    return !prevQ.equals(newQ);
   }
 
   async loadRelatedStudies() {
@@ -1082,13 +1101,35 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  makePoint(x: number, y: number): google.maps.Point | undefined {
-    return !this.mapsCoreLibrary ? undefined : new this.mapsCoreLibrary.Point(x, y);
-  }
-
   updateQueryParams(newParams: Params) {
     this.queryParamMap.set(convertToParamMap(newParams));
     this.query.set(this.queryParamsToQuery(this.queryParamMap()));
     this.updateUrl();
+  }
+
+  markerOptions(loc: google.maps.LatLngLiteral, markerType: string): google.maps.marker.AdvancedMarkerElementOptions {
+    const pinGlyph = new google.maps.marker.PinElement({
+      glyph: markerIconUrls[markerType],
+    });
+
+    return {
+      position: {lat: loc.lat, lng: loc.lng},
+      content: pinGlyph.element,
+    };
+  }
+
+  mapCircleOptions(hit: Hit): google.maps.CircleOptions {
+    return {
+      center: {
+        lat: hit.latitude + this.mapJitter(hit.id, true),
+        lng: hit.longitude + this.mapJitter(hit.id, false),
+      },
+      radius: this.circleRadius,
+      fillColor: hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200',
+      fillOpacity: 0.1,
+      clickable: true,
+      visible: this.selectedMapHit?.id === hit.id,
+      zIndex: -1,
+    };
   }
 }

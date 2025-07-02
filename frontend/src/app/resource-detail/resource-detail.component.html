@@ -120,7 +120,8 @@
     </div>
     <div id="resource-meta" fxFlex.gt-md="40%" fxLayout="column" fxLayoutGap="20px">
       <div *ngIf="resource && resource.hasCoords()" id="resource-map">
-        <map-view
+        <google-map
+          [options]="mapOptions()"
           [latitude]="resource.latitude"
           [longitude]="resource.longitude"
           [streetViewControl]="false"
@@ -175,7 +176,7 @@
               </ng-container>
             </map-info-window>
           </map-marker>
-        </map-view>
+        </google-map>
       </div>
       <div id="resource-categories">
         <app-filter-chips

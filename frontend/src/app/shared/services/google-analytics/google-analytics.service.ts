@@ -1,5 +1,6 @@
 /// <reference types="@types/google.analytics" />
-import {effect, Injectable} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {effect, Inject, Injectable, NgZone, PLATFORM_ID} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {ApiError} from '@app/api-error';
 import {Query} from '@app/shared/models/query';
@@ -17,14 +18,18 @@ export class GoogleAnalyticsService {
     private router: Router,
     private appEnvironmentService: AppEnvironmentService,
     private authenticationStateService: AuthenticationStateService,
+    private ngZone: NgZone,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     effect(() => {
-      if (!this.appEnvironmentService.props()) return;
+      if (!this.appEnvironmentService.props() || !isPlatformBrowser(this.platformId)) return;
 
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
-          gtag('config', appEnvironmentService.googleAnalyticsTagId, {
-            page_path: event.urlAfterRedirects,
+          this.ngZone.runOutsideAngular(() => {
+            gtag('config', appEnvironmentService.googleAnalyticsTagId, {
+              page_path: event.urlAfterRedirects,
+            });
           });
         }
       });
@@ -37,9 +42,12 @@ export class GoogleAnalyticsService {
   }
 
   private event(action: string, category: string, label: string) {
-    gtag('event', action, {
-      event_category: category,
-      event_label: label,
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.ngZone.runOutsideAngular(() => {
+      gtag('event', action, {
+        event_category: category,
+        event_label: label,
+      });
     });
   }
 
@@ -106,6 +114,9 @@ export class GoogleAnalyticsService {
   }
 
   public set_user(user_id) {
-    gtag('set', {user_id: user_id}); // Set the user ID using signed-in user_id.
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.ngZone.runOutsideAngular(() => {
+      gtag('set', {user_id: user_id}); // Set the user ID using signed-in user_id.
+    });
   }
 }

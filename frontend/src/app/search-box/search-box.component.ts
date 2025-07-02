@@ -1,5 +1,14 @@
 import {AsyncPipe, CommonModule} from '@angular/common';
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, Output, signal, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {
   MatAutocomplete,
@@ -41,8 +50,8 @@ import {debounce, map, Observable, startWith, timer} from 'rxjs';
 export class SearchBoxComponent implements OnInit, AfterViewInit {
   @Input() variant: 'dark-bg' | 'light-bg' = 'light-bg';
   @Input() words: string;
-  @Output() categorySelected = signal<Category>(null);
-  @Output() searchUpdated = signal<Params>(null);
+  @Output() categorySelected = new EventEmitter<Category>();
+  @Output() searchUpdated = new EventEmitter<Params>();
   autocompletePanelElement: MatAutocomplete;
   autocompletePanelTriggerElement: MatAutocompleteTrigger;
   filteredOptions: Observable<Category[]>;
@@ -130,35 +139,13 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
           queryParams: newParams,
         })
         .finally(() => {
-          this.searchUpdated.set(newParams);
+          this.searchUpdated.emit(newParams);
           this.changeDetectorRef.detectChanges();
         });
     } else {
-      this.searchUpdated.set(newParams);
+      this.searchUpdated.emit(newParams);
       return this.router.navigateByUrl('/search');
     }
-  }
-
-  /**
-   * Returns a string of the given category's ancestors' names in the format:
-   * "Grandparent Category Name > Parent Category Name > Category Name"
-   */
-  indentedString(option: Category) {
-    let parent = option.parent;
-    const parents = [];
-
-    while (parent) {
-      // Add ancestor to beginning of the parents array.
-      parents.unshift(parent);
-
-      // Go up to the next ancestor
-      parent = parent.parent;
-    }
-
-    return parents
-      .map(p => p.name)
-      .concat([option.name])
-      .join(' > ');
   }
 
   selectCategory($event: MatAutocompleteSelectedEvent) {
@@ -167,7 +154,7 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
     this.skipUpdate = true;
 
     // Emit the selected category.
-    this.categorySelected.set($event.option.value as Category);
+    this.categorySelected.emit($event.option.value as Category);
   }
 
   showVideo() {

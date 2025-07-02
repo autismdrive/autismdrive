@@ -8,6 +8,7 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {GoogleMapsModule} from '@angular/google-maps';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {
   BrowserModule,
@@ -24,7 +25,10 @@ import {
   withRouterConfig,
 } from '@angular/router';
 import {YouTubePlayerModule} from '@angular/youtube-player';
-import {googleMapsApiConfigFactory} from '@app/shared/services/google-maps-library/google-maps-api-config';
+import {
+  googleMapsApiConfigFactory,
+  googleMapsMapIdsFactory,
+} from '@app/shared/services/google-maps-library/google-maps-api-config';
 import {CardWrapperComponent} from '@forms/card-wrapper/card-wrapper.component';
 import {CategoriesSelectTreeComponent} from '@forms/categories-select-tree/categories-select-tree.component';
 import {GroupValidationWrapperComponent} from '@forms/group-validation-wrapper/group-validation-wrapper.component';
@@ -45,9 +49,6 @@ import {
   UrlValidator,
   UrlValidatorMessage,
 } from '@forms/validators/formly.validator';
-import {NgMapsCoreModule} from '@ng-maps/core';
-import {GOOGLE_MAPS_API_CONFIG, GoogleMapsAPIWrapper, NgMapsGoogleModule} from '@ng-maps/google';
-import {NgMapsMarkerClustererModule} from '@ng-maps/marker-clusterer';
 import {FlexLayoutModule} from '@ngbracket/ngx-layout';
 import {FormlyModule, provideFormlyCore} from '@ngx-formly/core';
 import {FormlyMaterialModule, withFormlyMaterial} from '@ngx-formly/material';
@@ -68,7 +69,7 @@ import {PdfJsViewerModule} from 'ng2-pdfjs-viewer';
 import {DeviceDetectorService} from 'ngx-device-detector';
 import {MarkdownModule} from 'ngx-markdown';
 import {appInitializer} from '../app-initializer';
-import {LOCAL_STORAGE} from './tokens';
+import {GOOGLE_MAPS_API_CONFIG, GOOGLE_MAPS_MAP_IDS, LOCAL_STORAGE} from './tokens';
 
 export const customFormlyConfig = {
   extras: {
@@ -153,6 +154,10 @@ export const appConfig = {
       useFactory: googleMapsApiConfigFactory,
     },
     {
+      provide: GOOGLE_MAPS_MAP_IDS,
+      useFactory: googleMapsMapIdsFactory,
+    },
+    {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: {appearance: 'outline'},
     },
@@ -172,10 +177,8 @@ export const appConfig = {
       FormlyMaterialModule,
       FormlyModule.forRoot(customFormlyConfig),
       FormsModule,
+      GoogleMapsModule,
       MarkdownModule.forRoot(),
-      NgMapsCoreModule,
-      NgMapsGoogleModule,
-      NgMapsMarkerClustererModule,
       PdfJsViewerModule,
       ReactiveFormsModule,
       TruncateModule,
@@ -189,7 +192,6 @@ export const appConfig = {
     DeviceDetectorService,
     GoogleAnalyticsService,
     GoogleMapsLibraryService,
-    GoogleMapsAPIWrapper,
     IntervalService,
     SearchService,
   ],

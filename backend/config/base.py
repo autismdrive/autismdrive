@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 
 from pydantic import Field, BaseModel
 from pydantic_settings import BaseSettings
@@ -13,6 +13,9 @@ class ElasticsearchSettings(BaseModel):
     use_ssl: bool = False
     verify_certs: bool = False
 
+class GoogleMapsMapIds(BaseModel):
+    resource_details_page: str = ""
+    search_page: str = ""
 
 class Settings(BaseSettings):
     NAME: str = "STAR DRIVE Database"
@@ -53,6 +56,7 @@ class Settings(BaseSettings):
 
     GOOGLE_MAPS_API_KEY: str = "__GOOGLE_MAPS_API_KEY__"
     GOOGLE_ANALYTICS_TAG_ID: str = "__GOOGLE_ANALYTICS_TAG_ID__"
+    GOOGLE_MAPS_MAP_IDS: GoogleMapsMapIds = Field(default_factory=GoogleMapsMapIds)
 
     ADMIN_EMAIL: str = "admin@tester.com"
     PRINCIPAL_INVESTIGATOR_EMAIL: str = "pi@tester.com"  # Receives some high level alerts per agreement with InfoSec.

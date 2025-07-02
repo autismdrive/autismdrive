@@ -5,7 +5,6 @@ const tsconfigJSON = createRequire(import.meta.url)('./tsconfig.json');
 
 const esModules = [
   '@angular',
-  '@ng-maps',
   '@ngbracket',
   '@ngx-formly',
   '@testing-library',
