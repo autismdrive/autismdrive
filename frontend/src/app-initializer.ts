@@ -3,6 +3,8 @@
  */
 import {HttpBackend, HttpEvent, HttpEventType, HttpRequest} from '@angular/common/http';
 import {inject} from '@angular/core';
+import {AppEnvironment} from '@models/environment';
+import {GoogleMapsApiConfig, GoogleMapsLibrary} from '@models/google-maps-api-config';
 import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {StorageService} from '@services/storage/storage.service';
 import {catchError, map} from 'rxjs';
@@ -20,7 +22,7 @@ export const appInitializer = () => {
   return httpBackend.handle(new HttpRequest('GET', CONFIG_URL, {responseType: 'json'})).pipe(
     map((r: HttpEvent<any>) => {
       if (r.type === HttpEventType.Response) {
-        const appEnvironment = r.body;
+        const appEnvironment: AppEnvironment = r.body;
         console.log('appInitializer > config endpoint response:', {appEnvironment});
         storageService.set('appEnvironment', JSON.stringify(appEnvironment));
         appEnvironmentService.fromProperties(appEnvironment);
@@ -28,8 +30,14 @@ export const appInitializer = () => {
           'googleMapsApiConfig',
           JSON.stringify({
             apiKey: appEnvironment.googleMapsApiKey,
-            libraries: ['maps', 'marker', 'places', 'geocoding'],
-          }),
+            libraries: [
+              GoogleMapsLibrary.CoreLibrary,
+              GoogleMapsLibrary.MapsLibrary,
+              GoogleMapsLibrary.MarkerLibrary,
+              GoogleMapsLibrary.PlacesLibrary,
+              GoogleMapsLibrary.GeocodingLibrary,
+            ],
+          } as GoogleMapsApiConfig),
         );
         storageService.set('googleMapsMapIds', JSON.stringify(appEnvironment.googleMapsMapIds));
       }

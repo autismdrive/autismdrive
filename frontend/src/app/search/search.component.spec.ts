@@ -6,8 +6,9 @@ import {ActivatedRoute, RouterModule} from '@angular/router';
 import {mockResource} from '@app/shared/fixtures/mock-resource';
 import {mockStudy} from '@app/shared/fixtures/mock-study';
 import {mockUser} from '@app/shared/fixtures/mock-user';
-import {LOCAL_STORAGE} from '@app/tokens';
+import {GOOGLE_MAPS_MAP_IDS, LOCAL_STORAGE} from '@app/tokens';
 import {faker} from '@faker-js/faker';
+import {mockGoogleMapsMapIdsFactory} from '@fixtures/mock-google-maps-config';
 import {GeoLocation} from '@models/geolocation';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
@@ -28,6 +29,7 @@ describe('SearchComponent', () => {
     id: 0,
     no_address: true,
   });
+  const googleMapsMapIds = mockGoogleMapsMapIdsFactory();
 
   beforeEach(() => {
     return MockBuilder(SearchComponent)
@@ -46,6 +48,7 @@ describe('SearchComponent', () => {
       .mock(GoogleMapsLibraryService, {core: signal(undefined)})
       .mock(SearchService, {})
       .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
+      .provide({provide: GOOGLE_MAPS_MAP_IDS, useValue: googleMapsMapIds})
       .provide({
         provide: ActivatedRoute,
         useValue: {

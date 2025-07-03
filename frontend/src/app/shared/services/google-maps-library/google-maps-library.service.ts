@@ -2,7 +2,7 @@
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
 import {afterNextRender, effect, Inject, Injectable, NgZone, PLATFORM_ID, signal, WritableSignal} from '@angular/core';
 import {AppEnvironmentService} from '@app/shared/services/app-environment/app-environment.service';
-import {GoogleMapsApiConfig, GoogleMapsMapIds} from '@models/google-maps-api-config';
+import {GoogleMapsApiConfig, GoogleMapsLibrary, GoogleMapsMapIds} from '@models/google-maps-api-config';
 
 declare let google;
 
@@ -88,11 +88,11 @@ export class GoogleMapsLibraryService {
     await this.ngZone.runOutsideAngular(async () => {
       console.log('Loading Google Maps libraries...');
 
-      const core = await google.maps.importLibrary('core');
+      const core = await google.maps.importLibrary(GoogleMapsLibrary.CoreLibrary);
       this.core.set(core as google.maps.CoreLibrary);
       console.log('google.maps.CoreLibrary loaded');
 
-      const marker = await google.maps.importLibrary('marker');
+      const marker = await google.maps.importLibrary(GoogleMapsLibrary.MarkerLibrary);
       this.marker.set(marker as google.maps.MarkerLibrary);
       console.log('google.maps.MarkerLibrary loaded');
     });
