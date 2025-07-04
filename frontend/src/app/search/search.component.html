@@ -348,26 +348,32 @@
         <map-marker-clusterer>
           <map-advanced-marker *ngIf="loc" [options]="markerOptions(loc, 'user')"></map-advanced-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <map-circle
-              [options]="mapCircleOptions(hit)"
-              (circleClick)="showInfoWindow(hit)"
-            >
-            </map-circle>
+            <map-circle [options]="mapCircleOptions(hit)" (circleClick)="showInfoWindow(hit)"> </map-circle>
             <map-advanced-marker
-              [options]="markerOptions({
-                lat: hit.latitude + mapJitter(hit.id, true),
-                lng: hit.longitude + mapJitter(hit.id, false),
-              }, hit.type + '-no-address')"
+              [options]="
+                markerOptions(
+                  {
+                    lat: hit.latitude + mapJitter(hit.id, true),
+                    lng: hit.longitude + mapJitter(hit.id, false),
+                  },
+                  hit.type + '-no-address'
+                )
+              "
               (mapClick)="showInfoWindow(hit)"
             >
             </map-advanced-marker>
           </ng-container>
           <ng-container *ngFor="let hit of hitsWithAddress">
             <map-marker
-              [options]="markerOptions({
-                lat: hit.latitude,
-                lng: hit.longitude,
-              }, hit.type)"
+              [options]="
+                markerOptions(
+                  {
+                    lat: hit.latitude,
+                    lng: hit.longitude,
+                  },
+                  hit.type
+                )
+              "
               (mapClick)="showInfoWindow(hit)"
             ></map-marker>
           </ng-container>

@@ -10,6 +10,8 @@ export function jwtInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): 
   // add authorization header with jwt token if available
   const token = authStateService.authToken;
 
+  console.log('jwtInterceptor > token:', token);
+
   if (isS3.test(req.url)) {
     // NOOP - don't add authorization headers when making s3 reqs, it confuses AWS.
   } else if (token) {

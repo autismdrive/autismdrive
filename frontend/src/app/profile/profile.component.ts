@@ -1,12 +1,12 @@
 import {CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, OnInit, signal, WritableSignal} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatLineModule} from '@angular/material/core';
 import {MatListModule} from '@angular/material/list';
 import {MatTabsModule} from '@angular/material/tabs';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, RouterModule} from '@angular/router';
 import {FavoriteResourcesComponent} from '@app/favorite-resources/favorite-resources.component';
 import {FavoriteTopicsComponent} from '@app/favorite-topics/favorite-topics.component';
 import {LoadingComponent} from '@app/loading/loading.component';
@@ -23,6 +23,7 @@ import {FlexModule} from '@ngbracket/ngx-layout';
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
+import {firstValueFrom} from 'rxjs';
 
 export const profileFormFields = [
   {
@@ -125,16 +126,19 @@ enum ProfileState {
     ParticipantProfileComponent,
     ProfileMetaComponent,
     ReactiveFormsModule,
+    RouterModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit {
+  loading: WritableSignal<boolean> = signal(true);
+  profileState: WritableSignal<ProfileState> = signal(undefined);
+  userRelationship: WritableSignal<ParticipantRelationship> = signal(undefined);
+
   user: User;
   userMeta: UserMeta;
   possibleStates = ProfileState;
-  forceMetaFormState = false;
   relationships = ParticipantRelationship;
-  loading = true;
   studyInquiries: StudyUser[];
   currentStudies: Study[];
   self: Participant;
@@ -146,74 +150,96 @@ export class ProfileComponent implements OnInit {
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = profileFormFields;
 
+  userRelationshipMessages = Object.fromEntries([
+    [
+      this.relationships.SELF_PROFESSIONAL,
+      `You indicated that you are a professional working in Autism research and treatment. Once your profile is complete we will be able to notify you about important updates.`,
+    ],
+    [
+      this.relationships.SELF_INTERESTED,
+      `Once your profile is complete we will be able to notify you about important updates.`,
+    ],
+    [
+      this.relationships.SELF_PARTICIPANT,
+      `Once your profile is complete, you'll be able to enroll in any relevant currently-running studies.`,
+    ],
+    [
+      this.relationships.SELF_GUARDIAN,
+      `Once your complete your profile and the profiles of your dependents, you'll be able to enroll them in any relevant currently-running studies.`,
+    ],
+  ]);
+
   constructor(
-    private authenticationService: AuthenticationService,
+    public authenticationService: AuthenticationService,
     private api: ApiService,
-    private router: Router,
     private route: ActivatedRoute,
   ) {
     this.route.queryParams.subscribe(params => {
       if (params.hasOwnProperty('meta')) {
-        this.forceMetaFormState = true;
+        this.profileState.set(ProfileState.NEEDS_META);
       }
     });
 
-    effect(() => {
+    effect(async () => {
       this.user = this.authenticationService.currentUser();
 
       if (!this.user) {
         this.user = null;
-        this.loading = false;
+        this.loading.set(false);
         return;
       }
 
       this.self = this.user.getSelf();
       this.dependents = this.user.getDependents();
 
-      this.api.getUserMeta(this.user.id).subscribe(
-        meta => {
-          this.userMeta = meta;
-          this.loading = false;
-        },
-        error1 => {
-          console.error(error1);
-          this.loading = false;
-        },
-      );
-      this.refreshParticipants();
-      this.api.getUserStudyInquiries(this.user.id).subscribe(x => (this.studyInquiries = x));
-      this.api.getStudies().subscribe(all => {
-        this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
-      });
+      this.userMeta = await firstValueFrom(this.api.getUserMeta(this.user.id));
+      this.loading.set(false);
+
+      await this.refreshParticipants();
+      this.studyInquiries = await firstValueFrom(this.api.getUserStudyInquiries(this.user.id));
+      const all = await firstValueFrom(this.api.getStudies());
+      this.currentStudies = all.filter(s => s.status === 'currently_enrolling');
       this.favoriteResources = this.user.user_favorites
         .filter(f => f.type === 'resource')
         .map(f => f.resource)
         .sort(a => a.id);
+
+      this.profileState.set(this.getProfileState());
+    });
+
+    effect(() => {
+      const state = this.profileState();
+      console.log('Profile state changed:', state);
+      if (state === ProfileState.HAS_PARTICIPANT) {
+        // user has a participant profile.
+        this.userRelationship.set(this.user.getSelf().relationship);
+      } else {
+        // user does not have a participant profile.
+        this.userRelationship.set(undefined);
+      }
     });
   }
 
   ngOnInit() {}
 
-  refreshParticipants() {
+  async refreshParticipants() {
     if (this.user) {
-      this.api.getUser(this.user.id).subscribe(u => {
-        const newU = new User(u);
-        this.self = newU.getSelf();
-        this.dependents = newU.getDependents();
-        if (newU.getSelf()) {
-          this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id).subscribe(f => {
-            this.selfPercentComplete = f.percentComplete();
-          });
-        }
-      });
+      const u = await firstValueFrom(this.api.getUser(this.user.id));
+      const newU = new User(u);
+      this.self = newU.getSelf();
+      this.dependents = newU.getDependents();
+      if (newU.getSelf()) {
+        const f = await firstValueFrom(this.api.getFlow(newU.getSelf().getFlowName(), newU.getSelf().id));
+        this.selfPercentComplete = f.percentComplete();
+      }
     }
   }
 
-  getState() {
+  getProfileState() {
     if (!this.user) {
       // can happen if user logs out from this page.
       return ProfileState.NEEDS_USER;
-    } else if (this.userMeta === undefined || this.forceMetaFormState) {
+    } else if (this.userMeta === undefined) {
       return ProfileState.NEEDS_META;
     } else if (this.user.getSelf() === undefined) {
       return ProfileState.NEEDS_PARTICIPANT;
@@ -222,18 +248,12 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  enrollDependent($event) {
-    $event.preventDefault();
-    this.router.navigate(['terms', ParticipantRelationship.DEPENDENT]);
-  }
-
-  createMeta() {
+  async createMeta() {
     if (this.form.valid) {
       this.model.id = this.user.id;
-      this.api.addUserMeta(this.model).subscribe(usermeta => {
-        this.userMeta = usermeta;
-        this.forceMetaFormState = false;
-      });
+      this.userMeta = await firstValueFrom(this.api.addUserMeta(this.model));
     }
   }
+
+  protected readonly ParticipantRelationship = ParticipantRelationship;
 }

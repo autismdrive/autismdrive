@@ -8,6 +8,7 @@ export class StorageService {
   private readonly storage = inject<Storage>(LOCAL_STORAGE);
 
   get(key: string) {
+    console.log('StorageService > get > key:', key, 'value:', this.storage.getItem(key));
     return this.storage.getItem(key);
   }
 

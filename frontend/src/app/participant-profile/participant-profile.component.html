@@ -3,9 +3,9 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        [ngSrc]="'/public/avatars/' + participant.avatar_icon || '001' + '.svg'"
+        [src]="`/public/avatars/${participant?.avatar_icon || '001'}.svg`"
         alt="{{ participant.name }}"
-        [ngStyle]="{'background-color': participant.avatar_color || '#CCC'}"
+        [ngStyle]="{'background-color': participant?.avatar_color || '#CCC'}"
         (click)="chooseAvatar(participant)"
         id="avatar_{{ participant.id }}"
         [width]="100"

@@ -1,3 +1,5 @@
+import {faker} from '@faker-js/faker';
+import {mockGoogleMapsMapIdsFactory} from '@fixtures/mock-google-maps-config';
 import {AppEnvironment} from '@models/environment';
 
 export const mockAppEnvironment: AppEnvironment = {
@@ -6,6 +8,7 @@ export const mockAppEnvironment: AppEnvironment = {
   testing: false,
   mirroring: false,
   production: false,
-  googleAnalyticsTagId: 'some_string',
-  googleMapsApiKey: 'some_string',
+  googleAnalyticsTagId: faker.string.uuid(),
+  googleMapsApiKey: faker.string.uuid(),
+  googleMapsMapIds: mockGoogleMapsMapIdsFactory(),
 };
