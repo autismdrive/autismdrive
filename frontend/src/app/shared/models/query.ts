@@ -14,9 +14,14 @@ export interface GeoBox {
 
 export type QueryProps = Partial<Query>;
 
+export interface QueryTotal {
+  relation: 'eq' | 'gte';
+  value: number;
+}
+
 export class Query {
   words = '';
-  total?: number;
+  total?: QueryTotal;
   start = 0;
   size = 20;
   types: string[] = [];

@@ -15,7 +15,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {GoogleMap, GoogleMapsModule} from '@angular/google-maps';
+import {GoogleMap, GoogleMapsModule, MapAdvancedMarker, MapInfoWindow} from '@angular/google-maps';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -134,9 +134,11 @@ enum LocationMode {
 export class SearchComponent implements AfterViewInit, OnInit {
   @HostBinding('@pageAnimations')
   public animatePage = true;
+  @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow;
 
   query: WritableSignal<Query> = signal<Query>(null);
   mapQuery: WritableSignal<Query> = signal<Query>(null);
+
   shouldShowMap: WritableSignal<boolean> = signal(false);
   loading: WritableSignal<boolean> = signal(true);
   queryParamMap: WritableSignal<ParamMap> = signal(convertToParamMap({}));
@@ -144,6 +146,8 @@ export class SearchComponent implements AfterViewInit, OnInit {
   mapOptions: WritableSignal<google.maps.MapOptions> = signal(undefined);
 
   prevQueryParamMap: ParamMap = convertToParamMap({});
+  queryWithResults: Query = null;
+  mapQueryWithResults: Query;
   prevQuery: Query = null;
   prevMapQuery: Query = null;
   resourceTypes = HitType.all_resources();
@@ -239,6 +243,9 @@ export class SearchComponent implements AfterViewInit, OnInit {
       url: 'https://www.nationalautismcenter.org/resources/for-families/',
     },
   ];
+  mapsCoreLibrary: google.maps.CoreLibrary;
+  mapsMarkerLibrary: google.maps.MarkerLibrary;
+
   mapBounds: google.maps.LatLngBounds;
   scrollDirection: Direction;
   readonly panelOpenState = signal(false);
@@ -273,7 +280,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
       this.query.set(newQuery);
     });
 
-    // Watch for changes to the map query signal, and update the URL when it changes.
+    // Watch for changes to the shouldShowMap signal, and update the mapQuery when it changes.
     effect(() => {
       // Only update the map query if we should be showing the map.
       if (!this.shouldShowMap()) return;
@@ -300,25 +307,24 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
       this.loading.set(true);
       const geoBox = this.geoBox();
-      const mapQueryWithResults = await firstValueFrom(this.searchService.mapSearch(newMapQuery, geoBox));
-      this.mapQuery.set(mapQueryWithResults);
+      this.mapQueryWithResults = await firstValueFrom(this.searchService.mapSearch(newMapQuery, geoBox));
 
-      if (mapQueryWithResults?.hits?.length > 0) {
-        this.hitsWithAddress = mapQueryWithResults.hits.filter(h => !h.no_address);
-        this.hitsWithNoAddress = mapQueryWithResults.hits.filter(h => h.no_address);
+      if (this.mapQueryWithResults?.hits?.length > 0) {
+        this.hitsWithAddress = this.mapQueryWithResults.hits.filter(h => !h.no_address);
+        this.hitsWithNoAddress = this.mapQueryWithResults.hits.filter(h => h.no_address);
       } else {
         this.hitsWithAddress = [];
         this.hitsWithNoAddress = [];
       }
 
-      // Update the UI with the new results.
-      this.loading.set(false);
-      this.changeDetectorRef.detectChanges();
-
       // If we are restricting to mapped results, update the main query to match the map results.
       if (this.restrictToMappedResults) {
         this.query.update(q => new Query({...q, geo_box: geoBox}));
       }
+
+      // Update the UI with the new results.
+      this.loading.set(false);
+      this.changeDetectorRef.detectChanges();
     });
 
     // Watch for changes to the current user.
@@ -328,7 +334,13 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
     // Watch for changes to the map library loading status.
     effect(() => {
-      this.googleMapsLibrary.core();
+      const core = this.googleMapsLibrary.core();
+      const marker = this.googleMapsLibrary.marker();
+
+      if (!core || !marker) return;
+
+      this.mapsCoreLibrary = core;
+      this.mapsMarkerLibrary = marker;
       this.mapOptions.set({
         mapId: this.googleMapsMapIds.searchPage,
         center: this.loc || this.defaultLoc,
@@ -346,20 +358,19 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
       // Get the results from the API.
       this.loading.set(true);
-      const queryWithResults = await firstValueFrom(this.searchService.search(newQuery));
-      this.query.set(queryWithResults);
+      this.queryWithResults = await firstValueFrom(this.searchService.search(newQuery));
 
       // Log the search event to Google Analytics.
-      this.googleAnalyticsService?.searchEvent(queryWithResults);
+      this.googleAnalyticsService?.searchEvent(this.queryWithResults);
 
       // Update the query parameters in the URL.
       this.updateUrl();
 
       // Update the UI with the new results.
-      this.loading.set(false);
-      this.changeDetectorRef.detectChanges();
       await this.loadRelatedStudies();
       this.updatePaginator();
+      this.loading.set(false);
+      this.changeDetectorRef.detectChanges();
     });
 
     this.sortMethods = createClone()(sortMethods);
@@ -389,16 +400,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
     );
   }
 
-  get mapsCoreLibrary() {
-    const core = this.googleMapsLibrary.core();
-
-    if (!core) {
-      console.error('Google Maps Library is not loaded yet.');
-    }
-
-    return core;
-  }
-
   @ViewChild('paginator')
   set paginator(value: MatPaginator) {
     this.paginatorElement = value;
@@ -426,7 +427,11 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   get hits(): Hit[] {
-    return this.query()?.hits;
+    return this.queryWithResults?.hits;
+  }
+
+  get hitsLoaded(): boolean {
+    return this.queryWithResults?.total?.value !== undefined;
   }
 
   get isDistanceSort(): boolean {
@@ -442,11 +447,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   get numResultsFrom(): number {
-    if (this.paginatorElement) {
-      return this.paginatorElement.pageIndex * this.pageSize + 1;
-    } else {
-      return 0;
-    }
+    return this.paginatorElement ? this.paginatorElement.pageIndex * this.pageSize + 1 : 0;
   }
 
   get numResultsTo(): number {
@@ -458,7 +459,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   get numTotalResults() {
-    return this.query()?.total || 0;
+    return this.queryWithResults?.total?.value || 0;
   }
 
   get shouldHideVideo() {
@@ -467,7 +468,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   updateShouldShowMap() {
     const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
-    this.shouldShowMap.set(this.mapsCoreLibrary && (isLocation || this.isDistanceSort));
+    this.shouldShowMap.set(!!this.mapsCoreLibrary && !!this.mapsMarkerLibrary && (isLocation || this.isDistanceSort));
   }
 
   get selectedCategory() {
@@ -475,7 +476,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   get resourceTypesFiltered(): HitType[] {
-    return this.resourceTypes.filter(t => t.name !== HitType.ALL_RESOURCES.name);
+    return [HitType.LOCATION, HitType.RESOURCE, HitType.EVENT];
   }
 
   ngOnInit() {
@@ -664,10 +665,12 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   selectType(keepType: string = null) {
-    const all = HitType.ALL_RESOURCES.name;
-    const forceReSort = !(keepType && keepType !== all);
+    const allName = HitType.ALL_RESOURCES.name;
+    const forceReSort = !(keepType && keepType !== allName);
 
-    this.selectedTypeTabIndex = this.resourceTypes.findIndex(t => (forceReSort ? t.name === keepType : t.name === all));
+    this.selectedTypeTabIndex = this.resourceTypes.findIndex(t =>
+      forceReSort ? t.name === keepType : t.name === allName,
+    );
     this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
     const sortMethod = this.getSortMethod(forceReSort, keepType);
     this.selectedSort = this.sortMethods[sortMethod];
@@ -676,7 +679,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
       q =>
         new Query({
           ...q,
-          types: forceReSort || keepType === all ? this.resourceTypesFilteredNames() : [keepType],
+          types: forceReSort || keepType === allName ? this.resourceTypesFilteredNames() : [keepType],
           date: !forceReSort || keepType === HitType.EVENT.name ? new Date() : undefined,
           sort: this.selectedSort.sortQuery,
         }),
@@ -766,15 +769,17 @@ export class SearchComponent implements AfterViewInit, OnInit {
     return zipCode && zipCode !== '' && /^\d{5}$/.test(zipCode);
   }
 
-  async showInfoWindow(hit: Hit) {
+  async showInfoWindow(marker: MapAdvancedMarker, hit: Hit) {
     this.selectedMapResource = await firstValueFrom(this.api.getResource(hit.id));
     this.selectedMapHit = hit;
     this.googleAnalyticsService?.mapEvent(hit.id.toString());
+    this.infoWindow.open(marker);
   }
 
   closeInfoWindow() {
     this.selectedMapResource = null;
     this.selectedMapHit = null;
+    this.infoWindow.close();
   }
 
   /**
@@ -890,9 +895,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
     }
   }
 
-  goSelectedMapResource(selectedMapResource: Resource) {
-    this.googleAnalyticsService?.mapResourceEvent(selectedMapResource.id.toString());
-    this.router.navigate(['/' + selectedMapResource.type.toLowerCase() + '/' + selectedMapResource.id]);
+  goSelectedMapResource(selectedMapResource?: Resource) {
+    if (!selectedMapResource) return;
+    this.googleAnalyticsService?.mapResourceEvent(selectedMapResource?.id?.toString());
+    this.router.navigate(['/' + selectedMapResource?.type?.toLowerCase() + '/' + selectedMapResource?.id]);
   }
 
   hideVideo(shouldHide = true) {
@@ -1108,13 +1114,14 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   markerOptions(loc: google.maps.LatLngLiteral, markerType: string): google.maps.marker.AdvancedMarkerElementOptions {
-    const pinGlyph = new google.maps.marker.PinElement({
-      glyph: markerIconUrls[markerType],
-    });
+    const svgPath = markerIconUrls[markerType];
+    const imgEl = document.createElement('img');
+    imgEl.src = location.origin + '/' + svgPath;
 
     return {
-      position: {lat: loc.lat, lng: loc.lng},
-      content: pinGlyph.element,
+      position: loc,
+      title: markerType,
+      content: imgEl,
     };
   }
 
@@ -1128,8 +1135,12 @@ export class SearchComponent implements AfterViewInit, OnInit {
       fillColor: hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200',
       fillOpacity: 0.1,
       clickable: true,
-      visible: this.selectedMapHit?.id === hit.id,
+      // visible: this.selectedMapHit?.id === hit.id,
       zIndex: -1,
     };
+  }
+
+  numResultsText(hits?: Hit[]) {
+    return !!hits ? `${hits.length} mapped results` : 'Loading results...';
   }
 }

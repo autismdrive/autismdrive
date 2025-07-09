@@ -45,6 +45,7 @@
     "@angular/ssr": ">=19.2.0",
     "@angular/youtube-player": ">=19.2.0",
     "@auth0/angular-jwt": "5.2.0",
+    "@googlemaps/markerclusterer": "2.6.2",
     "@material/material-color-utilities": "0.3.0",
     "@ngbracket/ngx-layout": "19.0.0",
     "@ngx-formly/core": "7.0.0-next.0",

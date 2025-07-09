@@ -12,7 +12,6 @@ import {catchError, map} from 'rxjs';
 export const CONFIG_URL = 'http://localhost:5000/api/config';
 
 export const appInitializer = () => {
-  console.log('appInitializer');
   const httpBackend = inject(HttpBackend);
   const storageService = inject(StorageService);
   const appEnvironmentService = inject(AppEnvironmentService);
@@ -23,7 +22,6 @@ export const appInitializer = () => {
     map((r: HttpEvent<any>) => {
       if (r.type === HttpEventType.Response) {
         const appEnvironment: AppEnvironment = r.body;
-        console.log('appInitializer > config endpoint response:', {appEnvironment});
         storageService.set('appEnvironment', JSON.stringify(appEnvironment));
         appEnvironmentService.fromProperties(appEnvironment);
         storageService.set(

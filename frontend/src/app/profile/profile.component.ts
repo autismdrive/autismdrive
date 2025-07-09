@@ -208,9 +208,7 @@ export class ProfileComponent implements OnInit {
     });
 
     effect(() => {
-      const state = this.profileState();
-      console.log('Profile state changed:', state);
-      if (state === ProfileState.HAS_PARTICIPANT) {
+      if (this.profileState() === ProfileState.HAS_PARTICIPANT) {
         // user has a participant profile.
         this.userRelationship.set(this.user.getSelf().relationship);
       } else {

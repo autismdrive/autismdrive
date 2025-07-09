@@ -101,7 +101,7 @@
               </div>
 
               <div id="language-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
-                <div *ngIf="query">
+                <div *ngIf="query()">
                   <app-search-filter
                     [aggregations]="query().language_counts"
                     [label_title]="'Filter by Language'"
@@ -175,7 +175,7 @@
   <mat-button-toggle-group [value]="expandResults" (change)="expandResults = !expandResults">
     <mat-button-toggle [value]="true">
       <ng-container *ngIf="!restrictToMappedResults">{{ numTotalResults }} results</ng-container>
-      <ng-container *ngIf="restrictToMappedResults">{{ hits.length }} mapped results</ng-container>
+      <ng-container *ngIf="restrictToMappedResults">{{ numResultsText(hits) }}</ng-container>
     </mat-button-toggle>
     <mat-button-toggle [value]="false" [disabled]="!shouldShowMap()">Map</mat-button-toggle>
   </mat-button-toggle-group>
@@ -194,7 +194,7 @@
   >
     <ng-container *ngIf="!loading(); else loadingMessage">
       <div
-        *ngIf="query()?.hits.length === 0"
+        *ngIf="hitsLoaded && queryWithResults?.total?.value === 0"
         fxLayout="column"
         fxLayoutGap="20px"
         fxLayoutAlign="center center"
@@ -208,7 +208,7 @@
         <h3>Check back soon for more updates!</h3>
       </div>
       <div
-        *ngIf="query()?.total !== 0"
+        *ngIf="queryWithResults?.total?.value !== 0"
         id="sort-and-status"
         fxLayout="row"
         fxLayout.lt-md="column"
@@ -216,17 +216,16 @@
       >
         <div
           class="search-result-status"
-          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults"
+          [attr.data-num-results]="restrictToMappedResults ? hits?.length || 0 : numTotalResults"
           fxShow
           fxHide.lt-md
           *ngIf="paginatorElement"
         >
-          <h4 *ngIf="!restrictToMappedResults">
-            Showing {{ numResultsFrom }}-{{ numResultsTo }} of {{ numTotalResults }} results
+          <h4 *ngIf="hitsLoaded">
+            Showing {{ numResultsFrom }}-{{ numResultsTo }} of {{ numTotalResults }}
+            {{ restrictToMappedResults ? 'mapped' : '' }} results
           </h4>
-          <h4 *ngIf="restrictToMappedResults">
-            Showing {{ numResultsFrom }}-{{ numResultsTo }} of {{ numTotalResults }} mapped results.
-          </h4>
+          <h4 *ngIf="!hitsLoaded">Loading results...</h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
           <app-search-sort
@@ -255,7 +254,7 @@
           [typeLabels]="typeLabels"
         ></app-search-filters-breadcrumbs>
       </div>
-      <div *ngIf="hits.length > 0">
+      <div *ngIf="hitsLoaded">
         <app-search-result
           *ngFor="let hit of hits; let i = index"
           [hit]="hit"
@@ -273,7 +272,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
-      [ngClass]="{ghost: !query || numTotalResults === 0}"
+      [ngClass]="{ghost: !queryWithResults || numTotalResults === 0}"
     >
     </mat-paginator>
   </div>
@@ -282,6 +281,7 @@
     fxFlex="40%"
     fxFlex.lt-md="100%"
     fxShow
+    *ngIf="shouldShowMap()"
     [fxShow.lt-md]="!expandResults"
     [ngClass.gt-sm]="mapDockClass(scrollSpy, searchHeader, searchFooter)"
     [ngStyle.gt-sm]="{width: '40%'}"
@@ -334,9 +334,8 @@
         </div>
       </div>
     </mat-expansion-panel>
-    <div id="map" fxLayout="column" fxLayoutGap="2em">
+    <div id="map" fxLayout="column" fxLayoutGap="2em" *ngIf="shouldShowMap()">
       <google-map
-        *ngIf="shouldShowMap()"
         #mapTemplate
         [options]="mapOptions()"
         (mapInitialized)="mapLoad($event)"
@@ -345,11 +344,12 @@
         (zoomChanged)="updateZoom(mapTemplate.getZoom())"
         (boundsChanged)="updateResultsList(mapTemplate.getBounds())"
       >
-        <map-marker-clusterer>
+        <map-marker-clusterer *ngIf="hitsLoaded">
           <map-advanced-marker *ngIf="loc" [options]="markerOptions(loc, 'user')"></map-advanced-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <map-circle [options]="mapCircleOptions(hit)" (circleClick)="showInfoWindow(hit)"> </map-circle>
+            <map-circle *ngIf="selectedMapHit?.id === hit.id" [options]="mapCircleOptions(hit)"> </map-circle>
             <map-advanced-marker
+              #marker="mapAdvancedMarker"
               [options]="
                 markerOptions(
                   {
@@ -359,12 +359,13 @@
                   hit.type + '-no-address'
                 )
               "
-              (mapClick)="showInfoWindow(hit)"
+              (mapClick)="showInfoWindow(marker, hit)"
             >
             </map-advanced-marker>
           </ng-container>
           <ng-container *ngFor="let hit of hitsWithAddress">
-            <map-marker
+            <map-advanced-marker
+              #marker="mapAdvancedMarker"
               [options]="
                 markerOptions(
                   {
@@ -374,31 +375,30 @@
                   hit.type
                 )
               "
-              (mapClick)="showInfoWindow(hit)"
-            ></map-marker>
+              (mapClick)="showInfoWindow(marker, hit)"
+            ></map-advanced-marker>
           </ng-container>
         </map-marker-clusterer>
-        <ng-container *ngIf="selectedMapResource">
-          <map-info-window
-            [options]="{
-              position: {
-                lat: selectedMapHit.latitude,
-                lng: selectedMapHit.longitude,
-              },
-            }"
-            (close)="closeInfoWindow()"
+        <map-info-window
+          *ngIf="!loading() && hitsLoaded"
+          [options]="{
+            position: {
+              lat: selectedMapHit?.latitude || loc.lat,
+              lng: selectedMapHit?.longitude || loc.lng,
+            },
+          }"
+          (closeclick)="closeInfoWindow()"
+        >
+          <a
+            class="title mat-h2"
+            href="/#/{{ selectedMapResource?.type?.toLowerCase() }}/{{ selectedMapResource?.id }}"
+            (click)="goSelectedMapResource(selectedMapResource)"
+            >{{ selectedMapResource?.title }}</a
           >
-            <a
-              class="title mat-h2"
-              href="/#/{{ selectedMapResource.type.toLowerCase() }}/{{ selectedMapResource.id }}"
-              (click)="goSelectedMapResource(selectedMapResource)"
-              >{{ selectedMapResource.title }}</a
-            >
-            <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
-              {{ selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type }} Details</a
-            >
-          </map-info-window>
-        </ng-container>
+          <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
+            {{ selectedMapHit?.no_address ? 'In-home therapy' : selectedMapHit?.type }} Details</a
+          >
+        </map-info-window>
       </google-map>
 
       <div *ngIf="highlightedStudy" id="studies-highlight">
@@ -446,11 +446,16 @@
     </div>
   </div>
   <app-border-box-tile
-    *ngIf="!loading()"
+    *ngIf="!loading() && hitsLoaded"
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"
     (click)="submitResource()"
+  ></app-border-box-tile>
+  <app-border-box-tile
+    *ngIf="!loading() && !hitsLoaded"
+    [title]="'Loading...'"
+    [subtitle]="`Retrieving ${query()?.types}`"
   ></app-border-box-tile>
 </div>
 <span id="scroll-spy" #scrollSpy></span>

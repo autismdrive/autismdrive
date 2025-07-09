@@ -49,7 +49,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('AppComponent > ngOnInit');
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const title = this.route.snapshot.firstChild.data['title'];

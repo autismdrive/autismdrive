@@ -1,4 +1,4 @@
-import {CommonModule} from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {HitType} from '@models/hit_type';
@@ -8,21 +8,21 @@ import {HitType} from '@models/hit_type';
   selector: 'app-type-icon',
   templateUrl: './type-icon.component.html',
   styleUrls: ['./type-icon.component.scss'],
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, NgOptimizedImage],
 })
 export class TypeIconComponent {
   @Input() iconType: string;
-  @Input() size: number;
-
-  iconTypes: string[] = HitType.all().map(ht => ht.name);
+  @Input() size?: number = 1.5;
 
   constructor() {}
 
-  is(actual: string, expected: string) {
-    return actual === expected;
-  }
+  get hitType(): HitType {
+    const key = this.iconType.toUpperCase();
 
-  get pxSize() {
-    return `${this.size * 16}px`;
+    if (!(key in HitType)) {
+      console.error(`Invalid icon type: ${this.iconType}`);
+    }
+
+    return HitType[key as keyof typeof HitType] as HitType;
   }
 }

@@ -44,11 +44,6 @@ export class AuthenticationService {
         }
       }
     });
-
-    effect(() => {
-      const user = this.currentUser();
-      console.log('AuthenticationService > currentUser changed:', user);
-    });
   }
 
   isLoggedIn(): boolean {

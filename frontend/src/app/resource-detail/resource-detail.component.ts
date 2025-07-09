@@ -1,7 +1,7 @@
 /// <reference types="@types/google.maps" />
 import {CommonModule, DatePipe, formatDate, NgOptimizedImage, UpperCasePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject, signal, WritableSignal} from '@angular/core';
-import {GoogleMapsModule} from '@angular/google-maps';
+import {ChangeDetectionStrategy, Component, effect, inject, signal, ViewChild, WritableSignal} from '@angular/core';
+import {GoogleMapsModule, MapAdvancedMarker, MapInfoWindow} from '@angular/google-maps';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatLine} from '@angular/material/core';
@@ -58,6 +58,7 @@ import {MarkdownComponent} from 'ngx-markdown';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceDetailComponent {
+  @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow;
   resource: Resource;
   mapLoc: google.maps.LatLngLiteral;
   currentUser: User;
@@ -85,12 +86,14 @@ export class ResourceDetailComponent {
     });
     effect(() => {
       const core = this.googleMapsLibrary.core();
+      const isLoading = this.loading();
 
-      if (core && this.resource?.hasCoords()) {
+      if (!isLoading && core && this.resource?.hasCoords()) {
         this.googleMapsCoreLibrary = core;
         this.mapOptions.set({
           mapId: this.googleMapsMapIds.resourceDetailsPage,
           center: {lat: this.resource?.latitude, lng: this.resource?.longitude},
+          zoom: 10,
         });
       }
     });
@@ -242,11 +245,40 @@ export class ResourceDetailComponent {
     ];
   }
 
-  toggleInfoWindow($event) {
+  toggleInfoWindow(marker: MapAdvancedMarker) {
     this.showInfoWindow = !this.showInfoWindow;
+    this.infoWindow.open(marker);
   }
 
   makePoint(x: number, y: number): google.maps.Point {
     return new this.googleMapsCoreLibrary.Point(x, y);
+  }
+
+  mapCircleOptions(resource: Resource): google.maps.CircleOptions {
+    return {
+      center: {
+        lat: resource.latitude,
+        lng: resource.longitude,
+      },
+      radius: 32186.9, // Approximately 20 miles in meters
+      fillColor: resource.type.toLowerCase() === 'location' ? '#6c799c' : '#E57200',
+      fillOpacity: 0.1,
+      clickable: true,
+    };
+  }
+
+  markerOptions(resource: Resource): google.maps.marker.AdvancedMarkerElementOptions {
+    const imgEl = document.createElement('img');
+    imgEl.src =
+      location.origin + '/public/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg';
+
+    return {
+      position: {
+        lat: resource.latitude,
+        lng: resource.longitude,
+      },
+      title: resource.title,
+      content: imgEl,
+    };
   }
 }

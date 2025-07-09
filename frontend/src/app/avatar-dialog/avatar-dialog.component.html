@@ -25,7 +25,7 @@
           (click)="setImage(avatarImage)"
           [ngClass]="{'avatar-image-active': isSelectedImage(avatarImage)}"
         >
-          <img alt="#{{ i }}" [src]="`/public/avatars/${avatarImage}.svg`" width="96" height="96" />
+          <img alt="#{{ i }}" [ngSrc]="`/public/avatars/${avatarImage}.svg`" [width]="96" [height]="96" />
         </button>
       </div>
       <button mat-button class="scroll-right" (click)="scroll($event, 'avatar-images', 'right')">
