@@ -1,7 +1,7 @@
 from typing import Literal
 from icecream import ic, IceCreamDebugger
 
-ic.configureOutput(includeContext=True, contextAbsPath=True)
+ic.configureOutput(prefix="LogService", includeContext=True, contextAbsPath=True)
 
 
 class LogService:
